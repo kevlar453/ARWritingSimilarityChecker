@@ -1,0 +1,550 @@
+{
+  "version": "Hybrid v1 (Frozen Baseline)",
+  "benchmark_run_id": 21,
+  "engine": "hybrid",
+  "created_at": "2026-10-03 12:51:54",
+  "total_cases": 50,
+  "metrics": {
+    "binary_precision": 1.0,
+    "binary_recall": 1.0,
+    "binary_f1": 1.0,
+    "macro_f1": 1.0
+  },
+  "thresholds": {
+    "exact_match_similarity": 70.0,
+    "exact_review_similarity": 10.0,
+    "tfidf_match_similarity": 85.0,
+    "tfidf_review_similarity": 10.0,
+    "exact_match_longest": 50,
+    "exact_review_longest": 10,
+    "significant_min_idf": 0.5,
+    "shingle_size": 5
+  },
+  "evidence_patterns": {
+    "VERBATIM_MATCH": "match",
+    "COPY_EDIT": "review",
+    "COMMON_ACADEMIC_PHRASE": "review",
+    "SEMANTIC_PARAPHRASE": "review",
+    "PARTIAL_DIRECT_MATCH": "review",
+    "NO_EVIDENCE": "no_match"
+  },
+  "confusion_matrix": {
+    "match": {
+      "match": 10,
+      "review": 0,
+      "no_match": 0
+    },
+    "review": {
+      "match": 0,
+      "review": 30,
+      "no_match": 0
+    },
+    "no_match": {
+      "match": 0,
+      "review": 0,
+      "no_match": 10
+    }
+  },
+  "cases": [
+    {
+      "case_name": "TC-001",
+      "category": "identical",
+      "expected_result": "match",
+      "predicted_result": "match",
+      "similarity": 100.0,
+      "matched_words": 32,
+      "longest_match_words": 31,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-002",
+      "category": "identical",
+      "expected_result": "match",
+      "predicted_result": "match",
+      "similarity": 100.0,
+      "matched_words": 32,
+      "longest_match_words": 31,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-003",
+      "category": "identical",
+      "expected_result": "match",
+      "predicted_result": "match",
+      "similarity": 100.0,
+      "matched_words": 32,
+      "longest_match_words": 31,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-004",
+      "category": "identical",
+      "expected_result": "match",
+      "predicted_result": "match",
+      "similarity": 100.0,
+      "matched_words": 32,
+      "longest_match_words": 31,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-005",
+      "category": "identical",
+      "expected_result": "match",
+      "predicted_result": "match",
+      "similarity": 100.0,
+      "matched_words": 32,
+      "longest_match_words": 31,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-006",
+      "category": "identical",
+      "expected_result": "match",
+      "predicted_result": "match",
+      "similarity": 100.0,
+      "matched_words": 32,
+      "longest_match_words": 31,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-007",
+      "category": "identical",
+      "expected_result": "match",
+      "predicted_result": "match",
+      "similarity": 100.0,
+      "matched_words": 32,
+      "longest_match_words": 31,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-008",
+      "category": "identical",
+      "expected_result": "match",
+      "predicted_result": "match",
+      "similarity": 100.0,
+      "matched_words": 32,
+      "longest_match_words": 31,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-009",
+      "category": "identical",
+      "expected_result": "match",
+      "predicted_result": "match",
+      "similarity": 100.0,
+      "matched_words": 32,
+      "longest_match_words": 31,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-010",
+      "category": "identical",
+      "expected_result": "match",
+      "predicted_result": "match",
+      "similarity": 100.0,
+      "matched_words": 32,
+      "longest_match_words": 31,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-011",
+      "category": "copy_edit",
+      "expected_result": "review",
+      "predicted_result": "review",
+      "similarity": 81.25,
+      "matched_words": 26,
+      "longest_match_words": 26,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-012",
+      "category": "copy_edit",
+      "expected_result": "review",
+      "predicted_result": "review",
+      "similarity": 81.25,
+      "matched_words": 26,
+      "longest_match_words": 26,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-013",
+      "category": "copy_edit",
+      "expected_result": "review",
+      "predicted_result": "review",
+      "similarity": 81.25,
+      "matched_words": 26,
+      "longest_match_words": 26,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-014",
+      "category": "copy_edit",
+      "expected_result": "review",
+      "predicted_result": "review",
+      "similarity": 81.25,
+      "matched_words": 26,
+      "longest_match_words": 26,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-015",
+      "category": "copy_edit",
+      "expected_result": "review",
+      "predicted_result": "review",
+      "similarity": 81.25,
+      "matched_words": 26,
+      "longest_match_words": 26,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-016",
+      "category": "copy_edit",
+      "expected_result": "review",
+      "predicted_result": "review",
+      "similarity": 81.25,
+      "matched_words": 26,
+      "longest_match_words": 26,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-017",
+      "category": "copy_edit",
+      "expected_result": "review",
+      "predicted_result": "review",
+      "similarity": 81.25,
+      "matched_words": 26,
+      "longest_match_words": 26,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-018",
+      "category": "copy_edit",
+      "expected_result": "review",
+      "predicted_result": "review",
+      "similarity": 81.25,
+      "matched_words": 26,
+      "longest_match_words": 26,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-019",
+      "category": "copy_edit",
+      "expected_result": "review",
+      "predicted_result": "review",
+      "similarity": 81.25,
+      "matched_words": 26,
+      "longest_match_words": 26,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-020",
+      "category": "copy_edit",
+      "expected_result": "review",
+      "predicted_result": "review",
+      "similarity": 81.25,
+      "matched_words": 26,
+      "longest_match_words": 26,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-021",
+      "category": "paraphrase",
+      "expected_result": "review",
+      "predicted_result": "review",
+      "similarity": 41.34,
+      "matched_words": 0,
+      "longest_match_words": 0,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-022",
+      "category": "paraphrase",
+      "expected_result": "review",
+      "predicted_result": "review",
+      "similarity": 41.34,
+      "matched_words": 0,
+      "longest_match_words": 0,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-023",
+      "category": "paraphrase",
+      "expected_result": "review",
+      "predicted_result": "review",
+      "similarity": 41.34,
+      "matched_words": 0,
+      "longest_match_words": 0,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-024",
+      "category": "paraphrase",
+      "expected_result": "review",
+      "predicted_result": "review",
+      "similarity": 41.34,
+      "matched_words": 0,
+      "longest_match_words": 0,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-025",
+      "category": "paraphrase",
+      "expected_result": "review",
+      "predicted_result": "review",
+      "similarity": 41.34,
+      "matched_words": 0,
+      "longest_match_words": 0,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-026",
+      "category": "paraphrase",
+      "expected_result": "review",
+      "predicted_result": "review",
+      "similarity": 41.34,
+      "matched_words": 0,
+      "longest_match_words": 0,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-027",
+      "category": "paraphrase",
+      "expected_result": "review",
+      "predicted_result": "review",
+      "similarity": 41.34,
+      "matched_words": 0,
+      "longest_match_words": 0,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-028",
+      "category": "paraphrase",
+      "expected_result": "review",
+      "predicted_result": "review",
+      "similarity": 41.34,
+      "matched_words": 0,
+      "longest_match_words": 0,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-029",
+      "category": "paraphrase",
+      "expected_result": "review",
+      "predicted_result": "review",
+      "similarity": 41.34,
+      "matched_words": 0,
+      "longest_match_words": 0,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-030",
+      "category": "paraphrase",
+      "expected_result": "review",
+      "predicted_result": "review",
+      "similarity": 41.34,
+      "matched_words": 0,
+      "longest_match_words": 0,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-031",
+      "category": "common_phrase",
+      "expected_result": "review",
+      "predicted_result": "review",
+      "similarity": 52.38,
+      "matched_words": 11,
+      "longest_match_words": 6,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-032",
+      "category": "common_phrase",
+      "expected_result": "review",
+      "predicted_result": "review",
+      "similarity": 52.38,
+      "matched_words": 11,
+      "longest_match_words": 6,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-033",
+      "category": "common_phrase",
+      "expected_result": "review",
+      "predicted_result": "review",
+      "similarity": 52.38,
+      "matched_words": 11,
+      "longest_match_words": 6,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-034",
+      "category": "common_phrase",
+      "expected_result": "review",
+      "predicted_result": "review",
+      "similarity": 52.38,
+      "matched_words": 11,
+      "longest_match_words": 6,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-035",
+      "category": "common_phrase",
+      "expected_result": "review",
+      "predicted_result": "review",
+      "similarity": 52.38,
+      "matched_words": 11,
+      "longest_match_words": 6,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-036",
+      "category": "common_phrase",
+      "expected_result": "review",
+      "predicted_result": "review",
+      "similarity": 52.38,
+      "matched_words": 11,
+      "longest_match_words": 6,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-037",
+      "category": "common_phrase",
+      "expected_result": "review",
+      "predicted_result": "review",
+      "similarity": 52.38,
+      "matched_words": 11,
+      "longest_match_words": 6,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-038",
+      "category": "common_phrase",
+      "expected_result": "review",
+      "predicted_result": "review",
+      "similarity": 52.38,
+      "matched_words": 11,
+      "longest_match_words": 6,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-039",
+      "category": "common_phrase",
+      "expected_result": "review",
+      "predicted_result": "review",
+      "similarity": 52.38,
+      "matched_words": 11,
+      "longest_match_words": 6,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-040",
+      "category": "common_phrase",
+      "expected_result": "review",
+      "predicted_result": "review",
+      "similarity": 52.38,
+      "matched_words": 11,
+      "longest_match_words": 6,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-041",
+      "category": "unrelated",
+      "expected_result": "no_match",
+      "predicted_result": "no_match",
+      "similarity": 5.73,
+      "matched_words": 0,
+      "longest_match_words": 0,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-042",
+      "category": "unrelated",
+      "expected_result": "no_match",
+      "predicted_result": "no_match",
+      "similarity": 5.73,
+      "matched_words": 0,
+      "longest_match_words": 0,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-043",
+      "category": "unrelated",
+      "expected_result": "no_match",
+      "predicted_result": "no_match",
+      "similarity": 5.73,
+      "matched_words": 0,
+      "longest_match_words": 0,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-044",
+      "category": "unrelated",
+      "expected_result": "no_match",
+      "predicted_result": "no_match",
+      "similarity": 5.73,
+      "matched_words": 0,
+      "longest_match_words": 0,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-045",
+      "category": "unrelated",
+      "expected_result": "no_match",
+      "predicted_result": "no_match",
+      "similarity": 5.73,
+      "matched_words": 0,
+      "longest_match_words": 0,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-046",
+      "category": "unrelated",
+      "expected_result": "no_match",
+      "predicted_result": "no_match",
+      "similarity": 5.73,
+      "matched_words": 0,
+      "longest_match_words": 0,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-047",
+      "category": "unrelated",
+      "expected_result": "no_match",
+      "predicted_result": "no_match",
+      "similarity": 5.73,
+      "matched_words": 0,
+      "longest_match_words": 0,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-048",
+      "category": "unrelated",
+      "expected_result": "no_match",
+      "predicted_result": "no_match",
+      "similarity": 5.73,
+      "matched_words": 0,
+      "longest_match_words": 0,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-049",
+      "category": "unrelated",
+      "expected_result": "no_match",
+      "predicted_result": "no_match",
+      "similarity": 5.73,
+      "matched_words": 0,
+      "longest_match_words": 0,
+      "error_type": null
+    },
+    {
+      "case_name": "TC-050",
+      "category": "unrelated",
+      "expected_result": "no_match",
+      "predicted_result": "no_match",
+      "similarity": 5.73,
+      "matched_words": 0,
+      "longest_match_words": 0,
+      "error_type": null
+    }
+  ]
+}

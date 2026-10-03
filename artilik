@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PYTHON_BIN="$SCRIPT_DIR/.venv/bin/python"
+
+if [ ! -f "$PYTHON_BIN" ]; then
+    echo "[!] Virtual environment (.venv) tidak ditemukan."
+    exit 1
+fi
+
+case "$1" in
+    benchmark)
+        shift
+        exec "$PYTHON_BIN" -m benchmark.runner "$@"
+        ;;
+    worker)
+        shift
+        exec "$PYTHON_BIN" -m worker.worker "$@"
+        ;;
+    test)
+        shift
+        exec "$PYTHON_BIN" -m pytest -v tests/ "$@"
+        ;;
+    sanity)
+        shift
+        exec "$PYTHON_BIN" benchmark/sanity.py "$@"
+        ;;
+    diagnose)
+        shift
+        exec "$PYTHON_BIN" -m benchmark.diagnose "$@"
+        ;;
+    regression)
+        shift
+        exec "$PYTHON_BIN" tests/e2e_pipeline_test.py "$@"
+        ;;
+    readiness)
+        shift
+        exec "$PYTHON_BIN" tests/test_production_readiness.py "$@"
+        ;;
+    *)
+        echo "============================================="
+        echo "        AR Tilik CLI Management Tool         "
+        echo "============================================="
+        echo "Penggunaan praktis:"
+        echo "  ./artilik benchmark --engine [hybrid|tfidf|idf|exact]"
+        echo "  ./artilik regression [--cleanup]"
+        echo "  ./artilik readiness"
+        echo "  ./artilik test"
+        echo "  ./artilik diagnose --run <id> --case <TC-XXX> [--engine <hybrid|exact|tfidf>]"
+        echo "  ./artilik worker [--once]"
+        echo "  ./artilik sanity [run_id]"
+        echo ""
+        echo "Atau aktifkan virtualenv secara manual:"
+        echo "  source .venv/bin/activate"
+        echo "  python -m benchmark.runner --engine hybrid"
+        ;;
+esac
