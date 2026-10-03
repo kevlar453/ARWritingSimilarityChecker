@@ -36,6 +36,10 @@ case "$1" in
         shift
         exec "$PYTHON_BIN" tests/test_production_readiness.py "$@"
         ;;
+    metrics)
+        shift
+        exec "$PYTHON_BIN" -m worker.metrics "$@"
+        ;;
     *)
         echo "============================================="
         echo "        AR Tilik CLI Management Tool         "
@@ -44,6 +48,7 @@ case "$1" in
         echo "  ./artilik benchmark --engine [hybrid|tfidf|idf|exact]"
         echo "  ./artilik regression [--cleanup]"
         echo "  ./artilik readiness"
+        echo "  ./artilik metrics"
         echo "  ./artilik test"
         echo "  ./artilik diagnose --run <id> --case <TC-XXX> [--engine <hybrid|exact|tfidf>]"
         echo "  ./artilik worker [--once]"

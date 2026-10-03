@@ -1,4 +1,5 @@
 import json
+import time
 from worker.database import get_connection
 from worker.matcher import run_similarity_check
 from worker.tfidf import run_tfidf_similarity_check
@@ -6,6 +7,7 @@ from worker.hybrid import run_hybrid_similarity_check
 from worker.indexer import index_document
 
 def process_similarity_check(document_id: int, report_id: int, engine: str = "hybrid"):
+    t_start = time.perf_counter()
     connection = get_connection()
     try:
         # 1. Update status report menjadi processing
@@ -99,6 +101,9 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
             source_count = result["source_count"]
             match_count = result["match_count"]
 
+        duration = time.perf_counter() - t_start
+        result["execution_time_seconds"] = round(duration, 3)
+
         # 5. Simpan summary ke tabel reports
         cursor.execute("""
             UPDATE reports
@@ -191,6 +196,8 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
             
         connection.commit()
         cursor.close()
+        print(f"  [METRIC] Report #{report_id} Doc #{document_id} [{engine.upper()}] completed in {duration:.2f}s "
+              f"-> {predicted_decision.upper()} ({evidence_pattern}) | Exact: {exact_sim:.1f}% | Cosine: {cosine_sim:.1f}%")
         return result
     except Exception as e:
         connection.rollback()
