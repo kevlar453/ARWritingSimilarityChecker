@@ -129,11 +129,14 @@ def display_metrics():
             max_lat = max(latencies)
             sorted_lat = sorted(latencies)
             p95_lat = sorted_lat[int(len(sorted_lat) * 0.95)]
-            print(f"Sample Terukur       : {len(latencies)} laporan")
+            print(f"Status Sampel        : Initial observed latency baseline (n={len(latencies)})")
             print(f"Rata-rata Latensi    : {avg_lat:.3f} detik")
             print(f"Min Latensi          : {min_lat:.3f} detik")
             print(f"Max Latensi          : {max_lat:.3f} detik")
-            print(f"p95 Latensi          : {p95_lat:.3f} detik")
+            if len(latencies) >= 30:
+                print(f"p95 Latensi          : {p95_lat:.3f} detik")
+            else:
+                print(f"Catatan Statistik    : n={len(latencies)} belum memenuhi syarat inferensi p95 operasional (memerlukan n>=30).")
         else:
             print("Belum ada data latensi presisi (Metrik aktif mulai v1.0.0+).")
         print()

@@ -63,26 +63,31 @@ Match Count         : 31 pasase
 
 ## ⚖️ 4. Evaluasi Kualitatif Keadilan Akademik (Academic Fairness)
 
-### A. Perlindungan terhadap Tuduhan Plagiarisme Keliru (*Zero False Accusation*)
-Pada sistem pembanding konvensional yang hanya mengeluarkan satu angka persentase kemiripan (misal: "Kemiripan 19%"), seorang mahasiswa magister sering kali langsung dicurigai melakukan plagiarisme oleh komite etik atau aplikasi otomatis.
+### A. Temuan Konkret di Balik Angka (Concrete Evidence Analysis)
+Sistem mendeteksi pasase cocok terpanjang sepanjang 6 kata:
+> *"Berdasarkan hasil penelitian yang telah dilakukan,"*
 
-Pada **AR Tilik v1.0**, arsitektur **Dual-Lens** membedakan secara tegas:
+Frasa ini cocok pada beberapa dokumen rujukan di dalam korpus institusi. Temuan konkret ini menjadi ilustrasi nyata mengapa angka kemiripan sekuensial yang sangat kecil (Exact = 0,03%) tidak boleh diterjemahkan secara serampangan menjadi tuduhan plagiarisme. Frasa tersebut merupakan formula akademik baku (*methodological boilerplate*) yang wajar dan lazim digunakan dalam penulisan laporan penelitian.
+
+Oleh karena itu, penempatan keputusan pada status **`REVIEW`** di sini tepat diposisikan sebagai **permintaan peninjauan bukti tekstual**, bukan sebagai vonis pelanggaran integritas akademik.
+
+### B. Evaluasi Objektif Arsitektur Dual-Lens
+Pada pilot tesis nyata ini:
 1. **Lensa Sekuensial (Exact Matcher = 0.03%, Longest = 6 kata)**:
-   Membuktikan secara matematis bahwa penulis **TIDAK melakukan salin-tempel (*verbatim copy-paste*)** dari korpus dokumen yang ada. Naskah disusun dengan kalimat dan gaya tutur orisinal penulis sendiri.
+   Menunjukkan bahwa naskah tidak memuat pasase berurutan panjang dari korpus rujukan yang ada.
 2. **Lensa Leksikal (TF-IDF Cosine = 18.82%)**:
-   Menjelaskan bahwa kemiripan leksikal 18.82% timbul karena naskah menggunakan terminologi standar teologi katolik, ensiklik kepausan (*Sacramentum Caritatis*), metode fenomenologis kualitatif, dan konsep psikologi spiritual.
-3. **Pola Bukti `SEMANTIC_PARAPHRASE` & Keputusan `REVIEW`**:
-   Sistem secara objektif mengarahkan dosen pembimbing untuk meninjau secara kualitatif (*review*), **bukan menolak atau memvonis (*match/plagiat*)**.
+   Menjelaskan bahwa kemiripan leksikal muncul dari penggunaan terminologi spesifik teologi katolik, ensiklik *Sacramentum Caritatis*, dan metodologi fenomenologis-kualitatif.
+3. **Pernyataan Evaluasi Resmi**:
+   > *"Pada pilot tesis ini, AR Tilik mengklasifikasikan dokumen sebagai REVIEW dan memisahkan bukti exact sequential overlap yang sangat rendah (0,03%) dari kemiripan leksikal/topikal (18,82%), sehingga hasil dapat ditinjau berdasarkan jenis evidence, bukan similarity score tunggal."*
 
-### B. Kegunaan Fitur Modal `[View passage]`
-Bagi dosen pembimbing dan penguji, modal perbandingan pasase berdampingan memungkinkan verifikasi langsung:
-- Pasase yang terdeteksi cocok hanyalah frasa metodologi 5–6 kata (misalnya: *"dalam penelitian ini peneliti menggunakan"* atau *"analisis data dilakukan dengan"*).
-- Dosen dapat langsung memvalidasi keaslian naskah dalam hitungan detik tanpa keraguan.
+### C. Catatan Evaluasi Sumber untuk Backlog v1.1
+Daftar sumber teratas (Benchmark Source 01–05) seluruhnya memiliki `Exact = 0.0%` dan nilai kemiripan murni digerakkan oleh `Cosine = 11.5% – 18.8%`. 
+Kondisi ini mengidentifikasi kebutuhan penting untuk v1.1: **memisahkan *Direct Textual Overlap* dari *Lexical/Topical Similarity* pada pemeringkatan sumber**, agar peninjau tidak salah mengira sumber berperingkat teratas sebagai sumber penjiplakan harfiah jika nilai direct overlap-nya 0.0%.
 
 ---
 
 ## ✅ 5. Kesimpulan Evaluasi Pilot
 
-1. **Skalabilitas Dokumen Tebal**: Terbukti stabil memproses naskah tesis master tebal (174 halaman, 34.400 kata) dalam waktu **6,1 detik** tanpa lonjakan memori atau kendala batas timeout.
-2. **Validasi Model Dual-Lens**: Dekomposisi bukti bekerja presisi di lapangan nyata—mampu memisahkan kemiripan frasa istilah (*topical overlap*) dari tindakan penjiplakan harfiah (*verbatim copying*).
-3. **Kesiapan Rilis**: Hasil pilot dokumen nyata ini mengonfirmasi bahwa AR Tilik telah siap sepenuhnya untuk dirilis sebagai **v1.0.0 General Availability**.
+1. **Skalabilitas Dokumen Nyata**: Stabil memproses naskah tesis master tebal (174 halaman, 34.400 kata) dalam durasi worker **6,12 detik** tanpa kendala memori maupun timeout antrean.
+2. **Fungsi Dekomposisi Bukti**: Mampu memisahkan kemiripan terminologi bidang keilmuan (*topical lexical overlap*) dari kecocokan frasa sekuensial panjang (*verbatim matching*).
+3. **Kesiapan Operasional**: Membuktikan bahwa arsitektur Dual-Lens v1.0.0 siap beroperasi di lapangan nyata dengan landasan evaluasi bukti yang transparan.
