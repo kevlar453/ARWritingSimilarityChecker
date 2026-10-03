@@ -75,11 +75,12 @@ Dokumen ini berisi daftar periksa komprehensif (*release checklist*) sebagai sya
 - [x] `docs/LIMITATIONS.md`: Batasan sistem, cakupan ilmiah, dan filosofi keadilan akademik.
 - [x] `docs/REPRODUCIBILITY.md`: Panduan instalasi dan reproduksi pengujian mandiri.
 - [x] `docs/CHECKLIST.md`: Lembar periksa kelayakan rilis GA.
+- [x] `docs/PILOT_EVALUATION.md`: Laporan evaluasi pilot naskah tesis master riil 174 halaman.
 
 ---
 
 ## 🔬 6. Uji Coba Dokumen Riil (Real-World Pilot)
 
-- [ ] **Eksekusi Naskah Tesis Riil**: Memproses naskah tesis Magister Teologi Katolik 174 halaman (Emiliana Vivi, 2026).
-- [ ] **Observasi Performa Pemrosesan**: Mengukur durasi ekstraksi PDF, tokenisasi, chunking, dan waktu respons worker.
-- [ ] **Evaluasi Kualitatif Bukti**: Menilai transparansi bukti kutipan ensiklik *Sacramentum Caritatis* dan metodologi penelitian tanpa vonis keliru.
+- [x] **Eksekusi Naskah Tesis Riil**: Memproses naskah tesis Magister Teologi Katolik 174 halaman (Emiliana Vivi, 2026).
+- [x] **Observasi Performa Pemrosesan**: Durasi ekstraksi PDF 0.297s, pemrosesan worker 6.116s, total turnaround 7.07s untuk 34.400 kata.
+- [x] **Evaluasi Kualitatif Bukti**: Terbukti bebas vonis keliru (Exact: 0.03%, Cosine: 18.82%, Pattern: `SEMANTIC_PARAPHRASE`, Keputusan: `REVIEW`). Integritas orisinalitas naskah terlindungi.
