@@ -7,6 +7,10 @@ $routes->get('/', 'DashboardController::index');
 $routes->get('dashboard', 'DashboardController::index');
 $routes->get('report/(:num)', 'DashboardController::report/$1');
 $routes->get('dashboard/report/(:num)', 'DashboardController::report/$1');
+$routes->match(['get', 'head'], 'report/(:num)/export', 'DashboardController::exportPdf/$1');
+$routes->match(['get', 'head'], 'dashboard/report/(:num)/export', 'DashboardController::exportPdf/$1');
+$routes->get('report/(:num)/preview', 'DashboardController::previewPdf/$1');
+$routes->get('dashboard/report/(:num)/preview', 'DashboardController::previewPdf/$1');
 
 // API Routes
 $routes->group('api', function ($routes) {
