@@ -454,36 +454,80 @@ if ($dec === 'match') {
         </div>
     </div>
 
-    <!-- Sources Table -->
-    <h3 class="section-header">Dokumen Rujukan Teratas Terdeteksi</h3>
-    <table class="data-table">
+    <!-- Divergence Alert (if exact ~ 0 and cosine > 0) -->
+    <?php 
+        $has_pdf_div = ($exact_sim <= 0.05 && $cosine_sim > 0.0);
+        $direct_pdf_sources = array_filter($sources ?? [], fn($s) => ((float)($s['exact_similarity'] ?? $s['similarity'] ?? 0)) > 0 || ((int)($s['matched_words'] ?? 0)) > 0);
+        $lexical_pdf_sources = array_filter($sources ?? [], fn($s) => ((float)($s['cosine_similarity'] ?? 0)) > 0);
+    ?>
+    <?php if ($has_pdf_div): ?>
+        <div style="margin-bottom: 12px; padding: 8px 12px; background-color: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; font-size: 8pt; color: #92400e; page-break-inside: avoid;">
+            <strong>Divergensi Bukti Terdeteksi:</strong> Terdapat kemiripan kosakata/topikal (TF-IDF Cosine: <?= number_format($cosine_sim, 2) ?>%), namun <strong>tidak ditemukan pasase sekuensial yang beririsan langsung (Exact: <?= number_format($exact_sim, 2) ?>%)</strong>. Skor kosinus mencerminkan medan makna bersama, bukan penyalinan verbatim.
+        </div>
+    <?php endif; ?>
+
+    <!-- Table 1: Direct Textual Overlap -->
+    <h3 class="section-header">1. Dokumen Rujukan: Direct Textual Overlap (Lensa 1 - Exact Matcher)</h3>
+    <table class="data-table" style="margin-bottom: 14px;">
         <thead>
             <tr>
                 <th style="width: 35px; text-align: center;">Peringkat</th>
                 <th style="text-align: left;">Judul Dokumen Rujukan</th>
-                <th style="width: 75px; text-align: right;">Skor Gabungan</th>
-                <th style="width: 65px; text-align: right;">Exact</th>
-                <th style="width: 65px; text-align: right;">Kosinus</th>
+                <th style="width: 80px; text-align: right;">Exact Overlap</th>
+                <th style="width: 90px; text-align: right;">Kata Cocok</th>
             </tr>
         </thead>
         <tbody>
-            <?php if (!empty($sources)): ?>
-                <?php foreach (array_slice($sources, 0, 10) as $s): ?>
+            <?php if (!empty($direct_pdf_sources)): ?>
+                <?php foreach (array_slice($direct_pdf_sources, 0, 5) as $s): ?>
                     <tr>
                         <td style="text-align: center; font-weight: bold; width: 40px;">#<?= $s['source_rank'] ?? 1 ?></td>
                         <td>
                             <strong><?= esc($s['source_title'] ?? $s['title'] ?? ('Rujukan #' . $s['source_document_id'])) ?></strong>
-                            <div style="font-size: 8pt; color: #64748b;">ID #<?= $s['source_document_id'] ?> &bull; <?= ($s['source_type'] ?? '') === 'corpus' ? 'Korpus Institusi' : 'Naskah Terpublikasi' ?></div>
+                            <div style="font-size: 7.5pt; color: #64748b;">ID #<?= $s['source_document_id'] ?> &bull; <?= ($s['source_type'] ?? '') === 'corpus' ? 'Korpus Institusi' : 'Naskah Terpublikasi' ?></div>
                         </td>
-                        <td style="text-align: right; font-weight: bold; width: 75px; color: #1e3a8a;"><?= number_format($s['similarity'] ?? 0, 1) ?>%</td>
-                        <td style="text-align: right; width: 65px; color: #475569;"><?= number_format($s['exact_similarity'] ?? 0, 1) ?>%</td>
-                        <td style="text-align: right; width: 65px; color: #475569;"><?= number_format($s['cosine_similarity'] ?? 0, 1) ?>%</td>
+                        <td style="text-align: right; font-weight: bold; width: 80px; color: #1e3a8a;"><?= number_format($s['exact_similarity'] ?? $s['similarity'] ?? 0, 1) ?>%</td>
+                        <td style="text-align: right; width: 90px; color: #475569;"><?= number_format($s['matched_words'] ?? 0) ?> kata</td>
                     </tr>
                 <?php endforeach; ?>
             <?php else: ?>
                 <tr>
-                    <td colspan="5" style="text-align: center; color: #64748b; font-style: italic; padding: 16px;">
-                        Tidak ada dokumen rujukan yang menunjukkan kesamaan signifikan.
+                    <td colspan="4" style="text-align: center; color: #64748b; font-style: italic; padding: 10px;">
+                        Tidak ditemukan dokumen rujukan yang memiliki pasase sekuensial langsung (Exact = 0%).
+                    </td>
+                </tr>
+            <?php endif; ?>
+        </tbody>
+    </table>
+
+    <!-- Table 2: Lexical / Topic Similarity -->
+    <h3 class="section-header">2. Dokumen Rujukan: Lexical / Topic Similarity (Lensa 2 - TF-IDF Vectorizer)</h3>
+    <table class="data-table" style="margin-bottom: 14px;">
+        <thead>
+            <tr>
+                <th style="width: 35px; text-align: center;">Peringkat</th>
+                <th style="text-align: left;">Judul Dokumen Rujukan</th>
+                <th style="width: 80px; text-align: right;">Cosine Sim</th>
+                <th style="width: 90px; text-align: right;">Istilah Beririsan</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php if (!empty($lexical_pdf_sources)): ?>
+                <?php foreach (array_slice($lexical_pdf_sources, 0, 5) as $s): ?>
+                    <tr>
+                        <td style="text-align: center; font-weight: bold; width: 40px;">#<?= $s['source_rank'] ?? 1 ?></td>
+                        <td>
+                            <strong><?= esc($s['source_title'] ?? $s['title'] ?? ('Rujukan #' . $s['source_document_id'])) ?></strong>
+                            <div style="font-size: 7.5pt; color: #64748b;">ID #<?= $s['source_document_id'] ?> &bull; <?= ($s['source_type'] ?? '') === 'corpus' ? 'Korpus Institusi' : 'Naskah Terpublikasi' ?></div>
+                        </td>
+                        <td style="text-align: right; font-weight: bold; width: 80px; color: #0d9488;"><?= number_format($s['cosine_similarity'] ?? 0, 1) ?>%</td>
+                        <td style="text-align: right; width: 90px; color: #475569;"><?= number_format($s['matched_words'] ?? 0) ?> istilah</td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <tr>
+                    <td colspan="4" style="text-align: center; color: #64748b; font-style: italic; padding: 10px;">
+                        Tidak ada dokumen rujukan yang menunjukkan irisan kemiripan kosinus leksikal.
                     </td>
                 </tr>
             <?php endif; ?>

@@ -322,53 +322,149 @@
                 </div>
             </div>
 
-            <!-- Tier 4: SOURCE EVIDENCE & [View Passage] -->
-            <div class="p-6 bg-white space-y-4">
+            <!-- Tier 4: SOURCE EVIDENCE (Grouped by Evidence Type: Direct Overlap vs Lexical Similarity) -->
+            <?php
+                $exactSimVal = (float) ($report['exact_similarity'] ?? $report['overall_similarity'] ?? 0);
+                $cosineSimVal = (float) ($report['cosine_similarity'] ?? 0);
+                $hasDivergence = ($exactSimVal <= 0.05 && $cosineSimVal > 0.0);
+
+                $directOverlapSources = array_filter($sources ?? [], function($s) {
+                    $ex = (float) ($s['exact_similarity'] ?? $s['similarity'] ?? 0);
+                    $mw = (int) ($s['matched_words'] ?? 0);
+                    return $ex > 0.0 || $mw > 0;
+                });
+
+                $lexicalSources = array_filter($sources ?? [], function($s) {
+                    $cos = (float) ($s['cosine_similarity'] ?? 0);
+                    return $cos > 0.0;
+                });
+            ?>
+            <div class="p-6 bg-white space-y-6">
                 <div class="flex items-center justify-between border-b border-slate-100 pb-2">
                     <div class="flex items-center gap-2">
                         <span class="text-xs font-bold uppercase tracking-wider text-slate-900 font-mono-code">
-                            SOURCE EVIDENCE
+                            SOURCE EVIDENCE (DECOMPOSED)
                         </span>
-                        <span class="text-xs text-slate-400">(<?= count($sources) ?> sumber terdeteksi)</span>
+                        <span class="text-xs text-slate-400">(<?= count($sources) ?> sumber rujukan)</span>
                     </div>
                 </div>
 
-                <?php if (empty($sources)): ?>
-                    <p class="text-xs text-slate-400 py-4 text-center">Tidak ditemukan dokumen korpus rujukan yang beririsan.</p>
-                <?php else: ?>
-                    <div class="divide-y divide-slate-100 max-h-[480px] overflow-y-auto pr-1">
-                        <?php foreach ($sources as $idx => $src): ?>
-                            <div class="py-3.5 first:pt-0 last:pb-0 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                                <div class="space-y-1">
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-xs font-bold font-mono-code px-2 py-0.5 rounded bg-slate-100 text-slate-700">
-                                            #<?= $src['source_rank'] ?>
-                                        </span>
-                                        <h4 class="font-bold text-sm text-slate-900">
-                                            <?= esc($src['source_title']) ?>
-                                        </h4>
-                                        <span class="text-[11px] uppercase font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">
-                                            <?= esc($src['source_type'] ?? 'dokumen') ?>
-                                        </span>
-                                    </div>
-                                    <div class="text-xs text-slate-500 font-mono-code flex flex-wrap items-center gap-3">
-                                        <span><?= number_format($src['matched_words']) ?> matching words</span>
-                                        <span>•</span>
-                                        <span>Exact: <strong><?= number_format($src['exact_similarity'] ?? $src['similarity'], 1) ?>%</strong></span>
-                                        <span>•</span>
-                                        <span>Cosine: <strong><?= number_format($src['cosine_similarity'] ?? 0, 1) ?>%</strong></span>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <button onclick="openPassageModal(<?= $src['source_document_id'] ?>, '<?= esc($src['source_title']) ?>')" class="w-full sm:w-auto px-4 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-lg border border-indigo-200 transition shadow-2xs flex items-center justify-center gap-1.5">
-                                        <span>🔍</span> [View passage]
-                                    </button>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
+                <?php if ($hasDivergence): ?>
+                    <!-- Divergence State Callout -->
+                    <div class="p-4 rounded-xl bg-amber-50/90 border border-amber-200 text-amber-900 text-xs sm:text-sm space-y-1.5 shadow-2xs">
+                        <div class="flex items-center gap-2 font-bold text-amber-950">
+                            <span class="text-base">⚠️</span>
+                            <span>Divergensi Bukti Terdeteksi (Lexical Similarity Without Direct Textual Overlap)</span>
+                        </div>
+                        <p class="text-amber-800 leading-relaxed text-xs">
+                            Dokumen rujukan teratas menunjukkan kemiripan kosakata/topik (TF-IDF Cosine: <strong><?= number_format($cosineSimVal, 2) ?>%</strong>), namun <strong>tidak ditemukan pasase sekuensial yang beririsan langsung (Exact: <?= number_format($exactSimVal, 2) ?>%)</strong>. Skor kosinus mencerminkan irisan terminologi dan medan makna bersama, bukan bukti penjiplakan sekuensial langsung.
+                        </p>
                     </div>
                 <?php endif; ?>
+
+                <!-- Group 1: DIRECT TEXTUAL OVERLAP (Exact Sequential Matcher) -->
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between border-b border-indigo-100 pb-1.5">
+                        <div class="flex items-center gap-2">
+                            <span class="w-5 h-5 rounded bg-indigo-600 text-white flex items-center justify-center font-bold text-xs">1</span>
+                            <h4 class="font-bold text-xs uppercase tracking-wider text-indigo-950 font-mono-code">
+                                DIRECT TEXTUAL OVERLAP (BUKTI SEKUENSIAL LANGSUNG)
+                            </h4>
+                        </div>
+                        <span class="text-[11px] font-mono-code font-semibold px-2 py-0.5 rounded <?= empty($directOverlapSources) ? 'bg-slate-100 text-slate-400' : 'bg-indigo-50 text-indigo-700' ?>">
+                            <?= count($directOverlapSources) ?> sumber
+                        </span>
+                    </div>
+
+                    <?php if (empty($directOverlapSources)): ?>
+                        <div class="p-4 rounded-lg bg-slate-50 border border-dashed border-slate-200 text-center text-xs text-slate-400">
+                            🍃 Tidak ditemukan dokumen rujukan yang memiliki pasase sekuensial langsung (Exact = 0%).
+                        </div>
+                    <?php else: ?>
+                        <div class="divide-y divide-slate-100 max-h-[300px] overflow-y-auto pr-1">
+                            <?php foreach ($directOverlapSources as $src): ?>
+                                <div class="py-3 first:pt-0 last:pb-0 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                    <div class="space-y-1">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-xs font-bold font-mono-code px-2 py-0.5 rounded bg-indigo-50 text-indigo-700">
+                                                #<?= $src['source_rank'] ?>
+                                            </span>
+                                            <h5 class="font-bold text-sm text-slate-900">
+                                                <?= esc($src['source_title']) ?>
+                                            </h5>
+                                            <span class="text-[11px] uppercase font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">
+                                                <?= esc($src['source_type'] ?? 'dokumen') ?>
+                                            </span>
+                                        </div>
+                                        <div class="text-xs text-slate-500 font-mono-code flex flex-wrap items-center gap-3">
+                                            <span>Exact Overlap: <strong class="text-indigo-700 font-bold"><?= number_format($src['exact_similarity'] ?? $src['similarity'], 1) ?>%</strong></span>
+                                            <span>•</span>
+                                            <span><?= number_format($src['matched_words']) ?> matched words</span>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <button onclick="openPassageModal(<?= $src['source_document_id'] ?>, '<?= esc($src['source_title']) ?>')" class="w-full sm:w-auto px-4 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-lg border border-indigo-200 transition shadow-2xs flex items-center justify-center gap-1.5">
+                                            <span>🔍</span> [View passage]
+                                        </button>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Group 2: LEXICAL / TOPIC SIMILARITY (TF-IDF Vector Space Matcher) -->
+                <div class="space-y-3 pt-2">
+                    <div class="flex items-center justify-between border-b border-teal-100 pb-1.5">
+                        <div class="flex items-center gap-2">
+                            <span class="w-5 h-5 rounded bg-teal-600 text-white flex items-center justify-center font-bold text-xs">2</span>
+                            <h4 class="font-bold text-xs uppercase tracking-wider text-teal-950 font-mono-code">
+                                LEXICAL / TOPIC SIMILARITY (KEMIRIPAN TOPIKAL & KOSAKATA)
+                            </h4>
+                        </div>
+                        <span class="text-[11px] font-mono-code font-semibold px-2 py-0.5 rounded <?= empty($lexicalSources) ? 'bg-slate-100 text-slate-400' : 'bg-teal-50 text-teal-700' ?>">
+                            <?= count($lexicalSources) ?> sumber
+                        </span>
+                    </div>
+
+                    <?php if (empty($lexicalSources)): ?>
+                        <div class="p-4 rounded-lg bg-slate-50 border border-dashed border-slate-200 text-center text-xs text-slate-400">
+                            🍃 Tidak ditemukan dokumen rujukan dengan irisan kosinus leksikal signifikan.
+                        </div>
+                    <?php else: ?>
+                        <div class="divide-y divide-slate-100 max-h-[300px] overflow-y-auto pr-1">
+                            <?php foreach ($lexicalSources as $src): ?>
+                                <div class="py-3 first:pt-0 last:pb-0 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                    <div class="space-y-1">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-xs font-bold font-mono-code px-2 py-0.5 rounded bg-teal-50 text-teal-700">
+                                                #<?= $src['source_rank'] ?>
+                                            </span>
+                                            <h5 class="font-bold text-sm text-slate-900">
+                                                <?= esc($src['source_title']) ?>
+                                            </h5>
+                                            <span class="text-[11px] uppercase font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">
+                                                <?= esc($src['source_type'] ?? 'dokumen') ?>
+                                            </span>
+                                        </div>
+                                        <div class="text-xs text-slate-500 font-mono-code flex flex-wrap items-center gap-3">
+                                            <span>Cosine Similarity: <strong class="text-teal-700 font-bold"><?= number_format($src['cosine_similarity'] ?? 0, 1) ?>%</strong></span>
+                                            <span>•</span>
+                                            <span><?= number_format($src['matched_words']) ?> shared terms</span>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <button onclick="openPassageModal(<?= $src['source_document_id'] ?>, '<?= esc($src['source_title']) ?>')" class="w-full sm:w-auto px-4 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 font-bold text-xs rounded-lg border border-teal-200 transition shadow-2xs flex items-center justify-center gap-1.5">
+                                            <span>🔍</span> [View passage]
+                                        </button>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
 
