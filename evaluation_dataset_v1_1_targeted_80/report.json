@@ -1,0 +1,438 @@
+{
+  "evaluation_name": "Targeted 80-Case Academic Context Evaluation (v1.1)",
+  "executed_at": "2026-10-05T01:41:55.394549",
+  "system_version": "v1.1.0",
+  "baseline_version": "v1.0.0 (FROZEN)",
+  "all_quality_gates_pass": true,
+  "quality_gates": {
+    "gate_v11_b1_context_accuracy_ge_95": true,
+    "gate_v11_b2_citation_status_ge_95": true,
+    "gate_v11_b3_non_suppression_invariance_100": true,
+    "gate_v11_b4_decision_invariance_100": true,
+    "gate_v11_b5_engine_defects_zero": true
+  },
+  "global_metrics": {
+    "total_cases": 80,
+    "decision_agreement_pct": 82.5,
+    "context_detection_accuracy_pct": 100.0,
+    "citation_status_accuracy_pct": 100.0,
+    "evidence_type_alignment_pct": 87.5,
+    "decision_invariance_pct": 100.0,
+    "non_suppression_invariance_pct": 100.0,
+    "elapsed_seconds": 0.039
+  },
+  "failure_taxonomy_distribution": {
+    "BOUNDARY_BEHAVIOR:THRESHOLD_TRANSITION": 4,
+    "ENGINE_LIMITATION:NO_CONTEXT_AWARENESS": 10
+  },
+  "group_breakdown": [
+    {
+      "group_index": 1,
+      "group_name": "Uncited direct overlap",
+      "total_cases": 10,
+      "decision_accuracy_pct": 100.0,
+      "context_accuracy_pct": 100.0,
+      "citation_status_accuracy_pct": 100.0,
+      "evidence_type_accuracy_pct": 100.0,
+      "decision_invariant_pct": 100.0,
+      "non_suppression_pct": 100.0,
+      "mismatch_count": 0
+    },
+    {
+      "group_index": 2,
+      "group_name": "Parenthetical citation",
+      "total_cases": 10,
+      "decision_accuracy_pct": 100.0,
+      "context_accuracy_pct": 100.0,
+      "citation_status_accuracy_pct": 100.0,
+      "evidence_type_accuracy_pct": 100.0,
+      "decision_invariant_pct": 100.0,
+      "non_suppression_pct": 100.0,
+      "mismatch_count": 0
+    },
+    {
+      "group_index": 3,
+      "group_name": "Inline citation",
+      "total_cases": 10,
+      "decision_accuracy_pct": 100.0,
+      "context_accuracy_pct": 100.0,
+      "citation_status_accuracy_pct": 100.0,
+      "evidence_type_accuracy_pct": 100.0,
+      "decision_invariant_pct": 100.0,
+      "non_suppression_pct": 100.0,
+      "mismatch_count": 0
+    },
+    {
+      "group_index": 4,
+      "group_name": "Direct/block quote",
+      "total_cases": 10,
+      "decision_accuracy_pct": 100.0,
+      "context_accuracy_pct": 100.0,
+      "citation_status_accuracy_pct": 100.0,
+      "evidence_type_accuracy_pct": 100.0,
+      "decision_invariant_pct": 100.0,
+      "non_suppression_pct": 100.0,
+      "mismatch_count": 0
+    },
+    {
+      "group_index": 5,
+      "group_name": "Paraphrase + citation",
+      "total_cases": 10,
+      "decision_accuracy_pct": 90.0,
+      "context_accuracy_pct": 100.0,
+      "citation_status_accuracy_pct": 100.0,
+      "evidence_type_accuracy_pct": 100.0,
+      "decision_invariant_pct": 100.0,
+      "non_suppression_pct": 100.0,
+      "mismatch_count": 1
+    },
+    {
+      "group_index": 6,
+      "group_name": "Methodology / academic boilerplate",
+      "total_cases": 10,
+      "decision_accuracy_pct": 0.0,
+      "context_accuracy_pct": 100.0,
+      "citation_status_accuracy_pct": 100.0,
+      "evidence_type_accuracy_pct": 0.0,
+      "decision_invariant_pct": 100.0,
+      "non_suppression_pct": 100.0,
+      "mismatch_count": 10
+    },
+    {
+      "group_index": 7,
+      "group_name": "Exact = 0 + high TF-IDF",
+      "total_cases": 10,
+      "decision_accuracy_pct": 100.0,
+      "context_accuracy_pct": 100.0,
+      "citation_status_accuracy_pct": 100.0,
+      "evidence_type_accuracy_pct": 100.0,
+      "decision_invariant_pct": 100.0,
+      "non_suppression_pct": 100.0,
+      "mismatch_count": 0
+    },
+    {
+      "group_index": 8,
+      "group_name": "Unrelated citation to overlap",
+      "total_cases": 10,
+      "decision_accuracy_pct": 70.0,
+      "context_accuracy_pct": 100.0,
+      "citation_status_accuracy_pct": 100.0,
+      "evidence_type_accuracy_pct": 100.0,
+      "decision_invariant_pct": 100.0,
+      "non_suppression_pct": 100.0,
+      "mismatch_count": 3
+    }
+  ],
+  "mismatches_count": 14,
+  "mismatches": [
+    {
+      "case_id": "EV11-PRA-009",
+      "group_index": 5,
+      "group_name": "Paraphrase + citation",
+      "expected_class": "review",
+      "predicted_class": "no_match",
+      "expected_context": "PARENTHETICAL_CITATION",
+      "predicted_context": "PARENTHETICAL_CITATION",
+      "expected_status": "CITED",
+      "predicted_status": "CITED",
+      "expected_evidence_type": "LEXICAL_TOPIC_SIMILARITY",
+      "predicted_evidence_type": "LEXICAL_TOPIC_SIMILARITY",
+      "exact_similarity": 0.0,
+      "cosine_similarity": 9.72,
+      "longest_match_words": 0,
+      "failure_classification": "BOUNDARY_BEHAVIOR:THRESHOLD_TRANSITION",
+      "reasons": [
+        "Decision mismatch: expected 'review', got 'no_match' (pattern: NO_EVIDENCE)"
+      ]
+    },
+    {
+      "case_id": "EV11-MET-001",
+      "group_index": 6,
+      "group_name": "Methodology / academic boilerplate",
+      "expected_class": "review",
+      "predicted_class": "match",
+      "expected_context": "NONE",
+      "predicted_context": "NONE",
+      "expected_status": "NOT_CITED",
+      "predicted_status": "NOT_CITED",
+      "expected_evidence_type": "METHODOLOGY_BOILERPLATE",
+      "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
+      "exact_similarity": 76.19,
+      "cosine_similarity": 88.08,
+      "longest_match_words": 16,
+      "failure_classification": "ENGINE_LIMITATION:NO_CONTEXT_AWARENESS",
+      "reasons": [
+        "Decision mismatch: expected 'review', got 'match' (pattern: VERBATIM_MATCH)",
+        "Evidence type mismatch: expected 'METHODOLOGY_BOILERPLATE', got 'DIRECT_TEXTUAL_OVERLAP'"
+      ]
+    },
+    {
+      "case_id": "EV11-MET-002",
+      "group_index": 6,
+      "group_name": "Methodology / academic boilerplate",
+      "expected_class": "review",
+      "predicted_class": "match",
+      "expected_context": "NONE",
+      "predicted_context": "NONE",
+      "expected_status": "NOT_CITED",
+      "predicted_status": "NOT_CITED",
+      "expected_evidence_type": "METHODOLOGY_BOILERPLATE",
+      "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
+      "exact_similarity": 75.0,
+      "cosine_similarity": 89.2,
+      "longest_match_words": 15,
+      "failure_classification": "ENGINE_LIMITATION:NO_CONTEXT_AWARENESS",
+      "reasons": [
+        "Decision mismatch: expected 'review', got 'match' (pattern: VERBATIM_MATCH)",
+        "Evidence type mismatch: expected 'METHODOLOGY_BOILERPLATE', got 'DIRECT_TEXTUAL_OVERLAP'"
+      ]
+    },
+    {
+      "case_id": "EV11-MET-003",
+      "group_index": 6,
+      "group_name": "Methodology / academic boilerplate",
+      "expected_class": "review",
+      "predicted_class": "match",
+      "expected_context": "NONE",
+      "predicted_context": "NONE",
+      "expected_status": "NOT_CITED",
+      "predicted_status": "NOT_CITED",
+      "expected_evidence_type": "METHODOLOGY_BOILERPLATE",
+      "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
+      "exact_similarity": 76.19,
+      "cosine_similarity": 90.86,
+      "longest_match_words": 16,
+      "failure_classification": "ENGINE_LIMITATION:NO_CONTEXT_AWARENESS",
+      "reasons": [
+        "Decision mismatch: expected 'review', got 'match' (pattern: VERBATIM_MATCH)",
+        "Evidence type mismatch: expected 'METHODOLOGY_BOILERPLATE', got 'DIRECT_TEXTUAL_OVERLAP'"
+      ]
+    },
+    {
+      "case_id": "EV11-MET-004",
+      "group_index": 6,
+      "group_name": "Methodology / academic boilerplate",
+      "expected_class": "review",
+      "predicted_class": "match",
+      "expected_context": "NONE",
+      "predicted_context": "NONE",
+      "expected_status": "NOT_CITED",
+      "predicted_status": "NOT_CITED",
+      "expected_evidence_type": "METHODOLOGY_BOILERPLATE",
+      "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
+      "exact_similarity": 79.17,
+      "cosine_similarity": 92.49,
+      "longest_match_words": 19,
+      "failure_classification": "ENGINE_LIMITATION:NO_CONTEXT_AWARENESS",
+      "reasons": [
+        "Decision mismatch: expected 'review', got 'match' (pattern: VERBATIM_MATCH)",
+        "Evidence type mismatch: expected 'METHODOLOGY_BOILERPLATE', got 'DIRECT_TEXTUAL_OVERLAP'"
+      ]
+    },
+    {
+      "case_id": "EV11-MET-005",
+      "group_index": 6,
+      "group_name": "Methodology / academic boilerplate",
+      "expected_class": "review",
+      "predicted_class": "match",
+      "expected_context": "NONE",
+      "predicted_context": "NONE",
+      "expected_status": "NOT_CITED",
+      "predicted_status": "NOT_CITED",
+      "expected_evidence_type": "METHODOLOGY_BOILERPLATE",
+      "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
+      "exact_similarity": 78.26,
+      "cosine_similarity": 90.19,
+      "longest_match_words": 18,
+      "failure_classification": "ENGINE_LIMITATION:NO_CONTEXT_AWARENESS",
+      "reasons": [
+        "Decision mismatch: expected 'review', got 'match' (pattern: VERBATIM_MATCH)",
+        "Evidence type mismatch: expected 'METHODOLOGY_BOILERPLATE', got 'DIRECT_TEXTUAL_OVERLAP'"
+      ]
+    },
+    {
+      "case_id": "EV11-MET-006",
+      "group_index": 6,
+      "group_name": "Methodology / academic boilerplate",
+      "expected_class": "review",
+      "predicted_class": "match",
+      "expected_context": "NONE",
+      "predicted_context": "NONE",
+      "expected_status": "NOT_CITED",
+      "predicted_status": "NOT_CITED",
+      "expected_evidence_type": "METHODOLOGY_BOILERPLATE",
+      "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
+      "exact_similarity": 75.0,
+      "cosine_similarity": 91.05,
+      "longest_match_words": 15,
+      "failure_classification": "ENGINE_LIMITATION:NO_CONTEXT_AWARENESS",
+      "reasons": [
+        "Decision mismatch: expected 'review', got 'match' (pattern: VERBATIM_MATCH)",
+        "Evidence type mismatch: expected 'METHODOLOGY_BOILERPLATE', got 'DIRECT_TEXTUAL_OVERLAP'"
+      ]
+    },
+    {
+      "case_id": "EV11-MET-007",
+      "group_index": 6,
+      "group_name": "Methodology / academic boilerplate",
+      "expected_class": "review",
+      "predicted_class": "match",
+      "expected_context": "NONE",
+      "predicted_context": "NONE",
+      "expected_status": "NOT_CITED",
+      "predicted_status": "NOT_CITED",
+      "expected_evidence_type": "METHODOLOGY_BOILERPLATE",
+      "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
+      "exact_similarity": 73.68,
+      "cosine_similarity": 89.56,
+      "longest_match_words": 14,
+      "failure_classification": "ENGINE_LIMITATION:NO_CONTEXT_AWARENESS",
+      "reasons": [
+        "Decision mismatch: expected 'review', got 'match' (pattern: VERBATIM_MATCH)",
+        "Evidence type mismatch: expected 'METHODOLOGY_BOILERPLATE', got 'DIRECT_TEXTUAL_OVERLAP'"
+      ]
+    },
+    {
+      "case_id": "EV11-MET-008",
+      "group_index": 6,
+      "group_name": "Methodology / academic boilerplate",
+      "expected_class": "review",
+      "predicted_class": "match",
+      "expected_context": "NONE",
+      "predicted_context": "NONE",
+      "expected_status": "NOT_CITED",
+      "predicted_status": "NOT_CITED",
+      "expected_evidence_type": "METHODOLOGY_BOILERPLATE",
+      "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
+      "exact_similarity": 79.17,
+      "cosine_similarity": 94.0,
+      "longest_match_words": 19,
+      "failure_classification": "ENGINE_LIMITATION:NO_CONTEXT_AWARENESS",
+      "reasons": [
+        "Decision mismatch: expected 'review', got 'match' (pattern: VERBATIM_MATCH)",
+        "Evidence type mismatch: expected 'METHODOLOGY_BOILERPLATE', got 'DIRECT_TEXTUAL_OVERLAP'"
+      ]
+    },
+    {
+      "case_id": "EV11-MET-009",
+      "group_index": 6,
+      "group_name": "Methodology / academic boilerplate",
+      "expected_class": "review",
+      "predicted_class": "match",
+      "expected_context": "NONE",
+      "predicted_context": "NONE",
+      "expected_status": "NOT_CITED",
+      "predicted_status": "NOT_CITED",
+      "expected_evidence_type": "METHODOLOGY_BOILERPLATE",
+      "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
+      "exact_similarity": 78.26,
+      "cosine_similarity": 91.59,
+      "longest_match_words": 18,
+      "failure_classification": "ENGINE_LIMITATION:NO_CONTEXT_AWARENESS",
+      "reasons": [
+        "Decision mismatch: expected 'review', got 'match' (pattern: VERBATIM_MATCH)",
+        "Evidence type mismatch: expected 'METHODOLOGY_BOILERPLATE', got 'DIRECT_TEXTUAL_OVERLAP'"
+      ]
+    },
+    {
+      "case_id": "EV11-MET-010",
+      "group_index": 6,
+      "group_name": "Methodology / academic boilerplate",
+      "expected_class": "review",
+      "predicted_class": "match",
+      "expected_context": "NONE",
+      "predicted_context": "NONE",
+      "expected_status": "NOT_CITED",
+      "predicted_status": "NOT_CITED",
+      "expected_evidence_type": "METHODOLOGY_BOILERPLATE",
+      "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
+      "exact_similarity": 75.0,
+      "cosine_similarity": 89.65,
+      "longest_match_words": 15,
+      "failure_classification": "ENGINE_LIMITATION:NO_CONTEXT_AWARENESS",
+      "reasons": [
+        "Decision mismatch: expected 'review', got 'match' (pattern: VERBATIM_MATCH)",
+        "Evidence type mismatch: expected 'METHODOLOGY_BOILERPLATE', got 'DIRECT_TEXTUAL_OVERLAP'"
+      ]
+    },
+    {
+      "case_id": "EV11-DIS-001",
+      "group_index": 8,
+      "group_name": "Unrelated citation to overlap",
+      "expected_class": "match",
+      "predicted_class": "review",
+      "expected_context": "PARENTHETICAL_CITATION",
+      "predicted_context": "PARENTHETICAL_CITATION",
+      "expected_status": "CITED",
+      "predicted_status": "CITED",
+      "expected_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
+      "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
+      "exact_similarity": 71.43,
+      "cosine_similarity": 83.55,
+      "longest_match_words": 25,
+      "failure_classification": "BOUNDARY_BEHAVIOR:THRESHOLD_TRANSITION",
+      "reasons": [
+        "Decision mismatch: expected 'match', got 'review' (pattern: COPY_EDIT)"
+      ]
+    },
+    {
+      "case_id": "EV11-DIS-006",
+      "group_index": 8,
+      "group_name": "Unrelated citation to overlap",
+      "expected_class": "match",
+      "predicted_class": "review",
+      "expected_context": "PARENTHETICAL_CITATION",
+      "predicted_context": "PARENTHETICAL_CITATION",
+      "expected_status": "CITED",
+      "predicted_status": "CITED",
+      "expected_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
+      "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
+      "exact_similarity": 70.0,
+      "cosine_similarity": 83.67,
+      "longest_match_words": 21,
+      "failure_classification": "BOUNDARY_BEHAVIOR:THRESHOLD_TRANSITION",
+      "reasons": [
+        "Decision mismatch: expected 'match', got 'review' (pattern: COPY_EDIT)"
+      ]
+    },
+    {
+      "case_id": "EV11-DIS-010",
+      "group_index": 8,
+      "group_name": "Unrelated citation to overlap",
+      "expected_class": "match",
+      "predicted_class": "review",
+      "expected_context": "PARENTHETICAL_CITATION",
+      "predicted_context": "PARENTHETICAL_CITATION",
+      "expected_status": "CITED",
+      "predicted_status": "CITED",
+      "expected_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
+      "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
+      "exact_similarity": 74.07,
+      "cosine_similarity": 84.93,
+      "longest_match_words": 20,
+      "failure_classification": "BOUNDARY_BEHAVIOR:THRESHOLD_TRANSITION",
+      "reasons": [
+        "Decision mismatch: expected 'match', got 'review' (pattern: COPY_EDIT)"
+      ]
+    }
+  ],
+  "behavioral_diff": {
+    "monolithic_v1_0": {
+      "citation_awareness": false,
+      "source_evidence_decomposed": false,
+      "divergence_detection": false,
+      "character_spans_provided": false,
+      "context_rationales_provided": false
+    },
+    "contextual_v1_1": {
+      "citation_awareness": true,
+      "source_evidence_decomposed": true,
+      "divergence_detection": true,
+      "character_spans_provided": true,
+      "context_rationales_provided": true,
+      "decision_invariant_guaranteed": true,
+      "metric_non_suppression_guaranteed": true
+    },
+    "impact_summary": "Sistem v1.1 mempertahankan 100% metrik dan keputusan klasifikasi v1.0.0, sekaligus melengkapi seluruh 80 kasus dengan visibilitas sitasi/kutipan, pemisahan Direct Overlap vs Lexical Similarity, dan peringatan divergensi transparan."
+  }
+}
