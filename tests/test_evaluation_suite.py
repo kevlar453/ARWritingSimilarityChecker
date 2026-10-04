@@ -110,12 +110,14 @@ def test_human_reviewer_selection_and_tagging():
 
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM evaluation_labels WHERE case_id = 'EV-ADV-051'")
-    row = cursor.fetchone()
+    cursor.execute("SELECT * FROM evaluation_labels WHERE case_id = 'EV-ADV-051' ORDER BY id DESC LIMIT 1")
+    rows = cursor.fetchall()
+    row = rows[0] if rows else None
     cursor.close()
     conn.close()
 
     assert row is not None
     assert row["reviewer_code"] == "RV-TEST"
     assert row["properly_cited"] == 1
+    assert row["human_interpretation"] == "DIRECT_OVERLAP_PROPERLY_CITED"
     assert row["system_assessment"] == "CORRECT"

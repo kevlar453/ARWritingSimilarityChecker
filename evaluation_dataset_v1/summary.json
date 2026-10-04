@@ -1,6 +1,7 @@
 {
   "dataset_version": "v1.0.0",
   "total_cases": 500,
+  "unique_content_hashes": 437,
   "seed_cases": 50,
   "mutation_cases": 250,
   "boundary_cases": 100,

@@ -10,6 +10,11 @@
     "expected_pattern": "VERBATIM_MATCH",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 1,
+    "content_hash": "029410cd0549ad1d",
+    "failure_class": null,
     "metadata": {
       "seed_category": "identical",
       "seed_index": 1
@@ -26,6 +31,11 @@
     "expected_pattern": "VERBATIM_MATCH",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 2,
+    "content_hash": "029410cd0549ad1d",
+    "failure_class": null,
     "metadata": {
       "seed_category": "identical",
       "seed_index": 2
@@ -42,6 +52,11 @@
     "expected_pattern": "VERBATIM_MATCH",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 3,
+    "content_hash": "029410cd0549ad1d",
+    "failure_class": null,
     "metadata": {
       "seed_category": "identical",
       "seed_index": 3
@@ -58,6 +73,11 @@
     "expected_pattern": "VERBATIM_MATCH",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 4,
+    "content_hash": "029410cd0549ad1d",
+    "failure_class": null,
     "metadata": {
       "seed_category": "identical",
       "seed_index": 4
@@ -74,6 +94,11 @@
     "expected_pattern": "VERBATIM_MATCH",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 5,
+    "content_hash": "029410cd0549ad1d",
+    "failure_class": null,
     "metadata": {
       "seed_category": "identical",
       "seed_index": 5
@@ -90,6 +115,11 @@
     "expected_pattern": "VERBATIM_MATCH",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 6,
+    "content_hash": "029410cd0549ad1d",
+    "failure_class": null,
     "metadata": {
       "seed_category": "identical",
       "seed_index": 6
@@ -106,6 +136,11 @@
     "expected_pattern": "VERBATIM_MATCH",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 7,
+    "content_hash": "029410cd0549ad1d",
+    "failure_class": null,
     "metadata": {
       "seed_category": "identical",
       "seed_index": 7
@@ -122,6 +157,11 @@
     "expected_pattern": "VERBATIM_MATCH",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 8,
+    "content_hash": "029410cd0549ad1d",
+    "failure_class": null,
     "metadata": {
       "seed_category": "identical",
       "seed_index": 8
@@ -138,6 +178,11 @@
     "expected_pattern": "VERBATIM_MATCH",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 9,
+    "content_hash": "029410cd0549ad1d",
+    "failure_class": null,
     "metadata": {
       "seed_category": "identical",
       "seed_index": 9
@@ -154,6 +199,11 @@
     "expected_pattern": "VERBATIM_MATCH",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 10,
+    "content_hash": "029410cd0549ad1d",
+    "failure_class": null,
     "metadata": {
       "seed_category": "identical",
       "seed_index": 10
@@ -170,6 +220,11 @@
     "expected_pattern": "COPY_EDIT",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 11,
+    "content_hash": "9c4d708e1d2ae463",
+    "failure_class": null,
     "metadata": {
       "seed_category": "copy_edit",
       "seed_index": 11
@@ -186,6 +241,11 @@
     "expected_pattern": "COPY_EDIT",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 12,
+    "content_hash": "9c4d708e1d2ae463",
+    "failure_class": null,
     "metadata": {
       "seed_category": "copy_edit",
       "seed_index": 12
@@ -202,6 +262,11 @@
     "expected_pattern": "COPY_EDIT",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 13,
+    "content_hash": "9c4d708e1d2ae463",
+    "failure_class": null,
     "metadata": {
       "seed_category": "copy_edit",
       "seed_index": 13
@@ -218,6 +283,11 @@
     "expected_pattern": "COPY_EDIT",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 14,
+    "content_hash": "9c4d708e1d2ae463",
+    "failure_class": null,
     "metadata": {
       "seed_category": "copy_edit",
       "seed_index": 14
@@ -234,6 +304,11 @@
     "expected_pattern": "COPY_EDIT",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 15,
+    "content_hash": "9c4d708e1d2ae463",
+    "failure_class": null,
     "metadata": {
       "seed_category": "copy_edit",
       "seed_index": 15
@@ -250,6 +325,11 @@
     "expected_pattern": "COPY_EDIT",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 16,
+    "content_hash": "9c4d708e1d2ae463",
+    "failure_class": null,
     "metadata": {
       "seed_category": "copy_edit",
       "seed_index": 16
@@ -266,6 +346,11 @@
     "expected_pattern": "COPY_EDIT",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 17,
+    "content_hash": "9c4d708e1d2ae463",
+    "failure_class": null,
     "metadata": {
       "seed_category": "copy_edit",
       "seed_index": 17
@@ -282,6 +367,11 @@
     "expected_pattern": "COPY_EDIT",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 18,
+    "content_hash": "9c4d708e1d2ae463",
+    "failure_class": null,
     "metadata": {
       "seed_category": "copy_edit",
       "seed_index": 18
@@ -298,6 +388,11 @@
     "expected_pattern": "COPY_EDIT",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 19,
+    "content_hash": "9c4d708e1d2ae463",
+    "failure_class": null,
     "metadata": {
       "seed_category": "copy_edit",
       "seed_index": 19
@@ -314,6 +409,11 @@
     "expected_pattern": "COPY_EDIT",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 20,
+    "content_hash": "9c4d708e1d2ae463",
+    "failure_class": null,
     "metadata": {
       "seed_category": "copy_edit",
       "seed_index": 20
@@ -330,6 +430,11 @@
     "expected_pattern": "SEMANTIC_PARAPHRASE",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 21,
+    "content_hash": "5fb3efd880a8954e",
+    "failure_class": null,
     "metadata": {
       "seed_category": "paraphrase",
       "seed_index": 21
@@ -346,6 +451,11 @@
     "expected_pattern": "SEMANTIC_PARAPHRASE",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 22,
+    "content_hash": "5fb3efd880a8954e",
+    "failure_class": null,
     "metadata": {
       "seed_category": "paraphrase",
       "seed_index": 22
@@ -362,6 +472,11 @@
     "expected_pattern": "SEMANTIC_PARAPHRASE",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 23,
+    "content_hash": "5fb3efd880a8954e",
+    "failure_class": null,
     "metadata": {
       "seed_category": "paraphrase",
       "seed_index": 23
@@ -378,6 +493,11 @@
     "expected_pattern": "SEMANTIC_PARAPHRASE",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 24,
+    "content_hash": "5fb3efd880a8954e",
+    "failure_class": null,
     "metadata": {
       "seed_category": "paraphrase",
       "seed_index": 24
@@ -394,6 +514,11 @@
     "expected_pattern": "SEMANTIC_PARAPHRASE",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 25,
+    "content_hash": "5fb3efd880a8954e",
+    "failure_class": null,
     "metadata": {
       "seed_category": "paraphrase",
       "seed_index": 25
@@ -410,6 +535,11 @@
     "expected_pattern": "SEMANTIC_PARAPHRASE",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 26,
+    "content_hash": "5fb3efd880a8954e",
+    "failure_class": null,
     "metadata": {
       "seed_category": "paraphrase",
       "seed_index": 26
@@ -426,6 +556,11 @@
     "expected_pattern": "SEMANTIC_PARAPHRASE",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 27,
+    "content_hash": "5fb3efd880a8954e",
+    "failure_class": null,
     "metadata": {
       "seed_category": "paraphrase",
       "seed_index": 27
@@ -442,6 +577,11 @@
     "expected_pattern": "SEMANTIC_PARAPHRASE",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 28,
+    "content_hash": "5fb3efd880a8954e",
+    "failure_class": null,
     "metadata": {
       "seed_category": "paraphrase",
       "seed_index": 28
@@ -458,6 +598,11 @@
     "expected_pattern": "SEMANTIC_PARAPHRASE",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 29,
+    "content_hash": "5fb3efd880a8954e",
+    "failure_class": null,
     "metadata": {
       "seed_category": "paraphrase",
       "seed_index": 29
@@ -474,6 +619,11 @@
     "expected_pattern": "SEMANTIC_PARAPHRASE",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 30,
+    "content_hash": "5fb3efd880a8954e",
+    "failure_class": null,
     "metadata": {
       "seed_category": "paraphrase",
       "seed_index": 30
@@ -490,6 +640,11 @@
     "expected_pattern": "COMMON_ACADEMIC_PHRASE",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 31,
+    "content_hash": "4bf3c83eea5eab8f",
+    "failure_class": null,
     "metadata": {
       "seed_category": "common_phrase",
       "seed_index": 31
@@ -506,6 +661,11 @@
     "expected_pattern": "COMMON_ACADEMIC_PHRASE",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 32,
+    "content_hash": "4bf3c83eea5eab8f",
+    "failure_class": null,
     "metadata": {
       "seed_category": "common_phrase",
       "seed_index": 32
@@ -522,6 +682,11 @@
     "expected_pattern": "COMMON_ACADEMIC_PHRASE",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 33,
+    "content_hash": "4bf3c83eea5eab8f",
+    "failure_class": null,
     "metadata": {
       "seed_category": "common_phrase",
       "seed_index": 33
@@ -538,6 +703,11 @@
     "expected_pattern": "COMMON_ACADEMIC_PHRASE",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 34,
+    "content_hash": "4bf3c83eea5eab8f",
+    "failure_class": null,
     "metadata": {
       "seed_category": "common_phrase",
       "seed_index": 34
@@ -554,6 +724,11 @@
     "expected_pattern": "COMMON_ACADEMIC_PHRASE",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 35,
+    "content_hash": "4bf3c83eea5eab8f",
+    "failure_class": null,
     "metadata": {
       "seed_category": "common_phrase",
       "seed_index": 35
@@ -570,6 +745,11 @@
     "expected_pattern": "COMMON_ACADEMIC_PHRASE",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 36,
+    "content_hash": "4bf3c83eea5eab8f",
+    "failure_class": null,
     "metadata": {
       "seed_category": "common_phrase",
       "seed_index": 36
@@ -586,6 +766,11 @@
     "expected_pattern": "COMMON_ACADEMIC_PHRASE",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 37,
+    "content_hash": "4bf3c83eea5eab8f",
+    "failure_class": null,
     "metadata": {
       "seed_category": "common_phrase",
       "seed_index": 37
@@ -602,6 +787,11 @@
     "expected_pattern": "COMMON_ACADEMIC_PHRASE",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 38,
+    "content_hash": "4bf3c83eea5eab8f",
+    "failure_class": null,
     "metadata": {
       "seed_category": "common_phrase",
       "seed_index": 38
@@ -618,6 +808,11 @@
     "expected_pattern": "COMMON_ACADEMIC_PHRASE",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 39,
+    "content_hash": "4bf3c83eea5eab8f",
+    "failure_class": null,
     "metadata": {
       "seed_category": "common_phrase",
       "seed_index": 39
@@ -634,6 +829,11 @@
     "expected_pattern": "COMMON_ACADEMIC_PHRASE",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 40,
+    "content_hash": "4bf3c83eea5eab8f",
+    "failure_class": null,
     "metadata": {
       "seed_category": "common_phrase",
       "seed_index": 40
@@ -650,6 +850,11 @@
     "expected_pattern": "NO_EVIDENCE",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 41,
+    "content_hash": "9537102ed48d55b3",
+    "failure_class": null,
     "metadata": {
       "seed_category": "unrelated",
       "seed_index": 41
@@ -666,6 +871,11 @@
     "expected_pattern": "NO_EVIDENCE",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 42,
+    "content_hash": "9537102ed48d55b3",
+    "failure_class": null,
     "metadata": {
       "seed_category": "unrelated",
       "seed_index": 42
@@ -682,6 +892,11 @@
     "expected_pattern": "NO_EVIDENCE",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 43,
+    "content_hash": "9537102ed48d55b3",
+    "failure_class": null,
     "metadata": {
       "seed_category": "unrelated",
       "seed_index": 43
@@ -698,6 +913,11 @@
     "expected_pattern": "NO_EVIDENCE",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 44,
+    "content_hash": "9537102ed48d55b3",
+    "failure_class": null,
     "metadata": {
       "seed_category": "unrelated",
       "seed_index": 44
@@ -714,6 +934,11 @@
     "expected_pattern": "NO_EVIDENCE",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 45,
+    "content_hash": "9537102ed48d55b3",
+    "failure_class": null,
     "metadata": {
       "seed_category": "unrelated",
       "seed_index": 45
@@ -730,6 +955,11 @@
     "expected_pattern": "NO_EVIDENCE",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 46,
+    "content_hash": "9537102ed48d55b3",
+    "failure_class": null,
     "metadata": {
       "seed_category": "unrelated",
       "seed_index": 46
@@ -746,6 +976,11 @@
     "expected_pattern": "NO_EVIDENCE",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 47,
+    "content_hash": "9537102ed48d55b3",
+    "failure_class": null,
     "metadata": {
       "seed_category": "unrelated",
       "seed_index": 47
@@ -762,6 +997,11 @@
     "expected_pattern": "NO_EVIDENCE",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 48,
+    "content_hash": "9537102ed48d55b3",
+    "failure_class": null,
     "metadata": {
       "seed_category": "unrelated",
       "seed_index": 48
@@ -778,6 +1018,11 @@
     "expected_pattern": "NO_EVIDENCE",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 49,
+    "content_hash": "9537102ed48d55b3",
+    "failure_class": null,
     "metadata": {
       "seed_category": "unrelated",
       "seed_index": 49
@@ -794,6 +1039,11 @@
     "expected_pattern": "NO_EVIDENCE",
     "human_validated": false,
     "system_version": "v1.0.0",
+    "mutation_operator": "NONE",
+    "mutation_strength": "BASELINE",
+    "generation_seed": 50,
+    "content_hash": "9537102ed48d55b3",
+    "failure_class": null,
     "metadata": {
       "seed_category": "unrelated",
       "seed_index": 50

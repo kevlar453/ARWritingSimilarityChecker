@@ -32,7 +32,21 @@ from evaluation.schema import (
     SYSTEM_ASSESSMENT_ACCEPTABLE,
     SYSTEM_ASSESSMENT_TOO_STRICT,
     SYSTEM_ASSESSMENT_TOO_LENIENT,
-    SYSTEM_ASSESSMENT_UNCERTAIN
+    SYSTEM_ASSESSMENT_UNCERTAIN,
+    CITATION_CONTEXT_NONE,
+    CITATION_CONTEXT_INLINE,
+    CITATION_CONTEXT_PARENTHETICAL,
+    CITATION_CONTEXT_BLOCK_QUOTE,
+    CITATION_CONTEXT_DIRECT_QUOTE,
+    CITATION_CONTEXT_FOOTNOTE,
+    CITATION_CONTEXT_BIBLIOGRAPHY,
+    CITATION_CONTEXT_UNKNOWN,
+    HUMAN_INTERPRETATION_DIRECT_OVERLAP_RELEVANT,
+    HUMAN_INTERPRETATION_DIRECT_OVERLAP_PROPERLY_CITED,
+    HUMAN_INTERPRETATION_COMMON_ACADEMIC_LANGUAGE,
+    HUMAN_INTERPRETATION_METHODOLOGY_BOILERPLATE,
+    HUMAN_INTERPRETATION_NEEDS_INVESTIGATION,
+    HUMAN_INTERPRETATION_FALSE_POSITIVE
 )
 from evaluation.db import save_human_label
 
@@ -206,61 +220,54 @@ def display_review_queue(queue: List[Dict[str, Any]]):
     print("Gunakan './artilik eval review --inspect <case_id>' untuk rincian kasus")
     print("atau './artilik eval review --interactive' untuk peninjauan interaktif.\n")
 
-def inspect_single_case(case_id: str, queue: List[Dict[str, Any]]):
-    item = next((q for q in queue if q["case_id"] == case_id), None)
-    if not item:
-        # Cari di cases.json jika tidak ada di queue top-k
-        cases, results = load_evaluation_data()
-        c = next((c for c in cases if c["case_id"] == case_id), None)
-        r = next((r for r in results if r["case_id"] == case_id), None)
-        if not c or not r:
-            print(f"[!] Kasus '{case_id}' tidak ditemukan.")
-            return
-        item = {
-            "queue_rank": "-",
-            "priority_reason": "Direct Inspection",
-            "case_id": case_id,
-            "case_type": c.get("case_type"),
-            "generation_method": c.get("generation_method"),
-            "expected_class": c.get("expected_class"),
-            "expected_pattern": c.get("expected_pattern"),
-            "predicted_class": r.get("predicted_class"),
-            "predicted_pattern": r.get("predicted_pattern"),
-            "agreement": r.get("agreement"),
-            "exact_similarity": r.get("exact_similarity"),
-            "cosine_similarity": r.get("cosine_similarity"),
-            "longest_match_words": r.get("longest_match_words"),
-            "avg_idf": r.get("avg_idf"),
-            "max_idf": r.get("max_idf"),
-            "rationale": r.get("rationale"),
-            "submission_snippet": c.get("submission_text", "")
-        }
+def inspect_single_case(case_id: str, queue: Optional[List[Dict[str, Any]]] = None):
+    cases, results = load_evaluation_data()
+    c = next((c for c in cases if c["case_id"] == case_id), None)
+    r = next((r for r in results if r["case_id"] == case_id), None)
+    if not c or not r:
+        print(f"[!] Kasus '{case_id}' tidak ditemukan.")
+        return
 
-    print("\n" + "=" * 60)
-    print(f"HIGH PRIORITY REVIEW CASE: {item['case_id']}")
-    print("=" * 60)
-    print(f"Alasan Prioritas : {item['priority_reason']}")
-    print(f"Tipe Kasus       : {item['case_type']} ({item['generation_method']})")
-    print("-" * 60)
-    print(f"Pattern          : {item['predicted_pattern']}")
-    print(f"Decision         : {item['predicted_class'].upper()}")
-    print(f"Agreement        : {item['agreement']}")
-    print(f"Exact Similarity : {item['exact_similarity']}% (Longest: {item['longest_match_words']} kata, Max IDF: {item['max_idf']})")
-    print(f"TF-IDF Cosine    : {item['cosine_similarity']}% (Avg IDF: {item['avg_idf']})")
-    print("-" * 60)
+    priority_reason = "Direct Inspection"
+    if queue:
+        item = next((q for q in queue if q["case_id"] == case_id), None)
+        if item:
+            priority_reason = item.get("priority_reason", priority_reason)
+
+    print("\n" + "=" * 65)
+    print(f"HIGH PRIORITY REVIEW CASE: {c['case_id']}")
+    print("=" * 65)
+    print(f"Alasan Prioritas : {priority_reason}")
+    print(f"Tipe Kasus       : {c.get('case_type')} ({c.get('generation_method')})")
+    print(f"Operator/Kekuatan: {c.get('mutation_operator', '-')} / {c.get('mutation_strength', '-')}")
+    print(f"Content Hash     : {c.get('content_hash', '-')}")
+    print("-" * 65)
+    print(f"Expected Class   : {c.get('expected_class')} ({c.get('expected_pattern')})")
+    print(f"Predicted Class  : {r.get('predicted_class', '').upper()} ({r.get('predicted_pattern')})")
+    print(f"Agreement        : {r.get('agreement')}")
+    print(f"Failure Class    : {r.get('failure_class') or 'NONE'}")
+    print("-" * 65)
+    print(f"Exact Similarity : {r.get('exact_similarity')}% (Longest: {r.get('longest_match_words')} kata, Max IDF: {r.get('max_idf')})")
+    print(f"TF-IDF Cosine    : {r.get('cosine_similarity')}% (Matched: {r.get('matched_terms')} terms, Avg IDF: {r.get('avg_idf')})")
+    print("-" * 65)
     print("[SUBMISSION TEXT]")
-    print(item["submission_snippet"])
-    print("-" * 60)
+    print(c.get("submission_text", ""))
+    print("-" * 65)
     print("[EXPLAINABILITY RATIONALE]")
-    print(item["rationale"])
-    print("-" * 60)
+    print(r.get("rationale", ""))
+    print("-" * 65)
     print("Reviewer Labels:")
     print(" [ ] Relevant")
     print(" [ ] Common phrase")
     print(" [ ] Properly cited")
     print(" [ ] Needs investigation")
     print(" [ ] False positive")
-    print("=" * 60 + "\n")
+    print("-" * 65)
+    print("Citation Contexts:")
+    print(" NONE | INLINE_CITATION | PARENTHETICAL_CITATION | BLOCK_QUOTE | DIRECT_QUOTE | FOOTNOTE | BIBLIOGRAPHY")
+    print("Human Interpretations:")
+    print(" DIRECT_OVERLAP_RELEVANT | DIRECT_OVERLAP_PROPERLY_CITED | COMMON_ACADEMIC_LANGUAGE | METHODOLOGY_BOILERPLATE | NEEDS_INVESTIGATION | FALSE_POSITIVE")
+    print("=" * 65 + "\n")
 
 def tag_case_cli(
     case_id: str,
@@ -268,16 +275,31 @@ def tag_case_cli(
     human_decision: str,
     label: str,
     system_assessment: str = "CORRECT",
-    notes: Optional[str] = None
+    notes: Optional[str] = None,
+    citation_context: str = CITATION_CONTEXT_NONE,
+    human_interpretation: str = HUMAN_INTERPRETATION_DIRECT_OVERLAP_RELEVANT
 ):
     valid_labels = ["Relevant", "Common phrase", "Properly cited", "Needs investigation", "False positive"]
     if label not in valid_labels:
         raise ValueError(f"Label tidak valid. Pilih dari: {valid_labels}")
 
+    # Otomatisasi asosiasi interpretasi jika belum eksplisit dispesifikasi
+    if human_interpretation == HUMAN_INTERPRETATION_DIRECT_OVERLAP_RELEVANT:
+        if label == "Properly cited":
+            human_interpretation = HUMAN_INTERPRETATION_DIRECT_OVERLAP_PROPERLY_CITED
+        elif label == "Common phrase":
+            human_interpretation = HUMAN_INTERPRETATION_COMMON_ACADEMIC_LANGUAGE
+        elif label == "Needs investigation":
+            human_interpretation = HUMAN_INTERPRETATION_NEEDS_INVESTIGATION
+        elif label == "False positive":
+            human_interpretation = HUMAN_INTERPRETATION_FALSE_POSITIVE
+
     review_label = HumanReviewLabel(
         case_id=case_id,
         reviewer_code=reviewer_code,
         human_decision=human_decision,
+        citation_context=citation_context,
+        human_interpretation=human_interpretation,
         evidence_relevant=(label == "Relevant"),
         common_phrase=(label == "Common phrase"),
         properly_cited=(label == "Properly cited"),
@@ -305,9 +327,11 @@ def tag_case_cli(
         json.dump(existing, f, indent=2, ensure_ascii=False)
 
     print(f"[✓] Berhasil menyimpan anotasi manusia untuk {case_id}:")
-    print(f"    Reviewer   : {reviewer_code}")
-    print(f"    Decision   : {human_decision}")
-    print(f"    Label      : [{label}]")
-    print(f"    Assessment : {system_assessment}")
+    print(f"    Reviewer       : {reviewer_code}")
+    print(f"    Decision       : {human_decision}")
+    print(f"    Label          : [{label}]")
+    print(f"    Context        : {citation_context}")
+    print(f"    Interpretation : {human_interpretation}")
+    print(f"    Assessment     : {system_assessment}")
     if notes:
-        print(f"    Catatan    : {notes}")
+        print(f"    Catatan        : {notes}")

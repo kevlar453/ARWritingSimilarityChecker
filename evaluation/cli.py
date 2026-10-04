@@ -70,7 +70,9 @@ def cmd_review(args):
             human_decision=args.decision.lower(),
             label=args.label,
             system_assessment=args.assessment or "CORRECT",
-            notes=args.notes
+            notes=args.notes,
+            citation_context=args.context or "NONE",
+            human_interpretation=args.interpretation or "DIRECT_OVERLAP_RELEVANT"
         )
         return
 
@@ -79,7 +81,7 @@ def cmd_review(args):
         print(f"Menampilkan {len(queue)} kasus informatif antrean tertinggi.\n")
         for item in queue:
             inspect_single_case(item["case_id"], queue)
-            print("Pilihan:")
+            print("Pilihan Label:")
             print(" [1] Relevant")
             print(" [2] Common phrase")
             print(" [3] Properly cited")
@@ -108,15 +110,27 @@ def cmd_review(args):
             selected_label = label_map.get(choice)
             if selected_label:
                 dec = input(f"Keputusan Rekomendasi Manusia [{item['predicted_class']}]: ").strip() or item["predicted_class"]
+                
+                ctx_default = "PARENTHETICAL_CITATION" if selected_label == "Properly cited" else "NONE"
+                ctx = input(f"Konteks Sitasi (NONE/INLINE/PARENTHETICAL/QUOTE) [default {ctx_default}]: ").strip().upper() or ctx_default
+                if ctx == "INLINE": ctx = "INLINE_CITATION"
+                elif ctx == "PARENTHETICAL": ctx = "PARENTHETICAL_CITATION"
+                elif ctx == "QUOTE": ctx = "DIRECT_QUOTE"
+
+                interp_default = "DIRECT_OVERLAP_PROPERLY_CITED" if selected_label == "Properly cited" else "DIRECT_OVERLAP_RELEVANT"
+                interp = input(f"Interpretasi Akademik [default {interp_default}]: ").strip() or interp_default
+
                 assess = input("Penilaian Sistem [CORRECT/ACCEPTABLE/TOO_STRICT/TOO_LENIENT] (default CORRECT): ").strip().upper() or "CORRECT"
                 notes = input("Catatan Tambahan (opsional): ").strip() or None
                 tag_case_cli(
                     case_id=item["case_id"],
-                    reviewer_code="RV-001",
+                    reviewer_code=args.reviewer or "RV-001",
                     human_decision=dec,
                     label=selected_label,
                     system_assessment=assess,
-                    notes=notes
+                    notes=notes,
+                    citation_context=ctx,
+                    human_interpretation=interp
                 )
                 print("-" * 60)
         return
@@ -147,6 +161,12 @@ def main():
     rev_parser.add_argument("--label", type=str, choices=["Relevant", "Common phrase", "Properly cited", "Needs investigation", "False positive"], help="Label bukti")
     rev_parser.add_argument("--reviewer", type=str, default="RV-001", help="Kode anonim reviewer (default: RV-001)")
     rev_parser.add_argument("--assessment", type=str, choices=["CORRECT", "ACCEPTABLE", "TOO_STRICT", "TOO_LENIENT", "UNCERTAIN"], default="CORRECT", help="Penilaian sistem")
+    rev_parser.add_argument("--context", type=str, default="NONE",
+                            choices=["NONE", "INLINE_CITATION", "PARENTHETICAL_CITATION", "BLOCK_QUOTE", "DIRECT_QUOTE", "FOOTNOTE", "BIBLIOGRAPHY", "UNKNOWN"],
+                            help="Konteks sitasi (default: NONE)")
+    rev_parser.add_argument("--interpretation", type=str, default="DIRECT_OVERLAP_RELEVANT",
+                            choices=["DIRECT_OVERLAP_RELEVANT", "DIRECT_OVERLAP_PROPERLY_CITED", "COMMON_ACADEMIC_LANGUAGE", "METHODOLOGY_BOILERPLATE", "NEEDS_INVESTIGATION", "FALSE_POSITIVE"],
+                            help="Interpretasi akademik manusia (default: DIRECT_OVERLAP_RELEVANT)")
     rev_parser.add_argument("--notes", type=str, help="Catatan reviewer")
     rev_parser.set_defaults(func=cmd_review)
 
