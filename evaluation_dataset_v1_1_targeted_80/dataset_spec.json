@@ -1,0 +1,64 @@
+{
+  "dataset_name": "evaluation_dataset_v1_1_targeted_80",
+  "version": "1.1.0",
+  "baseline_version": "1.0.0 (FROZEN)",
+  "total_cases": 80,
+  "groups": [
+    {
+      "group_index": 1,
+      "name": "Uncited direct overlap",
+      "count": 10,
+      "prefix": "EV11-UNC"
+    },
+    {
+      "group_index": 2,
+      "name": "Parenthetical citation",
+      "count": 10,
+      "prefix": "EV11-PAR"
+    },
+    {
+      "group_index": 3,
+      "name": "Inline citation",
+      "count": 10,
+      "prefix": "EV11-INL"
+    },
+    {
+      "group_index": 4,
+      "name": "Direct / block quote",
+      "count": 10,
+      "prefix": "EV11-QUO"
+    },
+    {
+      "group_index": 5,
+      "name": "Paraphrase + citation",
+      "count": 10,
+      "prefix": "EV11-PRA"
+    },
+    {
+      "group_index": 6,
+      "name": "Methodology / academic boilerplate",
+      "count": 10,
+      "prefix": "EV11-MET"
+    },
+    {
+      "group_index": 7,
+      "name": "Exact = 0 + high TF-IDF",
+      "count": 10,
+      "prefix": "EV11-DIV"
+    },
+    {
+      "group_index": 8,
+      "name": "Unrelated citation to overlap",
+      "count": 10,
+      "prefix": "EV11-DIS"
+    }
+  ],
+  "quality_gates": {
+    "gate_d1_full_provenance": true,
+    "gate_d2_explicit_expectations": true,
+    "gate_d3_zero_duplicate_hashes": true,
+    "gate_d4_labels_isolated_from_engine": true,
+    "gate_d5_synthetic_separated_from_human_truth": true,
+    "gate_d6_frozen_v1_0_untouched": true
+  }
+}

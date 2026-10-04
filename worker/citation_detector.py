@@ -64,8 +64,8 @@ RE_AMBIGUOUS_PATTERNS = [
 ]
 
 # 2. Block Quote Patterns
-RE_BLOCKQUOTE_INDENT = re.compile(r"^(?: {4,}|\t+)(?:\S|\n)")
-RE_BLOCKQUOTE_MD = re.compile(r"^(?:>\s+)")
+RE_BLOCKQUOTE_INDENT = re.compile(r"^(?: {4,}|\t+)(?:\S|\n)", re.MULTILINE)
+RE_BLOCKQUOTE_MD = re.compile(r"^(?:>\s+)", re.MULTILINE)
 RE_BLOCKQUOTE_TAG = re.compile(r"<blockquote[^>]*>(.*?)</blockquote>", re.DOTALL | re.IGNORECASE)
 
 # 3. Direct Quotation Patterns
@@ -172,15 +172,16 @@ def detect_citation_context(text: Optional[str]) -> CitationDetectionResult:
         )
 
     # ── Tahap 3: Cek Block Quote (Indented / Markdown) ───────────
-    if RE_BLOCKQUOTE_INDENT.match(raw_text) or RE_BLOCKQUOTE_MD.match(raw_text) or RE_BLOCKQUOTE_TAG.search(raw_text):
-        span = raw_text.rstrip()
+    m_bq = RE_BLOCKQUOTE_INDENT.search(raw_text) or RE_BLOCKQUOTE_MD.search(raw_text) or RE_BLOCKQUOTE_TAG.search(raw_text)
+    if m_bq:
+        span = raw_text[m_bq.start():].rstrip()
         return CitationDetectionResult(
             context_type=CitationContext.BLOCK_QUOTE.value,
             citation_status=CitationStatus.QUOTE.value,
             confidence=CitationConfidence.HIGH.value,
             matched_span=span,
-            span_start=0,
-            span_end=len(span),
+            span_start=m_bq.start(),
+            span_end=m_bq.start() + len(span),
             rationale="Detected indented block quotation formatting structure.",
         )
 

@@ -14,6 +14,7 @@ CASE_TYPE_MUTATION = "MUTATION"
 CASE_TYPE_BOUNDARY = "BOUNDARY"
 CASE_TYPE_ADVERSARIAL = "ADVERSARIAL"
 CASE_TYPE_REAL_WORLD = "REAL_WORLD"
+CASE_TYPE_TARGETED_V1_1 = "TARGETED_V1_1"
 
 # Level & Operator Mutasi
 MUTATION_LEXICAL = "LEXICAL_EDIT"
@@ -120,6 +121,9 @@ class EvaluationCase:
     generation_seed: Optional[int] = None
     content_hash: Optional[str] = None
     failure_class: Optional[str] = None
+    expected_context: Optional[str] = None
+    expected_citation_status: Optional[str] = None
+    expected_evidence_type: Optional[str] = None
     metadata: Dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
