@@ -12,6 +12,11 @@
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         .font-mono-code { font-family: 'JetBrains Mono', monospace; }
+        .radio-card:has(input[type="radio"]:checked) {
+            background-color: rgb(238 242 255) !important;
+            border-color: rgb(79 70 229) !important;
+            box-shadow: 0 0 0 1px rgb(79 70 229) !important;
+        }
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800 antialiased min-h-screen">
@@ -204,7 +209,7 @@
                     ];
                     foreach ($interpOpts as $val => $info):
                     ?>
-                        <label class="relative flex items-start p-3 rounded-xl border border-slate-200 hover:border-indigo-400 cursor-pointer transition bg-slate-50/50 has-checked:bg-indigo-50 has-checked:border-indigo-600">
+                        <label class="radio-card relative flex items-start p-3 rounded-xl border border-slate-200 hover:border-indigo-400 cursor-pointer transition bg-slate-50/50">
                             <input type="radio" name="human_interpretation" value="<?= $val ?>" <?= $curInterp === $val ? 'checked' : '' ?> class="mt-0.5 text-indigo-600 focus:ring-indigo-500">
                             <div class="ml-2.5">
                                 <span class="block text-xs font-bold text-slate-800"><?= $info['label'] ?></span>
@@ -289,7 +294,7 @@
                         ];
                         foreach ($assessOpts as $val => $info):
                         ?>
-                            <label class="flex items-start p-2.5 rounded-lg border border-slate-200 hover:border-indigo-400 cursor-pointer bg-slate-50/50 has-checked:bg-indigo-50 has-checked:border-indigo-600">
+                            <label class="radio-card flex items-start p-2.5 rounded-lg border border-slate-200 hover:border-indigo-400 cursor-pointer transition bg-slate-50/50">
                                 <input type="radio" name="system_assessment" value="<?= $val ?>" <?= $curAssess === $val ? 'checked' : '' ?> class="mt-0.5 text-indigo-600 focus:ring-indigo-500">
                                 <div class="ml-2">
                                     <span class="block text-xs font-bold text-slate-800"><?= $info['label'] ?></span>
@@ -305,19 +310,21 @@
                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
                         E. Tingkat Keyakinan Reviewer (Confidence):
                     </label>
-                    <div class="flex items-center gap-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                         <?php
                         $confOpts = [
-                            'HIGH' => 'High (Sangat Yakin)',
-                            'MEDIUM' => 'Medium (Cukup Yakin)',
-                            'LOW' => 'Low (Kurang Yakin)',
+                            'HIGH'   => ['label' => 'High', 'desc' => 'Sangat Yakin'],
+                            'MEDIUM' => ['label' => 'Medium', 'desc' => 'Cukup Yakin'],
+                            'LOW'    => ['label' => 'Low', 'desc' => 'Kurang Yakin'],
                         ];
-                        foreach ($confOpts as $val => $txt):
+                        foreach ($confOpts as $val => $info):
                         ?>
-                            <label class="flex-1 p-2.5 text-center rounded-lg border border-slate-200 hover:border-indigo-400 cursor-pointer bg-slate-50/50 has-checked:bg-indigo-50 has-checked:border-indigo-600">
-                                <input type="radio" name="reviewer_confidence" value="<?= $val ?>" <?= $curConf === $val ? 'checked' : '' ?> class="sr-only">
-                                <span class="block text-xs font-bold text-slate-800"><?= explode(' ', $txt)[0] ?></span>
-                                <span class="block text-[10px] text-slate-500"><?= $txt ?></span>
+                            <label class="radio-card flex items-center gap-2.5 p-3 rounded-xl border border-slate-200 hover:border-indigo-400 cursor-pointer transition bg-slate-50/50">
+                                <input type="radio" name="reviewer_confidence" value="<?= $val ?>" <?= $curConf === $val ? 'checked' : '' ?> class="text-indigo-600 focus:ring-indigo-500 w-4 h-4">
+                                <div>
+                                    <span class="block text-xs font-bold text-slate-800"><?= $info['label'] ?></span>
+                                    <span class="block text-[10px] text-slate-500 leading-tight"><?= $info['desc'] ?></span>
+                                </div>
                             </label>
                         <?php endforeach; ?>
                     </div>
@@ -354,5 +361,25 @@
 
     </main>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            function updateRadioCards() {
+                document.querySelectorAll('.radio-card').forEach(function (card) {
+                    var input = card.querySelector('input[type="radio"]');
+                    if (input && input.checked) {
+                        card.classList.add('bg-indigo-50', 'border-indigo-600', 'ring-1', 'ring-indigo-500');
+                        card.classList.remove('bg-slate-50/50', 'border-slate-200');
+                    } else if (input) {
+                        card.classList.remove('bg-indigo-50', 'border-indigo-600', 'ring-1', 'ring-indigo-500');
+                        card.classList.add('bg-slate-50/50', 'border-slate-200');
+                    }
+                });
+            }
+            document.querySelectorAll('.radio-card input[type="radio"]').forEach(function (radio) {
+                radio.addEventListener('change', updateRadioCards);
+            });
+            updateRadioCards();
+        });
+    </script>
 </body>
 </html>
