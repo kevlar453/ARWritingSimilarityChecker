@@ -125,6 +125,18 @@ class EvidenceContractV11:
     """
     Kontrak data bukti v1.1 seragam untuk penganalisis kemiripan dan konteks akademik.
     Menjaga kompatibilitas ke belakang (backward compatibility) dengan v1.0.0.
+
+    Semantik Field Ekstensi v1.1:
+    - evidence_type: DIRECT_TEXTUAL_OVERLAP | LEXICAL_TOPIC_SIMILARITY | COMMON_ACADEMIC_LANGUAGE | METHODOLOGY_BOILERPLATE | UNKNOWN
+    - citation_context: NONE | INLINE_CITATION | PARENTHETICAL_CITATION | BLOCK_QUOTE | DIRECT_QUOTE | FOOTNOTE | BIBLIOGRAPHY | UNKNOWN
+    - citation_status: NOT_CITED | CITED | PARTIALLY_CITED | QUOTE | PARAPHRASED_WITH_CITATION | NOT_APPLICABLE | UNKNOWN (default: UNKNOWN sebelum deteksi berjalan)
+    - citation_confidence: HIGH | MEDIUM | LOW | UNKNOWN (default: UNKNOWN sebelum deteksi berjalan)
+    - context_span: String cuplikan teks spesifik yang mendasari deteksi konteks
+    - rationale: Penjelasan objektif MENGAPA metadata konteks/evidence terdeteksi
+                 (misal: 'Detected author-year citation pattern adjacent to evidence span').
+                 PERINGATAN: Field ini BUKAN tempat mencantumkan justifikasi keputusan
+                 sistem (MATCH/REVIEW/NO_MATCH) dan BUKAN vonis plagiarisme/bukan plagiarisme.
+                 Prinsip arsitektur: Detect -> Decompose -> Contextualize -> Human Judgment.
     """
     # ── Core v1.0.0 Fields ───────────────────────────────────────
     engine: str
