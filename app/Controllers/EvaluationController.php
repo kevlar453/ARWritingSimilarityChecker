@@ -143,14 +143,93 @@ class EvaluationController extends BaseController
                        ->get()
                        ->getRowArray();
 
+        list($highlightedSubmission, $highlightedSource) = $this->highlightPhrases(
+            $item['submission_text'],
+            $item['source_text'],
+            3
+        );
+
         return view('evaluation/detail', [
-            'item'         => $item,
-            'currentIndex' => $currentIndex,
-            'totalCases'   => count($set),
-            'prevCase'     => $prevCase,
-            'nextCase'     => $nextCase,
-            'existing'     => $existing,
+            'item'                  => $item,
+            'currentIndex'          => $currentIndex,
+            'totalCases'            => count($set),
+            'prevCase'              => $prevCase,
+            'nextCase'              => $nextCase,
+            'existing'              => $existing,
+            'highlightedSubmission' => $highlightedSubmission,
+            'highlightedSource'     => $highlightedSource,
         ]);
+    }
+
+    /**
+     * Menghitung dan memberikan highlight pada pasase teks yang berurutan (>= 3 kata)
+     */
+    private function highlightPhrases(string $textA, string $textB, int $minWords = 3): array
+    {
+        preg_match_all("/\b[\p{L}\p{N}_\-]+\b/u", $textA, $matchesA, PREG_OFFSET_CAPTURE);
+        preg_match_all("/\b[\p{L}\p{N}_\-]+\b/u", $textB, $matchesB, PREG_OFFSET_CAPTURE);
+
+        $wordsA = $matchesA[0] ?? [];
+        $wordsB = $matchesB[0] ?? [];
+
+        $cleanA = array_map(fn($w) => mb_strtolower($w[0]), $wordsA);
+        $cleanB = array_map(fn($w) => mb_strtolower($w[0]), $wordsB);
+
+        $countA = count($cleanA);
+        $countB = count($cleanB);
+
+        if ($countA < $minWords || $countB < $minWords) {
+            return [htmlspecialchars($textA), htmlspecialchars($textB)];
+        }
+
+        $usedA = array_fill(0, $countA, false);
+        $usedB = array_fill(0, $countB, false);
+        $rangesA = [];
+        $rangesB = [];
+
+        for ($len = min(30, $countA, $countB); $len >= $minWords; $len--) {
+            for ($i = 0; $i <= $countA - $len; $i++) {
+                if ($usedA[$i]) continue;
+                $sliceA = array_slice($cleanA, $i, $len);
+
+                for ($j = 0; $j <= $countB - $len; $j++) {
+                    if ($usedB[$j]) continue;
+                    $sliceB = array_slice($cleanB, $j, $len);
+
+                    if ($sliceA === $sliceB) {
+                        for ($k = 0; $k < $len; $k++) {
+                            $usedA[$i + $k] = true;
+                            $usedB[$j + $k] = true;
+                        }
+                        $startCharA = $wordsA[$i][1];
+                        $endCharA = $wordsA[$i + $len - 1][1] + strlen($wordsA[$i + $len - 1][0]);
+                        $rangesA[] = [$startCharA, $endCharA];
+
+                        $startCharB = $wordsB[$j][1];
+                        $endCharB = $wordsB[$j + $len - 1][1] + strlen($wordsB[$j + $len - 1][0]);
+                        $rangesB[] = [$startCharB, $endCharB];
+                        break;
+                    }
+                }
+            }
+        }
+
+        $apply = function (string $text, array $ranges): string {
+            if (empty($ranges)) {
+                return htmlspecialchars($text);
+            }
+            usort($ranges, fn($a, $b) => $b[0] <=> $a[0]);
+            $res = $text;
+            foreach ($ranges as $r) {
+                $len = $r[1] - $r[0];
+                $sub = substr($res, $r[0], $len);
+                $replacement = '<mark class="bg-amber-100 text-amber-950 font-semibold px-1 rounded border border-amber-300 shadow-xs">' . htmlspecialchars($sub) . '</mark>';
+                $res = substr_replace($res, $replacement, $r[0], $len);
+            }
+            return $res;
+        };
+
+        return [$apply($textA, $rangesA), $apply($textB, $rangesB)];
     }
 
     /**
@@ -162,13 +241,18 @@ class EvaluationController extends BaseController
         $caseIds = array_column($set, 'case_id');
         $currentIndex = array_search($caseId, $caseIds);
 
-        $reviewerCode = $this->request->getPost('reviewer_code') ?: 'RV-001';
-        $interpretation = $this->request->getPost('human_interpretation') ?: 'DIRECT_OVERLAP_RELEVANT';
-        $citationContext = $this->request->getPost('citation_context') ?: 'NONE';
-        $citationStatus = $this->request->getPost('citation_status') ?: 'NOT_CITED';
-        $assessment = $this->request->getPost('system_assessment') ?: 'CORRECT';
-        $confidence = $this->request->getPost('reviewer_confidence') ?: 'HIGH';
+        $reviewerCode = trim($this->request->getPost('reviewer_code') ?: 'RV-001');
+        $interpretation = $this->request->getPost('human_interpretation');
+        $citationContext = $this->request->getPost('citation_context');
+        $citationStatus = $this->request->getPost('citation_status');
+        $assessment = $this->request->getPost('system_assessment');
+        $confidence = $this->request->getPost('reviewer_confidence');
         $notes = trim($this->request->getPost('notes') ?: '');
+
+        // Validasi ketat: seluruh 5 field pertimbangan manusia wajib diisi
+        if (empty($interpretation) || empty($citationContext) || empty($citationStatus) || empty($assessment) || empty($confidence)) {
+            return redirect()->to("/evaluation/$caseId")->with('error', "Gagal menyimpan: Seluruh 5 field pertimbangan manusia (Human Interpretation, Citation Context, Citation Status, System Assessment, Confidence) wajib dipilih sebelum menyimpan.");
+        }
 
         $isRelevant = in_array($interpretation, ['DIRECT_OVERLAP_RELEVANT', 'DIRECT_OVERLAP_PROPERLY_CITED']) ? 1 : 0;
         $isCommon = ($interpretation === 'COMMON_ACADEMIC_LANGUAGE') ? 1 : 0;

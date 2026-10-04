@@ -53,6 +53,20 @@
     <!-- Main Container -->
     <main class="max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-6">
 
+        <!-- Flash Messages -->
+        <?php if (session()->getFlashdata('error')): ?>
+            <div class="bg-rose-50 border border-rose-200 text-rose-800 px-4 py-3 rounded-xl text-xs flex items-center gap-2">
+                <svg class="w-4 h-4 text-rose-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span><?= esc(session()->getFlashdata('error')) ?></span>
+            </div>
+        <?php endif; ?>
+        <?php if (session()->getFlashdata('success')): ?>
+            <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-xl text-xs flex items-center gap-2">
+                <svg class="w-4 h-4 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                <span><?= esc(session()->getFlashdata('success')) ?></span>
+            </div>
+        <?php endif; ?>
+
         <!-- Case Overview Header -->
         <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -139,64 +153,92 @@
         </div>
 
         <!-- 2. EVIDENCE COMPARISON DUAL-PANE -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Submission Excerpt -->
-            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs flex flex-col justify-between">
-                <div>
-                    <div class="flex items-center gap-2 mb-3 pb-2 border-b border-slate-100">
-                        <span class="w-2 h-2 rounded-full bg-blue-500"></span>
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">Teks Submisi (Submission Text)</h3>
-                    </div>
-                    <div class="text-xs text-slate-700 leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-200 font-mono-code whitespace-pre-wrap max-h-72 overflow-y-auto">
-<?= esc($item['submission_text']) ?>
-                    </div>
+        <div class="space-y-3">
+            <div class="bg-amber-50/80 border border-amber-200 text-amber-900 px-4 py-2.5 rounded-xl text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-xs">
+                <div class="flex items-center gap-2">
+                    <span class="px-1.5 py-0.5 rounded bg-amber-200 text-amber-950 font-bold border border-amber-300 text-[10px] tracking-wider">HIGHLIGHT</span>
+                    <span>Pasase berurutan yang bersesuaian (matching phrase sequence ≥ 3 kata) disorot otomatis dengan latar kuning untuk memudahkan komparasi visual.</span>
                 </div>
+                <span class="text-[11px] font-semibold text-amber-800 font-mono-code flex-shrink-0">EXACT PASASE: <?= $item['longest_match_words'] ?> KATA</span>
             </div>
 
-            <!-- Source Excerpt -->
-            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs flex flex-col justify-between">
-                <div>
-                    <div class="flex items-center gap-2 mb-3 pb-2 border-b border-slate-100">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">Teks Sumber Rujukan (Source Text)</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Submission Excerpt -->
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-100">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">Teks Submisi (Submission Text)</h3>
+                            </div>
+                            <span class="text-[10px] text-slate-400 font-mono-code"><?= str_word_count(strip_tags($item['submission_text'])) ?> KATA</span>
+                        </div>
+                        <div class="text-xs text-slate-800 leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-200 font-mono-code whitespace-pre-wrap max-h-72 overflow-y-auto">
+<?= $highlightedSubmission ?>
+                        </div>
                     </div>
-                    <div class="text-xs text-slate-700 leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-200 font-mono-code whitespace-pre-wrap max-h-72 overflow-y-auto">
-<?= esc($item['source_text']) ?>
+                </div>
+
+                <!-- Source Excerpt -->
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-100">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">Teks Sumber Rujukan (Source Text)</h3>
+                            </div>
+                            <span class="text-[10px] text-slate-400 font-mono-code"><?= str_word_count(strip_tags($item['source_text'])) ?> KATA</span>
+                        </div>
+                        <div class="text-xs text-slate-800 leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-200 font-mono-code whitespace-pre-wrap max-h-72 overflow-y-auto">
+<?= $highlightedSource ?>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- 3. HUMAN REVIEW FORM -->
-        <form method="POST" action="<?= base_url('evaluation/' . $item['case_id'] . '/save') ?>" class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-6">
+        <form method="POST" action="<?= base_url('evaluation/' . $item['case_id'] . '/save') ?>" id="reviewForm" class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-6">
             <?= csrf_field() ?>
 
-            <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
+            <div class="border-b border-slate-100 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                    <h2 class="text-base font-bold text-slate-900">Form Telaah & Validasi Manusia (Review Form)</h2>
-                    <p class="text-xs text-slate-500">Isi evaluasi berdasarkan konteks akademik riil teks di atas.</p>
+                    <div class="flex items-center gap-2">
+                        <h2 class="text-base font-bold text-slate-900">Form Telaah & Validasi Manusia (Review Form)</h2>
+                        <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200">
+                            Post-Release Evaluation Layer
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-0.5">Human judgment untuk evaluasi pasca-rilis; bukan perubahan terhadap keputusan engine.</p>
+                    <p class="text-[11px] text-amber-700 mt-1.5 bg-amber-50/60 p-2 rounded-lg border border-amber-200/60 flex items-center gap-1.5 leading-normal">
+                        <svg class="w-4 h-4 text-amber-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <span><strong>Catatan Metodologis:</strong> Penilaian Anda (misal <em>CORRECT / ACCEPTABLE</em>) merupakan evaluasi terhadap ketepatan kerja sistem, bukan pengganti (<em>replacement</em>) atas keputusan klasifikasi engine v1.0.0.</span>
+                    </p>
                 </div>
-                <div class="flex items-center gap-2 text-xs">
+                <div class="flex items-center gap-2 text-xs flex-shrink-0 self-start sm:self-center">
                     <label class="font-medium text-slate-600">Kode Reviewer:</label>
                     <input type="text" name="reviewer_code" value="<?= esc($existing['reviewer_code'] ?? 'RV-001') ?>" class="border border-slate-200 rounded-lg px-2.5 py-1 text-xs font-mono-code w-24 text-center bg-slate-50">
                 </div>
             </div>
 
             <?php
-            // Pre-selected values if existing record exists
-            $curInterp = $existing['human_interpretation'] ?? 'DIRECT_OVERLAP_RELEVANT';
-            $curCtx = $existing['citation_context'] ?? 'NONE';
-            $curStat = $existing['citation_status'] ?? 'NOT_CITED';
-            $curAssess = $existing['system_assessment'] ?? 'CORRECT';
-            $curConf = $existing['reviewer_confidence'] ?? 'HIGH';
-            $curNotes = $existing['notes'] ?? '';
+            // Pre-selected values ONLY if existing record exists in database
+            $curInterp = $existing['human_interpretation'] ?? null;
+            $curCtx    = $existing['citation_context'] ?? null;
+            $curStat   = $existing['citation_status'] ?? null;
+            $curAssess = $existing['system_assessment'] ?? null;
+            $curConf   = $existing['reviewer_confidence'] ?? null;
+            $curNotes  = $existing['notes'] ?? '';
             ?>
 
             <!-- A. Human Interpretation (Evidence Relevance) -->
             <div>
-                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                    A. Interpretasi Manusia Terhadap Relevansi Bukti (Human Interpretation):
-                </label>
+                <div class="flex items-center justify-between mb-2">
+                    <label class="text-xs font-bold uppercase tracking-wider text-slate-700">
+                        A. Interpretasi Manusia Terhadap Relevansi Bukti (Human Interpretation):
+                    </label>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200 uppercase tracking-wider">* wajib pilih</span>
+                </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
                     <?php
                     $interpOpts = [
@@ -210,7 +252,7 @@
                     foreach ($interpOpts as $val => $info):
                     ?>
                         <label class="radio-card relative flex items-start p-3 rounded-xl border border-slate-200 hover:border-indigo-400 cursor-pointer transition bg-slate-50/50">
-                            <input type="radio" name="human_interpretation" value="<?= $val ?>" <?= $curInterp === $val ? 'checked' : '' ?> class="mt-0.5 text-indigo-600 focus:ring-indigo-500">
+                            <input type="radio" name="human_interpretation" value="<?= $val ?>" <?= $curInterp === $val ? 'checked' : '' ?> required class="mt-0.5 text-indigo-600 focus:ring-indigo-500">
                             <div class="ml-2.5">
                                 <span class="block text-xs font-bold text-slate-800"><?= $info['label'] ?></span>
                                 <span class="block text-[11px] text-slate-500 leading-tight mt-0.5"><?= $info['desc'] ?></span>
@@ -224,9 +266,12 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-100">
                 <!-- B. Citation Context -->
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                        B. Konteks Sitasi Bukti (Citation Context):
-                    </label>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="text-xs font-bold uppercase tracking-wider text-slate-700">
+                            B. Konteks Sitasi Bukti (Citation Context):
+                        </label>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200 uppercase tracking-wider">* wajib pilih</span>
+                    </div>
                     <div class="space-y-1.5 bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-xs">
                         <?php
                         $ctxOpts = [
@@ -242,7 +287,7 @@
                         foreach ($ctxOpts as $val => $txt):
                         ?>
                             <label class="flex items-center gap-2 cursor-pointer p-1 rounded hover:bg-slate-100">
-                                <input type="radio" name="citation_context" value="<?= $val ?>" <?= $curCtx === $val ? 'checked' : '' ?> class="text-indigo-600 focus:ring-indigo-500">
+                                <input type="radio" name="citation_context" value="<?= $val ?>" <?= $curCtx === $val ? 'checked' : '' ?> required class="text-indigo-600 focus:ring-indigo-500">
                                 <span class="text-slate-800 text-xs"><?= $txt ?></span>
                             </label>
                         <?php endforeach; ?>
@@ -251,9 +296,12 @@
 
                 <!-- C. Citation Status -->
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                        C. Status Akademik Bukti (Citation Status):
-                    </label>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="text-xs font-bold uppercase tracking-wider text-slate-700">
+                            C. Status Akademik Bukti (Citation Status):
+                        </label>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200 uppercase tracking-wider">* wajib pilih</span>
+                    </div>
                     <div class="space-y-1.5 bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-xs">
                         <?php
                         $statOpts = [
@@ -268,7 +316,7 @@
                         foreach ($statOpts as $val => $txt):
                         ?>
                             <label class="flex items-center gap-2 cursor-pointer p-1 rounded hover:bg-slate-100">
-                                <input type="radio" name="citation_status" value="<?= $val ?>" <?= $curStat === $val ? 'checked' : '' ?> class="text-indigo-600 focus:ring-indigo-500">
+                                <input type="radio" name="citation_status" value="<?= $val ?>" <?= $curStat === $val ? 'checked' : '' ?> required class="text-indigo-600 focus:ring-indigo-500">
                                 <span class="text-slate-800 text-xs"><?= $txt ?></span>
                             </label>
                         <?php endforeach; ?>
@@ -280,9 +328,12 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-100">
                 <!-- D. System Assessment -->
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                        D. Penilaian Terhadap Sistem (System Assessment):
-                    </label>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="text-xs font-bold uppercase tracking-wider text-slate-700">
+                            D. Penilaian Terhadap Sistem (System Assessment):
+                        </label>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200 uppercase tracking-wider">* wajib pilih</span>
+                    </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <?php
                         $assessOpts = [
@@ -295,7 +346,7 @@
                         foreach ($assessOpts as $val => $info):
                         ?>
                             <label class="radio-card flex items-start p-2.5 rounded-lg border border-slate-200 hover:border-indigo-400 cursor-pointer transition bg-slate-50/50">
-                                <input type="radio" name="system_assessment" value="<?= $val ?>" <?= $curAssess === $val ? 'checked' : '' ?> class="mt-0.5 text-indigo-600 focus:ring-indigo-500">
+                                <input type="radio" name="system_assessment" value="<?= $val ?>" <?= $curAssess === $val ? 'checked' : '' ?> required class="mt-0.5 text-indigo-600 focus:ring-indigo-500">
                                 <div class="ml-2">
                                     <span class="block text-xs font-bold text-slate-800"><?= $info['label'] ?></span>
                                     <span class="block text-[10px] text-slate-500 leading-tight"><?= $info['desc'] ?></span>
@@ -307,9 +358,12 @@
 
                 <!-- E. Confidence -->
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                        E. Tingkat Keyakinan Reviewer (Confidence):
-                    </label>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="text-xs font-bold uppercase tracking-wider text-slate-700">
+                            E. Tingkat Keyakinan Reviewer (Confidence):
+                        </label>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200 uppercase tracking-wider">* wajib pilih</span>
+                    </div>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                         <?php
                         $confOpts = [
@@ -320,7 +374,7 @@
                         foreach ($confOpts as $val => $info):
                         ?>
                             <label class="radio-card flex items-center gap-2.5 p-3 rounded-xl border border-slate-200 hover:border-indigo-400 cursor-pointer transition bg-slate-50/50">
-                                <input type="radio" name="reviewer_confidence" value="<?= $val ?>" <?= $curConf === $val ? 'checked' : '' ?> class="text-indigo-600 focus:ring-indigo-500 w-4 h-4">
+                                <input type="radio" name="reviewer_confidence" value="<?= $val ?>" <?= $curConf === $val ? 'checked' : '' ?> required class="text-indigo-600 focus:ring-indigo-500 w-4 h-4">
                                 <div>
                                     <span class="block text-xs font-bold text-slate-800"><?= $info['label'] ?></span>
                                     <span class="block text-[10px] text-slate-500 leading-tight"><?= $info['desc'] ?></span>
@@ -340,18 +394,26 @@
             </div>
 
             <!-- Submit Button Bar -->
-            <div class="pt-4 border-t border-slate-100 flex items-center justify-between">
-                <a href="<?= base_url('evaluation') ?>" class="text-xs font-semibold text-slate-500 hover:text-slate-800 transition">
-                    Batal & Kembali
-                </a>
+            <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <a href="<?= base_url('evaluation') ?>" class="text-xs font-semibold text-slate-500 hover:text-slate-800 transition">
+                        ← Batal & Antrean
+                    </a>
+                    <button type="button" id="resetFormBtn" class="text-xs text-slate-400 hover:text-rose-600 transition underline">
+                        Kosongkan Pilihan
+                    </button>
+                </div>
 
                 <div class="flex items-center gap-3">
+                    <div id="validationHint" class="text-xs font-medium text-amber-700"></div>
+
                     <?php if ($nextCase): ?>
                         <a href="<?= base_url('evaluation/' . $nextCase) ?>" class="text-xs font-semibold text-slate-600 hover:text-slate-900 border border-slate-200 px-4 py-2 rounded-xl bg-white hover:bg-slate-50 transition">
                             Lewati (Skip)
                         </a>
                     <?php endif; ?>
-                    <button type="submit" class="text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 px-6 py-2.5 rounded-xl shadow-sm transition flex items-center gap-2">
+
+                    <button type="submit" id="saveSubmitBtn" class="text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 disabled:cursor-not-allowed disabled:hover:bg-slate-300 px-6 py-2.5 rounded-xl shadow-sm transition flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                         Simpan & Kasus Berikutnya →
                     </button>
@@ -363,6 +425,8 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            var groups = ['human_interpretation', 'citation_context', 'citation_status', 'system_assessment', 'reviewer_confidence'];
+
             function updateRadioCards() {
                 document.querySelectorAll('.radio-card').forEach(function (card) {
                     var input = card.querySelector('input[type="radio"]');
@@ -375,10 +439,46 @@
                     }
                 });
             }
-            document.querySelectorAll('.radio-card input[type="radio"]').forEach(function (radio) {
-                radio.addEventListener('change', updateRadioCards);
+
+            function validateForm() {
+                var missing = 0;
+                groups.forEach(function (name) {
+                    var checked = document.querySelector('input[name="' + name + '"]:checked');
+                    if (!checked) missing++;
+                });
+
+                var submitBtn = document.getElementById('saveSubmitBtn');
+                var hint = document.getElementById('validationHint');
+
+                if (missing === 0) {
+                    submitBtn.removeAttribute('disabled');
+                    hint.innerHTML = '<span class="text-emerald-700 flex items-center gap-1"><svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Siap disimpan (5/5 lengkap)</span>';
+                } else {
+                    submitBtn.setAttribute('disabled', 'disabled');
+                    hint.innerHTML = '<span class="text-amber-700 flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span> Pilih 5 pertimbangan wajib (' + missing + ' tersisa)</span>';
+                }
+            }
+
+            document.querySelectorAll('input[type="radio"]').forEach(function (radio) {
+                radio.addEventListener('change', function () {
+                    updateRadioCards();
+                    validateForm();
+                });
             });
+
+            var resetBtn = document.getElementById('resetFormBtn');
+            if (resetBtn) {
+                resetBtn.addEventListener('click', function () {
+                    document.querySelectorAll('input[type="radio"]').forEach(function (r) {
+                        r.checked = false;
+                    });
+                    updateRadioCards();
+                    validateForm();
+                });
+            }
+
             updateRadioCards();
+            validateForm();
         });
     </script>
 </body>
