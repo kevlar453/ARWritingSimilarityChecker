@@ -1,0 +1,86 @@
+{
+  "report_name": "AR Tilik v1.1 - Human Validation & Expert Review Report (WP-06)",
+  "generated_at": "2026-10-05T02:04:13.880103",
+  "baseline_engine": "v1.0.0 (FROZEN)",
+  "system_version": "v1.1.0",
+  "total_cases": 30,
+  "reviewed_cases": 30,
+  "pending_cases": 0,
+  "agreement_rate_pct": 100.0,
+  "system_assessment_distribution": {
+    "ACCEPTABLE": 6,
+    "CORRECT": 24
+  },
+  "human_interpretation_distribution": {
+    "METHODOLOGY_BOILERPLATE": 5,
+    "DIRECT_OVERLAP_PROPERLY_CITED": 10,
+    "NEEDS_INVESTIGATION": 6,
+    "COMMON_ACADEMIC_LANGUAGE": 6,
+    "DIRECT_OVERLAP_RELEVANT": 3
+  },
+  "citation_context_distribution": {
+    "NONE": 14,
+    "PARENTHETICAL_CITATION": 12,
+    "INLINE_CITATION": 1,
+    "DIRECT_QUOTE": 2,
+    "BLOCK_QUOTE": 1
+  },
+  "citation_status_distribution": {
+    "NOT_CITED": 14,
+    "CITED": 13,
+    "QUOTE": 3
+  },
+  "confidence_distribution": {
+    "HIGH": 30
+  },
+  "tier_breakdown": {
+    "Tier 1 — Methodology / Academic Boilerplate": {
+      "total": 5,
+      "reviewed": 5,
+      "system_correct": 0,
+      "system_acceptable": 5,
+      "system_deviant": 0
+    },
+    "Tier 2 — Paraphrase + Citation": {
+      "total": 5,
+      "reviewed": 5,
+      "system_correct": 5,
+      "system_acceptable": 0,
+      "system_deviant": 0
+    },
+    "Tier 3 — High Exact + Citation / Quote": {
+      "total": 5,
+      "reviewed": 5,
+      "system_correct": 5,
+      "system_acceptable": 0,
+      "system_deviant": 0
+    },
+    "Tier 4 — Unrelated Citation Distractor": {
+      "total": 5,
+      "reviewed": 5,
+      "system_correct": 5,
+      "system_acceptable": 0,
+      "system_deviant": 0
+    },
+    "Tier 5 — Exact = 0 + High TF-IDF": {
+      "total": 5,
+      "reviewed": 5,
+      "system_correct": 5,
+      "system_acceptable": 0,
+      "system_deviant": 0
+    },
+    "Tier 6 — Boundary Cases & Control": {
+      "total": 5,
+      "reviewed": 5,
+      "system_correct": 4,
+      "system_acceptable": 1,
+      "system_deviant": 0
+    }
+  },
+  "key_findings": [
+    "Evaluasi penelaah manusia memvalidasi bahwa sistem v1.0.0 tetap memberikan bukti komputasi yang benar dan objektif.",
+    "Penelaah secara konsisten menilai bahwa kehadiran metadata sitasi dan dekomposisi Direct Overlap vs Lexical Similarity sangat membantu penelaahan karya akademik.",
+    "Pada kasus methodology boilerplate (Tier 1), reviewer mengapresiasi bahwa sistem mendeteksi kesamaan teks tanpa langsung mendiskualifikasi karya secara otomatis.",
+    "Pada kasus distractor citation (Tier 4), reviewer menilai sistem v1.1 sangat efektif karena pasase yang disalin tetap terlihat jelas meskipun diimbuhi sitasi pengecoh."
+  ]
+}

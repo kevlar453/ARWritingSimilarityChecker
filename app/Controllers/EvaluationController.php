@@ -21,14 +21,37 @@ class EvaluationController extends BaseController
         $this->reviewsJsonPath = ROOTPATH . 'evaluation_dataset_v1/human_reviews.json';
     }
 
+    private function getSuite(?string $caseId = null): string
+    {
+        if ($caseId && str_starts_with($caseId, 'EV11-')) {
+            return 'v1_1';
+        }
+        $param = $this->request->getGet('suite');
+        if ($param) {
+            session()->set('evaluation_suite', $param);
+            return $param;
+        }
+        return session()->get('evaluation_suite') ?? 'v1_1';
+    }
+
     /**
      * Memuat 30 kasus prioritas dari file dataset dan menyinkronkan status dari database.
      */
-    private function getReviewSet(): array
+    private function getReviewSet(?string $caseId = null): array
     {
-        if (!file_exists($this->reviewSetPath)) {
-            // Panggil python helper untuk generate jika belum ada
-            @exec(ROOTPATH . '.venv/bin/python -c "from evaluation.reviewer import get_human_review_30_set; get_human_review_30_set()"');
+        $suite = $this->getSuite($caseId);
+        if ($suite === 'v1_1') {
+            $this->reviewSetPath = ROOTPATH . 'evaluation_dataset_v1_1_targeted_80/human_review_set_v1_1.json';
+            $this->reviewsJsonPath = ROOTPATH . 'evaluation_dataset_v1_1_targeted_80/human_reviews_v1_1.json';
+            if (!file_exists($this->reviewSetPath)) {
+                @exec(ROOTPATH . '.venv/bin/python -c "from evaluation.reviewer_v1_1 import get_human_review_v11_set; get_human_review_v11_set()"');
+            }
+        } else {
+            $this->reviewSetPath = ROOTPATH . 'evaluation_dataset_v1/human_review_set.json';
+            $this->reviewsJsonPath = ROOTPATH . 'evaluation_dataset_v1/human_reviews.json';
+            if (!file_exists($this->reviewSetPath)) {
+                @exec(ROOTPATH . '.venv/bin/python -c "from evaluation.reviewer import get_human_review_30_set; get_human_review_30_set()"');
+            }
         }
 
         if (file_exists($this->reviewSetPath)) {
@@ -283,7 +306,11 @@ class EvaluationController extends BaseController
         // Sinkronisasi via python backend
         $cleanNotes = $notes ? addslashes($notes) : '';
         $pyNotesArg = $notes ? "'$cleanNotes'" : "None";
-        $pyCmd = ROOTPATH . ".venv/bin/python -c \"from evaluation.reviewer import tag_case_full; tag_case_full('$caseId', '$reviewerCode', 'review', '$citationContext', '$citationStatus', '$interpretation', '$assessment', '$confidence', 'REVIEWED', $pyNotesArg)\"";
+        if (str_starts_with($caseId, 'EV11-')) {
+            $pyCmd = ROOTPATH . ".venv/bin/python -c \"from evaluation.reviewer_v1_1 import tag_case_v11; tag_case_v11('$caseId', '$reviewerCode', 'review', '$citationContext', '$citationStatus', '$interpretation', '$assessment', '$confidence', 'REVIEWED', $pyNotesArg)\"";
+        } else {
+            $pyCmd = ROOTPATH . ".venv/bin/python -c \"from evaluation.reviewer import tag_case_full; tag_case_full('$caseId', '$reviewerCode', 'review', '$citationContext', '$citationStatus', '$interpretation', '$assessment', '$confidence', 'REVIEWED', $pyNotesArg)\"";
+        }
         @exec($pyCmd);
 
         // Redirect ke kasus berikutnya atau ke ringkasan jika selesai

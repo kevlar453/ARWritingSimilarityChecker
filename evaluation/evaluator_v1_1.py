@@ -75,6 +75,7 @@ class EvaluationResultV11:
     domain: Optional[str]
     expected_class: str
     predicted_class: str
+    predicted_pattern: str
     decision_match: bool
     expected_context: str
     predicted_context: str
@@ -385,6 +386,7 @@ class EvaluatorV11:
             domain=case.metadata.get("domain"),
             expected_class=case.expected_class or "unknown",
             predicted_class=v1_decision,
+            predicted_pattern=hybrid_res["pattern"],
             decision_match=decision_match,
             expected_context=case.expected_context or "NONE",
             predicted_context=context_res.context_type,

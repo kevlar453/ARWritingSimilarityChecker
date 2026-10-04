@@ -7,6 +7,7 @@
     "domain": "Renewable Energy",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "NONE",
     "predicted_context": "NONE",
@@ -36,7 +37,7 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "evaluated_at": "2026-10-05T01:41:55.358727"
+    "evaluated_at": "2026-10-05T02:04:13.781945"
   },
   {
     "case_id": "EV11-UNC-002",
@@ -46,6 +47,7 @@
     "domain": "Computer Science / NLP",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "NONE",
     "predicted_context": "NONE",
@@ -75,7 +77,7 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "evaluated_at": "2026-10-05T01:41:55.359283"
+    "evaluated_at": "2026-10-05T02:04:13.782231"
   },
   {
     "case_id": "EV11-UNC-003",
@@ -85,6 +87,7 @@
     "domain": "Agriculture",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "NONE",
     "predicted_context": "NONE",
@@ -114,7 +117,7 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "evaluated_at": "2026-10-05T01:41:55.359860"
+    "evaluated_at": "2026-10-05T02:04:13.782527"
   },
   {
     "case_id": "EV11-UNC-004",
@@ -124,6 +127,7 @@
     "domain": "Public Health",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "NONE",
     "predicted_context": "NONE",
@@ -153,7 +157,7 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "evaluated_at": "2026-10-05T01:41:55.360376"
+    "evaluated_at": "2026-10-05T02:04:13.782764"
   },
   {
     "case_id": "EV11-UNC-005",
@@ -163,6 +167,7 @@
     "domain": "Economics",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "NONE",
     "predicted_context": "NONE",
@@ -192,7 +197,7 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "evaluated_at": "2026-10-05T01:41:55.360809"
+    "evaluated_at": "2026-10-05T02:04:13.783214"
   },
   {
     "case_id": "EV11-UNC-006",
@@ -202,6 +207,7 @@
     "domain": "Environmental Science",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "NONE",
     "predicted_context": "NONE",
@@ -231,7 +237,7 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "evaluated_at": "2026-10-05T01:41:55.361239"
+    "evaluated_at": "2026-10-05T02:04:13.783477"
   },
   {
     "case_id": "EV11-UNC-007",
@@ -241,6 +247,7 @@
     "domain": "Law",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "NONE",
     "predicted_context": "NONE",
@@ -270,7 +277,7 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "evaluated_at": "2026-10-05T01:41:55.361827"
+    "evaluated_at": "2026-10-05T02:04:13.783781"
   },
   {
     "case_id": "EV11-UNC-008",
@@ -280,6 +287,7 @@
     "domain": "Pharmacology",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "NONE",
     "predicted_context": "NONE",
@@ -309,7 +317,7 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "evaluated_at": "2026-10-05T01:41:55.362274"
+    "evaluated_at": "2026-10-05T02:04:13.784047"
   },
   {
     "case_id": "EV11-UNC-009",
@@ -319,6 +327,7 @@
     "domain": "Education",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "NONE",
     "predicted_context": "NONE",
@@ -348,7 +357,7 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "evaluated_at": "2026-10-05T01:41:55.362672"
+    "evaluated_at": "2026-10-05T02:04:13.784305"
   },
   {
     "case_id": "EV11-UNC-010",
@@ -358,6 +367,7 @@
     "domain": "Urban Planning",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "NONE",
     "predicted_context": "NONE",
@@ -387,7 +397,7 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "evaluated_at": "2026-10-05T01:41:55.363149"
+    "evaluated_at": "2026-10-05T02:04:13.784535"
   },
   {
     "case_id": "EV11-PAR-001",
@@ -397,6 +407,7 @@
     "domain": "Renewable Energy",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "PARENTHETICAL_CITATION",
     "predicted_context": "PARENTHETICAL_CITATION",
@@ -426,7 +437,7 @@
     "span_start": 0,
     "span_end": 20,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "evaluated_at": "2026-10-05T01:41:55.363680"
+    "evaluated_at": "2026-10-05T02:04:13.784792"
   },
   {
     "case_id": "EV11-PAR-002",
@@ -436,6 +447,7 @@
     "domain": "Computer Science / NLP",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "PARENTHETICAL_CITATION",
     "predicted_context": "PARENTHETICAL_CITATION",
@@ -465,7 +477,7 @@
     "span_start": 0,
     "span_end": 32,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "evaluated_at": "2026-10-05T01:41:55.364144"
+    "evaluated_at": "2026-10-05T02:04:13.785025"
   },
   {
     "case_id": "EV11-PAR-003",
@@ -475,6 +487,7 @@
     "domain": "Agriculture",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "PARENTHETICAL_CITATION",
     "predicted_context": "PARENTHETICAL_CITATION",
@@ -504,7 +517,7 @@
     "span_start": 0,
     "span_end": 43,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "evaluated_at": "2026-10-05T01:41:55.364733"
+    "evaluated_at": "2026-10-05T02:04:13.785323"
   },
   {
     "case_id": "EV11-PAR-004",
@@ -514,6 +527,7 @@
     "domain": "Public Health",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "PARENTHETICAL_CITATION",
     "predicted_context": "PARENTHETICAL_CITATION",
@@ -543,7 +557,7 @@
     "span_start": 182,
     "span_end": 201,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "evaluated_at": "2026-10-05T01:41:55.365237"
+    "evaluated_at": "2026-10-05T02:04:13.785562"
   },
   {
     "case_id": "EV11-PAR-005",
@@ -553,6 +567,7 @@
     "domain": "Economics",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "PARENTHETICAL_CITATION",
     "predicted_context": "PARENTHETICAL_CITATION",
@@ -582,7 +597,7 @@
     "span_start": 0,
     "span_end": 27,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "evaluated_at": "2026-10-05T01:41:55.365697"
+    "evaluated_at": "2026-10-05T02:04:13.785779"
   },
   {
     "case_id": "EV11-PAR-006",
@@ -592,6 +607,7 @@
     "domain": "Environmental Science",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "PARENTHETICAL_CITATION",
     "predicted_context": "PARENTHETICAL_CITATION",
@@ -621,7 +637,7 @@
     "span_start": 168,
     "span_end": 188,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "evaluated_at": "2026-10-05T01:41:55.366141"
+    "evaluated_at": "2026-10-05T02:04:13.786004"
   },
   {
     "case_id": "EV11-PAR-007",
@@ -631,6 +647,7 @@
     "domain": "Law",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "PARENTHETICAL_CITATION",
     "predicted_context": "PARENTHETICAL_CITATION",
@@ -660,7 +677,7 @@
     "span_start": 0,
     "span_end": 34,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "evaluated_at": "2026-10-05T01:41:55.366578"
+    "evaluated_at": "2026-10-05T02:04:13.786231"
   },
   {
     "case_id": "EV11-PAR-008",
@@ -670,6 +687,7 @@
     "domain": "Pharmacology",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "PARENTHETICAL_CITATION",
     "predicted_context": "PARENTHETICAL_CITATION",
@@ -699,7 +717,7 @@
     "span_start": 175,
     "span_end": 198,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "evaluated_at": "2026-10-05T01:41:55.367039"
+    "evaluated_at": "2026-10-05T02:04:13.786473"
   },
   {
     "case_id": "EV11-PAR-009",
@@ -709,6 +727,7 @@
     "domain": "Education",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "PARENTHETICAL_CITATION",
     "predicted_context": "PARENTHETICAL_CITATION",
@@ -738,7 +757,7 @@
     "span_start": 0,
     "span_end": 43,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "evaluated_at": "2026-10-05T01:41:55.367449"
+    "evaluated_at": "2026-10-05T02:04:13.786694"
   },
   {
     "case_id": "EV11-PAR-010",
@@ -748,6 +767,7 @@
     "domain": "Urban Planning",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "PARENTHETICAL_CITATION",
     "predicted_context": "PARENTHETICAL_CITATION",
@@ -777,7 +797,7 @@
     "span_start": 182,
     "span_end": 197,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "evaluated_at": "2026-10-05T01:41:55.367896"
+    "evaluated_at": "2026-10-05T02:04:13.786927"
   },
   {
     "case_id": "EV11-INL-001",
@@ -787,6 +807,7 @@
     "domain": "Renewable Energy",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "INLINE_CITATION",
     "predicted_context": "INLINE_CITATION",
@@ -816,7 +837,7 @@
     "span_start": 209,
     "span_end": 212,
     "rationale": "Detected bracketed inline reference marker adjacent to evidence span.",
-    "evaluated_at": "2026-10-05T01:41:55.368429"
+    "evaluated_at": "2026-10-05T02:04:13.787185"
   },
   {
     "case_id": "EV11-INL-002",
@@ -826,6 +847,7 @@
     "domain": "Computer Science / NLP",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "INLINE_CITATION",
     "predicted_context": "INLINE_CITATION",
@@ -855,7 +877,7 @@
     "span_start": 175,
     "span_end": 188,
     "rationale": "Detected bracketed inline reference marker adjacent to evidence span.",
-    "evaluated_at": "2026-10-05T01:41:55.368881"
+    "evaluated_at": "2026-10-05T02:04:13.787423"
   },
   {
     "case_id": "EV11-INL-003",
@@ -865,6 +887,7 @@
     "domain": "Agriculture",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "INLINE_CITATION",
     "predicted_context": "INLINE_CITATION",
@@ -894,7 +917,7 @@
     "span_start": 205,
     "span_end": 211,
     "rationale": "Detected bracketed inline reference marker adjacent to evidence span.",
-    "evaluated_at": "2026-10-05T01:41:55.369426"
+    "evaluated_at": "2026-10-05T02:04:13.787834"
   },
   {
     "case_id": "EV11-INL-004",
@@ -904,6 +927,7 @@
     "domain": "Public Health",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "INLINE_CITATION",
     "predicted_context": "INLINE_CITATION",
@@ -933,7 +957,7 @@
     "span_start": 182,
     "span_end": 203,
     "rationale": "Detected bracketed inline reference marker adjacent to evidence span.",
-    "evaluated_at": "2026-10-05T01:41:55.369905"
+    "evaluated_at": "2026-10-05T02:04:13.788121"
   },
   {
     "case_id": "EV11-INL-005",
@@ -943,6 +967,7 @@
     "domain": "Economics",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "INLINE_CITATION",
     "predicted_context": "INLINE_CITATION",
@@ -972,7 +997,7 @@
     "span_start": 171,
     "span_end": 176,
     "rationale": "Detected bracketed inline reference marker adjacent to evidence span.",
-    "evaluated_at": "2026-10-05T01:41:55.370334"
+    "evaluated_at": "2026-10-05T02:04:13.788403"
   },
   {
     "case_id": "EV11-INL-006",
@@ -982,6 +1007,7 @@
     "domain": "Environmental Science",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "INLINE_CITATION",
     "predicted_context": "INLINE_CITATION",
@@ -1011,7 +1037,7 @@
     "span_start": 168,
     "span_end": 183,
     "rationale": "Detected bracketed inline reference marker adjacent to evidence span.",
-    "evaluated_at": "2026-10-05T01:41:55.370760"
+    "evaluated_at": "2026-10-05T02:04:13.788668"
   },
   {
     "case_id": "EV11-INL-007",
@@ -1021,6 +1047,7 @@
     "domain": "Law",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "INLINE_CITATION",
     "predicted_context": "INLINE_CITATION",
@@ -1050,7 +1077,7 @@
     "span_start": 177,
     "span_end": 180,
     "rationale": "Detected bracketed inline reference marker adjacent to evidence span.",
-    "evaluated_at": "2026-10-05T01:41:55.371187"
+    "evaluated_at": "2026-10-05T02:04:13.788922"
   },
   {
     "case_id": "EV11-INL-008",
@@ -1060,6 +1087,7 @@
     "domain": "Pharmacology",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "INLINE_CITATION",
     "predicted_context": "INLINE_CITATION",
@@ -1089,7 +1117,7 @@
     "span_start": 175,
     "span_end": 189,
     "rationale": "Detected bracketed inline reference marker adjacent to evidence span.",
-    "evaluated_at": "2026-10-05T01:41:55.371624"
+    "evaluated_at": "2026-10-05T02:04:13.789191"
   },
   {
     "case_id": "EV11-INL-009",
@@ -1099,6 +1127,7 @@
     "domain": "Education",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "INLINE_CITATION",
     "predicted_context": "INLINE_CITATION",
@@ -1128,7 +1157,7 @@
     "span_start": 170,
     "span_end": 176,
     "rationale": "Detected bracketed inline reference marker adjacent to evidence span.",
-    "evaluated_at": "2026-10-05T01:41:55.372035"
+    "evaluated_at": "2026-10-05T02:04:13.789439"
   },
   {
     "case_id": "EV11-INL-010",
@@ -1138,6 +1167,7 @@
     "domain": "Urban Planning",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "INLINE_CITATION",
     "predicted_context": "INLINE_CITATION",
@@ -1167,7 +1197,7 @@
     "span_start": 182,
     "span_end": 196,
     "rationale": "Detected bracketed inline reference marker adjacent to evidence span.",
-    "evaluated_at": "2026-10-05T01:41:55.372788"
+    "evaluated_at": "2026-10-05T02:04:13.789794"
   },
   {
     "case_id": "EV11-QUO-001",
@@ -1177,6 +1207,7 @@
     "domain": "Renewable Energy",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "DIRECT_QUOTE",
     "predicted_context": "DIRECT_QUOTE",
@@ -1206,7 +1237,7 @@
     "span_start": 25,
     "span_end": 236,
     "rationale": "Detected passage enclosed within typographic or direct quotation marks.",
-    "evaluated_at": "2026-10-05T01:41:55.373370"
+    "evaluated_at": "2026-10-05T02:04:13.790320"
   },
   {
     "case_id": "EV11-QUO-002",
@@ -1216,6 +1247,7 @@
     "domain": "Computer Science / NLP",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "DIRECT_QUOTE",
     "predicted_context": "DIRECT_QUOTE",
@@ -1245,7 +1277,7 @@
     "span_start": 25,
     "span_end": 202,
     "rationale": "Detected passage enclosed within typographic or direct quotation marks.",
-    "evaluated_at": "2026-10-05T01:41:55.373850"
+    "evaluated_at": "2026-10-05T02:04:13.790608"
   },
   {
     "case_id": "EV11-QUO-003",
@@ -1255,6 +1287,7 @@
     "domain": "Agriculture",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "DIRECT_QUOTE",
     "predicted_context": "DIRECT_QUOTE",
@@ -1284,7 +1317,7 @@
     "span_start": 25,
     "span_end": 232,
     "rationale": "Detected passage enclosed within typographic or direct quotation marks.",
-    "evaluated_at": "2026-10-05T01:41:55.374426"
+    "evaluated_at": "2026-10-05T02:04:13.790938"
   },
   {
     "case_id": "EV11-QUO-004",
@@ -1294,6 +1327,7 @@
     "domain": "Public Health",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "DIRECT_QUOTE",
     "predicted_context": "DIRECT_QUOTE",
@@ -1323,7 +1357,7 @@
     "span_start": 25,
     "span_end": 209,
     "rationale": "Detected passage enclosed within typographic or direct quotation marks.",
-    "evaluated_at": "2026-10-05T01:41:55.374920"
+    "evaluated_at": "2026-10-05T02:04:13.791199"
   },
   {
     "case_id": "EV11-QUO-005",
@@ -1333,6 +1367,7 @@
     "domain": "Economics",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "DIRECT_QUOTE",
     "predicted_context": "DIRECT_QUOTE",
@@ -1362,7 +1397,7 @@
     "span_start": 27,
     "span_end": 200,
     "rationale": "Detected passage enclosed within typographic or direct quotation marks.",
-    "evaluated_at": "2026-10-05T01:41:55.375411"
+    "evaluated_at": "2026-10-05T02:04:13.791479"
   },
   {
     "case_id": "EV11-QUO-006",
@@ -1372,6 +1407,7 @@
     "domain": "Environmental Science",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "DIRECT_QUOTE",
     "predicted_context": "DIRECT_QUOTE",
@@ -1401,7 +1437,7 @@
     "span_start": 27,
     "span_end": 197,
     "rationale": "Detected passage enclosed within typographic or direct quotation marks.",
-    "evaluated_at": "2026-10-05T01:41:55.375874"
+    "evaluated_at": "2026-10-05T02:04:13.791731"
   },
   {
     "case_id": "EV11-QUO-007",
@@ -1411,6 +1447,7 @@
     "domain": "Law",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "BLOCK_QUOTE",
     "predicted_context": "BLOCK_QUOTE",
@@ -1440,7 +1477,7 @@
     "span_start": 48,
     "span_end": 229,
     "rationale": "Detected indented block quotation formatting structure.",
-    "evaluated_at": "2026-10-05T01:41:55.376299"
+    "evaluated_at": "2026-10-05T02:04:13.791949"
   },
   {
     "case_id": "EV11-QUO-008",
@@ -1450,6 +1487,7 @@
     "domain": "Pharmacology",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "BLOCK_QUOTE",
     "predicted_context": "BLOCK_QUOTE",
@@ -1479,7 +1517,7 @@
     "span_start": 48,
     "span_end": 227,
     "rationale": "Detected indented block quotation formatting structure.",
-    "evaluated_at": "2026-10-05T01:41:55.376821"
+    "evaluated_at": "2026-10-05T02:04:13.792192"
   },
   {
     "case_id": "EV11-QUO-009",
@@ -1489,6 +1527,7 @@
     "domain": "Education",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "BLOCK_QUOTE",
     "predicted_context": "BLOCK_QUOTE",
@@ -1518,7 +1557,7 @@
     "span_start": 51,
     "span_end": 223,
     "rationale": "Detected indented block quotation formatting structure.",
-    "evaluated_at": "2026-10-05T01:41:55.377212"
+    "evaluated_at": "2026-10-05T02:04:13.792425"
   },
   {
     "case_id": "EV11-QUO-010",
@@ -1528,6 +1567,7 @@
     "domain": "Urban Planning",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "BLOCK_QUOTE",
     "predicted_context": "BLOCK_QUOTE",
@@ -1557,7 +1597,7 @@
     "span_start": 51,
     "span_end": 235,
     "rationale": "Detected indented block quotation formatting structure.",
-    "evaluated_at": "2026-10-05T01:41:55.377617"
+    "evaluated_at": "2026-10-05T02:04:13.792646"
   },
   {
     "case_id": "EV11-PRA-001",
@@ -1567,6 +1607,7 @@
     "domain": "Renewable Energy",
     "expected_class": "review",
     "predicted_class": "review",
+    "predicted_pattern": "SEMANTIC_PARAPHRASE",
     "decision_match": true,
     "expected_context": "PARENTHETICAL_CITATION",
     "predicted_context": "PARENTHETICAL_CITATION",
@@ -1596,7 +1637,7 @@
     "span_start": 0,
     "span_end": 20,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "evaluated_at": "2026-10-05T01:41:55.378045"
+    "evaluated_at": "2026-10-05T02:04:13.792878"
   },
   {
     "case_id": "EV11-PRA-002",
@@ -1606,6 +1647,7 @@
     "domain": "Computer Science / NLP",
     "expected_class": "review",
     "predicted_class": "review",
+    "predicted_pattern": "SEMANTIC_PARAPHRASE",
     "decision_match": true,
     "expected_context": "PARENTHETICAL_CITATION",
     "predicted_context": "PARENTHETICAL_CITATION",
@@ -1635,7 +1677,7 @@
     "span_start": 166,
     "span_end": 187,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "evaluated_at": "2026-10-05T01:41:55.378454"
+    "evaluated_at": "2026-10-05T02:04:13.793105"
   },
   {
     "case_id": "EV11-PRA-003",
@@ -1645,6 +1687,7 @@
     "domain": "Agriculture",
     "expected_class": "review",
     "predicted_class": "review",
+    "predicted_pattern": "SEMANTIC_PARAPHRASE",
     "decision_match": true,
     "expected_context": "PARENTHETICAL_CITATION",
     "predicted_context": "PARENTHETICAL_CITATION",
@@ -1674,7 +1717,7 @@
     "span_start": 0,
     "span_end": 32,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "evaluated_at": "2026-10-05T01:41:55.379100"
+    "evaluated_at": "2026-10-05T02:04:13.793348"
   },
   {
     "case_id": "EV11-PRA-004",
@@ -1684,6 +1727,7 @@
     "domain": "Public Health",
     "expected_class": "review",
     "predicted_class": "review",
+    "predicted_pattern": "SEMANTIC_PARAPHRASE",
     "decision_match": true,
     "expected_context": "INLINE_CITATION",
     "predicted_context": "INLINE_CITATION",
@@ -1713,7 +1757,7 @@
     "span_start": 148,
     "span_end": 151,
     "rationale": "Detected bracketed inline reference marker adjacent to evidence span.",
-    "evaluated_at": "2026-10-05T01:41:55.379564"
+    "evaluated_at": "2026-10-05T02:04:13.793559"
   },
   {
     "case_id": "EV11-PRA-005",
@@ -1723,6 +1767,7 @@
     "domain": "Economics",
     "expected_class": "review",
     "predicted_class": "review",
+    "predicted_pattern": "SEMANTIC_PARAPHRASE",
     "decision_match": true,
     "expected_context": "PARENTHETICAL_CITATION",
     "predicted_context": "PARENTHETICAL_CITATION",
@@ -1752,7 +1797,7 @@
     "span_start": 0,
     "span_end": 40,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "evaluated_at": "2026-10-05T01:41:55.379951"
+    "evaluated_at": "2026-10-05T02:04:13.793785"
   },
   {
     "case_id": "EV11-PRA-006",
@@ -1762,6 +1807,7 @@
     "domain": "Environmental Science",
     "expected_class": "review",
     "predicted_class": "review",
+    "predicted_pattern": "SEMANTIC_PARAPHRASE",
     "decision_match": true,
     "expected_context": "PARENTHETICAL_CITATION",
     "predicted_context": "PARENTHETICAL_CITATION",
@@ -1791,7 +1837,7 @@
     "span_start": 145,
     "span_end": 161,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "evaluated_at": "2026-10-05T01:41:55.380345"
+    "evaluated_at": "2026-10-05T02:04:13.793985"
   },
   {
     "case_id": "EV11-PRA-007",
@@ -1801,6 +1847,7 @@
     "domain": "Law",
     "expected_class": "review",
     "predicted_class": "review",
+    "predicted_pattern": "SEMANTIC_PARAPHRASE",
     "decision_match": true,
     "expected_context": "PARENTHETICAL_CITATION",
     "predicted_context": "PARENTHETICAL_CITATION",
@@ -1830,7 +1877,7 @@
     "span_start": 0,
     "span_end": 43,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "evaluated_at": "2026-10-05T01:41:55.380792"
+    "evaluated_at": "2026-10-05T02:04:13.794194"
   },
   {
     "case_id": "EV11-PRA-008",
@@ -1840,6 +1887,7 @@
     "domain": "Pharmacology",
     "expected_class": "review",
     "predicted_class": "review",
+    "predicted_pattern": "SEMANTIC_PARAPHRASE",
     "decision_match": true,
     "expected_context": "INLINE_CITATION",
     "predicted_context": "INLINE_CITATION",
@@ -1869,7 +1917,7 @@
     "span_start": 147,
     "span_end": 150,
     "rationale": "Detected bracketed inline reference marker adjacent to evidence span.",
-    "evaluated_at": "2026-10-05T01:41:55.381221"
+    "evaluated_at": "2026-10-05T02:04:13.794378"
   },
   {
     "case_id": "EV11-PRA-009",
@@ -1879,6 +1927,7 @@
     "domain": "Education",
     "expected_class": "review",
     "predicted_class": "no_match",
+    "predicted_pattern": "NO_EVIDENCE",
     "decision_match": false,
     "expected_context": "PARENTHETICAL_CITATION",
     "predicted_context": "PARENTHETICAL_CITATION",
@@ -1910,7 +1959,7 @@
     "span_start": 0,
     "span_end": 23,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "evaluated_at": "2026-10-05T01:41:55.381646"
+    "evaluated_at": "2026-10-05T02:04:13.794553"
   },
   {
     "case_id": "EV11-PRA-010",
@@ -1920,6 +1969,7 @@
     "domain": "Urban Planning",
     "expected_class": "review",
     "predicted_class": "review",
+    "predicted_pattern": "SEMANTIC_PARAPHRASE",
     "decision_match": true,
     "expected_context": "PARENTHETICAL_CITATION",
     "predicted_context": "PARENTHETICAL_CITATION",
@@ -1949,7 +1999,7 @@
     "span_start": 152,
     "span_end": 167,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "evaluated_at": "2026-10-05T01:41:55.382119"
+    "evaluated_at": "2026-10-05T02:04:13.794762"
   },
   {
     "case_id": "EV11-MET-001",
@@ -1959,6 +2009,7 @@
     "domain": null,
     "expected_class": "review",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": false,
     "expected_context": "NONE",
     "predicted_context": "NONE",
@@ -1991,7 +2042,7 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "evaluated_at": "2026-10-05T01:41:55.382546"
+    "evaluated_at": "2026-10-05T02:04:13.794961"
   },
   {
     "case_id": "EV11-MET-002",
@@ -2001,6 +2052,7 @@
     "domain": null,
     "expected_class": "review",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": false,
     "expected_context": "NONE",
     "predicted_context": "NONE",
@@ -2033,7 +2085,7 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "evaluated_at": "2026-10-05T01:41:55.382959"
+    "evaluated_at": "2026-10-05T02:04:13.795158"
   },
   {
     "case_id": "EV11-MET-003",
@@ -2043,6 +2095,7 @@
     "domain": null,
     "expected_class": "review",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": false,
     "expected_context": "NONE",
     "predicted_context": "NONE",
@@ -2075,7 +2128,7 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "evaluated_at": "2026-10-05T01:41:55.383357"
+    "evaluated_at": "2026-10-05T02:04:13.795349"
   },
   {
     "case_id": "EV11-MET-004",
@@ -2085,6 +2138,7 @@
     "domain": null,
     "expected_class": "review",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": false,
     "expected_context": "NONE",
     "predicted_context": "NONE",
@@ -2117,7 +2171,7 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "evaluated_at": "2026-10-05T01:41:55.383778"
+    "evaluated_at": "2026-10-05T02:04:13.795562"
   },
   {
     "case_id": "EV11-MET-005",
@@ -2127,6 +2181,7 @@
     "domain": null,
     "expected_class": "review",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": false,
     "expected_context": "NONE",
     "predicted_context": "NONE",
@@ -2159,7 +2214,7 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "evaluated_at": "2026-10-05T01:41:55.384165"
+    "evaluated_at": "2026-10-05T02:04:13.795761"
   },
   {
     "case_id": "EV11-MET-006",
@@ -2169,6 +2224,7 @@
     "domain": null,
     "expected_class": "review",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": false,
     "expected_context": "NONE",
     "predicted_context": "NONE",
@@ -2201,7 +2257,7 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "evaluated_at": "2026-10-05T01:41:55.384876"
+    "evaluated_at": "2026-10-05T02:04:13.795947"
   },
   {
     "case_id": "EV11-MET-007",
@@ -2211,6 +2267,7 @@
     "domain": null,
     "expected_class": "review",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": false,
     "expected_context": "NONE",
     "predicted_context": "NONE",
@@ -2243,7 +2300,7 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "evaluated_at": "2026-10-05T01:41:55.385349"
+    "evaluated_at": "2026-10-05T02:04:13.796142"
   },
   {
     "case_id": "EV11-MET-008",
@@ -2253,6 +2310,7 @@
     "domain": null,
     "expected_class": "review",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": false,
     "expected_context": "NONE",
     "predicted_context": "NONE",
@@ -2285,7 +2343,7 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "evaluated_at": "2026-10-05T01:41:55.385791"
+    "evaluated_at": "2026-10-05T02:04:13.796353"
   },
   {
     "case_id": "EV11-MET-009",
@@ -2295,6 +2353,7 @@
     "domain": null,
     "expected_class": "review",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": false,
     "expected_context": "NONE",
     "predicted_context": "NONE",
@@ -2327,7 +2386,7 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "evaluated_at": "2026-10-05T01:41:55.386213"
+    "evaluated_at": "2026-10-05T02:04:13.796555"
   },
   {
     "case_id": "EV11-MET-010",
@@ -2337,6 +2396,7 @@
     "domain": null,
     "expected_class": "review",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": false,
     "expected_context": "NONE",
     "predicted_context": "NONE",
@@ -2369,7 +2429,7 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "evaluated_at": "2026-10-05T01:41:55.386551"
+    "evaluated_at": "2026-10-05T02:04:13.796737"
   },
   {
     "case_id": "EV11-DIV-001",
@@ -2379,6 +2439,7 @@
     "domain": "Renewable Energy",
     "expected_class": "review",
     "predicted_class": "review",
+    "predicted_pattern": "SEMANTIC_PARAPHRASE",
     "decision_match": true,
     "expected_context": "NONE",
     "predicted_context": "NONE",
@@ -2408,7 +2469,7 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "evaluated_at": "2026-10-05T01:41:55.386914"
+    "evaluated_at": "2026-10-05T02:04:13.796924"
   },
   {
     "case_id": "EV11-DIV-002",
@@ -2418,6 +2479,7 @@
     "domain": "Computer Science / NLP",
     "expected_class": "review",
     "predicted_class": "review",
+    "predicted_pattern": "SEMANTIC_PARAPHRASE",
     "decision_match": true,
     "expected_context": "NONE",
     "predicted_context": "NONE",
@@ -2447,7 +2509,7 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "evaluated_at": "2026-10-05T01:41:55.387259"
+    "evaluated_at": "2026-10-05T02:04:13.797108"
   },
   {
     "case_id": "EV11-DIV-003",
@@ -2457,6 +2519,7 @@
     "domain": "Agriculture",
     "expected_class": "review",
     "predicted_class": "review",
+    "predicted_pattern": "SEMANTIC_PARAPHRASE",
     "decision_match": true,
     "expected_context": "NONE",
     "predicted_context": "NONE",
@@ -2486,7 +2549,7 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "evaluated_at": "2026-10-05T01:41:55.387622"
+    "evaluated_at": "2026-10-05T02:04:13.797285"
   },
   {
     "case_id": "EV11-DIV-004",
@@ -2496,6 +2559,7 @@
     "domain": "Public Health",
     "expected_class": "review",
     "predicted_class": "review",
+    "predicted_pattern": "SEMANTIC_PARAPHRASE",
     "decision_match": true,
     "expected_context": "NONE",
     "predicted_context": "NONE",
@@ -2525,7 +2589,7 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "evaluated_at": "2026-10-05T01:41:55.387970"
+    "evaluated_at": "2026-10-05T02:04:13.797452"
   },
   {
     "case_id": "EV11-DIV-005",
@@ -2535,6 +2599,7 @@
     "domain": "Economics",
     "expected_class": "review",
     "predicted_class": "review",
+    "predicted_pattern": "SEMANTIC_PARAPHRASE",
     "decision_match": true,
     "expected_context": "NONE",
     "predicted_context": "NONE",
@@ -2564,7 +2629,7 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "evaluated_at": "2026-10-05T01:41:55.388358"
+    "evaluated_at": "2026-10-05T02:04:13.797624"
   },
   {
     "case_id": "EV11-DIV-006",
@@ -2574,6 +2639,7 @@
     "domain": "Environmental Science",
     "expected_class": "review",
     "predicted_class": "review",
+    "predicted_pattern": "SEMANTIC_PARAPHRASE",
     "decision_match": true,
     "expected_context": "NONE",
     "predicted_context": "NONE",
@@ -2603,7 +2669,7 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "evaluated_at": "2026-10-05T01:41:55.388681"
+    "evaluated_at": "2026-10-05T02:04:13.797785"
   },
   {
     "case_id": "EV11-DIV-007",
@@ -2613,6 +2679,7 @@
     "domain": "Law",
     "expected_class": "review",
     "predicted_class": "review",
+    "predicted_pattern": "SEMANTIC_PARAPHRASE",
     "decision_match": true,
     "expected_context": "NONE",
     "predicted_context": "NONE",
@@ -2642,7 +2709,7 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "evaluated_at": "2026-10-05T01:41:55.389258"
+    "evaluated_at": "2026-10-05T02:04:13.797948"
   },
   {
     "case_id": "EV11-DIV-008",
@@ -2652,6 +2719,7 @@
     "domain": "Pharmacology",
     "expected_class": "review",
     "predicted_class": "review",
+    "predicted_pattern": "SEMANTIC_PARAPHRASE",
     "decision_match": true,
     "expected_context": "NONE",
     "predicted_context": "NONE",
@@ -2681,7 +2749,7 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "evaluated_at": "2026-10-05T01:41:55.389601"
+    "evaluated_at": "2026-10-05T02:04:13.798115"
   },
   {
     "case_id": "EV11-DIV-009",
@@ -2691,6 +2759,7 @@
     "domain": "Education",
     "expected_class": "review",
     "predicted_class": "review",
+    "predicted_pattern": "SEMANTIC_PARAPHRASE",
     "decision_match": true,
     "expected_context": "NONE",
     "predicted_context": "NONE",
@@ -2720,7 +2789,7 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "evaluated_at": "2026-10-05T01:41:55.389934"
+    "evaluated_at": "2026-10-05T02:04:13.798275"
   },
   {
     "case_id": "EV11-DIV-010",
@@ -2730,6 +2799,7 @@
     "domain": "Urban Planning",
     "expected_class": "review",
     "predicted_class": "review",
+    "predicted_pattern": "SEMANTIC_PARAPHRASE",
     "decision_match": true,
     "expected_context": "NONE",
     "predicted_context": "NONE",
@@ -2759,7 +2829,7 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "evaluated_at": "2026-10-05T01:41:55.390238"
+    "evaluated_at": "2026-10-05T02:04:13.798442"
   },
   {
     "case_id": "EV11-DIS-001",
@@ -2769,6 +2839,7 @@
     "domain": "Renewable Energy",
     "expected_class": "match",
     "predicted_class": "review",
+    "predicted_pattern": "COPY_EDIT",
     "decision_match": false,
     "expected_context": "PARENTHETICAL_CITATION",
     "predicted_context": "PARENTHETICAL_CITATION",
@@ -2800,7 +2871,7 @@
     "span_start": 256,
     "span_end": 274,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "evaluated_at": "2026-10-05T01:41:55.390739"
+    "evaluated_at": "2026-10-05T02:04:13.798745"
   },
   {
     "case_id": "EV11-DIS-002",
@@ -2810,6 +2881,7 @@
     "domain": "Computer Science / NLP",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "PARENTHETICAL_CITATION",
     "predicted_context": "PARENTHETICAL_CITATION",
@@ -2839,7 +2911,7 @@
     "span_start": 176,
     "span_end": 225,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "evaluated_at": "2026-10-05T01:41:55.391139"
+    "evaluated_at": "2026-10-05T02:04:13.799001"
   },
   {
     "case_id": "EV11-DIS-003",
@@ -2849,6 +2921,7 @@
     "domain": "Agriculture",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "PARENTHETICAL_CITATION",
     "predicted_context": "PARENTHETICAL_CITATION",
@@ -2878,7 +2951,7 @@
     "span_start": 256,
     "span_end": 268,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "evaluated_at": "2026-10-05T01:41:55.391679"
+    "evaluated_at": "2026-10-05T02:04:13.799342"
   },
   {
     "case_id": "EV11-DIS-004",
@@ -2888,6 +2961,7 @@
     "domain": "Public Health",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "PARENTHETICAL_CITATION",
     "predicted_context": "PARENTHETICAL_CITATION",
@@ -2917,7 +2991,7 @@
     "span_start": 183,
     "span_end": 249,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "evaluated_at": "2026-10-05T01:41:55.392021"
+    "evaluated_at": "2026-10-05T02:04:13.799607"
   },
   {
     "case_id": "EV11-DIS-005",
@@ -2927,6 +3001,7 @@
     "domain": "Economics",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "PARENTHETICAL_CITATION",
     "predicted_context": "PARENTHETICAL_CITATION",
@@ -2956,7 +3031,7 @@
     "span_start": 172,
     "span_end": 223,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "evaluated_at": "2026-10-05T01:41:55.392366"
+    "evaluated_at": "2026-10-05T02:04:13.799965"
   },
   {
     "case_id": "EV11-DIS-006",
@@ -2966,6 +3041,7 @@
     "domain": "Environmental Science",
     "expected_class": "match",
     "predicted_class": "review",
+    "predicted_pattern": "COPY_EDIT",
     "decision_match": false,
     "expected_context": "PARENTHETICAL_CITATION",
     "predicted_context": "PARENTHETICAL_CITATION",
@@ -2997,7 +3073,7 @@
     "span_start": 169,
     "span_end": 237,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "evaluated_at": "2026-10-05T01:41:55.392849"
+    "evaluated_at": "2026-10-05T02:04:13.800248"
   },
   {
     "case_id": "EV11-DIS-007",
@@ -3007,6 +3083,7 @@
     "domain": "Law",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "PARENTHETICAL_CITATION",
     "predicted_context": "PARENTHETICAL_CITATION",
@@ -3036,7 +3113,7 @@
     "span_start": 178,
     "span_end": 242,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "evaluated_at": "2026-10-05T01:41:55.393183"
+    "evaluated_at": "2026-10-05T02:04:13.800592"
   },
   {
     "case_id": "EV11-DIS-008",
@@ -3046,6 +3123,7 @@
     "domain": "Pharmacology",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "PARENTHETICAL_CITATION",
     "predicted_context": "PARENTHETICAL_CITATION",
@@ -3075,7 +3153,7 @@
     "span_start": 176,
     "span_end": 236,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "evaluated_at": "2026-10-05T01:41:55.393484"
+    "evaluated_at": "2026-10-05T02:04:13.800904"
   },
   {
     "case_id": "EV11-DIS-009",
@@ -3085,6 +3163,7 @@
     "domain": "Education",
     "expected_class": "match",
     "predicted_class": "match",
+    "predicted_pattern": "VERBATIM_MATCH",
     "decision_match": true,
     "expected_context": "PARENTHETICAL_CITATION",
     "predicted_context": "PARENTHETICAL_CITATION",
@@ -3114,7 +3193,7 @@
     "span_start": 171,
     "span_end": 230,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "evaluated_at": "2026-10-05T01:41:55.393886"
+    "evaluated_at": "2026-10-05T02:04:13.801182"
   },
   {
     "case_id": "EV11-DIS-010",
@@ -3124,6 +3203,7 @@
     "domain": "Urban Planning",
     "expected_class": "match",
     "predicted_class": "review",
+    "predicted_pattern": "COPY_EDIT",
     "decision_match": false,
     "expected_context": "PARENTHETICAL_CITATION",
     "predicted_context": "PARENTHETICAL_CITATION",
@@ -3155,6 +3235,6 @@
     "span_start": 183,
     "span_end": 245,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "evaluated_at": "2026-10-05T01:41:55.394408"
+    "evaluated_at": "2026-10-05T02:04:13.801447"
   }
 ]

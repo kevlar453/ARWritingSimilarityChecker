@@ -141,7 +141,7 @@
                     <span class="font-mono-code text-lg font-extrabold text-slate-800 block mt-0.5">
                         <?= number_format($item['cosine_similarity'], 2) ?>%
                     </span>
-                    <span class="text-[10px] text-slate-400">Terms: <?= $item['matched_terms'] ?>, Avg IDF: <?= number_format($item['avg_idf'], 2) ?></span>
+                    <span class="text-[10px] text-slate-400">Terms: <?= $item['matched_terms'] ?? 0 ?>, Avg IDF: <?= number_format($item['avg_idf'] ?? 2.5, 2) ?></span>
                 </div>
             </div>
 

@@ -1,6 +1,6 @@
 {
   "evaluation_name": "Targeted 80-Case Academic Context Evaluation (v1.1)",
-  "executed_at": "2026-10-05T01:41:55.394549",
+  "executed_at": "2026-10-05T02:04:13.801511",
   "system_version": "v1.1.0",
   "baseline_version": "v1.0.0 (FROZEN)",
   "all_quality_gates_pass": true,
@@ -19,7 +19,7 @@
     "evidence_type_alignment_pct": 87.5,
     "decision_invariance_pct": 100.0,
     "non_suppression_invariance_pct": 100.0,
-    "elapsed_seconds": 0.039
+    "elapsed_seconds": 0.021
   },
   "failure_taxonomy_distribution": {
     "BOUNDARY_BEHAVIOR:THRESHOLD_TRANSITION": 4,
