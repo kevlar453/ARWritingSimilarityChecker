@@ -44,11 +44,16 @@ case "$1" in
         shift
         exec "$PYTHON_BIN" -m worker.exporter "$@"
         ;;
+    eval)
+        shift
+        exec "$PYTHON_BIN" -m evaluation.cli "$@"
+        ;;
     *)
         echo "============================================="
         echo "        AR Tilik CLI Management Tool         "
         echo "============================================="
         echo "Penggunaan praktis:"
+        echo "  ./artilik eval [generate|run|review]"
         echo "  ./artilik benchmark --engine [hybrid|tfidf|idf|exact]"
         echo "  ./artilik regression [--cleanup]"
         echo "  ./artilik readiness"

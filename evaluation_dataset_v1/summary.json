@@ -1,0 +1,9 @@
+{
+  "dataset_version": "v1.0.0",
+  "total_cases": 500,
+  "seed_cases": 50,
+  "mutation_cases": 250,
+  "boundary_cases": 100,
+  "adversarial_cases": 100,
+  "output_directory": "/home/humanitarianism/www/html/ARWritingSimilarityChecker/evaluation_dataset_v1"
+}

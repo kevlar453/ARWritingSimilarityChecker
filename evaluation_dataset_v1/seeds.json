@@ -1,0 +1,802 @@
+[
+  {
+    "case_id": "EV-SEED-001",
+    "case_type": "SEED",
+    "source_case": "TC-001",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "match",
+    "expected_pattern": "VERBATIM_MATCH",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "identical",
+      "seed_index": 1
+    }
+  },
+  {
+    "case_id": "EV-SEED-002",
+    "case_type": "SEED",
+    "source_case": "TC-002",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "match",
+    "expected_pattern": "VERBATIM_MATCH",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "identical",
+      "seed_index": 2
+    }
+  },
+  {
+    "case_id": "EV-SEED-003",
+    "case_type": "SEED",
+    "source_case": "TC-003",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "match",
+    "expected_pattern": "VERBATIM_MATCH",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "identical",
+      "seed_index": 3
+    }
+  },
+  {
+    "case_id": "EV-SEED-004",
+    "case_type": "SEED",
+    "source_case": "TC-004",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "match",
+    "expected_pattern": "VERBATIM_MATCH",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "identical",
+      "seed_index": 4
+    }
+  },
+  {
+    "case_id": "EV-SEED-005",
+    "case_type": "SEED",
+    "source_case": "TC-005",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "match",
+    "expected_pattern": "VERBATIM_MATCH",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "identical",
+      "seed_index": 5
+    }
+  },
+  {
+    "case_id": "EV-SEED-006",
+    "case_type": "SEED",
+    "source_case": "TC-006",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "match",
+    "expected_pattern": "VERBATIM_MATCH",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "identical",
+      "seed_index": 6
+    }
+  },
+  {
+    "case_id": "EV-SEED-007",
+    "case_type": "SEED",
+    "source_case": "TC-007",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "match",
+    "expected_pattern": "VERBATIM_MATCH",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "identical",
+      "seed_index": 7
+    }
+  },
+  {
+    "case_id": "EV-SEED-008",
+    "case_type": "SEED",
+    "source_case": "TC-008",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "match",
+    "expected_pattern": "VERBATIM_MATCH",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "identical",
+      "seed_index": 8
+    }
+  },
+  {
+    "case_id": "EV-SEED-009",
+    "case_type": "SEED",
+    "source_case": "TC-009",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "match",
+    "expected_pattern": "VERBATIM_MATCH",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "identical",
+      "seed_index": 9
+    }
+  },
+  {
+    "case_id": "EV-SEED-010",
+    "case_type": "SEED",
+    "source_case": "TC-010",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "match",
+    "expected_pattern": "VERBATIM_MATCH",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "identical",
+      "seed_index": 10
+    }
+  },
+  {
+    "case_id": "EV-SEED-011",
+    "case_type": "SEED",
+    "source_case": "TC-011",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Penelitian ini bertujuan untuk menganalisis dampak teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "copy_edit",
+      "seed_index": 11
+    }
+  },
+  {
+    "case_id": "EV-SEED-012",
+    "case_type": "SEED",
+    "source_case": "TC-012",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Penelitian ini bertujuan untuk menganalisis dampak teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "copy_edit",
+      "seed_index": 12
+    }
+  },
+  {
+    "case_id": "EV-SEED-013",
+    "case_type": "SEED",
+    "source_case": "TC-013",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Penelitian ini bertujuan untuk menganalisis dampak teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "copy_edit",
+      "seed_index": 13
+    }
+  },
+  {
+    "case_id": "EV-SEED-014",
+    "case_type": "SEED",
+    "source_case": "TC-014",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Penelitian ini bertujuan untuk menganalisis dampak teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "copy_edit",
+      "seed_index": 14
+    }
+  },
+  {
+    "case_id": "EV-SEED-015",
+    "case_type": "SEED",
+    "source_case": "TC-015",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Penelitian ini bertujuan untuk menganalisis dampak teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "copy_edit",
+      "seed_index": 15
+    }
+  },
+  {
+    "case_id": "EV-SEED-016",
+    "case_type": "SEED",
+    "source_case": "TC-016",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Penelitian ini bertujuan untuk menganalisis dampak teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "copy_edit",
+      "seed_index": 16
+    }
+  },
+  {
+    "case_id": "EV-SEED-017",
+    "case_type": "SEED",
+    "source_case": "TC-017",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Penelitian ini bertujuan untuk menganalisis dampak teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "copy_edit",
+      "seed_index": 17
+    }
+  },
+  {
+    "case_id": "EV-SEED-018",
+    "case_type": "SEED",
+    "source_case": "TC-018",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Penelitian ini bertujuan untuk menganalisis dampak teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "copy_edit",
+      "seed_index": 18
+    }
+  },
+  {
+    "case_id": "EV-SEED-019",
+    "case_type": "SEED",
+    "source_case": "TC-019",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Penelitian ini bertujuan untuk menganalisis dampak teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "copy_edit",
+      "seed_index": 19
+    }
+  },
+  {
+    "case_id": "EV-SEED-020",
+    "case_type": "SEED",
+    "source_case": "TC-020",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Penelitian ini bertujuan untuk menganalisis dampak teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "copy_edit",
+      "seed_index": 20
+    }
+  },
+  {
+    "case_id": "EV-SEED-021",
+    "case_type": "SEED",
+    "source_case": "TC-021",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Studi ini dilakukan untuk menganalisis hubungan antara pemanfaatan teknologi informasi dan performa organisasi. Pendekatan kuantitatif digunakan dalam penelitian dengan instrumen berupa kuesioner. Temuan penelitian memperlihatkan adanya keterkaitan penggunaan teknologi dengan peningkatan performa organisasi.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "SEMANTIC_PARAPHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "paraphrase",
+      "seed_index": 21
+    }
+  },
+  {
+    "case_id": "EV-SEED-022",
+    "case_type": "SEED",
+    "source_case": "TC-022",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Studi ini dilakukan untuk menganalisis hubungan antara pemanfaatan teknologi informasi dan performa organisasi. Pendekatan kuantitatif digunakan dalam penelitian dengan instrumen berupa kuesioner. Temuan penelitian memperlihatkan adanya keterkaitan penggunaan teknologi dengan peningkatan performa organisasi.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "SEMANTIC_PARAPHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "paraphrase",
+      "seed_index": 22
+    }
+  },
+  {
+    "case_id": "EV-SEED-023",
+    "case_type": "SEED",
+    "source_case": "TC-023",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Studi ini dilakukan untuk menganalisis hubungan antara pemanfaatan teknologi informasi dan performa organisasi. Pendekatan kuantitatif digunakan dalam penelitian dengan instrumen berupa kuesioner. Temuan penelitian memperlihatkan adanya keterkaitan penggunaan teknologi dengan peningkatan performa organisasi.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "SEMANTIC_PARAPHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "paraphrase",
+      "seed_index": 23
+    }
+  },
+  {
+    "case_id": "EV-SEED-024",
+    "case_type": "SEED",
+    "source_case": "TC-024",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Studi ini dilakukan untuk menganalisis hubungan antara pemanfaatan teknologi informasi dan performa organisasi. Pendekatan kuantitatif digunakan dalam penelitian dengan instrumen berupa kuesioner. Temuan penelitian memperlihatkan adanya keterkaitan penggunaan teknologi dengan peningkatan performa organisasi.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "SEMANTIC_PARAPHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "paraphrase",
+      "seed_index": 24
+    }
+  },
+  {
+    "case_id": "EV-SEED-025",
+    "case_type": "SEED",
+    "source_case": "TC-025",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Studi ini dilakukan untuk menganalisis hubungan antara pemanfaatan teknologi informasi dan performa organisasi. Pendekatan kuantitatif digunakan dalam penelitian dengan instrumen berupa kuesioner. Temuan penelitian memperlihatkan adanya keterkaitan penggunaan teknologi dengan peningkatan performa organisasi.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "SEMANTIC_PARAPHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "paraphrase",
+      "seed_index": 25
+    }
+  },
+  {
+    "case_id": "EV-SEED-026",
+    "case_type": "SEED",
+    "source_case": "TC-026",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Studi ini dilakukan untuk menganalisis hubungan antara pemanfaatan teknologi informasi dan performa organisasi. Pendekatan kuantitatif digunakan dalam penelitian dengan instrumen berupa kuesioner. Temuan penelitian memperlihatkan adanya keterkaitan penggunaan teknologi dengan peningkatan performa organisasi.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "SEMANTIC_PARAPHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "paraphrase",
+      "seed_index": 26
+    }
+  },
+  {
+    "case_id": "EV-SEED-027",
+    "case_type": "SEED",
+    "source_case": "TC-027",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Studi ini dilakukan untuk menganalisis hubungan antara pemanfaatan teknologi informasi dan performa organisasi. Pendekatan kuantitatif digunakan dalam penelitian dengan instrumen berupa kuesioner. Temuan penelitian memperlihatkan adanya keterkaitan penggunaan teknologi dengan peningkatan performa organisasi.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "SEMANTIC_PARAPHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "paraphrase",
+      "seed_index": 27
+    }
+  },
+  {
+    "case_id": "EV-SEED-028",
+    "case_type": "SEED",
+    "source_case": "TC-028",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Studi ini dilakukan untuk menganalisis hubungan antara pemanfaatan teknologi informasi dan performa organisasi. Pendekatan kuantitatif digunakan dalam penelitian dengan instrumen berupa kuesioner. Temuan penelitian memperlihatkan adanya keterkaitan penggunaan teknologi dengan peningkatan performa organisasi.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "SEMANTIC_PARAPHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "paraphrase",
+      "seed_index": 28
+    }
+  },
+  {
+    "case_id": "EV-SEED-029",
+    "case_type": "SEED",
+    "source_case": "TC-029",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Studi ini dilakukan untuk menganalisis hubungan antara pemanfaatan teknologi informasi dan performa organisasi. Pendekatan kuantitatif digunakan dalam penelitian dengan instrumen berupa kuesioner. Temuan penelitian memperlihatkan adanya keterkaitan penggunaan teknologi dengan peningkatan performa organisasi.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "SEMANTIC_PARAPHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "paraphrase",
+      "seed_index": 29
+    }
+  },
+  {
+    "case_id": "EV-SEED-030",
+    "case_type": "SEED",
+    "source_case": "TC-030",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Studi ini dilakukan untuk menganalisis hubungan antara pemanfaatan teknologi informasi dan performa organisasi. Pendekatan kuantitatif digunakan dalam penelitian dengan instrumen berupa kuesioner. Temuan penelitian memperlihatkan adanya keterkaitan penggunaan teknologi dengan peningkatan performa organisasi.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "SEMANTIC_PARAPHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "paraphrase",
+      "seed_index": 30
+    }
+  },
+  {
+    "case_id": "EV-SEED-031",
+    "case_type": "SEED",
+    "source_case": "TC-031",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui kondisi objek yang diamati. Berdasarkan hasil penelitian yang telah dilakukan, terdapat beberapa karakteristik yang perlu diperhatikan.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "common_phrase",
+      "seed_index": 31
+    }
+  },
+  {
+    "case_id": "EV-SEED-032",
+    "case_type": "SEED",
+    "source_case": "TC-032",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui kondisi objek yang diamati. Berdasarkan hasil penelitian yang telah dilakukan, terdapat beberapa karakteristik yang perlu diperhatikan.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "common_phrase",
+      "seed_index": 32
+    }
+  },
+  {
+    "case_id": "EV-SEED-033",
+    "case_type": "SEED",
+    "source_case": "TC-033",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui kondisi objek yang diamati. Berdasarkan hasil penelitian yang telah dilakukan, terdapat beberapa karakteristik yang perlu diperhatikan.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "common_phrase",
+      "seed_index": 33
+    }
+  },
+  {
+    "case_id": "EV-SEED-034",
+    "case_type": "SEED",
+    "source_case": "TC-034",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui kondisi objek yang diamati. Berdasarkan hasil penelitian yang telah dilakukan, terdapat beberapa karakteristik yang perlu diperhatikan.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "common_phrase",
+      "seed_index": 34
+    }
+  },
+  {
+    "case_id": "EV-SEED-035",
+    "case_type": "SEED",
+    "source_case": "TC-035",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui kondisi objek yang diamati. Berdasarkan hasil penelitian yang telah dilakukan, terdapat beberapa karakteristik yang perlu diperhatikan.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "common_phrase",
+      "seed_index": 35
+    }
+  },
+  {
+    "case_id": "EV-SEED-036",
+    "case_type": "SEED",
+    "source_case": "TC-036",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui kondisi objek yang diamati. Berdasarkan hasil penelitian yang telah dilakukan, terdapat beberapa karakteristik yang perlu diperhatikan.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "common_phrase",
+      "seed_index": 36
+    }
+  },
+  {
+    "case_id": "EV-SEED-037",
+    "case_type": "SEED",
+    "source_case": "TC-037",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui kondisi objek yang diamati. Berdasarkan hasil penelitian yang telah dilakukan, terdapat beberapa karakteristik yang perlu diperhatikan.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "common_phrase",
+      "seed_index": 37
+    }
+  },
+  {
+    "case_id": "EV-SEED-038",
+    "case_type": "SEED",
+    "source_case": "TC-038",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui kondisi objek yang diamati. Berdasarkan hasil penelitian yang telah dilakukan, terdapat beberapa karakteristik yang perlu diperhatikan.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "common_phrase",
+      "seed_index": 38
+    }
+  },
+  {
+    "case_id": "EV-SEED-039",
+    "case_type": "SEED",
+    "source_case": "TC-039",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui kondisi objek yang diamati. Berdasarkan hasil penelitian yang telah dilakukan, terdapat beberapa karakteristik yang perlu diperhatikan.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "common_phrase",
+      "seed_index": 39
+    }
+  },
+  {
+    "case_id": "EV-SEED-040",
+    "case_type": "SEED",
+    "source_case": "TC-040",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui kondisi objek yang diamati. Berdasarkan hasil penelitian yang telah dilakukan, terdapat beberapa karakteristik yang perlu diperhatikan.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "common_phrase",
+      "seed_index": 40
+    }
+  },
+  {
+    "case_id": "EV-SEED-041",
+    "case_type": "SEED",
+    "source_case": "TC-041",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Pengelolaan tanaman hortikultura membutuhkan kondisi tanah yang sesuai. Pemupukan dilakukan berdasarkan kebutuhan tanaman dan kondisi lingkungan. Produktivitas tanaman dipengaruhi oleh ketersediaan air dan unsur hara.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "unrelated",
+      "seed_index": 41
+    }
+  },
+  {
+    "case_id": "EV-SEED-042",
+    "case_type": "SEED",
+    "source_case": "TC-042",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Pengelolaan tanaman hortikultura membutuhkan kondisi tanah yang sesuai. Pemupukan dilakukan berdasarkan kebutuhan tanaman dan kondisi lingkungan. Produktivitas tanaman dipengaruhi oleh ketersediaan air dan unsur hara.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "unrelated",
+      "seed_index": 42
+    }
+  },
+  {
+    "case_id": "EV-SEED-043",
+    "case_type": "SEED",
+    "source_case": "TC-043",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Pengelolaan tanaman hortikultura membutuhkan kondisi tanah yang sesuai. Pemupukan dilakukan berdasarkan kebutuhan tanaman dan kondisi lingkungan. Produktivitas tanaman dipengaruhi oleh ketersediaan air dan unsur hara.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "unrelated",
+      "seed_index": 43
+    }
+  },
+  {
+    "case_id": "EV-SEED-044",
+    "case_type": "SEED",
+    "source_case": "TC-044",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Pengelolaan tanaman hortikultura membutuhkan kondisi tanah yang sesuai. Pemupukan dilakukan berdasarkan kebutuhan tanaman dan kondisi lingkungan. Produktivitas tanaman dipengaruhi oleh ketersediaan air dan unsur hara.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "unrelated",
+      "seed_index": 44
+    }
+  },
+  {
+    "case_id": "EV-SEED-045",
+    "case_type": "SEED",
+    "source_case": "TC-045",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Pengelolaan tanaman hortikultura membutuhkan kondisi tanah yang sesuai. Pemupukan dilakukan berdasarkan kebutuhan tanaman dan kondisi lingkungan. Produktivitas tanaman dipengaruhi oleh ketersediaan air dan unsur hara.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "unrelated",
+      "seed_index": 45
+    }
+  },
+  {
+    "case_id": "EV-SEED-046",
+    "case_type": "SEED",
+    "source_case": "TC-046",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Pengelolaan tanaman hortikultura membutuhkan kondisi tanah yang sesuai. Pemupukan dilakukan berdasarkan kebutuhan tanaman dan kondisi lingkungan. Produktivitas tanaman dipengaruhi oleh ketersediaan air dan unsur hara.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "unrelated",
+      "seed_index": 46
+    }
+  },
+  {
+    "case_id": "EV-SEED-047",
+    "case_type": "SEED",
+    "source_case": "TC-047",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Pengelolaan tanaman hortikultura membutuhkan kondisi tanah yang sesuai. Pemupukan dilakukan berdasarkan kebutuhan tanaman dan kondisi lingkungan. Produktivitas tanaman dipengaruhi oleh ketersediaan air dan unsur hara.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "unrelated",
+      "seed_index": 47
+    }
+  },
+  {
+    "case_id": "EV-SEED-048",
+    "case_type": "SEED",
+    "source_case": "TC-048",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Pengelolaan tanaman hortikultura membutuhkan kondisi tanah yang sesuai. Pemupukan dilakukan berdasarkan kebutuhan tanaman dan kondisi lingkungan. Produktivitas tanaman dipengaruhi oleh ketersediaan air dan unsur hara.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "unrelated",
+      "seed_index": 48
+    }
+  },
+  {
+    "case_id": "EV-SEED-049",
+    "case_type": "SEED",
+    "source_case": "TC-049",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Pengelolaan tanaman hortikultura membutuhkan kondisi tanah yang sesuai. Pemupukan dilakukan berdasarkan kebutuhan tanaman dan kondisi lingkungan. Produktivitas tanaman dipengaruhi oleh ketersediaan air dan unsur hara.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "unrelated",
+      "seed_index": 49
+    }
+  },
+  {
+    "case_id": "EV-SEED-050",
+    "case_type": "SEED",
+    "source_case": "TC-050",
+    "generation_method": "BENCHMARK_SEED",
+    "submission_text": "Pengelolaan tanaman hortikultura membutuhkan kondisi tanah yang sesuai. Pemupukan dilakukan berdasarkan kebutuhan tanaman dan kondisi lingkungan. Produktivitas tanaman dipengaruhi oleh ketersediaan air dan unsur hara.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "seed_category": "unrelated",
+      "seed_index": 50
+    }
+  }
+]

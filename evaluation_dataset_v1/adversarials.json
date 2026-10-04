@@ -1,0 +1,1602 @@
+[
+  {
+    "case_id": "EV-ADV-001",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "METHODOLOGY_BOILERPLATE",
+    "submission_text": "Bab III Metodologi Penelitian. Data dianalisis menggunakan metode deskriptif kuantitatif dengan bantuan software statistik untuk menguji hipotesis asosiatif. Adapun instrumen penelitian disusun berdasarkan kerangka konseptual yang telah diuraikan pada bab sebelumnya.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "methodology_boilerplate",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-002",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "METHODOLOGY_BOILERPLATE",
+    "submission_text": "Bab III Metodologi Penelitian. Populasi dalam penelitian ini adalah seluruh pegawai aktif, sedangkan penentuan jumlah sampel dilakukan menggunakan rumus Slovin. Adapun instrumen penelitian disusun berdasarkan kerangka konseptual yang telah diuraikan pada bab sebelumnya.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "methodology_boilerplate",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-003",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "METHODOLOGY_BOILERPLATE",
+    "submission_text": "Bab III Metodologi Penelitian. Uji validitas instrumen dihitung menggunakan korelasi Product Moment dari Pearson dengan batas signifikansi lima persen. Adapun instrumen penelitian disusun berdasarkan kerangka konseptual yang telah diuraikan pada bab sebelumnya.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "methodology_boilerplate",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-004",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "METHODOLOGY_BOILERPLATE",
+    "submission_text": "Bab III Metodologi Penelitian. Uji reliabilitas kuesioner diukur menggunakan koefisien Cronbach Alpha dengan kriteria nilai reliabel lebih besar dari 0,60. Adapun instrumen penelitian disusun berdasarkan kerangka konseptual yang telah diuraikan pada bab sebelumnya.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "methodology_boilerplate",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-005",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "METHODOLOGY_BOILERPLATE",
+    "submission_text": "Bab III Metodologi Penelitian. Uji asumsi klasik mencakup pengujian normalitas dengan uji Kolmogorov-Smirnov, multikolinearitas melalui nilai VIF, dan uji heteroskedastisitas. Adapun instrumen penelitian disusun berdasarkan kerangka konseptual yang telah diuraikan pada bab sebelumnya.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "methodology_boilerplate",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-006",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "METHODOLOGY_BOILERPLATE",
+    "submission_text": "Bab III Metodologi Penelitian. Teknik pengumpulan data menggunakan kuesioner skala Likert lima tingkat mulai dari sangat tidak setuju hingga sangat setuju. Adapun instrumen penelitian disusun berdasarkan kerangka konseptual yang telah diuraikan pada bab sebelumnya.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "methodology_boilerplate",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-007",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "METHODOLOGY_BOILERPLATE",
+    "submission_text": "Bab III Metodologi Penelitian. Penelitian ini merupakan penelitian eksplanatori yang bermaksud menjelaskan hubungan kausal antara variabel bebas dan variabel terikat. Adapun instrumen penelitian disusun berdasarkan kerangka konseptual yang telah diuraikan pada bab sebelumnya.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "methodology_boilerplate",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-008",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "METHODOLOGY_BOILERPLATE",
+    "submission_text": "Bab III Metodologi Penelitian. Metode penarikan sampel menggunakan purposive sampling dengan kriteria responden telah bekerja minimal selama dua tahun. Adapun instrumen penelitian disusun berdasarkan kerangka konseptual yang telah diuraikan pada bab sebelumnya.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "methodology_boilerplate",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-009",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "METHODOLOGY_BOILERPLATE",
+    "submission_text": "Bab III Metodologi Penelitian. Analisis regresi linear berganda diterapkan untuk mengestimasi koefisien determinasi dan kontribusi relatif masing-masing indikator. Adapun instrumen penelitian disusun berdasarkan kerangka konseptual yang telah diuraikan pada bab sebelumnya.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "methodology_boilerplate",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-010",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "METHODOLOGY_BOILERPLATE",
+    "submission_text": "Bab III Metodologi Penelitian. Pengujian kelayakan model dilakukan melalui uji F untuk simultan dan uji t parsial guna menentukan keberartian pengaruh variabel. Adapun instrumen penelitian disusun berdasarkan kerangka konseptual yang telah diuraikan pada bab sebelumnya.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "methodology_boilerplate",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-011",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "METHODOLOGY_BOILERPLATE",
+    "submission_text": "Bab III Metodologi Penelitian. Data dianalisis menggunakan metode deskriptif kuantitatif dengan bantuan software statistik untuk menguji hipotesis asosiatif. Adapun instrumen penelitian disusun berdasarkan kerangka konseptual yang telah diuraikan pada bab sebelumnya.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "methodology_boilerplate",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-012",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "METHODOLOGY_BOILERPLATE",
+    "submission_text": "Bab III Metodologi Penelitian. Populasi dalam penelitian ini adalah seluruh pegawai aktif, sedangkan penentuan jumlah sampel dilakukan menggunakan rumus Slovin. Adapun instrumen penelitian disusun berdasarkan kerangka konseptual yang telah diuraikan pada bab sebelumnya.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "methodology_boilerplate",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-013",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "METHODOLOGY_BOILERPLATE",
+    "submission_text": "Bab III Metodologi Penelitian. Uji validitas instrumen dihitung menggunakan korelasi Product Moment dari Pearson dengan batas signifikansi lima persen. Adapun instrumen penelitian disusun berdasarkan kerangka konseptual yang telah diuraikan pada bab sebelumnya.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "methodology_boilerplate",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-014",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "METHODOLOGY_BOILERPLATE",
+    "submission_text": "Bab III Metodologi Penelitian. Uji reliabilitas kuesioner diukur menggunakan koefisien Cronbach Alpha dengan kriteria nilai reliabel lebih besar dari 0,60. Adapun instrumen penelitian disusun berdasarkan kerangka konseptual yang telah diuraikan pada bab sebelumnya.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "methodology_boilerplate",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-015",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "METHODOLOGY_BOILERPLATE",
+    "submission_text": "Bab III Metodologi Penelitian. Uji asumsi klasik mencakup pengujian normalitas dengan uji Kolmogorov-Smirnov, multikolinearitas melalui nilai VIF, dan uji heteroskedastisitas. Adapun instrumen penelitian disusun berdasarkan kerangka konseptual yang telah diuraikan pada bab sebelumnya.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "methodology_boilerplate",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-016",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "METHODOLOGY_BOILERPLATE",
+    "submission_text": "Bab III Metodologi Penelitian. Teknik pengumpulan data menggunakan kuesioner skala Likert lima tingkat mulai dari sangat tidak setuju hingga sangat setuju. Adapun instrumen penelitian disusun berdasarkan kerangka konseptual yang telah diuraikan pada bab sebelumnya.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "methodology_boilerplate",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-017",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "METHODOLOGY_BOILERPLATE",
+    "submission_text": "Bab III Metodologi Penelitian. Penelitian ini merupakan penelitian eksplanatori yang bermaksud menjelaskan hubungan kausal antara variabel bebas dan variabel terikat. Adapun instrumen penelitian disusun berdasarkan kerangka konseptual yang telah diuraikan pada bab sebelumnya.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "methodology_boilerplate",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-018",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "METHODOLOGY_BOILERPLATE",
+    "submission_text": "Bab III Metodologi Penelitian. Metode penarikan sampel menggunakan purposive sampling dengan kriteria responden telah bekerja minimal selama dua tahun. Adapun instrumen penelitian disusun berdasarkan kerangka konseptual yang telah diuraikan pada bab sebelumnya.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "methodology_boilerplate",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-019",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "METHODOLOGY_BOILERPLATE",
+    "submission_text": "Bab III Metodologi Penelitian. Analisis regresi linear berganda diterapkan untuk mengestimasi koefisien determinasi dan kontribusi relatif masing-masing indikator. Adapun instrumen penelitian disusun berdasarkan kerangka konseptual yang telah diuraikan pada bab sebelumnya.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "methodology_boilerplate",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-020",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "METHODOLOGY_BOILERPLATE",
+    "submission_text": "Bab III Metodologi Penelitian. Pengujian kelayakan model dilakukan melalui uji F untuk simultan dan uji t parsial guna menentukan keberartian pengaruh variabel. Adapun instrumen penelitian disusun berdasarkan kerangka konseptual yang telah diuraikan pada bab sebelumnya.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "methodology_boilerplate",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-021",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "METHODOLOGY_BOILERPLATE",
+    "submission_text": "Bab III Metodologi Penelitian. Data dianalisis menggunakan metode deskriptif kuantitatif dengan bantuan software statistik untuk menguji hipotesis asosiatif. Adapun instrumen penelitian disusun berdasarkan kerangka konseptual yang telah diuraikan pada bab sebelumnya.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "methodology_boilerplate",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-022",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "METHODOLOGY_BOILERPLATE",
+    "submission_text": "Bab III Metodologi Penelitian. Populasi dalam penelitian ini adalah seluruh pegawai aktif, sedangkan penentuan jumlah sampel dilakukan menggunakan rumus Slovin. Adapun instrumen penelitian disusun berdasarkan kerangka konseptual yang telah diuraikan pada bab sebelumnya.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "methodology_boilerplate",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-023",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "METHODOLOGY_BOILERPLATE",
+    "submission_text": "Bab III Metodologi Penelitian. Uji validitas instrumen dihitung menggunakan korelasi Product Moment dari Pearson dengan batas signifikansi lima persen. Adapun instrumen penelitian disusun berdasarkan kerangka konseptual yang telah diuraikan pada bab sebelumnya.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "methodology_boilerplate",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-024",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "METHODOLOGY_BOILERPLATE",
+    "submission_text": "Bab III Metodologi Penelitian. Uji reliabilitas kuesioner diukur menggunakan koefisien Cronbach Alpha dengan kriteria nilai reliabel lebih besar dari 0,60. Adapun instrumen penelitian disusun berdasarkan kerangka konseptual yang telah diuraikan pada bab sebelumnya.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "methodology_boilerplate",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-025",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "METHODOLOGY_BOILERPLATE",
+    "submission_text": "Bab III Metodologi Penelitian. Uji asumsi klasik mencakup pengujian normalitas dengan uji Kolmogorov-Smirnov, multikolinearitas melalui nilai VIF, dan uji heteroskedastisitas. Adapun instrumen penelitian disusun berdasarkan kerangka konseptual yang telah diuraikan pada bab sebelumnya.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "methodology_boilerplate",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-026",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-011",
+    "generation_method": "CITATION_PROTECTED",
+    "submission_text": "Sebagaimana dikemukakan oleh para ahli terdahulu (Sugiyono, 2019: 145), penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Melalui pengumpulan data kuantitatif, diharapkan korelasi antarvariabel dapat dibuktikan secara empiris (Sugiyono, 2019: 145).",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "citation_protected",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-027",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-011",
+    "generation_method": "CITATION_PROTECTED",
+    "submission_text": "Sebagaimana dikemukakan oleh para ahli terdahulu (Davis, 1989), penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Melalui pengumpulan data kuantitatif, diharapkan korelasi antarvariabel dapat dibuktikan secara empiris (Davis, 1989).",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "citation_protected",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-028",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-011",
+    "generation_method": "CITATION_PROTECTED",
+    "submission_text": "Sebagaimana dikemukakan oleh para ahli terdahulu (Kotler & Keller, 2016), penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Melalui pengumpulan data kuantitatif, diharapkan korelasi antarvariabel dapat dibuktikan secara empiris (Kotler & Keller, 2016).",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "citation_protected",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-029",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-011",
+    "generation_method": "CITATION_PROTECTED",
+    "submission_text": "Sebagaimana dikemukakan oleh para ahli terdahulu (Jogiyanto, 2021: 88), penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Melalui pengumpulan data kuantitatif, diharapkan korelasi antarvariabel dapat dibuktikan secara empiris (Jogiyanto, 2021: 88).",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "citation_protected",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-030",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-011",
+    "generation_method": "CITATION_PROTECTED",
+    "submission_text": "Sebagaimana dikemukakan oleh para ahli terdahulu (Nugroho dkk., 2022), penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Melalui pengumpulan data kuantitatif, diharapkan korelasi antarvariabel dapat dibuktikan secara empiris (Nugroho dkk., 2022).",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "citation_protected",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-031",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-011",
+    "generation_method": "CITATION_PROTECTED",
+    "submission_text": "Sebagaimana dikemukakan oleh para ahli terdahulu (Santoso & Wibowo, 2020), penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Melalui pengumpulan data kuantitatif, diharapkan korelasi antarvariabel dapat dibuktikan secara empiris (Santoso & Wibowo, 2020).",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "citation_protected",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-032",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-011",
+    "generation_method": "CITATION_PROTECTED",
+    "submission_text": "Sebagaimana dikemukakan oleh para ahli terdahulu (Pratama, 2023), penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Melalui pengumpulan data kuantitatif, diharapkan korelasi antarvariabel dapat dibuktikan secara empiris (Pratama, 2023).",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "citation_protected",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-033",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-011",
+    "generation_method": "CITATION_PROTECTED",
+    "submission_text": "Sebagaimana dikemukakan oleh para ahli terdahulu (Hidayat & Susilo, 2021), penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Melalui pengumpulan data kuantitatif, diharapkan korelasi antarvariabel dapat dibuktikan secara empiris (Hidayat & Susilo, 2021).",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "citation_protected",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-034",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-011",
+    "generation_method": "CITATION_PROTECTED",
+    "submission_text": "Sebagaimana dikemukakan oleh para ahli terdahulu (Sekaran & Bougie, 2016), penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Melalui pengumpulan data kuantitatif, diharapkan korelasi antarvariabel dapat dibuktikan secara empiris (Sekaran & Bougie, 2016).",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "citation_protected",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-035",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-011",
+    "generation_method": "CITATION_PROTECTED",
+    "submission_text": "Sebagaimana dikemukakan oleh para ahli terdahulu (Creswell, 2018: 52), penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Melalui pengumpulan data kuantitatif, diharapkan korelasi antarvariabel dapat dibuktikan secara empiris (Creswell, 2018: 52).",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "citation_protected",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-036",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-011",
+    "generation_method": "CITATION_PROTECTED",
+    "submission_text": "Sebagaimana dikemukakan oleh para ahli terdahulu (Sugiyono, 2019: 145), penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Melalui pengumpulan data kuantitatif, diharapkan korelasi antarvariabel dapat dibuktikan secara empiris (Sugiyono, 2019: 145).",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "citation_protected",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-037",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-011",
+    "generation_method": "CITATION_PROTECTED",
+    "submission_text": "Sebagaimana dikemukakan oleh para ahli terdahulu (Davis, 1989), penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Melalui pengumpulan data kuantitatif, diharapkan korelasi antarvariabel dapat dibuktikan secara empiris (Davis, 1989).",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "citation_protected",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-038",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-011",
+    "generation_method": "CITATION_PROTECTED",
+    "submission_text": "Sebagaimana dikemukakan oleh para ahli terdahulu (Kotler & Keller, 2016), penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Melalui pengumpulan data kuantitatif, diharapkan korelasi antarvariabel dapat dibuktikan secara empiris (Kotler & Keller, 2016).",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "citation_protected",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-039",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-011",
+    "generation_method": "CITATION_PROTECTED",
+    "submission_text": "Sebagaimana dikemukakan oleh para ahli terdahulu (Jogiyanto, 2021: 88), penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Melalui pengumpulan data kuantitatif, diharapkan korelasi antarvariabel dapat dibuktikan secara empiris (Jogiyanto, 2021: 88).",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "citation_protected",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-040",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-011",
+    "generation_method": "CITATION_PROTECTED",
+    "submission_text": "Sebagaimana dikemukakan oleh para ahli terdahulu (Nugroho dkk., 2022), penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Melalui pengumpulan data kuantitatif, diharapkan korelasi antarvariabel dapat dibuktikan secara empiris (Nugroho dkk., 2022).",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "citation_protected",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-041",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-011",
+    "generation_method": "CITATION_PROTECTED",
+    "submission_text": "Sebagaimana dikemukakan oleh para ahli terdahulu (Santoso & Wibowo, 2020), penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Melalui pengumpulan data kuantitatif, diharapkan korelasi antarvariabel dapat dibuktikan secara empiris (Santoso & Wibowo, 2020).",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "citation_protected",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-042",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-011",
+    "generation_method": "CITATION_PROTECTED",
+    "submission_text": "Sebagaimana dikemukakan oleh para ahli terdahulu (Pratama, 2023), penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Melalui pengumpulan data kuantitatif, diharapkan korelasi antarvariabel dapat dibuktikan secara empiris (Pratama, 2023).",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "citation_protected",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-043",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-011",
+    "generation_method": "CITATION_PROTECTED",
+    "submission_text": "Sebagaimana dikemukakan oleh para ahli terdahulu (Hidayat & Susilo, 2021), penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Melalui pengumpulan data kuantitatif, diharapkan korelasi antarvariabel dapat dibuktikan secara empiris (Hidayat & Susilo, 2021).",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "citation_protected",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-044",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-011",
+    "generation_method": "CITATION_PROTECTED",
+    "submission_text": "Sebagaimana dikemukakan oleh para ahli terdahulu (Sekaran & Bougie, 2016), penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Melalui pengumpulan data kuantitatif, diharapkan korelasi antarvariabel dapat dibuktikan secara empiris (Sekaran & Bougie, 2016).",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "citation_protected",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-045",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-011",
+    "generation_method": "CITATION_PROTECTED",
+    "submission_text": "Sebagaimana dikemukakan oleh para ahli terdahulu (Creswell, 2018: 52), penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Melalui pengumpulan data kuantitatif, diharapkan korelasi antarvariabel dapat dibuktikan secara empiris (Creswell, 2018: 52).",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "citation_protected",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-046",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-011",
+    "generation_method": "CITATION_PROTECTED",
+    "submission_text": "Sebagaimana dikemukakan oleh para ahli terdahulu (Sugiyono, 2019: 145), penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Melalui pengumpulan data kuantitatif, diharapkan korelasi antarvariabel dapat dibuktikan secara empiris (Sugiyono, 2019: 145).",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "citation_protected",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-047",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-011",
+    "generation_method": "CITATION_PROTECTED",
+    "submission_text": "Sebagaimana dikemukakan oleh para ahli terdahulu (Davis, 1989), penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Melalui pengumpulan data kuantitatif, diharapkan korelasi antarvariabel dapat dibuktikan secara empiris (Davis, 1989).",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "citation_protected",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-048",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-011",
+    "generation_method": "CITATION_PROTECTED",
+    "submission_text": "Sebagaimana dikemukakan oleh para ahli terdahulu (Kotler & Keller, 2016), penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Melalui pengumpulan data kuantitatif, diharapkan korelasi antarvariabel dapat dibuktikan secara empiris (Kotler & Keller, 2016).",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "citation_protected",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-049",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-011",
+    "generation_method": "CITATION_PROTECTED",
+    "submission_text": "Sebagaimana dikemukakan oleh para ahli terdahulu (Jogiyanto, 2021: 88), penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Melalui pengumpulan data kuantitatif, diharapkan korelasi antarvariabel dapat dibuktikan secara empiris (Jogiyanto, 2021: 88).",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "citation_protected",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-050",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-011",
+    "generation_method": "CITATION_PROTECTED",
+    "submission_text": "Sebagaimana dikemukakan oleh para ahli terdahulu (Nugroho dkk., 2022), penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Melalui pengumpulan data kuantitatif, diharapkan korelasi antarvariabel dapat dibuktikan secara empiris (Nugroho dkk., 2022).",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "citation_protected",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-051",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-001",
+    "generation_method": "EXACT_QUOTE",
+    "submission_text": "Landasan teoretis penelitian merujuk pada pernyataan resmi: \"Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner\" (Sugiyono, 2019: 145). Kutipan langsung di atas menjadi rujukan operasional dalam perumusan instrumen riset.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "exact_quote",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-052",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-001",
+    "generation_method": "EXACT_QUOTE",
+    "submission_text": "Landasan teoretis penelitian merujuk pada pernyataan resmi: \"Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner\" (Davis, 1989). Kutipan langsung di atas menjadi rujukan operasional dalam perumusan instrumen riset.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "exact_quote",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-053",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-001",
+    "generation_method": "EXACT_QUOTE",
+    "submission_text": "Landasan teoretis penelitian merujuk pada pernyataan resmi: \"Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner\" (Kotler & Keller, 2016). Kutipan langsung di atas menjadi rujukan operasional dalam perumusan instrumen riset.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "exact_quote",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-054",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-001",
+    "generation_method": "EXACT_QUOTE",
+    "submission_text": "Landasan teoretis penelitian merujuk pada pernyataan resmi: \"Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner\" (Jogiyanto, 2021: 88). Kutipan langsung di atas menjadi rujukan operasional dalam perumusan instrumen riset.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "exact_quote",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-055",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-001",
+    "generation_method": "EXACT_QUOTE",
+    "submission_text": "Landasan teoretis penelitian merujuk pada pernyataan resmi: \"Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner\" (Nugroho dkk., 2022). Kutipan langsung di atas menjadi rujukan operasional dalam perumusan instrumen riset.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "exact_quote",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-056",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-001",
+    "generation_method": "EXACT_QUOTE",
+    "submission_text": "Landasan teoretis penelitian merujuk pada pernyataan resmi: \"Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner\" (Santoso & Wibowo, 2020). Kutipan langsung di atas menjadi rujukan operasional dalam perumusan instrumen riset.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "exact_quote",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-057",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-001",
+    "generation_method": "EXACT_QUOTE",
+    "submission_text": "Landasan teoretis penelitian merujuk pada pernyataan resmi: \"Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner\" (Pratama, 2023). Kutipan langsung di atas menjadi rujukan operasional dalam perumusan instrumen riset.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "exact_quote",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-058",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-001",
+    "generation_method": "EXACT_QUOTE",
+    "submission_text": "Landasan teoretis penelitian merujuk pada pernyataan resmi: \"Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner\" (Hidayat & Susilo, 2021). Kutipan langsung di atas menjadi rujukan operasional dalam perumusan instrumen riset.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "exact_quote",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-059",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-001",
+    "generation_method": "EXACT_QUOTE",
+    "submission_text": "Landasan teoretis penelitian merujuk pada pernyataan resmi: \"Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner\" (Sekaran & Bougie, 2016). Kutipan langsung di atas menjadi rujukan operasional dalam perumusan instrumen riset.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "exact_quote",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-060",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-001",
+    "generation_method": "EXACT_QUOTE",
+    "submission_text": "Landasan teoretis penelitian merujuk pada pernyataan resmi: \"Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner\" (Creswell, 2018: 52). Kutipan langsung di atas menjadi rujukan operasional dalam perumusan instrumen riset.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "exact_quote",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-061",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-001",
+    "generation_method": "EXACT_QUOTE",
+    "submission_text": "Landasan teoretis penelitian merujuk pada pernyataan resmi: \"Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner\" (Sugiyono, 2019: 145). Kutipan langsung di atas menjadi rujukan operasional dalam perumusan instrumen riset.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "exact_quote",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-062",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-001",
+    "generation_method": "EXACT_QUOTE",
+    "submission_text": "Landasan teoretis penelitian merujuk pada pernyataan resmi: \"Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner\" (Davis, 1989). Kutipan langsung di atas menjadi rujukan operasional dalam perumusan instrumen riset.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "exact_quote",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-063",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-001",
+    "generation_method": "EXACT_QUOTE",
+    "submission_text": "Landasan teoretis penelitian merujuk pada pernyataan resmi: \"Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner\" (Kotler & Keller, 2016). Kutipan langsung di atas menjadi rujukan operasional dalam perumusan instrumen riset.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "exact_quote",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-064",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-001",
+    "generation_method": "EXACT_QUOTE",
+    "submission_text": "Landasan teoretis penelitian merujuk pada pernyataan resmi: \"Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner\" (Jogiyanto, 2021: 88). Kutipan langsung di atas menjadi rujukan operasional dalam perumusan instrumen riset.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "exact_quote",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-065",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-001",
+    "generation_method": "EXACT_QUOTE",
+    "submission_text": "Landasan teoretis penelitian merujuk pada pernyataan resmi: \"Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner\" (Nugroho dkk., 2022). Kutipan langsung di atas menjadi rujukan operasional dalam perumusan instrumen riset.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "exact_quote",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-066",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-001",
+    "generation_method": "EXACT_QUOTE",
+    "submission_text": "Landasan teoretis penelitian merujuk pada pernyataan resmi: \"Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner\" (Santoso & Wibowo, 2020). Kutipan langsung di atas menjadi rujukan operasional dalam perumusan instrumen riset.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "exact_quote",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-067",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-001",
+    "generation_method": "EXACT_QUOTE",
+    "submission_text": "Landasan teoretis penelitian merujuk pada pernyataan resmi: \"Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner\" (Pratama, 2023). Kutipan langsung di atas menjadi rujukan operasional dalam perumusan instrumen riset.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "exact_quote",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-068",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-001",
+    "generation_method": "EXACT_QUOTE",
+    "submission_text": "Landasan teoretis penelitian merujuk pada pernyataan resmi: \"Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner\" (Hidayat & Susilo, 2021). Kutipan langsung di atas menjadi rujukan operasional dalam perumusan instrumen riset.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "exact_quote",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-069",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-001",
+    "generation_method": "EXACT_QUOTE",
+    "submission_text": "Landasan teoretis penelitian merujuk pada pernyataan resmi: \"Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner\" (Sekaran & Bougie, 2016). Kutipan langsung di atas menjadi rujukan operasional dalam perumusan instrumen riset.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "exact_quote",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-070",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-001",
+    "generation_method": "EXACT_QUOTE",
+    "submission_text": "Landasan teoretis penelitian merujuk pada pernyataan resmi: \"Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner\" (Creswell, 2018: 52). Kutipan langsung di atas menjadi rujukan operasional dalam perumusan instrumen riset.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "exact_quote",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-071",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-001",
+    "generation_method": "EXACT_QUOTE",
+    "submission_text": "Landasan teoretis penelitian merujuk pada pernyataan resmi: \"Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner\" (Sugiyono, 2019: 145). Kutipan langsung di atas menjadi rujukan operasional dalam perumusan instrumen riset.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "exact_quote",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-072",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-001",
+    "generation_method": "EXACT_QUOTE",
+    "submission_text": "Landasan teoretis penelitian merujuk pada pernyataan resmi: \"Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner\" (Davis, 1989). Kutipan langsung di atas menjadi rujukan operasional dalam perumusan instrumen riset.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "exact_quote",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-073",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-001",
+    "generation_method": "EXACT_QUOTE",
+    "submission_text": "Landasan teoretis penelitian merujuk pada pernyataan resmi: \"Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner\" (Kotler & Keller, 2016). Kutipan langsung di atas menjadi rujukan operasional dalam perumusan instrumen riset.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "exact_quote",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-074",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-001",
+    "generation_method": "EXACT_QUOTE",
+    "submission_text": "Landasan teoretis penelitian merujuk pada pernyataan resmi: \"Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner\" (Jogiyanto, 2021: 88). Kutipan langsung di atas menjadi rujukan operasional dalam perumusan instrumen riset.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "exact_quote",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-075",
+    "case_type": "ADVERSARIAL",
+    "source_case": "TC-001",
+    "generation_method": "EXACT_QUOTE",
+    "submission_text": "Landasan teoretis penelitian merujuk pada pernyataan resmi: \"Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner\" (Nugroho dkk., 2022). Kutipan langsung di atas menjadi rujukan operasional dalam perumusan instrumen riset.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "exact_quote",
+      "review_tag": "Properly cited"
+    }
+  },
+  {
+    "case_id": "EV-ADV-076",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "TERMINOLOGY_OVERLAP",
+    "submission_text": "Kajian literatur bidang ilmu spesifik. Arsitektur deep learning multilayer perceptron mengoptimalkan loss function cross-entropy melalui algoritma backpropagation dan adaptive gradient descent. Pendekatan ini diadopsi untuk meningkatkan akurasi estimasi parameter model.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "terminology_overlap",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-077",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "TERMINOLOGY_OVERLAP",
+    "submission_text": "Kajian literatur bidang ilmu spesifik. Mekanisme self-attention transformer menghitung dot-product similarity antara matriks query dan key dengan penskalaan dimensi embedding residual connection. Pendekatan ini diadopsi untuk meningkatkan akurasi estimasi parameter model.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "terminology_overlap",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-078",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "TERMINOLOGY_OVERLAP",
+    "submission_text": "Kajian literatur bidang ilmu spesifik. Farmakokinetika senyawa bioaktif mencakup laju absorpsi gastrointestinal, volume distribusi plasma, biotransformasi hepatik, dan ekskresi klirens ginjal. Pendekatan ini diadopsi untuk meningkatkan akurasi estimasi parameter model.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "terminology_overlap",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-079",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "TERMINOLOGY_OVERLAP",
+    "submission_text": "Kajian literatur bidang ilmu spesifik. Model ekuilibrium umum stokastik dinamis memodelkan kurva Phillips forward-looking dengan rigiditas harga Calvo dan fungsi utilitas konsumen. Pendekatan ini diadopsi untuk meningkatkan akurasi estimasi parameter model.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "terminology_overlap",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-080",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "TERMINOLOGY_OVERLAP",
+    "submission_text": "Kajian literatur bidang ilmu spesifik. Sintesis nanopartikel perak menggunakan bioreduktor ekstrak daun menginduksi resonansi plasmon permukaan terdeteksi pada spektrofotometri UV-Vis. Pendekatan ini diadopsi untuk meningkatkan akurasi estimasi parameter model.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "terminology_overlap",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-081",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "TERMINOLOGY_OVERLAP",
+    "submission_text": "Kajian literatur bidang ilmu spesifik. Asas legalitas dalam hukum pidana materiil menentukan tiada suatu perbuatan dapat dipidana kecuali atas kekuatan aturan pidana perundang-undangan. Pendekatan ini diadopsi untuk meningkatkan akurasi estimasi parameter model.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "terminology_overlap",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-082",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "TERMINOLOGY_OVERLAP",
+    "submission_text": "Kajian literatur bidang ilmu spesifik. Filogeni molekuler sekuens gen ribosom dianalisis dengan metode maximum likelihood berakar outgroup menggunakan model substitusi nukleotida GTR. Pendekatan ini diadopsi untuk meningkatkan akurasi estimasi parameter model.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "terminology_overlap",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-083",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "TERMINOLOGY_OVERLAP",
+    "submission_text": "Kajian literatur bidang ilmu spesifik. Termodinamika transfer massa difusional pada membran elektrolit polimerik dikendalikan oleh gradien potensial elektrokimia dan konsentrasi ionik. Pendekatan ini diadopsi untuk meningkatkan akurasi estimasi parameter model.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "terminology_overlap",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-084",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "TERMINOLOGY_OVERLAP",
+    "submission_text": "Kajian literatur bidang ilmu spesifik. Algoritma enkripsi kurva eliptik menjamin integritas kriptografis kunci privat berbasis masalah logaritma diskrit pada medan hingga berordo tinggi. Pendekatan ini diadopsi untuk meningkatkan akurasi estimasi parameter model.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "terminology_overlap",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-085",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "TERMINOLOGY_OVERLAP",
+    "submission_text": "Kajian literatur bidang ilmu spesifik. Ekologi mikroba tanah rizosfer dicirikan oleh keragaman taksonomi metagenomik 16S rRNA dan aktivitas enzimatik dehidrogenase fosfatase. Pendekatan ini diadopsi untuk meningkatkan akurasi estimasi parameter model.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "terminology_overlap",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-086",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "TERMINOLOGY_OVERLAP",
+    "submission_text": "Kajian literatur bidang ilmu spesifik. Arsitektur deep learning multilayer perceptron mengoptimalkan loss function cross-entropy melalui algoritma backpropagation dan adaptive gradient descent. Pendekatan ini diadopsi untuk meningkatkan akurasi estimasi parameter model.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "terminology_overlap",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-087",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "TERMINOLOGY_OVERLAP",
+    "submission_text": "Kajian literatur bidang ilmu spesifik. Mekanisme self-attention transformer menghitung dot-product similarity antara matriks query dan key dengan penskalaan dimensi embedding residual connection. Pendekatan ini diadopsi untuk meningkatkan akurasi estimasi parameter model.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "terminology_overlap",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-088",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "TERMINOLOGY_OVERLAP",
+    "submission_text": "Kajian literatur bidang ilmu spesifik. Farmakokinetika senyawa bioaktif mencakup laju absorpsi gastrointestinal, volume distribusi plasma, biotransformasi hepatik, dan ekskresi klirens ginjal. Pendekatan ini diadopsi untuk meningkatkan akurasi estimasi parameter model.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "terminology_overlap",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-089",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "TERMINOLOGY_OVERLAP",
+    "submission_text": "Kajian literatur bidang ilmu spesifik. Model ekuilibrium umum stokastik dinamis memodelkan kurva Phillips forward-looking dengan rigiditas harga Calvo dan fungsi utilitas konsumen. Pendekatan ini diadopsi untuk meningkatkan akurasi estimasi parameter model.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "terminology_overlap",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-090",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "TERMINOLOGY_OVERLAP",
+    "submission_text": "Kajian literatur bidang ilmu spesifik. Sintesis nanopartikel perak menggunakan bioreduktor ekstrak daun menginduksi resonansi plasmon permukaan terdeteksi pada spektrofotometri UV-Vis. Pendekatan ini diadopsi untuk meningkatkan akurasi estimasi parameter model.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "terminology_overlap",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-091",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "TERMINOLOGY_OVERLAP",
+    "submission_text": "Kajian literatur bidang ilmu spesifik. Asas legalitas dalam hukum pidana materiil menentukan tiada suatu perbuatan dapat dipidana kecuali atas kekuatan aturan pidana perundang-undangan. Pendekatan ini diadopsi untuk meningkatkan akurasi estimasi parameter model.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "terminology_overlap",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-092",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "TERMINOLOGY_OVERLAP",
+    "submission_text": "Kajian literatur bidang ilmu spesifik. Filogeni molekuler sekuens gen ribosom dianalisis dengan metode maximum likelihood berakar outgroup menggunakan model substitusi nukleotida GTR. Pendekatan ini diadopsi untuk meningkatkan akurasi estimasi parameter model.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "terminology_overlap",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-093",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "TERMINOLOGY_OVERLAP",
+    "submission_text": "Kajian literatur bidang ilmu spesifik. Termodinamika transfer massa difusional pada membran elektrolit polimerik dikendalikan oleh gradien potensial elektrokimia dan konsentrasi ionik. Pendekatan ini diadopsi untuk meningkatkan akurasi estimasi parameter model.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "terminology_overlap",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-094",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "TERMINOLOGY_OVERLAP",
+    "submission_text": "Kajian literatur bidang ilmu spesifik. Algoritma enkripsi kurva eliptik menjamin integritas kriptografis kunci privat berbasis masalah logaritma diskrit pada medan hingga berordo tinggi. Pendekatan ini diadopsi untuk meningkatkan akurasi estimasi parameter model.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "terminology_overlap",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-095",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "TERMINOLOGY_OVERLAP",
+    "submission_text": "Kajian literatur bidang ilmu spesifik. Ekologi mikroba tanah rizosfer dicirikan oleh keragaman taksonomi metagenomik 16S rRNA dan aktivitas enzimatik dehidrogenase fosfatase. Pendekatan ini diadopsi untuk meningkatkan akurasi estimasi parameter model.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "terminology_overlap",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-096",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "TERMINOLOGY_OVERLAP",
+    "submission_text": "Kajian literatur bidang ilmu spesifik. Arsitektur deep learning multilayer perceptron mengoptimalkan loss function cross-entropy melalui algoritma backpropagation dan adaptive gradient descent. Pendekatan ini diadopsi untuk meningkatkan akurasi estimasi parameter model.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "terminology_overlap",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-097",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "TERMINOLOGY_OVERLAP",
+    "submission_text": "Kajian literatur bidang ilmu spesifik. Mekanisme self-attention transformer menghitung dot-product similarity antara matriks query dan key dengan penskalaan dimensi embedding residual connection. Pendekatan ini diadopsi untuk meningkatkan akurasi estimasi parameter model.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "terminology_overlap",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-098",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "TERMINOLOGY_OVERLAP",
+    "submission_text": "Kajian literatur bidang ilmu spesifik. Farmakokinetika senyawa bioaktif mencakup laju absorpsi gastrointestinal, volume distribusi plasma, biotransformasi hepatik, dan ekskresi klirens ginjal. Pendekatan ini diadopsi untuk meningkatkan akurasi estimasi parameter model.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "terminology_overlap",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-099",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "TERMINOLOGY_OVERLAP",
+    "submission_text": "Kajian literatur bidang ilmu spesifik. Model ekuilibrium umum stokastik dinamis memodelkan kurva Phillips forward-looking dengan rigiditas harga Calvo dan fungsi utilitas konsumen. Pendekatan ini diadopsi untuk meningkatkan akurasi estimasi parameter model.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "terminology_overlap",
+      "review_tag": "Common phrase"
+    }
+  },
+  {
+    "case_id": "EV-ADV-100",
+    "case_type": "ADVERSARIAL",
+    "source_case": null,
+    "generation_method": "TERMINOLOGY_OVERLAP",
+    "submission_text": "Kajian literatur bidang ilmu spesifik. Sintesis nanopartikel perak menggunakan bioreduktor ekstrak daun menginduksi resonansi plasmon permukaan terdeteksi pada spektrofotometri UV-Vis. Pendekatan ini diadopsi untuk meningkatkan akurasi estimasi parameter model.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "adversarial_category": "terminology_overlap",
+      "review_tag": "Common phrase"
+    }
+  }
+]

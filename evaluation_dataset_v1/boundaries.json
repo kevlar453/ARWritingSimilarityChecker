@@ -1,0 +1,1602 @@
+[
+  {
+    "case_id": "EV-BND-001",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-011",
+    "generation_method": "THRESHOLD_EXACT_70_MINUS_ONE",
+    "submission_text": "Penelitian ini bertujuan untuk menganalisis pengaruh pemanfaatan teknologi informasi terhadap produktivitas kerja pegawai instansi. Metode penelitian menggunakan pendekatan kuantitatif berbasis instrumen survei lapangan yang komprehensif.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "exact_70",
+      "offset": -1
+    }
+  },
+  {
+    "case_id": "EV-BND-002",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-011",
+    "generation_method": "THRESHOLD_EXACT_70_AT",
+    "submission_text": "Penelitian ini bertujuan untuk menganalisis dampak teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "exact_70",
+      "offset": 0
+    }
+  },
+  {
+    "case_id": "EV-BND-003",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-011",
+    "generation_method": "THRESHOLD_EXACT_70_PLUS_ONE",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "match",
+    "expected_pattern": "VERBATIM_MATCH",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "exact_70",
+      "offset": 1
+    }
+  },
+  {
+    "case_id": "EV-BND-004",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-011",
+    "generation_method": "THRESHOLD_EXACT_70_MINUS_ONE",
+    "submission_text": "Penelitian ini bertujuan untuk menganalisis pengaruh pemanfaatan teknologi informasi terhadap produktivitas kerja pegawai instansi. Metode penelitian menggunakan pendekatan kuantitatif berbasis instrumen survei lapangan yang komprehensif.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "exact_70",
+      "offset": -1
+    }
+  },
+  {
+    "case_id": "EV-BND-005",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-011",
+    "generation_method": "THRESHOLD_EXACT_70_AT",
+    "submission_text": "Penelitian ini bertujuan untuk menganalisis dampak teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "exact_70",
+      "offset": 0
+    }
+  },
+  {
+    "case_id": "EV-BND-006",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-011",
+    "generation_method": "THRESHOLD_EXACT_70_PLUS_ONE",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "match",
+    "expected_pattern": "VERBATIM_MATCH",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "exact_70",
+      "offset": 1
+    }
+  },
+  {
+    "case_id": "EV-BND-007",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-011",
+    "generation_method": "THRESHOLD_EXACT_70_MINUS_ONE",
+    "submission_text": "Penelitian ini bertujuan untuk menganalisis pengaruh pemanfaatan teknologi informasi terhadap produktivitas kerja pegawai instansi. Metode penelitian menggunakan pendekatan kuantitatif berbasis instrumen survei lapangan yang komprehensif.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "exact_70",
+      "offset": -1
+    }
+  },
+  {
+    "case_id": "EV-BND-008",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-011",
+    "generation_method": "THRESHOLD_EXACT_70_AT",
+    "submission_text": "Penelitian ini bertujuan untuk menganalisis dampak teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "exact_70",
+      "offset": 0
+    }
+  },
+  {
+    "case_id": "EV-BND-009",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-011",
+    "generation_method": "THRESHOLD_EXACT_70_PLUS_ONE",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "match",
+    "expected_pattern": "VERBATIM_MATCH",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "exact_70",
+      "offset": 1
+    }
+  },
+  {
+    "case_id": "EV-BND-010",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-011",
+    "generation_method": "THRESHOLD_EXACT_70_MINUS_ONE",
+    "submission_text": "Penelitian ini bertujuan untuk menganalisis pengaruh pemanfaatan teknologi informasi terhadap produktivitas kerja pegawai instansi. Metode penelitian menggunakan pendekatan kuantitatif berbasis instrumen survei lapangan yang komprehensif.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "exact_70",
+      "offset": -1
+    }
+  },
+  {
+    "case_id": "EV-BND-011",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-011",
+    "generation_method": "THRESHOLD_EXACT_70_AT",
+    "submission_text": "Penelitian ini bertujuan untuk menganalisis dampak teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "exact_70",
+      "offset": 0
+    }
+  },
+  {
+    "case_id": "EV-BND-012",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-011",
+    "generation_method": "THRESHOLD_EXACT_70_PLUS_ONE",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "match",
+    "expected_pattern": "VERBATIM_MATCH",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "exact_70",
+      "offset": 1
+    }
+  },
+  {
+    "case_id": "EV-BND-013",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-011",
+    "generation_method": "THRESHOLD_EXACT_70_MINUS_ONE",
+    "submission_text": "Penelitian ini bertujuan untuk menganalisis pengaruh pemanfaatan teknologi informasi terhadap produktivitas kerja pegawai instansi. Metode penelitian menggunakan pendekatan kuantitatif berbasis instrumen survei lapangan yang komprehensif.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "exact_70",
+      "offset": -1
+    }
+  },
+  {
+    "case_id": "EV-BND-014",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-011",
+    "generation_method": "THRESHOLD_EXACT_70_AT",
+    "submission_text": "Penelitian ini bertujuan untuk menganalisis dampak teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "exact_70",
+      "offset": 0
+    }
+  },
+  {
+    "case_id": "EV-BND-015",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-011",
+    "generation_method": "THRESHOLD_EXACT_70_PLUS_ONE",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "match",
+    "expected_pattern": "VERBATIM_MATCH",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "exact_70",
+      "offset": 1
+    }
+  },
+  {
+    "case_id": "EV-BND-016",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-031",
+    "generation_method": "THRESHOLD_EXACT_10_MINUS_ONE",
+    "submission_text": "Budidaya tanaman kedelai varietas unggul pada lahan kering masam memerlukan perlakuan ameliorasi tanah melalui pemberian kapur pertanian dan pupuk hayati. Ketersediaan fosfor terlarut seringkali menjadi faktor pembatas utama dalam fase pembentukan bintil akar dan pengisian polong tanaman. Penerapan teknik irigasi tetes mampu mengoptimalkan penggunaan air irigasi sekaligus menekan pertumbuhan gulma liar. Hasil pemantauan agroekosistem menunjukkan peningkatan biomassa tanaman seiring dengan perbaikan kapasitas tukar kation dan aktivitas mikroorganisme tanah di sekitar rizosfer. Petani setempat mulai mengadopsi pola tanam rotasi legum dengan jagung untuk memutus siklus hidup hama penggerek batang dan mempertahankan kesuburan lapisan olah tanah.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "exact_10",
+      "offset": -1
+    }
+  },
+  {
+    "case_id": "EV-BND-017",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-031",
+    "generation_method": "THRESHOLD_EXACT_10_AT",
+    "submission_text": "Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Semua responden berasal dari dinas pariwisata daerah pegunungan yang tidak relevan.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "exact_10",
+      "offset": 0
+    }
+  },
+  {
+    "case_id": "EV-BND-018",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-031",
+    "generation_method": "THRESHOLD_EXACT_10_PLUS_ONE",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Responden berasal dari dinas pariwisata wilayah pegunungan yang tidak relevan dengan teknologi.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "PARTIAL_DIRECT_MATCH",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "exact_10",
+      "offset": 1
+    }
+  },
+  {
+    "case_id": "EV-BND-019",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-031",
+    "generation_method": "THRESHOLD_EXACT_10_MINUS_ONE",
+    "submission_text": "Budidaya tanaman kedelai varietas unggul pada lahan kering masam memerlukan perlakuan ameliorasi tanah melalui pemberian kapur pertanian dan pupuk hayati. Ketersediaan fosfor terlarut seringkali menjadi faktor pembatas utama dalam fase pembentukan bintil akar dan pengisian polong tanaman. Penerapan teknik irigasi tetes mampu mengoptimalkan penggunaan air irigasi sekaligus menekan pertumbuhan gulma liar. Hasil pemantauan agroekosistem menunjukkan peningkatan biomassa tanaman seiring dengan perbaikan kapasitas tukar kation dan aktivitas mikroorganisme tanah di sekitar rizosfer. Petani setempat mulai mengadopsi pola tanam rotasi legum dengan jagung untuk memutus siklus hidup hama penggerek batang dan mempertahankan kesuburan lapisan olah tanah.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "exact_10",
+      "offset": -1
+    }
+  },
+  {
+    "case_id": "EV-BND-020",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-031",
+    "generation_method": "THRESHOLD_EXACT_10_AT",
+    "submission_text": "Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Semua responden berasal dari dinas pariwisata daerah pegunungan yang tidak relevan.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "exact_10",
+      "offset": 0
+    }
+  },
+  {
+    "case_id": "EV-BND-021",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-031",
+    "generation_method": "THRESHOLD_EXACT_10_PLUS_ONE",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Responden berasal dari dinas pariwisata wilayah pegunungan yang tidak relevan dengan teknologi.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "PARTIAL_DIRECT_MATCH",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "exact_10",
+      "offset": 1
+    }
+  },
+  {
+    "case_id": "EV-BND-022",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-031",
+    "generation_method": "THRESHOLD_EXACT_10_MINUS_ONE",
+    "submission_text": "Budidaya tanaman kedelai varietas unggul pada lahan kering masam memerlukan perlakuan ameliorasi tanah melalui pemberian kapur pertanian dan pupuk hayati. Ketersediaan fosfor terlarut seringkali menjadi faktor pembatas utama dalam fase pembentukan bintil akar dan pengisian polong tanaman. Penerapan teknik irigasi tetes mampu mengoptimalkan penggunaan air irigasi sekaligus menekan pertumbuhan gulma liar. Hasil pemantauan agroekosistem menunjukkan peningkatan biomassa tanaman seiring dengan perbaikan kapasitas tukar kation dan aktivitas mikroorganisme tanah di sekitar rizosfer. Petani setempat mulai mengadopsi pola tanam rotasi legum dengan jagung untuk memutus siklus hidup hama penggerek batang dan mempertahankan kesuburan lapisan olah tanah.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "exact_10",
+      "offset": -1
+    }
+  },
+  {
+    "case_id": "EV-BND-023",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-031",
+    "generation_method": "THRESHOLD_EXACT_10_AT",
+    "submission_text": "Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Semua responden berasal dari dinas pariwisata daerah pegunungan yang tidak relevan.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "exact_10",
+      "offset": 0
+    }
+  },
+  {
+    "case_id": "EV-BND-024",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-031",
+    "generation_method": "THRESHOLD_EXACT_10_PLUS_ONE",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Responden berasal dari dinas pariwisata wilayah pegunungan yang tidak relevan dengan teknologi.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "PARTIAL_DIRECT_MATCH",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "exact_10",
+      "offset": 1
+    }
+  },
+  {
+    "case_id": "EV-BND-025",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-031",
+    "generation_method": "THRESHOLD_EXACT_10_MINUS_ONE",
+    "submission_text": "Budidaya tanaman kedelai varietas unggul pada lahan kering masam memerlukan perlakuan ameliorasi tanah melalui pemberian kapur pertanian dan pupuk hayati. Ketersediaan fosfor terlarut seringkali menjadi faktor pembatas utama dalam fase pembentukan bintil akar dan pengisian polong tanaman. Penerapan teknik irigasi tetes mampu mengoptimalkan penggunaan air irigasi sekaligus menekan pertumbuhan gulma liar. Hasil pemantauan agroekosistem menunjukkan peningkatan biomassa tanaman seiring dengan perbaikan kapasitas tukar kation dan aktivitas mikroorganisme tanah di sekitar rizosfer. Petani setempat mulai mengadopsi pola tanam rotasi legum dengan jagung untuk memutus siklus hidup hama penggerek batang dan mempertahankan kesuburan lapisan olah tanah.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "exact_10",
+      "offset": -1
+    }
+  },
+  {
+    "case_id": "EV-BND-026",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-031",
+    "generation_method": "THRESHOLD_EXACT_10_AT",
+    "submission_text": "Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Semua responden berasal dari dinas pariwisata daerah pegunungan yang tidak relevan.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "exact_10",
+      "offset": 0
+    }
+  },
+  {
+    "case_id": "EV-BND-027",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-031",
+    "generation_method": "THRESHOLD_EXACT_10_PLUS_ONE",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Responden berasal dari dinas pariwisata wilayah pegunungan yang tidak relevan dengan teknologi.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "PARTIAL_DIRECT_MATCH",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "exact_10",
+      "offset": 1
+    }
+  },
+  {
+    "case_id": "EV-BND-028",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-031",
+    "generation_method": "THRESHOLD_EXACT_10_MINUS_ONE",
+    "submission_text": "Budidaya tanaman kedelai varietas unggul pada lahan kering masam memerlukan perlakuan ameliorasi tanah melalui pemberian kapur pertanian dan pupuk hayati. Ketersediaan fosfor terlarut seringkali menjadi faktor pembatas utama dalam fase pembentukan bintil akar dan pengisian polong tanaman. Penerapan teknik irigasi tetes mampu mengoptimalkan penggunaan air irigasi sekaligus menekan pertumbuhan gulma liar. Hasil pemantauan agroekosistem menunjukkan peningkatan biomassa tanaman seiring dengan perbaikan kapasitas tukar kation dan aktivitas mikroorganisme tanah di sekitar rizosfer. Petani setempat mulai mengadopsi pola tanam rotasi legum dengan jagung untuk memutus siklus hidup hama penggerek batang dan mempertahankan kesuburan lapisan olah tanah.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "exact_10",
+      "offset": -1
+    }
+  },
+  {
+    "case_id": "EV-BND-029",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-031",
+    "generation_method": "THRESHOLD_EXACT_10_AT",
+    "submission_text": "Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Semua responden berasal dari dinas pariwisata daerah pegunungan yang tidak relevan.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "exact_10",
+      "offset": 0
+    }
+  },
+  {
+    "case_id": "EV-BND-030",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-031",
+    "generation_method": "THRESHOLD_EXACT_10_PLUS_ONE",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Responden berasal dari dinas pariwisata wilayah pegunungan yang tidak relevan dengan teknologi.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "PARTIAL_DIRECT_MATCH",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "exact_10",
+      "offset": 1
+    }
+  },
+  {
+    "case_id": "EV-BND-031",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-001",
+    "generation_method": "THRESHOLD_TFIDF_85_MINUS_ONE",
+    "submission_text": "Penelitian ini bertujuan untuk menganalisis dampak teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "tfidf_85",
+      "offset": -1
+    }
+  },
+  {
+    "case_id": "EV-BND-032",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-001",
+    "generation_method": "THRESHOLD_TFIDF_85_AT",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja secara signifikan.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "tfidf_85",
+      "offset": 0
+    }
+  },
+  {
+    "case_id": "EV-BND-033",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-001",
+    "generation_method": "THRESHOLD_TFIDF_85_PLUS_ONE",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "match",
+    "expected_pattern": "VERBATIM_MATCH",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "tfidf_85",
+      "offset": 1
+    }
+  },
+  {
+    "case_id": "EV-BND-034",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-001",
+    "generation_method": "THRESHOLD_TFIDF_85_MINUS_ONE",
+    "submission_text": "Penelitian ini bertujuan untuk menganalisis dampak teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "tfidf_85",
+      "offset": -1
+    }
+  },
+  {
+    "case_id": "EV-BND-035",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-001",
+    "generation_method": "THRESHOLD_TFIDF_85_AT",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja secara signifikan.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "tfidf_85",
+      "offset": 0
+    }
+  },
+  {
+    "case_id": "EV-BND-036",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-001",
+    "generation_method": "THRESHOLD_TFIDF_85_PLUS_ONE",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "match",
+    "expected_pattern": "VERBATIM_MATCH",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "tfidf_85",
+      "offset": 1
+    }
+  },
+  {
+    "case_id": "EV-BND-037",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-001",
+    "generation_method": "THRESHOLD_TFIDF_85_MINUS_ONE",
+    "submission_text": "Penelitian ini bertujuan untuk menganalisis dampak teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "tfidf_85",
+      "offset": -1
+    }
+  },
+  {
+    "case_id": "EV-BND-038",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-001",
+    "generation_method": "THRESHOLD_TFIDF_85_AT",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja secara signifikan.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "tfidf_85",
+      "offset": 0
+    }
+  },
+  {
+    "case_id": "EV-BND-039",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-001",
+    "generation_method": "THRESHOLD_TFIDF_85_PLUS_ONE",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "match",
+    "expected_pattern": "VERBATIM_MATCH",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "tfidf_85",
+      "offset": 1
+    }
+  },
+  {
+    "case_id": "EV-BND-040",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-001",
+    "generation_method": "THRESHOLD_TFIDF_85_MINUS_ONE",
+    "submission_text": "Penelitian ini bertujuan untuk menganalisis dampak teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "tfidf_85",
+      "offset": -1
+    }
+  },
+  {
+    "case_id": "EV-BND-041",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-001",
+    "generation_method": "THRESHOLD_TFIDF_85_AT",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja secara signifikan.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "tfidf_85",
+      "offset": 0
+    }
+  },
+  {
+    "case_id": "EV-BND-042",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-001",
+    "generation_method": "THRESHOLD_TFIDF_85_PLUS_ONE",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "match",
+    "expected_pattern": "VERBATIM_MATCH",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "tfidf_85",
+      "offset": 1
+    }
+  },
+  {
+    "case_id": "EV-BND-043",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-001",
+    "generation_method": "THRESHOLD_TFIDF_85_MINUS_ONE",
+    "submission_text": "Penelitian ini bertujuan untuk menganalisis dampak teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "tfidf_85",
+      "offset": -1
+    }
+  },
+  {
+    "case_id": "EV-BND-044",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-001",
+    "generation_method": "THRESHOLD_TFIDF_85_AT",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja secara signifikan.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "tfidf_85",
+      "offset": 0
+    }
+  },
+  {
+    "case_id": "EV-BND-045",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-001",
+    "generation_method": "THRESHOLD_TFIDF_85_PLUS_ONE",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "match",
+    "expected_pattern": "VERBATIM_MATCH",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "tfidf_85",
+      "offset": 1
+    }
+  },
+  {
+    "case_id": "EV-BND-046",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-041",
+    "generation_method": "THRESHOLD_TFIDF_10_MINUS_ONE",
+    "submission_text": "Pengelolaan tanaman hortikultura membutuhkan kondisi tanah yang sesuai. Pemupukan dilakukan berdasarkan kebutuhan tanaman dan kondisi lingkungan. Produktivitas tanaman dipengaruhi oleh ketersediaan air dan unsur hara.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "tfidf_10",
+      "offset": -1
+    }
+  },
+  {
+    "case_id": "EV-BND-047",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-041",
+    "generation_method": "THRESHOLD_TFIDF_10_AT",
+    "submission_text": "Pengelolaan tanaman hortikultura membutuhkan kondisi tanah yang sesuai. Pemupukan dilakukan berdasarkan kebutuhan tanaman dan kondisi lingkungan. Produktivitas tanaman dipengaruhi oleh ketersediaan air dan unsur hara. Sistem pemantauan menggunakan teknologi informasi dasar.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "SEMANTIC_PARAPHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "tfidf_10",
+      "offset": 0
+    }
+  },
+  {
+    "case_id": "EV-BND-048",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-041",
+    "generation_method": "THRESHOLD_TFIDF_10_PLUS_ONE",
+    "submission_text": "Pengelolaan tanaman hortikultura membutuhkan kondisi tanah yang sesuai. Pemupukan dilakukan berdasarkan kebutuhan tanaman dan kondisi lingkungan. Produktivitas tanaman dipengaruhi oleh ketersediaan air dan unsur hara. Pengukuran efisiensi kinerja organisasi pemupukan memanfaatkan teknologi informasi modern.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "SEMANTIC_PARAPHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "tfidf_10",
+      "offset": 1
+    }
+  },
+  {
+    "case_id": "EV-BND-049",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-041",
+    "generation_method": "THRESHOLD_TFIDF_10_MINUS_ONE",
+    "submission_text": "Pengelolaan tanaman hortikultura membutuhkan kondisi tanah yang sesuai. Pemupukan dilakukan berdasarkan kebutuhan tanaman dan kondisi lingkungan. Produktivitas tanaman dipengaruhi oleh ketersediaan air dan unsur hara.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "tfidf_10",
+      "offset": -1
+    }
+  },
+  {
+    "case_id": "EV-BND-050",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-041",
+    "generation_method": "THRESHOLD_TFIDF_10_AT",
+    "submission_text": "Pengelolaan tanaman hortikultura membutuhkan kondisi tanah yang sesuai. Pemupukan dilakukan berdasarkan kebutuhan tanaman dan kondisi lingkungan. Produktivitas tanaman dipengaruhi oleh ketersediaan air dan unsur hara. Sistem pemantauan menggunakan teknologi informasi dasar.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "SEMANTIC_PARAPHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "tfidf_10",
+      "offset": 0
+    }
+  },
+  {
+    "case_id": "EV-BND-051",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-041",
+    "generation_method": "THRESHOLD_TFIDF_10_PLUS_ONE",
+    "submission_text": "Pengelolaan tanaman hortikultura membutuhkan kondisi tanah yang sesuai. Pemupukan dilakukan berdasarkan kebutuhan tanaman dan kondisi lingkungan. Produktivitas tanaman dipengaruhi oleh ketersediaan air dan unsur hara. Pengukuran efisiensi kinerja organisasi pemupukan memanfaatkan teknologi informasi modern.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "SEMANTIC_PARAPHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "tfidf_10",
+      "offset": 1
+    }
+  },
+  {
+    "case_id": "EV-BND-052",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-041",
+    "generation_method": "THRESHOLD_TFIDF_10_MINUS_ONE",
+    "submission_text": "Pengelolaan tanaman hortikultura membutuhkan kondisi tanah yang sesuai. Pemupukan dilakukan berdasarkan kebutuhan tanaman dan kondisi lingkungan. Produktivitas tanaman dipengaruhi oleh ketersediaan air dan unsur hara.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "tfidf_10",
+      "offset": -1
+    }
+  },
+  {
+    "case_id": "EV-BND-053",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-041",
+    "generation_method": "THRESHOLD_TFIDF_10_AT",
+    "submission_text": "Pengelolaan tanaman hortikultura membutuhkan kondisi tanah yang sesuai. Pemupukan dilakukan berdasarkan kebutuhan tanaman dan kondisi lingkungan. Produktivitas tanaman dipengaruhi oleh ketersediaan air dan unsur hara. Sistem pemantauan menggunakan teknologi informasi dasar.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "SEMANTIC_PARAPHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "tfidf_10",
+      "offset": 0
+    }
+  },
+  {
+    "case_id": "EV-BND-054",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-041",
+    "generation_method": "THRESHOLD_TFIDF_10_PLUS_ONE",
+    "submission_text": "Pengelolaan tanaman hortikultura membutuhkan kondisi tanah yang sesuai. Pemupukan dilakukan berdasarkan kebutuhan tanaman dan kondisi lingkungan. Produktivitas tanaman dipengaruhi oleh ketersediaan air dan unsur hara. Pengukuran efisiensi kinerja organisasi pemupukan memanfaatkan teknologi informasi modern.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "SEMANTIC_PARAPHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "tfidf_10",
+      "offset": 1
+    }
+  },
+  {
+    "case_id": "EV-BND-055",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-041",
+    "generation_method": "THRESHOLD_TFIDF_10_MINUS_ONE",
+    "submission_text": "Pengelolaan tanaman hortikultura membutuhkan kondisi tanah yang sesuai. Pemupukan dilakukan berdasarkan kebutuhan tanaman dan kondisi lingkungan. Produktivitas tanaman dipengaruhi oleh ketersediaan air dan unsur hara.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "tfidf_10",
+      "offset": -1
+    }
+  },
+  {
+    "case_id": "EV-BND-056",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-041",
+    "generation_method": "THRESHOLD_TFIDF_10_AT",
+    "submission_text": "Pengelolaan tanaman hortikultura membutuhkan kondisi tanah yang sesuai. Pemupukan dilakukan berdasarkan kebutuhan tanaman dan kondisi lingkungan. Produktivitas tanaman dipengaruhi oleh ketersediaan air dan unsur hara. Sistem pemantauan menggunakan teknologi informasi dasar.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "SEMANTIC_PARAPHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "tfidf_10",
+      "offset": 0
+    }
+  },
+  {
+    "case_id": "EV-BND-057",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-041",
+    "generation_method": "THRESHOLD_TFIDF_10_PLUS_ONE",
+    "submission_text": "Pengelolaan tanaman hortikultura membutuhkan kondisi tanah yang sesuai. Pemupukan dilakukan berdasarkan kebutuhan tanaman dan kondisi lingkungan. Produktivitas tanaman dipengaruhi oleh ketersediaan air dan unsur hara. Pengukuran efisiensi kinerja organisasi pemupukan memanfaatkan teknologi informasi modern.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "SEMANTIC_PARAPHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "tfidf_10",
+      "offset": 1
+    }
+  },
+  {
+    "case_id": "EV-BND-058",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-041",
+    "generation_method": "THRESHOLD_TFIDF_10_MINUS_ONE",
+    "submission_text": "Pengelolaan tanaman hortikultura membutuhkan kondisi tanah yang sesuai. Pemupukan dilakukan berdasarkan kebutuhan tanaman dan kondisi lingkungan. Produktivitas tanaman dipengaruhi oleh ketersediaan air dan unsur hara.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "tfidf_10",
+      "offset": -1
+    }
+  },
+  {
+    "case_id": "EV-BND-059",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-041",
+    "generation_method": "THRESHOLD_TFIDF_10_AT",
+    "submission_text": "Pengelolaan tanaman hortikultura membutuhkan kondisi tanah yang sesuai. Pemupukan dilakukan berdasarkan kebutuhan tanaman dan kondisi lingkungan. Produktivitas tanaman dipengaruhi oleh ketersediaan air dan unsur hara. Sistem pemantauan menggunakan teknologi informasi dasar.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "SEMANTIC_PARAPHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "tfidf_10",
+      "offset": 0
+    }
+  },
+  {
+    "case_id": "EV-BND-060",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-041",
+    "generation_method": "THRESHOLD_TFIDF_10_PLUS_ONE",
+    "submission_text": "Pengelolaan tanaman hortikultura membutuhkan kondisi tanah yang sesuai. Pemupukan dilakukan berdasarkan kebutuhan tanaman dan kondisi lingkungan. Produktivitas tanaman dipengaruhi oleh ketersediaan air dan unsur hara. Pengukuran efisiensi kinerja organisasi pemupukan memanfaatkan teknologi informasi modern.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "SEMANTIC_PARAPHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "tfidf_10",
+      "offset": 1
+    }
+  },
+  {
+    "case_id": "EV-BND-061",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-011",
+    "generation_method": "THRESHOLD_LONGEST_50_MINUS_ONE",
+    "submission_text": "Pengembangan energi baru terbarukan di kawasan pesisir menghadapi berbagai tantangan teknis dan regulasi. Turbin angin lepas pantai memerlukan materia Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja secara terukur. Budidaya tanaman kedelai varietas unggul pada lahan kering masam memerlukan perlakuan ameliorasi tanah melalui pemberian kapur pertanian dan pupuk hay",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "PARTIAL_DIRECT_MATCH",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "longest_50",
+      "offset": -1
+    }
+  },
+  {
+    "case_id": "EV-BND-062",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-011",
+    "generation_method": "THRESHOLD_LONGEST_50_AT",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja secara terukur. Kajian mendalam difokuskan pada instrumen validasi.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "longest_50",
+      "offset": 0
+    }
+  },
+  {
+    "case_id": "EV-BND-063",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-011",
+    "generation_method": "THRESHOLD_LONGEST_50_PLUS_ONE",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja secara terukur. Kajian mendalam difokuskan pada instrumen validasi empiris di lingkungan instansi daerah.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "longest_50",
+      "offset": 1
+    }
+  },
+  {
+    "case_id": "EV-BND-064",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-011",
+    "generation_method": "THRESHOLD_LONGEST_50_MINUS_ONE",
+    "submission_text": "Pengembangan energi baru terbarukan di kawasan pesisir menghadapi berbagai tantangan teknis dan regulasi. Turbin angin lepas pantai memerlukan materia Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja secara terukur. Budidaya tanaman kedelai varietas unggul pada lahan kering masam memerlukan perlakuan ameliorasi tanah melalui pemberian kapur pertanian dan pupuk hay",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "PARTIAL_DIRECT_MATCH",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "longest_50",
+      "offset": -1
+    }
+  },
+  {
+    "case_id": "EV-BND-065",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-011",
+    "generation_method": "THRESHOLD_LONGEST_50_AT",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja secara terukur. Kajian mendalam difokuskan pada instrumen validasi.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "longest_50",
+      "offset": 0
+    }
+  },
+  {
+    "case_id": "EV-BND-066",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-011",
+    "generation_method": "THRESHOLD_LONGEST_50_PLUS_ONE",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja secara terukur. Kajian mendalam difokuskan pada instrumen validasi empiris di lingkungan instansi daerah.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "longest_50",
+      "offset": 1
+    }
+  },
+  {
+    "case_id": "EV-BND-067",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-011",
+    "generation_method": "THRESHOLD_LONGEST_50_MINUS_ONE",
+    "submission_text": "Pengembangan energi baru terbarukan di kawasan pesisir menghadapi berbagai tantangan teknis dan regulasi. Turbin angin lepas pantai memerlukan materia Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja secara terukur. Budidaya tanaman kedelai varietas unggul pada lahan kering masam memerlukan perlakuan ameliorasi tanah melalui pemberian kapur pertanian dan pupuk hay",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "PARTIAL_DIRECT_MATCH",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "longest_50",
+      "offset": -1
+    }
+  },
+  {
+    "case_id": "EV-BND-068",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-011",
+    "generation_method": "THRESHOLD_LONGEST_50_AT",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja secara terukur. Kajian mendalam difokuskan pada instrumen validasi.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "longest_50",
+      "offset": 0
+    }
+  },
+  {
+    "case_id": "EV-BND-069",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-011",
+    "generation_method": "THRESHOLD_LONGEST_50_PLUS_ONE",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja secara terukur. Kajian mendalam difokuskan pada instrumen validasi empiris di lingkungan instansi daerah.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "longest_50",
+      "offset": 1
+    }
+  },
+  {
+    "case_id": "EV-BND-070",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-011",
+    "generation_method": "THRESHOLD_LONGEST_50_MINUS_ONE",
+    "submission_text": "Pengembangan energi baru terbarukan di kawasan pesisir menghadapi berbagai tantangan teknis dan regulasi. Turbin angin lepas pantai memerlukan materia Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja secara terukur. Budidaya tanaman kedelai varietas unggul pada lahan kering masam memerlukan perlakuan ameliorasi tanah melalui pemberian kapur pertanian dan pupuk hay",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "PARTIAL_DIRECT_MATCH",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "longest_50",
+      "offset": -1
+    }
+  },
+  {
+    "case_id": "EV-BND-071",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-011",
+    "generation_method": "THRESHOLD_LONGEST_50_AT",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja secara terukur. Kajian mendalam difokuskan pada instrumen validasi.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "longest_50",
+      "offset": 0
+    }
+  },
+  {
+    "case_id": "EV-BND-072",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-011",
+    "generation_method": "THRESHOLD_LONGEST_50_PLUS_ONE",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja secara terukur. Kajian mendalam difokuskan pada instrumen validasi empiris di lingkungan instansi daerah.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "longest_50",
+      "offset": 1
+    }
+  },
+  {
+    "case_id": "EV-BND-073",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-011",
+    "generation_method": "THRESHOLD_LONGEST_50_MINUS_ONE",
+    "submission_text": "Pengembangan energi baru terbarukan di kawasan pesisir menghadapi berbagai tantangan teknis dan regulasi. Turbin angin lepas pantai memerlukan materia Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja secara terukur. Budidaya tanaman kedelai varietas unggul pada lahan kering masam memerlukan perlakuan ameliorasi tanah melalui pemberian kapur pertanian dan pupuk hay",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "PARTIAL_DIRECT_MATCH",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "longest_50",
+      "offset": -1
+    }
+  },
+  {
+    "case_id": "EV-BND-074",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-011",
+    "generation_method": "THRESHOLD_LONGEST_50_AT",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja secara terukur. Kajian mendalam difokuskan pada instrumen validasi.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "longest_50",
+      "offset": 0
+    }
+  },
+  {
+    "case_id": "EV-BND-075",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-011",
+    "generation_method": "THRESHOLD_LONGEST_50_PLUS_ONE",
+    "submission_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja secara terukur. Kajian mendalam difokuskan pada instrumen validasi empiris di lingkungan instansi daerah.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COPY_EDIT",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "longest_50",
+      "offset": 1
+    }
+  },
+  {
+    "case_id": "EV-BND-076",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-031",
+    "generation_method": "THRESHOLD_LONGEST_10_MINUS_ONE",
+    "submission_text": "Pengembangan energi baru terbarukan di kawasan pesisir menghadapi berbagai tantangan teknis dan regulasi. Turbin angin lepas pantai memerlukan material khusus yang tahan terhadap korosi air laut serta fluktuasi kecepatan angin musiman. Pemerintah daerah bersama konsorsium industri energi mulai menguji coba prototipe turbin dengan kapasitas daya terpasang sebesar lima megawatt. Evaluasi kelayakan investasi menunjukkan bahwa efisiensi konversi daya meningkat secara konsisten selama masa transisi operasional. Integrasi jaringan transmisi bawah laut menuju gardu induk daratan membutuhkan perencanaan matang guna meminimalkan lonjakan tegangan dan distorsi harmonik. Selain itu, aspek pembiayaan berkelanjutan dan skema kemitraan pemerintah swasta memegang peranan penting dalam menjamin stabilitas pasokan listrik jangka panjang bagi masyarakat pesisir kepulauan.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "longest_10",
+      "offset": -1
+    }
+  },
+  {
+    "case_id": "EV-BND-077",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-031",
+    "generation_method": "THRESHOLD_LONGEST_10_AT",
+    "submission_text": "Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Semua responden berasal dari dinas pariwisata daerah pegunungan yang tidak relevan.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "longest_10",
+      "offset": 0
+    }
+  },
+  {
+    "case_id": "EV-BND-078",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-031",
+    "generation_method": "THRESHOLD_LONGEST_10_PLUS_ONE",
+    "submission_text": "Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner terstruktur. Kawasan konservasi alam menjadi latar belakang studi lapangan.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "longest_10",
+      "offset": 1
+    }
+  },
+  {
+    "case_id": "EV-BND-079",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-031",
+    "generation_method": "THRESHOLD_LONGEST_10_MINUS_ONE",
+    "submission_text": "Pengembangan energi baru terbarukan di kawasan pesisir menghadapi berbagai tantangan teknis dan regulasi. Turbin angin lepas pantai memerlukan material khusus yang tahan terhadap korosi air laut serta fluktuasi kecepatan angin musiman. Pemerintah daerah bersama konsorsium industri energi mulai menguji coba prototipe turbin dengan kapasitas daya terpasang sebesar lima megawatt. Evaluasi kelayakan investasi menunjukkan bahwa efisiensi konversi daya meningkat secara konsisten selama masa transisi operasional. Integrasi jaringan transmisi bawah laut menuju gardu induk daratan membutuhkan perencanaan matang guna meminimalkan lonjakan tegangan dan distorsi harmonik. Selain itu, aspek pembiayaan berkelanjutan dan skema kemitraan pemerintah swasta memegang peranan penting dalam menjamin stabilitas pasokan listrik jangka panjang bagi masyarakat pesisir kepulauan.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "longest_10",
+      "offset": -1
+    }
+  },
+  {
+    "case_id": "EV-BND-080",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-031",
+    "generation_method": "THRESHOLD_LONGEST_10_AT",
+    "submission_text": "Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Semua responden berasal dari dinas pariwisata daerah pegunungan yang tidak relevan.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "longest_10",
+      "offset": 0
+    }
+  },
+  {
+    "case_id": "EV-BND-081",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-031",
+    "generation_method": "THRESHOLD_LONGEST_10_PLUS_ONE",
+    "submission_text": "Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner terstruktur. Kawasan konservasi alam menjadi latar belakang studi lapangan.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "longest_10",
+      "offset": 1
+    }
+  },
+  {
+    "case_id": "EV-BND-082",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-031",
+    "generation_method": "THRESHOLD_LONGEST_10_MINUS_ONE",
+    "submission_text": "Pengembangan energi baru terbarukan di kawasan pesisir menghadapi berbagai tantangan teknis dan regulasi. Turbin angin lepas pantai memerlukan material khusus yang tahan terhadap korosi air laut serta fluktuasi kecepatan angin musiman. Pemerintah daerah bersama konsorsium industri energi mulai menguji coba prototipe turbin dengan kapasitas daya terpasang sebesar lima megawatt. Evaluasi kelayakan investasi menunjukkan bahwa efisiensi konversi daya meningkat secara konsisten selama masa transisi operasional. Integrasi jaringan transmisi bawah laut menuju gardu induk daratan membutuhkan perencanaan matang guna meminimalkan lonjakan tegangan dan distorsi harmonik. Selain itu, aspek pembiayaan berkelanjutan dan skema kemitraan pemerintah swasta memegang peranan penting dalam menjamin stabilitas pasokan listrik jangka panjang bagi masyarakat pesisir kepulauan.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "longest_10",
+      "offset": -1
+    }
+  },
+  {
+    "case_id": "EV-BND-083",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-031",
+    "generation_method": "THRESHOLD_LONGEST_10_AT",
+    "submission_text": "Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Semua responden berasal dari dinas pariwisata daerah pegunungan yang tidak relevan.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "longest_10",
+      "offset": 0
+    }
+  },
+  {
+    "case_id": "EV-BND-084",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-031",
+    "generation_method": "THRESHOLD_LONGEST_10_PLUS_ONE",
+    "submission_text": "Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner terstruktur. Kawasan konservasi alam menjadi latar belakang studi lapangan.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "longest_10",
+      "offset": 1
+    }
+  },
+  {
+    "case_id": "EV-BND-085",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-031",
+    "generation_method": "THRESHOLD_LONGEST_10_MINUS_ONE",
+    "submission_text": "Pengembangan energi baru terbarukan di kawasan pesisir menghadapi berbagai tantangan teknis dan regulasi. Turbin angin lepas pantai memerlukan material khusus yang tahan terhadap korosi air laut serta fluktuasi kecepatan angin musiman. Pemerintah daerah bersama konsorsium industri energi mulai menguji coba prototipe turbin dengan kapasitas daya terpasang sebesar lima megawatt. Evaluasi kelayakan investasi menunjukkan bahwa efisiensi konversi daya meningkat secara konsisten selama masa transisi operasional. Integrasi jaringan transmisi bawah laut menuju gardu induk daratan membutuhkan perencanaan matang guna meminimalkan lonjakan tegangan dan distorsi harmonik. Selain itu, aspek pembiayaan berkelanjutan dan skema kemitraan pemerintah swasta memegang peranan penting dalam menjamin stabilitas pasokan listrik jangka panjang bagi masyarakat pesisir kepulauan.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "longest_10",
+      "offset": -1
+    }
+  },
+  {
+    "case_id": "EV-BND-086",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-031",
+    "generation_method": "THRESHOLD_LONGEST_10_AT",
+    "submission_text": "Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Semua responden berasal dari dinas pariwisata daerah pegunungan yang tidak relevan.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "longest_10",
+      "offset": 0
+    }
+  },
+  {
+    "case_id": "EV-BND-087",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-031",
+    "generation_method": "THRESHOLD_LONGEST_10_PLUS_ONE",
+    "submission_text": "Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner terstruktur. Kawasan konservasi alam menjadi latar belakang studi lapangan.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "longest_10",
+      "offset": 1
+    }
+  },
+  {
+    "case_id": "EV-BND-088",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-031",
+    "generation_method": "THRESHOLD_LONGEST_10_MINUS_ONE",
+    "submission_text": "Pengembangan energi baru terbarukan di kawasan pesisir menghadapi berbagai tantangan teknis dan regulasi. Turbin angin lepas pantai memerlukan material khusus yang tahan terhadap korosi air laut serta fluktuasi kecepatan angin musiman. Pemerintah daerah bersama konsorsium industri energi mulai menguji coba prototipe turbin dengan kapasitas daya terpasang sebesar lima megawatt. Evaluasi kelayakan investasi menunjukkan bahwa efisiensi konversi daya meningkat secara konsisten selama masa transisi operasional. Integrasi jaringan transmisi bawah laut menuju gardu induk daratan membutuhkan perencanaan matang guna meminimalkan lonjakan tegangan dan distorsi harmonik. Selain itu, aspek pembiayaan berkelanjutan dan skema kemitraan pemerintah swasta memegang peranan penting dalam menjamin stabilitas pasokan listrik jangka panjang bagi masyarakat pesisir kepulauan.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "no_match",
+    "expected_pattern": "NO_EVIDENCE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "longest_10",
+      "offset": -1
+    }
+  },
+  {
+    "case_id": "EV-BND-089",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-031",
+    "generation_method": "THRESHOLD_LONGEST_10_AT",
+    "submission_text": "Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Semua responden berasal dari dinas pariwisata daerah pegunungan yang tidak relevan.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "longest_10",
+      "offset": 0
+    }
+  },
+  {
+    "case_id": "EV-BND-090",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-031",
+    "generation_method": "THRESHOLD_LONGEST_10_PLUS_ONE",
+    "submission_text": "Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner terstruktur. Kawasan konservasi alam menjadi latar belakang studi lapangan.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "longest_10",
+      "offset": 1
+    }
+  },
+  {
+    "case_id": "EV-BND-091",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-031",
+    "generation_method": "THRESHOLD_IDF_05_MINUS_ONE",
+    "submission_text": "Metode penelitian kuantitatif ini menganalisis data spektrum galaksi spiral menggunakan teleskop inframerah. Berdasarkan hasil penelitian yang telah dilakukan, kandungan hidrogen molekuler menunjukkan karakteristik pergeseran merah yang unik.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "idf_05",
+      "offset": -1
+    }
+  },
+  {
+    "case_id": "EV-BND-092",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-031",
+    "generation_method": "THRESHOLD_IDF_05_MINUS_ONE",
+    "submission_text": "Metode penelitian kuantitatif ini menganalisis data spektrum galaksi spiral menggunakan teleskop inframerah. Berdasarkan hasil penelitian yang telah dilakukan, kandungan hidrogen molekuler menunjukkan karakteristik pergeseran merah yang unik.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "idf_05",
+      "offset": -1
+    }
+  },
+  {
+    "case_id": "EV-BND-093",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-031",
+    "generation_method": "THRESHOLD_IDF_05_MINUS_ONE",
+    "submission_text": "Metode penelitian kuantitatif ini menganalisis data spektrum galaksi spiral menggunakan teleskop inframerah. Berdasarkan hasil penelitian yang telah dilakukan, kandungan hidrogen molekuler menunjukkan karakteristik pergeseran merah yang unik.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "idf_05",
+      "offset": -1
+    }
+  },
+  {
+    "case_id": "EV-BND-094",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-031",
+    "generation_method": "THRESHOLD_IDF_05_MINUS_ONE",
+    "submission_text": "Metode penelitian kuantitatif ini menganalisis data spektrum galaksi spiral menggunakan teleskop inframerah. Berdasarkan hasil penelitian yang telah dilakukan, kandungan hidrogen molekuler menunjukkan karakteristik pergeseran merah yang unik.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "idf_05",
+      "offset": -1
+    }
+  },
+  {
+    "case_id": "EV-BND-095",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-031",
+    "generation_method": "THRESHOLD_IDF_05_AT",
+    "submission_text": "Metode penelitian kuantitatif ini menganalisis data spektrum galaksi spiral menggunakan teleskop inframerah. Berdasarkan hasil penelitian yang telah dilakukan, kandungan hidrogen molekuler menunjukkan karakteristik pergeseran merah yang unik.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "idf_05",
+      "offset": 0
+    }
+  },
+  {
+    "case_id": "EV-BND-096",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-031",
+    "generation_method": "THRESHOLD_IDF_05_AT",
+    "submission_text": "Metode penelitian kuantitatif ini menganalisis data spektrum galaksi spiral menggunakan teleskop inframerah. Berdasarkan hasil penelitian yang telah dilakukan, kandungan hidrogen molekuler menunjukkan karakteristik pergeseran merah yang unik.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "idf_05",
+      "offset": 0
+    }
+  },
+  {
+    "case_id": "EV-BND-097",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-031",
+    "generation_method": "THRESHOLD_IDF_05_AT",
+    "submission_text": "Metode penelitian kuantitatif ini menganalisis data spektrum galaksi spiral menggunakan teleskop inframerah. Berdasarkan hasil penelitian yang telah dilakukan, kandungan hidrogen molekuler menunjukkan karakteristik pergeseran merah yang unik.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "COMMON_ACADEMIC_PHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "idf_05",
+      "offset": 0
+    }
+  },
+  {
+    "case_id": "EV-BND-098",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-031",
+    "generation_method": "THRESHOLD_IDF_05_PLUS_ONE",
+    "submission_text": "Studi ini dilakukan untuk menganalisis hubungan antara pemanfaatan teknologi informasi dan performa organisasi. Pendekatan kuantitatif digunakan dalam penelitian dengan instrumen berupa kuesioner. Temuan penelitian memperlihatkan adanya keterkaitan penggunaan teknologi dengan peningkatan performa organisasi.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "SEMANTIC_PARAPHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "idf_05",
+      "offset": 1
+    }
+  },
+  {
+    "case_id": "EV-BND-099",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-031",
+    "generation_method": "THRESHOLD_IDF_05_PLUS_ONE",
+    "submission_text": "Studi ini dilakukan untuk menganalisis hubungan antara pemanfaatan teknologi informasi dan performa organisasi. Pendekatan kuantitatif digunakan dalam penelitian dengan instrumen berupa kuesioner. Temuan penelitian memperlihatkan adanya keterkaitan penggunaan teknologi dengan peningkatan performa organisasi.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "SEMANTIC_PARAPHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "idf_05",
+      "offset": 1
+    }
+  },
+  {
+    "case_id": "EV-BND-100",
+    "case_type": "BOUNDARY",
+    "source_case": "TC-031",
+    "generation_method": "THRESHOLD_IDF_05_PLUS_ONE",
+    "submission_text": "Studi ini dilakukan untuk menganalisis hubungan antara pemanfaatan teknologi informasi dan performa organisasi. Pendekatan kuantitatif digunakan dalam penelitian dengan instrumen berupa kuesioner. Temuan penelitian memperlihatkan adanya keterkaitan penggunaan teknologi dengan peningkatan performa organisasi.",
+    "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
+    "expected_class": "review",
+    "expected_pattern": "SEMANTIC_PARAPHRASE",
+    "human_validated": false,
+    "system_version": "v1.0.0",
+    "metadata": {
+      "threshold_target": "idf_05",
+      "offset": 1
+    }
+  }
+]
