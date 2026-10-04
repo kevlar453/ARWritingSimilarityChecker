@@ -13,19 +13,6 @@
     "reviewed_at": "2026-10-04T11:52:47.224168"
   },
   {
-    "case_id": "EV-ADV-051",
-    "reviewer_code": "RV-TEST",
-    "human_decision": "review",
-    "evidence_relevant": false,
-    "common_phrase": false,
-    "properly_cited": true,
-    "needs_investigation": false,
-    "false_positive": false,
-    "system_assessment": "CORRECT",
-    "notes": "Uji anotasi otomatis",
-    "reviewed_at": "2026-10-04T11:53:13.497732"
-  },
-  {
     "case_id": "EV-ADV-026",
     "reviewer_code": "RV-001",
     "human_decision": "review",
@@ -105,29 +92,17 @@
     "reviewer_code": "RV-TEST",
     "human_decision": "review",
     "citation_context": "NONE",
+    "citation_status": "NOT_CITED",
     "human_interpretation": "DIRECT_OVERLAP_PROPERLY_CITED",
-    "evidence_relevant": false,
+    "evidence_relevant": true,
     "common_phrase": false,
     "properly_cited": true,
     "needs_investigation": false,
     "false_positive": false,
     "system_assessment": "CORRECT",
+    "reviewer_confidence": "HIGH",
+    "review_status": "REVIEWED",
     "notes": "Uji anotasi otomatis",
-    "reviewed_at": "2026-10-04T12:44:58.152220"
-  },
-  {
-    "case_id": "EV-ADV-051",
-    "reviewer_code": "RV-TEST",
-    "human_decision": "review",
-    "citation_context": "NONE",
-    "human_interpretation": "DIRECT_OVERLAP_PROPERLY_CITED",
-    "evidence_relevant": false,
-    "common_phrase": false,
-    "properly_cited": true,
-    "needs_investigation": false,
-    "false_positive": false,
-    "system_assessment": "CORRECT",
-    "notes": "Uji anotasi otomatis",
-    "reviewed_at": "2026-10-04T12:45:35.042834"
+    "reviewed_at": "2026-10-04T13:32:30.046058"
   }
 ]

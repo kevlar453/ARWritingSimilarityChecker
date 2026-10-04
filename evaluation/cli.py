@@ -20,7 +20,10 @@ from evaluation.reviewer import (
     save_queue_to_file,
     display_review_queue,
     inspect_single_case,
-    tag_case_cli
+    tag_case_cli,
+    run_interactive_human_review,
+    get_human_review_summary,
+    get_human_review_30_set
 )
 
 def cmd_generate(args):
@@ -138,6 +141,10 @@ def cmd_review(args):
     # Tampilan antrean default
     display_review_queue(queue)
 
+def cmd_human_review(args):
+    reviewer = args.reviewer or "RV-001"
+    run_interactive_human_review(reviewer_code=reviewer)
+
 def main():
     parser = argparse.ArgumentParser(description="AR Tilik Evaluation Suite CLI")
     subparsers = parser.add_subparsers(dest="subcommand", help="Sub-command untuk evaluasi")
@@ -165,10 +172,15 @@ def main():
                             choices=["NONE", "INLINE_CITATION", "PARENTHETICAL_CITATION", "BLOCK_QUOTE", "DIRECT_QUOTE", "FOOTNOTE", "BIBLIOGRAPHY", "UNKNOWN"],
                             help="Konteks sitasi (default: NONE)")
     rev_parser.add_argument("--interpretation", type=str, default="DIRECT_OVERLAP_RELEVANT",
-                            choices=["DIRECT_OVERLAP_RELEVANT", "DIRECT_OVERLAP_PROPERLY_CITED", "COMMON_ACADEMIC_LANGUAGE", "METHODOLOGY_BOILERPLATE", "NEEDS_INVESTIGATION", "FALSE_POSITIVE"],
+                            choices=["DIRECT_OVERLAP_RELEVANT", "DIRECT_OVERLAP_PROPERLY_CITED", "COMMON_ACADEMIC_LANGUAGE", "METHODOLOGY_BOILERPLATE", "NEEDS_INVESTIGATION", "FALSE_POSITIVE", "INSUFFICIENT_EVIDENCE"],
                             help="Interpretasi akademik manusia (default: DIRECT_OVERLAP_RELEVANT)")
     rev_parser.add_argument("--notes", type=str, help="Catatan reviewer")
     rev_parser.set_defaults(func=cmd_review)
+
+    # eval human-review
+    hr_parser = subparsers.add_parser("human-review", help="Alur kerja telaah interaktif 30 kasus prioritas tinggi")
+    hr_parser.add_argument("--reviewer", type=str, default="RV-001", help="Kode anonim reviewer (default: RV-001)")
+    hr_parser.set_defaults(func=cmd_human_review)
 
     args = parser.parse_args()
     if not hasattr(args, "func"):

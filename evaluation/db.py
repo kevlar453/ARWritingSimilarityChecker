@@ -105,7 +105,10 @@ def init_evaluation_tables():
     # Tambahkan kolom baru pada evaluation_labels jika belum ada
     for col, col_type in [
         ("citation_context", "VARCHAR(64) NOT NULL DEFAULT 'NONE'"),
-        ("human_interpretation", "VARCHAR(64) NOT NULL DEFAULT 'DIRECT_OVERLAP_RELEVANT'")
+        ("citation_status", "VARCHAR(64) NOT NULL DEFAULT 'NOT_CITED'"),
+        ("human_interpretation", "VARCHAR(64) NOT NULL DEFAULT 'DIRECT_OVERLAP_RELEVANT'"),
+        ("reviewer_confidence", "VARCHAR(16) NOT NULL DEFAULT 'HIGH'"),
+        ("review_status", "VARCHAR(32) NOT NULL DEFAULT 'REVIEWED'")
     ]:
         try:
             cursor.execute(f"ALTER TABLE evaluation_labels ADD COLUMN {col} {col_type}")
@@ -208,20 +211,21 @@ def save_human_label(label_data: Dict[str, Any]):
     cursor.execute("""
         INSERT INTO evaluation_labels (
             case_id, reviewer_code, human_decision, citation_context,
-            human_interpretation, evidence_relevant, common_phrase,
+            citation_status, human_interpretation, evidence_relevant, common_phrase,
             properly_cited, needs_investigation, false_positive,
-            system_assessment, notes, reviewed_at
+            system_assessment, reviewer_confidence, review_status, notes, reviewed_at
         ) VALUES (
             %(case_id)s, %(reviewer_code)s, %(human_decision)s, %(citation_context)s,
-            %(human_interpretation)s, %(evidence_relevant)s, %(common_phrase)s,
+            %(citation_status)s, %(human_interpretation)s, %(evidence_relevant)s, %(common_phrase)s,
             %(properly_cited)s, %(needs_investigation)s, %(false_positive)s,
-            %(system_assessment)s, %(notes)s, NOW()
+            %(system_assessment)s, %(reviewer_confidence)s, %(review_status)s, %(notes)s, NOW()
         )
     """, {
         "case_id": label_data["case_id"],
         "reviewer_code": label_data.get("reviewer_code", "RV-001"),
         "human_decision": label_data["human_decision"],
         "citation_context": label_data.get("citation_context", "NONE"),
+        "citation_status": label_data.get("citation_status", "NOT_CITED"),
         "human_interpretation": label_data.get("human_interpretation", "DIRECT_OVERLAP_RELEVANT"),
         "evidence_relevant": 1 if label_data.get("evidence_relevant") else 0,
         "common_phrase": 1 if label_data.get("common_phrase") else 0,
@@ -229,6 +233,8 @@ def save_human_label(label_data: Dict[str, Any]):
         "needs_investigation": 1 if label_data.get("needs_investigation") else 0,
         "false_positive": 1 if label_data.get("false_positive") else 0,
         "system_assessment": label_data.get("system_assessment", "CORRECT"),
+        "reviewer_confidence": label_data.get("reviewer_confidence", "HIGH"),
+        "review_status": label_data.get("review_status", "REVIEWED"),
         "notes": label_data.get("notes"),
     })
     conn.commit()

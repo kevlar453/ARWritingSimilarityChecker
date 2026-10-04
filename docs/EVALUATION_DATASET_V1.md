@@ -169,10 +169,73 @@ Tabel basis data `evaluation_labels` mencatat keputusan manusia dengan pemisahan
 - `METHODOLOGY_BOILERPLATE`: Uraian teknis/metodologis standar (*"Uji normalitas menggunakan Kolmogorov-Smirnov..."*).
 - `NEEDS_INVESTIGATION`: Memerlukan pemeriksaan naskah asli oleh komite.
 - `FALSE_POSITIVE`: Kesamaan artefak statistik tanpa kesamaan substansi.
+- `INSUFFICIENT_EVIDENCE`: Bukti tidak cukup untuk memvalidasi klaim kesamaan.
+
+### Pilihan Status Atribusi Sitasi (`citation_status`):
+- `NOT_CITED`: Tidak ditemukan atribusi rujukan.
+- `CITED`: Rujukan dicantumkan secara lengkap.
+- `PARTIALLY_CITED`: Rujukan dicantumkan sebagian atau tidak lengkap.
+- `QUOTE`: Pasase dikutip langsung menggunakan tanda petik.
+- `PARAPHRASED_WITH_CITATION`: Parafrase dengan penyertaan sitasi sah.
+- `NOT_APPLICABLE`: Bagian naskah tidak membutuhkan sitasi.
+
+### Pilihan Penilaian terhadap Sistem (`system_assessment`):
+- `CORRECT`: Keputusan dan bukti sistem tepat secara akademik.
+- `ACCEPTABLE`: Keputusan sistem masih dapat diterima dalam batas toleransi.
+- `TOO_STRICT`: Sistem menilai terlalu ketat (misal menuduh frasa umum).
+- `TOO_LENIENT`: Sistem menilai terlalu longgar (lolos overlap signifikan).
+- `UNCERTAIN`: Penelaah belum dapat menentukan kepastian.
+
+### Pilihan Keyakinan Penelaah (`reviewer_confidence`):
+- `HIGH`: Keyakinan tinggi didukung bukti kuat.
+- `MEDIUM`: Keyakinan sedang dengan sedikit ambiguitas kontekstual.
+- `LOW`: Keyakinan rendah, membutuhkan second opinion pakar bidang.
 
 ---
 
-## 8. Alur Kerja CLI
+## 8. Prioritized Human Review Set (Phase HR-1: 30 Kasus Terkurasi)
+
+Untuk menghindari kejenuhan penelaah (*reviewer fatigue*) dan memaksimalkan nilai diagnostik, fase HR-1 memilih **tepat 30 kasus prioritas tinggi** yang dibagi rata ke dalam **6 Tier Prioritas** (5 kasus per tier):
+
+| Tier Prioritas | Target | Fokus Evaluasi & Kasus Kunci |
+|---|---|---|
+| **Tier 1 — Edge Cases / Former Failures** | 5 | Kasus tepi dari evaluasi awal (`EV-MUT-104`, `EV-MUT-105`, `EV-ADV-005`, `EV-ADV-026`, `EV-ADV-027`). |
+| **Tier 2 — High Exact + Citation / Quote** | 5 | Kasus dengan exact overlap tinggi namun berstatus sitasi sah atau kutipan bertanda petik (`EV-ADV-028` s/d `030`, `EV-ADV-051`, `052`). |
+| **Tier 3 — High TF-IDF + Exact ≈ 0** | 5 | Kasus dengan kemiripan topik/jargon tinggi tanpa overlap sekuensial (`EV-ADV-076` s/d `080`). |
+| **Tier 4 — Boundary Cases** | 5 | Kasus uji tepat di sekitar ambang batas konfigurasi v1.0.0 (`EV-BND-001`, `016`, `031`, `046`, `061`). |
+| **Tier 5 — Semantic Paraphrase** | 5 | Kasus benchmark parafrase semantik (`EV-SEED-021` s/d `025`). |
+| **Tier 6 — Random Production / Control** | 5 | Kasus kontrol baseline (verbatim clone, copy-edit, frasa umum, disiplin berbeda: `EV-SEED-001`, `011`, `031`, `041`, `005`). |
+
+### 4 Human Review UI Gates (HR-UI Gates 1–4):
+1. **Gate 1: Zero Engine Modifications** — Engine v1.0.0, ambang batas, dan Evidence Contract berstatus **FROZEN**. Tidak ada modifikasi kode deteksi.
+2. **Gate 2: Read Existing System Evidence Only** — Antarmuka hanya membaca bukti sekuensial dan leksikal yang dihasilkan sistem secara deterministik.
+3. **Gate 3: Separate Storage** — Anotasi manusia tersimpan terisolasi di tabel `evaluation_labels` dan `human_reviews.json`, tanpa mencampuri tabel produksi (`documents`, `reports`).
+4. **Gate 4: Blind Review** — Label sintetis buatan generator (`expected_class`, `expected_pattern`) disembunyikan sepenuhnya dari penelaah untuk mencegah bias konfirmasi (*confirmation bias*).
+
+---
+
+## 9. Antarmuka Web Telaah Manusia (/evaluation)
+
+Sistem telaah manusia terintegrasi penuh melalui tiga antarmuka web:
+
+1. **Antrean Telaah (`GET /evaluation`)**:
+   - Menampilkan tabel 30 kasus prioritas dengan filter status telaah (*Semua, Selesai, Menunggu*), filter pola sistem, dan filter tier prioritas.
+   - Dilengkapi kartu statistik total kasus, progres penyelesaian, dan indikator Blind Review.
+2. **Detail Telaah Kasus (`GET /evaluation/:case_id`)**:
+   - **Dual-Pane Text Excerpt**: Perbandingan berdampingan antara naskah submisi dan naskah rujukan.
+   - **Kartu Hasil Sistem**: Keputusan sistem (MATCH/REVIEW/NO_MATCH), pola bukti, skor Exact dan TF-IDF, panjang pasase cocok, bobot IDF, dan pertimbangan sistem.
+   - **Formulir Telaah 6 Dimensi**: Pilihan radio button untuk *Human Interpretation*, *Citation Context*, *Citation Status*, *System Assessment*, *Reviewer Confidence*, dan catatan bebas penelaah.
+   - Navigasi cepat: Tombol *"Simpan & Kasus Berikutnya"*, *"Sebelumnya"*, dan *"Berikutnya"*.
+3. **Ringkasan Hasil Telaah (`GET /evaluation/summary`)**:
+   - Visualisasi ringkasan penyelesaian dan tingkat keselarasan (*Human-System Agreement Rate*).
+   - Grafik distribusi untuk seluruh 5 dimensi evaluasi.
+   - Tabel pemantauan progres per tier (6 tier).
+   - Kartu wawasan empiris (*Diagnostic Insights*) sebagai landasan backlog v1.1.
+   - Tabel rincian seluruh kasus yang telah selesai ditelaah.
+
+---
+
+## 10. Alur Kerja CLI
 
 ```bash
 # 1. Menghasilkan 500 kasus evaluasi terisolasi dengan hash deduplikasi
@@ -181,22 +244,22 @@ Tabel basis data `evaluation_labels` mencatat keputusan manusia dengan pemisahan
 # 2. Menjalankan engine AR Tilik v1.0.0 pada seluruh 500 kasus
 ./artilik eval run
 
-# 3. Menampilkan antrean kasus paling informatif untuk telaah manusia
+# 3. Menampilkan antrean 30 kasus prioritas untuk telaah manusia
 ./artilik eval review
 
 # 4. Memeriksa rincian kasus spesifik (metrik dual-lens, teks, provenans)
 ./artilik eval review --inspect EV-ADV-026
 
-# 5. Membubuhkan anotasi telaah manusia via CLI lengkap dengan konteks & interpretasi
+# 5. Alur telaah interaktif CLI 30 kasus prioritas (Phase HR-1)
+./artilik eval human-review [--reviewer RV-001]
+
+# 6. Membubuhkan anotasi telaah manusia spesifik via CLI
 ./artilik eval review --tag EV-ADV-026 \
   --decision review \
-  --label "Properly cited" \
   --context PARENTHETICAL_CITATION \
   --interpretation DIRECT_OVERLAP_PROPERLY_CITED \
   --assessment CORRECT \
   --reviewer RV-001 \
   --notes "Teks mengandung sitasi sah Sugiyono (2019)"
-
-# 6. Mode telaah interaktif satu per satu
-./artilik eval review --interactive
 ```
+

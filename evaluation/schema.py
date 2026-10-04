@@ -50,6 +50,27 @@ HUMAN_INTERPRETATION_COMMON_ACADEMIC_LANGUAGE = "COMMON_ACADEMIC_LANGUAGE"
 HUMAN_INTERPRETATION_METHODOLOGY_BOILERPLATE = "METHODOLOGY_BOILERPLATE"
 HUMAN_INTERPRETATION_NEEDS_INVESTIGATION = "NEEDS_INVESTIGATION"
 HUMAN_INTERPRETATION_FALSE_POSITIVE = "FALSE_POSITIVE"
+HUMAN_INTERPRETATION_INSUFFICIENT_EVIDENCE = "INSUFFICIENT_EVIDENCE"
+
+# Status Akademik Bukti (Citation Status)
+CITATION_STATUS_NOT_CITED = "NOT_CITED"
+CITATION_STATUS_CITED = "CITED"
+CITATION_STATUS_PARTIALLY_CITED = "PARTIALLY_CITED"
+CITATION_STATUS_QUOTE = "QUOTE"
+CITATION_STATUS_PARAPHRASED_WITH_CITATION = "PARAPHRASED_WITH_CITATION"
+CITATION_STATUS_NOT_APPLICABLE = "NOT_APPLICABLE"
+CITATION_STATUS_UNKNOWN = "UNKNOWN"
+
+# Tingkat Keyakinan Reviewer (Reviewer Confidence)
+CONFIDENCE_HIGH = "HIGH"
+CONFIDENCE_MEDIUM = "MEDIUM"
+CONFIDENCE_LOW = "LOW"
+
+# Siklus Hidup Peninjauan (Review Lifecycle)
+LIFECYCLE_PENDING = "PENDING"
+LIFECYCLE_UNDER_REVIEW = "UNDER_REVIEW"
+LIFECYCLE_REVIEWED = "REVIEWED"
+LIFECYCLE_VALIDATED = "VALIDATED"
 
 # Penilaian Sistem oleh Reviewer Manusia
 SYSTEM_ASSESSMENT_CORRECT = "CORRECT"
@@ -147,6 +168,7 @@ class HumanReviewLabel:
     reviewer_code: str               # e.g. RV-001
     human_decision: str              # match | review | no_match | properly_cited
     citation_context: str = CITATION_CONTEXT_NONE
+    citation_status: str = CITATION_STATUS_NOT_CITED
     human_interpretation: str = HUMAN_INTERPRETATION_DIRECT_OVERLAP_RELEVANT
     evidence_relevant: bool = False
     common_phrase: bool = False
@@ -154,6 +176,8 @@ class HumanReviewLabel:
     needs_investigation: bool = False
     false_positive: bool = False
     system_assessment: str = SYSTEM_ASSESSMENT_CORRECT
+    reviewer_confidence: str = CONFIDENCE_HIGH
+    review_status: str = LIFECYCLE_REVIEWED
     notes: Optional[str] = None
     reviewed_at: str = field(default_factory=lambda: datetime.now().isoformat())
 

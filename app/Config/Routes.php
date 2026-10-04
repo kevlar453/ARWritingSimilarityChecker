@@ -33,3 +33,11 @@ $routes->group('admin/corpus', function ($routes) {
     $routes->delete('(:num)', 'Admin\CorpusController::delete/$1');
     $routes->post('(:num)/reindex', 'Admin\CorpusController::reindex/$1');
 });
+
+// Human Review & Evaluation Subsystem (Phase HR-1 Isolated Module)
+$routes->group('evaluation', function ($routes) {
+    $routes->get('/', 'EvaluationController::index');
+    $routes->get('summary', 'EvaluationController::summary');
+    $routes->get('(:segment)', 'EvaluationController::detail/$1');
+    $routes->post('(:segment)/save', 'EvaluationController::save/$1');
+});
