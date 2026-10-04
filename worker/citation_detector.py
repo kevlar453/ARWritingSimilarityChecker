@@ -80,7 +80,7 @@ RE_FOOTNOTE_SUPERSCRIPT = re.compile(r'(?<=\w)([¹²³⁴⁵⁶⁷⁸⁹⁰]+)')
 
 # 5. Inline Bracketed Citations (author-year or numeric list)
 RE_INLINE_AUTHOR = re.compile(
-    r'\[\s*([A-Z][a-zA-Z\s\-\'\,\.\&]+(?:et\s+al\.|dkk\.)?,?\s*(?:19|20)\d{2}[a-z]?)\s*\]'
+    r'\[\s*(?:(?:bdk\.|cf\.|lihat|see)\s+)?([A-Z][a-zA-Z\s\-\'\,\.\&]+(?:et\s+al\.|dkk\.)?,?\s*(?:1[6-9]|20)\d{2}[a-z]?)\s*\]'
 )
 RE_INLINE_NUMERIC = re.compile(
     r'(?<!\w)\[\s*([1-9]\d*(?:\s*,\s*[1-9]\d*|\s*[\-\–]\s*[1-9]\d*)*)\s*\]'
@@ -88,13 +88,13 @@ RE_INLINE_NUMERIC = re.compile(
 
 # 6. Parenthetical Author-Year Citations
 RE_NARRATIVE_CITATION = re.compile(
-    r'\b((?:Menurut|Berdasarkan|Sebagaimana\s+(?:dinyatakan|dikemukakan)\s+oleh|Sesuai\s+(?:dengan)?|Dalam|Studi\s+oleh|Penelitian\s+oleh|Kajian\s+oleh|According\s+to|As\s+(?:stated|noted)\s+by)\s+([A-Z][a-zA-Z\s\-\'\&]+(?:(?:et\s+al\.|dkk\.)|\s*(?:&|and|dan)\s*[A-Z][a-zA-Z\s\-\']+)?)\s*\(((?:19|20)\d{2}[a-z]?(?::\s*\d+(?:[\-\–]\d+)?)?)\))'
+    r'\b((?:Menurut|Berdasarkan|Sebagaimana\s+(?:dinyatakan|dikemukakan)\s+oleh|Sesuai\s+(?:dengan)?|Dalam|Studi\s+oleh|Penelitian\s+oleh|Kajian\s+oleh|According\s+to|As\s+(?:stated|noted)\s+by)\s+([A-Z][a-zA-Z\s\-\'\&]+(?:(?:et\s+al\.|dkk\.)|\s*(?:&|and|dan)\s*[A-Z][a-zA-Z\s\-\']+)?)\s*\(((?:1[6-9]|20)\d{2}[a-z]?(?::\s*\d+(?:[\-\–]\d+)?)?)\))'
 )
 RE_NARRATIVE_SIMPLE = re.compile(
-    r'\b(([A-Z][a-zA-Z\s\-\'\&]+(?:(?:et\s+al\.|dkk\.)|\s*(?:&|and|dan)\s*[A-Z][a-zA-Z\s\-\']+)?)\s*\(((?:19|20)\d{2}[a-z]?(?::\s*\d+(?:[\-\–]\d+)?)?)\))'
+    r'\b(([A-Z][a-zA-Z\s\-\'\&]+(?:(?:et\s+al\.|dkk\.)|\s*(?:&|and|dan)\s*[A-Z][a-zA-Z\s\-\']+)?)\s*\(((?:1[6-9]|20)\d{2}[a-z]?(?::\s*\d+(?:[\-\–]\d+)?)?)\))'
 )
 RE_PARENTHETICAL = re.compile(
-    r'(\(\s*[A-Z][a-zA-Z\s\-\'\&]+(?:(?:et\s+al\.|dkk\.)|\s*(?:&|and|dan)\s*[A-Z][a-zA-Z\s\-\']+)?\,\s*(?:19|20)\d{2}[a-z]?(?::\s*\d+(?:[\-\–]\d+)?)?\s*\))'
+    r'(\(\s*(?:(?:bdk\.|cf\.|lihat|see)\s+)?(?:[a-zA-Z0-9_\-\s\.\,\'\&]+?oleh\s+)?([A-Z][a-zA-Z\s\-\'\&]+(?:(?:et\s+al\.|dkk\.)|\s*(?:&|and|dan)\s*[A-Z][a-zA-Z\s\-\']+)?)\,\s*(?:1[6-9]|20)\d{2}[a-z]?(?::\s*\d+(?:[\-\–]\d+)?)?\s*\))'
 )
 
 # 7. Bibliography / Reference List Entry
