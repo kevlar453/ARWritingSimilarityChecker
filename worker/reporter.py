@@ -1,3 +1,4 @@
+import os
 import json
 import time
 from worker.database import get_connection
@@ -5,6 +6,9 @@ from worker.matcher import run_similarity_check
 from worker.tfidf import run_tfidf_similarity_check
 from worker.hybrid import run_hybrid_similarity_check
 from worker.indexer import index_document
+from worker.citation_detector import detect_citation_context
+from worker.evidence_presenter import present_hybrid_report
+from worker.observability import log_observability_event, verify_non_suppression_and_invariance
 
 def process_similarity_check(document_id: int, report_id: int, engine: str = "hybrid"):
     t_start = time.perf_counter()
@@ -103,6 +107,74 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
 
         duration = time.perf_counter() - t_start
         result["execution_time_seconds"] = round(duration, 3)
+
+        # 4b. Ekstraksi Konteks Sitasi, Presentasi Terdekomposisi, & Telemetri Observabilitas v1.1
+        try:
+            submission_text = ""
+            cursor.execute(
+                "SELECT text FROM document_chunks WHERE document_id = %s ORDER BY chunk_index ASC",
+                (document_id,)
+            )
+            chunks = cursor.fetchall()
+            if chunks:
+                submission_text = " ".join(c["text"] for c in chunks if c.get("text"))
+            elif document.get("storage_path") and os.path.exists(document["storage_path"]):
+                from worker.extractor import extract_document
+                pages = extract_document(document["storage_path"], document.get("mime_type"))
+                submission_text = " ".join(p["text"] for p in pages if p.get("text"))
+
+            t_cite_start = time.perf_counter()
+            context_res = detect_citation_context(submission_text)
+            cite_latency_ms = (time.perf_counter() - t_cite_start) * 1000.0
+
+            t_pres_start = time.perf_counter()
+            v11_presentation = present_hybrid_report(
+                report_dict=result,
+                sources=result.get("sources", []),
+                evidence_text=submission_text,
+                context_detection=context_res
+            )
+            pres_latency_ms = (time.perf_counter() - t_pres_start) * 1000.0
+
+            inv_check = verify_non_suppression_and_invariance(
+                v1_exact=exact_sim,
+                v1_cosine=cosine_sim,
+                v1_decision=predicted_decision,
+                presentation=v11_presentation
+            )
+
+            result["v1_1_presentation"] = v11_presentation
+            result["v1_1_observability"] = {
+                "citation_parsing_ms": round(cite_latency_ms, 4),
+                "presentation_ms": round(pres_latency_ms, 4),
+                "sla_passed": cite_latency_ms < 150.0,
+                "context_type": context_res.context_type,
+                "citation_status": context_res.citation_status,
+                "citation_confidence": context_res.confidence,
+                "has_divergence": v11_presentation.get("source_evidence", {}).get("divergence") is not None,
+                "non_suppression_verified": inv_check["non_suppression_verified"],
+                "decision_invariance_verified": inv_check["decision_invariance_verified"],
+            }
+
+            log_observability_event("SIMILARITY_CHECK_COMPLETED", {
+                "report_id": report_id,
+                "document_id": document_id,
+                "engine": engine,
+                "predicted_decision": predicted_decision,
+                "exact_similarity": exact_sim,
+                "cosine_similarity": cosine_sim,
+                "duration_seconds": round(duration, 3),
+                "citation_parsing_ms": round(cite_latency_ms, 4),
+                "sla_passed": cite_latency_ms < 150.0,
+                "context_type": context_res.context_type,
+                "citation_status": context_res.citation_status,
+                "has_divergence": v11_presentation.get("source_evidence", {}).get("divergence") is not None,
+                "non_suppression_verified": inv_check["non_suppression_verified"],
+                "decision_invariance_verified": inv_check["decision_invariance_verified"],
+            })
+        except Exception as obs_err:
+            # Failsafe: error observabilitas tidak boleh menggagalkan penulisan laporan utama
+            print(f"  [OBSERVABILITY WARNING] Gagal merekam metrik v1.1 untuk Report #{report_id}: {obs_err}")
 
         # 5. Simpan summary ke tabel reports
         cursor.execute("""

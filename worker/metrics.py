@@ -165,6 +165,30 @@ def display_metrics():
                     pass
                     
             print(f"#{r_id:<4} | Doc #{d_id:<4} | {name:<28} | {dec:<8} | {pat:<24} | Ex:{exact:>6} Cos:{cos:>6}{lat_str}")
+        print()
+
+        # [7] V1.1 OPERATIONAL OBSERVABILITY & CONTEXT METRICS
+        try:
+            from worker.observability import get_operational_observability_summary
+            obs_summary = get_operational_observability_summary(db_conn=conn)
+            print("[7] V1.1 OPERATIONAL OBSERVABILITY & CONTEXT METRICS")
+            print("----------------------------------------------------------------------")
+            print(f"Target SLA Parsing Sitasi : < {obs_summary['sla_target_max_latency_ms']} ms")
+            print(f"Status Kepatuhan SLA      : [{'✓ PASS' if obs_summary['is_sla_compliant'] else '✗ FAIL'}]")
+            cp = obs_summary["citation_parsing_latency"]
+            if cp["count"] > 0:
+                print(f"Rata-rata Overhead Sitasi : {cp['avg_ms']:.4f} ms (p95: {cp['p95_ms']:.4f} ms, n={cp['count']})")
+            div = obs_summary["divergence"]
+            ns = obs_summary["non_suppression"]
+            print(f"Insiden Divergensi Bukti  : {div['count']} ({div['rate_percent']}%) [Exact≈0 & Cos>0]")
+            print(f"Verifikasi Non-Suppression: {ns['verified_count']} terverifikasi ({ns['verification_rate_percent']}%) [Invarian 100%]")
+            print()
+            print("Distribusi Konteks Sitasi v1.1:")
+            for ctx_name, ctx_stat in obs_summary["context_distribution"].items():
+                if ctx_stat["count"] > 0:
+                    print(f"  - {ctx_name:<25}: {ctx_stat['count']:4d} ({ctx_stat['percent']:5.1f}%)")
+        except Exception as e:
+            pass
         print("======================================================================")
 
     finally:
