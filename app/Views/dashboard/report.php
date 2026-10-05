@@ -522,6 +522,11 @@
                                             <span class="text-[11px] uppercase font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">
                                                 <?= esc($src['source_type'] ?? 'dokumen') ?>
                                             </span>
+                                            <?php if (!empty($src['is_jit_discovered']) || in_array((int)$src['source_document_id'], $jitDiscoveredIds ?? [], true)): ?>
+                                                <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1 shadow-2xs">
+                                                    <span>🎯</span> JIT Peer Discovery
+                                                </span>
+                                            <?php endif; ?>
                                         </div>
                                         <div class="text-xs text-slate-500 font-mono-code flex flex-wrap items-center gap-3">
                                             <span>Exact Overlap: <strong class="text-indigo-700 font-bold"><?= number_format($src['exact_similarity'] ?? $src['similarity'], 1) ?>%</strong></span>
@@ -574,6 +579,11 @@
                                             <span class="text-[11px] uppercase font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">
                                                 <?= esc($src['source_type'] ?? 'dokumen') ?>
                                             </span>
+                                            <?php if (!empty($src['is_jit_discovered']) || in_array((int)$src['source_document_id'], $jitDiscoveredIds ?? [], true)): ?>
+                                                <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1 shadow-2xs">
+                                                    <span>🎯</span> JIT Peer Discovery
+                                                </span>
+                                            <?php endif; ?>
                                         </div>
                                         <div class="text-xs text-slate-500 font-mono-code flex flex-wrap items-center gap-3">
                                             <span>Cosine Similarity: <strong class="text-teal-700 font-bold"><?= number_format($src['cosine_similarity'] ?? 0, 1) ?>%</strong></span>
@@ -799,6 +809,201 @@
                 <p class="text-[11px] text-slate-500 pt-0.5">
                     Prinsip Keadilan: Mengidentifikasi penulisan yang menyalin alur pemikiran dari literatur asing tanpa penyebutan rujukan primer.
                 </p>
+            </div>
+        </div>
+        <?php endif; ?>
+
+        <!-- ═════════════════════════════════════════════════════════════════════ -->
+        <!-- SINTESIS RISIKO AKADEMIK BERBOBOT ML (XGBOOST CLASSIFIER v3.4)       -->
+        <!-- ═════════════════════════════════════════════════════════════════════ -->
+        <?php if (!empty($xgboostRisk)): ?>
+        <?php
+            $xgbRiskScore = (float)($xgboostRisk['calibrated_risk_score'] ?? 0.0);
+            $xgbRiskLevel = $xgboostRisk['risk_level'] ?? 'LOW';
+            $xgbLabel = $xgboostRisk['verdict_label'] ?? 'Aman (Bebas Indikasi Signifikan)';
+            $xgbRationale = $xgboostRisk['summary_rationale'] ?? '';
+            $xgbProbs = $xgboostRisk['probabilities'] ?? [];
+            $pOrig = round((float)($xgbProbs['p_original'] ?? 0.0) * 100, 1);
+            $pRev = round((float)($xgbProbs['p_needs_review'] ?? 0.0) * 100, 1);
+            $pRisk = round((float)($xgbProbs['p_high_risk'] ?? 0.0) * 100, 1);
+            $xgbDrivers = $xgboostRisk['explainable_drivers'] ?? [];
+
+            $xgbBadgeClass = match($xgbRiskLevel) {
+                'HIGH' => 'bg-rose-50 text-rose-700 border-rose-300',
+                'MODERATE' => 'bg-amber-50 text-amber-700 border-amber-300',
+                default => 'bg-emerald-50 text-emerald-700 border-emerald-300'
+            };
+            $xgbMeterColor = match($xgbRiskLevel) {
+                'HIGH' => 'bg-rose-600',
+                'MODERATE' => 'bg-amber-500',
+                default => 'bg-emerald-600'
+            };
+        ?>
+        <div class="bg-white border-2 border-slate-300 rounded-2xl p-6 shadow-xs space-y-5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-2xl">🤖</span>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="font-bold text-base text-slate-900">Sintesis Risiko Akademik Berbobot XGBoost</h3>
+                            <span class="text-[10px] font-bold font-mono-code uppercase px-2 py-0.5 rounded bg-purple-50 text-purple-700 border border-purple-200">
+                                XGBoost v3.4 • 11 Dimensi Tabular
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-400">Penyintesis probabilistik terkalibrasi yang memadukan bukti sekuensial, leksikal, stylometri, dan alih bahasa secara non-linear</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 self-start sm:self-auto">
+                    <span class="text-xs font-mono-code font-bold px-3 py-1 rounded-full border shadow-2xs <?= $xgbBadgeClass ?>">
+                        Level Risiko: <strong><?= esc($xgbRiskLevel) ?></strong> (<?= number_format($xgbRiskScore, 1) ?>%)
+                    </span>
+                </div>
+            </div>
+
+            <!-- Probabilities & Score Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3.5">
+                <!-- Calibrated Risk Score -->
+                <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50 space-y-1.5">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Skor Risiko Terkalibrasi</span>
+                    <div class="text-2xl font-extrabold text-slate-900 font-mono-code"><?= number_format($xgbRiskScore, 1) ?>%</div>
+                    <div class="w-full bg-slate-200 rounded-full h-1.5 overflow-hidden">
+                        <div class="h-1.5 rounded-full <?= $xgbMeterColor ?>" style="width: <?= min(100, max(2, $xgbRiskScore)) ?>%"></div>
+                    </div>
+                    <p class="text-[10px] text-slate-400">Sintesis agregat ensemble ML</p>
+                </div>
+
+                <!-- Probability 1: P(Original) -->
+                <div class="p-3.5 rounded-xl border border-emerald-100 bg-emerald-50/40 space-y-1">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-700">P (Orisinal Mandiri)</span>
+                        <span class="text-xs">🌱</span>
+                    </div>
+                    <div class="text-2xl font-extrabold text-emerald-800 font-mono-code"><?= number_format($pOrig, 1) ?>%</div>
+                    <p class="text-[10px] text-emerald-700/80">Peluang kepenulisan mandiri murni</p>
+                </div>
+
+                <!-- Probability 2: P(Review) -->
+                <div class="p-3.5 rounded-xl border border-amber-100 bg-amber-50/40 space-y-1">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-amber-700">P (Perlu Telaah Dosen)</span>
+                        <span class="text-xs">🔍</span>
+                    </div>
+                    <div class="text-2xl font-extrabold text-amber-800 font-mono-code"><?= number_format($pRev, 1) ?>%</div>
+                    <p class="text-[10px] text-amber-700/80">Peluang nuansa teks perlu klarifikasi</p>
+                </div>
+
+                <!-- Probability 3: P(High Risk) -->
+                <div class="p-3.5 rounded-xl border border-rose-100 bg-rose-50/40 space-y-1">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-rose-700">P (Risiko Tinggi / Verbatim)</span>
+                        <span class="text-xs">⚠️</span>
+                    </div>
+                    <div class="text-2xl font-extrabold text-rose-800 font-mono-code"><?= number_format($pRisk, 1) ?>%</div>
+                    <p class="text-[10px] text-rose-700/80">Peluang kesamaan tekstual substansial</p>
+                </div>
+            </div>
+
+            <!-- Explainable AI (Risk Drivers) -->
+            <div class="space-y-2">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-500 font-mono-code flex items-center gap-1.5">
+                    <span>🧭</span> Faktor Pendorong Keputusan (Explainable AI Drivers):
+                </span>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <?php foreach ($xgbDrivers as $driver): ?>
+                        <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-700 flex items-start gap-2 shadow-2xs">
+                            <span class="text-indigo-600 mt-0.5">✦</span>
+                            <span><?= esc($driver) ?></span>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+
+            <!-- Summary & Academic Fairness Notice -->
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-700 leading-relaxed space-y-2">
+                <div class="font-bold text-slate-900 flex items-center gap-1.5 text-xs uppercase tracking-wider font-mono-code">
+                    <span>💡</span> Rekomendasi Sintesis XGBoost:
+                </div>
+                <p class="text-slate-800 leading-relaxed italic bg-white p-3 rounded-lg border border-slate-200 shadow-2xs">
+                    "<?= esc($xgbRationale) ?>"
+                </p>
+                <div class="flex items-start gap-2 pt-1 text-[11px] text-slate-500">
+                    <span class="text-sm">⚖️</span>
+                    <span><strong>Prinsip Keadilan Akademik:</strong> Integrasi XGBoost berfungsi sebagai penimbang bukti probabilistik untuk membantu pembimbing dan penguji memilah formulasi baku atau kutipan sah dari penyalinan substantif, tanpa vonis otomatis yang merugikan integritas mahasiswa.</span>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
+
+        <!-- ═════════════════════════════════════════════════════════════════════ -->
+        <!-- JUST-IN-TIME (JIT) PEER REFERENCE DISCOVERY                           -->
+        <!-- ═════════════════════════════════════════════════════════════════════ -->
+        <?php if (!empty($jitHarvesting) && !empty($jitHarvesting['discovered_works'])): ?>
+        <div class="bg-white border-2 border-emerald-200 rounded-2xl p-6 shadow-xs space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-emerald-100 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-2xl">🎯</span>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="font-bold text-base text-slate-900">Just-In-Time (JIT) Peer Reference Discovery</h3>
+                            <span class="text-[10px] font-bold font-mono-code uppercase px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-300">
+                                On-Demand Harvesting
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-500">
+                            AR Tilik secara otomatis mendeteksi domain disipliner naskah dan mengindeks karya sebidang dari basis data terbuka sebagai pembanding riil
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 self-start sm:self-auto">
+                    <span class="text-xs font-mono-code font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-300 shadow-2xs">
+                        <?= count($jitHarvesting['discovered_works']) ?> Karya Sebidang Ditemukan
+                    </span>
+                </div>
+            </div>
+
+            <!-- Substantive Topic Queries Executed -->
+            <?php if (!empty($jitHarvesting['queries_executed'])): ?>
+                <div class="space-y-1.5">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500 font-mono-code block">
+                        Kata Kunci &amp; Domain Disipliner yang Diekstrak:
+                    </span>
+                    <div class="flex flex-wrap gap-1.5">
+                        <?php foreach ($jitHarvesting['queries_executed'] as $q): ?>
+                            <span class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 font-mono-code text-xs font-semibold border border-emerald-200 flex items-center gap-1 shadow-2xs">
+                                <span>🏷️</span> <?= esc($q) ?>
+                            </span>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            <?php endif; ?>
+
+            <!-- Discovered Peer Works List -->
+            <div class="space-y-2 pt-1">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-500 font-mono-code block">
+                    Karya Ilmiah Sebidang yang Diindeks ke Korpus Pembanding:
+                </span>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <?php foreach ($jitHarvesting['discovered_works'] as $dw): ?>
+                        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1 shadow-2xs">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="text-[10px] font-bold font-mono-code px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">
+                                    Tahun <?= esc($dw['year'] ?? '-') ?>
+                                </span>
+                                <?php if (!empty($dw['url'])): ?>
+                                    <a href="<?= esc($dw['url']) ?>" target="_blank" rel="noopener noreferrer" class="text-[11px] text-indigo-600 hover:text-indigo-800 hover:underline flex items-center gap-1">
+                                        <span>🔗 Buka Sumber</span>
+                                    </a>
+                                <?php endif; ?>
+                            </div>
+                            <h5 class="font-bold text-xs text-slate-900 leading-snug">
+                                <?= esc($dw['title']) ?>
+                            </h5>
+                            <p class="text-[11px] text-slate-500 italic">
+                                <?= esc($dw['source_name'] ?? 'Basis Data Akademik Terbuka') ?>
+                            </p>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
             </div>
         </div>
         <?php endif; ?>

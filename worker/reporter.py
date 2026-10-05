@@ -36,7 +36,31 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
                 mime_type=document.get("mime_type"),
                 is_corpus=(document.get("document_type") == "corpus")
             )
-            
+
+        # 3b. Just-In-Time (JIT) Topic Harvesting (Pencarian Korpus Sebidang Otomatis)
+        jit_harvest_res = None
+        if document.get("document_type") != "corpus":
+            doc_title = document.get("title") or document.get("original_filename") or ""
+            cursor.execute(
+                "SELECT text FROM document_chunks WHERE document_id = %s ORDER BY chunk_index ASC LIMIT 5",
+                (document_id,)
+            )
+            early_chunks = cursor.fetchall()
+            early_text = " ".join(c["text"] for c in early_chunks if c.get("text")) if early_chunks else None
+
+            if doc_title:
+                try:
+                    from worker.jit_harvester import harvest_topic_references_jit
+                    jit_harvest_res = harvest_topic_references_jit(
+                        title=doc_title,
+                        text=early_text,
+                        max_works=3,
+                        connection=connection
+                    )
+                except Exception as jit_err:
+                    print(f"  [JIT HARVESTER WARNING] Gagal menjalankan JIT harvester untuk Doc #{document_id}: {jit_err}")
+                    jit_harvest_res = {"status": "error", "error_message": str(jit_err)}
+
         # 4. Jalankan similarity check sesuai engine
         engine = (engine or "hybrid").lower()
         
@@ -107,6 +131,13 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
 
         duration = time.perf_counter() - t_start
         result["execution_time_seconds"] = round(duration, 3)
+
+        # Tandai sumber rujukan yang ditemukan melalui JIT topic harvester
+        if jit_harvest_res and isinstance(jit_harvest_res, dict):
+            discovered_ids = {w["document_id"] for w in jit_harvest_res.get("discovered_works", []) if w.get("document_id")}
+            for src in result.get("sources", []):
+                if src.get("source_document_id") in discovered_ids:
+                    src["is_jit_discovered"] = True
 
         # 4b. Ekstraksi Konteks Sitasi, Presentasi Terdekomposisi, & Telemetri Observabilitas v1.1
         try:
@@ -199,6 +230,46 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
                     match["boilerplate_phrase"] = bp_pass.matched_phrase
                     match["boilerplate_rationale"] = bp_pass.rationale
 
+            # 6. XGBoost Academic Risk Synthesizer (Penyintesis Risiko Akademik Berbobot ML)
+            from worker.risk_classifier import predict_academic_risk_xgboost
+
+            matches_list = result.get("matches", [])
+            total_matches_cnt = len(matches_list)
+            bp_count = sum(1 for m in matches_list if m.get("is_boilerplate"))
+            bp_ratio = (bp_count / total_matches_cnt) if total_matches_cnt > 0 else (0.8 if boilerplate_res.is_boilerplate else 0.0)
+
+            cited_count = sum(1 for m in matches_list if detect_citation_context(m.get("passage_text", "")).citation_status in ("CITED", "ATTRIBUTED"))
+            q_ratio = (cited_count / total_matches_cnt) if total_matches_cnt > 0 else (0.8 if context_res.citation_status in ("CITED", "ATTRIBUTED") else 0.0)
+
+            burstiness_val = 0.5
+            trans_density_val = 0.0
+            if isinstance(ai_stylometrics_res, dict) and "metrics" in ai_stylometrics_res:
+                burstiness_val = float(ai_stylometrics_res["metrics"].get("burstiness", 0.5))
+                trans_density_val = float(ai_stylometrics_res["metrics"].get("transition_density", 0.0))
+
+            cl_score = 0.0
+            if cross_lingual_res:
+                if hasattr(cross_lingual_res, "cross_lingual_score"):
+                    cl_score = float(cross_lingual_res.cross_lingual_score)
+                elif isinstance(cross_lingual_res, dict):
+                    cl_score = float(cross_lingual_res.get("cross_lingual_score", 0.0))
+
+            xgboost_risk_res = predict_academic_risk_xgboost(
+                exact_sim=exact_sim,
+                cosine_sim=cosine_sim,
+                longest_match_words=longest_match,
+                avg_idf=avg_idf,
+                shared_terms_count=shared_terms_count,
+                source_count=source_count,
+                burstiness=burstiness_val,
+                transition_density=trans_density_val,
+                cross_lingual_score=cl_score,
+                boilerplate_ratio=bp_ratio,
+                quote_ratio=q_ratio
+            )
+            result["xgboost_risk"] = xgboost_risk_res
+            result["jit_harvesting"] = jit_harvest_res
+
             t_pres_start = time.perf_counter()
             v11_presentation = present_hybrid_report(
                 report_dict=result,
@@ -210,6 +281,8 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
                 boilerplate_detection=boilerplate_res,
                 ai_stylometrics=ai_stylometrics_res,
                 cross_lingual=cross_lingual_res,
+                xgboost_risk=xgboost_risk_res,
+                jit_harvesting=jit_harvest_res,
             )
             pres_latency_ms = (time.perf_counter() - t_pres_start) * 1000.0
 

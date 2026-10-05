@@ -1,0 +1,10 @@
+# AR Tilik - Core & Extended Requirements
+mysql-connector-python>=9.0.0
+pymupdf>=1.24.0
+python-docx>=1.1.0
+lxml>=5.0.0
+scikit-learn>=1.5.0
+xgboost>=2.1.0
+numpy>=1.26.0
+scipy>=1.13.0
+pytest>=8.0.0

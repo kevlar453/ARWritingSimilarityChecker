@@ -121,6 +121,8 @@ def present_hybrid_report(
     boilerplate_detection: Optional[Any] = None,
     ai_stylometrics: Optional[Any] = None,
     cross_lingual: Optional[Any] = None,
+    xgboost_risk: Optional[Any] = None,
+    jit_harvesting: Optional[Any] = None,
 ) -> Dict[str, Any]:
     """
     Membangun struktur presentasi bukti terdekomposisi lengkap v1.1.
@@ -221,5 +223,7 @@ def present_hybrid_report(
             "boilerplate_detection": boilerplate_detection.to_dict() if hasattr(boilerplate_detection, "to_dict") else boilerplate_detection,
             "ai_stylometrics": ai_stylometrics.to_dict() if hasattr(ai_stylometrics, "to_dict") else ai_stylometrics,
             "cross_lingual": cross_lingual.to_dict() if hasattr(cross_lingual, "to_dict") else cross_lingual,
+            "xgboost_risk": xgboost_risk.to_dict() if hasattr(xgboost_risk, "to_dict") else xgboost_risk,
+            "jit_harvesting": jit_harvesting.to_dict() if hasattr(jit_harvesting, "to_dict") else jit_harvesting,
         }
     }

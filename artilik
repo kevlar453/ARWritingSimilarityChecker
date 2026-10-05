@@ -88,11 +88,26 @@ case "$1" in
         shift
         exec "$PYTHON_BIN" -m worker.auto_discovery_harvester "$@"
         ;;
+    corpus:jit)
+        shift
+        exec "$PYTHON_BIN" -m worker.jit_harvester "$@"
+        ;;
+    risk:train)
+        shift
+        exec "$PYTHON_BIN" -m worker.risk_classifier --train "$@"
+        ;;
+    risk:predict)
+        shift
+        exec "$PYTHON_BIN" -m worker.risk_classifier "$@"
+        ;;
     *)
         echo "============================================="
         echo "        AR Tilik CLI Management Tool         "
         echo "============================================="
         echo "Penggunaan praktis:"
+        echo "  ./artilik corpus:jit --title \"<judul>\"      # Temukan & indeks korpus sebidang Just-In-Time"
+        echo "  ./artilik risk:train                        # Latih model XGBoost Academic Risk Synthesizer"
+        echo "  ./artilik risk:predict                      # Uji inferensi model XGBoost Academic Risk"
         echo "  ./artilik corpus:discover --query \"<topik>\" # Cari & indeks karya ilmiah otomatis via OpenAlex"
         echo "  ./artilik corpus:discover --registry        # Panen otomatis dari katalog repositori kampus RI"
         echo "  ./artilik corpus:dropzone                   # Memproses semua file dalam storage/corpus_dropzone/"
