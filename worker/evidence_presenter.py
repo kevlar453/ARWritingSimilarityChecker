@@ -116,6 +116,11 @@ def present_hybrid_report(
     sources: Optional[List[Dict[str, Any]]] = None,
     evidence_text: Optional[str] = None,
     context_detection: Optional[CitationDetectionResult] = None,
+    segmentation: Optional[Any] = None,
+    term_drilldown: Optional[Any] = None,
+    boilerplate_detection: Optional[Any] = None,
+    ai_stylometrics: Optional[Any] = None,
+    cross_lingual: Optional[Any] = None,
 ) -> Dict[str, Any]:
     """
     Membangun struktur presentasi bukti terdekomposisi lengkap v1.1.
@@ -209,5 +214,12 @@ def present_hybrid_report(
             ),
             "requires_investigation": system_decision == "review" and context_detection.citation_status == CitationStatus.NOT_CITED.value,
             "properly_attributed_indicated": context_detection.citation_status in (CitationStatus.CITED.value, CitationStatus.QUOTE.value),
+        },
+        "v1_2_evolution": {
+            "section_segmentation": segmentation.to_dict() if hasattr(segmentation, "to_dict") else segmentation,
+            "term_drilldown": term_drilldown.to_dict() if hasattr(term_drilldown, "to_dict") else term_drilldown,
+            "boilerplate_detection": boilerplate_detection.to_dict() if hasattr(boilerplate_detection, "to_dict") else boilerplate_detection,
+            "ai_stylometrics": ai_stylometrics.to_dict() if hasattr(ai_stylometrics, "to_dict") else ai_stylometrics,
+            "cross_lingual": cross_lingual.to_dict() if hasattr(cross_lingual, "to_dict") else cross_lingual,
         }
     }

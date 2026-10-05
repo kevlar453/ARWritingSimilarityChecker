@@ -330,7 +330,7 @@
     "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
     "review_status": "REVIEWED",
     "human_review": {
-      "id": 149,
+      "id": 156,
       "case_id": "EV-ADV-051",
       "reviewer_code": "RV-TEST",
       "human_decision": "review",
@@ -341,7 +341,7 @@
       "false_positive": 0,
       "system_assessment": "CORRECT",
       "notes": "Uji anotasi otomatis",
-      "reviewed_at": "2026-10-05 09:48:01",
+      "reviewed_at": "2026-10-06 00:17:45",
       "citation_context": "NONE",
       "human_interpretation": "DIRECT_OVERLAP_PROPERLY_CITED",
       "citation_status": "NOT_CITED",

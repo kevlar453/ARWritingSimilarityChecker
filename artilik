@@ -60,11 +60,46 @@ case "$1" in
         shift
         exec "$PYTHON_BIN" -m evaluation.cli "$@"
         ;;
+    notify)
+        shift
+        exec "$PYTHON_BIN" -m worker.telegram_notifier "$@"
+        ;;
+    corpus:import)
+        shift
+        exec "$PYTHON_BIN" -m worker.corpus_harvester "$@"
+        ;;
+    corpus:dropzone)
+        shift
+        exec "$PYTHON_BIN" -m worker.corpus_harvester --dropzone "$@"
+        ;;
+    corpus:harvest)
+        shift
+        exec "$PYTHON_BIN" -m worker.oai_harvester "$@"
+        ;;
+    corpus:cron)
+        shift
+        exec "$PYTHON_BIN" -m worker.scheduler_cron "$@"
+        ;;
+    corpus:enroll)
+        shift
+        exec "$PYTHON_BIN" -m worker.corpus_harvester --enroll "$@"
+        ;;
+    corpus:discover)
+        shift
+        exec "$PYTHON_BIN" -m worker.auto_discovery_harvester "$@"
+        ;;
     *)
         echo "============================================="
         echo "        AR Tilik CLI Management Tool         "
         echo "============================================="
         echo "Penggunaan praktis:"
+        echo "  ./artilik corpus:discover --query \"<topik>\" # Cari & indeks karya ilmiah otomatis via OpenAlex"
+        echo "  ./artilik corpus:discover --registry        # Panen otomatis dari katalog repositori kampus RI"
+        echo "  ./artilik corpus:dropzone                   # Memproses semua file dalam storage/corpus_dropzone/"
+        echo "  ./artilik corpus:import <file|dir>          # Impor naskah/folder/ZIP ke korpus institusi"
+        echo "  ./artilik corpus:harvest --url <oai_url>    # Panen dari repositori kampus (EPrints/DSpace/OJS)"
+        echo "  ./artilik corpus:cron                       # Jalankan siklus panen otomatis (dropzone + OAI)"
+        echo "  ./artilik corpus:enroll <doc_id>            # Promosikan submission ke korpus institusi"
         echo "  ./artilik eval [generate|run|review]"
         echo "  ./artilik benchmark --engine [hybrid|tfidf|idf|exact]"
         echo "  ./artilik regression [--cleanup]"
@@ -74,6 +109,7 @@ case "$1" in
         echo "  ./artilik quality [--json]"
         echo "  ./artilik pilot-sample [--dry-run] [--target-per-tier 5]"
         echo "  ./artilik export --report <id> [--output <file.pdf>]"
+        echo "  ./artilik notify \"Pesan notifikasi Telegram\""
         echo "  ./artilik test"
         echo "  ./artilik diagnose --run <id> --case <TC-XXX> [--engine <hybrid|exact|tfidf>]"
         echo "  ./artilik worker [--once]"

@@ -141,6 +141,89 @@ class CorpusController extends BaseController
         ]);
     }
 
+    public function syncDropzone()
+    {
+        $pythonBin = ROOTPATH . '.venv/bin/python';
+        $script = ROOTPATH . 'worker/corpus_harvester.py';
+
+        if (! file_exists($pythonBin) || ! file_exists($script)) {
+            return $this->response->setStatusCode(500)->setJSON([
+                'status'  => 'error',
+                'message' => 'Skrip Python harvester tidak ditemukan di lingkungan server.'
+            ]);
+        }
+
+        // Jalankan dari ROOTPATH dengan PYTHONPATH eksplisit
+        $rootPath = escapeshellarg(rtrim(ROOTPATH, '/'));
+        $cmd = "cd {$rootPath} && PYTHONPATH={$rootPath} " . escapeshellcmd("{$pythonBin} -m worker.corpus_harvester --dropzone") . ' 2>&1';
+        $output = shell_exec($cmd);
+
+        $hasError = (strpos($output, 'Traceback') !== false) || (strpos($output, 'Error:') !== false);
+
+        if ($hasError) {
+            return $this->response->setStatusCode(500)->setJSON([
+                'status'  => 'error',
+                'message' => 'Terjadi kendala saat pemindaian dropzone.',
+                'output'  => $output
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'status'  => 'success',
+            'message' => 'Pemindaian direktori dropzone berhasil dijalankan.',
+            'output'  => $output
+        ]);
+    }
+
+    public function autoDiscover()
+    {
+        $pythonBin = ROOTPATH . '.venv/bin/python';
+        $script = ROOTPATH . 'worker/auto_discovery_harvester.py';
+
+        if (! file_exists($pythonBin) || ! file_exists($script)) {
+            return $this->response->setStatusCode(500)->setJSON([
+                'status'  => 'error',
+                'message' => 'Skrip Python auto discovery tidak ditemukan di lingkungan server.'
+            ]);
+        }
+
+        $mode = $this->request->getPost('mode') ?: 'query';
+        $query = trim($this->request->getPost('query') ?: '');
+        $limit = max(1, min((int) ($this->request->getPost('limit') ?: 5), 30));
+
+        $rootPath = escapeshellarg(rtrim(ROOTPATH, '/'));
+
+        if ($mode === 'registry') {
+            $cmd = "cd {$rootPath} && PYTHONPATH={$rootPath} " . escapeshellcmd("{$pythonBin} -m worker.auto_discovery_harvester --registry --limit {$limit}") . ' 2>&1';
+        } else {
+            if (empty($query)) {
+                return $this->response->setStatusCode(400)->setJSON([
+                    'status'  => 'error',
+                    'message' => 'Topik atau kata kunci pencarian karya ilmiah wajib diisi.'
+                ]);
+            }
+            $escapedQuery = escapeshellarg($query);
+            $cmd = "cd {$rootPath} && PYTHONPATH={$rootPath} " . escapeshellcmd("{$pythonBin} -m worker.auto_discovery_harvester --query {$escapedQuery} --limit {$limit}") . ' 2>&1';
+        }
+
+        $output = shell_exec($cmd);
+        $hasError = (strpos($output, 'Traceback') !== false) || (strpos($output, 'Error:') !== false);
+
+        if ($hasError) {
+            return $this->response->setStatusCode(500)->setJSON([
+                'status'  => 'error',
+                'message' => 'Terjadi kendala saat melakukan pencarian otomatis karya ilmiah.',
+                'output'  => $output
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'status'  => 'success',
+            'message' => 'Pencarian dan pengindeksan korpus otomatis berhasil dieksekusi.',
+            'output'  => $output
+        ]);
+    }
+
     private function queueIndexJob($documentId)
     {
         $db = db_connect();

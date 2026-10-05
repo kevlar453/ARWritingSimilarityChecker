@@ -17,12 +17,12 @@
 <body class="bg-slate-100 text-slate-800 antialiased min-h-screen">
 
     <!-- Top Navigation -->
-    <nav class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+    <nav class="bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 shadow-xs">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16 items-center">
+            <div class="flex flex-wrap sm:flex-nowrap justify-between min-h-[4rem] py-2.5 sm:py-3.5 items-center gap-2.5 sm:gap-4">
                 <div class="flex items-center gap-3">
-                    <a href="<?= base_url('dashboard') ?>" class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold text-xl shadow-md shadow-indigo-100 hover:bg-indigo-700 transition">
-                        AR
+                    <a href="<?= base_url('dashboard') ?>" class="flex-shrink-0">
+                        <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik Logo" class="w-11 h-11 object-contain drop-shadow-sm hover:scale-105 transition-transform duration-200">
                     </a>
                     <div>
                         <div class="flex items-center gap-2">

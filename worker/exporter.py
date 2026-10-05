@@ -2,6 +2,7 @@ import argparse
 import hashlib
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -62,6 +63,94 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
 
     total_words = evidence_data.get("total_words", 0)
     exec_time = evidence_data.get("execution_time_seconds", 0)
+
+    # Ekstraksi modul evolusi v1.2
+    v11_pres = evidence_data.get("v1_1_presentation", {})
+    v12_evol = v11_pres.get("v1_2_evolution", {}) if isinstance(v11_pres, dict) else {}
+    sec_seg = v12_evol.get("section_segmentation")
+    term_drill = v12_evol.get("term_drilldown")
+
+    section_seg_html = ""
+    if sec_seg:
+        pct_dist = sec_seg.get("zone_percentage_distribution", {})
+        cnt_dist = sec_seg.get("zone_word_distribution", {})
+        core_pct = sec_seg.get("core_substance_percentage", 0.0)
+        p_front = pct_dist.get("FRONT_MATTER", 0.0)
+        p_body = pct_dist.get("BODY_TEXT", 0.0)
+        p_meth = pct_dist.get("METHODOLOGY", 0.0)
+        p_back = pct_dist.get("BACK_MATTER", 0.0)
+        w_front = cnt_dist.get("FRONT_MATTER", 0)
+        w_body = cnt_dist.get("BODY_TEXT", 0)
+        w_meth = cnt_dist.get("METHODOLOGY", 0)
+        w_back = cnt_dist.get("BACK_MATTER", 0)
+
+        section_seg_html = f"""
+        <h3 class="section-header">Dekomposisi Struktur & Zonasi Naskah (Smart Section Segmentation)</h3>
+        <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px 12px; margin-bottom: 14px; page-break-inside: avoid;">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; font-size: 8.5pt;">
+                <span><strong>Distribusi Fungsional Dokumen:</strong> Total {sec_seg.get('total_words', total_words):,} kata</span>
+                <span style="font-weight: bold; color: #1e3a8a; background: #eef2ff; padding: 2px 8px; border-radius: 4px; border: 1px solid #c7d2fe;">
+                    {core_pct:.1f}% Substansi Pokok
+                </span>
+            </div>
+            <table style="width: 100%; border-collapse: collapse; font-size: 8pt; text-align: center;">
+                <tr style="background: #f8fafc; font-weight: bold; color: #0f294a;">
+                    <td style="padding: 6px; border: 1px solid #e2e8f0; width: 25%;">1. Front Matter</td>
+                    <td style="padding: 6px; border: 1px solid #c7d2fe; background: #eef2ff; width: 25%;">2. Body Text (Substansi)</td>
+                    <td style="padding: 6px; border: 1px solid #fef3c7; background: #fffbeb; width: 25%;">3. Methodology</td>
+                    <td style="padding: 6px; border: 1px solid #ccfbf1; background: #f0fdfa; width: 25%;">4. Back Matter</td>
+                </tr>
+                <tr>
+                    <td style="padding: 5px; border: 1px solid #e2e8f0;">{p_front:.1f}% ({w_front:,} kata)</td>
+                    <td style="padding: 5px; border: 1px solid #c7d2fe; font-weight: bold; color: #1e3a8a;">{p_body:.1f}% ({w_body:,} kata)</td>
+                    <td style="padding: 5px; border: 1px solid #fef3c7; color: #92400e;">{p_meth:.1f}% ({w_meth:,} kata)</td>
+                    <td style="padding: 5px; border: 1px solid #ccfbf1; color: #0f766e;">{p_back:.1f}% ({w_back:,} kata)</td>
+                </tr>
+            </table>
+            <div style="font-size: 7.5pt; color: #64748b; margin-top: 6px; line-height: 1.35;">
+                &bull; Pemisahan zonasi memastikan kemiripan format lembar pengesahan/kata pengantar (Front Matter) dan daftar pustaka (Back Matter) tidak mendistorsi evaluasi keaslian naskah.
+            </div>
+        </div>
+        """
+
+    term_drill_html = ""
+    if term_drill and term_drill.get("top_contributing_terms"):
+        t_rows = ""
+        for tc in term_drill["top_contributing_terms"][:6]:
+            tier = tc.get("significance_tier", "COMMON_VOCABULARY")
+            tier_label = "Khas Disipliner" if tier == "DISCIPLINARY_KEYWORD" else ("Bidang Kajian" if tier == "TOPICAL_TERM" else "Kosakata Umum")
+            t_rows += f"""
+            <tr>
+                <td style="padding: 4px 8px; border: 1px solid #e2e8f0; font-weight: bold;">{tc.get('term')}</td>
+                <td style="padding: 4px 8px; border: 1px solid #e2e8f0; text-align: center;">{tc.get('sub_count', 0)}x / {tc.get('doc_count', 0)}x</td>
+                <td style="padding: 4px 8px; border: 1px solid #e2e8f0; text-align: right;">{float(tc.get('idf', 0)):.3f}</td>
+                <td style="padding: 4px 8px; border: 1px solid #e2e8f0; text-align: right; font-weight: bold; color: #047857;">{float(tc.get('contribution_pct', 0)):.1f}%</td>
+                <td style="padding: 4px 8px; border: 1px solid #e2e8f0; text-align: center; font-size: 7.5pt;">{tier_label}</td>
+            </tr>
+            """
+        narrative = term_drill.get("explanation_narrative", "")
+        term_drill_html = f"""
+        <h3 class="section-header">Transparansi Bobot Kosakata (Term-Level IDF Decomposition)</h3>
+        <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px 12px; margin-bottom: 14px; page-break-inside: avoid;">
+            <div style="font-size: 8pt; font-style: italic; color: #334155; margin-bottom: 8px; background: #f8fafc; padding: 6px 10px; border-left: 3px solid #0f294a; border-radius: 0 4px 4px 0;">
+                &ldquo;{narrative}&rdquo;
+            </div>
+            <table style="width: 100%; border-collapse: collapse; font-size: 8pt;">
+                <thead>
+                    <tr style="background: #f1f5f9; font-weight: bold; color: #0f294a;">
+                        <th style="padding: 5px 8px; border: 1px solid #cbd5e1; text-align: left;">Istilah Kunci</th>
+                        <th style="padding: 5px 8px; border: 1px solid #cbd5e1; text-align: center;">Frekuensi</th>
+                        <th style="padding: 5px 8px; border: 1px solid #cbd5e1; text-align: right;">Bobot IDF</th>
+                        <th style="padding: 5px 8px; border: 1px solid #cbd5e1; text-align: right;">Kontribusi</th>
+                        <th style="padding: 5px 8px; border: 1px solid #cbd5e1; text-align: center;">Signifikansi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {t_rows}
+                </tbody>
+            </table>
+        </div>
+        """
 
     # Decision styling
     if dec == "match":
@@ -136,6 +225,17 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
         src_id = m.get("source_document_id", "-")
         sub_span = f"Kata {m.get('submission_start', 0)} &ndash; {m.get('submission_end', 0)}"
 
+        bp_html = ""
+        if m.get("is_boilerplate"):
+            bp_cat = m.get("boilerplate_category", "FORMULA")
+            bp_phr = m.get("boilerplate_phrase", "")
+            bp_rat = m.get("boilerplate_rationale", "")
+            bp_html = f"""
+            <div style="margin-top: 6px; padding: 4px 8px; background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 4px; font-size: 7.5pt; color: #3730a3;">
+                <strong>&bull; Formulasi Ilmiah Baku ({bp_cat}):</strong> &ldquo;{bp_phr}&rdquo; &mdash; {bp_rat} (Konvensi penulisan standar).
+            </div>
+            """
+
         matches_html += f"""
         <div class="match-item" style="margin-bottom: 12px; padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px; background-color: #f8fafc; page-break-inside: avoid;">
             <div style="display: flex; justify-content: space-between; font-size: 8.5pt; margin-bottom: 6px; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px;">
@@ -152,6 +252,7 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
                     <div style="color: #334155; font-style: italic;">&ldquo;{s_src[:280] + ('...' if len(s_src) > 280 else '')}&rdquo;</div>
                 </div>
             </div>
+            {bp_html}
         </div>
         """
 
@@ -577,6 +678,9 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
         </div>
     </div>
 
+    {section_seg_html}
+    {term_drill_html}
+
     <!-- Sources Table -->
     <h3 class="section-header">Dokumen Rujukan Teratas Terdeteksi</h3>
     <table class="data-table">
@@ -691,20 +795,35 @@ def export_report_pdf(report_id: int, output_path: str | None = None) -> bytes:
     pdf_file = pdf_temp.name
 
     try:
-        # Try WeasyPrint first
-        cmd = ["weasyprint", html_file, pdf_file]
-        res = subprocess.run(cmd, capture_output=True, text=True)
-        if res.returncode != 0:
-            # Fallback to Google Chrome headless
-            chrome_cmd = [
-                "google-chrome",
-                "--headless",
-                "--disable-gpu",
-                "--no-sandbox",
-                f"--print-to-pdf={pdf_file}",
-                html_file
-            ]
-            subprocess.run(chrome_cmd, capture_output=True, check=True)
+        # 1. Coba WeasyPrint jika terpasang
+        success = False
+        weasy_bin = shutil.which("weasyprint")
+        if weasy_bin:
+            res = subprocess.run([weasy_bin, html_file, pdf_file], capture_output=True, text=True)
+            if res.returncode == 0:
+                success = True
+
+        # 2. Fallback ke Google Chrome / Chromium headless
+        if not success:
+            chrome_bin = (
+                shutil.which("google-chrome-stable") or
+                shutil.which("google-chrome") or
+                shutil.which("chromium-browser") or
+                shutil.which("chromium")
+            )
+            if chrome_bin:
+                chrome_cmd = [
+                    chrome_bin,
+                    "--headless",
+                    "--disable-gpu",
+                    "--no-sandbox",
+                    f"--print-to-pdf={pdf_file}",
+                    html_file
+                ]
+                subprocess.run(chrome_cmd, capture_output=True, check=True)
+                success = True
+            else:
+                raise RuntimeError("Tidak ditemukan WeasyPrint maupun Google Chrome/Chromium untuk merender PDF.")
 
         with open(pdf_file, "rb") as f_pdf:
             pdf_bytes = f_pdf.read()

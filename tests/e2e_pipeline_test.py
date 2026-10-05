@@ -12,6 +12,7 @@ import json
 import tempfile
 import urllib.request
 import urllib.parse
+import os
 from pathlib import Path
 from collections import Counter
 
@@ -22,7 +23,7 @@ from benchmark.database import get_connection
 from benchmark.dataset import generate_dataset
 from benchmark.metrics import calculate_binary_metrics, calculate_multiclass_metrics
 
-BASE_URL = "http://localhost:8085"
+BASE_URL = os.getenv("APP_BASE_URL", "http://localhost:8085")
 
 def post_multipart(url: str, fields: dict, files: dict) -> dict:
     """Helper untuk mengirim multipart/form-data tanpa dependensi eksternal."""

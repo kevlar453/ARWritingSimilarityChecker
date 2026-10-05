@@ -12,6 +12,7 @@ Menguji ketahanan sistem terhadap skenario anomali dan edge cases produksi:
 """
 
 import sys
+import os
 import json
 import time
 import urllib.request
@@ -22,7 +23,7 @@ sys.path.append(str(Path(__file__).resolve().parents[1]))
 
 from benchmark.database import get_connection
 
-BASE_URL = "http://localhost:8085"
+BASE_URL = os.getenv("APP_BASE_URL", "http://localhost:8085")
 
 def post_multipart(url: str, fields: dict, files: dict) -> tuple[int, dict]:
     boundary = "----WebKitFormBoundaryArtilikProdTest"

@@ -15,36 +15,71 @@
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800 antialiased min-h-screen">
+    <!-- Top Loading Progress Bar -->
+    <div id="topProgressBar" class="fixed top-0 left-0 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600 z-50 w-0 transition-all duration-300 ease-out pointer-events-none"></div>
+
+    <!-- Page Transition Spinner Overlay -->
+    <div id="pageTransitionOverlay" class="fixed inset-0 bg-slate-900/25 backdrop-blur-[2px] z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-200">
+        <div class="bg-white rounded-2xl px-6 py-4 shadow-2xl border border-slate-100 flex items-center gap-3.5">
+            <svg class="animate-spin h-5 w-5 text-indigo-600" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span class="text-sm font-semibold text-slate-700">Memuat halaman...</span>
+        </div>
+    </div>
+
     <!-- Navbar -->
-    <nav class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+    <nav class="bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 shadow-xs">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16 items-center">
-                <div class="flex items-center gap-3">
-                    <a href="<?= base_url('dashboard') ?>" class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold text-xl shadow-md shadow-indigo-100 hover:bg-indigo-700 transition">
-                        AR
+            <div class="flex flex-wrap sm:flex-nowrap justify-between min-h-[4rem] py-2.5 sm:py-3.5 items-center gap-2.5 sm:gap-4">
+                <div class="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
+                    <a href="<?= base_url('dashboard') ?>" class="flex-shrink-0 group">
+                        <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik Logo" class="w-10 h-10 sm:w-11 sm:h-11 object-contain drop-shadow-sm group-hover:scale-105 transition-transform duration-200">
                     </a>
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <a href="<?= base_url('dashboard') ?>" class="text-xl font-bold bg-gradient-to-r from-indigo-700 to-indigo-500 bg-clip-text text-transparent hover:opacity-90">AR Tilik</a>
-                            <span class="text-xs px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 font-semibold border border-indigo-100">Laporan #<?= $report['id'] ?></span>
-                            <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                            <a href="<?= base_url('dashboard') ?>" class="text-lg sm:text-xl font-bold bg-gradient-to-r from-indigo-700 to-indigo-500 bg-clip-text text-transparent hover:opacity-90">AR Tilik</a>
+                            <span class="text-[10px] sm:text-xs px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 font-semibold border border-indigo-100 whitespace-nowrap">Laporan #<?= $report['id'] ?></span>
+                            <span class="text-[9px] sm:text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200 whitespace-nowrap">
                                 Engine: <?= strtoupper(esc($report['engine'] ?? 'hybrid')) ?>
                             </span>
                         </div>
-                        <p class="text-[11px] text-slate-400">Academic Writing Similarity & Evidence Checker</p>
+                        <p class="hidden sm:block text-[11px] text-slate-400 truncate">Academic Writing Similarity & Evidence Checker</p>
                     </div>
                 </div>
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2 flex-shrink-0">
                     <?php if (($report['status'] ?? '') === 'completed'): ?>
-                        <a href="<?= base_url('report/' . $report['id'] . '/export') ?>" target="_blank" class="text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg shadow-sm transition">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <?php if (($document['document_type'] ?? '') === 'corpus'): ?>
+                            <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 flex items-center gap-1.5 px-3 py-1.5 rounded-lg shadow-xs">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                <span>Korpus Institusi</span>
+                            </span>
+                        <?php else: ?>
+                            <button id="btnEnrollCorpus" onclick="enrollDocumentAsCorpus(<?= $document['id'] ?>)" class="text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 active:bg-emerald-200 border border-emerald-300 flex items-center gap-1.5 px-3 py-1.5 rounded-lg shadow-xs transition cursor-pointer">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                </svg>
+                                <span>Daftarkan ke Korpus</span>
+                            </button>
+                        <?php endif; ?>
+                        <button onclick="openDualReaderModal()" class="text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-lg shadow-xs transition cursor-pointer">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/>
+                            </svg>
+                            <span>Layar Ganda</span>
+                        </button>
+                        <a href="<?= base_url('report/' . $report['id'] . '/export') ?>" target="_blank" class="text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-lg shadow-xs transition">
+                            <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                             </svg>
-                            Unduh PDF Resmi
+                            <span>Unduh PDF</span>
                         </a>
                     <?php endif; ?>
-                    <a href="<?= base_url('dashboard') ?>" class="text-xs font-semibold text-slate-600 hover:text-indigo-600 flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-white transition">
-                        ← Kembali ke Dashboard
+                    <a href="<?= base_url('dashboard') ?>" class="text-xs font-semibold text-slate-600 hover:text-indigo-600 flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-white transition">
+                        <span>← Dashboard</span>
                     </a>
                 </div>
             </div>
@@ -143,7 +178,99 @@
                 'NO_EVIDENCE'             => 'Tidak ditemukan bukti kemiripan sekuensial maupun leksikal yang signifikan'
             ];
             $patternDesc = $patternDescriptions[$pattern] ?? $pattern;
+
+            // Variabel Evolusi v1.2
+            $v11Pres = $evidenceData['v1_1_presentation'] ?? [];
+            $v12Evol = $v11Pres['v1_2_evolution'] ?? [];
+            $secSeg = $v12Evol['section_segmentation'] ?? null;
+            $termDrill = $v12Evol['term_drilldown'] ?? null;
+            $bpDetect = $v12Evol['boilerplate_detection'] ?? null;
         ?>
+
+        <!-- ═════════════════════════════════════════════════════════════════════ -->
+        <!-- FITUR 1: LIVE EXCLUSION FILTERS & CLIENT-SIDE DYNAMIC RECALCULATION   -->
+        <!-- ═════════════════════════════════════════════════════════════════════ -->
+        <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-2xl p-5 sm:p-6 text-white shadow-md border border-indigo-900/50 space-y-4">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <div class="space-y-1">
+                    <div class="flex items-center gap-2">
+                        <span class="text-base sm:text-lg">🎛️</span>
+                        <h2 class="text-sm sm:text-base font-extrabold uppercase tracking-wide font-mono-code text-white">
+                            Live Exclusion Filters &amp; Skor Murni
+                        </h2>
+                        <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-indigo-500/30 text-indigo-200 border border-indigo-400/40 font-mono-code">
+                            Fitur 1 (Live Recalc)
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-300">
+                        Aktifkan saklar di bawah ini untuk mengecualikan segmen tertentu secara instan di browser (<10ms) tanpa membebani server:
+                    </p>
+                </div>
+
+                <!-- Live Score Badges -->
+                <div class="flex items-center gap-3 bg-white/10 backdrop-blur-md px-4 py-2.5 rounded-xl border border-white/15 self-start lg:self-auto">
+                    <div class="text-right">
+                        <div class="text-[10px] uppercase font-bold text-slate-300">Skor Asli</div>
+                        <div class="text-sm font-bold font-mono-code text-slate-300" id="rawScoreDisplay"><?= number_format($report['overall_similarity'], 2) ?>%</div>
+                    </div>
+                    <div class="text-slate-400 text-lg">➔</div>
+                    <div>
+                        <div class="text-[10px] uppercase font-bold text-indigo-200 flex items-center gap-1.5">
+                            <span>Skor Kemiripan Murni</span>
+                            <span id="filterActiveBadge" class="hidden w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                        </div>
+                        <div class="text-xl sm:text-2xl font-black font-mono-code text-emerald-300 transition-all duration-300" id="liveAdjustedScoreDisplay">
+                            <?= number_format($report['overall_similarity'], 2) ?>%
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Toggles Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-white/10 text-xs">
+                <!-- Toggle 1: Quotes -->
+                <label class="flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 cursor-pointer transition select-none group">
+                    <div class="flex items-center gap-2.5 pr-2">
+                        <span class="text-base">💬</span>
+                        <div>
+                            <div class="font-bold text-white group-hover:text-indigo-200 transition">Kecualikan Kutipan</div>
+                            <div class="text-[10px] text-slate-400 leading-tight">Abaikan teks dalam tanda petik ("...")</div>
+                        </div>
+                    </div>
+                    <input type="checkbox" id="toggleExcludeQuotes" onchange="recalculateLiveScore()" class="w-4 h-4 rounded text-indigo-500 focus:ring-indigo-400 bg-slate-800 border-slate-600 cursor-pointer">
+                </label>
+
+                <!-- Toggle 2: Boilerplate -->
+                <label class="flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 cursor-pointer transition select-none group">
+                    <div class="flex items-center gap-2.5 pr-2">
+                        <span class="text-base">📐</span>
+                        <div>
+                            <div class="font-bold text-white group-hover:text-indigo-200 transition">Kecualikan Frasa Baku</div>
+                            <div class="text-[10px] text-slate-400 leading-tight">Prosedur metode &amp; transisi ilmiah baku</div>
+                        </div>
+                    </div>
+                    <input type="checkbox" id="toggleExcludeBoilerplate" onchange="recalculateLiveScore()" class="w-4 h-4 rounded text-indigo-500 focus:ring-indigo-400 bg-slate-800 border-slate-600 cursor-pointer">
+                </label>
+
+                <!-- Toggle 3: Bibliography -->
+                <label class="flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 cursor-pointer transition select-none group">
+                    <div class="flex items-center gap-2.5 pr-2">
+                        <span class="text-base">📚</span>
+                        <div>
+                            <div class="font-bold text-white group-hover:text-indigo-200 transition">Kecualikan Bibliografi</div>
+                            <div class="text-[10px] text-slate-400 leading-tight">Daftar pustaka &amp; lampiran belakang</div>
+                        </div>
+                    </div>
+                    <input type="checkbox" id="toggleExcludeBibliography" onchange="recalculateLiveScore()" class="w-4 h-4 rounded text-indigo-500 focus:ring-indigo-400 bg-slate-800 border-slate-600 cursor-pointer">
+                </label>
+            </div>
+
+            <!-- Filter Status Bar -->
+            <div id="filterStatusNotice" class="text-[11px] text-slate-300 font-mono-code flex items-center justify-between bg-black/20 px-3.5 py-1.5 rounded-lg border border-white/5">
+                <span id="filterExcludedCountText">Semua pasase aktif (0 kata dikecualikan).</span>
+                <button type="button" onclick="resetLiveFilters()" class="text-indigo-300 hover:text-white underline text-[10px] cursor-pointer">Reset Semua Filter</button>
+            </div>
+        </div>
 
         <!-- ═════════════════════════════════════════════════════════════════════ -->
         <!-- CORE EVIDENCE DECOMPOSITION CARD                                     -->
@@ -468,6 +595,401 @@
             </div>
         </div>
 
+        <!-- ═════════════════════════════════════════════════════════════════════ -->
+        <!-- FITUR 2: INDIKATOR TEKS BUATAN AI & PROFIL STYLOMETRI                 -->
+        <!-- ═════════════════════════════════════════════════════════════════════ -->
+        <?php if (!empty($aiStylometrics)): ?>
+        <?php
+            $aiScore = (float)($aiStylometrics['ai_probability_score'] ?? 0);
+            $aiConf = $aiStylometrics['ai_confidence_level'] ?? 'LOW';
+            $aiLabel = $aiStylometrics['verdict_label'] ?? 'Gaya Bahasa Alami Manusia';
+            $aiMetrics = $aiStylometrics['metrics'] ?? [];
+            $burstiness = (float)($aiMetrics['burstiness'] ?? 0.5);
+            $transDensity = (float)($aiMetrics['transition_density'] ?? 0);
+            $avgSentLen = (float)($aiMetrics['average_sentence_length'] ?? 0);
+            $anomalies = $aiStylometrics['anomalies'] ?? [];
+
+            $aiScoreBadgeClass = match($aiConf) {
+                'HIGH' => 'bg-rose-50 text-rose-700 border-rose-200',
+                'MODERATE' => 'bg-amber-50 text-amber-700 border-amber-200',
+                default => 'bg-emerald-50 text-emerald-700 border-emerald-200'
+            };
+            $aiScoreColor = match($aiConf) {
+                'HIGH' => 'text-rose-600',
+                'MODERATE' => 'text-amber-600',
+                default => 'text-emerald-600'
+            };
+        ?>
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-2xl">🤖</span>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="font-bold text-base text-slate-900">Indikator Teks Buatan AI &amp; Profil Stylometri</h3>
+                            <span class="text-[10px] font-bold font-mono-code uppercase px-2 py-0.5 rounded bg-purple-50 text-purple-700 border border-purple-100">Fitur 2</span>
+                        </div>
+                        <p class="text-xs text-slate-400">Analisis variabilitas ritme sintaksis (Burstiness), kepadatan frasa transisi generik, &amp; anomali pemintal teks (Spinner/QuillBot)</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 self-start sm:self-auto">
+                    <span class="text-xs font-mono-code font-bold px-3 py-1 rounded-full border shadow-2xs <?= $aiScoreBadgeClass ?>">
+                        Probabilitas AI: <strong class="<?= $aiScoreColor ?>"><?= number_format($aiScore, 1) ?>%</strong> (<?= $aiConf ?>)
+                    </span>
+                </div>
+            </div>
+
+            <!-- Stylometric Gauges & Metric Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                <!-- 1. Burstiness (Variabilitas Panjang Kalimat) -->
+                <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">1. Sentence Burstiness</span>
+                        <span class="text-xs font-mono-code font-bold <?= $burstiness < 0.28 ? 'text-rose-600' : 'text-emerald-600' ?>">
+                            <?= number_format($burstiness, 2) ?>
+                        </span>
+                    </div>
+                    <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                        <div style="width: <?= min(100, max(5, $burstiness * 100)) ?>%" class="h-full <?= $burstiness < 0.28 ? 'bg-rose-500' : ($burstiness < 0.40 ? 'bg-amber-500' : 'bg-emerald-500') ?>"></div>
+                    </div>
+                    <div class="flex justify-between text-[10px] text-slate-400 font-mono-code">
+                        <span>AI (&lt;0.28)</span>
+                        <span>Manusia (&gt;0.45)</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 leading-tight">
+                        <?= $burstiness < 0.28 ? 'Panjang kalimat sangat seragam (khas LLM).' : 'Ritme bervariasi secara organik (khas manusia).' ?>
+                    </p>
+                </div>
+
+                <!-- 2. Kepadatan Transisi AI -->
+                <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">2. Kepadatan Frasa AI</span>
+                        <span class="text-xs font-mono-code font-bold <?= $transDensity >= 2.5 ? 'text-rose-600' : 'text-slate-700' ?>">
+                            <?= number_format($transDensity, 1) ?> / 1k kata
+                        </span>
+                    </div>
+                    <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                        <div style="width: <?= min(100, $transDensity * 20) ?>%" class="h-full <?= $transDensity >= 2.5 ? 'bg-rose-500' : 'bg-indigo-500' ?>"></div>
+                    </div>
+                    <div class="flex justify-between text-[10px] text-slate-400 font-mono-code">
+                        <span>Wajar (&lt;2.0)</span>
+                        <span>Tinggi (&gt;3.5)</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 leading-tight">
+                        Frekuensi frasa klise LLM (misal: "dalam era digital", "perlu digarisbawahi").
+                    </p>
+                </div>
+
+                <!-- 3. Rata-rata Panjang Kalimat -->
+                <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">3. Rerata Kalimat</span>
+                        <span class="text-xs font-mono-code font-bold text-slate-800">
+                            <?= number_format($avgSentLen, 1) ?> kata
+                        </span>
+                    </div>
+                    <div class="text-sm font-extrabold text-slate-800">
+                        <?= number_format($aiMetrics['total_sentences_analyzed'] ?? 0) ?> kalimat dianalisis
+                    </div>
+                    <p class="text-[11px] text-slate-500 leading-tight">
+                        Teks LLM cenderung menghasilkan rata-rata 18–28 kata per kalimat secara konsisten.
+                    </p>
+                </div>
+
+                <!-- 4. Anomali Parafrase Spinner -->
+                <div class="p-3.5 rounded-xl border <?= empty($anomalies) ? 'border-emerald-200 bg-emerald-50/30' : 'border-amber-200 bg-amber-50/40' ?> space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-bold uppercase tracking-wider <?= empty($anomalies) ? 'text-emerald-700' : 'text-amber-800' ?>">4. Rekayasa Leksikal</span>
+                        <span class="text-xs font-mono-code font-bold <?= empty($anomalies) ? 'text-emerald-700' : 'text-amber-700' ?>">
+                            <?= count($anomalies) ?> anomali
+                        </span>
+                    </div>
+                    <div class="text-sm font-extrabold <?= empty($anomalies) ? 'text-emerald-900' : 'text-amber-900' ?>">
+                        <?= empty($anomalies) ? 'Bersih (Bebas Spinner)' : 'Terdeteksi Pola Canggung' ?>
+                    </div>
+                    <p class="text-[11px] <?= empty($anomalies) ? 'text-emerald-700/80' : 'text-amber-800/80' ?> leading-tight">
+                        Pemeriksaan substitusi sinonim hiperbolis tak wajar (QuillBot/Spinner).
+                    </p>
+                </div>
+            </div>
+
+            <!-- Stylometric Narrative Box & Ethical Fairness Disclaimer -->
+            <div class="p-4 rounded-xl bg-purple-50/60 border border-purple-200 text-xs sm:text-sm text-purple-950 space-y-2">
+                <div class="flex items-center justify-between font-bold text-xs font-mono-code">
+                    <span class="flex items-center gap-1.5">
+                        <span>💬</span> KESIMPULAN STYLOMETRI: <span class="<?= $aiScoreColor ?>"><?= esc($aiLabel) ?></span>
+                    </span>
+                </div>
+                <p class="text-slate-700 text-xs sm:text-sm leading-relaxed italic bg-white p-3 rounded-lg border border-purple-100 shadow-2xs">
+                    "<?= esc($aiStylometrics['summary_rationale'] ?? '') ?>"
+                </p>
+                <div class="flex items-start gap-2 pt-1 text-[11px] text-purple-800/80">
+                    <span class="text-sm">⚖️</span>
+                    <span><strong>Prinsip Keadilan Akademik:</strong> Indikator ini merupakan panduan profil probabilitas statistik, bukan vonis mutlak. Penguji dan pembimbing disarankan melakukan klarifikasi dialogis lisan secara arif mengenai pemahaman konsep karya tulis mahasiswa.</span>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
+
+        <!-- ═════════════════════════════════════════════════════════════════════ -->
+        <!-- FITUR 5: KEMIRIPAN LINTAS BAHASA (CROSS-LINGUAL SIMILARITY ID <-> EN) -->
+        <!-- ═════════════════════════════════════════════════════════════════════ -->
+        <?php if (!empty($crossLingual) && !empty($crossLingual['is_cross_lingual_match'])): ?>
+        <div class="bg-white border-2 border-indigo-200 rounded-2xl p-6 shadow-xs space-y-5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-indigo-100 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-2xl">🌐</span>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="font-bold text-base text-slate-900">Deteksi Kemiripan Lintas Bahasa (Cross-Lingual ID ↔ EN)</h3>
+                            <span class="text-[10px] font-bold font-mono-code uppercase px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200">Fitur 5</span>
+                        </div>
+                        <p class="text-xs text-slate-400">Deteksi naskah hasil terjemahan langsung (direct translation) dari literatur berbahasa Inggris tanpa pencantuman sitasi sah</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 self-start sm:self-auto">
+                    <span class="text-xs font-mono-code font-bold px-3 py-1 rounded-full bg-indigo-50 text-indigo-800 border border-indigo-300 shadow-2xs">
+                        Pasangan: <strong><?= esc($crossLingual['detected_pair'] ?? 'EN -> ID') ?></strong> • Skor: <strong><?= number_format($crossLingual['cross_lingual_score'] ?? 0, 1) ?>%</strong>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Metrics Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                <div class="p-3.5 rounded-xl border border-indigo-100 bg-indigo-50/40 space-y-1">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-700">Skor Keselarasan Konsep</span>
+                    <div class="text-2xl font-extrabold text-indigo-900"><?= number_format($crossLingual['cross_lingual_score'] ?? 0, 1) ?>%</div>
+                    <p class="text-[11px] text-indigo-800/70">Tingkat kesamaan semantik terstruktur lintas bahasa.</p>
+                </div>
+                <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 space-y-1">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-600">Konsep Bersama (Concepts)</span>
+                    <div class="text-2xl font-extrabold text-slate-800"><?= (int)($crossLingual['shared_concept_count'] ?? 0) ?> istilah</div>
+                    <p class="text-[11px] text-slate-500">Terminologi akademik kunci yang dipetakan secara kanonikal.</p>
+                </div>
+                <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 space-y-1">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-600">Pasangan Relasi Gagasan</span>
+                    <div class="text-2xl font-extrabold text-slate-800"><?= (int)($crossLingual['shared_pairs_count'] ?? 0) ?> relasi</div>
+                    <p class="text-[11px] text-slate-500">Struktur ko-okurensi gagasan dalam jendela kalimat.</p>
+                </div>
+            </div>
+
+            <!-- Matched Academic Concepts Pills -->
+            <?php if (!empty($crossLingual['matched_concepts'])): ?>
+                <div class="space-y-1.5">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500 font-mono-code block">Konsep Kunci yang Selaras Lintas Bahasa:</span>
+                    <div class="flex flex-wrap gap-1.5">
+                        <?php foreach ($crossLingual['matched_concepts'] as $mc): ?>
+                            <span class="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-800 font-mono-code text-xs font-semibold border border-indigo-200 flex items-center gap-1 shadow-2xs">
+                                <span>🎯</span> <?= esc($mc) ?>
+                            </span>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            <?php endif; ?>
+
+            <!-- Rationale Box -->
+            <div class="p-4 rounded-xl bg-slate-50 border border-indigo-200 text-xs sm:text-sm text-slate-700 leading-relaxed space-y-1.5">
+                <div class="font-bold text-indigo-950 flex items-center gap-1.5 text-xs uppercase tracking-wider font-mono-code">
+                    <span>💡</span> Analisis Semantik Terjemahan:
+                </div>
+                <p class="text-slate-800 leading-relaxed italic bg-white p-3 rounded-lg border border-slate-200 shadow-2xs">
+                    "<?= esc($crossLingual['rationale'] ?? '') ?>"
+                </p>
+                <p class="text-[11px] text-slate-500 pt-0.5">
+                    Prinsip Keadilan: Mengidentifikasi penulisan yang menyalin alur pemikiran dari literatur asing tanpa penyebutan rujukan primer.
+                </p>
+            </div>
+        </div>
+        <?php endif; ?>
+
+        <!-- ═════════════════════════════════════════════════════════════════════ -->
+        <!-- MODUL 1: DEKOMPOSISI STRUKTUR & ZONASI NASKAH (SMART SECTION PARSER)  -->
+        <!-- ═════════════════════════════════════════════════════════════════════ -->
+        <?php if (!empty($secSeg)): ?>
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-2xl">📑</span>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="font-bold text-base text-slate-900">Dekomposisi Struktur & Zonasi Naskah</h3>
+                            <span class="text-[10px] font-bold font-mono-code uppercase px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-100">Modul 1</span>
+                        </div>
+                        <p class="text-xs text-slate-400">Pembedahan fungsional naskah untuk mengisolasi formalitas administratif dari substansi pemikiran ilmiah</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 self-start sm:self-auto">
+                    <span class="text-xs font-mono-code font-bold px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 shadow-2xs">
+                        <?= number_format($secSeg['core_substance_percentage'] ?? 0, 1) ?>% Substansi Pokok
+                    </span>
+                </div>
+            </div>
+
+            <!-- Multi-Zone Progress Bar -->
+            <div class="space-y-2">
+                <div class="flex justify-between text-xs text-slate-500 font-medium">
+                    <span>Distribusi Proporsi Naskah</span>
+                    <span>Total Volume: <strong class="text-slate-700 font-mono-code"><?= number_format($secSeg['total_words'] ?? 0) ?> kata</strong></span>
+                </div>
+                <?php
+                    $pctFront = (float)($secSeg['zone_percentage_distribution']['FRONT_MATTER'] ?? 0);
+                    $pctBody = (float)($secSeg['zone_percentage_distribution']['BODY_TEXT'] ?? 0);
+                    $pctMethod = (float)($secSeg['zone_percentage_distribution']['METHODOLOGY'] ?? 0);
+                    $pctBack = (float)($secSeg['zone_percentage_distribution']['BACK_MATTER'] ?? 0);
+                ?>
+                <div class="h-3.5 w-full bg-slate-100 rounded-full overflow-hidden flex shadow-inner">
+                    <?php if ($pctFront > 0): ?>
+                        <div style="width: <?= $pctFront ?>%" class="bg-slate-400 hover:opacity-90 transition-opacity" title="Front Matter: <?= $pctFront ?>%"></div>
+                    <?php endif; ?>
+                    <?php if ($pctBody > 0): ?>
+                        <div style="width: <?= $pctBody ?>%" class="bg-indigo-600 hover:opacity-90 transition-opacity" title="Body Text (Substansi): <?= $pctBody ?>%"></div>
+                    <?php endif; ?>
+                    <?php if ($pctMethod > 0): ?>
+                        <div style="width: <?= $pctMethod ?>%" class="bg-amber-500 hover:opacity-90 transition-opacity" title="Methodology: <?= $pctMethod ?>%"></div>
+                    <?php endif; ?>
+                    <?php if ($pctBack > 0): ?>
+                        <div style="width: <?= $pctBack ?>%" class="bg-teal-500 hover:opacity-90 transition-opacity" title="Back Matter: <?= $pctBack ?>%"></div>
+                    <?php endif; ?>
+                </div>
+                <div class="flex flex-wrap items-center gap-4 text-[11px] pt-1 text-slate-500">
+                    <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span> Front Matter (<?= number_format($pctFront, 1) ?>%)</span>
+                    <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-indigo-600"></span> Body Text (<?= number_format($pctBody, 1) ?>%)</span>
+                    <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Methodology (<?= number_format($pctMethod, 1) ?>%)</span>
+                    <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-teal-500"></span> Back Matter (<?= number_format($pctBack, 1) ?>%)</span>
+                </div>
+            </div>
+
+            <!-- 4 Functional Zones Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <!-- Zone 1: Front Matter -->
+                <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 space-y-1.5">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">1. Front Matter</span>
+                        <span class="text-xs font-mono-code font-bold text-slate-700"><?= number_format($pctFront, 1) ?>%</span>
+                    </div>
+                    <div class="text-sm font-extrabold text-slate-800"><?= number_format($secSeg['zone_word_distribution']['FRONT_MATTER'] ?? 0) ?> kata</div>
+                    <p class="text-[11px] text-slate-500 leading-tight">Formalitas: Cover, Lembar Pengesahan, Abstrak, & Daftar Isi.</p>
+                </div>
+
+                <!-- Zone 2: Body Text (Substance) -->
+                <div class="p-3.5 rounded-xl border border-indigo-200 bg-indigo-50/40 space-y-1.5">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-700">2. Body Text (Substansi)</span>
+                        <span class="text-xs font-mono-code font-bold text-indigo-700"><?= number_format($pctBody, 1) ?>%</span>
+                    </div>
+                    <div class="text-sm font-extrabold text-indigo-900"><?= number_format($secSeg['zone_word_distribution']['BODY_TEXT'] ?? 0) ?> kata</div>
+                    <p class="text-[11px] text-indigo-900/70 leading-tight">Inti Orisinalitas: Bab I, Bab II, Bab IV (Hasil), & Bab V (Saran).</p>
+                </div>
+
+                <!-- Zone 3: Methodology -->
+                <div class="p-3.5 rounded-xl border border-amber-200 bg-amber-50/40 space-y-1.5">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-amber-700">3. Methodology</span>
+                        <span class="text-xs font-mono-code font-bold text-amber-700"><?= number_format($pctMethod, 1) ?>%</span>
+                    </div>
+                    <div class="text-sm font-extrabold text-amber-900"><?= number_format($secSeg['zone_word_distribution']['METHODOLOGY'] ?? 0) ?> kata</div>
+                    <p class="text-[11px] text-amber-900/70 leading-tight">Prosedur Ilmiah: Bab III (Desain, Populasi/Sampel, & Instrumen).</p>
+                </div>
+
+                <!-- Zone 4: Back Matter -->
+                <div class="p-3.5 rounded-xl border border-teal-200 bg-teal-50/40 space-y-1.5">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-teal-700">4. Back Matter</span>
+                        <span class="text-xs font-mono-code font-bold text-teal-700"><?= number_format($pctBack, 1) ?>%</span>
+                    </div>
+                    <div class="text-sm font-extrabold text-teal-900"><?= number_format($secSeg['zone_word_distribution']['BACK_MATTER'] ?? 0) ?> kata</div>
+                    <p class="text-[11px] text-teal-900/70 leading-tight">Penunjang: Daftar Pustaka (Bibliografi) & Lampiran Data.</p>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
+
+        <!-- ═════════════════════════════════════════════════════════════════════ -->
+        <!-- MODUL 2: TERM-LEVEL IDF DRILL-DOWN (EXPLAINABLE TF-IDF)               -->
+        <!-- ═════════════════════════════════════════════════════════════════════ -->
+        <?php if (!empty($termDrill) && !empty($termDrill['top_contributing_terms'])): ?>
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-2xl">🔬</span>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="font-bold text-base text-slate-900">Transparansi Bobot Kosakata (Term-Level IDF Drill-Down)</h3>
+                            <span class="text-[10px] font-bold font-mono-code uppercase px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-100">Modul 2</span>
+                        </div>
+                        <p class="text-xs text-slate-400">Dekomposisi kontribusi dot-product setiap istilah bersama terhadap skor kemiripan kosinus (Explainable TF-IDF)</p>
+                    </div>
+                </div>
+                <span class="text-xs font-mono-code font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs self-start sm:self-auto">
+                    <?= count($termDrill['top_contributing_terms']) ?> Istilah Teratas
+                </span>
+            </div>
+
+            <!-- Narrative Explanation Box -->
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-700 leading-relaxed space-y-2">
+                <div class="font-bold text-slate-900 flex items-center gap-1.5 text-xs uppercase tracking-wider font-mono-code">
+                    <span>💡</span> Narasi Transparansi Sistem:
+                </div>
+                <p class="text-slate-700 text-xs sm:text-sm leading-relaxed italic bg-white p-3 rounded-lg border border-slate-200 shadow-2xs">
+                    "<?= esc($termDrill['explanation_narrative'] ?? '') ?>"
+                </p>
+                <div class="flex flex-wrap items-center gap-3 pt-1 text-xs font-mono-code text-slate-500">
+                    <span>Kata Khas Disipliner: <strong class="text-purple-700 font-bold"><?= (int)($termDrill['disciplinary_terms_count'] ?? 0) ?></strong></span>
+                    <span>•</span>
+                    <span>Istilah Bidang Kajian: <strong class="text-blue-700 font-bold"><?= (int)($termDrill['topical_terms_count'] ?? 0) ?></strong></span>
+                    <span>•</span>
+                    <span>Kosakata Umum: <strong class="text-slate-700 font-bold"><?= (int)($termDrill['common_terms_count'] ?? 0) ?></strong></span>
+                    <span>•</span>
+                    <span>Kontribusi Bobot Khas: <strong class="text-purple-700 font-bold"><?= number_format($termDrill['disciplinary_contribution_percentage'] ?? 0, 1) ?>%</strong></span>
+                </div>
+            </div>
+
+            <!-- Table of Top Contributing Terms -->
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border border-slate-200 rounded-lg overflow-hidden min-w-[620px]">
+                    <thead class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200 uppercase font-mono-code text-[11px]">
+                        <tr>
+                            <th class="py-2.5 px-3">Istilah (Term)</th>
+                            <th class="py-2.5 px-3 text-center">Frekuensi (Submisi / Rujukan)</th>
+                            <th class="py-2.5 px-3 text-right">Bobot IDF</th>
+                            <th class="py-2.5 px-3 text-right">Kontribusi Kosinus</th>
+                            <th class="py-2.5 px-3 text-center">Tingkat Signifikansi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 font-mono-code">
+                        <?php foreach ($termDrill['top_contributing_terms'] as $tc): ?>
+                            <?php
+                                $tier = $tc['significance_tier'] ?? 'COMMON_VOCABULARY';
+                                $tierBadge = match($tier) {
+                                    'DISCIPLINARY_KEYWORD' => 'bg-purple-50 text-purple-700 border-purple-200',
+                                    'TOPICAL_TERM' => 'bg-blue-50 text-blue-700 border-blue-200',
+                                    default => 'bg-slate-100 text-slate-600 border-slate-200'
+                                };
+                                $tierLabel = match($tier) {
+                                    'DISCIPLINARY_KEYWORD' => 'Khas Topik (Disipliner)',
+                                    'TOPICAL_TERM' => 'Bidang Kajian',
+                                    default => 'Kosakata Umum'
+                                };
+                            ?>
+                            <tr class="hover:bg-slate-50/80 transition-colors">
+                                <td class="py-2.5 px-3 font-bold text-slate-900"><?= esc($tc['term']) ?></td>
+                                <td class="py-2.5 px-3 text-center text-slate-600"><?= (int)($tc['sub_count'] ?? 0) ?>x / <?= (int)($tc['doc_count'] ?? 0) ?>x</td>
+                                <td class="py-2.5 px-3 text-right text-slate-700"><?= number_format($tc['idf'] ?? 0, 3) ?></td>
+                                <td class="py-2.5 px-3 text-right font-bold text-emerald-700"><?= number_format($tc['contribution_pct'] ?? 0, 1) ?>%</td>
+                                <td class="py-2.5 px-3 text-center">
+                                    <span class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded border <?= $tierBadge ?>">
+                                        <?= $tierLabel ?>
+                                    </span>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <?php endif; ?>
+
         <!-- Attention & Significance Profile Banner -->
         <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs">
             <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Profil Signifikansi & Atensi Akademik</h3>
@@ -525,13 +1047,25 @@
             <?php else: ?>
                 <div class="space-y-4 max-h-[640px] overflow-y-auto pr-1">
                     <?php foreach ($matches as $idx => $m): ?>
-                        <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 hover:bg-white hover:border-indigo-300 transition-all space-y-3">
+                        <?php
+                            $subSnip = $m['submission_snippet'] ?? '';
+                            $isQuoteMatch = (str_contains($subSnip, '"') || str_contains($subSnip, '“') || str_contains($subSnip, '”') || ($m['citation_status'] ?? '') === 'QUOTE');
+                            $isBpMatch = !empty($m['is_boilerplate']);
+                            $isBibMatch = (stripos($subSnip, 'daftar pustaka') !== false || stripos($subSnip, 'references') !== false || stripos($subSnip, 'bibliografi') !== false);
+                        ?>
+                        <div id="passage-card-<?= $idx ?>" data-match-idx="<?= $idx ?>" data-word-count="<?= (int)$m['word_count'] ?>" data-is-boilerplate="<?= $isBpMatch ? '1' : '0' ?>" data-is-quote="<?= $isQuoteMatch ? '1' : '0' ?>" data-is-biblio="<?= $isBibMatch ? '1' : '0' ?>" class="passage-card border border-slate-200 rounded-xl p-4 bg-slate-50/50 hover:bg-white hover:border-indigo-300 transition-all space-y-3">
                             <div class="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-200/60">
                                 <div class="flex items-center gap-2">
                                     <span class="text-xs font-bold px-2 py-0.5 rounded bg-slate-200 text-slate-700 font-mono-code">#<?= $idx + 1 ?></span>
                                     <span class="text-xs font-bold text-slate-800 truncate max-w-sm">Sumber: <?= esc($m['source_title']) ?></span>
+                                    <span id="passage-excluded-badge-<?= $idx ?>" class="hidden text-[10px] font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-300 font-mono-code">
+                                        Dikecualikan Filter
+                                    </span>
                                 </div>
                                 <div class="flex items-center gap-2">
+                                    <button type="button" onclick="openDualReaderModal(<?= (int)$m['source_document_id'] ?>, <?= $idx ?>)" class="text-[11px] font-semibold text-indigo-700 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-2.5 py-0.5 rounded border border-indigo-200 flex items-center gap-1 transition cursor-pointer">
+                                        <span>📖</span> Layar Ganda
+                                    </button>
                                     <?php 
                                         $com = $m['commonness'] ?? 'low';
                                         $comClass = match($com) {
@@ -576,6 +1110,35 @@
                                     </span>
                                 </div>
                             </div>
+
+                            <?php if (!empty($m['is_boilerplate'])): ?>
+                                <?php
+                                    $bpCat = $m['boilerplate_category'] ?? 'METHODOLOGY_PROCEDURE';
+                                    $bpCatLabel = match($bpCat) {
+                                        'METHODOLOGY_PROCEDURE' => '📐 Prosedur Metodologi Baku',
+                                        'STATISTICAL_ANALYSIS'  => '📊 Analisis Statistik Standar',
+                                        'ACADEMIC_TRANSITION'   => '🔗 Frasa Transisi Ilmiah',
+                                        'ADMINISTRATIVE_FORMULA'=> '🏛️ Formulasi Administratif Dokumen',
+                                        default                 => '📐 Formulasi Ilmiah Baku'
+                                    };
+                                ?>
+                                <div class="p-3 rounded-lg bg-indigo-50/70 border border-indigo-200/80 text-xs space-y-1">
+                                    <div class="flex flex-wrap items-center justify-between gap-1.5">
+                                        <span class="font-bold text-indigo-900 text-[11px] uppercase tracking-wider flex items-center gap-1.5 font-mono-code">
+                                            <span><?= $bpCatLabel ?></span>
+                                        </span>
+                                        <?php if (!empty($m['boilerplate_phrase'])): ?>
+                                            <span class="font-mono-code text-[10px] bg-white text-indigo-700 px-2 py-0.5 rounded border border-indigo-200 font-semibold">
+                                                Frasa: "<?= esc($m['boilerplate_phrase']) ?>"
+                                            </span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <p class="text-slate-600 text-[11px] leading-relaxed">
+                                        <?= esc($m['boilerplate_rationale'] ?? 'Formulasi kalimat standar keilmuan.') ?>
+                                        <span class="text-slate-400 block pt-0.5 italic">&bull; Catatan Keadilan: Konvensi penulisan ilmiah yang lazim, bukan indikasi pelanggaran orisinalitas substantif.</span>
+                                    </p>
+                                </div>
+                            <?php endif; ?>
 
                             <div class="flex justify-between items-center text-[11px] text-slate-400 pt-1 border-t border-slate-100">
                                 <span>Rata-rata IDF: <strong class="text-slate-700 font-mono-code"><?= number_format($m['average_idf'] ?? 0, 3) ?></strong></span>
@@ -632,6 +1195,22 @@
                 content.innerHTML = '<p class="text-xs text-slate-400 text-center py-6">Tidak ada pasase teks sekuensial untuk dokumen ini (hanya kemiripan leksikal kosinus global).</p>';
             } else {
                 sourceMatches.forEach((m, idx) => {
+                    let bpBanner = '';
+                    if (m.is_boilerplate) {
+                        const bpCat = (m.boilerplate_category || 'FORMULA').replace(/_/g, ' ');
+                        bpBanner = `
+                            <div class="mt-2 p-2.5 rounded-lg bg-indigo-50 border border-indigo-200 text-xs space-y-0.5">
+                                <div class="font-bold text-indigo-900 text-[11px] uppercase tracking-wider flex items-center gap-1.5 font-mono-code">
+                                    <span>📐</span> Formulasi Ilmiah Baku (${bpCat})
+                                </div>
+                                <div class="text-slate-600 text-[11px] leading-relaxed">
+                                    ${m.boilerplate_rationale || 'Konvensi kalimat penulisan ilmiah standar.'}
+                                    <span class="text-slate-400 block pt-0.5 italic">&bull; Catatan Keadilan: Konvensi penulisan ilmiah standar, bukan indikasi pelanggaran orisinalitas substantif.</span>
+                                </div>
+                            </div>
+                        `;
+                    }
+
                     const block = document.createElement('div');
                     block.className = 'border border-slate-200 rounded-xl p-4 bg-slate-50 space-y-2';
                     block.innerHTML = `
@@ -651,6 +1230,7 @@
                                 "${m.source_snippet || '-'}"
                             </div>
                         </div>
+                        ${bpBanner}
                     `;
                     content.appendChild(block);
                 });
@@ -663,13 +1243,484 @@
             document.getElementById('passageModal').classList.add('hidden');
         }
 
-        // Close modal on backdrop click or Escape key
-        document.getElementById('passageModal').addEventListener('click', function(e) {
-            if (e.target === this) closePassageModal();
+        // ═════════════════════════════════════════════════════════════════════
+        // FITUR 1: INTERACTIVE SIDE-BY-SIDE DUAL READER LOGIC
+        // ═════════════════════════════════════════════════════════════════════
+        const submissionFullText = <?= json_encode($submissionText ?? '', JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>;
+        const sourceTextsMap = <?= json_encode($sourceTexts ?? [], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>;
+        const reportSources = <?= json_encode($sources ?? [], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>;
+        let currentDualMatches = [];
+        let currentDualMatchIndex = 0;
+        let isSyncScrolling = false;
+
+        function openDualReaderModal(preferredSourceId = null, focusMatchIdx = null) {
+            const modal = document.getElementById('dualReaderModal');
+            const select = document.getElementById('dualSourceSelect');
+            select.innerHTML = '';
+
+            if (!reportSources || reportSources.length === 0) {
+                alert('Tidak ada dokumen rujukan yang terdeteksi untuk perbandingan layar ganda.');
+                return;
+            }
+
+            reportSources.forEach((s, idx) => {
+                const opt = document.createElement('option');
+                opt.value = s.source_document_id;
+                opt.text = `#${idx + 1} - ${s.source_title} (${parseFloat(s.similarity || 0).toFixed(1)}%)`;
+                if (preferredSourceId && parseInt(preferredSourceId) === parseInt(s.source_document_id)) {
+                    opt.selected = true;
+                }
+                select.appendChild(opt);
+            });
+
+            if (!preferredSourceId && reportSources.length > 0) {
+                select.value = reportSources[0].source_document_id;
+            }
+
+            modal.classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+
+            renderDualReaderContent();
+
+            if (focusMatchIdx !== null) {
+                setTimeout(() => {
+                    const matchItemIdx = currentDualMatches.findIndex(m => parseInt(m.match_original_idx) === parseInt(focusMatchIdx));
+                    if (matchItemIdx !== -1) {
+                        jumpToDualMatch(matchItemIdx);
+                    }
+                }, 150);
+            }
+        }
+
+        function closeDualReaderModal() {
+            const modal = document.getElementById('dualReaderModal');
+            modal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }
+
+        function switchDualReaderSource(sourceId) {
+            renderDualReaderContent();
+        }
+
+        function renderDualReaderContent() {
+            const select = document.getElementById('dualSourceSelect');
+            const selectedSrcId = parseInt(select.value);
+            const selectedSourceObj = reportSources.find(s => parseInt(s.source_document_id) === selectedSrcId) || reportSources[0];
+
+            document.getElementById('dualSrcHeaderTitle').innerText = selectedSourceObj ? selectedSourceObj.source_title : 'Dokumen Rujukan';
+
+            // Filter pasase yang cocok untuk sumber terpilih
+            currentDualMatches = allMatches
+                .map((m, originalIdx) => ({ ...m, match_original_idx: originalIdx }))
+                .filter(m => parseInt(m.source_document_id) === selectedSrcId);
+
+            currentDualMatchIndex = 0;
+            updateDualMatchNavCounter();
+
+            const subPane = document.getElementById('dualSubPane');
+            const srcPane = document.getElementById('dualSrcPane');
+
+            // 1. Render Teks Submisi dengan Penandaan (Marks)
+            const subWords = submissionFullText ? submissionFullText.split(/\s+/) : [];
+            document.getElementById('dualSubInfoText').innerText = `${subWords.length} kata • ${currentDualMatches.length} pasase cocok`;
+
+            if (subWords.length === 0) {
+                subPane.innerHTML = '<p class="text-slate-400 italic py-8 text-center">Naskah submisi tidak dapat dimuat.</p>';
+            } else {
+                let subHtml = '';
+                let currentWordIdx = 0;
+                
+                // Urutkan kecocokan berdasarkan submission_start
+                const sortedSubMatches = [...currentDualMatches].sort((a, b) => parseInt(a.submission_start) - parseInt(b.submission_start));
+                
+                while (currentWordIdx < subWords.length) {
+                    // Cek apakah ada match yang dimulai di kata ini
+                    const activeMatch = sortedSubMatches.find(m => currentWordIdx >= parseInt(m.submission_start) && currentWordIdx <= parseInt(m.submission_end));
+                    if (activeMatch) {
+                        const mStart = parseInt(activeMatch.submission_start);
+                        const mEnd = parseInt(activeMatch.submission_end);
+                        const sliceWords = subWords.slice(mStart, mEnd + 1).join(' ');
+                        const matchItemIdx = currentDualMatches.findIndex(m => m.match_original_idx === activeMatch.match_original_idx);
+                        
+                        subHtml += ` <mark id="dual-sub-m-${matchItemIdx}" onclick="jumpToDualMatch(${matchItemIdx})" class="dual-match-item cursor-pointer px-1.5 py-0.5 rounded bg-amber-200/90 hover:bg-amber-300 text-amber-950 font-semibold border-b-2 border-amber-500 transition-all shadow-2xs" title="Klik untuk fokus pasase #${matchItemIdx + 1}">` + escapeHtml(sliceWords) + `</mark> `;
+                        currentWordIdx = mEnd + 1;
+                    } else {
+                        // Tambahkan kata normal
+                        subHtml += escapeHtml(subWords[currentWordIdx]) + ' ';
+                        currentWordIdx++;
+                    }
+                }
+                subPane.innerHTML = `<div class="leading-relaxed whitespace-pre-wrap">${subHtml}</div>`;
+            }
+
+            // 2. Render Teks Sumber dengan Penandaan (Marks)
+            const srcFullText = sourceTextsMap[selectedSrcId] || '';
+            const srcWords = srcFullText ? srcFullText.split(/\s+/) : [];
+            document.getElementById('dualSrcInfoText').innerText = `${srcWords.length} kata`;
+
+            if (srcWords.length === 0) {
+                // Fallback jika chunk sumber tidak lengkap, render cuplikan snippet pasase
+                let fallbackSrcHtml = '<div class="space-y-4">';
+                currentDualMatches.forEach((m, mIdx) => {
+                    fallbackSrcHtml += `
+                        <div id="dual-src-m-${mIdx}" onclick="jumpToDualMatch(${mIdx})" class="p-3 rounded-xl border border-indigo-200 bg-indigo-50/50 cursor-pointer hover:bg-indigo-100/60 transition">
+                            <div class="text-[10px] font-bold font-mono-code text-indigo-700 mb-1">Pasase Rujukan #${mIdx + 1} (Kata ke-${m.source_start} s/d ${m.source_end})</div>
+                            <div class="text-sm font-semibold text-slate-800">"${escapeHtml(m.source_snippet || '-')}"</div>
+                        </div>
+                    `;
+                });
+                fallbackSrcHtml += '</div>';
+                srcPane.innerHTML = fallbackSrcHtml;
+            } else {
+                let srcHtml = '';
+                let currentWordIdx = 0;
+                const sortedSrcMatches = [...currentDualMatches].sort((a, b) => parseInt(a.source_start) - parseInt(b.source_start));
+
+                while (currentWordIdx < srcWords.length) {
+                    const activeMatch = sortedSrcMatches.find(m => currentWordIdx >= parseInt(m.source_start) && currentWordIdx <= parseInt(m.source_end));
+                    if (activeMatch) {
+                        const mStart = parseInt(activeMatch.source_start);
+                        const mEnd = parseInt(activeMatch.source_end);
+                        const sliceWords = srcWords.slice(mStart, mEnd + 1).join(' ');
+                        const matchItemIdx = currentDualMatches.findIndex(m => m.match_original_idx === activeMatch.match_original_idx);
+
+                        srcHtml += ` <mark id="dual-src-m-${matchItemIdx}" onclick="jumpToDualMatch(${matchItemIdx})" class="dual-match-item cursor-pointer px-1.5 py-0.5 rounded bg-indigo-200/90 hover:bg-indigo-300 text-indigo-950 font-semibold border-b-2 border-indigo-600 transition-all shadow-2xs" title="Klik untuk fokus pasase #${matchItemIdx + 1}">` + escapeHtml(sliceWords) + `</mark> `;
+                        currentWordIdx = mEnd + 1;
+                    } else {
+                        srcHtml += escapeHtml(srcWords[currentWordIdx]) + ' ';
+                        currentWordIdx++;
+                    }
+                }
+                srcPane.innerHTML = `<div class="leading-relaxed whitespace-pre-wrap">${srcHtml}</div>`;
+            }
+
+            // Setup Sinkronisasi Gulir (Sync-Scroll)
+            setupDualSyncScroll();
+        }
+
+        function escapeHtml(text) {
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return String(text).replace(/[&<>"']/g, m => map[m]);
+        }
+
+        function setupDualSyncScroll() {
+            const subPane = document.getElementById('dualSubPane');
+            const srcPane = document.getElementById('dualSrcPane');
+            const syncToggle = document.getElementById('dualSyncToggle');
+
+            subPane.onscroll = function() {
+                if (!syncToggle.checked || isSyncScrolling) return;
+                isSyncScrolling = true;
+                const pct = subPane.scrollTop / (subPane.scrollHeight - subPane.clientHeight || 1);
+                srcPane.scrollTop = pct * (srcPane.scrollHeight - srcPane.clientHeight);
+                setTimeout(() => { isSyncScrolling = false; }, 30);
+            };
+
+            srcPane.onscroll = function() {
+                if (!syncToggle.checked || isSyncScrolling) return;
+                isSyncScrolling = true;
+                const pct = srcPane.scrollTop / (srcPane.scrollHeight - srcPane.clientHeight || 1);
+                subPane.scrollTop = pct * (subPane.scrollHeight - subPane.clientHeight);
+                setTimeout(() => { isSyncScrolling = false; }, 30);
+            };
+        }
+
+        function updateDualMatchNavCounter() {
+            const counter = document.getElementById('dualMatchNavCounter');
+            if (currentDualMatches.length === 0) {
+                counter.innerText = '0 / 0';
+            } else {
+                counter.innerText = `${currentDualMatchIndex + 1} / ${currentDualMatches.length}`;
+            }
+        }
+
+        function navigateDualMatch(direction) {
+            if (currentDualMatches.length === 0) return;
+            currentDualMatchIndex = (currentDualMatchIndex + direction + currentDualMatches.length) % currentDualMatches.length;
+            jumpToDualMatch(currentDualMatchIndex);
+        }
+
+        function jumpToDualMatch(matchIndex) {
+            currentDualMatchIndex = matchIndex;
+            updateDualMatchNavCounter();
+
+            // Lepas highlight aktif sebelumnya
+            document.querySelectorAll('.dual-active-focus').forEach(el => {
+                el.classList.remove('dual-active-focus', 'ring-4', 'ring-indigo-500', 'ring-offset-2', 'z-20');
+            });
+
+            const subTarget = document.getElementById(`dual-sub-m-${matchIndex}`);
+            const srcTarget = document.getElementById(`dual-src-m-${matchIndex}`);
+
+            if (subTarget) {
+                subTarget.classList.add('dual-active-focus', 'ring-4', 'ring-indigo-500', 'ring-offset-2', 'z-20');
+                subTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            if (srcTarget) {
+                srcTarget.classList.add('dual-active-focus', 'ring-4', 'ring-indigo-500', 'ring-offset-2', 'z-20');
+                srcTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        // ═════════════════════════════════════════════════════════════════════
+        // FITUR 1: LIVE EXCLUSION FILTERS & DYNAMIC SCORE RECALCULATION
+        // ═════════════════════════════════════════════════════════════════════
+        const rawOverallScore = <?= (float)$report['overall_similarity'] ?>;
+
+        function recalculateLiveScore() {
+            const excludeQuotes = document.getElementById('toggleExcludeQuotes').checked;
+            const excludeBoilerplate = document.getElementById('toggleExcludeBoilerplate').checked;
+            const excludeBiblio = document.getElementById('toggleExcludeBibliography').checked;
+
+            const cards = document.querySelectorAll('.passage-card');
+            let totalMatchedWords = 0;
+            let excludedWords = 0;
+            let excludedCount = 0;
+
+            cards.forEach(card => {
+                const wCount = parseInt(card.getAttribute('data-word-count') || 0);
+                const isBp = card.getAttribute('data-is-boilerplate') === '1';
+                const isQuote = card.getAttribute('data-is-quote') === '1';
+                const isBib = card.getAttribute('data-is-biblio') === '1';
+                const idx = card.getAttribute('data-match-idx');
+                const badge = document.getElementById(`passage-excluded-badge-${idx}`);
+
+                totalMatchedWords += wCount;
+
+                let shouldExclude = false;
+                let reasons = [];
+
+                if (excludeQuotes && isQuote) {
+                    shouldExclude = true;
+                    reasons.push('Kutipan');
+                }
+                if (excludeBoilerplate && isBp) {
+                    shouldExclude = true;
+                    reasons.push('Frasa Baku');
+                }
+                if (excludeBiblio && isBib) {
+                    shouldExclude = true;
+                    reasons.push('Bibliografi');
+                }
+
+                if (shouldExclude) {
+                    excludedWords += wCount;
+                    excludedCount++;
+                    card.classList.add('opacity-40', 'bg-slate-100', 'border-dashed');
+                    card.classList.remove('hover:bg-white', 'hover:border-indigo-300');
+                    if (badge) {
+                        badge.classList.remove('hidden');
+                        badge.innerText = `Dikecualikan Filter (${reasons.join(', ')})`;
+                    }
+                } else {
+                    card.classList.remove('opacity-40', 'bg-slate-100', 'border-dashed');
+                    card.classList.add('hover:bg-white', 'hover:border-indigo-300');
+                    if (badge) badge.classList.add('hidden');
+                }
+            });
+
+            // Hitung skor kemiripan murni (Adjusted Score) secara proporsional
+            let adjustedScore = rawOverallScore;
+            if (totalMatchedWords > 0) {
+                const activeWords = Math.max(0, totalMatchedWords - excludedWords);
+                adjustedScore = (activeWords / totalMatchedWords) * rawOverallScore;
+            } else if (excludedWords > 0) {
+                adjustedScore = 0.0;
+            }
+            adjustedScore = Math.max(0, Math.min(rawOverallScore, adjustedScore));
+
+            const displayEl = document.getElementById('liveAdjustedScoreDisplay');
+            const activeBadge = document.getElementById('filterActiveBadge');
+            const statusNotice = document.getElementById('filterExcludedCountText');
+
+            displayEl.innerText = adjustedScore.toFixed(2) + '%';
+
+            // Animasi warna badge skor
+            displayEl.className = 'text-xl sm:text-2xl font-black font-mono-code transition-all duration-300 ' + 
+                (adjustedScore >= 70 ? 'text-rose-400' : (adjustedScore >= 10 ? 'text-amber-300' : 'text-emerald-300'));
+
+            if (excludeQuotes || excludeBoilerplate || excludeBiblio) {
+                activeBadge.classList.remove('hidden');
+                statusNotice.innerHTML = `Filter aktif: <strong class="text-indigo-200">${excludedCount} pasase (${excludedWords} kata)</strong> dikecualikan dari perhitungan murni.`;
+            } else {
+                activeBadge.classList.add('hidden');
+                statusNotice.innerText = 'Semua pasase aktif (0 kata dikecualikan).';
+            }
+        }
+
+        function resetLiveFilters() {
+            document.getElementById('toggleExcludeQuotes').checked = false;
+            document.getElementById('toggleExcludeBoilerplate').checked = false;
+            document.getElementById('toggleExcludeBibliography').checked = false;
+            recalculateLiveScore();
+        }
+
+        // Page Transition Handling
+        function startPageTransition() {
+            const bar = document.getElementById('topProgressBar');
+            const overlay = document.getElementById('pageTransitionOverlay');
+            if (bar) bar.style.width = '70%';
+            if (overlay) {
+                overlay.classList.remove('pointer-events-none', 'opacity-0');
+                overlay.classList.add('opacity-100');
+            }
+        }
+
+        document.addEventListener('click', function(e) {
+            const link = e.target.closest('a');
+            if (link && link.href && !link.target && !link.href.startsWith('javascript:') && !link.href.includes('#')) {
+                const currentOrigin = window.location.origin;
+                if (link.href.startsWith(currentOrigin)) {
+                    startPageTransition();
+                }
+            }
         });
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') closePassageModal();
-        });
+
+        // Enroll as Institutional Corpus
+        async function enrollDocumentAsCorpus(docId) {
+            if (!confirm('Apakah Anda yakin ingin mendaftarkan naskah ini ke dalam Korpus Institusi permanen? Naskah ini akan menjadi basis pembanding bagi pemeriksaan selanjutnya.')) {
+                return;
+            }
+
+            const btn = document.getElementById('btnEnrollCorpus');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = `
+                    <svg class="animate-spin h-3.5 w-3.5 text-emerald-700" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>Mendaftarkan...</span>
+                `;
+            }
+
+            try {
+                const res = await fetch(`<?= base_url('api/documents') ?>/${docId}/enroll`, {
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json' }
+                });
+                const data = await res.json();
+                if (res.ok && data.status === 'success') {
+                    if (btn) {
+                        btn.outerHTML = `
+                            <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 flex items-center gap-1.5 px-3 py-1.5 rounded-lg shadow-xs">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                <span>Korpus Institusi</span>
+                            </span>
+                        `;
+                    }
+                    alert(data.message || 'Naskah berhasil didaftarkan sebagai Korpus Institusi!');
+                } else if (data.status === 'already_enrolled') {
+                    alert(data.message);
+                } else {
+                    alert('Gagal: ' + (data.message || 'Terjadi kesalahan sistem.'));
+                    if (btn) btn.disabled = false;
+                }
+            } catch (err) {
+                alert('Kendala koneksi ke server: ' + err.message);
+                if (btn) btn.disabled = false;
+            }
+        }
     </script>
+
+    <!-- ═════════════════════════════════════════════════════════════════════ -->
+    <!-- INTERACTIVE SIDE-BY-SIDE DUAL READER MODAL (FITUR 1)                  -->
+    <!-- ═════════════════════════════════════════════════════════════════════ -->
+    <div id="dualReaderModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex flex-col p-2 sm:p-4 transition-opacity duration-200">
+        <div class="bg-white rounded-2xl w-full h-full shadow-2xl border border-slate-200 flex flex-col overflow-hidden">
+            <!-- Modal Header -->
+            <div class="px-5 py-3.5 border-b border-slate-200 bg-slate-900 text-white flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <span class="text-xl">📖</span>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="font-bold text-sm sm:text-base text-white tracking-wide">
+                                Interactive Side-by-Side Dual Reader
+                            </h3>
+                            <span class="text-[10px] uppercase font-bold font-mono-code px-2 py-0.5 rounded bg-indigo-500/30 text-indigo-200 border border-indigo-400/30">
+                                Sync-Scroll Active
+                            </span>
+                        </div>
+                        <p class="text-[11px] text-slate-400">Komparasi naskah mahasiswa vs dokumen rujukan secara sinkron berdampingan</p>
+                    </div>
+                </div>
+
+                <!-- Controls in Header -->
+                <div class="flex flex-wrap items-center gap-3 text-xs">
+                    <!-- Source Selector -->
+                    <div class="flex items-center gap-1.5 bg-slate-800 px-2.5 py-1.5 rounded-lg border border-slate-700">
+                        <label for="dualSourceSelect" class="text-slate-400 font-medium text-[11px]">Rujukan:</label>
+                        <select id="dualSourceSelect" onchange="switchDualReaderSource(this.value)" class="bg-slate-900 text-indigo-200 font-bold text-xs rounded border border-slate-700 py-0.5 px-2 focus:ring-1 focus:ring-indigo-400 focus:outline-none">
+                            <!-- Injected by JavaScript -->
+                        </select>
+                    </div>
+
+                    <!-- Sync-Scroll Switch -->
+                    <label class="flex items-center gap-1.5 bg-slate-800 px-2.5 py-1.5 rounded-lg border border-slate-700 cursor-pointer select-none">
+                        <input type="checkbox" id="dualSyncToggle" checked class="w-3.5 h-3.5 rounded text-indigo-500 focus:ring-indigo-400 bg-slate-900 border-slate-700 cursor-pointer">
+                        <span class="text-slate-300 text-[11px]">Sync-Scroll</span>
+                    </label>
+
+                    <!-- Match Navigator -->
+                    <div class="flex items-center gap-1 bg-slate-800 px-2 py-1 rounded-lg border border-slate-700 font-mono-code text-[11px]">
+                        <button type="button" onclick="navigateDualMatch(-1)" class="px-2 py-0.5 hover:bg-slate-700 rounded text-slate-300 hover:text-white transition font-bold cursor-pointer" title="Pasase Sebelumnya">◄</button>
+                        <span id="dualMatchNavCounter" class="px-2 text-indigo-300 font-semibold">0 / 0</span>
+                        <button type="button" onclick="navigateDualMatch(1)" class="px-2 py-0.5 hover:bg-slate-700 rounded text-slate-300 hover:text-white transition font-bold cursor-pointer" title="Pasase Berikutnya">►</button>
+                    </div>
+
+                    <!-- Close Button -->
+                    <button type="button" onclick="closeDualReaderModal()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-rose-900/60 text-slate-400 hover:text-rose-300 border border-slate-700 flex items-center justify-center transition font-bold text-base cursor-pointer">
+                        ✕
+                    </button>
+                </div>
+            </div>
+
+            <!-- Modal Body: 2 Columns Split Screen -->
+            <div class="flex-1 grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-200 min-h-0 bg-slate-100">
+                <!-- Left Column: Naskah Mahasiswa (Submisi) -->
+                <div class="flex flex-col min-h-0 bg-white">
+                    <div class="px-5 py-2.5 bg-indigo-50/70 border-b border-indigo-100 flex items-center justify-between text-xs">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                            <span class="font-bold text-indigo-950 uppercase tracking-wider font-mono-code">Naskah Mahasiswa (Submisi)</span>
+                        </div>
+                        <span class="text-[11px] text-slate-500 font-mono-code" id="dualSubInfoText"></span>
+                    </div>
+                    <div id="dualSubPane" class="flex-1 overflow-y-auto p-6 text-sm text-slate-800 leading-relaxed font-serif select-text scroll-smooth space-y-3">
+                        <!-- Full text with highlight marks -->
+                    </div>
+                </div>
+
+                <!-- Right Column: Dokumen Rujukan (Sumber) -->
+                <div class="flex flex-col min-h-0 bg-white">
+                    <div class="px-5 py-2.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between text-xs">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-indigo-600"></span>
+                            <span class="font-bold text-slate-900 uppercase tracking-wider font-mono-code" id="dualSrcHeaderTitle">Dokumen Rujukan</span>
+                        </div>
+                        <span class="text-[11px] text-slate-500 font-mono-code" id="dualSrcInfoText"></span>
+                    </div>
+                    <div id="dualSrcPane" class="flex-1 overflow-y-auto p-6 text-sm text-slate-800 leading-relaxed font-serif select-text scroll-smooth space-y-3">
+                        <!-- Full text with highlight marks -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="px-5 py-2.5 border-t border-slate-200 bg-slate-50 flex items-center justify-between text-xs text-slate-500">
+                <div class="flex items-center gap-3">
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-amber-200 border border-amber-400 inline-block"></span> Teks Submisi Cocok</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-indigo-200 border border-indigo-400 inline-block"></span> Teks Sumber Cocok</span>
+                    <span class="hidden sm:inline text-slate-400">• Klik pada teks tersorot untuk menyinkronkan posisi kedua dokumen</span>
+                </div>
+                <button type="button" onclick="closeDualReaderModal()" class="px-4 py-1.5 bg-slate-800 hover:bg-slate-900 text-white font-semibold text-xs rounded-lg transition cursor-pointer">
+                    Tutup Layar Ganda
+                </button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

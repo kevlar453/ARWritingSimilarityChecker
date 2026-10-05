@@ -121,8 +121,33 @@ class DashboardController extends BaseController
             } else {
                 $m['source_snippet'] = 'Teks sumber tidak tersedia.';
             }
+
+            // Anotasi Academic Boilerplate dari evidenceData jika tersedia
+            $m['is_boilerplate'] = false;
+            $m['boilerplate_category'] = 'NONE';
+            $m['boilerplate_phrase'] = null;
+            $m['boilerplate_rationale'] = null;
         }
         unset($m);
+
+        // Petakan metadata v1.2 dari evidenceData['matches']
+        if (!empty($evidenceData['matches']) && is_array($evidenceData['matches'])) {
+            $evMatchMap = [];
+            foreach ($evidenceData['matches'] as $em) {
+                $k = ($em['source_document_id'] ?? 0) . '_' . ($em['submission_start'] ?? 0);
+                $evMatchMap[$k] = $em;
+            }
+            foreach ($matches as &$m) {
+                $k = ((int) $m['source_document_id']) . '_' . ((int) $m['submission_start']);
+                if (isset($evMatchMap[$k])) {
+                    $m['is_boilerplate'] = !empty($evMatchMap[$k]['is_boilerplate']);
+                    $m['boilerplate_category'] = $evMatchMap[$k]['boilerplate_category'] ?? 'NONE';
+                    $m['boilerplate_phrase'] = $evMatchMap[$k]['boilerplate_phrase'] ?? null;
+                    $m['boilerplate_rationale'] = $evMatchMap[$k]['boilerplate_rationale'] ?? null;
+                }
+            }
+            unset($m);
+        }
 
         $highAttentionCount = 0;
         $commonPassagesCount = 0;
@@ -135,6 +160,34 @@ class DashboardController extends BaseController
             }
         }
 
+        // Ambil teks lengkap submisi & sumber untuk Layar Ganda (Dual-Reader)
+        $subChunks = $db->table('document_chunks')
+                        ->select('text')
+                        ->where('document_id', $report['document_id'])
+                        ->orderBy('chunk_index', 'ASC')
+                        ->get()->getResultArray();
+        $submissionText = implode(' ', array_column($subChunks, 'text'));
+
+        $sourceTexts = [];
+        foreach ($sources as $s) {
+            $sDocId = (int) $s['source_document_id'];
+            $srcChunks = $db->table('document_chunks')
+                            ->select('text')
+                            ->where('document_id', $sDocId)
+                            ->orderBy('chunk_index', 'ASC')
+                            ->get()->getResultArray();
+            $sourceTexts[$sDocId] = implode(' ', array_column($srcChunks, 'text'));
+        }
+
+        // Resolusi Stylometrik & AI Indicator
+        $aiStylometrics = $evidenceData['ai_stylometrics'] ?? $evidenceData['v1_1_presentation']['v1_2_evolution']['ai_stylometrics'] ?? null;
+        if (!$aiStylometrics && !empty($submissionText)) {
+            $aiStylometrics = $this->computeFallbackStylometrics($submissionText);
+        }
+
+        // Resolusi Cross-Lingual Analysis
+        $crossLingual = $evidenceData['cross_lingual'] ?? $evidenceData['v1_1_presentation']['v1_2_evolution']['cross_lingual'] ?? null;
+
         return view('dashboard/report', [
             'report'              => $report,
             'document'            => $document,
@@ -143,7 +196,111 @@ class DashboardController extends BaseController
             'matches'             => $matches,
             'highAttentionCount'  => $highAttentionCount,
             'commonPassagesCount' => $commonPassagesCount,
+            'submissionText'      => $submissionText,
+            'sourceTexts'         => $sourceTexts,
+            'aiStylometrics'      => $aiStylometrics,
+            'crossLingual'        => $crossLingual,
         ]);
+    }
+
+    private function computeFallbackStylometrics(string $text): array
+    {
+        $rawSentences = preg_split('/[.!?]+(?:\s+|\n+|$)/u', $text, -1, PREG_SPLIT_NO_EMPTY);
+        $sentences = [];
+        $lengths = [];
+        foreach ($rawSentences as $s) {
+            $words = preg_split('/\s+/u', trim($s));
+            if (count($words) >= 3) {
+                $sentences[] = trim($s);
+                $lengths[] = count($words);
+            }
+        }
+        $totalWords = str_word_count($text);
+        if ($totalWords < 50 || count($lengths) < 3) {
+            return [
+                'status' => 'insufficient_data',
+                'ai_probability_score' => 0.0,
+                'ai_confidence_level' => 'LOW',
+                'verdict_label' => 'Data Teks Tidak Mencukupi',
+                'summary_rationale' => 'Panjang naskah terlalu pendek untuk dianalisis profil stylometrinya.',
+                'metrics' => [
+                    'burstiness' => 0.5,
+                    'lexical_diversity' => 0.0,
+                    'transition_density' => 0.0,
+                    'average_sentence_length' => 0.0,
+                    'total_sentences_analyzed' => count($lengths),
+                    'total_words_analyzed' => $totalWords,
+                ],
+                'anomalies' => []
+            ];
+        }
+
+        $mean = array_sum($lengths) / count($lengths);
+        $variance = 0.0;
+        foreach ($lengths as $l) {
+            $variance += pow($l - $mean, 2);
+        }
+        $stdDev = sqrt($variance / count($lengths));
+        $burstiness = round($stdDev / ($mean ?: 1), 4);
+
+        $markers = [
+            'dalam era digital saat ini', 'perlu digarisbawahi bahwa', 'menarik untuk dicermati',
+            'tidak dapat dipungkiri bahwa', 'memiliki peran yang sangat krusial', 'seiring dengan perkembangan zaman',
+            'dapat disimpulkan bahwa secara keseluruhan', 'pada dasarnya hal ini menunjukkan',
+            'merupakan aspek yang tak terpisahkan', 'memberikan kontribusi yang signifikan',
+            'furthermore', 'moreover', 'in conclusion', 'it is important to note that', 'plays a crucial role in',
+            'delves into', 'a multifaceted approach'
+        ];
+        $lower = mb_strtolower($text);
+        $markerHits = 0;
+        foreach ($markers as $m) {
+            $markerHits += substr_count($lower, $m);
+        }
+        $transDensity = round(($markerHits / ($totalWords ?: 1)) * 1000, 2);
+
+        $aiScore = 0.0;
+        if ($burstiness < 0.25) $aiScore += 40.0;
+        elseif ($burstiness < 0.32) $aiScore += 25.0;
+        elseif ($burstiness < 0.40) $aiScore += 10.0;
+
+        if ($transDensity >= 3.5) $aiScore += 35.0;
+        elseif ($transDensity >= 2.0) $aiScore += 20.0;
+        elseif ($transDensity >= 1.0) $aiScore += 10.0;
+
+        if ($mean >= 18 && $mean <= 28 && $burstiness < 0.35) $aiScore += 15.0;
+
+        $aiScore = min(100.0, max(0.0, round($aiScore, 2)));
+
+        if ($aiScore >= 65.0) {
+            $conf = 'HIGH';
+            $label = 'Pola Susunan Terstruktur Khas AI (Tinggi)';
+            $rationale = "Naskah menunjukkan variasi panjang kalimat yang sangat seragam (Burstiness: " . number_format($burstiness, 2) . ") disertai kepadatan frasa transisi generik (" . number_format($transDensity, 1) . "/1000 kata). Disarankan konfirmasi pemahaman konseptual secara lisan.";
+        } elseif ($aiScore >= 38.0) {
+            $conf = 'MODERATE';
+            $label = 'Indikasi Parafrase AI Ringan / Berbantuan Mesin';
+            $rationale = "Ditemukan beberapa segmen dengan keteraturan sintaksis khas mesin (Burstiness: " . number_format($burstiness, 2) . "). Naskah kemungkinan menggunakan alat bantu parafrase digital.";
+        } else {
+            $conf = 'LOW';
+            $label = 'Gaya Bahasa Alami Manusia (Organik)';
+            $rationale = "Struktur kalimat memiliki variasi ritme yang dinamis dan organik (Burstiness: " . number_format($burstiness, 2) . ") khas penulisan manusia mandiri.";
+        }
+
+        return [
+            'status' => 'completed',
+            'ai_probability_score' => $aiScore,
+            'ai_confidence_level' => $conf,
+            'verdict_label' => $label,
+            'summary_rationale' => $rationale,
+            'metrics' => [
+                'burstiness' => $burstiness,
+                'lexical_diversity' => 0.0,
+                'transition_density' => $transDensity,
+                'average_sentence_length' => round($mean, 2),
+                'total_sentences_analyzed' => count($lengths),
+                'total_words_analyzed' => $totalWords,
+            ],
+            'anomalies' => []
+        ];
     }
 
     public function exportPdf($id)

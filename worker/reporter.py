@@ -127,12 +127,89 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
             context_res = detect_citation_context(submission_text)
             cite_latency_ms = (time.perf_counter() - t_cite_start) * 1000.0
 
+            # 4c. Modul Evolusi v1.2: Section Parser, Term-Level Drilldown, Boilerplate Detector
+            from worker.section_parser import parse_document_sections
+            from worker.term_inspector import compute_term_drilldown
+            from worker.boilerplate_detector import detect_academic_boilerplate
+            from worker.ai_stylometrics import analyze_ai_stylometrics
+            from worker.cross_lingual import calculate_cross_lingual_similarity
+
+            # 1. Smart Section Parser
+            segmentation_res = parse_document_sections(submission_text)
+
+            # 2. Term-Level Drill-Down (jika terdapat dokumen rujukan)
+            ref_text = ""
+            if result.get("sources"):
+                top_src_id = result["sources"][0]["source_document_id"]
+                cursor.execute(
+                    "SELECT text FROM document_chunks WHERE document_id = %s ORDER BY chunk_index ASC",
+                    (top_src_id,)
+                )
+                src_chunks = cursor.fetchall()
+                if src_chunks:
+                    ref_text = " ".join(sc["text"] for sc in src_chunks if sc.get("text"))
+                elif not src_chunks:
+                    cursor.execute("SELECT storage_path, mime_type FROM documents WHERE id = %s", (top_src_id,))
+                    src_doc = cursor.fetchone()
+                    if src_doc and src_doc.get("storage_path") and os.path.exists(src_doc["storage_path"]):
+                        from worker.extractor import extract_document
+                        src_pages = extract_document(src_doc["storage_path"], src_doc.get("mime_type"))
+                        ref_text = " ".join(p["text"] for p in src_pages if p.get("text"))
+
+            term_drilldown_res = None
+            if ref_text:
+                term_drilldown_res = compute_term_drilldown(
+                    submission_text=submission_text,
+                    reference_text=ref_text,
+                    top_k=10
+                )
+
+            # 3. Academic Boilerplate Detector
+            boilerplate_res = detect_academic_boilerplate(submission_text)
+
+            # 4. Stylometric & AI-Generated Text Indicator (Fitur 2)
+            ai_stylometrics_res = analyze_ai_stylometrics(submission_text)
+            result["ai_stylometrics"] = ai_stylometrics_res
+
+            # 5. Cross-Lingual Semantic Similarity Engine (Fitur 5)
+            cross_lingual_res = None
+            if ref_text:
+                cross_lingual_res = calculate_cross_lingual_similarity(submission_text, ref_text)
+                if cross_lingual_res and result.get("sources"):
+                    result["sources"][0]["cross_lingual"] = cross_lingual_res
+            result["cross_lingual"] = cross_lingual_res
+
+            # Anotasi pasase individu dengan teks pasase & status boilerplate
+            sub_words = submission_text.split()
+            for match in result.get("matches", []):
+                s_start = match.get("submission_start", 0)
+                s_end = match.get("submission_end", s_start)
+                if 0 <= s_start < len(sub_words):
+                    passage_slice = sub_words[s_start : s_end + 1]
+                    p_text = " ".join(passage_slice)
+                    match["passage_text"] = p_text
+                    bp_pass = detect_academic_boilerplate(p_text)
+                    if not bp_pass.is_boilerplate:
+                        ctx_slice = sub_words[max(0, s_start - 2) : min(len(sub_words), s_end + 4)]
+                        ctx_text = " ".join(ctx_slice)
+                        bp_pass = detect_academic_boilerplate(ctx_text)
+
+                    match["is_boilerplate"] = bp_pass.is_boilerplate
+                    match["boilerplate_category"] = bp_pass.category.value
+                    match["boilerplate_phrase"] = bp_pass.matched_phrase
+                    match["boilerplate_rationale"] = bp_pass.rationale
+
             t_pres_start = time.perf_counter()
             v11_presentation = present_hybrid_report(
                 report_dict=result,
                 sources=result.get("sources", []),
                 evidence_text=submission_text,
-                context_detection=context_res
+                context_detection=context_res,
+                segmentation=segmentation_res,
+                term_drilldown=term_drilldown_res,
+                boilerplate_detection=boilerplate_res,
+                ai_stylometrics=ai_stylometrics_res,
+                cross_lingual=cross_lingual_res,
             )
             pres_latency_ms = (time.perf_counter() - t_pres_start) * 1000.0
 
@@ -270,6 +347,21 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
         cursor.close()
         print(f"  [METRIC] Report #{report_id} Doc #{document_id} [{engine.upper()}] completed in {duration:.2f}s "
               f"-> {predicted_decision.upper()} ({evidence_pattern}) | Exact: {exact_sim:.1f}% | Cosine: {cosine_sim:.1f}%")
+
+        # 8. Notifikasi Telegram Otomatis (Failsafe)
+        try:
+            from worker.telegram_notifier import notify_similarity_check_completed
+            notify_similarity_check_completed(
+                report_id=report_id,
+                document_title=document.get("title", f"Dokumen #{document_id}"),
+                decision=predicted_decision,
+                exact_similarity=exact_sim,
+                cosine_similarity=cosine_sim,
+                longest_match_words=longest_match
+            )
+        except Exception as tele_err:
+            print(f"  [TELEGRAM WARNING] Gagal mengirim notifikasi untuk Report #{report_id}: {tele_err}")
+
         return result
     except Exception as e:
         connection.rollback()

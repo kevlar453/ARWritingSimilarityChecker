@@ -141,4 +141,71 @@ class DocumentController extends BaseController
             'message'     => 'Pemeriksaan similarity berhasil dijadwalkan ke antrean worker.'
         ]);
     }
+
+    public function enroll($id)
+    {
+        $documentModel = new DocumentModel();
+        $document = $documentModel->find($id);
+
+        if (! $document) {
+            return $this->response->setStatusCode(404)->setJSON([
+                'status'  => 'error',
+                'message' => 'Dokumen tidak ditemukan.'
+            ]);
+        }
+
+        if ($document['document_type'] === 'corpus') {
+            return $this->response->setJSON([
+                'status'  => 'already_enrolled',
+                'message' => 'Dokumen ini sudah terdaftar sebagai korpus institusi.'
+            ]);
+        }
+
+        $db = db_connect();
+        $db->transStart();
+
+        // 1. Daftarkan fingerprints unik naskah ke fingerprint_documents
+        $db->query("
+            INSERT IGNORE INTO fingerprint_documents (fingerprint, document_id, created_at)
+            SELECT DISTINCT fingerprint, ?, NOW()
+            FROM fingerprints
+            WHERE document_id = ?
+        ", [(int)$id, (int)$id]);
+
+        // 2. Perbarui status dokumen menjadi corpus institusi
+        $documentModel->update($id, [
+            'document_type'     => 'corpus',
+            'corpus_visibility' => 'institution',
+            'indexing_status'   => 'completed',
+            'updated_at'        => date('Y-m-d H:i:s')
+        ]);
+
+        // 3. Perbarui fingerprint_stats untuk menghitung ulang DF/IDF korpus
+        $db->query("
+            INSERT INTO fingerprint_stats (fingerprint, document_frequency, created_at, updated_at)
+            SELECT fd.fingerprint, COUNT(DISTINCT fd.document_id), NOW(), NOW()
+            FROM fingerprint_documents fd
+            INNER JOIN documents d ON d.id = fd.document_id
+            WHERE d.document_type = 'corpus'
+              AND (d.benchmark_run_id IS NULL OR d.benchmark_run_id = 0)
+            GROUP BY fd.fingerprint
+            ON DUPLICATE KEY UPDATE
+                document_frequency = VALUES(document_frequency),
+                updated_at = NOW()
+        ");
+
+        $db->transComplete();
+
+        if ($db->transStatus() === false) {
+            return $this->response->setStatusCode(500)->setJSON([
+                'status'  => 'error',
+                'message' => 'Gagal mendaftarkan naskah ke korpus institusi.'
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'status'  => 'success',
+            'message' => "Naskah '{$document['title']}' berhasil didaftarkan sebagai Korpus Institusi permanen."
+        ]);
+    }
 }

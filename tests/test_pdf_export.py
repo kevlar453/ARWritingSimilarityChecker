@@ -1,3 +1,4 @@
+import os
 import urllib.request
 import urllib.parse
 import json
@@ -5,7 +6,7 @@ import pytest
 from worker.database import get_connection
 from worker.exporter import export_report_pdf, generate_verification_hash
 
-BASE_URL = "http://localhost:8085"
+BASE_URL = os.getenv("APP_BASE_URL", "http://localhost:8085")
 
 def get_latest_completed_report_id() -> int:
     conn = get_connection()
