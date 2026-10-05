@@ -34,9 +34,9 @@ Dokumen ini menetapkan panduan metodologis, tata kelola evaluasi lapangan, pemis
 
 ### Milestone Operasional (Phase R):
 - [x] **Milestone R1 — Release Closure (SELESAI)**: Pembekuan v1.1.0, audit kelulusan Gate V11-A s.d. V11-J, publikasi *Release Notes* dan pemutakhiran repositori.
-- [ ] **Milestone R2 — Operational Pilot (TAHAP SAAT INI)**: Penelaahan awal pada 20–30 dokumen submisi akademik nyata menggunakan sampling berbasis risiko.
-- [ ] **Milestone R3 — First Production Evidence Review**: Perluasan populasi menjadi 50–100 kasus nyata untuk melacak pola sistematis.
-- [ ] **Milestone R4 — Operational Baseline**: Penetapan baseline metrik lapangan (konteks, kesepakatan manusia, latensi, rate divergensi, rate UNKNOWN).
+- [x] **Milestone R2 — Operational Pilot (SELESAI)**: Penelaahan awal pada 30 dokumen submisi akademik nyata menggunakan sampling berbasis risiko.
+- [x] **Milestone R3 — First Production Evidence Review (SELESAI)**: Evaluasi kegunaan pemisahan bukti (*Layer Utility Question*), dekomposisi provenance suite di DB/UI, dan persiapan protokol ekspansi 50 kasus nyata (lihat [Laporan Milestone R3](MILESTONE_R3_OPERATIONAL_PILOT_REPORT.md)).
+- [ ] **Milestone R4 — Operational Baseline (TAHAP BERIKUTNYA)**: Penetapan baseline metrik lapangan permanen (konteks, kesepakatan manusia, latensi, rate divergensi, rate UNKNOWN).
 - [ ] **Milestone R5 — v1.2 Decision Gate**: Evaluasi bukti empiris apakah sistem tetap dipertahankan pada v1.1.x atau memerlukan peningkatan ke v1.2.
 
 ---

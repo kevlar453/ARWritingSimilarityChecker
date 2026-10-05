@@ -304,6 +304,44 @@
                     </div>
                 </div>
 
+                <!-- Provenance & Suite Breakdown -->
+                <div>
+                    <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Distribusi Provenance & Suite Evaluasi</h3>
+                    <div class="space-y-1.5 text-xs">
+                        <?php foreach ($hum['suite_provenance_breakdown'] ?? [] as $sName => $sData): ?>
+                            <div class="p-2 rounded-lg border border-slate-200 bg-slate-50/70 flex justify-between items-center">
+                                <div>
+                                    <span class="font-bold text-slate-800 font-mono-code"><?= esc($sName) ?></span>
+                                    <span class="text-[10px] text-slate-400 block">[<?= esc($sData['provenance']) ?>]</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="font-bold text-indigo-700"><?= $sData['label_count'] ?> label</span>
+                                    <span class="text-[10px] text-emerald-700 block font-semibold">Agreement: <?= $sData['reviewer_agreement_rate_percent'] ?>%</span>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+
+                <!-- Layer Utility (Milestone R3) -->
+                <div>
+                    <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Kegunaan Pemisahan Bukti (Layer Utility — Milestone R3)</h3>
+                    <div class="grid grid-cols-3 gap-2 text-xs text-center">
+                        <?php
+                        $uData = $hum['layer_utility_metrics'] ?? [];
+                        foreach (['YES' => 'bg-emerald-50 text-emerald-800 border-emerald-200', 'PARTIALLY' => 'bg-amber-50 text-amber-800 border-amber-200', 'NO' => 'bg-rose-50 text-rose-800 border-rose-200'] as $uKey => $uClass):
+                            $cnt = $uData[$uKey]['count'] ?? 0;
+                            $pct = $uData[$uKey]['percent'] ?? 0;
+                        ?>
+                            <div class="p-2 rounded-lg border <?= $uClass ?>">
+                                <span class="font-bold block text-[11px]"><?= $uKey ?></span>
+                                <span class="text-base font-extrabold"><?= $cnt ?></span>
+                                <span class="text-[10px] block opacity-80">(<?= $pct ?>%)</span>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+
                 <!-- Academic Interpretation Taxonomy -->
                 <div>
                     <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Taksonomi Interpretasi Akademik</h3>

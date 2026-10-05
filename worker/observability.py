@@ -593,24 +593,84 @@ def get_operational_quality_report(db_conn=None) -> Dict[str, Any]:
 
         # ── 3. HUMAN VALIDATION METRICS DARI TABEL EVALUATION_LABELS ──
         cursor.execute("""
-            SELECT system_assessment, citation_context, citation_status,
-                   human_interpretation, reviewer_confidence, review_status
+            SELECT id, case_id, system_assessment, citation_context, citation_status,
+                   human_interpretation, reviewer_confidence, decomposition_utility,
+                   review_status, reviewer_code, reviewed_at
             FROM evaluation_labels
+            ORDER BY id ASC
         """)
         labels = cursor.fetchall()
 
         h_assess = Counter(r["system_assessment"] for r in labels if r.get("system_assessment"))
         h_interp = Counter(r["human_interpretation"] for r in labels if r.get("human_interpretation"))
         h_conf = Counter(r["reviewer_confidence"] for r in labels if r.get("reviewer_confidence"))
+        h_util = Counter(r.get("decomposition_utility") for r in labels if r.get("decomposition_utility"))
         total_reviewed = len(labels)
         correct_cnt = h_assess.get("CORRECT", 0)
         acceptable_cnt = h_assess.get("ACCEPTABLE", 0)
         agreement_cnt = correct_cnt + acceptable_cnt
         agreement_rate = round((agreement_cnt / max(1, total_reviewed)) * 100.0, 2)
 
+        # Provenance & Suite Breakdown (Memisahkan populasi pilot nyata vs sintetis)
+        suite_groups: Dict[str, List[Dict[str, Any]]] = {
+            "pilot_r2": [],
+            "v1_1_targeted": [],
+            "v1_0_baseline": [],
+            "production_sampling": [],
+        }
+
+        for r in labels:
+            cid = r.get("case_id", "")
+            if cid.startswith("PILOT-"):
+                suite_groups["pilot_r2"].append(r)
+            elif cid.startswith("EV11-"):
+                suite_groups["v1_1_targeted"].append(r)
+            elif cid.startswith("EV-"):
+                suite_groups["v1_0_baseline"].append(r)
+            else:
+                suite_groups["production_sampling"].append(r)
+
+        suite_breakdown = {}
+        for s_name, s_labels in suite_groups.items():
+            s_cnt = len(s_labels)
+            if s_cnt == 0:
+                continue
+            s_ass = Counter(l.get("system_assessment") for l in s_labels if l.get("system_assessment"))
+            s_ut = Counter(l.get("decomposition_utility") for l in s_labels if l.get("decomposition_utility"))
+            s_corr = s_ass.get("CORRECT", 0)
+            s_acc = s_ass.get("ACCEPTABLE", 0)
+            s_agr = s_corr + s_acc
+            suite_breakdown[s_name] = {
+                "label_count": s_cnt,
+                "provenance": "REAL_WORLD_PILOT" if s_name == "pilot_r2" else ("SYNTHETIC_TARGETED" if s_name == "v1_1_targeted" else "SYNTHETIC_BENCHMARK"),
+                "reviewer_agreement_rate_percent": round((s_agr / max(1, s_cnt)) * 100.0, 1),
+                "system_assessment_distribution": {
+                    "CORRECT": s_corr,
+                    "ACCEPTABLE": s_acc,
+                    "TOO_STRICT": s_ass.get("TOO_STRICT", 0),
+                    "TOO_LENIENT": s_ass.get("TOO_LENIENT", 0),
+                    "UNCERTAIN": s_ass.get("UNCERTAIN", 0),
+                },
+                "layer_utility_distribution": {
+                    "YES": s_ut.get("YES", 0),
+                    "PARTIALLY": s_ut.get("PARTIALLY", 0),
+                    "NO": s_ut.get("NO", 0),
+                    "NOT_RECORDED": s_cnt - sum(s_ut.values()),
+                },
+            }
+
+        layer_utility_metrics = {
+            "YES": {"count": h_util.get("YES", 0), "percent": round((h_util.get("YES", 0) / max(1, total_reviewed)) * 100.0, 1)},
+            "PARTIALLY": {"count": h_util.get("PARTIALLY", 0), "percent": round((h_util.get("PARTIALLY", 0) / max(1, total_reviewed)) * 100.0, 1)},
+            "NO": {"count": h_util.get("NO", 0), "percent": round((h_util.get("NO", 0) / max(1, total_reviewed)) * 100.0, 1)},
+            "NOT_RECORDED": {"count": total_reviewed - sum(h_util.values()), "percent": round(((total_reviewed - sum(h_util.values())) / max(1, total_reviewed)) * 100.0, 1)},
+        }
+
         human_metrics = {
             "total_cases_reviewed": total_reviewed,
             "reviewer_agreement_rate_percent": agreement_rate,
+            "suite_provenance_breakdown": suite_breakdown,
+            "layer_utility_metrics": layer_utility_metrics,
             "system_assessment_distribution": {
                 "CORRECT": {"count": correct_cnt, "percent": round((correct_cnt / max(1, total_reviewed)) * 100.0, 1)},
                 "ACCEPTABLE": {"count": acceptable_cnt, "percent": round((acceptable_cnt / max(1, total_reviewed)) * 100.0, 1)},
@@ -731,8 +791,20 @@ def display_operational_quality_dashboard(report: Optional[Dict[str, Any]] = Non
     # 3. HUMAN VALIDATION METRICS
     print("[3] HUMAN VALIDATION METRICS (GROUND TRUTH PENELAAH AHLI)")
     print("----------------------------------------------------------------------")
-    print(f"Total Kasus Ditelaah      : {hum['total_cases_reviewed']}")
+    print(f"Total Kasus Ditelaah      : {hum['total_cases_reviewed']} label")
     print(f"Reviewer Agreement Rate   : {hum['reviewer_agreement_rate_percent']}% (CORRECT + ACCEPTABLE)")
+    
+    # Distribusi Provenance & Suite
+    print("Distribusi Provenance & Suite:")
+    for s_name, s_data in hum.get("suite_provenance_breakdown", {}).items():
+        print(f"  - {s_name:<20}: {s_data['label_count']:3d} label [{s_data['provenance']}] (Agreement: {s_data['reviewer_agreement_rate_percent']}%)")
+
+    # Evaluasi Kegunaan Pemisahan Bukti (Layer Utility)
+    print("Kegunaan Pemisahan Bukti (Layer Utility — Milestone R3):")
+    for k, v in hum.get("layer_utility_metrics", {}).items():
+        if v["count"] > 0:
+            print(f"  - {k:<15}: {v['count']:4d} ({v['percent']:5.1f}%)")
+
     print("Asesmen terhadap Sistem:")
     for k, v in hum["system_assessment_distribution"].items():
         print(f"  - {k:<15}: {v['count']:4d} ({v['percent']:5.1f}%)")

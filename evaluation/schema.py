@@ -81,6 +81,11 @@ SYSTEM_ASSESSMENT_TOO_STRICT = "TOO_STRICT"
 SYSTEM_ASSESSMENT_TOO_LENIENT = "TOO_LENIENT"
 SYSTEM_ASSESSMENT_UNCERTAIN = "UNCERTAIN"
 
+# Kegunaan Pemisahan Lapisan Bukti (Decomposition Utility Question - Milestone R3)
+DECOMPOSITION_UTILITY_YES = "YES"
+DECOMPOSITION_UTILITY_PARTIALLY = "PARTIALLY"
+DECOMPOSITION_UTILITY_NO = "NO"
+
 # Taksonomi Kegagalan Evaluasi (Failure Taxonomy)
 FAILURE_NONE = "NONE"
 
@@ -182,6 +187,7 @@ class HumanReviewLabel:
     false_positive: bool = False
     system_assessment: str = SYSTEM_ASSESSMENT_CORRECT
     reviewer_confidence: str = CONFIDENCE_HIGH
+    decomposition_utility: str = DECOMPOSITION_UTILITY_YES
     review_status: str = LIFECYCLE_REVIEWED
     notes: Optional[str] = None
     reviewed_at: str = field(default_factory=lambda: datetime.now().isoformat())

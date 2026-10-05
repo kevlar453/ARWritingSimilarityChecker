@@ -34,6 +34,7 @@
       "human_interpretation": "DIRECT_OVERLAP_RELEVANT",
       "citation_status": "NOT_CITED",
       "reviewer_confidence": "HIGH",
+      "decomposition_utility": null,
       "review_status": "REVIEWED"
     }
   },
@@ -72,6 +73,7 @@
       "human_interpretation": "DIRECT_OVERLAP_RELEVANT",
       "citation_status": "NOT_CITED",
       "reviewer_confidence": "HIGH",
+      "decomposition_utility": null,
       "review_status": "REVIEWED"
     }
   },
@@ -110,6 +112,7 @@
       "human_interpretation": "METHODOLOGY_BOILERPLATE",
       "citation_status": "NOT_CITED",
       "reviewer_confidence": "HIGH",
+      "decomposition_utility": null,
       "review_status": "REVIEWED"
     }
   },
@@ -148,6 +151,7 @@
       "human_interpretation": "DIRECT_OVERLAP_RELEVANT",
       "citation_status": "NOT_CITED",
       "reviewer_confidence": "HIGH",
+      "decomposition_utility": null,
       "review_status": "REVIEWED"
     }
   },
@@ -186,6 +190,7 @@
       "human_interpretation": "DIRECT_OVERLAP_RELEVANT",
       "citation_status": "NOT_CITED",
       "reviewer_confidence": "HIGH",
+      "decomposition_utility": null,
       "review_status": "REVIEWED"
     }
   },
@@ -224,6 +229,7 @@
       "human_interpretation": "DIRECT_OVERLAP_RELEVANT",
       "citation_status": "CITED",
       "reviewer_confidence": "HIGH",
+      "decomposition_utility": null,
       "review_status": "REVIEWED"
     }
   },
@@ -262,6 +268,7 @@
       "human_interpretation": "DIRECT_OVERLAP_RELEVANT",
       "citation_status": "NOT_CITED",
       "reviewer_confidence": "HIGH",
+      "decomposition_utility": null,
       "review_status": "REVIEWED"
     }
   },
@@ -300,6 +307,7 @@
       "human_interpretation": "DIRECT_OVERLAP_RELEVANT",
       "citation_status": "NOT_CITED",
       "reviewer_confidence": "HIGH",
+      "decomposition_utility": null,
       "review_status": "REVIEWED"
     }
   },
@@ -322,7 +330,7 @@
     "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
     "review_status": "REVIEWED",
     "human_review": {
-      "id": 112,
+      "id": 149,
       "case_id": "EV-ADV-051",
       "reviewer_code": "RV-TEST",
       "human_decision": "review",
@@ -333,11 +341,12 @@
       "false_positive": 0,
       "system_assessment": "CORRECT",
       "notes": "Uji anotasi otomatis",
-      "reviewed_at": "2026-10-05 08:48:55",
+      "reviewed_at": "2026-10-05 09:48:01",
       "citation_context": "NONE",
       "human_interpretation": "DIRECT_OVERLAP_PROPERLY_CITED",
       "citation_status": "NOT_CITED",
       "reviewer_confidence": "HIGH",
+      "decomposition_utility": null,
       "review_status": "REVIEWED"
     }
   },
@@ -376,6 +385,7 @@
       "human_interpretation": "DIRECT_OVERLAP_RELEVANT",
       "citation_status": "NOT_CITED",
       "reviewer_confidence": "HIGH",
+      "decomposition_utility": null,
       "review_status": "REVIEWED"
     }
   },
@@ -414,6 +424,7 @@
       "human_interpretation": "DIRECT_OVERLAP_RELEVANT",
       "citation_status": "NOT_CITED",
       "reviewer_confidence": "HIGH",
+      "decomposition_utility": null,
       "review_status": "REVIEWED"
     }
   },
@@ -452,6 +463,7 @@
       "human_interpretation": "DIRECT_OVERLAP_RELEVANT",
       "citation_status": "NOT_CITED",
       "reviewer_confidence": "HIGH",
+      "decomposition_utility": null,
       "review_status": "REVIEWED"
     }
   },
@@ -490,6 +502,7 @@
       "human_interpretation": "DIRECT_OVERLAP_RELEVANT",
       "citation_status": "NOT_CITED",
       "reviewer_confidence": "HIGH",
+      "decomposition_utility": null,
       "review_status": "REVIEWED"
     }
   },
@@ -528,6 +541,7 @@
       "human_interpretation": "DIRECT_OVERLAP_RELEVANT",
       "citation_status": "NOT_CITED",
       "reviewer_confidence": "HIGH",
+      "decomposition_utility": null,
       "review_status": "REVIEWED"
     }
   },
@@ -566,6 +580,7 @@
       "human_interpretation": "DIRECT_OVERLAP_RELEVANT",
       "citation_status": "NOT_CITED",
       "reviewer_confidence": "HIGH",
+      "decomposition_utility": null,
       "review_status": "REVIEWED"
     }
   },
@@ -604,6 +619,7 @@
       "human_interpretation": "DIRECT_OVERLAP_RELEVANT",
       "citation_status": "NOT_CITED",
       "reviewer_confidence": "HIGH",
+      "decomposition_utility": null,
       "review_status": "REVIEWED"
     }
   },
@@ -642,6 +658,7 @@
       "human_interpretation": "DIRECT_OVERLAP_RELEVANT",
       "citation_status": "NOT_CITED",
       "reviewer_confidence": "HIGH",
+      "decomposition_utility": null,
       "review_status": "REVIEWED"
     }
   },
@@ -680,6 +697,7 @@
       "human_interpretation": "DIRECT_OVERLAP_RELEVANT",
       "citation_status": "NOT_CITED",
       "reviewer_confidence": "HIGH",
+      "decomposition_utility": null,
       "review_status": "REVIEWED"
     }
   },
@@ -718,6 +736,7 @@
       "human_interpretation": "DIRECT_OVERLAP_RELEVANT",
       "citation_status": "NOT_CITED",
       "reviewer_confidence": "HIGH",
+      "decomposition_utility": null,
       "review_status": "REVIEWED"
     }
   },
@@ -756,6 +775,7 @@
       "human_interpretation": "DIRECT_OVERLAP_RELEVANT",
       "citation_status": "NOT_CITED",
       "reviewer_confidence": "HIGH",
+      "decomposition_utility": null,
       "review_status": "REVIEWED"
     }
   },
@@ -794,6 +814,7 @@
       "human_interpretation": "DIRECT_OVERLAP_RELEVANT",
       "citation_status": "NOT_CITED",
       "reviewer_confidence": "HIGH",
+      "decomposition_utility": null,
       "review_status": "REVIEWED"
     }
   },
@@ -832,6 +853,7 @@
       "human_interpretation": "DIRECT_OVERLAP_RELEVANT",
       "citation_status": "NOT_CITED",
       "reviewer_confidence": "HIGH",
+      "decomposition_utility": null,
       "review_status": "REVIEWED"
     }
   },
@@ -870,6 +892,7 @@
       "human_interpretation": "DIRECT_OVERLAP_RELEVANT",
       "citation_status": "NOT_CITED",
       "reviewer_confidence": "HIGH",
+      "decomposition_utility": null,
       "review_status": "REVIEWED"
     }
   },
@@ -908,6 +931,7 @@
       "human_interpretation": "DIRECT_OVERLAP_RELEVANT",
       "citation_status": "NOT_CITED",
       "reviewer_confidence": "HIGH",
+      "decomposition_utility": null,
       "review_status": "REVIEWED"
     }
   },
@@ -946,6 +970,7 @@
       "human_interpretation": "DIRECT_OVERLAP_RELEVANT",
       "citation_status": "NOT_CITED",
       "reviewer_confidence": "HIGH",
+      "decomposition_utility": null,
       "review_status": "REVIEWED"
     }
   },
@@ -984,6 +1009,7 @@
       "human_interpretation": "DIRECT_OVERLAP_RELEVANT",
       "citation_status": "NOT_CITED",
       "reviewer_confidence": "HIGH",
+      "decomposition_utility": null,
       "review_status": "REVIEWED"
     }
   },
@@ -1022,6 +1048,7 @@
       "human_interpretation": "DIRECT_OVERLAP_RELEVANT",
       "citation_status": "NOT_CITED",
       "reviewer_confidence": "HIGH",
+      "decomposition_utility": null,
       "review_status": "REVIEWED"
     }
   },
@@ -1060,6 +1087,7 @@
       "human_interpretation": "DIRECT_OVERLAP_RELEVANT",
       "citation_status": "NOT_CITED",
       "reviewer_confidence": "HIGH",
+      "decomposition_utility": null,
       "review_status": "REVIEWED"
     }
   },
@@ -1098,6 +1126,7 @@
       "human_interpretation": "DIRECT_OVERLAP_RELEVANT",
       "citation_status": "NOT_CITED",
       "reviewer_confidence": "HIGH",
+      "decomposition_utility": null,
       "review_status": "REVIEWED"
     }
   },
@@ -1136,6 +1165,7 @@
       "human_interpretation": "DIRECT_OVERLAP_RELEVANT",
       "citation_status": "NOT_CITED",
       "reviewer_confidence": "HIGH",
+      "decomposition_utility": null,
       "review_status": "REVIEWED"
     }
   }

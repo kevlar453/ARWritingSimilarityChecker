@@ -1,6 +1,6 @@
 {
   "evaluation_name": "Targeted 80-Case Academic Context Evaluation (v1.1)",
-  "executed_at": "2026-10-05T08:48:55.979145",
+  "executed_at": "2026-10-05T09:48:01.345986",
   "system_version": "v1.1.0",
   "baseline_version": "v1.0.0 (FROZEN)",
   "all_quality_gates_pass": true,
@@ -19,20 +19,20 @@
     "evidence_type_alignment_pct": 87.5,
     "decision_invariance_pct": 100.0,
     "non_suppression_invariance_pct": 100.0,
-    "elapsed_seconds": 0.022
+    "elapsed_seconds": 0.021
   },
   "observability_metrics": {
     "target_sla_overhead_ms": 150.0,
     "is_sla_compliant": true,
     "citation_parsing_latency": {
       "count": 80,
-      "avg_ms": 0.1114,
-      "min_ms": 0.0595,
-      "max_ms": 0.3112,
-      "p50_ms": 0.1046,
-      "p90_ms": 0.1646,
-      "p95_ms": 0.2303,
-      "p99_ms": 0.3112,
+      "avg_ms": 0.1042,
+      "min_ms": 0.0656,
+      "max_ms": 0.2607,
+      "p50_ms": 0.0888,
+      "p90_ms": 0.1545,
+      "p95_ms": 0.187,
+      "p99_ms": 0.2607,
       "statistically_valid_p95": true,
       "sample_note": "Sampel operasional valid (n=80 >= 30)."
     },

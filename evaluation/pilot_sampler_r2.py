@@ -444,9 +444,11 @@ def tag_pilot_case(
     reviewer_confidence: str,
     review_status: str = "REVIEWED",
     notes: Optional[str] = None,
+    decomposition_utility: str = "YES",
 ) -> Dict[str, Any]:
     """
     Menyimpan hasil telaah manusia untuk kasus pilot dan memperbarui file JSON.
+    Termasuk evaluasi kegunaan pemisahan Layer A dan Layer B (R3 Utility Question).
     """
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
@@ -457,56 +459,86 @@ def tag_pilot_case(
         is_investigate = 1 if human_interpretation == "NEEDS_INVESTIGATION" else 0
         is_false_pos = 1 if human_interpretation == "FALSE_POSITIVE" else 0
 
-        # Simpan ke tabel evaluation_labels
-        sql_label = """
-        INSERT INTO evaluation_labels (
-            case_id, reviewer_code, human_decision, citation_context, citation_status,
-            human_interpretation, evidence_relevant, common_phrase, properly_cited,
-            needs_investigation, false_positive, system_assessment, reviewer_confidence,
-            review_status, notes, reviewed_at
-        ) VALUES (
-            %s, %s, %s, %s, %s,
-            %s, %s, %s, %s,
-            %s, %s, %s, %s,
-            %s, %s, NOW()
-        )
-        ON DUPLICATE KEY UPDATE
-            reviewer_code = VALUES(reviewer_code),
-            human_decision = VALUES(human_decision),
-            citation_context = VALUES(citation_context),
-            citation_status = VALUES(citation_status),
-            human_interpretation = VALUES(human_interpretation),
-            evidence_relevant = VALUES(evidence_relevant),
-            common_phrase = VALUES(common_phrase),
-            properly_cited = VALUES(properly_cited),
-            needs_investigation = VALUES(needs_investigation),
-            false_positive = VALUES(false_positive),
-            system_assessment = VALUES(system_assessment),
-            reviewer_confidence = VALUES(reviewer_confidence),
-            review_status = VALUES(review_status),
-            notes = VALUES(notes),
-            reviewed_at = NOW()
-        """
-        cursor.execute(
-            sql_label,
-            (
-                case_id,
-                reviewer_code,
-                human_decision,
-                citation_context,
-                citation_status,
-                human_interpretation,
-                is_relevant,
-                is_common,
-                is_cited,
-                is_investigate,
-                is_false_pos,
-                system_assessment,
-                reviewer_confidence,
-                review_status,
-                notes,
-            ),
-        )
+        cursor.execute("SELECT id FROM evaluation_labels WHERE case_id = %s", (case_id,))
+        existing_row = cursor.fetchone()
+
+        if existing_row:
+            sql_update = """
+            UPDATE evaluation_labels SET
+                reviewer_code = %s,
+                human_decision = %s,
+                citation_context = %s,
+                citation_status = %s,
+                human_interpretation = %s,
+                evidence_relevant = %s,
+                common_phrase = %s,
+                properly_cited = %s,
+                needs_investigation = %s,
+                false_positive = %s,
+                system_assessment = %s,
+                reviewer_confidence = %s,
+                decomposition_utility = %s,
+                review_status = %s,
+                notes = %s,
+                reviewed_at = NOW()
+            WHERE id = %s
+            """
+            cursor.execute(
+                sql_update,
+                (
+                    reviewer_code,
+                    human_decision,
+                    citation_context,
+                    citation_status,
+                    human_interpretation,
+                    is_relevant,
+                    is_common,
+                    is_cited,
+                    is_investigate,
+                    is_false_pos,
+                    system_assessment,
+                    reviewer_confidence,
+                    decomposition_utility,
+                    review_status,
+                    notes,
+                    existing_row["id"],
+                ),
+            )
+        else:
+            sql_insert = """
+            INSERT INTO evaluation_labels (
+                case_id, reviewer_code, human_decision, citation_context, citation_status,
+                human_interpretation, evidence_relevant, common_phrase, properly_cited,
+                needs_investigation, false_positive, system_assessment, reviewer_confidence,
+                decomposition_utility, review_status, notes, reviewed_at
+            ) VALUES (
+                %s, %s, %s, %s, %s,
+                %s, %s, %s, %s,
+                %s, %s, %s, %s,
+                %s, %s, %s, NOW()
+            )
+            """
+            cursor.execute(
+                sql_insert,
+                (
+                    case_id,
+                    reviewer_code,
+                    human_decision,
+                    citation_context,
+                    citation_status,
+                    human_interpretation,
+                    is_relevant,
+                    is_common,
+                    is_cited,
+                    is_investigate,
+                    is_false_pos,
+                    system_assessment,
+                    reviewer_confidence,
+                    decomposition_utility,
+                    review_status,
+                    notes,
+                ),
+            )
         conn.commit()
 
         # Update JSON reviews file
@@ -528,6 +560,7 @@ def tag_pilot_case(
             "human_interpretation": human_interpretation,
             "system_assessment": system_assessment,
             "reviewer_confidence": reviewer_confidence,
+            "decomposition_utility": decomposition_utility,
             "review_status": review_status,
             "notes": notes,
             "reviewed_at": datetime.now(timezone.utc).isoformat(),

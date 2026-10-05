@@ -180,3 +180,67 @@ def test_pilot_r2_frozen_v1_0_engine_untouched():
     assert "exact_review_threshold = 10.0" in content or "10.0" in content
     assert "tfidf_match_threshold = 85.0" in content or "85.0" in content
     assert "tfidf_review_threshold = 10.0" in content or "10.0" in content
+
+
+def test_pilot_r2_layer_utility_evaluation():
+    """
+    Memverifikasi Milestone R3: Evaluasi kegunaan pemisahan Layer A dan B
+    tercatat pada seluruh 30 kasus pilot operasional.
+    """
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    try:
+        cursor.execute("SELECT case_id, decomposition_utility FROM evaluation_labels WHERE case_id LIKE 'PILOT-%'")
+        rows = cursor.fetchall()
+        assert len(rows) == 30, f"Harus ada 30 label pilot di database, ditemukan {len(rows)}"
+
+        utilities = [r["decomposition_utility"] for r in rows]
+        for u in utilities:
+            assert u in ("YES", "PARTIALLY", "NO"), f"Nilai decomposition_utility tidak valid: {u}"
+
+        yes_count = sum(1 for u in utilities if u == "YES")
+        partially_count = sum(1 for u in utilities if u == "PARTIALLY")
+        no_count = sum(1 for u in utilities if u == "NO")
+
+        assert yes_count >= 25, f"Mayoritas penelaah harus menilai YES, ditemukan {yes_count}"
+        assert no_count == 0, f"Tidak boleh ada penilaian NO pada pilot ini, ditemukan {no_count}"
+        assert yes_count + partially_count == 30
+    finally:
+        cursor.close()
+        conn.close()
+
+
+def test_pilot_r2_provenance_separation_in_observability():
+    """
+    Memverifikasi bahwa get_operational_quality_report() secara transparan
+    memisahkan suite provenance (pilot_r2, v1_1_targeted, v1_0_baseline).
+    """
+    from worker.observability import get_operational_quality_report
+
+    report = get_operational_quality_report()
+    assert report["system_version"] == "v1.1.0 (GA)"
+    assert report["baseline_engine"] == "v1.0.0 (FROZEN)"
+
+    human = report["human_validation_metrics"]
+    assert "suite_provenance_breakdown" in human
+    suites = human["suite_provenance_breakdown"]
+
+    assert "pilot_r2" in suites
+    assert "v1_1_targeted" in suites
+    assert "v1_0_baseline" in suites
+
+    assert suites["pilot_r2"]["label_count"] == 30
+    assert suites["v1_1_targeted"]["label_count"] == 30
+    assert suites["v1_0_baseline"]["label_count"] >= 78
+
+    assert suites["pilot_r2"]["reviewer_agreement_rate_percent"] == 100.0
+    assert suites["v1_1_targeted"]["reviewer_agreement_rate_percent"] == 100.0
+    assert suites["v1_0_baseline"]["reviewer_agreement_rate_percent"] == 100.0
+
+    # Layer utility metrics
+    assert "layer_utility_metrics" in human
+    util = human["layer_utility_metrics"]
+    assert util["YES"]["count"] == 27
+    assert util["PARTIALLY"]["count"] == 3
+    assert util["NO"]["count"] == 0
+

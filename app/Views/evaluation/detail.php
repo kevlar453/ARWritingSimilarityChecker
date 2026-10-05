@@ -228,6 +228,7 @@
             $curStat   = $existing['citation_status'] ?? null;
             $curAssess = $existing['system_assessment'] ?? null;
             $curConf   = $existing['reviewer_confidence'] ?? null;
+            $curUtil   = $existing['decomposition_utility'] ?? 'YES';
             $curNotes  = $existing['notes'] ?? '';
             ?>
 
@@ -382,14 +383,45 @@
                             </label>
                         <?php endforeach; ?>
                     </div>
+                </div>
 
-                    <!-- F. Notes -->
-                    <div class="mt-4">
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                            F. Catatan Reviewer (Reviewer Notes):
+                <!-- F. Evaluasi Kegunaan Pemisahan Bukti (Layer Utility — Milestone R3) -->
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="text-xs font-bold uppercase tracking-wider text-slate-700">
+                            F. Evaluasi Kegunaan Pemisahan Bukti (Layer Utility — Milestone R3):
                         </label>
-                        <textarea name="notes" rows="2" placeholder="Tuliskan catatan akademik spesifik terkait pasase ini..." class="w-full text-xs p-2.5 rounded-lg border border-slate-200 focus:ring-1 focus:ring-indigo-500 font-mono-code"><?= esc($curNotes) ?></textarea>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200 uppercase tracking-wider">* wajib pilih</span>
                     </div>
+                    <p class="text-[11px] text-slate-500 mb-2.5">
+                        Apakah pemisahan <strong>Layer A (Bukti Tekstual)</strong> dan <strong>Layer B (Konteks Akademik)</strong> membantu Anda memahami bukti dibandingkan skor kemiripan tunggal?
+                    </p>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                        <?php
+                        $utilOpts = [
+                            'YES' => ['label' => 'YES (Sangat Membantu)', 'desc' => 'Memisahkan overlap fisik vs orientasi topikal & konteks sitasi'],
+                            'PARTIALLY' => ['label' => 'PARTIALLY (Cukup Membantu)', 'desc' => 'Cukup membantu, namun butuh konteks/informasi lanjutan'],
+                            'NO' => ['label' => 'NO (Tidak Membantu)', 'desc' => 'Tidak membantu / lebih memilih satu skor tunggal'],
+                        ];
+                        foreach ($utilOpts as $val => $info):
+                        ?>
+                            <label class="radio-card flex items-start gap-2.5 p-3 rounded-xl border border-slate-200 hover:border-indigo-400 cursor-pointer transition bg-slate-50/50">
+                                <input type="radio" name="decomposition_utility" value="<?= $val ?>" <?= $curUtil === $val ? 'checked' : '' ?> required class="text-indigo-600 focus:ring-indigo-500 w-4 h-4 mt-0.5">
+                                <div>
+                                    <span class="block text-xs font-bold text-slate-800"><?= $info['label'] ?></span>
+                                    <span class="block text-[10px] text-slate-500 leading-tight"><?= $info['desc'] ?></span>
+                                </div>
+                            </label>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+
+                <!-- G. Notes -->
+                <div class="mt-4">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                        G. Catatan Reviewer (Reviewer Notes):
+                    </label>
+                    <textarea name="notes" rows="2" placeholder="Tuliskan catatan akademik spesifik terkait pasase ini..." class="w-full text-xs p-2.5 rounded-lg border border-slate-200 focus:ring-1 focus:ring-indigo-500 font-mono-code"><?= esc($curNotes) ?></textarea>
                 </div>
             </div>
 
@@ -425,7 +457,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            var groups = ['human_interpretation', 'citation_context', 'citation_status', 'system_assessment', 'reviewer_confidence'];
+            var groups = ['human_interpretation', 'citation_context', 'citation_status', 'system_assessment', 'reviewer_confidence', 'decomposition_utility'];
 
             function updateRadioCards() {
                 document.querySelectorAll('.radio-card').forEach(function (card) {
@@ -452,10 +484,10 @@
 
                 if (missing === 0) {
                     submitBtn.removeAttribute('disabled');
-                    hint.innerHTML = '<span class="text-emerald-700 flex items-center gap-1"><svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Siap disimpan (5/5 lengkap)</span>';
+                    hint.innerHTML = '<span class="text-emerald-700 flex items-center gap-1"><svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Siap disimpan (6/6 lengkap)</span>';
                 } else {
                     submitBtn.setAttribute('disabled', 'disabled');
-                    hint.innerHTML = '<span class="text-amber-700 flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span> Pilih 5 pertimbangan wajib (' + missing + ' tersisa)</span>';
+                    hint.innerHTML = '<span class="text-amber-700 flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span> Pilih 6 pertimbangan wajib (' + missing + ' tersisa)</span>';
                 }
             }
 

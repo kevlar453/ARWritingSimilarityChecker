@@ -285,6 +285,7 @@ class EvaluationController extends BaseController
         $citationStatus = $this->request->getPost('citation_status');
         $assessment = $this->request->getPost('system_assessment');
         $confidence = $this->request->getPost('reviewer_confidence');
+        $utility = $this->request->getPost('decomposition_utility') ?: 'YES';
         $notes = trim($this->request->getPost('notes') ?: '');
 
         // Validasi ketat: seluruh 5 field pertimbangan manusia wajib diisi
@@ -313,6 +314,7 @@ class EvaluationController extends BaseController
             'false_positive'       => $isFalsePositive,
             'system_assessment'    => $assessment,
             'reviewer_confidence'  => $confidence,
+            'decomposition_utility'=> $utility,
             'review_status'        => 'REVIEWED',
             'notes'                => $notes ?: null,
             'reviewed_at'          => date('Y-m-d H:i:s'),
@@ -322,7 +324,7 @@ class EvaluationController extends BaseController
         $cleanNotes = $notes ? addslashes($notes) : '';
         $pyNotesArg = $notes ? "'$cleanNotes'" : "None";
         if (str_starts_with($caseId, 'PILOT-')) {
-            $pyCmd = ROOTPATH . ".venv/bin/python -c \"from evaluation.pilot_sampler_r2 import tag_pilot_case; tag_pilot_case('$caseId', '$reviewerCode', 'review', '$citationContext', '$citationStatus', '$interpretation', '$assessment', '$confidence', 'REVIEWED', $pyNotesArg)\"";
+            $pyCmd = ROOTPATH . ".venv/bin/python -c \"from evaluation.pilot_sampler_r2 import tag_pilot_case; tag_pilot_case('$caseId', '$reviewerCode', 'review', '$citationContext', '$citationStatus', '$interpretation', '$assessment', '$confidence', 'REVIEWED', $pyNotesArg, '$utility')\"";
         } elseif (str_starts_with($caseId, 'EV11-')) {
             $pyCmd = ROOTPATH . ".venv/bin/python -c \"from evaluation.reviewer_v1_1 import tag_case_v11; tag_case_v11('$caseId', '$reviewerCode', 'review', '$citationContext', '$citationStatus', '$interpretation', '$assessment', '$confidence', 'REVIEWED', $pyNotesArg)\"";
         } else {
@@ -423,7 +425,7 @@ class EvaluationController extends BaseController
         $currentSuite = $this->getSuite();
         $output = [];
         $returnVar = 0;
-        @exec(ROOTPATH . '.venv/bin/python worker/observability.py --quality --json', $output, $returnVar);
+        @exec(ROOTPATH . '.venv/bin/python ' . ROOTPATH . 'worker/observability.py --quality --json', $output, $returnVar);
         $rawJson = implode("\n", $output);
         $report = json_decode($rawJson, true) ?: [];
 
