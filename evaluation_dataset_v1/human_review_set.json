@@ -18,7 +18,7 @@
     "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
     "review_status": "REVIEWED",
     "human_review": {
-      "id": 46,
+      "id": 61,
       "case_id": "EV-MUT-104",
       "reviewer_code": "RV-001",
       "human_decision": "review",
@@ -29,11 +29,11 @@
       "false_positive": 0,
       "system_assessment": "CORRECT",
       "notes": "Restrukturisasi klausa akademis. Overlap teks terdeteksi 67.65% dengan cosine 80.77%. Sistem dan penilai sepakat pada status REVIEW.",
-      "reviewed_at": "2026-10-04 06:58:28",
+      "reviewed_at": "2026-10-04 07:24:55",
       "citation_context": "NONE",
       "human_interpretation": "DIRECT_OVERLAP_RELEVANT",
       "citation_status": "NOT_CITED",
-      "reviewer_confidence": "MEDIUM",
+      "reviewer_confidence": "HIGH",
       "review_status": "REVIEWED"
     }
   },
@@ -56,7 +56,7 @@
     "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
     "review_status": "REVIEWED",
     "human_review": {
-      "id": 47,
+      "id": 62,
       "case_id": "EV-MUT-105",
       "reviewer_code": "RV-001",
       "human_decision": "review",
@@ -67,11 +67,11 @@
       "false_positive": 0,
       "system_assessment": "CORRECT",
       "notes": "Restrukturisasi klausa kedua. Overlap 75% dengan cosine 79.33%. Sistem dan penilai sepakat pada status REVIEW.",
-      "reviewed_at": "2026-10-04 06:58:38",
+      "reviewed_at": "2026-10-04 07:25:07",
       "citation_context": "NONE",
       "human_interpretation": "DIRECT_OVERLAP_RELEVANT",
       "citation_status": "NOT_CITED",
-      "reviewer_confidence": "MEDIUM",
+      "reviewer_confidence": "HIGH",
       "review_status": "REVIEWED"
     }
   },
@@ -94,7 +94,7 @@
     "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
     "review_status": "REVIEWED",
     "human_review": {
-      "id": 51,
+      "id": 63,
       "case_id": "EV-ADV-005",
       "reviewer_code": "RV-001",
       "human_decision": "review",
@@ -105,7 +105,7 @@
       "false_positive": 0,
       "system_assessment": "CORRECT",
       "notes": "Formula metodologis standar (uji asumsi klasik, Kolmogorov-Smirnov). Exact 0%, Cosine 15.2%. Sistem mendeteksi kemiripan leksikal topikal, penilai manusia mengklasifikasikan sebagai METHODOLOGY_BOILERPLATE.",
-      "reviewed_at": "2026-10-04 06:59:30",
+      "reviewed_at": "2026-10-04 07:25:22",
       "citation_context": "NONE",
       "human_interpretation": "METHODOLOGY_BOILERPLATE",
       "citation_status": "NOT_CITED",
@@ -322,7 +322,7 @@
     "source_text": "Penelitian ini bertujuan untuk mengetahui pengaruh teknologi informasi terhadap kinerja organisasi. Metode penelitian menggunakan pendekatan kuantitatif dengan pengumpulan data melalui kuesioner. Hasil penelitian menunjukkan adanya hubungan antara penggunaan teknologi dan peningkatan kinerja.",
     "review_status": "REVIEWED",
     "human_review": {
-      "id": 60,
+      "id": 112,
       "case_id": "EV-ADV-051",
       "reviewer_code": "RV-TEST",
       "human_decision": "review",
@@ -333,7 +333,7 @@
       "false_positive": 0,
       "system_assessment": "CORRECT",
       "notes": "Uji anotasi otomatis",
-      "reviewed_at": "2026-10-04 14:20:47",
+      "reviewed_at": "2026-10-05 08:48:55",
       "citation_context": "NONE",
       "human_interpretation": "DIRECT_OVERLAP_PROPERLY_CITED",
       "citation_status": "NOT_CITED",

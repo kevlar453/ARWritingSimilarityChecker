@@ -36,6 +36,10 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
+                    <a href="<?= base_url('evaluation/quality') ?>" class="text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3.5 py-1.5 rounded-lg transition flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                        Dasbor Kualitas
+                    </a>
                     <a href="<?= base_url('evaluation/summary') ?>" class="text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-3.5 py-1.5 rounded-lg transition flex items-center gap-1.5">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
@@ -61,15 +65,46 @@
             </div>
         <?php endif; ?>
 
+        <!-- Suite Selector Tabs -->
+        <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-3">
+            <div class="inline-flex rounded-xl border border-slate-200 p-1 bg-white shadow-xs text-xs font-semibold">
+                <a href="?suite=pilot_r2" class="px-4 py-2 rounded-lg transition <?= ($currentSuite ?? 'pilot_r2') === 'pilot_r2' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900' ?>">
+                    🚀 Pilot R2: Dokumen Nyata (30 Kasus)
+                </a>
+                <a href="?suite=v1_1" class="px-4 py-2 rounded-lg transition <?= ($currentSuite ?? '') === 'v1_1' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900' ?>">
+                    🎯 v1.1 Targeted Suite (30 Kasus)
+                </a>
+                <a href="?suite=v1_0" class="px-4 py-2 rounded-lg transition <?= ($currentSuite ?? '') === 'v1_0' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900' ?>">
+                    🔒 v1.0 Baseline (30 Kasus)
+                </a>
+            </div>
+            <div class="text-xs text-slate-400 font-mono-code">
+                Active Suite: <strong class="text-slate-700"><?= esc(strtoupper($currentSuite ?? 'PILOT_R2')) ?></strong>
+            </div>
+        </div>
+
         <!-- Header Card & Overview -->
         <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs">
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                 <div>
-                    <h1 class="text-2xl font-bold text-slate-900">Antrean Telaah Manusia (Prioritized Human Review)</h1>
-                    <p class="text-sm text-slate-500 mt-1 max-w-3xl">
-                        Mengevaluasi kesesuaian akademik bukti tekstual yang dihasilkan oleh engine v1.0.0 pada 30 kasus prioritas terkurasi:
-                        kasus tepi (*edge cases*), pasase bersitasi, jargon keilmuan, batas threshold, parafrase semantik, dan kontrol dasar.
-                    </p>
+                    <?php if (($currentSuite ?? 'pilot_r2') === 'pilot_r2'): ?>
+                        <h1 class="text-2xl font-bold text-slate-900">Antrean Telaah Lapangan (Operational Pilot R2 — Dokumen Nyata)</h1>
+                        <p class="text-sm text-slate-500 mt-1 max-w-3xl">
+                            Penelaahan ahli berbasis risiko (*Risk-Based Sampling*) pada 30 dokumen submisi nyata dari populasi operasional sistem:
+                            tumpang tindih verbatim, pasase bersitasi, divergensi leksikal, formulasi metodologis, kasus batas threshold, dan kontrol orisinalitas.
+                        </p>
+                    <?php elseif (($currentSuite ?? '') === 'v1_1'): ?>
+                        <h1 class="text-2xl font-bold text-slate-900">Antrean Telaah Manusia v1.1 (Prioritized Human Review)</h1>
+                        <p class="text-sm text-slate-500 mt-1 max-w-3xl">
+                            Mengevaluasi kesesuaian akademik bukti tekstual yang dihasilkan oleh engine v1.0.0 pada 30 kasus prioritas terkurasi:
+                            kasus tepi (*edge cases*), pasase bersitasi, jargon keilmuan, batas threshold, parafrase semantik, dan kontrol dasar.
+                        </p>
+                    <?php else: ?>
+                        <h1 class="text-2xl font-bold text-slate-900">Antrean Telaah Manusia v1.0 (Baseline Reference)</h1>
+                        <p class="text-sm text-slate-500 mt-1 max-w-3xl">
+                            Mengevaluasi kesesuaian akademik bukti tekstual baseline reference implementation v1.0.0.
+                        </p>
+                    <?php endif; ?>
                     <div class="flex items-center gap-2 mt-3 text-xs text-slate-500">
                         <span class="inline-flex items-center gap-1 font-semibold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-100">
                             HR-UI Gate 4: Blind Review

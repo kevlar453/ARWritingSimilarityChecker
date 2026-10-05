@@ -23,15 +23,23 @@ class EvaluationController extends BaseController
 
     private function getSuite(?string $caseId = null): string
     {
-        if ($caseId && str_starts_with($caseId, 'EV11-')) {
-            return 'v1_1';
+        if ($caseId) {
+            if (str_starts_with($caseId, 'PILOT-') || str_starts_with($caseId, 'EV-R2-')) {
+                return 'pilot_r2';
+            }
+            if (str_starts_with($caseId, 'EV11-')) {
+                return 'v1_1';
+            }
+            if (str_starts_with($caseId, 'EV-')) {
+                return 'v1_0';
+            }
         }
         $param = $this->request->getGet('suite');
         if ($param) {
             session()->set('evaluation_suite', $param);
             return $param;
         }
-        return session()->get('evaluation_suite') ?? 'v1_1';
+        return session()->get('evaluation_suite') ?? 'pilot_r2';
     }
 
     /**
@@ -40,7 +48,13 @@ class EvaluationController extends BaseController
     private function getReviewSet(?string $caseId = null): array
     {
         $suite = $this->getSuite($caseId);
-        if ($suite === 'v1_1') {
+        if ($suite === 'pilot_r2') {
+            $this->reviewSetPath = ROOTPATH . 'evaluation_dataset_v1_1_targeted_80/pilot_r2_set.json';
+            $this->reviewsJsonPath = ROOTPATH . 'evaluation_dataset_v1_1_targeted_80/pilot_r2_reviews.json';
+            if (!file_exists($this->reviewSetPath)) {
+                @exec(ROOTPATH . '.venv/bin/python evaluation/pilot_sampler_r2.py');
+            }
+        } elseif ($suite === 'v1_1') {
             $this->reviewSetPath = ROOTPATH . 'evaluation_dataset_v1_1_targeted_80/human_review_set_v1_1.json';
             $this->reviewsJsonPath = ROOTPATH . 'evaluation_dataset_v1_1_targeted_80/human_reviews_v1_1.json';
             if (!file_exists($this->reviewSetPath)) {
@@ -132,6 +146,7 @@ class EvaluationController extends BaseController
             'priorityFilter' => $priorityFilter,
             'patterns'       => $patterns,
             'priorities'     => $priorities,
+            'currentSuite'   => $this->getSuite(),
         ]);
     }
 
@@ -306,7 +321,9 @@ class EvaluationController extends BaseController
         // Sinkronisasi via python backend
         $cleanNotes = $notes ? addslashes($notes) : '';
         $pyNotesArg = $notes ? "'$cleanNotes'" : "None";
-        if (str_starts_with($caseId, 'EV11-')) {
+        if (str_starts_with($caseId, 'PILOT-')) {
+            $pyCmd = ROOTPATH . ".venv/bin/python -c \"from evaluation.pilot_sampler_r2 import tag_pilot_case; tag_pilot_case('$caseId', '$reviewerCode', 'review', '$citationContext', '$citationStatus', '$interpretation', '$assessment', '$confidence', 'REVIEWED', $pyNotesArg)\"";
+        } elseif (str_starts_with($caseId, 'EV11-')) {
             $pyCmd = ROOTPATH . ".venv/bin/python -c \"from evaluation.reviewer_v1_1 import tag_case_v11; tag_case_v11('$caseId', '$reviewerCode', 'review', '$citationContext', '$citationStatus', '$interpretation', '$assessment', '$confidence', 'REVIEWED', $pyNotesArg)\"";
         } else {
             $pyCmd = ROOTPATH . ".venv/bin/python -c \"from evaluation.reviewer import tag_case_full; tag_case_full('$caseId', '$reviewerCode', 'review', '$citationContext', '$citationStatus', '$interpretation', '$assessment', '$confidence', 'REVIEWED', $pyNotesArg)\"";
@@ -394,6 +411,25 @@ class EvaluationController extends BaseController
             'agreementRate'      => $agreementRate,
             'reviewedCases'      => $reviewedCases,
             'firstPendingCaseId' => $firstPendingCaseId,
+            'currentSuite'       => $this->getSuite(),
+        ]);
+    }
+
+    /**
+     * 4. Halaman Dasbor Kualitas Operasional (Operational Quality Dashboard) - /evaluation/quality
+     */
+    public function quality()
+    {
+        $currentSuite = $this->getSuite();
+        $output = [];
+        $returnVar = 0;
+        @exec(ROOTPATH . '.venv/bin/python worker/observability.py --quality --json', $output, $returnVar);
+        $rawJson = implode("\n", $output);
+        $report = json_decode($rawJson, true) ?: [];
+
+        return view('evaluation/quality', [
+            'report'       => $report,
+            'currentSuite' => $currentSuite,
         ]);
     }
 }

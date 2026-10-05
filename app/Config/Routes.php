@@ -38,6 +38,7 @@ $routes->group('admin/corpus', function ($routes) {
 $routes->group('evaluation', function ($routes) {
     $routes->get('/', 'EvaluationController::index');
     $routes->get('summary', 'EvaluationController::summary');
+    $routes->get('quality', 'EvaluationController::quality');
     $routes->get('(:segment)', 'EvaluationController::detail/$1');
     $routes->post('(:segment)/save', 'EvaluationController::save/$1');
 });

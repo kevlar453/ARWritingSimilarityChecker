@@ -15,6 +15,9 @@
     "generation_seed": 1,
     "content_hash": "029410cd0549ad1d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "identical",
       "seed_index": 1
@@ -36,6 +39,9 @@
     "generation_seed": 2,
     "content_hash": "029410cd0549ad1d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "identical",
       "seed_index": 2
@@ -57,6 +63,9 @@
     "generation_seed": 3,
     "content_hash": "029410cd0549ad1d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "identical",
       "seed_index": 3
@@ -78,6 +87,9 @@
     "generation_seed": 4,
     "content_hash": "029410cd0549ad1d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "identical",
       "seed_index": 4
@@ -99,6 +111,9 @@
     "generation_seed": 5,
     "content_hash": "029410cd0549ad1d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "identical",
       "seed_index": 5
@@ -120,6 +135,9 @@
     "generation_seed": 6,
     "content_hash": "029410cd0549ad1d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "identical",
       "seed_index": 6
@@ -141,6 +159,9 @@
     "generation_seed": 7,
     "content_hash": "029410cd0549ad1d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "identical",
       "seed_index": 7
@@ -162,6 +183,9 @@
     "generation_seed": 8,
     "content_hash": "029410cd0549ad1d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "identical",
       "seed_index": 8
@@ -183,6 +207,9 @@
     "generation_seed": 9,
     "content_hash": "029410cd0549ad1d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "identical",
       "seed_index": 9
@@ -204,6 +231,9 @@
     "generation_seed": 10,
     "content_hash": "029410cd0549ad1d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "identical",
       "seed_index": 10
@@ -225,6 +255,9 @@
     "generation_seed": 11,
     "content_hash": "9c4d708e1d2ae463",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "copy_edit",
       "seed_index": 11
@@ -246,6 +279,9 @@
     "generation_seed": 12,
     "content_hash": "9c4d708e1d2ae463",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "copy_edit",
       "seed_index": 12
@@ -267,6 +303,9 @@
     "generation_seed": 13,
     "content_hash": "9c4d708e1d2ae463",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "copy_edit",
       "seed_index": 13
@@ -288,6 +327,9 @@
     "generation_seed": 14,
     "content_hash": "9c4d708e1d2ae463",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "copy_edit",
       "seed_index": 14
@@ -309,6 +351,9 @@
     "generation_seed": 15,
     "content_hash": "9c4d708e1d2ae463",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "copy_edit",
       "seed_index": 15
@@ -330,6 +375,9 @@
     "generation_seed": 16,
     "content_hash": "9c4d708e1d2ae463",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "copy_edit",
       "seed_index": 16
@@ -351,6 +399,9 @@
     "generation_seed": 17,
     "content_hash": "9c4d708e1d2ae463",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "copy_edit",
       "seed_index": 17
@@ -372,6 +423,9 @@
     "generation_seed": 18,
     "content_hash": "9c4d708e1d2ae463",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "copy_edit",
       "seed_index": 18
@@ -393,6 +447,9 @@
     "generation_seed": 19,
     "content_hash": "9c4d708e1d2ae463",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "copy_edit",
       "seed_index": 19
@@ -414,6 +471,9 @@
     "generation_seed": 20,
     "content_hash": "9c4d708e1d2ae463",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "copy_edit",
       "seed_index": 20
@@ -435,6 +495,9 @@
     "generation_seed": 21,
     "content_hash": "5fb3efd880a8954e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "paraphrase",
       "seed_index": 21
@@ -456,6 +519,9 @@
     "generation_seed": 22,
     "content_hash": "5fb3efd880a8954e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "paraphrase",
       "seed_index": 22
@@ -477,6 +543,9 @@
     "generation_seed": 23,
     "content_hash": "5fb3efd880a8954e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "paraphrase",
       "seed_index": 23
@@ -498,6 +567,9 @@
     "generation_seed": 24,
     "content_hash": "5fb3efd880a8954e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "paraphrase",
       "seed_index": 24
@@ -519,6 +591,9 @@
     "generation_seed": 25,
     "content_hash": "5fb3efd880a8954e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "paraphrase",
       "seed_index": 25
@@ -540,6 +615,9 @@
     "generation_seed": 26,
     "content_hash": "5fb3efd880a8954e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "paraphrase",
       "seed_index": 26
@@ -561,6 +639,9 @@
     "generation_seed": 27,
     "content_hash": "5fb3efd880a8954e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "paraphrase",
       "seed_index": 27
@@ -582,6 +663,9 @@
     "generation_seed": 28,
     "content_hash": "5fb3efd880a8954e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "paraphrase",
       "seed_index": 28
@@ -603,6 +687,9 @@
     "generation_seed": 29,
     "content_hash": "5fb3efd880a8954e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "paraphrase",
       "seed_index": 29
@@ -624,6 +711,9 @@
     "generation_seed": 30,
     "content_hash": "5fb3efd880a8954e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "paraphrase",
       "seed_index": 30
@@ -645,6 +735,9 @@
     "generation_seed": 31,
     "content_hash": "4bf3c83eea5eab8f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "common_phrase",
       "seed_index": 31
@@ -666,6 +759,9 @@
     "generation_seed": 32,
     "content_hash": "4bf3c83eea5eab8f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "common_phrase",
       "seed_index": 32
@@ -687,6 +783,9 @@
     "generation_seed": 33,
     "content_hash": "4bf3c83eea5eab8f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "common_phrase",
       "seed_index": 33
@@ -708,6 +807,9 @@
     "generation_seed": 34,
     "content_hash": "4bf3c83eea5eab8f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "common_phrase",
       "seed_index": 34
@@ -729,6 +831,9 @@
     "generation_seed": 35,
     "content_hash": "4bf3c83eea5eab8f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "common_phrase",
       "seed_index": 35
@@ -750,6 +855,9 @@
     "generation_seed": 36,
     "content_hash": "4bf3c83eea5eab8f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "common_phrase",
       "seed_index": 36
@@ -771,6 +879,9 @@
     "generation_seed": 37,
     "content_hash": "4bf3c83eea5eab8f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "common_phrase",
       "seed_index": 37
@@ -792,6 +903,9 @@
     "generation_seed": 38,
     "content_hash": "4bf3c83eea5eab8f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "common_phrase",
       "seed_index": 38
@@ -813,6 +927,9 @@
     "generation_seed": 39,
     "content_hash": "4bf3c83eea5eab8f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "common_phrase",
       "seed_index": 39
@@ -834,6 +951,9 @@
     "generation_seed": 40,
     "content_hash": "4bf3c83eea5eab8f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "common_phrase",
       "seed_index": 40
@@ -855,6 +975,9 @@
     "generation_seed": 41,
     "content_hash": "9537102ed48d55b3",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "unrelated",
       "seed_index": 41
@@ -876,6 +999,9 @@
     "generation_seed": 42,
     "content_hash": "9537102ed48d55b3",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "unrelated",
       "seed_index": 42
@@ -897,6 +1023,9 @@
     "generation_seed": 43,
     "content_hash": "9537102ed48d55b3",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "unrelated",
       "seed_index": 43
@@ -918,6 +1047,9 @@
     "generation_seed": 44,
     "content_hash": "9537102ed48d55b3",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "unrelated",
       "seed_index": 44
@@ -939,6 +1071,9 @@
     "generation_seed": 45,
     "content_hash": "9537102ed48d55b3",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "unrelated",
       "seed_index": 45
@@ -960,6 +1095,9 @@
     "generation_seed": 46,
     "content_hash": "9537102ed48d55b3",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "unrelated",
       "seed_index": 46
@@ -981,6 +1119,9 @@
     "generation_seed": 47,
     "content_hash": "9537102ed48d55b3",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "unrelated",
       "seed_index": 47
@@ -1002,6 +1143,9 @@
     "generation_seed": 48,
     "content_hash": "9537102ed48d55b3",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "unrelated",
       "seed_index": 48
@@ -1023,6 +1167,9 @@
     "generation_seed": 49,
     "content_hash": "9537102ed48d55b3",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "unrelated",
       "seed_index": 49
@@ -1044,6 +1191,9 @@
     "generation_seed": 50,
     "content_hash": "9537102ed48d55b3",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "seed_category": "unrelated",
       "seed_index": 50
@@ -1065,6 +1215,9 @@
     "generation_seed": 1,
     "content_hash": "d9a957547269a78c",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "identical",
@@ -1087,6 +1240,9 @@
     "generation_seed": 2,
     "content_hash": "af32f8e3976b8a86",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "identical",
@@ -1109,6 +1265,9 @@
     "generation_seed": 3,
     "content_hash": "ad7d7b5d878e96d1",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "identical",
@@ -1131,6 +1290,9 @@
     "generation_seed": 4,
     "content_hash": "01a1c0be970cce83",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "identical",
@@ -1153,6 +1315,9 @@
     "generation_seed": 5,
     "content_hash": "7273afe7a6585ba4",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "identical",
@@ -1175,6 +1340,9 @@
     "generation_seed": 6,
     "content_hash": "7527bed803dde9e3",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "identical",
@@ -1197,6 +1365,9 @@
     "generation_seed": 7,
     "content_hash": "62552e42037f9e8b",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "identical",
@@ -1219,6 +1390,9 @@
     "generation_seed": 8,
     "content_hash": "c6816758221c70a4",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "identical",
@@ -1241,6 +1415,9 @@
     "generation_seed": 9,
     "content_hash": "f5b29084a2928f6e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "identical",
@@ -1263,6 +1440,9 @@
     "generation_seed": 10,
     "content_hash": "2562d90324d3d6c9",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "identical",
@@ -1285,6 +1465,9 @@
     "generation_seed": 11,
     "content_hash": "6b5932ae0824b450",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "copy_edit",
@@ -1307,6 +1490,9 @@
     "generation_seed": 12,
     "content_hash": "012d6f4db1f6e278",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "copy_edit",
@@ -1329,6 +1515,9 @@
     "generation_seed": 13,
     "content_hash": "81c76741c758ba40",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "copy_edit",
@@ -1351,6 +1540,9 @@
     "generation_seed": 14,
     "content_hash": "5d1eea66fbd4fb06",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "copy_edit",
@@ -1373,6 +1565,9 @@
     "generation_seed": 15,
     "content_hash": "e2091e73ce090af5",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "copy_edit",
@@ -1395,6 +1590,9 @@
     "generation_seed": 16,
     "content_hash": "c24ee76addf0546c",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "copy_edit",
@@ -1417,6 +1615,9 @@
     "generation_seed": 17,
     "content_hash": "b118d5eeaca4f160",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "copy_edit",
@@ -1439,6 +1640,9 @@
     "generation_seed": 18,
     "content_hash": "2b46d4e97c895890",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "copy_edit",
@@ -1461,6 +1665,9 @@
     "generation_seed": 19,
     "content_hash": "d65d56b84bf82c9e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "copy_edit",
@@ -1483,6 +1690,9 @@
     "generation_seed": 20,
     "content_hash": "11eaecce4fdf8185",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "copy_edit",
@@ -1505,6 +1715,9 @@
     "generation_seed": 21,
     "content_hash": "0461c22a381c3442",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "paraphrase",
@@ -1527,6 +1740,9 @@
     "generation_seed": 22,
     "content_hash": "157bc79a217f74e3",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "paraphrase",
@@ -1549,6 +1765,9 @@
     "generation_seed": 23,
     "content_hash": "f76ac4984c4d8b0e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "paraphrase",
@@ -1571,6 +1790,9 @@
     "generation_seed": 24,
     "content_hash": "866945b9e82e7068",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "paraphrase",
@@ -1593,6 +1815,9 @@
     "generation_seed": 25,
     "content_hash": "7532284463c875c2",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "paraphrase",
@@ -1615,6 +1840,9 @@
     "generation_seed": 26,
     "content_hash": "258b694940203774",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "paraphrase",
@@ -1637,6 +1865,9 @@
     "generation_seed": 27,
     "content_hash": "cac4316e1c26f3bb",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "paraphrase",
@@ -1659,6 +1890,9 @@
     "generation_seed": 28,
     "content_hash": "c802d18a77015b45",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "paraphrase",
@@ -1681,6 +1915,9 @@
     "generation_seed": 29,
     "content_hash": "77ecba21959c35f2",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "paraphrase",
@@ -1703,6 +1940,9 @@
     "generation_seed": 30,
     "content_hash": "060335ca0c6675c1",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "paraphrase",
@@ -1725,6 +1965,9 @@
     "generation_seed": 31,
     "content_hash": "e397d9ab6e984e16",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "common_phrase",
@@ -1747,6 +1990,9 @@
     "generation_seed": 32,
     "content_hash": "3bf6273a9e0329d6",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "common_phrase",
@@ -1769,6 +2015,9 @@
     "generation_seed": 33,
     "content_hash": "b8c5b4ba0d8567b2",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "common_phrase",
@@ -1791,6 +2040,9 @@
     "generation_seed": 34,
     "content_hash": "b3c8094c9bc6e6ac",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "common_phrase",
@@ -1813,6 +2065,9 @@
     "generation_seed": 35,
     "content_hash": "24382f6d6a392e3a",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "common_phrase",
@@ -1835,6 +2090,9 @@
     "generation_seed": 36,
     "content_hash": "b13bb57938026496",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "common_phrase",
@@ -1857,6 +2115,9 @@
     "generation_seed": 37,
     "content_hash": "722f1dc6f36b8857",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "common_phrase",
@@ -1879,6 +2140,9 @@
     "generation_seed": 38,
     "content_hash": "39e01c309f009b9b",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "common_phrase",
@@ -1901,6 +2165,9 @@
     "generation_seed": 39,
     "content_hash": "e7d70e0cd18efa04",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "common_phrase",
@@ -1923,6 +2190,9 @@
     "generation_seed": 40,
     "content_hash": "cd0980daca7a08b5",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "common_phrase",
@@ -1945,6 +2215,9 @@
     "generation_seed": 41,
     "content_hash": "0fbdcda7c3013a4d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "unrelated",
@@ -1967,6 +2240,9 @@
     "generation_seed": 42,
     "content_hash": "cb446eb7f00ada20",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "unrelated",
@@ -1989,6 +2265,9 @@
     "generation_seed": 43,
     "content_hash": "8a723c319e31004d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "unrelated",
@@ -2011,6 +2290,9 @@
     "generation_seed": 44,
     "content_hash": "940b0252c7164940",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "unrelated",
@@ -2033,6 +2315,9 @@
     "generation_seed": 45,
     "content_hash": "c165ea27be9b80d3",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "unrelated",
@@ -2055,6 +2340,9 @@
     "generation_seed": 46,
     "content_hash": "49db2048f01c7c8e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "unrelated",
@@ -2077,6 +2365,9 @@
     "generation_seed": 47,
     "content_hash": "b8b231f33605e507",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "unrelated",
@@ -2099,6 +2390,9 @@
     "generation_seed": 48,
     "content_hash": "e0daf4cbda3c3598",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "unrelated",
@@ -2121,6 +2415,9 @@
     "generation_seed": 49,
     "content_hash": "d6fd2c43e1d1e30a",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "unrelated",
@@ -2143,6 +2440,9 @@
     "generation_seed": 50,
     "content_hash": "fb41c1737d8ed801",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "unrelated",
@@ -2165,6 +2465,9 @@
     "generation_seed": 51,
     "content_hash": "a541632b7d6628ab",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "identical",
@@ -2187,6 +2490,9 @@
     "generation_seed": 52,
     "content_hash": "6c9a1fa15200c127",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "identical",
@@ -2209,6 +2515,9 @@
     "generation_seed": 53,
     "content_hash": "16c0b9ae30caa53f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "identical",
@@ -2231,6 +2540,9 @@
     "generation_seed": 54,
     "content_hash": "5297ad399ccb2995",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "identical",
@@ -2253,6 +2565,9 @@
     "generation_seed": 55,
     "content_hash": "fe743fa9832cffba",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "identical",
@@ -2275,6 +2590,9 @@
     "generation_seed": 56,
     "content_hash": "1c98322fc9722dad",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "identical",
@@ -2297,6 +2615,9 @@
     "generation_seed": 57,
     "content_hash": "c7bcdc16f2a94e77",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "identical",
@@ -2319,6 +2640,9 @@
     "generation_seed": 58,
     "content_hash": "71b3c4372d9ffd56",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "identical",
@@ -2341,6 +2665,9 @@
     "generation_seed": 59,
     "content_hash": "6e0de5e8710c986a",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "identical",
@@ -2363,6 +2690,9 @@
     "generation_seed": 60,
     "content_hash": "2d58167ac9b8db2d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "identical",
@@ -2385,6 +2715,9 @@
     "generation_seed": 61,
     "content_hash": "97b4f014a11e5c9c",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "copy_edit",
@@ -2407,6 +2740,9 @@
     "generation_seed": 62,
     "content_hash": "0c321ebac4a538bd",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "copy_edit",
@@ -2429,6 +2765,9 @@
     "generation_seed": 63,
     "content_hash": "a712eddce369dc0b",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "copy_edit",
@@ -2451,6 +2790,9 @@
     "generation_seed": 64,
     "content_hash": "123fab50fb90f96f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "copy_edit",
@@ -2473,6 +2815,9 @@
     "generation_seed": 65,
     "content_hash": "63c42aebb4904fb8",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "copy_edit",
@@ -2495,6 +2840,9 @@
     "generation_seed": 66,
     "content_hash": "e6e5d9aa7073589f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "copy_edit",
@@ -2517,6 +2865,9 @@
     "generation_seed": 67,
     "content_hash": "be034ee88312b78f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "copy_edit",
@@ -2539,6 +2890,9 @@
     "generation_seed": 68,
     "content_hash": "30259765bc13f008",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "copy_edit",
@@ -2561,6 +2915,9 @@
     "generation_seed": 69,
     "content_hash": "ce2667571e57b48b",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "copy_edit",
@@ -2583,6 +2940,9 @@
     "generation_seed": 70,
     "content_hash": "119cbd12a27427de",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "copy_edit",
@@ -2605,6 +2965,9 @@
     "generation_seed": 71,
     "content_hash": "179677d7b6ae45f3",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "paraphrase",
@@ -2627,6 +2990,9 @@
     "generation_seed": 72,
     "content_hash": "4150c6fa47ab4b1e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "paraphrase",
@@ -2649,6 +3015,9 @@
     "generation_seed": 73,
     "content_hash": "47be64f10e353bd8",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "paraphrase",
@@ -2671,6 +3040,9 @@
     "generation_seed": 74,
     "content_hash": "691ea8048e96819e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "paraphrase",
@@ -2693,6 +3065,9 @@
     "generation_seed": 75,
     "content_hash": "b5c63032fa290313",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "paraphrase",
@@ -2715,6 +3090,9 @@
     "generation_seed": 76,
     "content_hash": "cd7996669ff0a89d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "paraphrase",
@@ -2737,6 +3115,9 @@
     "generation_seed": 77,
     "content_hash": "3cbd52aa1947c81a",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "paraphrase",
@@ -2759,6 +3140,9 @@
     "generation_seed": 78,
     "content_hash": "f3afd9030a712ae0",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "paraphrase",
@@ -2781,6 +3165,9 @@
     "generation_seed": 79,
     "content_hash": "19f703f8efaa9a54",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "paraphrase",
@@ -2803,6 +3190,9 @@
     "generation_seed": 80,
     "content_hash": "5f6d8387fd0b4971",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "paraphrase",
@@ -2825,6 +3215,9 @@
     "generation_seed": 81,
     "content_hash": "7b35c1b8060eac6d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "common_phrase",
@@ -2847,6 +3240,9 @@
     "generation_seed": 82,
     "content_hash": "be89425304d0a518",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "common_phrase",
@@ -2869,6 +3265,9 @@
     "generation_seed": 83,
     "content_hash": "1ebc9f4d5a3cb961",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "common_phrase",
@@ -2891,6 +3290,9 @@
     "generation_seed": 84,
     "content_hash": "ff13dc3de1bcd8ca",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "common_phrase",
@@ -2913,6 +3315,9 @@
     "generation_seed": 85,
     "content_hash": "1ef8d3cffbc067fe",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "common_phrase",
@@ -2935,6 +3340,9 @@
     "generation_seed": 86,
     "content_hash": "7ef80bf2b3b4b118",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "common_phrase",
@@ -2957,6 +3365,9 @@
     "generation_seed": 87,
     "content_hash": "c0db16f1159943f7",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "common_phrase",
@@ -2979,6 +3390,9 @@
     "generation_seed": 88,
     "content_hash": "90b19a36440ac64e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "common_phrase",
@@ -3001,6 +3415,9 @@
     "generation_seed": 89,
     "content_hash": "2ec2eaa2c059c908",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "common_phrase",
@@ -3023,6 +3440,9 @@
     "generation_seed": 90,
     "content_hash": "b64584fe4be02532",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "common_phrase",
@@ -3045,6 +3465,9 @@
     "generation_seed": 91,
     "content_hash": "6937651afbbe4ae0",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "unrelated",
@@ -3067,6 +3490,9 @@
     "generation_seed": 92,
     "content_hash": "f9ba07e2943b3d7b",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "unrelated",
@@ -3089,6 +3515,9 @@
     "generation_seed": 93,
     "content_hash": "7f136f35dc28518a",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "unrelated",
@@ -3111,6 +3540,9 @@
     "generation_seed": 94,
     "content_hash": "d029167e51b8d905",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "unrelated",
@@ -3133,6 +3565,9 @@
     "generation_seed": 95,
     "content_hash": "f9d4df20596da6c6",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "unrelated",
@@ -3155,6 +3590,9 @@
     "generation_seed": 96,
     "content_hash": "226b95185db61198",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "unrelated",
@@ -3177,6 +3615,9 @@
     "generation_seed": 97,
     "content_hash": "93b69ac24c60c2e6",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "unrelated",
@@ -3199,6 +3640,9 @@
     "generation_seed": 98,
     "content_hash": "f5abc735497e7e40",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "unrelated",
@@ -3221,6 +3665,9 @@
     "generation_seed": 99,
     "content_hash": "1d28d7150b9dbdf7",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "unrelated",
@@ -3243,6 +3690,9 @@
     "generation_seed": 100,
     "content_hash": "aaa6b7e17aaedbfe",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 1,
       "parent_category": "unrelated",
@@ -3265,6 +3715,9 @@
     "generation_seed": 101,
     "content_hash": "0bc588a984d373f9",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "identical",
@@ -3287,6 +3740,9 @@
     "generation_seed": 102,
     "content_hash": "e6be41ada7dcb3ed",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "identical",
@@ -3309,6 +3765,9 @@
     "generation_seed": 103,
     "content_hash": "fcde2415001397b2",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "identical",
@@ -3331,6 +3790,9 @@
     "generation_seed": 104,
     "content_hash": "99343a3a4e635cb6",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "identical",
@@ -3353,6 +3815,9 @@
     "generation_seed": 105,
     "content_hash": "26976025f141fbdd",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "identical",
@@ -3375,6 +3840,9 @@
     "generation_seed": 106,
     "content_hash": "529f3ac4558e0d46",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "identical",
@@ -3397,6 +3865,9 @@
     "generation_seed": 107,
     "content_hash": "82a06cb3445a8c0c",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "identical",
@@ -3419,6 +3890,9 @@
     "generation_seed": 108,
     "content_hash": "0422cc4b45134c11",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "identical",
@@ -3441,6 +3915,9 @@
     "generation_seed": 109,
     "content_hash": "d55f3405b5bc0a79",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "identical",
@@ -3463,6 +3940,9 @@
     "generation_seed": 110,
     "content_hash": "67d5b361e113d499",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "identical",
@@ -3485,6 +3965,9 @@
     "generation_seed": 111,
     "content_hash": "024013411bf597e3",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "copy_edit",
@@ -3507,6 +3990,9 @@
     "generation_seed": 112,
     "content_hash": "4b0c482e5a2e519f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "copy_edit",
@@ -3529,6 +4015,9 @@
     "generation_seed": 113,
     "content_hash": "1f42adab5458bd7d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "copy_edit",
@@ -3551,6 +4040,9 @@
     "generation_seed": 114,
     "content_hash": "4cc52d916f05d7d0",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "copy_edit",
@@ -3573,6 +4065,9 @@
     "generation_seed": 115,
     "content_hash": "83c836254b55f46c",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "copy_edit",
@@ -3595,6 +4090,9 @@
     "generation_seed": 116,
     "content_hash": "beec4e887b6b7f0a",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "copy_edit",
@@ -3617,6 +4115,9 @@
     "generation_seed": 117,
     "content_hash": "4a37a3f596fc49f2",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "copy_edit",
@@ -3639,6 +4140,9 @@
     "generation_seed": 118,
     "content_hash": "1ff6e5b654f01891",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "copy_edit",
@@ -3661,6 +4165,9 @@
     "generation_seed": 119,
     "content_hash": "6f6111ce2a1941ae",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "copy_edit",
@@ -3683,6 +4190,9 @@
     "generation_seed": 120,
     "content_hash": "64636d8b45a246d5",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "copy_edit",
@@ -3705,6 +4215,9 @@
     "generation_seed": 121,
     "content_hash": "50353899ca40e881",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "paraphrase",
@@ -3727,6 +4240,9 @@
     "generation_seed": 122,
     "content_hash": "3f49756e7b5594d2",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "paraphrase",
@@ -3749,6 +4265,9 @@
     "generation_seed": 123,
     "content_hash": "903ccb9aa5c061be",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "paraphrase",
@@ -3771,6 +4290,9 @@
     "generation_seed": 124,
     "content_hash": "6a19ae9fa20d550a",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "paraphrase",
@@ -3793,6 +4315,9 @@
     "generation_seed": 125,
     "content_hash": "154c4b1c5afd042e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "paraphrase",
@@ -3815,6 +4340,9 @@
     "generation_seed": 126,
     "content_hash": "33c9530e7ecf171c",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "paraphrase",
@@ -3837,6 +4365,9 @@
     "generation_seed": 127,
     "content_hash": "62918a43784da8c7",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "paraphrase",
@@ -3859,6 +4390,9 @@
     "generation_seed": 128,
     "content_hash": "671da745b11ddadc",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "paraphrase",
@@ -3881,6 +4415,9 @@
     "generation_seed": 129,
     "content_hash": "2cb42868d24c0155",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "paraphrase",
@@ -3903,6 +4440,9 @@
     "generation_seed": 130,
     "content_hash": "1156127d368d9a89",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "paraphrase",
@@ -3925,6 +4465,9 @@
     "generation_seed": 131,
     "content_hash": "0ce62a4b41516630",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "common_phrase",
@@ -3947,6 +4490,9 @@
     "generation_seed": 132,
     "content_hash": "8ce0ee7e18f915fe",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "common_phrase",
@@ -3969,6 +4515,9 @@
     "generation_seed": 133,
     "content_hash": "68d9cd54c5f5d9a2",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "common_phrase",
@@ -3991,6 +4540,9 @@
     "generation_seed": 134,
     "content_hash": "4b9416b4b298c49f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "common_phrase",
@@ -4013,6 +4565,9 @@
     "generation_seed": 135,
     "content_hash": "8fbfcd04a3f6b4f3",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "common_phrase",
@@ -4035,6 +4590,9 @@
     "generation_seed": 136,
     "content_hash": "72b72bf7d6c3f980",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "common_phrase",
@@ -4057,6 +4615,9 @@
     "generation_seed": 137,
     "content_hash": "08698289f8e4e086",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "common_phrase",
@@ -4079,6 +4640,9 @@
     "generation_seed": 138,
     "content_hash": "cac3591aac046f85",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "common_phrase",
@@ -4101,6 +4665,9 @@
     "generation_seed": 139,
     "content_hash": "bef42a76c759ec7a",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "common_phrase",
@@ -4123,6 +4690,9 @@
     "generation_seed": 140,
     "content_hash": "b797138797233199",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "common_phrase",
@@ -4145,6 +4715,9 @@
     "generation_seed": 141,
     "content_hash": "dd6c90fa8dd6cddd",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "unrelated",
@@ -4167,6 +4740,9 @@
     "generation_seed": 142,
     "content_hash": "1cd95a0475454543",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "unrelated",
@@ -4189,6 +4765,9 @@
     "generation_seed": 143,
     "content_hash": "b11d97d05abe3cd1",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "unrelated",
@@ -4211,6 +4790,9 @@
     "generation_seed": 144,
     "content_hash": "bd677f1b25917bae",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "unrelated",
@@ -4233,6 +4815,9 @@
     "generation_seed": 145,
     "content_hash": "8de1bfae0cb7b113",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "unrelated",
@@ -4255,6 +4840,9 @@
     "generation_seed": 146,
     "content_hash": "f278f7d0fef2b190",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "unrelated",
@@ -4277,6 +4865,9 @@
     "generation_seed": 147,
     "content_hash": "b11d97d05abe3cd1",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "unrelated",
@@ -4299,6 +4890,9 @@
     "generation_seed": 148,
     "content_hash": "bd677f1b25917bae",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "unrelated",
@@ -4321,6 +4915,9 @@
     "generation_seed": 149,
     "content_hash": "8de1bfae0cb7b113",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "unrelated",
@@ -4343,6 +4940,9 @@
     "generation_seed": 150,
     "content_hash": "f278f7d0fef2b190",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 2,
       "parent_category": "unrelated",
@@ -4365,6 +4965,9 @@
     "generation_seed": 151,
     "content_hash": "429eb8d617ce1275",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "identical",
@@ -4387,6 +4990,9 @@
     "generation_seed": 152,
     "content_hash": "3d984f5f474fcbb6",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "identical",
@@ -4409,6 +5015,9 @@
     "generation_seed": 153,
     "content_hash": "b7bb89bc9b914034",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "identical",
@@ -4431,6 +5040,9 @@
     "generation_seed": 154,
     "content_hash": "6666ce9ae71f1462",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "identical",
@@ -4453,6 +5065,9 @@
     "generation_seed": 155,
     "content_hash": "43e642dd96a469f7",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "identical",
@@ -4475,6 +5090,9 @@
     "generation_seed": 156,
     "content_hash": "ee50025bd2b1beec",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "identical",
@@ -4497,6 +5115,9 @@
     "generation_seed": 157,
     "content_hash": "e0d6647208f8f3f0",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "identical",
@@ -4519,6 +5140,9 @@
     "generation_seed": 158,
     "content_hash": "61e7ead00c014f48",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "identical",
@@ -4541,6 +5165,9 @@
     "generation_seed": 159,
     "content_hash": "5385abe31cf059cd",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "identical",
@@ -4563,6 +5190,9 @@
     "generation_seed": 160,
     "content_hash": "582e5c0e6d53b01f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "identical",
@@ -4585,6 +5215,9 @@
     "generation_seed": 161,
     "content_hash": "be186014b095fd2b",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "copy_edit",
@@ -4607,6 +5240,9 @@
     "generation_seed": 162,
     "content_hash": "6c74cf63e5a28a60",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "copy_edit",
@@ -4629,6 +5265,9 @@
     "generation_seed": 163,
     "content_hash": "70c39ee1aad53bee",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "copy_edit",
@@ -4651,6 +5290,9 @@
     "generation_seed": 164,
     "content_hash": "f7a5e41130b36f5a",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "copy_edit",
@@ -4673,6 +5315,9 @@
     "generation_seed": 165,
     "content_hash": "a3d9261ce90e5fec",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "copy_edit",
@@ -4695,6 +5340,9 @@
     "generation_seed": 166,
     "content_hash": "6bc5d689201c43ac",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "copy_edit",
@@ -4717,6 +5365,9 @@
     "generation_seed": 167,
     "content_hash": "937ba862994a39d3",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "copy_edit",
@@ -4739,6 +5390,9 @@
     "generation_seed": 168,
     "content_hash": "d8ea18f69bbf20b0",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "copy_edit",
@@ -4761,6 +5415,9 @@
     "generation_seed": 169,
     "content_hash": "542f16f46c667ab5",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "copy_edit",
@@ -4783,6 +5440,9 @@
     "generation_seed": 170,
     "content_hash": "e9ba801953382251",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "copy_edit",
@@ -4805,6 +5465,9 @@
     "generation_seed": 171,
     "content_hash": "5f9693f2cbc82b0f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "paraphrase",
@@ -4827,6 +5490,9 @@
     "generation_seed": 172,
     "content_hash": "a19393549e23833d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "paraphrase",
@@ -4849,6 +5515,9 @@
     "generation_seed": 173,
     "content_hash": "fdf86d606984404c",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "paraphrase",
@@ -4871,6 +5540,9 @@
     "generation_seed": 174,
     "content_hash": "a38f4c0d204a767d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "paraphrase",
@@ -4893,6 +5565,9 @@
     "generation_seed": 175,
     "content_hash": "6f529a6b54203206",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "paraphrase",
@@ -4915,6 +5590,9 @@
     "generation_seed": 176,
     "content_hash": "dcad76a45611df9c",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "paraphrase",
@@ -4937,6 +5615,9 @@
     "generation_seed": 177,
     "content_hash": "947ad03feb37623c",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "paraphrase",
@@ -4959,6 +5640,9 @@
     "generation_seed": 178,
     "content_hash": "6d16bdfd7164f6b9",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "paraphrase",
@@ -4981,6 +5665,9 @@
     "generation_seed": 179,
     "content_hash": "9a7706fdf65bd3bd",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "paraphrase",
@@ -5003,6 +5690,9 @@
     "generation_seed": 180,
     "content_hash": "429e1f8006ac5236",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "paraphrase",
@@ -5025,6 +5715,9 @@
     "generation_seed": 181,
     "content_hash": "158c92d4632122f0",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "common_phrase",
@@ -5047,6 +5740,9 @@
     "generation_seed": 182,
     "content_hash": "4bd8a0be4ebf1c17",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "common_phrase",
@@ -5069,6 +5765,9 @@
     "generation_seed": 183,
     "content_hash": "8eaa4c36e8e59ed2",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "common_phrase",
@@ -5091,6 +5790,9 @@
     "generation_seed": 184,
     "content_hash": "fdfb613ce60ffae9",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "common_phrase",
@@ -5113,6 +5815,9 @@
     "generation_seed": 185,
     "content_hash": "09d0e2a2d5481136",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "common_phrase",
@@ -5135,6 +5840,9 @@
     "generation_seed": 186,
     "content_hash": "b2af8761989dd4b6",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "common_phrase",
@@ -5157,6 +5865,9 @@
     "generation_seed": 187,
     "content_hash": "be2e67be93b48ef6",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "common_phrase",
@@ -5179,6 +5890,9 @@
     "generation_seed": 188,
     "content_hash": "d34ba8ce68a6c5a0",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "common_phrase",
@@ -5201,6 +5915,9 @@
     "generation_seed": 189,
     "content_hash": "701205d9b50b71a0",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "common_phrase",
@@ -5223,6 +5940,9 @@
     "generation_seed": 190,
     "content_hash": "4f45fcaae6f4788c",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "common_phrase",
@@ -5245,6 +5965,9 @@
     "generation_seed": 191,
     "content_hash": "03e64b7b1a96dc00",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "unrelated",
@@ -5267,6 +5990,9 @@
     "generation_seed": 192,
     "content_hash": "c21b1f89b89c7273",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "unrelated",
@@ -5289,6 +6015,9 @@
     "generation_seed": 193,
     "content_hash": "bdf1ee1adec65bc1",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "unrelated",
@@ -5311,6 +6040,9 @@
     "generation_seed": 194,
     "content_hash": "2d67a4e48a74131d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "unrelated",
@@ -5333,6 +6065,9 @@
     "generation_seed": 195,
     "content_hash": "1e434198b280d285",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "unrelated",
@@ -5355,6 +6090,9 @@
     "generation_seed": 196,
     "content_hash": "a962213235b02aef",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "unrelated",
@@ -5377,6 +6115,9 @@
     "generation_seed": 197,
     "content_hash": "09eb864ce27598ed",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "unrelated",
@@ -5399,6 +6140,9 @@
     "generation_seed": 198,
     "content_hash": "553ec18034cb6a6f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "unrelated",
@@ -5421,6 +6165,9 @@
     "generation_seed": 199,
     "content_hash": "31726cb01d1dacc8",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "unrelated",
@@ -5443,6 +6190,9 @@
     "generation_seed": 200,
     "content_hash": "5d85b1f256807f2e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 3,
       "parent_category": "unrelated",
@@ -5465,6 +6215,9 @@
     "generation_seed": 201,
     "content_hash": "19b85d1f80bc00cc",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "identical",
@@ -5487,6 +6240,9 @@
     "generation_seed": 202,
     "content_hash": "c1b63827c3150498",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "identical",
@@ -5509,6 +6265,9 @@
     "generation_seed": 203,
     "content_hash": "db3a0bc9750b4a7c",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "identical",
@@ -5531,6 +6290,9 @@
     "generation_seed": 204,
     "content_hash": "3944eb007acdf579",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "identical",
@@ -5553,6 +6315,9 @@
     "generation_seed": 205,
     "content_hash": "1d11071c59f21146",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "identical",
@@ -5575,6 +6340,9 @@
     "generation_seed": 206,
     "content_hash": "9056bbc3c1575201",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "identical",
@@ -5597,6 +6365,9 @@
     "generation_seed": 207,
     "content_hash": "5d5b00cf3fba852e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "identical",
@@ -5619,6 +6390,9 @@
     "generation_seed": 208,
     "content_hash": "8e18d29d8572eb11",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "identical",
@@ -5641,6 +6415,9 @@
     "generation_seed": 209,
     "content_hash": "6179ce69d7e8371e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "identical",
@@ -5663,6 +6440,9 @@
     "generation_seed": 210,
     "content_hash": "645b43de09f92e1f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "identical",
@@ -5685,6 +6465,9 @@
     "generation_seed": 211,
     "content_hash": "a38cbfa73a34f349",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "copy_edit",
@@ -5707,6 +6490,9 @@
     "generation_seed": 212,
     "content_hash": "334c2f7c34f9662b",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "copy_edit",
@@ -5729,6 +6515,9 @@
     "generation_seed": 213,
     "content_hash": "794b6b80a6f57b1d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "copy_edit",
@@ -5751,6 +6540,9 @@
     "generation_seed": 214,
     "content_hash": "de06b0231423d4ff",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "copy_edit",
@@ -5773,6 +6565,9 @@
     "generation_seed": 215,
     "content_hash": "c97ead27201c7199",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "copy_edit",
@@ -5795,6 +6590,9 @@
     "generation_seed": 216,
     "content_hash": "c8abd6b70cd35b1a",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "copy_edit",
@@ -5817,6 +6615,9 @@
     "generation_seed": 217,
     "content_hash": "c5621b6a96644d6f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "copy_edit",
@@ -5839,6 +6640,9 @@
     "generation_seed": 218,
     "content_hash": "009c799fcef738de",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "copy_edit",
@@ -5861,6 +6665,9 @@
     "generation_seed": 219,
     "content_hash": "f9235dac0b39954b",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "copy_edit",
@@ -5883,6 +6690,9 @@
     "generation_seed": 220,
     "content_hash": "115561fb14ca9bd4",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "copy_edit",
@@ -5905,6 +6715,9 @@
     "generation_seed": 221,
     "content_hash": "0f6e940cb1c9089f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "paraphrase",
@@ -5927,6 +6740,9 @@
     "generation_seed": 222,
     "content_hash": "402ebfa2c2df82a0",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "paraphrase",
@@ -5949,6 +6765,9 @@
     "generation_seed": 223,
     "content_hash": "73fc48c7775d39c4",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "paraphrase",
@@ -5971,6 +6790,9 @@
     "generation_seed": 224,
     "content_hash": "66f9e68fb678aaf8",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "paraphrase",
@@ -5993,6 +6815,9 @@
     "generation_seed": 225,
     "content_hash": "22eed4c5639883ff",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "paraphrase",
@@ -6015,6 +6840,9 @@
     "generation_seed": 226,
     "content_hash": "0a651647b9e29722",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "paraphrase",
@@ -6037,6 +6865,9 @@
     "generation_seed": 227,
     "content_hash": "d5281ae247c8c665",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "paraphrase",
@@ -6059,6 +6890,9 @@
     "generation_seed": 228,
     "content_hash": "69340f2c47502f7d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "paraphrase",
@@ -6081,6 +6915,9 @@
     "generation_seed": 229,
     "content_hash": "8e55b9eeb4b14752",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "paraphrase",
@@ -6103,6 +6940,9 @@
     "generation_seed": 230,
     "content_hash": "c909bb74ee31c5b0",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "paraphrase",
@@ -6125,6 +6965,9 @@
     "generation_seed": 231,
     "content_hash": "135d1c7c4507716d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "common_phrase",
@@ -6147,6 +6990,9 @@
     "generation_seed": 232,
     "content_hash": "8473181235b78bf1",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "common_phrase",
@@ -6169,6 +7015,9 @@
     "generation_seed": 233,
     "content_hash": "47167e247db5f62b",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "common_phrase",
@@ -6191,6 +7040,9 @@
     "generation_seed": 234,
     "content_hash": "0efd80976c040aa4",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "common_phrase",
@@ -6213,6 +7065,9 @@
     "generation_seed": 235,
     "content_hash": "34e5b0886ce19d4d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "common_phrase",
@@ -6235,6 +7090,9 @@
     "generation_seed": 236,
     "content_hash": "cbc7440be6367ed9",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "common_phrase",
@@ -6257,6 +7115,9 @@
     "generation_seed": 237,
     "content_hash": "f6f4ed4ee36f91c3",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "common_phrase",
@@ -6279,6 +7140,9 @@
     "generation_seed": 238,
     "content_hash": "d2a333c85a1cde3e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "common_phrase",
@@ -6301,6 +7165,9 @@
     "generation_seed": 239,
     "content_hash": "b9a7ad93cce00147",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "common_phrase",
@@ -6323,6 +7190,9 @@
     "generation_seed": 240,
     "content_hash": "1f07e3ab5edbfe86",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "common_phrase",
@@ -6345,6 +7215,9 @@
     "generation_seed": 241,
     "content_hash": "466d85960fd5022c",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "unrelated",
@@ -6367,6 +7240,9 @@
     "generation_seed": 242,
     "content_hash": "99113ff2b9886b50",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "unrelated",
@@ -6389,6 +7265,9 @@
     "generation_seed": 243,
     "content_hash": "2847ca8e18e00b27",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "unrelated",
@@ -6411,6 +7290,9 @@
     "generation_seed": 244,
     "content_hash": "8c60041874bc4302",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "unrelated",
@@ -6433,6 +7315,9 @@
     "generation_seed": 245,
     "content_hash": "9485330e31d855cf",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "unrelated",
@@ -6455,6 +7340,9 @@
     "generation_seed": 246,
     "content_hash": "350227d0f6aa780b",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "unrelated",
@@ -6477,6 +7365,9 @@
     "generation_seed": 247,
     "content_hash": "8fc1fae5a797172d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "unrelated",
@@ -6499,6 +7390,9 @@
     "generation_seed": 248,
     "content_hash": "d336011d6a74239d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "unrelated",
@@ -6521,6 +7415,9 @@
     "generation_seed": 249,
     "content_hash": "b950ffa1b9f81ffa",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "unrelated",
@@ -6543,6 +7440,9 @@
     "generation_seed": 250,
     "content_hash": "02cd68e3b01c3f81",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "mutation_level": 4,
       "parent_category": "unrelated",
@@ -6565,6 +7465,9 @@
     "generation_seed": 1,
     "content_hash": "9f2cf1ff083eb398",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_70",
       "offset": -1
@@ -6586,6 +7489,9 @@
     "generation_seed": 2,
     "content_hash": "d6022de94e1113d5",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_70",
       "offset": 0
@@ -6607,6 +7513,9 @@
     "generation_seed": 3,
     "content_hash": "029410cd0549ad1d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_70",
       "offset": 1
@@ -6628,6 +7537,9 @@
     "generation_seed": 4,
     "content_hash": "df945dcce4b66e65",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_70",
       "offset": -1
@@ -6649,6 +7561,9 @@
     "generation_seed": 5,
     "content_hash": "81cce300c47930ae",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_70",
       "offset": 0
@@ -6670,6 +7585,9 @@
     "generation_seed": 6,
     "content_hash": "029410cd0549ad1d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_70",
       "offset": 1
@@ -6691,6 +7609,9 @@
     "generation_seed": 7,
     "content_hash": "375335faae6bce34",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_70",
       "offset": -1
@@ -6712,6 +7633,9 @@
     "generation_seed": 8,
     "content_hash": "281326f02d636d78",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_70",
       "offset": 0
@@ -6733,6 +7657,9 @@
     "generation_seed": 9,
     "content_hash": "029410cd0549ad1d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_70",
       "offset": 1
@@ -6754,6 +7681,9 @@
     "generation_seed": 10,
     "content_hash": "460c534cc4192fef",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_70",
       "offset": -1
@@ -6775,6 +7705,9 @@
     "generation_seed": 11,
     "content_hash": "80139d4441431173",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_70",
       "offset": 0
@@ -6796,6 +7729,9 @@
     "generation_seed": 12,
     "content_hash": "029410cd0549ad1d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_70",
       "offset": 1
@@ -6817,6 +7753,9 @@
     "generation_seed": 13,
     "content_hash": "0a65ae79caa46156",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_70",
       "offset": -1
@@ -6838,6 +7777,9 @@
     "generation_seed": 14,
     "content_hash": "8bc381491386bd53",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_70",
       "offset": 0
@@ -6859,6 +7801,9 @@
     "generation_seed": 15,
     "content_hash": "029410cd0549ad1d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_70",
       "offset": 1
@@ -6880,6 +7825,9 @@
     "generation_seed": 16,
     "content_hash": "fec71f2e2b703948",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_10",
       "offset": -1
@@ -6901,6 +7849,9 @@
     "generation_seed": 17,
     "content_hash": "78b974b9bfd06871",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_10",
       "offset": 0
@@ -6922,6 +7873,9 @@
     "generation_seed": 18,
     "content_hash": "0b4b7e135034838e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_10",
       "offset": 1
@@ -6943,6 +7897,9 @@
     "generation_seed": 19,
     "content_hash": "056f91af854ac0fe",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_10",
       "offset": -1
@@ -6964,6 +7921,9 @@
     "generation_seed": 20,
     "content_hash": "87bca1972509e47e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_10",
       "offset": 0
@@ -6985,6 +7945,9 @@
     "generation_seed": 21,
     "content_hash": "6f7fe813805cef3f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_10",
       "offset": 1
@@ -7006,6 +7969,9 @@
     "generation_seed": 22,
     "content_hash": "3fc9250e1a33672e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_10",
       "offset": -1
@@ -7027,6 +7993,9 @@
     "generation_seed": 23,
     "content_hash": "89732474c1903749",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_10",
       "offset": 0
@@ -7048,6 +8017,9 @@
     "generation_seed": 24,
     "content_hash": "dc67e3d414e7844f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_10",
       "offset": 1
@@ -7069,6 +8041,9 @@
     "generation_seed": 25,
     "content_hash": "fe9b42b4c2ed1c9f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_10",
       "offset": -1
@@ -7090,6 +8065,9 @@
     "generation_seed": 26,
     "content_hash": "ef8921eece003de3",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_10",
       "offset": 0
@@ -7111,6 +8089,9 @@
     "generation_seed": 27,
     "content_hash": "ed3f312d7609d70b",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_10",
       "offset": 1
@@ -7132,6 +8113,9 @@
     "generation_seed": 28,
     "content_hash": "8e0de8177dec60fc",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_10",
       "offset": -1
@@ -7153,6 +8137,9 @@
     "generation_seed": 29,
     "content_hash": "d566843408df5ff6",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_10",
       "offset": 0
@@ -7174,6 +8161,9 @@
     "generation_seed": 30,
     "content_hash": "ae26af911aad1ad0",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_10",
       "offset": 1
@@ -7195,6 +8185,9 @@
     "generation_seed": 31,
     "content_hash": "2974edade7d84e72",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_85",
       "offset": -1
@@ -7216,6 +8209,9 @@
     "generation_seed": 32,
     "content_hash": "b7c2c432496bd275",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_85",
       "offset": 0
@@ -7237,6 +8233,9 @@
     "generation_seed": 33,
     "content_hash": "029410cd0549ad1d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_85",
       "offset": 1
@@ -7258,6 +8257,9 @@
     "generation_seed": 34,
     "content_hash": "3b2c1fa656602dec",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_85",
       "offset": -1
@@ -7279,6 +8281,9 @@
     "generation_seed": 35,
     "content_hash": "b7c2c432496bd275",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_85",
       "offset": 0
@@ -7300,6 +8305,9 @@
     "generation_seed": 36,
     "content_hash": "029410cd0549ad1d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_85",
       "offset": 1
@@ -7321,6 +8329,9 @@
     "generation_seed": 37,
     "content_hash": "30f963db56eae614",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_85",
       "offset": -1
@@ -7342,6 +8353,9 @@
     "generation_seed": 38,
     "content_hash": "b7c2c432496bd275",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_85",
       "offset": 0
@@ -7363,6 +8377,9 @@
     "generation_seed": 39,
     "content_hash": "029410cd0549ad1d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_85",
       "offset": 1
@@ -7384,6 +8401,9 @@
     "generation_seed": 40,
     "content_hash": "405e7a8b4afbb48c",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_85",
       "offset": -1
@@ -7405,6 +8425,9 @@
     "generation_seed": 41,
     "content_hash": "b7c2c432496bd275",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_85",
       "offset": 0
@@ -7426,6 +8449,9 @@
     "generation_seed": 42,
     "content_hash": "029410cd0549ad1d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_85",
       "offset": 1
@@ -7447,6 +8473,9 @@
     "generation_seed": 43,
     "content_hash": "5e508d0ab69200f7",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_85",
       "offset": -1
@@ -7468,6 +8497,9 @@
     "generation_seed": 44,
     "content_hash": "b7c2c432496bd275",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_85",
       "offset": 0
@@ -7489,6 +8521,9 @@
     "generation_seed": 45,
     "content_hash": "029410cd0549ad1d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_85",
       "offset": 1
@@ -7510,6 +8545,9 @@
     "generation_seed": 46,
     "content_hash": "5e48619147f4d0c0",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_10",
       "offset": -1
@@ -7531,6 +8569,9 @@
     "generation_seed": 47,
     "content_hash": "6339b5b303828430",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_10",
       "offset": 0
@@ -7552,6 +8593,9 @@
     "generation_seed": 48,
     "content_hash": "0da2b19384d50065",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_10",
       "offset": 1
@@ -7573,6 +8617,9 @@
     "generation_seed": 49,
     "content_hash": "2c9e1ab13861364d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_10",
       "offset": -1
@@ -7594,6 +8641,9 @@
     "generation_seed": 50,
     "content_hash": "30dc8afe8837eb9c",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_10",
       "offset": 0
@@ -7615,6 +8665,9 @@
     "generation_seed": 51,
     "content_hash": "a6f9bb4d46b6ed3a",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_10",
       "offset": 1
@@ -7636,6 +8689,9 @@
     "generation_seed": 52,
     "content_hash": "3a45a21cb0ce222f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_10",
       "offset": -1
@@ -7657,6 +8713,9 @@
     "generation_seed": 53,
     "content_hash": "abbf2ba881fff05b",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_10",
       "offset": 0
@@ -7678,6 +8737,9 @@
     "generation_seed": 54,
     "content_hash": "664efa9beb6fe953",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_10",
       "offset": 1
@@ -7699,6 +8761,9 @@
     "generation_seed": 55,
     "content_hash": "6804ad838e507283",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_10",
       "offset": -1
@@ -7720,6 +8785,9 @@
     "generation_seed": 56,
     "content_hash": "29ed5c46ea0f81ed",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_10",
       "offset": 0
@@ -7741,6 +8809,9 @@
     "generation_seed": 57,
     "content_hash": "63ae3931f66ea12c",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_10",
       "offset": 1
@@ -7762,6 +8833,9 @@
     "generation_seed": 58,
     "content_hash": "741048648b2063fa",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_10",
       "offset": -1
@@ -7783,6 +8857,9 @@
     "generation_seed": 59,
     "content_hash": "acc1d47bddb274bc",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_10",
       "offset": 0
@@ -7804,6 +8881,9 @@
     "generation_seed": 60,
     "content_hash": "e4e08e8bbc5c9dcd",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_10",
       "offset": 1
@@ -7825,6 +8905,9 @@
     "generation_seed": 61,
     "content_hash": "544e4e7575b2fd93",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_50",
       "offset": -1
@@ -7846,6 +8929,9 @@
     "generation_seed": 62,
     "content_hash": "f3671c01150320e5",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_50",
       "offset": 0
@@ -7867,6 +8953,9 @@
     "generation_seed": 63,
     "content_hash": "2cd3c667a38fb07a",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_50",
       "offset": 1
@@ -7888,6 +8977,9 @@
     "generation_seed": 64,
     "content_hash": "e7cb41c674572717",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_50",
       "offset": -1
@@ -7909,6 +9001,9 @@
     "generation_seed": 65,
     "content_hash": "39060f2f15f98893",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_50",
       "offset": 0
@@ -7930,6 +9025,9 @@
     "generation_seed": 66,
     "content_hash": "7a5288ff2d755745",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_50",
       "offset": 1
@@ -7951,6 +9049,9 @@
     "generation_seed": 67,
     "content_hash": "649b2b592de9e900",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_50",
       "offset": -1
@@ -7972,6 +9073,9 @@
     "generation_seed": 68,
     "content_hash": "cde4fda62e01492c",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_50",
       "offset": 0
@@ -7993,6 +9097,9 @@
     "generation_seed": 69,
     "content_hash": "686687450ab5717d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_50",
       "offset": 1
@@ -8014,6 +9121,9 @@
     "generation_seed": 70,
     "content_hash": "cce108f2e0879196",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_50",
       "offset": -1
@@ -8035,6 +9145,9 @@
     "generation_seed": 71,
     "content_hash": "0b9c2fa4adfcd0b2",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_50",
       "offset": 0
@@ -8056,6 +9169,9 @@
     "generation_seed": 72,
     "content_hash": "00e5b85b1c6d2179",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_50",
       "offset": 1
@@ -8077,6 +9193,9 @@
     "generation_seed": 73,
     "content_hash": "dc890204a979997e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_50",
       "offset": -1
@@ -8098,6 +9217,9 @@
     "generation_seed": 74,
     "content_hash": "0aadd7631406cd45",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_50",
       "offset": 0
@@ -8119,6 +9241,9 @@
     "generation_seed": 75,
     "content_hash": "3ee68b0f3455ce3e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_50",
       "offset": 1
@@ -8140,6 +9265,9 @@
     "generation_seed": 76,
     "content_hash": "094995ad75bd8337",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_10",
       "offset": -1
@@ -8161,6 +9289,9 @@
     "generation_seed": 77,
     "content_hash": "4d166a1de6e08242",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_10",
       "offset": 0
@@ -8182,6 +9313,9 @@
     "generation_seed": 78,
     "content_hash": "96cc7df0b470a7e2",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_10",
       "offset": 1
@@ -8203,6 +9337,9 @@
     "generation_seed": 79,
     "content_hash": "eb69e5c3f0c42dce",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_10",
       "offset": -1
@@ -8224,6 +9361,9 @@
     "generation_seed": 80,
     "content_hash": "916f62398caf1e51",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_10",
       "offset": 0
@@ -8245,6 +9385,9 @@
     "generation_seed": 81,
     "content_hash": "cd00955465e22f85",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_10",
       "offset": 1
@@ -8266,6 +9409,9 @@
     "generation_seed": 82,
     "content_hash": "6e828e24c500556f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_10",
       "offset": -1
@@ -8287,6 +9433,9 @@
     "generation_seed": 83,
     "content_hash": "2db010918f9e3d79",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_10",
       "offset": 0
@@ -8308,6 +9457,9 @@
     "generation_seed": 84,
     "content_hash": "516eb455919dcd69",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_10",
       "offset": 1
@@ -8329,6 +9481,9 @@
     "generation_seed": 85,
     "content_hash": "17456399349ba5f1",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_10",
       "offset": -1
@@ -8350,6 +9505,9 @@
     "generation_seed": 86,
     "content_hash": "05dbb1ceebde9a8e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_10",
       "offset": 0
@@ -8371,6 +9529,9 @@
     "generation_seed": 87,
     "content_hash": "69d0aa0be483c82f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_10",
       "offset": 1
@@ -8392,6 +9553,9 @@
     "generation_seed": 88,
     "content_hash": "da743fa6297bc7e1",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_10",
       "offset": -1
@@ -8413,6 +9577,9 @@
     "generation_seed": 89,
     "content_hash": "59a1447620acf340",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_10",
       "offset": 0
@@ -8434,6 +9601,9 @@
     "generation_seed": 90,
     "content_hash": "b21864716bfc0c35",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_10",
       "offset": 1
@@ -8455,6 +9625,9 @@
     "generation_seed": 91,
     "content_hash": "dd2ca1c790450559",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "idf_05",
       "offset": -1
@@ -8476,6 +9649,9 @@
     "generation_seed": 92,
     "content_hash": "24d092922a13d224",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "idf_05",
       "offset": -1
@@ -8497,6 +9673,9 @@
     "generation_seed": 93,
     "content_hash": "4f4b4026292b60fc",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "idf_05",
       "offset": -1
@@ -8518,6 +9697,9 @@
     "generation_seed": 94,
     "content_hash": "f8b07ad5ce62984e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "idf_05",
       "offset": -1
@@ -8539,6 +9721,9 @@
     "generation_seed": 95,
     "content_hash": "4e548e4dcc54c66f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "idf_05",
       "offset": 0
@@ -8560,6 +9745,9 @@
     "generation_seed": 96,
     "content_hash": "980cd4c5b4b6e1f1",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "idf_05",
       "offset": 0
@@ -8581,6 +9769,9 @@
     "generation_seed": 97,
     "content_hash": "874bdcfd51744e16",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "idf_05",
       "offset": 0
@@ -8602,6 +9793,9 @@
     "generation_seed": 98,
     "content_hash": "f86c632c2d06748b",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "idf_05",
       "offset": 1
@@ -8623,6 +9817,9 @@
     "generation_seed": 99,
     "content_hash": "4d2cd1d0569baaa7",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "idf_05",
       "offset": 1
@@ -8644,6 +9841,9 @@
     "generation_seed": 100,
     "content_hash": "95b9a5bba130512f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "idf_05",
       "offset": 1
@@ -8665,6 +9865,9 @@
     "generation_seed": 1,
     "content_hash": "7a443c3bb5158c29",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -8688,6 +9891,9 @@
     "generation_seed": 2,
     "content_hash": "9738b9412a87489e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -8711,6 +9917,9 @@
     "generation_seed": 3,
     "content_hash": "97f7ebb55b8a10e2",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -8734,6 +9943,9 @@
     "generation_seed": 4,
     "content_hash": "136dd66db311ebab",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -8757,6 +9969,9 @@
     "generation_seed": 5,
     "content_hash": "bf53e6854efd8c05",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -8780,6 +9995,9 @@
     "generation_seed": 6,
     "content_hash": "27c27a8abf9e12e3",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -8803,6 +10021,9 @@
     "generation_seed": 7,
     "content_hash": "68501234c1003a90",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -8826,6 +10047,9 @@
     "generation_seed": 8,
     "content_hash": "7765bf19acaddb35",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -8849,6 +10073,9 @@
     "generation_seed": 9,
     "content_hash": "9bc204999a645ae0",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -8872,6 +10099,9 @@
     "generation_seed": 10,
     "content_hash": "8b529992eca05a5d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -8895,6 +10125,9 @@
     "generation_seed": 11,
     "content_hash": "c236b1070f9e2b31",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -8918,6 +10151,9 @@
     "generation_seed": 12,
     "content_hash": "c3e56818a05868be",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -8941,6 +10177,9 @@
     "generation_seed": 13,
     "content_hash": "cdb71fbc16a25a8a",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -8964,6 +10203,9 @@
     "generation_seed": 14,
     "content_hash": "4b320a72d22a61f2",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -8987,6 +10229,9 @@
     "generation_seed": 15,
     "content_hash": "66fbbaf45146b655",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -9010,6 +10255,9 @@
     "generation_seed": 16,
     "content_hash": "0119945c4b0211a0",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -9033,6 +10281,9 @@
     "generation_seed": 17,
     "content_hash": "7c3c24a0e3401b29",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -9056,6 +10307,9 @@
     "generation_seed": 18,
     "content_hash": "54347f7f06ad9214",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -9079,6 +10333,9 @@
     "generation_seed": 19,
     "content_hash": "6d13b9a2a7dc34ab",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -9102,6 +10359,9 @@
     "generation_seed": 20,
     "content_hash": "861d7a089f036ee8",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -9125,6 +10385,9 @@
     "generation_seed": 21,
     "content_hash": "6f64ce42df1b4de0",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -9148,6 +10411,9 @@
     "generation_seed": 22,
     "content_hash": "93e051189243b043",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -9171,6 +10437,9 @@
     "generation_seed": 23,
     "content_hash": "564b167651687a89",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -9194,6 +10463,9 @@
     "generation_seed": 24,
     "content_hash": "07905b41f08168a7",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -9217,6 +10489,9 @@
     "generation_seed": 25,
     "content_hash": "216f98ccb5cd6542",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -9240,6 +10515,9 @@
     "generation_seed": 26,
     "content_hash": "28cd0c2722f2cd28",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -9263,6 +10541,9 @@
     "generation_seed": 27,
     "content_hash": "fdb599fc12323c8a",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -9286,6 +10567,9 @@
     "generation_seed": 28,
     "content_hash": "2be1a55ec302f396",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -9309,6 +10593,9 @@
     "generation_seed": 29,
     "content_hash": "1bf0f017c66dbfe7",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -9332,6 +10619,9 @@
     "generation_seed": 30,
     "content_hash": "c97277644ca1d916",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -9355,6 +10645,9 @@
     "generation_seed": 31,
     "content_hash": "c5b1f483737bad47",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -9378,6 +10671,9 @@
     "generation_seed": 32,
     "content_hash": "74d5de162f95ef30",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -9401,6 +10697,9 @@
     "generation_seed": 33,
     "content_hash": "1f6462b7380d7a07",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -9424,6 +10723,9 @@
     "generation_seed": 34,
     "content_hash": "b62327254805fd79",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -9447,6 +10749,9 @@
     "generation_seed": 35,
     "content_hash": "4ebe869f159422a5",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -9470,6 +10775,9 @@
     "generation_seed": 36,
     "content_hash": "47bb54957a4e560c",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -9493,6 +10801,9 @@
     "generation_seed": 37,
     "content_hash": "f77588c2275f3866",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -9516,6 +10827,9 @@
     "generation_seed": 38,
     "content_hash": "4da90ed6bd8a8715",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -9539,6 +10853,9 @@
     "generation_seed": 39,
     "content_hash": "b4181baab4fb243e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -9562,6 +10879,9 @@
     "generation_seed": 40,
     "content_hash": "ac38e4d38ad1d93d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -9585,6 +10905,9 @@
     "generation_seed": 41,
     "content_hash": "35d942c57cc9dd50",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -9608,6 +10931,9 @@
     "generation_seed": 42,
     "content_hash": "1010bf1e777ca0fe",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -9631,6 +10957,9 @@
     "generation_seed": 43,
     "content_hash": "363865d7e68430b3",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -9654,6 +10983,9 @@
     "generation_seed": 44,
     "content_hash": "c0e6d210993cd688",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -9677,6 +11009,9 @@
     "generation_seed": 45,
     "content_hash": "83081aa10a7eb7b9",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -9700,6 +11035,9 @@
     "generation_seed": 46,
     "content_hash": "496fd45114ba60b0",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -9723,6 +11061,9 @@
     "generation_seed": 47,
     "content_hash": "3361d929a42fbe72",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -9746,6 +11087,9 @@
     "generation_seed": 48,
     "content_hash": "1532dd54afe63669",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -9769,6 +11113,9 @@
     "generation_seed": 49,
     "content_hash": "bc0fde98e1767b2d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -9792,6 +11139,9 @@
     "generation_seed": 50,
     "content_hash": "44288cd3cf93c4fb",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -9815,6 +11165,9 @@
     "generation_seed": 51,
     "content_hash": "76b6061d9db4ddb8",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -9838,6 +11191,9 @@
     "generation_seed": 52,
     "content_hash": "64de8764589ebb65",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -9861,6 +11217,9 @@
     "generation_seed": 53,
     "content_hash": "2639c66f45255604",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -9884,6 +11243,9 @@
     "generation_seed": 54,
     "content_hash": "a481c4fdb37cbdcd",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -9907,6 +11269,9 @@
     "generation_seed": 55,
     "content_hash": "548a137feea7ec4d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -9930,6 +11295,9 @@
     "generation_seed": 56,
     "content_hash": "beaa0db7bb935947",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -9953,6 +11321,9 @@
     "generation_seed": 57,
     "content_hash": "29f841956c7de589",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -9976,6 +11347,9 @@
     "generation_seed": 58,
     "content_hash": "5b9801032bc030c5",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -9999,6 +11373,9 @@
     "generation_seed": 59,
     "content_hash": "f7fb8660a51af800",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -10022,6 +11399,9 @@
     "generation_seed": 60,
     "content_hash": "997c201b8a18685d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -10045,6 +11425,9 @@
     "generation_seed": 61,
     "content_hash": "a9065fa5c9a974dd",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -10068,6 +11451,9 @@
     "generation_seed": 62,
     "content_hash": "551a2cbff25abc22",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -10091,6 +11477,9 @@
     "generation_seed": 63,
     "content_hash": "566196015f346775",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -10114,6 +11503,9 @@
     "generation_seed": 64,
     "content_hash": "51f2a879a67f568f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -10137,6 +11529,9 @@
     "generation_seed": 65,
     "content_hash": "9fc847b6e5068531",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -10160,6 +11555,9 @@
     "generation_seed": 66,
     "content_hash": "6a42b89293dd798b",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -10183,6 +11581,9 @@
     "generation_seed": 67,
     "content_hash": "66702c6eb1061f90",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -10206,6 +11607,9 @@
     "generation_seed": 68,
     "content_hash": "6527c828bfba3180",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -10229,6 +11633,9 @@
     "generation_seed": 69,
     "content_hash": "25618e0f252bb0d3",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -10252,6 +11659,9 @@
     "generation_seed": 70,
     "content_hash": "8b236ba26bdaaf6a",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -10275,6 +11685,9 @@
     "generation_seed": 71,
     "content_hash": "213bbfd8897b8e7f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -10298,6 +11711,9 @@
     "generation_seed": 72,
     "content_hash": "074b766f886f727d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -10321,6 +11737,9 @@
     "generation_seed": 73,
     "content_hash": "4312d6b02b714094",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -10344,6 +11763,9 @@
     "generation_seed": 74,
     "content_hash": "0bfc15d8dbe73475",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -10367,6 +11789,9 @@
     "generation_seed": 75,
     "content_hash": "bd1156ab4610ee09",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -10390,6 +11815,9 @@
     "generation_seed": 76,
     "content_hash": "a09cfe29abda0247",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -10413,6 +11841,9 @@
     "generation_seed": 77,
     "content_hash": "e86144db45b0b804",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -10436,6 +11867,9 @@
     "generation_seed": 78,
     "content_hash": "eeaa9ba50b4cadd4",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -10459,6 +11893,9 @@
     "generation_seed": 79,
     "content_hash": "ed530e4d11d72421",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -10482,6 +11919,9 @@
     "generation_seed": 80,
     "content_hash": "952aea7b1e2743dd",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -10505,6 +11945,9 @@
     "generation_seed": 81,
     "content_hash": "811e809b9a385b56",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -10528,6 +11971,9 @@
     "generation_seed": 82,
     "content_hash": "aca844a0e69472ea",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -10551,6 +11997,9 @@
     "generation_seed": 83,
     "content_hash": "f762c138ee1dc19e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -10574,6 +12023,9 @@
     "generation_seed": 84,
     "content_hash": "f8c4ef1d7b536f4e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -10597,6 +12049,9 @@
     "generation_seed": 85,
     "content_hash": "be8a4b073e6b17c6",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -10620,6 +12075,9 @@
     "generation_seed": 86,
     "content_hash": "507447f3793bc098",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -10643,6 +12101,9 @@
     "generation_seed": 87,
     "content_hash": "7acb25add9fd038b",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -10666,6 +12127,9 @@
     "generation_seed": 88,
     "content_hash": "3026c5cef1d4ca1b",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -10689,6 +12153,9 @@
     "generation_seed": 89,
     "content_hash": "f6e9d1673781c31c",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -10712,6 +12179,9 @@
     "generation_seed": 90,
     "content_hash": "af0a272406cd7efe",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -10735,6 +12205,9 @@
     "generation_seed": 91,
     "content_hash": "adf2a8de9c389546",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -10758,6 +12231,9 @@
     "generation_seed": 92,
     "content_hash": "837ee54ffbdd7f22",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -10781,6 +12257,9 @@
     "generation_seed": 93,
     "content_hash": "06b5e4540b7da6de",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -10804,6 +12283,9 @@
     "generation_seed": 94,
     "content_hash": "f7214fa46c5b5fea",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -10827,6 +12309,9 @@
     "generation_seed": 95,
     "content_hash": "2815847a785d6a5a",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -10850,6 +12335,9 @@
     "generation_seed": 96,
     "content_hash": "fe5f9ed01c2f4d6f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -10873,6 +12361,9 @@
     "generation_seed": 97,
     "content_hash": "25d75264d8a2f197",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -10896,6 +12387,9 @@
     "generation_seed": 98,
     "content_hash": "fc1ad268222c538a",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -10919,6 +12413,9 @@
     "generation_seed": 99,
     "content_hash": "bbf8ce206670f25c",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -10942,6 +12439,9 @@
     "generation_seed": 100,
     "content_hash": "ea33a3c88f895ed7",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",

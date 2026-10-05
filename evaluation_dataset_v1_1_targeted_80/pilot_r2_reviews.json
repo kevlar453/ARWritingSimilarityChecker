@@ -1,0 +1,19 @@
+{
+  "version": "v1.1.0",
+  "updated_at": "2026-10-05T01:48:59.769014+00:00",
+  "reviews": [
+    {
+      "case_id": "PILOT-P1-001",
+      "reviewer_code": "RV-PILOT-001",
+      "human_decision": "review",
+      "citation_context": "NONE",
+      "citation_status": "NOT_CITED",
+      "human_interpretation": "DIRECT_OVERLAP_RELEVANT",
+      "system_assessment": "CORRECT",
+      "reviewer_confidence": "HIGH",
+      "review_status": "REVIEWED",
+      "notes": "Anotasi uji otomatis validasi Milestone R2.",
+      "reviewed_at": "2026-10-05T01:48:59.769008+00:00"
+    }
+  ]
+}

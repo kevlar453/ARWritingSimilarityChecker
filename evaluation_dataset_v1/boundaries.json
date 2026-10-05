@@ -15,6 +15,9 @@
     "generation_seed": 1,
     "content_hash": "9f2cf1ff083eb398",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_70",
       "offset": -1
@@ -36,6 +39,9 @@
     "generation_seed": 2,
     "content_hash": "d6022de94e1113d5",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_70",
       "offset": 0
@@ -57,6 +63,9 @@
     "generation_seed": 3,
     "content_hash": "029410cd0549ad1d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_70",
       "offset": 1
@@ -78,6 +87,9 @@
     "generation_seed": 4,
     "content_hash": "df945dcce4b66e65",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_70",
       "offset": -1
@@ -99,6 +111,9 @@
     "generation_seed": 5,
     "content_hash": "81cce300c47930ae",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_70",
       "offset": 0
@@ -120,6 +135,9 @@
     "generation_seed": 6,
     "content_hash": "029410cd0549ad1d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_70",
       "offset": 1
@@ -141,6 +159,9 @@
     "generation_seed": 7,
     "content_hash": "375335faae6bce34",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_70",
       "offset": -1
@@ -162,6 +183,9 @@
     "generation_seed": 8,
     "content_hash": "281326f02d636d78",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_70",
       "offset": 0
@@ -183,6 +207,9 @@
     "generation_seed": 9,
     "content_hash": "029410cd0549ad1d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_70",
       "offset": 1
@@ -204,6 +231,9 @@
     "generation_seed": 10,
     "content_hash": "460c534cc4192fef",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_70",
       "offset": -1
@@ -225,6 +255,9 @@
     "generation_seed": 11,
     "content_hash": "80139d4441431173",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_70",
       "offset": 0
@@ -246,6 +279,9 @@
     "generation_seed": 12,
     "content_hash": "029410cd0549ad1d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_70",
       "offset": 1
@@ -267,6 +303,9 @@
     "generation_seed": 13,
     "content_hash": "0a65ae79caa46156",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_70",
       "offset": -1
@@ -288,6 +327,9 @@
     "generation_seed": 14,
     "content_hash": "8bc381491386bd53",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_70",
       "offset": 0
@@ -309,6 +351,9 @@
     "generation_seed": 15,
     "content_hash": "029410cd0549ad1d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_70",
       "offset": 1
@@ -330,6 +375,9 @@
     "generation_seed": 16,
     "content_hash": "fec71f2e2b703948",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_10",
       "offset": -1
@@ -351,6 +399,9 @@
     "generation_seed": 17,
     "content_hash": "78b974b9bfd06871",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_10",
       "offset": 0
@@ -372,6 +423,9 @@
     "generation_seed": 18,
     "content_hash": "0b4b7e135034838e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_10",
       "offset": 1
@@ -393,6 +447,9 @@
     "generation_seed": 19,
     "content_hash": "056f91af854ac0fe",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_10",
       "offset": -1
@@ -414,6 +471,9 @@
     "generation_seed": 20,
     "content_hash": "87bca1972509e47e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_10",
       "offset": 0
@@ -435,6 +495,9 @@
     "generation_seed": 21,
     "content_hash": "6f7fe813805cef3f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_10",
       "offset": 1
@@ -456,6 +519,9 @@
     "generation_seed": 22,
     "content_hash": "3fc9250e1a33672e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_10",
       "offset": -1
@@ -477,6 +543,9 @@
     "generation_seed": 23,
     "content_hash": "89732474c1903749",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_10",
       "offset": 0
@@ -498,6 +567,9 @@
     "generation_seed": 24,
     "content_hash": "dc67e3d414e7844f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_10",
       "offset": 1
@@ -519,6 +591,9 @@
     "generation_seed": 25,
     "content_hash": "fe9b42b4c2ed1c9f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_10",
       "offset": -1
@@ -540,6 +615,9 @@
     "generation_seed": 26,
     "content_hash": "ef8921eece003de3",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_10",
       "offset": 0
@@ -561,6 +639,9 @@
     "generation_seed": 27,
     "content_hash": "ed3f312d7609d70b",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_10",
       "offset": 1
@@ -582,6 +663,9 @@
     "generation_seed": 28,
     "content_hash": "8e0de8177dec60fc",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_10",
       "offset": -1
@@ -603,6 +687,9 @@
     "generation_seed": 29,
     "content_hash": "d566843408df5ff6",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_10",
       "offset": 0
@@ -624,6 +711,9 @@
     "generation_seed": 30,
     "content_hash": "ae26af911aad1ad0",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "exact_10",
       "offset": 1
@@ -645,6 +735,9 @@
     "generation_seed": 31,
     "content_hash": "2974edade7d84e72",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_85",
       "offset": -1
@@ -666,6 +759,9 @@
     "generation_seed": 32,
     "content_hash": "b7c2c432496bd275",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_85",
       "offset": 0
@@ -687,6 +783,9 @@
     "generation_seed": 33,
     "content_hash": "029410cd0549ad1d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_85",
       "offset": 1
@@ -708,6 +807,9 @@
     "generation_seed": 34,
     "content_hash": "3b2c1fa656602dec",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_85",
       "offset": -1
@@ -729,6 +831,9 @@
     "generation_seed": 35,
     "content_hash": "b7c2c432496bd275",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_85",
       "offset": 0
@@ -750,6 +855,9 @@
     "generation_seed": 36,
     "content_hash": "029410cd0549ad1d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_85",
       "offset": 1
@@ -771,6 +879,9 @@
     "generation_seed": 37,
     "content_hash": "30f963db56eae614",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_85",
       "offset": -1
@@ -792,6 +903,9 @@
     "generation_seed": 38,
     "content_hash": "b7c2c432496bd275",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_85",
       "offset": 0
@@ -813,6 +927,9 @@
     "generation_seed": 39,
     "content_hash": "029410cd0549ad1d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_85",
       "offset": 1
@@ -834,6 +951,9 @@
     "generation_seed": 40,
     "content_hash": "405e7a8b4afbb48c",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_85",
       "offset": -1
@@ -855,6 +975,9 @@
     "generation_seed": 41,
     "content_hash": "b7c2c432496bd275",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_85",
       "offset": 0
@@ -876,6 +999,9 @@
     "generation_seed": 42,
     "content_hash": "029410cd0549ad1d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_85",
       "offset": 1
@@ -897,6 +1023,9 @@
     "generation_seed": 43,
     "content_hash": "5e508d0ab69200f7",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_85",
       "offset": -1
@@ -918,6 +1047,9 @@
     "generation_seed": 44,
     "content_hash": "b7c2c432496bd275",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_85",
       "offset": 0
@@ -939,6 +1071,9 @@
     "generation_seed": 45,
     "content_hash": "029410cd0549ad1d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_85",
       "offset": 1
@@ -960,6 +1095,9 @@
     "generation_seed": 46,
     "content_hash": "5e48619147f4d0c0",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_10",
       "offset": -1
@@ -981,6 +1119,9 @@
     "generation_seed": 47,
     "content_hash": "6339b5b303828430",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_10",
       "offset": 0
@@ -1002,6 +1143,9 @@
     "generation_seed": 48,
     "content_hash": "0da2b19384d50065",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_10",
       "offset": 1
@@ -1023,6 +1167,9 @@
     "generation_seed": 49,
     "content_hash": "2c9e1ab13861364d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_10",
       "offset": -1
@@ -1044,6 +1191,9 @@
     "generation_seed": 50,
     "content_hash": "30dc8afe8837eb9c",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_10",
       "offset": 0
@@ -1065,6 +1215,9 @@
     "generation_seed": 51,
     "content_hash": "a6f9bb4d46b6ed3a",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_10",
       "offset": 1
@@ -1086,6 +1239,9 @@
     "generation_seed": 52,
     "content_hash": "3a45a21cb0ce222f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_10",
       "offset": -1
@@ -1107,6 +1263,9 @@
     "generation_seed": 53,
     "content_hash": "abbf2ba881fff05b",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_10",
       "offset": 0
@@ -1128,6 +1287,9 @@
     "generation_seed": 54,
     "content_hash": "664efa9beb6fe953",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_10",
       "offset": 1
@@ -1149,6 +1311,9 @@
     "generation_seed": 55,
     "content_hash": "6804ad838e507283",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_10",
       "offset": -1
@@ -1170,6 +1335,9 @@
     "generation_seed": 56,
     "content_hash": "29ed5c46ea0f81ed",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_10",
       "offset": 0
@@ -1191,6 +1359,9 @@
     "generation_seed": 57,
     "content_hash": "63ae3931f66ea12c",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_10",
       "offset": 1
@@ -1212,6 +1383,9 @@
     "generation_seed": 58,
     "content_hash": "741048648b2063fa",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_10",
       "offset": -1
@@ -1233,6 +1407,9 @@
     "generation_seed": 59,
     "content_hash": "acc1d47bddb274bc",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_10",
       "offset": 0
@@ -1254,6 +1431,9 @@
     "generation_seed": 60,
     "content_hash": "e4e08e8bbc5c9dcd",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "tfidf_10",
       "offset": 1
@@ -1275,6 +1455,9 @@
     "generation_seed": 61,
     "content_hash": "544e4e7575b2fd93",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_50",
       "offset": -1
@@ -1296,6 +1479,9 @@
     "generation_seed": 62,
     "content_hash": "f3671c01150320e5",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_50",
       "offset": 0
@@ -1317,6 +1503,9 @@
     "generation_seed": 63,
     "content_hash": "2cd3c667a38fb07a",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_50",
       "offset": 1
@@ -1338,6 +1527,9 @@
     "generation_seed": 64,
     "content_hash": "e7cb41c674572717",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_50",
       "offset": -1
@@ -1359,6 +1551,9 @@
     "generation_seed": 65,
     "content_hash": "39060f2f15f98893",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_50",
       "offset": 0
@@ -1380,6 +1575,9 @@
     "generation_seed": 66,
     "content_hash": "7a5288ff2d755745",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_50",
       "offset": 1
@@ -1401,6 +1599,9 @@
     "generation_seed": 67,
     "content_hash": "649b2b592de9e900",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_50",
       "offset": -1
@@ -1422,6 +1623,9 @@
     "generation_seed": 68,
     "content_hash": "cde4fda62e01492c",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_50",
       "offset": 0
@@ -1443,6 +1647,9 @@
     "generation_seed": 69,
     "content_hash": "686687450ab5717d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_50",
       "offset": 1
@@ -1464,6 +1671,9 @@
     "generation_seed": 70,
     "content_hash": "cce108f2e0879196",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_50",
       "offset": -1
@@ -1485,6 +1695,9 @@
     "generation_seed": 71,
     "content_hash": "0b9c2fa4adfcd0b2",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_50",
       "offset": 0
@@ -1506,6 +1719,9 @@
     "generation_seed": 72,
     "content_hash": "00e5b85b1c6d2179",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_50",
       "offset": 1
@@ -1527,6 +1743,9 @@
     "generation_seed": 73,
     "content_hash": "dc890204a979997e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_50",
       "offset": -1
@@ -1548,6 +1767,9 @@
     "generation_seed": 74,
     "content_hash": "0aadd7631406cd45",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_50",
       "offset": 0
@@ -1569,6 +1791,9 @@
     "generation_seed": 75,
     "content_hash": "3ee68b0f3455ce3e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_50",
       "offset": 1
@@ -1590,6 +1815,9 @@
     "generation_seed": 76,
     "content_hash": "094995ad75bd8337",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_10",
       "offset": -1
@@ -1611,6 +1839,9 @@
     "generation_seed": 77,
     "content_hash": "4d166a1de6e08242",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_10",
       "offset": 0
@@ -1632,6 +1863,9 @@
     "generation_seed": 78,
     "content_hash": "96cc7df0b470a7e2",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_10",
       "offset": 1
@@ -1653,6 +1887,9 @@
     "generation_seed": 79,
     "content_hash": "eb69e5c3f0c42dce",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_10",
       "offset": -1
@@ -1674,6 +1911,9 @@
     "generation_seed": 80,
     "content_hash": "916f62398caf1e51",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_10",
       "offset": 0
@@ -1695,6 +1935,9 @@
     "generation_seed": 81,
     "content_hash": "cd00955465e22f85",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_10",
       "offset": 1
@@ -1716,6 +1959,9 @@
     "generation_seed": 82,
     "content_hash": "6e828e24c500556f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_10",
       "offset": -1
@@ -1737,6 +1983,9 @@
     "generation_seed": 83,
     "content_hash": "2db010918f9e3d79",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_10",
       "offset": 0
@@ -1758,6 +2007,9 @@
     "generation_seed": 84,
     "content_hash": "516eb455919dcd69",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_10",
       "offset": 1
@@ -1779,6 +2031,9 @@
     "generation_seed": 85,
     "content_hash": "17456399349ba5f1",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_10",
       "offset": -1
@@ -1800,6 +2055,9 @@
     "generation_seed": 86,
     "content_hash": "05dbb1ceebde9a8e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_10",
       "offset": 0
@@ -1821,6 +2079,9 @@
     "generation_seed": 87,
     "content_hash": "69d0aa0be483c82f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_10",
       "offset": 1
@@ -1842,6 +2103,9 @@
     "generation_seed": 88,
     "content_hash": "da743fa6297bc7e1",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_10",
       "offset": -1
@@ -1863,6 +2127,9 @@
     "generation_seed": 89,
     "content_hash": "59a1447620acf340",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_10",
       "offset": 0
@@ -1884,6 +2151,9 @@
     "generation_seed": 90,
     "content_hash": "b21864716bfc0c35",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "longest_10",
       "offset": 1
@@ -1905,6 +2175,9 @@
     "generation_seed": 91,
     "content_hash": "dd2ca1c790450559",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "idf_05",
       "offset": -1
@@ -1926,6 +2199,9 @@
     "generation_seed": 92,
     "content_hash": "24d092922a13d224",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "idf_05",
       "offset": -1
@@ -1947,6 +2223,9 @@
     "generation_seed": 93,
     "content_hash": "4f4b4026292b60fc",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "idf_05",
       "offset": -1
@@ -1968,6 +2247,9 @@
     "generation_seed": 94,
     "content_hash": "f8b07ad5ce62984e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "idf_05",
       "offset": -1
@@ -1989,6 +2271,9 @@
     "generation_seed": 95,
     "content_hash": "4e548e4dcc54c66f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "idf_05",
       "offset": 0
@@ -2010,6 +2295,9 @@
     "generation_seed": 96,
     "content_hash": "980cd4c5b4b6e1f1",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "idf_05",
       "offset": 0
@@ -2031,6 +2319,9 @@
     "generation_seed": 97,
     "content_hash": "874bdcfd51744e16",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "idf_05",
       "offset": 0
@@ -2052,6 +2343,9 @@
     "generation_seed": 98,
     "content_hash": "f86c632c2d06748b",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "idf_05",
       "offset": 1
@@ -2073,6 +2367,9 @@
     "generation_seed": 99,
     "content_hash": "4d2cd1d0569baaa7",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "idf_05",
       "offset": 1
@@ -2094,6 +2391,9 @@
     "generation_seed": 100,
     "content_hash": "95b9a5bba130512f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "threshold_target": "idf_05",
       "offset": 1

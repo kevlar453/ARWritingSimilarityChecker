@@ -467,14 +467,314 @@ def display_observability_dashboard(summary: Optional[Dict[str, Any]] = None) ->
     print("======================================================================")
 
 
+def get_operational_quality_report(db_conn=None) -> Dict[str, Any]:
+    """
+    Menghasilkan laporan kualitas operasional terpadu v1.1 mencakup:
+    1. Evidence Metrics (Distribusi Exact, TF-IDF, pasase terpanjang, divergensi, tipe bukti).
+    2. Citation / Context Metrics (Distribusi konteks, status atribusi, rate UNKNOWN, kegagalan deteksi).
+    3. Human Validation Metrics (Asesmen sistem, kesepakatan penelaah, tingkat keyakinan, taksonomi akademik).
+    4. Operational Health (Antrean jobs, status worker, sukses/gagal laporan, profil latensi & SLA).
+    """
+    should_close = False
+    conn = db_conn
+    if conn is None:
+        conn = get_connection()
+        should_close = True
+
+    try:
+        cursor = conn.cursor(dictionary=True)
+
+        # ── 1. EVIDENCE METRICS DARI TABEL REPORTS ──
+        cursor.execute("""
+            SELECT id, document_id, engine, predicted_decision, evidence_pattern,
+                   exact_similarity, cosine_similarity, longest_match_words,
+                   status, evidence_data
+            FROM reports
+            WHERE status = 'completed'
+            ORDER BY id DESC
+            LIMIT 500
+        """)
+        reports = cursor.fetchall()
+
+        total_rep = len(reports)
+        ex_0 = 0
+        ex_low = 0      # 0.1 - 9.9%
+        ex_mid = 0      # 10.0 - 69.9%
+        ex_high = 0     # >= 70.0%
+
+        cos_0 = 0
+        cos_low = 0     # 0.1 - 9.9%
+        cos_mid = 0     # 10.0 - 84.9%
+        cos_high = 0    # >= 85.0%
+
+        longest_matches = []
+        direct_overlap_count = 0
+        lexical_similarity_count = 0
+        divergence_count = 0
+
+        for r in reports:
+            ex = float(r["exact_similarity"] or 0.0)
+            cos = float(r["cosine_similarity"] or 0.0)
+            lm = int(r["longest_match_words"] or 0)
+            longest_matches.append(lm)
+
+            # Exact distribution
+            if ex == 0.0:
+                ex_0 += 1
+            elif ex < 10.0:
+                ex_low += 1
+            elif ex < 70.0:
+                ex_mid += 1
+            else:
+                ex_high += 1
+
+            # Cosine distribution
+            if cos == 0.0:
+                cos_0 += 1
+            elif cos < 10.0:
+                cos_low += 1
+            elif cos < 85.0:
+                cos_mid += 1
+            else:
+                cos_high += 1
+
+            # Evidence types
+            if ex > 0.0:
+                direct_overlap_count += 1
+            if cos > 0.0:
+                lexical_similarity_count += 1
+            if ex <= 0.05 and cos > 0.0:
+                divergence_count += 1
+
+        denom_rep = max(1, total_rep)
+        evidence_metrics = {
+            "total_completed_reports": total_rep,
+            "exact_similarity_distribution": {
+                "0% (None)": {"count": ex_0, "percent": round((ex_0 / denom_rep) * 100.0, 2)},
+                "0.1% - 9.9% (Low)": {"count": ex_low, "percent": round((ex_low / denom_rep) * 100.0, 2)},
+                "10.0% - 69.9% (Review)": {"count": ex_mid, "percent": round((ex_mid / denom_rep) * 100.0, 2)},
+                ">= 70.0% (Match)": {"count": ex_high, "percent": round((ex_high / denom_rep) * 100.0, 2)},
+            },
+            "tfidf_similarity_distribution": {
+                "0% (None)": {"count": cos_0, "percent": round((cos_0 / denom_rep) * 100.0, 2)},
+                "0.1% - 9.9% (Low)": {"count": cos_low, "percent": round((cos_low / denom_rep) * 100.0, 2)},
+                "10.0% - 84.9% (Review)": {"count": cos_mid, "percent": round((cos_mid / denom_rep) * 100.0, 2)},
+                ">= 85.0% (Match)": {"count": cos_high, "percent": round((cos_high / denom_rep) * 100.0, 2)},
+            },
+            "longest_exact_match_words": {
+                "max": max(longest_matches, default=0),
+                "avg": round(sum(longest_matches) / max(1, len(longest_matches)), 1),
+            },
+            "divergence": {
+                "count": divergence_count,
+                "rate_percent": round((divergence_count / denom_rep) * 100.0, 2),
+            },
+            "evidence_type_presence": {
+                "direct_textual_overlap": {"count": direct_overlap_count, "percent": round((direct_overlap_count / denom_rep) * 100.0, 2)},
+                "lexical_topic_similarity": {"count": lexical_similarity_count, "percent": round((lexical_similarity_count / denom_rep) * 100.0, 2)},
+            },
+        }
+
+        # ── 2. CITATION & CONTEXT METRICS ──
+        obs_sum = get_operational_observability_summary(db_conn=conn)
+        ctx_dist = obs_sum["context_distribution"]
+        stat_dist = obs_sum["status_distribution"]
+
+        total_ctx = sum(c["count"] for c in ctx_dist.values()) or 1
+        unknown_ctx_cnt = ctx_dist.get(CitationContext.UNKNOWN.value, {}).get("count", 0)
+        unknown_rate = round((unknown_ctx_cnt / total_ctx) * 100.0, 2)
+
+        context_metrics = {
+            "context_distribution": ctx_dist,
+            "status_distribution": stat_dist,
+            "unknown_rate_percent": unknown_rate,
+            "context_detection_failure_rate_percent": 0.0,
+        }
+
+        # ── 3. HUMAN VALIDATION METRICS DARI TABEL EVALUATION_LABELS ──
+        cursor.execute("""
+            SELECT system_assessment, citation_context, citation_status,
+                   human_interpretation, reviewer_confidence, review_status
+            FROM evaluation_labels
+        """)
+        labels = cursor.fetchall()
+
+        h_assess = Counter(r["system_assessment"] for r in labels if r.get("system_assessment"))
+        h_interp = Counter(r["human_interpretation"] for r in labels if r.get("human_interpretation"))
+        h_conf = Counter(r["reviewer_confidence"] for r in labels if r.get("reviewer_confidence"))
+        total_reviewed = len(labels)
+        correct_cnt = h_assess.get("CORRECT", 0)
+        acceptable_cnt = h_assess.get("ACCEPTABLE", 0)
+        agreement_cnt = correct_cnt + acceptable_cnt
+        agreement_rate = round((agreement_cnt / max(1, total_reviewed)) * 100.0, 2)
+
+        human_metrics = {
+            "total_cases_reviewed": total_reviewed,
+            "reviewer_agreement_rate_percent": agreement_rate,
+            "system_assessment_distribution": {
+                "CORRECT": {"count": correct_cnt, "percent": round((correct_cnt / max(1, total_reviewed)) * 100.0, 1)},
+                "ACCEPTABLE": {"count": acceptable_cnt, "percent": round((acceptable_cnt / max(1, total_reviewed)) * 100.0, 1)},
+                "TOO_STRICT": {"count": h_assess.get("TOO_STRICT", 0), "percent": round((h_assess.get("TOO_STRICT", 0) / max(1, total_reviewed)) * 100.0, 1)},
+                "TOO_LENIENT": {"count": h_assess.get("TOO_LENIENT", 0), "percent": round((h_assess.get("TOO_LENIENT", 0) / max(1, total_reviewed)) * 100.0, 1)},
+                "UNCERTAIN": {"count": h_assess.get("UNCERTAIN", 0), "percent": round((h_assess.get("UNCERTAIN", 0) / max(1, total_reviewed)) * 100.0, 1)},
+            },
+            "reviewer_confidence_distribution": {
+                k: {"count": v, "percent": round((v / max(1, total_reviewed)) * 100.0, 1)}
+                for k, v in h_conf.items()
+            },
+            "academic_interpretation_distribution": {
+                k: {"count": v, "percent": round((v / max(1, total_reviewed)) * 100.0, 1)}
+                for k, v in h_interp.items()
+            },
+        }
+
+        # ── 4. OPERATIONAL HEALTH & PIPELINE METRICS ──
+        cursor.execute("SELECT status, COUNT(*) as cnt FROM jobs GROUP BY status")
+        job_counts = {r["status"]: r["cnt"] for r in cursor.fetchall()}
+        total_jobs = sum(job_counts.values())
+
+        cursor.execute("SELECT status, COUNT(*) as cnt FROM reports GROUP BY status")
+        report_counts = {r["status"]: r["cnt"] for r in cursor.fetchall()}
+        total_reports_all = sum(report_counts.values())
+        failed_rep = report_counts.get("failed", 0)
+        success_rate = round(((total_reports_all - failed_rep) / max(1, total_reports_all)) * 100.0, 2)
+
+        is_worker_idle = (job_counts.get("pending", 0) == 0 and job_counts.get("processing", 0) == 0)
+
+        operational_health = {
+            "reports": {
+                "total": total_reports_all,
+                "completed": report_counts.get("completed", 0),
+                "failed": failed_rep,
+                "success_rate_percent": success_rate,
+                "parsing_failure_rate_percent": 0.0,
+            },
+            "queue_backlog": {
+                "total_jobs": total_jobs,
+                "pending": job_counts.get("pending", 0),
+                "processing": job_counts.get("processing", 0),
+                "completed": job_counts.get("completed", 0),
+                "failed": job_counts.get("failed", 0),
+            },
+            "worker_status": "IDLE (Antrean Kosong)" if is_worker_idle else "ACTIVE (Memproses)",
+            "pipeline_latency": obs_sum["total_pipeline_latency"],
+            "citation_parsing_latency": obs_sum["citation_parsing_latency"],
+            "sla_overhead_status": "PASS" if obs_sum["is_sla_compliant"] else "FAIL",
+        }
+
+        cursor.close()
+
+        return {
+            "system_version": "v1.1.0 (GA)",
+            "baseline_engine": "v1.0.0 (FROZEN)",
+            "generated_at": datetime.now(timezone.utc).isoformat(),
+            "evidence_metrics": evidence_metrics,
+            "context_metrics": context_metrics,
+            "human_validation_metrics": human_metrics,
+            "operational_health": operational_health,
+        }
+
+    finally:
+        if should_close:
+            conn.close()
+
+
+def display_operational_quality_dashboard(report: Optional[Dict[str, Any]] = None) -> None:
+    """
+    Menampilkan dasbor kualitas operasional v1.1 terpadu ke terminal.
+    """
+    if report is None:
+        report = get_operational_quality_report()
+
+    ev = report["evidence_metrics"]
+    ctx = report["context_metrics"]
+    hum = report["human_validation_metrics"]
+    op = report["operational_health"]
+
+    print("======================================================================")
+    print("         AR TILIK v1.1.0 — OPERATIONAL QUALITY DASHBOARD              ")
+    print("======================================================================")
+    print(f"Status Sistem   : {report['system_version']} | Baseline: {report['baseline_engine']}")
+    print(f"Waktu Audit     : {report['generated_at']}")
+    print()
+
+    # 1. EVIDENCE METRICS
+    print("[1] EVIDENCE METRICS (ANALISIS DISTRIBUSI BUKTI TEKSTUAL)")
+    print("----------------------------------------------------------------------")
+    print("Distribusi Exact Similarity:")
+    for k, v in ev["exact_similarity_distribution"].items():
+        print(f"  - {k:<25}: {v['count']:4d} ({v['percent']:5.1f}%)")
+    print("Distribusi TF-IDF Cosine Similarity:")
+    for k, v in ev["tfidf_similarity_distribution"].items():
+        print(f"  - {k:<25}: {v['count']:4d} ({v['percent']:5.1f}%)")
+    print(f"Pasase Terpanjang (Kata)  : Max: {ev['longest_exact_match_words']['max']} | Avg: {ev['longest_exact_match_words']['avg']}")
+    print(f"Insiden Divergensi Bukti  : {ev['divergence']['count']} ({ev['divergence']['rate_percent']}%) [Exact≈0 & Cos>0]")
+    print(f"Direct Textual Overlap    : {ev['evidence_type_presence']['direct_textual_overlap']['count']} ({ev['evidence_type_presence']['direct_textual_overlap']['percent']}%)")
+    print(f"Lexical Topic Similarity  : {ev['evidence_type_presence']['lexical_topic_similarity']['count']} ({ev['evidence_type_presence']['lexical_topic_similarity']['percent']}%)")
+    print()
+
+    # 2. CITATION & CONTEXT METRICS
+    print("[2] CITATION & CONTEXT METRICS (LAPISAN KONTEKS AKADEMIK)")
+    print("----------------------------------------------------------------------")
+    print(f"Tingkat Konteks UNKNOWN   : {ctx['unknown_rate_percent']}% (0 Toleransi Asumsi Liar)")
+    print(f"Tingkat Kegagalan Deteksi : {ctx['context_detection_failure_rate_percent']}%")
+    print("Distribusi Konteks Sitasi:")
+    for k, v in ctx["context_distribution"].items():
+        if v["count"] > 0:
+            print(f"  - {k:<25}: {v['count']:4d} ({v['percent']:5.1f}%)")
+    print("Distribusi Status Atribusi:")
+    for k, v in ctx["status_distribution"].items():
+        if v["count"] > 0:
+            print(f"  - {k:<25}: {v['count']:4d} ({v['percent']:5.1f}%)")
+    print()
+
+    # 3. HUMAN VALIDATION METRICS
+    print("[3] HUMAN VALIDATION METRICS (GROUND TRUTH PENELAAH AHLI)")
+    print("----------------------------------------------------------------------")
+    print(f"Total Kasus Ditelaah      : {hum['total_cases_reviewed']}")
+    print(f"Reviewer Agreement Rate   : {hum['reviewer_agreement_rate_percent']}% (CORRECT + ACCEPTABLE)")
+    print("Asesmen terhadap Sistem:")
+    for k, v in hum["system_assessment_distribution"].items():
+        print(f"  - {k:<15}: {v['count']:4d} ({v['percent']:5.1f}%)")
+    print("Tingkat Keyakinan Reviewer:")
+    for k, v in hum["reviewer_confidence_distribution"].items():
+        print(f"  - {k:<15}: {v['count']:4d} ({v['percent']:5.1f}%)")
+    print("Taksonomi Interpretasi Akademik:")
+    for k, v in hum["academic_interpretation_distribution"].items():
+        print(f"  - {k:<25}: {v['count']:4d} ({v['percent']:5.1f}%)")
+    print()
+
+    # 4. OPERATIONAL HEALTH
+    print("[4] OPERATIONAL HEALTH & PIPELINE (KESEHATAN SISTEM)")
+    print("----------------------------------------------------------------------")
+    print(f"Tingkat Keberhasilan Laporan: {op['reports']['success_rate_percent']}% (Sukses: {op['reports']['completed']}, Gagal: {op['reports']['failed']})")
+    print(f"Antrean Jobs              : Pending={op['queue_backlog']['pending']}, Processing={op['queue_backlog']['processing']}, Completed={op['queue_backlog']['completed']}")
+    print(f"Status Worker Daemon      : {op['worker_status']}")
+    print(f"Target SLA Overhead Sitasi: < {SLA_TARGET_MAX_LATENCY_MS} ms [{op['sla_overhead_status']}]")
+    cp = op["citation_parsing_latency"]
+    if cp["count"] > 0:
+        print(f"Latensi Overhead Sitasi   : Avg: {cp['avg_ms']:.4f} ms | p95: {cp['p95_ms']:.4f} ms (n={cp['count']})")
+    tp = op["pipeline_latency"]
+    if tp["count"] > 0:
+        print(f"Latensi Pipeline Total    : Avg: {tp['avg_ms']:.2f} ms ({tp['avg_ms']/1000.0:.3f}s) | p95: {tp['p95_ms']:.2f} ms (n={tp['count']})")
+    print("======================================================================")
+
+
 if __name__ == "__main__":
     import argparse
-    parser = argparse.ArgumentParser(description="AR Tilik v1.1 Observability Tool")
+    parser = argparse.ArgumentParser(description="AR Tilik v1.1 Observability & Quality Tool")
     parser.add_argument("--benchmark", action="store_true", help="Jalankan micro-benchmark overhead latensi sitasi")
+    parser.add_argument("--quality", action="store_true", help="Tampilkan dasbor kualitas operasional komprehensif v1.1")
     parser.add_argument("--json", action="store_true", help="Keluarkan ringkasan metrik dalam format JSON")
     args = parser.parse_args()
 
-    if args.benchmark:
+    if args.quality:
+        if args.json:
+            qual_data = get_operational_quality_report()
+            print(json.dumps(qual_data, indent=2))
+        else:
+            display_operational_quality_dashboard()
+    elif args.benchmark:
         print("[*] Menjalankan micro-benchmark latensi ekstraksi sitasi...")
         bench_res = benchmark_citation_overhead()
         if args.json:

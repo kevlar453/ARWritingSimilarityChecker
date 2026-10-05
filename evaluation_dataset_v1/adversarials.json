@@ -15,6 +15,9 @@
     "generation_seed": 1,
     "content_hash": "7a443c3bb5158c29",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -38,6 +41,9 @@
     "generation_seed": 2,
     "content_hash": "9738b9412a87489e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -61,6 +67,9 @@
     "generation_seed": 3,
     "content_hash": "97f7ebb55b8a10e2",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -84,6 +93,9 @@
     "generation_seed": 4,
     "content_hash": "136dd66db311ebab",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -107,6 +119,9 @@
     "generation_seed": 5,
     "content_hash": "bf53e6854efd8c05",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -130,6 +145,9 @@
     "generation_seed": 6,
     "content_hash": "27c27a8abf9e12e3",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -153,6 +171,9 @@
     "generation_seed": 7,
     "content_hash": "68501234c1003a90",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -176,6 +197,9 @@
     "generation_seed": 8,
     "content_hash": "7765bf19acaddb35",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -199,6 +223,9 @@
     "generation_seed": 9,
     "content_hash": "9bc204999a645ae0",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -222,6 +249,9 @@
     "generation_seed": 10,
     "content_hash": "8b529992eca05a5d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -245,6 +275,9 @@
     "generation_seed": 11,
     "content_hash": "c236b1070f9e2b31",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -268,6 +301,9 @@
     "generation_seed": 12,
     "content_hash": "c3e56818a05868be",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -291,6 +327,9 @@
     "generation_seed": 13,
     "content_hash": "cdb71fbc16a25a8a",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -314,6 +353,9 @@
     "generation_seed": 14,
     "content_hash": "4b320a72d22a61f2",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -337,6 +379,9 @@
     "generation_seed": 15,
     "content_hash": "66fbbaf45146b655",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -360,6 +405,9 @@
     "generation_seed": 16,
     "content_hash": "0119945c4b0211a0",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -383,6 +431,9 @@
     "generation_seed": 17,
     "content_hash": "7c3c24a0e3401b29",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -406,6 +457,9 @@
     "generation_seed": 18,
     "content_hash": "54347f7f06ad9214",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -429,6 +483,9 @@
     "generation_seed": 19,
     "content_hash": "6d13b9a2a7dc34ab",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -452,6 +509,9 @@
     "generation_seed": 20,
     "content_hash": "861d7a089f036ee8",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -475,6 +535,9 @@
     "generation_seed": 21,
     "content_hash": "6f64ce42df1b4de0",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -498,6 +561,9 @@
     "generation_seed": 22,
     "content_hash": "93e051189243b043",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -521,6 +587,9 @@
     "generation_seed": 23,
     "content_hash": "564b167651687a89",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -544,6 +613,9 @@
     "generation_seed": 24,
     "content_hash": "07905b41f08168a7",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -567,6 +639,9 @@
     "generation_seed": 25,
     "content_hash": "216f98ccb5cd6542",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "methodology_boilerplate",
       "review_tag": "Common phrase",
@@ -590,6 +665,9 @@
     "generation_seed": 26,
     "content_hash": "28cd0c2722f2cd28",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -613,6 +691,9 @@
     "generation_seed": 27,
     "content_hash": "fdb599fc12323c8a",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -636,6 +717,9 @@
     "generation_seed": 28,
     "content_hash": "2be1a55ec302f396",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -659,6 +743,9 @@
     "generation_seed": 29,
     "content_hash": "1bf0f017c66dbfe7",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -682,6 +769,9 @@
     "generation_seed": 30,
     "content_hash": "c97277644ca1d916",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -705,6 +795,9 @@
     "generation_seed": 31,
     "content_hash": "c5b1f483737bad47",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -728,6 +821,9 @@
     "generation_seed": 32,
     "content_hash": "74d5de162f95ef30",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -751,6 +847,9 @@
     "generation_seed": 33,
     "content_hash": "1f6462b7380d7a07",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -774,6 +873,9 @@
     "generation_seed": 34,
     "content_hash": "b62327254805fd79",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -797,6 +899,9 @@
     "generation_seed": 35,
     "content_hash": "4ebe869f159422a5",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -820,6 +925,9 @@
     "generation_seed": 36,
     "content_hash": "47bb54957a4e560c",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -843,6 +951,9 @@
     "generation_seed": 37,
     "content_hash": "f77588c2275f3866",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -866,6 +977,9 @@
     "generation_seed": 38,
     "content_hash": "4da90ed6bd8a8715",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -889,6 +1003,9 @@
     "generation_seed": 39,
     "content_hash": "b4181baab4fb243e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -912,6 +1029,9 @@
     "generation_seed": 40,
     "content_hash": "ac38e4d38ad1d93d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -935,6 +1055,9 @@
     "generation_seed": 41,
     "content_hash": "35d942c57cc9dd50",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -958,6 +1081,9 @@
     "generation_seed": 42,
     "content_hash": "1010bf1e777ca0fe",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -981,6 +1107,9 @@
     "generation_seed": 43,
     "content_hash": "363865d7e68430b3",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -1004,6 +1133,9 @@
     "generation_seed": 44,
     "content_hash": "c0e6d210993cd688",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -1027,6 +1159,9 @@
     "generation_seed": 45,
     "content_hash": "83081aa10a7eb7b9",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -1050,6 +1185,9 @@
     "generation_seed": 46,
     "content_hash": "496fd45114ba60b0",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -1073,6 +1211,9 @@
     "generation_seed": 47,
     "content_hash": "3361d929a42fbe72",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -1096,6 +1237,9 @@
     "generation_seed": 48,
     "content_hash": "1532dd54afe63669",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -1119,6 +1263,9 @@
     "generation_seed": 49,
     "content_hash": "bc0fde98e1767b2d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -1142,6 +1289,9 @@
     "generation_seed": 50,
     "content_hash": "44288cd3cf93c4fb",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "citation_protected",
       "review_tag": "Properly cited",
@@ -1165,6 +1315,9 @@
     "generation_seed": 51,
     "content_hash": "76b6061d9db4ddb8",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -1188,6 +1341,9 @@
     "generation_seed": 52,
     "content_hash": "64de8764589ebb65",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -1211,6 +1367,9 @@
     "generation_seed": 53,
     "content_hash": "2639c66f45255604",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -1234,6 +1393,9 @@
     "generation_seed": 54,
     "content_hash": "a481c4fdb37cbdcd",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -1257,6 +1419,9 @@
     "generation_seed": 55,
     "content_hash": "548a137feea7ec4d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -1280,6 +1445,9 @@
     "generation_seed": 56,
     "content_hash": "beaa0db7bb935947",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -1303,6 +1471,9 @@
     "generation_seed": 57,
     "content_hash": "29f841956c7de589",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -1326,6 +1497,9 @@
     "generation_seed": 58,
     "content_hash": "5b9801032bc030c5",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -1349,6 +1523,9 @@
     "generation_seed": 59,
     "content_hash": "f7fb8660a51af800",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -1372,6 +1549,9 @@
     "generation_seed": 60,
     "content_hash": "997c201b8a18685d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -1395,6 +1575,9 @@
     "generation_seed": 61,
     "content_hash": "a9065fa5c9a974dd",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -1418,6 +1601,9 @@
     "generation_seed": 62,
     "content_hash": "551a2cbff25abc22",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -1441,6 +1627,9 @@
     "generation_seed": 63,
     "content_hash": "566196015f346775",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -1464,6 +1653,9 @@
     "generation_seed": 64,
     "content_hash": "51f2a879a67f568f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -1487,6 +1679,9 @@
     "generation_seed": 65,
     "content_hash": "9fc847b6e5068531",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -1510,6 +1705,9 @@
     "generation_seed": 66,
     "content_hash": "6a42b89293dd798b",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -1533,6 +1731,9 @@
     "generation_seed": 67,
     "content_hash": "66702c6eb1061f90",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -1556,6 +1757,9 @@
     "generation_seed": 68,
     "content_hash": "6527c828bfba3180",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -1579,6 +1783,9 @@
     "generation_seed": 69,
     "content_hash": "25618e0f252bb0d3",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -1602,6 +1809,9 @@
     "generation_seed": 70,
     "content_hash": "8b236ba26bdaaf6a",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -1625,6 +1835,9 @@
     "generation_seed": 71,
     "content_hash": "213bbfd8897b8e7f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -1648,6 +1861,9 @@
     "generation_seed": 72,
     "content_hash": "074b766f886f727d",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -1671,6 +1887,9 @@
     "generation_seed": 73,
     "content_hash": "4312d6b02b714094",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -1694,6 +1913,9 @@
     "generation_seed": 74,
     "content_hash": "0bfc15d8dbe73475",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -1717,6 +1939,9 @@
     "generation_seed": 75,
     "content_hash": "bd1156ab4610ee09",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "exact_quote",
       "review_tag": "Properly cited",
@@ -1740,6 +1965,9 @@
     "generation_seed": 76,
     "content_hash": "a09cfe29abda0247",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -1763,6 +1991,9 @@
     "generation_seed": 77,
     "content_hash": "e86144db45b0b804",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -1786,6 +2017,9 @@
     "generation_seed": 78,
     "content_hash": "eeaa9ba50b4cadd4",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -1809,6 +2043,9 @@
     "generation_seed": 79,
     "content_hash": "ed530e4d11d72421",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -1832,6 +2069,9 @@
     "generation_seed": 80,
     "content_hash": "952aea7b1e2743dd",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -1855,6 +2095,9 @@
     "generation_seed": 81,
     "content_hash": "811e809b9a385b56",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -1878,6 +2121,9 @@
     "generation_seed": 82,
     "content_hash": "aca844a0e69472ea",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -1901,6 +2147,9 @@
     "generation_seed": 83,
     "content_hash": "f762c138ee1dc19e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -1924,6 +2173,9 @@
     "generation_seed": 84,
     "content_hash": "f8c4ef1d7b536f4e",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -1947,6 +2199,9 @@
     "generation_seed": 85,
     "content_hash": "be8a4b073e6b17c6",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -1970,6 +2225,9 @@
     "generation_seed": 86,
     "content_hash": "507447f3793bc098",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -1993,6 +2251,9 @@
     "generation_seed": 87,
     "content_hash": "7acb25add9fd038b",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -2016,6 +2277,9 @@
     "generation_seed": 88,
     "content_hash": "3026c5cef1d4ca1b",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -2039,6 +2303,9 @@
     "generation_seed": 89,
     "content_hash": "f6e9d1673781c31c",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -2062,6 +2329,9 @@
     "generation_seed": 90,
     "content_hash": "af0a272406cd7efe",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -2085,6 +2355,9 @@
     "generation_seed": 91,
     "content_hash": "adf2a8de9c389546",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -2108,6 +2381,9 @@
     "generation_seed": 92,
     "content_hash": "837ee54ffbdd7f22",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -2131,6 +2407,9 @@
     "generation_seed": 93,
     "content_hash": "06b5e4540b7da6de",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -2154,6 +2433,9 @@
     "generation_seed": 94,
     "content_hash": "f7214fa46c5b5fea",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -2177,6 +2459,9 @@
     "generation_seed": 95,
     "content_hash": "2815847a785d6a5a",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -2200,6 +2485,9 @@
     "generation_seed": 96,
     "content_hash": "fe5f9ed01c2f4d6f",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -2223,6 +2511,9 @@
     "generation_seed": 97,
     "content_hash": "25d75264d8a2f197",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -2246,6 +2537,9 @@
     "generation_seed": 98,
     "content_hash": "fc1ad268222c538a",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -2269,6 +2563,9 @@
     "generation_seed": 99,
     "content_hash": "bbf8ce206670f25c",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",
@@ -2292,6 +2589,9 @@
     "generation_seed": 100,
     "content_hash": "ea33a3c88f895ed7",
     "failure_class": null,
+    "expected_context": null,
+    "expected_citation_status": null,
+    "expected_evidence_type": null,
     "metadata": {
       "adversarial_category": "terminology_overlap",
       "review_tag": "Common phrase",

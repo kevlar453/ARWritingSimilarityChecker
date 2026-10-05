@@ -44,6 +44,14 @@ case "$1" in
         shift
         exec "$PYTHON_BIN" worker/observability.py "$@"
         ;;
+    quality)
+        shift
+        exec "$PYTHON_BIN" worker/observability.py --quality "$@"
+        ;;
+    pilot-sample)
+        shift
+        exec "$PYTHON_BIN" evaluation/pilot_sampler_r2.py "$@"
+        ;;
     export)
         shift
         exec "$PYTHON_BIN" -m worker.exporter "$@"
@@ -63,6 +71,8 @@ case "$1" in
         echo "  ./artilik readiness"
         echo "  ./artilik metrics"
         echo "  ./artilik observability [--benchmark]"
+        echo "  ./artilik quality [--json]"
+        echo "  ./artilik pilot-sample [--dry-run] [--target-per-tier 5]"
         echo "  ./artilik export --report <id> [--output <file.pdf>]"
         echo "  ./artilik test"
         echo "  ./artilik diagnose --run <id> --case <TC-XXX> [--engine <hybrid|exact|tfidf>]"
