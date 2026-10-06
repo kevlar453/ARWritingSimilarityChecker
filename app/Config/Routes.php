@@ -6,11 +6,17 @@ use CodeIgniter\Router\RouteCollection;
 $routes->match(['get', 'head'], '/', 'LandingController::index');
 $routes->match(['get', 'head'], 'dashboard', 'DashboardController::index');
 $routes->match(['get', 'head'], 'report/(:num)', 'DashboardController::report/$1');
+$routes->match(['get', 'head'], 'reports/(:num)', 'DashboardController::report/$1');
 $routes->match(['get', 'head'], 'dashboard/report/(:num)', 'DashboardController::report/$1');
+$routes->match(['get', 'head'], 'dashboard/reports/(:num)', 'DashboardController::report/$1');
 $routes->match(['get', 'head'], 'report/(:num)/export', 'DashboardController::exportPdf/$1');
+$routes->match(['get', 'head'], 'reports/(:num)/export', 'DashboardController::exportPdf/$1');
 $routes->match(['get', 'head'], 'dashboard/report/(:num)/export', 'DashboardController::exportPdf/$1');
+$routes->match(['get', 'head'], 'dashboard/reports/(:num)/export', 'DashboardController::exportPdf/$1');
 $routes->get('report/(:num)/preview', 'DashboardController::previewPdf/$1');
+$routes->get('reports/(:num)/preview', 'DashboardController::previewPdf/$1');
 $routes->get('dashboard/report/(:num)/preview', 'DashboardController::previewPdf/$1');
+$routes->get('dashboard/reports/(:num)/preview', 'DashboardController::previewPdf/$1');
 $routes->match(['get', 'head'], 'verify/(:segment)', 'DashboardController::verify/$1');
 $routes->match(['get', 'head'], 'verify', 'DashboardController::verify');
 

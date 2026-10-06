@@ -533,7 +533,7 @@
                                             <td class="py-3 px-4 text-right">
                                                 <div class="flex items-center justify-end gap-1.5">
                                                     <?php if (isset($d['report']['id'])): ?>
-                                                        <a href="<?= base_url('reports/' . $d['id']) ?>" target="_blank" class="px-2 py-1 rounded bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-[10px] font-semibold transition-colors">
+                                                        <a href="<?= base_url('report/' . $d['report']['id']) ?>" target="_blank" class="px-2 py-1 rounded bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-[10px] font-semibold transition-colors">
                                                             Laporan
                                                         </a>
                                                     <?php endif; ?>

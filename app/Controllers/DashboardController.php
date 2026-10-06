@@ -80,9 +80,15 @@ class DashboardController extends BaseController
 
         $report = $reportModel->find($id);
         if (! $report) {
-            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Laporan #{$id} tidak ditemukan.");
+            // Dukung pemanggilan menggunakan document_id
+            $report = $reportModel->where('document_id', $id)->orderBy('id', 'DESC')->first();
         }
 
+        if (! $report) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Laporan atau dokumen #{$id} tidak ditemukan.");
+        }
+
+        $reportId = (int) $report['id'];
         $document = $docModel->find($report['document_id']);
 
         // Parse evidence_data JSON jika tersedia
@@ -95,7 +101,7 @@ class DashboardController extends BaseController
         $sources = $db->table('report_sources rs')
                       ->select('rs.*, d.title AS source_title, d.original_filename AS source_filename, d.source_type')
                       ->join('documents d', 'd.id = rs.source_document_id', 'left')
-                      ->where('rs.report_id', $id)
+                      ->where('rs.report_id', $reportId)
                       ->orderBy('rs.source_rank', 'ASC')
                       ->get()->getResultArray();
 
@@ -103,7 +109,7 @@ class DashboardController extends BaseController
         $matches = $db->table('report_matches rm')
                       ->select('rm.*, d.title AS source_title, d.original_filename AS source_filename')
                       ->join('documents d', 'd.id = rm.source_document_id', 'left')
-                      ->where('rm.report_id', $id)
+                      ->where('rm.report_id', $reportId)
                       ->orderBy('rm.submission_start', 'ASC')
                       ->get()->getResultArray();
 
@@ -343,13 +349,18 @@ class DashboardController extends BaseController
 
         $report = $reportModel->find($id);
         if (! $report) {
-            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Laporan #{$id} tidak ditemukan.");
+            $report = $reportModel->where('document_id', $id)->orderBy('id', 'DESC')->first();
         }
 
+        if (! $report) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Laporan atau dokumen #{$id} tidak ditemukan.");
+        }
+
+        $reportId = (int) $report['id'];
         $document = $docModel->find($report['document_id']);
         $rawTitle = $document['title'] ?? 'Dokumen';
         $safeTitle = preg_replace('/[^a-zA-Z0-9_\-]/', '_', $rawTitle);
-        $filename = "Laporan_AR_Tilik_#{$id}_{$safeTitle}.pdf";
+        $filename = "Laporan_AR_Tilik_#{$reportId}_{$safeTitle}.pdf";
 
         // Eksekusi worker exporter via Python
         $projectRoot = ROOTPATH;
@@ -358,7 +369,7 @@ class DashboardController extends BaseController
             $pythonBin = 'python3';
         }
 
-        $cmd = escapeshellcmd($pythonBin) . ' -m worker.exporter --report ' . (int) $id . ' --stdout';
+        $cmd = escapeshellcmd($pythonBin) . ' -m worker.exporter --report ' . $reportId . ' --stdout';
 
         $descriptors = [
             0 => ['pipe', 'r'],
@@ -400,23 +411,28 @@ class DashboardController extends BaseController
 
         $report = $reportModel->find($id);
         if (! $report) {
-            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Laporan #{$id} tidak ditemukan.");
+            $report = $reportModel->where('document_id', $id)->orderBy('id', 'DESC')->first();
         }
 
+        if (! $report) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Laporan atau dokumen #{$id} tidak ditemukan.");
+        }
+
+        $reportId = (int) $report['id'];
         $document = $docModel->find($report['document_id']);
         $evidenceData = !empty($report['evidence_data']) ? (is_string($report['evidence_data']) ? json_decode($report['evidence_data'], true) : $report['evidence_data']) : [];
 
         $sources = $db->table('report_sources rs')
                       ->select('rs.*, d.title AS source_title, d.original_filename AS source_filename, d.source_type')
                       ->join('documents d', 'd.id = rs.source_document_id', 'left')
-                      ->where('rs.report_id', $id)
+                      ->where('rs.report_id', $reportId)
                       ->orderBy('rs.source_rank', 'ASC')
                       ->get()->getResultArray();
 
         $matches = $db->table('report_matches rm')
                       ->select('rm.*, d.title AS source_title, d.original_filename AS source_filename')
                       ->join('documents d', 'd.id = rm.source_document_id', 'left')
-                      ->where('rm.report_id', $id)
+                      ->where('rm.report_id', $reportId)
                       ->orderBy('rm.word_count', 'DESC')
                       ->orderBy('rm.submission_start', 'ASC')
                       ->get()->getResultArray();
