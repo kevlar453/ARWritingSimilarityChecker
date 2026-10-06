@@ -134,17 +134,175 @@ def build_synthetic_training_dataset() -> Tuple[List[List[float]], List[int]]:
     return X, y
 
 
-def train_xgboost_risk_model() -> Any:
-    """Melatih dan menyimpan model XGBoost Academic Risk Classifier."""
+def load_expert_reviewed_training_dataset() -> Tuple[List[List[float]], List[int], Dict[str, Any]]:
+    """
+    Memuat dataset pelatihan yang menggabungkan:
+    1. Ground truth hasil telaah dewan etik & panel reviewer ahli (evaluation_labels & pilot_r2).
+    2. Dataset evaluasi terarah (targeted_80) & benchmark v1.
+    3. Boundary synthetic anchors untuk memastikan kestabilan pada edge cases ekstrem.
+    """
+    from worker.database import get_connection
+
+    # 1. Kumpulkan seluruh metrik kasus dari file-file hasil evaluasi & pilot
+    metrics_cache: Dict[str, Dict[str, Any]] = {}
+
+    # Pilot R2
+    try:
+        from evaluation.pilot_sampler_r2 import get_pilot_r2_set
+        for item in get_pilot_r2_set():
+            cid = item.get("case_id")
+            if cid:
+                metrics_cache[cid] = item
+    except Exception:
+        pass
+
+    # Targeted 80
+    t80_path = PROJECT_ROOT / "evaluation_dataset_v1_1_targeted_80" / "results.json"
+    if t80_path.exists():
+        try:
+            with open(t80_path, "r", encoding="utf-8") as f:
+                t80_data = json.load(f)
+                for item in t80_data:
+                    cid = item.get("case_id")
+                    if cid and cid not in metrics_cache:
+                        metrics_cache[cid] = item
+        except Exception:
+            pass
+
+    # Benchmark V1
+    v1_path = PROJECT_ROOT / "evaluation_dataset_v1" / "results.json"
+    if v1_path.exists():
+        try:
+            with open(v1_path, "r", encoding="utf-8") as f:
+                v1_data = json.load(f)
+                for item in v1_data:
+                    cid = item.get("case_id")
+                    if cid and cid not in metrics_cache:
+                        metrics_cache[cid] = item
+        except Exception:
+            pass
+
+    # 2. Ambil seluruh observasi telaah manusia dari tabel database evaluation_labels
+    human_labels: List[Dict[str, Any]] = []
+    try:
+        conn = get_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT case_id, human_decision, system_assessment, human_interpretation,
+                   properly_cited, needs_investigation, false_positive, citation_status
+            FROM evaluation_labels
+        """)
+        human_labels = cursor.fetchall()
+        cursor.close()
+        conn.close()
+    except Exception as db_err:
+        print(f"[!] Peringatan: Gagal membaca tabel evaluation_labels: {db_err}")
+
+    X_human = []
+    y_human = []
+    matched_cases_count = 0
+
+    class_map = {
+        "no_match": 0,
+        "review": 1,
+        "match": 2
+    }
+
+    for hl in human_labels:
+        cid = hl.get("case_id")
+        dec_str = str(hl.get("human_decision", "")).lower().strip()
+        if not cid or dec_str not in class_map or cid not in metrics_cache:
+            continue
+
+        item = metrics_cache[cid]
+        exact_sim = float(item.get("exact_similarity", 0.0))
+        cosine_sim = float(item.get("cosine_similarity", 0.0))
+        longest_match = int(item.get("longest_match_words", 0))
+        avg_idf = float(item.get("avg_idf", 1.5))
+        shared_terms = int(item.get("matched_terms", item.get("shared_terms_count", 5)))
+        source_count = 1
+
+        # Turunkan nilai kontekstual dari label ahli
+        h_interp = hl.get("human_interpretation", "")
+        properly_cited = int(hl.get("properly_cited", 0) or 0)
+
+        boilerplate_ratio = 0.0
+        quote_ratio = 0.0
+        burstiness = 0.50
+        transition_density = 1.0
+        cross_lingual_score = 0.0
+
+        if h_interp == "METHODOLOGY_BOILERPLATE":
+            boilerplate_ratio = 0.85
+            transition_density = 2.0
+        elif h_interp == "COMMON_ACADEMIC_LANGUAGE":
+            boilerplate_ratio = 0.50
+        elif properly_cited == 1 or h_interp == "DIRECT_OVERLAP_PROPERLY_CITED":
+            quote_ratio = 0.85
+        elif h_interp == "DIRECT_OVERLAP_RELEVANT":
+            quote_ratio = 0.0
+            boilerplate_ratio = 0.05
+
+        vec = extract_features_vector(
+            exact_sim=exact_sim,
+            cosine_sim=cosine_sim,
+            longest_match_words=longest_match,
+            avg_idf=avg_idf,
+            shared_terms_count=shared_terms,
+            source_count=source_count,
+            burstiness=burstiness,
+            transition_density=transition_density,
+            cross_lingual_score=cross_lingual_score,
+            boilerplate_ratio=boilerplate_ratio,
+            quote_ratio=quote_ratio
+        )
+        X_human.append(vec)
+        y_human.append(class_map[dec_str])
+        matched_cases_count += 1
+
+    # 3. Gabungkan dengan boundary synthetic anchors untuk stabilitas global
+    X_synthetic, y_synthetic = build_synthetic_training_dataset()
+
+    X_total = X_human + X_synthetic
+    y_total = y_human + y_synthetic
+
+    stats = {
+        "human_labels_count": matched_cases_count,
+        "synthetic_anchors_count": len(y_synthetic),
+        "total_training_samples": len(y_total),
+        "class_distribution": {
+            "NO_MATCH (0)": y_total.count(0),
+            "REVIEW (1)": y_total.count(1),
+            "MATCH (2)": y_total.count(2)
+        }
+    }
+
+    return X_total, y_total, stats
+
+
+def train_xgboost_risk_model(use_human_labels: bool = True) -> Any:
+    """Melatih dan menyimpan model XGBoost Academic Risk Classifier dengan data telaah ahli."""
     try:
         import xgboost as xgb
         MODEL_DIR.mkdir(parents=True, exist_ok=True)
-        X, y = build_synthetic_training_dataset()
+
+        if use_human_labels:
+            X, y, stats = load_expert_reviewed_training_dataset()
+            print("=" * 60)
+            print("  AR TILIK — PELATIHAN MODEL XGBOOST ACADEMIC RISK")
+            print("=" * 60)
+            print(f"Data Telaah Dewan Etik / Ahli : {stats['human_labels_count']} sampel")
+            print(f"Jangkar Sintetis Edge-Cases   : {stats['synthetic_anchors_count']} sampel")
+            print(f"Total Dataset Pelatihan       : {stats['total_training_samples']} sampel")
+            print(f"Distribusi Kelas              : {stats['class_distribution']}")
+        else:
+            X, y = build_synthetic_training_dataset()
+            stats = {"total_training_samples": len(y)}
 
         model = xgb.XGBClassifier(
-            n_estimators=40,
-            max_depth=3,
-            learning_rate=0.1,
+            n_estimators=60,
+            max_depth=4,
+            learning_rate=0.08,
             objective="multi:softprob",
             num_class=3,
             eval_metric="mlogloss",
@@ -152,6 +310,28 @@ def train_xgboost_risk_model() -> Any:
         )
         model.fit(X, y)
         model.save_model(str(MODEL_PATH))
+
+        # Evaluasi akurasi pada data latih & feature importances
+        preds = model.predict(X)
+        correct = sum(1 for p, act in zip(preds, y) if p == act)
+        train_acc = (correct / len(y)) * 100.0
+
+        importances = model.feature_importances_
+        feat_rank = sorted(zip(FEATURE_NAMES, importances), key=lambda x: x[1], reverse=True)
+
+        print("\nHasil Evaluasi Pelatihan:")
+        print(f"Akurasi Pelatihan             : {train_acc:.2f}% ({correct}/{len(y)})")
+        print("\nUrutan Pengaruh Fitur (Feature Importance):")
+        for fname, imp in feat_rank:
+            bar = "█" * int(imp * 30)
+            print(f"  - {fname:<25}: {imp:6.4f} | {bar}")
+
+        print("\n[✓] Model XGBoost berhasil disimpan ke:")
+        print(f"    {MODEL_PATH}")
+        print("=" * 60)
+
+        global _GLOBAL_MODEL
+        _GLOBAL_MODEL = model
         return model
     except Exception as err:
         print(f"[XGBOOST WARNING] Gagal melatih model XGBoost: {err}")

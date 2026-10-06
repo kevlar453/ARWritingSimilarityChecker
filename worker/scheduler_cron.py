@@ -99,7 +99,20 @@ def run_scheduler_pipeline(
         except Exception as oai_err:
             print(f"[!] Kendala pemanenan OAI-PMH: {oai_err}")
     else:
-        print("\n[2/4] OAI-PMH Harvester dilewati (CORPUS_OAI_URL belum dikonfigurasi di .env).")
+        print("\n[2/4] Memeriksa katalog registri repositori perguruan tinggi Indonesia...")
+        try:
+            from worker.auto_discovery_harvester import harvest_indonesian_registry
+            reg_res = harvest_indonesian_registry(max_repos=2, limit_per_repo=3)
+            indexed_oai = reg_res.get("indexed_count", 0)
+            oai_result = reg_res
+            print(f"      Diindeks dari registri: {indexed_oai}")
+            for itm in reg_res.get("details", []):
+                res_obj = itm.get("result", {})
+                for r in res_obj.get("records", []):
+                    if r.get("status") == "indexed":
+                        new_titles.append(r.get("title", itm.get("name", "Publikasi Repositori RI")))
+        except Exception as reg_err:
+            print(f"[!] Kendala pemanenan registri repositori: {reg_err}")
 
     # 3. Jalankan Autonomous Discovery jika dikonfigurasi di .env
     discovery_topics = os.getenv("CORPUS_DISCOVERY_TOPICS", "").strip()
@@ -149,6 +162,16 @@ def run_scheduler_pipeline(
     print("\n" + "=" * 60)
     print(f"Selesai dalam {duration:.2f} detik. Total naskah baru: +{total_new}")
     print("=" * 60)
+
+    # Catat log terstruktur ke file log
+    try:
+        log_dir = PROJECT_ROOT / "writable" / "logs"
+        log_dir.mkdir(parents=True, exist_ok=True)
+        log_file = log_dir / "harvester_cron.log"
+        with open(log_file, "a", encoding="utf-8") as f:
+            f.write(f"[{start_time.strftime('%Y-%m-%d %H:%M:%S')}] DURATION={duration:.2f}s NEW=+{total_new} (Dropzone={indexed_dropzone}, OAI/Reg={indexed_oai}, Discovery={indexed_discovery}) TOTAL_ACTIVE={total_corpus}\n")
+    except Exception:
+        pass
 
     return {
         "dropzone": dropzone_result,
