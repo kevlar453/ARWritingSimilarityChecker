@@ -1104,15 +1104,26 @@
             showProcessingModal('Mengunggah & Mengindeks Korpus...', 'Mengekstrak teks halaman dan menyusun indeks sidik jari dokumen.');
 
             try {
-                const res = await fetch('<?= base_url('admin/corpus') ?>', {
+                const res = await fetch('<?= base_url('api/corpus/contribute') ?>', {
                     method: 'POST',
-                    body: formData
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
                 });
                 const data = await res.json();
 
-                if (res.ok) {
-                    showProcessingModal('Korpus Berhasil Didaftarkan!', 'Memuat ulang daftar korpus institusi...');
-                    setTimeout(() => location.reload(), 1200);
+                if (res.status === 201 || res.ok) {
+                    let successTitle = 'Korpus Berhasil Didaftarkan!';
+                    if (data.bonus_awarded) {
+                        successTitle = '🎉 Bonus +1 Submisi Berhasil Diklaim!';
+                    }
+                    showProcessingModal(successTitle, data.message || 'Memuat ulang daftar korpus institusi...');
+                    setTimeout(() => location.reload(), 1400);
+                } else if (res.status === 409) {
+                    hideProcessingModal();
+                    alertBox.className = 'mt-4 p-4 rounded-xl text-xs sm:text-sm bg-amber-50 text-amber-900 border border-amber-300 block';
+                    alertBox.innerHTML = '<strong>Duplikat Terdeteksi:</strong> ' + data.message;
                 } else {
                     throw new Error(data.message || 'Gagal menambah korpus.');
                 }

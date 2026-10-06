@@ -113,7 +113,7 @@ class DocumentController extends BaseController
             ]);
         }
 
-        $file = $this->request->getFile('corpus_document');
+        $file = $this->request->getFile('corpus_document') ?: $this->request->getFile('document');
         if (! $file || ! $file->isValid()) {
             return $this->response->setStatusCode(400)->setJSON([
                 'status'  => 'error',
@@ -344,9 +344,23 @@ class DocumentController extends BaseController
             ]);
         }
 
+        // Catat kontribusi korpus untuk pemilik dokumen (+3 Korpus = +1 Submisi)
+        $bonusMsg = "";
+        $targetUserId = $document['user_id'] ?: session()->get('user_id');
+        if ($targetUserId) {
+            $userModel = new \App\Models\UserModel();
+            $rewardResult = $userModel->recordCorpusUpload((int)$targetUserId);
+            if (!empty($rewardResult['bonus_awarded'])) {
+                $bonusMsg = " Selamat! Sumbangan 3 korpus valid Anda telah tercapai dan mendapatkan bonus +1 submisi gratis!";
+            } else if (isset($rewardResult['quota_info']['corpus_to_next_bonus'])) {
+                $needed = $rewardResult['quota_info']['corpus_to_next_bonus'];
+                $bonusMsg = " Sumbang {$needed} korpus valid lagi untuk klaim reward +1 submisi.";
+            }
+        }
+
         return $this->response->setJSON([
             'status'  => 'success',
-            'message' => "Naskah '{$document['title']}' berhasil didaftarkan sebagai Korpus Institusi permanen."
+            'message' => "Naskah '{$document['title']}' berhasil didaftarkan sebagai Korpus Institusi permanen.{$bonusMsg}"
         ]);
     }
 
