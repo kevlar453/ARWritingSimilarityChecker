@@ -32,6 +32,15 @@ $routes->group('auth', function ($routes) {
     $routes->get('security-token', 'AuthController::securityToken');
 });
 
+// Payment & Top-Up Routes (Midtrans Snap & Webhook)
+$routes->group('payment', function ($routes) {
+    $routes->get('packages', 'PaymentController::packages');
+    $routes->post('create-snap', 'PaymentController::createSnapToken');
+    $routes->post('webhook', 'PaymentController::webhook');
+    $routes->get('status/(:segment)', 'PaymentController::checkStatus/$1');
+    $routes->get('history', 'PaymentController::history');
+});
+
 // API Routes
 $routes->group('api', function ($routes) {
     // Documents

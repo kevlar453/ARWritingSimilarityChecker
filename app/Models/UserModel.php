@@ -14,6 +14,8 @@ class UserModel extends Model
         'password_hash',
         'institution',
         'role',
+        'subscription_tier',
+        'subscription_expires_at',
         'status',
         'verification_token',
         'verification_token_expires_at',
@@ -93,6 +95,16 @@ class UserModel extends Model
         $resetTime = strtotime($user['week_reset_at']);
         $daysUntilReset = max(1, (int) ceil(($resetTime - time()) / 86400));
 
+        $subTier = $user['subscription_tier'] ?? 'free';
+        $subExpiresAt = $user['subscription_expires_at'] ?? null;
+        $isSubscribed = ($subTier !== 'free' && !empty($subExpiresAt) && strtotime($subExpiresAt) > time());
+        $subLabel = match ($subTier) {
+            'skripsi'   => 'Pejuang Skripsi',
+            'dosen_pro' => 'Dosen & Akademisi Pro',
+            default     => 'Paket Standar (Gratis)'
+        };
+        $daysUntilSubExpires = $isSubscribed ? max(1, (int) ceil((strtotime($subExpiresAt) - time()) / 86400)) : 0;
+
         return [
             'free_limit'              => $freeLimit,
             'free_weekly_limit'       => $freeLimit,
@@ -107,6 +119,11 @@ class UserModel extends Model
             'corpus_progress_percent' => $progressPct,
             'reset_date'              => $user['week_reset_at'],
             'days_until_reset'        => $daysUntilReset,
+            'subscription_tier'       => $subTier,
+            'subscription_expires_at' => $subExpiresAt,
+            'subscription_label'      => $subLabel,
+            'is_subscribed'           => $isSubscribed,
+            'subscription_days_left'  => $daysUntilSubExpires,
         ];
     }
 

@@ -123,6 +123,13 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                     Pengunjung
                 </a>
+                <a href="<?= base_url('admin?tab=payments') ?>" class="flex-shrink-0 px-3 py-1.5 rounded-lg flex items-center gap-2 whitespace-nowrap transition-colors <?= $activeTab === 'payments' ? 'bg-indigo-600/20 text-indigo-300 font-semibold border border-indigo-500/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50' ?>">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                    Transaksi & Pembayaran
+                    <?php if (!empty($metrics['payment_stats']['settled_count'])): ?>
+                        <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold"><?= (int) $metrics['payment_stats']['settled_count'] ?> lunas</span>
+                    <?php endif; ?>
+                </a>
                 <a href="<?= base_url('admin?tab=system') ?>" class="flex-shrink-0 px-3 py-1.5 rounded-lg flex items-center gap-2 whitespace-nowrap transition-colors <?= $activeTab === 'system' ? 'bg-indigo-600/20 text-indigo-300 font-semibold border border-indigo-500/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50' ?>">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                     Sistem Server
@@ -779,6 +786,111 @@
                                             </td>
                                             <td class="py-3 px-4 text-right text-slate-300 font-mono-code">
                                                 <?= $v['unique_visitors'] > 0 ? number_format($v['total_hits'] / $v['unique_visitors'], 2) : '1.00' ?>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 6.5: TRANSAKSI & PEMBAYARAN MIDTRANS   -->
+        <!-- ========================================== -->
+        <?php elseif ($activeTab === 'payments'): ?>
+            <div class="space-y-6">
+                <div>
+                    <h2 class="text-lg font-bold text-white">Transaksi & Pendapatan Midtrans</h2>
+                    <p class="text-xs text-slate-400">Monitoring pembayaran real-time via QRIS, GoPay, ShopeePay, dan Virtual Account</p>
+                </div>
+
+                <!-- Metric Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-4 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-lg">💰</div>
+                        <div>
+                            <div class="text-[11px] text-slate-400">Total Pendapatan (Gross)</div>
+                            <div class="text-xl font-extrabold text-white">Rp <?= number_format($metrics['payment_stats']['total_revenue'] ?? 0, 0, ',', '.') ?></div>
+                        </div>
+                    </div>
+                    <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-4 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-lg">✅</div>
+                        <div>
+                            <div class="text-[11px] text-slate-400">Transaksi Lunas (Settlement)</div>
+                            <div class="text-xl font-extrabold text-emerald-400"><?= number_format($metrics['payment_stats']['settled_count'] ?? 0) ?></div>
+                        </div>
+                    </div>
+                    <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-4 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-lg">⏳</div>
+                        <div>
+                            <div class="text-[11px] text-slate-400">Menunggu Pembayaran</div>
+                            <div class="text-xl font-extrabold text-amber-400"><?= number_format($metrics['payment_stats']['pending_count'] ?? 0) ?></div>
+                        </div>
+                    </div>
+                    <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-4 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center font-bold text-lg">📊</div>
+                        <div>
+                            <div class="text-[11px] text-slate-400">Total Transaksi</div>
+                            <div class="text-xl font-extrabold text-slate-200"><?= number_format($metrics['payment_stats']['total_transactions'] ?? 0) ?></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payments Table -->
+                <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl overflow-hidden shadow-xs">
+                    <div class="px-5 py-3 border-b border-slate-700/60 flex items-center justify-between">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Log Transaksi Terkini</h3>
+                        <span class="text-[11px] text-slate-500">Maks. 50 transaksi terakhir</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-slate-900/50 border-b border-slate-700/60 text-slate-400 font-semibold">
+                                    <th class="p-3">Order ID</th>
+                                    <th class="p-3">Pelanggan</th>
+                                    <th class="p-3">Paket</th>
+                                    <th class="p-3">Nominal</th>
+                                    <th class="p-3">Metode</th>
+                                    <th class="p-3">Status</th>
+                                    <th class="p-3">Waktu Bayar / Buat</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-700/40">
+                                <?php if (empty($paymentsList)): ?>
+                                    <tr>
+                                        <td colspan="7" class="p-6 text-center text-slate-500">Belum ada transaksi pembayaran yang tercatat.</td>
+                                    </tr>
+                                <?php else: ?>
+                                    <?php foreach ($paymentsList as $pay): ?>
+                                        <tr class="hover:bg-slate-800/30 transition-colors">
+                                            <td class="p-3 font-mono-code text-indigo-300 font-semibold"><?= esc($pay['order_id']) ?></td>
+                                            <td class="p-3">
+                                                <div class="text-slate-200 font-medium"><?= esc($pay['user_name'] ?? 'User #' . $pay['user_id']) ?></div>
+                                                <div class="text-[10px] text-slate-400"><?= esc($pay['user_email'] ?? '-') ?></div>
+                                            </td>
+                                            <td class="p-3">
+                                                <div class="text-slate-200 font-medium"><?= esc($pay['package_name']) ?></div>
+                                                <div class="text-[10px] text-emerald-400">+<?= (int) $pay['submissions_added'] ?> submisi</div>
+                                            </td>
+                                            <td class="p-3 font-mono-code font-bold text-slate-100">
+                                                Rp <?= number_format($pay['amount'], 0, ',', '.') ?>
+                                            </td>
+                                            <td class="p-3 text-slate-300 uppercase text-[10px] font-semibold">
+                                                <?= esc($pay['payment_type'] ?? 'Midtrans') ?>
+                                            </td>
+                                            <td class="p-3">
+                                                <?php if (in_array($pay['transaction_status'], ['settlement', 'capture'])): ?>
+                                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">LUNAS</span>
+                                                <?php elseif ($pay['transaction_status'] === 'pending'): ?>
+                                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">PENDING</span>
+                                                <?php else: ?>
+                                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30"><?= strtoupper(esc($pay['transaction_status'])) ?></span>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td class="p-3 text-[11px] text-slate-400">
+                                                <?= $pay['paid_at'] ? date('d M Y, H:i', strtotime($pay['paid_at'])) : date('d M Y, H:i', strtotime($pay['created_at'])) ?>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>

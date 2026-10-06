@@ -173,8 +173,13 @@
                 <div class="space-y-1.5">
                     <div class="flex items-center gap-2 flex-wrap">
                         <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-indigo-500/30 text-indigo-300 border border-indigo-500/40 uppercase tracking-wider">
-                            Akun Terdaftar: <?= esc($currentUser['name']) ?>
+                            Akun: <?= esc($currentUser['name']) ?>
                         </span>
+                        <?php if (!empty($quotaInfo['is_subscribed'])): ?>
+                        <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-500/25 text-amber-300 border border-amber-500/40 flex items-center gap-1 shadow-xs">
+                            ⭐ <?= esc($quotaInfo['subscription_label']) ?> (Sisa <?= (int) ($quotaInfo['subscription_days_left'] ?? 0) ?> hari)
+                        </span>
+                        <?php endif; ?>
                         <span class="text-xs text-slate-400">• <?= esc($currentUser['email']) ?></span>
                     </div>
                     <h2 class="text-lg font-bold text-white flex items-center gap-2 flex-wrap">
@@ -183,18 +188,18 @@
                     </h2>
                     <p class="text-xs text-slate-300 leading-relaxed max-w-2xl">
                         Kuota gratis: <strong class="text-white"><?= $quotaInfo['free_remaining'] ?? 3 ?>/<?= $quotaInfo['free_weekly_limit'] ?? $quotaInfo['free_limit'] ?? 3 ?> submisi</strong> minggu ini (reset otomatis dalam <?= $quotaInfo['days_until_reset'] ?? 7 ?> hari). 
-                        Bonus korpus: <strong class="text-amber-300">+<?= $quotaInfo['bonus_submissions'] ?? $quotaInfo['bonus_remaining'] ?? 0 ?> submisi</strong>. 
+                        Bonus & Top-Up: <strong class="text-amber-300">+<?= $quotaInfo['bonus_submissions'] ?? $quotaInfo['bonus_remaining'] ?? 0 ?> submisi</strong>. 
                         Tiap sumbangan <strong class="text-sky-300">3 naskah korpus valid</strong> memberikan reward <strong class="text-emerald-300">+1 submisi gratis</strong>!
                     </p>
                 </div>
                 
                 <div class="flex flex-wrap sm:flex-nowrap items-center gap-2.5 flex-shrink-0">
-                    <button type="button" onclick="openContributeCorpusModal()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-sm transition transform hover:-translate-y-0.5">
-                        <span>➕ Sumbang Korpus (+1 Kuota)</span>
+                    <button type="button" onclick="openPaymentModal()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white shadow-md transition transform hover:-translate-y-0.5 cursor-pointer">
+                        <span>⚡ Beli Kuota / Top-Up</span>
                     </button>
-                    <a href="<?= base_url('/#pricing') ?>" class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl font-semibold text-xs bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white border border-white/20 transition">
-                        <span>💎 Rencana Paket</span>
-                    </a>
+                    <button type="button" onclick="openContributeCorpusModal()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl font-bold text-xs bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-sm transition transform hover:-translate-y-0.5 cursor-pointer">
+                        <span>➕ Sumbang Korpus (+1)</span>
+                    </button>
                 </div>
             </div>
 
@@ -1258,5 +1263,221 @@
             </form>
         </div>
     </div>
+
+    <!-- Midtrans Snap Script -->
+    <script type="text/javascript" src="https://app.midtrans.com/snap/snap.js" data-client-key="<?= esc(env('midtrans.clientKey') ?: 'Mid-client-YcdL-k_f7VC97khK') ?>"></script>
+
+    <!-- Midtrans Payment & Top-Up Modal -->
+    <div id="paymentModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-xs z-50 flex items-center justify-center hidden p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-4xl w-full shadow-2xl border border-slate-100 overflow-hidden my-8 animate-in fade-in zoom-in-95 duration-150">
+            <!-- Modal Header -->
+            <div class="px-6 py-5 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border-b border-indigo-900/50 flex items-center justify-between text-white">
+                <div class="space-y-1">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xl">💳</span>
+                        <h3 class="text-lg font-bold">Top-Up Kuota & Paket Langganan</h3>
+                    </div>
+                    <p class="text-xs text-indigo-200">Pembayaran instan & otomatis via Midtrans: QRIS, GoPay, ShopeePay, dan Virtual Account Bank</p>
+                </div>
+                <button type="button" onclick="closePaymentModal()" class="text-slate-400 hover:text-white text-2xl font-bold p-1 leading-none transition">&times;</button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="p-6 space-y-6">
+                <!-- Info Alert -->
+                <div class="p-3 bg-indigo-50 border border-indigo-200 rounded-xl flex items-center justify-between gap-3 text-indigo-900 text-xs">
+                    <div class="flex items-center gap-2">
+                        <span class="text-base">⚡</span>
+                        <span>Kuota Anda saat ini: <strong class="text-indigo-950 font-bold"><?= $quotaInfo['total_available'] ?? 3 ?> Submisi</strong>. Pembayaran sukses akan langsung mengkreditkan kuota secara instan ke akun Anda tanpa perlu konfirmasi manual.</span>
+                    </div>
+                </div>
+
+                <div id="paymentAlert" class="hidden p-3 rounded-xl text-xs"></div>
+
+                <!-- Packages Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Paket 1: Top-up 3 Dokumen -->
+                    <div class="border border-slate-200 hover:border-emerald-500 rounded-2xl p-4 bg-white hover:shadow-md transition flex flex-col justify-between relative group">
+                        <div class="space-y-3">
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-200 inline-block">
+                                Paling Terjangkau
+                            </span>
+                            <div>
+                                <h4 class="font-extrabold text-sm text-slate-800">Top-Up 3 Dokumen</h4>
+                                <div class="mt-1 flex items-baseline gap-1">
+                                    <span class="text-xl font-black text-slate-900">Rp 10.000</span>
+                                </div>
+                                <p class="text-[11px] text-slate-500 mt-1">Rp 3.333 / submisi</p>
+                            </div>
+                            <ul class="text-[11px] text-slate-600 space-y-1.5 pt-2 border-t border-slate-100">
+                                <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> +3 submisi dokumen</li>
+                                <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Aktif selamanya (tanpa batas)</li>
+                                <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Ekspor PDF & tautan publik</li>
+                            </ul>
+                        </div>
+                        <button type="button" onclick="checkoutPackage('topup_3', this)" class="mt-4 w-full py-2 px-3 rounded-xl font-bold text-xs bg-slate-900 hover:bg-emerald-600 text-white transition shadow-xs cursor-pointer flex items-center justify-center gap-1">
+                            <span>Pilih Paket</span>
+                        </button>
+                    </div>
+
+                    <!-- Paket 2: Top-up 10 Dokumen -->
+                    <div class="border-2 border-amber-400 rounded-2xl p-4 bg-gradient-to-b from-amber-50/50 to-white hover:shadow-md transition flex flex-col justify-between relative group">
+                        <div class="space-y-3">
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white shadow-xs inline-block">
+                                ⭐ Paling Populer
+                            </span>
+                            <div>
+                                <h4 class="font-extrabold text-sm text-slate-800">Top-Up 10 Dokumen</h4>
+                                <div class="mt-1 flex items-baseline gap-1">
+                                    <span class="text-xl font-black text-slate-900">Rp 25.000</span>
+                                    <span class="text-[10px] text-emerald-600 font-bold">Hemat 16%</span>
+                                </div>
+                                <p class="text-[11px] text-slate-500 mt-1">Rp 2.500 / submisi</p>
+                            </div>
+                            <ul class="text-[11px] text-slate-600 space-y-1.5 pt-2 border-t border-amber-100">
+                                <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> +10 submisi dokumen</li>
+                                <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Aktif selamanya (tanpa batas)</li>
+                                <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Prioritas pemrosesan dokumen</li>
+                            </ul>
+                        </div>
+                        <button type="button" onclick="checkoutPackage('topup_10', this)" class="mt-4 w-full py-2 px-3 rounded-xl font-bold text-xs bg-amber-500 hover:bg-amber-600 text-white transition shadow-xs cursor-pointer flex items-center justify-center gap-1">
+                            <span>Pilih Paket</span>
+                        </button>
+                    </div>
+
+                    <!-- Paket 3: Pejuang Skripsi -->
+                    <div class="border border-slate-200 hover:border-cyan-500 rounded-2xl p-4 bg-white hover:shadow-md transition flex flex-col justify-between relative group">
+                        <div class="space-y-3">
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-cyan-100 text-cyan-800 border border-cyan-200 inline-block">
+                                Rekomendasi Mahasiswa
+                            </span>
+                            <div>
+                                <h4 class="font-extrabold text-sm text-slate-800">Paket Pejuang Skripsi</h4>
+                                <div class="mt-1 flex items-baseline gap-1">
+                                    <span class="text-xl font-black text-slate-900">Rp 25.000</span>
+                                    <span class="text-xs text-slate-500">/ bln</span>
+                                </div>
+                                <p class="text-[11px] text-cyan-600 font-medium mt-1">Rp 1.250 / submisi</p>
+                            </div>
+                            <ul class="text-[11px] text-slate-600 space-y-1.5 pt-2 border-t border-slate-100">
+                                <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> 20 submisi dokumen / bulan</li>
+                                <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Prioritas antrean cepat</li>
+                                <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Masa aktif paket 30 hari</li>
+                            </ul>
+                        </div>
+                        <button type="button" onclick="checkoutPackage('subs_skripsi', this)" class="mt-4 w-full py-2 px-3 rounded-xl font-bold text-xs bg-slate-900 hover:bg-cyan-600 text-white transition shadow-xs cursor-pointer flex items-center justify-center gap-1">
+                            <span>Langganan 30 Hari</span>
+                        </button>
+                    </div>
+
+                    <!-- Paket 4: Dosen & Peneliti Pro -->
+                    <div class="border border-slate-200 hover:border-purple-500 rounded-2xl p-4 bg-white hover:shadow-md transition flex flex-col justify-between relative group">
+                        <div class="space-y-3">
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 text-purple-800 border border-purple-200 inline-block">
+                                Kapasitas Besar
+                            </span>
+                            <div>
+                                <h4 class="font-extrabold text-sm text-slate-800">Dosen & Akademisi Pro</h4>
+                                <div class="mt-1 flex items-baseline gap-1">
+                                    <span class="text-xl font-black text-slate-900">Rp 75.000</span>
+                                    <span class="text-xs text-slate-500">/ bln</span>
+                                </div>
+                                <p class="text-[11px] text-purple-600 font-medium mt-1">Rp 1.000 / submisi</p>
+                            </div>
+                            <ul class="text-[11px] text-slate-600 space-y-1.5 pt-2 border-t border-slate-100">
+                                <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> 75 submisi dokumen / bulan</li>
+                                <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Prioritas pemrosesan tertinggi</li>
+                                <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Dukungan berkas hingga 30 MB</li>
+                            </ul>
+                        </div>
+                        <button type="button" onclick="checkoutPackage('subs_dosen', this)" class="mt-4 w-full py-2 px-3 rounded-xl font-bold text-xs bg-slate-900 hover:bg-purple-600 text-white transition shadow-xs cursor-pointer flex items-center justify-center gap-1">
+                            <span>Langganan 30 Hari</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Payment Methods Supported -->
+                <div class="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between text-xs text-slate-400 gap-3">
+                    <div class="flex items-center gap-2">
+                        <span>Metode Pembayaran Resmi:</span>
+                        <span class="font-semibold text-slate-600">QRIS (GoPay, OVO, Dana, LinkAja, ShopeePay), BCA, BRI, BNI, Mandiri VA</span>
+                    </div>
+                    <div class="text-[11px] text-slate-400">
+                        Keamanan dienkripsi 256-bit SSL via Midtrans Gateway
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment & Snap Logic -->
+    <script>
+        function openPaymentModal() {
+            document.getElementById('paymentModal').classList.remove('hidden');
+        }
+
+        function closePaymentModal() {
+            document.getElementById('paymentModal').classList.add('hidden');
+        }
+
+        async function checkoutPackage(packageId, btnElement) {
+            const originalText = btnElement.innerHTML;
+            btnElement.disabled = true;
+            btnElement.innerHTML = '<span class="inline-block animate-spin mr-1">⌛</span> Menyiapkan...';
+
+            const alertBox = document.getElementById('paymentAlert');
+            alertBox.className = 'hidden';
+
+            try {
+                const formData = new FormData();
+                formData.append('package_id', packageId);
+
+                const response = await fetch('<?= base_url('payment/create-snap') ?>', {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (!response.ok || data.status !== 'success' || !data.snap_token) {
+                    throw new Error(data.message || 'Gagal memproses token pembayaran Midtrans.');
+                }
+
+                // Tutup modal pemilihan paket
+                closePaymentModal();
+
+                // Buka Snap Popup Midtrans
+                if (window.snap) {
+                    window.snap.pay(data.snap_token, {
+                        onSuccess: function(result) {
+                            alert('🎉 Pembayaran Berhasil! Kuota akun Anda telah diperbarui.');
+                            window.location.reload();
+                        },
+                        onPending: function(result) {
+                            alert('⏳ Pembayaran sedang menunggu. Silakan selesaikan pembayaran sesuai instruksi QRIS/Virtual Account.');
+                            window.location.reload();
+                        },
+                        onError: function(result) {
+                            alert('❌ Terjadi kendala pembayaran: ' + (result.status_message || 'Gagal'));
+                        },
+                        onClose: function() {
+                            // User menutup popup sebelum bayar
+                        }
+                    });
+                } else {
+                    // Fallback jika popup JS terblokir
+                    window.location.href = data.redirect_url;
+                }
+            } catch (err) {
+                alertBox.className = 'p-3 rounded-xl text-xs bg-rose-50 text-rose-800 border border-rose-200 block';
+                alertBox.innerHTML = '<strong>Kendala:</strong> ' + err.message;
+            } finally {
+                btnElement.disabled = false;
+                btnElement.innerHTML = originalText;
+            }
+        }
+    </script>
 </body>
 </html>
+

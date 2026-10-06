@@ -4,6 +4,7 @@ namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
 use App\Models\DocumentModel;
+use App\Models\PaymentTransactionModel;
 use App\Models\ReportModel;
 use App\Models\UserModel;
 use App\Models\VisitorModel;
@@ -121,7 +122,12 @@ class DashboardController extends BaseController
                             ->get()
                             ->getResultArray();
 
-        // 10. Data Lingkungan Sistem
+        // 10. Data Transaksi & Pembayaran Midtrans
+        $paymentModel = new PaymentTransactionModel();
+        $paymentStats = $paymentModel->getPaymentStats();
+        $paymentsList = $paymentModel->getAllTransactions(50);
+
+        // 11. Data Lingkungan Sistem
         $systemInfo = [
             'php_version'         => PHP_VERSION,
             'memory_limit'        => ini_get('memory_limit'),
@@ -151,12 +157,14 @@ class DashboardController extends BaseController
                 'active_locks_count'    => $activeLocksCount,
                 'total_security_events' => $totalSecurityEvents,
                 'visitor_stats'         => $visitorStats,
+                'payment_stats'         => $paymentStats,
             ],
             'usersList'            => $usersList,
             'documentsList'        => $documentsList,
             'corpusList'           => $corpusList,
             'securityLogs'         => $securityLogs,
             'dailyVisitors'        => $dailyVisitors,
+            'paymentsList'         => $paymentsList,
             'systemInfo'           => $systemInfo,
             'currentAdmin'         => $userModel->find(session()->get('user_id')),
         ]);

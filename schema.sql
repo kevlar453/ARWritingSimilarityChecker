@@ -9,6 +9,8 @@ CREATE TABLE IF NOT EXISTS users (
     password_hash VARCHAR(255) NOT NULL,
     institution VARCHAR(191) NULL,
     role ENUM('user', 'admin') NOT NULL DEFAULT 'user',
+    subscription_tier ENUM('free', 'skripsi', 'dosen_pro') NOT NULL DEFAULT 'free',
+    subscription_expires_at DATETIME NULL DEFAULT NULL,
     status ENUM('pending_verification', 'active', 'inactive') NOT NULL DEFAULT 'pending_verification',
     verification_token VARCHAR(128) NULL,
     verification_token_expires_at DATETIME NULL,
@@ -249,6 +251,31 @@ CREATE TABLE IF NOT EXISTS landing_visitors (
     UNIQUE KEY uq_visitor_date (visitor_hash, visit_date),
     INDEX idx_visit_date (visit_date),
     INDEX idx_visitor_hash (visitor_hash)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS payment_transactions (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT UNSIGNED NOT NULL,
+    order_id VARCHAR(100) NOT NULL UNIQUE,
+    package_id VARCHAR(50) NOT NULL,
+    package_name VARCHAR(100) NOT NULL,
+    amount DECIMAL(12,2) NOT NULL,
+    submissions_added INT UNSIGNED NOT NULL DEFAULT 0,
+    subscription_tier VARCHAR(50) NULL DEFAULT NULL,
+    subscription_days INT UNSIGNED NOT NULL DEFAULT 0,
+    payment_type VARCHAR(50) NULL DEFAULT NULL,
+    transaction_status ENUM('pending', 'settlement', 'capture', 'deny', 'expire', 'cancel') NOT NULL DEFAULT 'pending',
+    fraud_status VARCHAR(50) NULL DEFAULT NULL,
+    snap_token VARCHAR(255) NULL DEFAULT NULL,
+    snap_redirect_url TEXT NULL DEFAULT NULL,
+    midtrans_response LONGTEXT NULL DEFAULT NULL,
+    paid_at DATETIME NULL DEFAULT NULL,
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
+    INDEX idx_trans_user (user_id),
+    INDEX idx_trans_status (transaction_status),
+    INDEX idx_trans_order (order_id),
+    CONSTRAINT fk_trans_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 SET FOREIGN_KEY_CHECKS = 1;
