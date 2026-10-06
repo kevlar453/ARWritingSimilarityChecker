@@ -227,7 +227,7 @@
             </div>
 
             <!-- Toggles Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-white/10 text-xs">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-3 border-t border-white/10 text-xs">
                 <!-- Toggle 1: Quotes -->
                 <label class="flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 cursor-pointer transition select-none group">
                     <div class="flex items-center gap-2.5 pr-2">
@@ -252,7 +252,19 @@
                     <input type="checkbox" id="toggleExcludeBoilerplate" onchange="recalculateLiveScore()" class="w-4 h-4 rounded text-indigo-500 focus:ring-indigo-400 bg-slate-800 border-slate-600 cursor-pointer">
                 </label>
 
-                <!-- Toggle 3: Bibliography -->
+                <!-- Toggle 3: Front Matter -->
+                <label class="flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 cursor-pointer transition select-none group">
+                    <div class="flex items-center gap-2.5 pr-2">
+                        <span class="text-base">📋</span>
+                        <div>
+                            <div class="font-bold text-white group-hover:text-indigo-200 transition">Kecualikan Formalitas Depan</div>
+                            <div class="text-[10px] text-slate-400 leading-tight">Cover, pengesahan &amp; pernyataan</div>
+                        </div>
+                    </div>
+                    <input type="checkbox" id="toggleExcludeFrontMatter" onchange="recalculateLiveScore()" class="w-4 h-4 rounded text-indigo-500 focus:ring-indigo-400 bg-slate-800 border-slate-600 cursor-pointer">
+                </label>
+
+                <!-- Toggle 4: Bibliography -->
                 <label class="flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 cursor-pointer transition select-none group">
                     <div class="flex items-center gap-2.5 pr-2">
                         <span class="text-base">📚</span>
@@ -1273,8 +1285,12 @@
                             $isQuoteMatch = (str_contains($subSnip, '"') || str_contains($subSnip, '“') || str_contains($subSnip, '”') || ($m['citation_status'] ?? '') === 'QUOTE');
                             $isBpMatch = !empty($m['is_boilerplate']);
                             $isBibMatch = (stripos($subSnip, 'daftar pustaka') !== false || stripos($subSnip, 'references') !== false || stripos($subSnip, 'bibliografi') !== false);
+                            $isFrontMatch = (
+                                (preg_match('/(?i)\b(?:lembar\s+(?:pengesahan|persetujuan)|pernyataan\s+(?:keaslian|bebas\s+plagiasi)|kata\s+pengantar|daftar\s+(?:isi|tabel|gambar))\b/', $subSnip) === 1) ||
+                                (!empty($m['boilerplate_category']) && in_array($m['boilerplate_category'], ['ADMINISTRATIVE_FORMULA', 'LEGAL_CITATION'], true))
+                            );
                         ?>
-                        <div id="passage-card-<?= $idx ?>" data-match-idx="<?= $idx ?>" data-word-count="<?= (int)$m['word_count'] ?>" data-is-boilerplate="<?= $isBpMatch ? '1' : '0' ?>" data-is-quote="<?= $isQuoteMatch ? '1' : '0' ?>" data-is-biblio="<?= $isBibMatch ? '1' : '0' ?>" class="passage-card border border-slate-200 rounded-xl p-4 bg-slate-50/50 hover:bg-white hover:border-indigo-300 transition-all space-y-3">
+                        <div id="passage-card-<?= $idx ?>" data-match-idx="<?= $idx ?>" data-word-count="<?= (int)$m['word_count'] ?>" data-is-boilerplate="<?= $isBpMatch ? '1' : '0' ?>" data-is-quote="<?= $isQuoteMatch ? '1' : '0' ?>" data-is-biblio="<?= $isBibMatch ? '1' : '0' ?>" data-is-front="<?= $isFrontMatch ? '1' : '0' ?>" class="passage-card border border-slate-200 rounded-xl p-4 bg-slate-50/50 hover:bg-white hover:border-indigo-300 transition-all space-y-3">
                             <div class="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-200/60">
                                 <div class="flex items-center gap-2">
                                     <span class="text-xs font-bold px-2 py-0.5 rounded bg-slate-200 text-slate-700 font-mono-code">#<?= $idx + 1 ?></span>
@@ -1939,6 +1955,7 @@
         function recalculateLiveScore() {
             const excludeQuotes = document.getElementById('toggleExcludeQuotes').checked;
             const excludeBoilerplate = document.getElementById('toggleExcludeBoilerplate').checked;
+            const excludeFrontMatter = document.getElementById('toggleExcludeFrontMatter').checked;
             const excludeBiblio = document.getElementById('toggleExcludeBibliography').checked;
 
             const cards = document.querySelectorAll('.passage-card');
@@ -1950,6 +1967,7 @@
                 const wCount = parseInt(card.getAttribute('data-word-count') || 0);
                 const isBp = card.getAttribute('data-is-boilerplate') === '1';
                 const isQuote = card.getAttribute('data-is-quote') === '1';
+                const isFront = card.getAttribute('data-is-front') === '1';
                 const isBib = card.getAttribute('data-is-biblio') === '1';
                 const idx = card.getAttribute('data-match-idx');
                 const badge = document.getElementById(`passage-excluded-badge-${idx}`);
@@ -1966,6 +1984,10 @@
                 if (excludeBoilerplate && isBp) {
                     shouldExclude = true;
                     reasons.push('Frasa Baku');
+                }
+                if (excludeFrontMatter && isFront) {
+                    shouldExclude = true;
+                    reasons.push('Formalitas Depan');
                 }
                 if (excludeBiblio && isBib) {
                     shouldExclude = true;
@@ -2008,7 +2030,7 @@
             displayEl.className = 'text-xl sm:text-2xl font-black font-mono-code transition-all duration-300 ' + 
                 (adjustedScore >= 70 ? 'text-rose-400' : (adjustedScore >= 10 ? 'text-amber-300' : 'text-emerald-300'));
 
-            if (excludeQuotes || excludeBoilerplate || excludeBiblio) {
+            if (excludeQuotes || excludeBoilerplate || excludeFrontMatter || excludeBiblio) {
                 activeBadge.classList.remove('hidden');
                 statusNotice.innerHTML = `Filter aktif: <strong class="text-indigo-200">${excludedCount} pasase (${excludedWords} kata)</strong> dikecualikan dari perhitungan murni.`;
             } else {
@@ -2020,6 +2042,7 @@
         function resetLiveFilters() {
             document.getElementById('toggleExcludeQuotes').checked = false;
             document.getElementById('toggleExcludeBoilerplate').checked = false;
+            document.getElementById('toggleExcludeFrontMatter').checked = false;
             document.getElementById('toggleExcludeBibliography').checked = false;
             recalculateLiveScore();
         }

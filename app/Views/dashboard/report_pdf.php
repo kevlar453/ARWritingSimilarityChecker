@@ -341,6 +341,10 @@ if ($dec === 'match') {
 </head>
 <body>
 
+    <?php
+        $verifyUrl = "https://tilik.arsetontong.top/verify/" . urlencode($cert_hash);
+        $qrApiUrl = "https://api.qrserver.com/v1/create-qr-code/?size=120x120&color=0f-29-4a&data=" . urlencode($verifyUrl);
+    ?>
     <!-- Header / Kop -->
     <table class="header-table">
         <tr>
@@ -349,8 +353,16 @@ if ($dec === 'match') {
                 <div class="brand-sub">Academic Writing Similarity &bull; Evidence Decomposition Engine</div>
             </td>
             <td class="cert-box" style="vertical-align: middle;">
-                <div style="color: #64748b; font-size: 7.5pt; margin-bottom: 2px;">NOMOR SERTIFIKAT VERIFIKASI</div>
-                <div class="cert-code"><?= esc($cert_hash) ?></div>
+                <div style="display: flex; align-items: center; justify-content: flex-end; gap: 10px;">
+                    <div style="text-align: right;">
+                        <div style="color: #64748b; font-size: 7.5pt; margin-bottom: 2px;">NOMOR SERTIFIKAT VERIFIKASI</div>
+                        <a href="<?= esc($verifyUrl) ?>" target="_blank" class="cert-code" style="text-decoration: none; color: #0f294a;"><?= esc($cert_hash) ?></a>
+                        <div style="font-size: 6.5pt; color: #64748b; margin-top: 2px;">Pindai QR untuk Validasi Keaslian</div>
+                    </div>
+                    <a href="<?= esc($verifyUrl) ?>" target="_blank">
+                        <img src="<?= esc($qrApiUrl) ?>" alt="QR Code" style="width: 52px; height: 52px; border: 1px solid #cbd5e1; border-radius: 4px; padding: 2px; background: #ffffff;" />
+                    </a>
+                </div>
             </td>
         </tr>
     </table>

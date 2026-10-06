@@ -11,6 +11,8 @@ $routes->match(['get', 'head'], 'report/(:num)/export', 'DashboardController::ex
 $routes->match(['get', 'head'], 'dashboard/report/(:num)/export', 'DashboardController::exportPdf/$1');
 $routes->get('report/(:num)/preview', 'DashboardController::previewPdf/$1');
 $routes->get('dashboard/report/(:num)/preview', 'DashboardController::previewPdf/$1');
+$routes->match(['get', 'head'], 'verify/(:segment)', 'DashboardController::verify/$1');
+$routes->match(['get', 'head'], 'verify', 'DashboardController::verify');
 
 // API Routes
 $routes->group('api', function ($routes) {
@@ -19,6 +21,7 @@ $routes->group('api', function ($routes) {
     $routes->get('documents/(:num)', 'Api\DocumentController::show/$1');
     $routes->post('documents/(:num)/check', 'Api\DocumentController::check/$1');
     $routes->post('documents/(:num)/enroll', 'Api\DocumentController::enroll/$1');
+    $routes->post('integration/check', 'Api\DocumentController::checkSubmission');
 
     // Reports
     $routes->get('reports/(:num)', 'Api\ReportController::show/$1');

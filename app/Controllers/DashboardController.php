@@ -589,4 +589,93 @@ class DashboardController extends BaseController
             $m['boilerplate_rationale'] = 'Formulasi administratif penugasan sivitas akademika dalam pengujian tugas akhir.';
         }
     }
+
+    /**
+     * Halaman Publik Verifikasi Sertifikat Resmi AR Tilik (via QR Code / URL)
+     */
+    public function verify(?string $code = null)
+    {
+        $code = $code ?? $this->request->getGet('code');
+        if (!$code) {
+            return view('dashboard/verify', [
+                'status'       => 'input',
+                'code'         => '',
+                'report'       => null,
+                'document'     => null,
+                'sources'      => [],
+                'evidenceData' => [],
+            ]);
+        }
+
+        $code = strtoupper(trim($code));
+        $db = db_connect();
+
+        // 1. Cari berdasarkan kolom verification_code
+        $builder = $db->table('reports');
+        $builder->select('reports.*, documents.title AS document_title, documents.original_filename, documents.created_at AS document_created_at');
+        $builder->join('documents', 'documents.id = reports.document_id', 'left');
+        $builder->where('reports.verification_code', $code);
+        $report = $builder->get()->getRowArray();
+
+        // 2. Fallback deterministik jika kode belum terindeks di database
+        if (!$report) {
+            $candidates = $db->table('reports')
+                             ->select('reports.*, documents.title AS document_title, documents.original_filename, documents.created_at AS document_created_at')
+                             ->join('documents', 'documents.id = reports.document_id', 'left')
+                             ->where('reports.status', 'completed')
+                             ->orderBy('reports.id', 'DESC')
+                             ->get(300)->getResultArray();
+
+            foreach ($candidates as $cand) {
+                $rawCreated = (string) $cand['created_at'];
+                $sim = (float) ($cand['overall_similarity'] ?? 0);
+                $seed = "ARTILIK:{$cand['id']}:{$cand['document_id']}:{$rawCreated}:" . sprintf("%.2f", $sim) . ":OFFICIAL_CERTIFICATE";
+                $h = strtoupper(substr(hash('sha256', $seed), 0, 12));
+                $computedHash = "ART-" . substr($h, 0, 4) . "-" . substr($h, 4, 4) . "-" . substr($h, 8, 4);
+
+                if ($computedHash === $code) {
+                    $report = $cand;
+                    // Cache ke database untuk query berikutnya
+                    $db->table('reports')->where('id', $cand['id'])->update(['verification_code' => $code]);
+                    break;
+                }
+            }
+        }
+
+        if (!$report) {
+            return view('dashboard/verify', [
+                'status'       => 'not_found',
+                'code'         => $code,
+                'report'       => null,
+                'document'     => null,
+                'sources'      => [],
+                'evidenceData' => [],
+            ]);
+        }
+
+        $evidenceData = !empty($report['evidence_data']) ? (is_string($report['evidence_data']) ? json_decode($report['evidence_data'], true) : $report['evidence_data']) : [];
+
+        // Ambil 5 rujukan teratas
+        $sources = $db->table('report_sources rs')
+                      ->select('rs.*, d.title AS source_title, d.original_filename AS source_filename, d.source_type')
+                      ->join('documents d', 'd.id = rs.source_document_id', 'left')
+                      ->where('rs.report_id', $report['id'])
+                      ->orderBy('rs.source_rank', 'ASC')
+                      ->limit(5)
+                      ->get()->getResultArray();
+
+        return view('dashboard/verify', [
+            'status'       => 'valid',
+            'code'         => $code,
+            'report'       => $report,
+            'document'     => [
+                'id'                => $report['document_id'],
+                'title'             => $report['document_title'] ?? 'Dokumen Karya Ilmiah',
+                'original_filename' => $report['original_filename'] ?? "document_{$report['document_id']}.pdf",
+                'created_at'        => $report['document_created_at'] ?? $report['created_at'],
+            ],
+            'sources'      => $sources,
+            'evidenceData' => $evidenceData,
+        ]);
+    }
 }

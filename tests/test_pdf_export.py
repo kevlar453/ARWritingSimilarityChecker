@@ -61,3 +61,30 @@ def test_preview_report_pdf_http_endpoint():
         assert "LEMBAR HASIL UJI KEMIRIPAN TEKS AKADEMIK" in html
         assert "AR TILIK" in html
         assert "Prinsip Keadilan Akademik" in html
+
+def test_verify_valid_certificate_portal():
+    conn = get_connection()
+    try:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT verification_code FROM reports WHERE verification_code IS NOT NULL AND status = 'completed' LIMIT 1")
+        row = cursor.fetchone()
+        assert row is not None
+        code = row["verification_code"]
+    finally:
+        conn.close()
+    
+    url = f"{BASE_URL}/verify/{code}"
+    req = urllib.request.Request(url, method="GET")
+    with urllib.request.urlopen(req, timeout=15) as resp:
+        assert resp.getcode() == 200
+        html = resp.read().decode("utf-8")
+        assert "TERVERIFIKASI ASLI" in html
+        assert code in html
+
+def test_verify_not_found_certificate_portal():
+    url = f"{BASE_URL}/verify/ART-NONEXISTENT-CODE"
+    req = urllib.request.Request(url, method="GET")
+    with urllib.request.urlopen(req, timeout=15) as resp:
+        assert resp.getcode() == 200
+        html = resp.read().decode("utf-8")
+        assert "Sertifikat Tidak Ditemukan" in html

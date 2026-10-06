@@ -10,10 +10,34 @@ import tempfile
 from datetime import datetime
 from pathlib import Path
 
+import qrcode
+import base64
+import io
+
 # Ensure root directory is on PYTHONPATH
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 
 from worker.database import get_connection
+
+VERIFY_BASE_URL = os.getenv("APP_PUBLIC_URL", "https://tilik.arsetontong.top")
+
+def generate_qr_code_base64(url: str) -> str:
+    try:
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_M,
+            box_size=4,
+            border=1
+        )
+        qr.add_data(url)
+        qr.make(fit=True)
+        img = qr.make_image(fill_color="#0f294a", back_color="white")
+        buf = io.BytesIO()
+        img.save(buf, format="PNG")
+        return base64.b64encode(buf.getvalue()).decode("utf-8")
+    except Exception as e:
+        print(f"[EXPORTER WARNING] Gagal menghasilkan QR code: {e}")
+        return ""
 
 def generate_verification_hash(report_id: int, doc_id: int, created_at: str, sim: float) -> str:
     seed = f"ARTILIK:{report_id}:{doc_id}:{created_at}:{sim:.2f}:OFFICIAL_CERTIFICATE"
@@ -263,6 +287,10 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
             Tidak ditemukan pasase kata berurutan yang melebihi batas deteksi sekuensial.
         </div>
         """
+
+    verify_url = f"{VERIFY_BASE_URL}/verify/{cert_hash}"
+    qr_code_base64 = generate_qr_code_base64(verify_url)
+    qr_img_tag = f'<img src="data:image/png;base64,{qr_code_base64}" alt="QR Verifikasi" style="width: 52px; height: 52px; border: 1px solid #cbd5e1; border-radius: 4px; padding: 2px; background: #ffffff;" />' if qr_code_base64 else ''
 
     html = f"""<!DOCTYPE html>
 <html lang="id">
@@ -574,8 +602,14 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
                 <div class="brand-sub">Academic Writing Similarity &bull; Evidence Decomposition Engine</div>
             </td>
             <td class="cert-box" style="vertical-align: middle;">
-                <div style="color: #64748b; font-size: 7.5pt; margin-bottom: 2px;">NOMOR SERTIFIKAT VERIFIKASI</div>
-                <div class="cert-code">{cert_hash}</div>
+                <div style="display: flex; align-items: center; justify-content: flex-end; gap: 10px;">
+                    <div style="text-align: right;">
+                        <div style="color: #64748b; font-size: 7.5pt; margin-bottom: 2px;">NOMOR SERTIFIKAT VERIFIKASI</div>
+                        <div class="cert-code">{cert_hash}</div>
+                        <div style="font-size: 6.5pt; color: #64748b; margin-top: 2px;">Pindai QR untuk Validasi Keaslian</div>
+                    </div>
+                    {qr_img_tag}
+                </div>
             </td>
         </tr>
     </table>
@@ -735,6 +769,16 @@ def export_report_pdf(report_id: int, output_path: str | None = None) -> bytes:
             raise ValueError(f"Laporan ID #{report_id} tidak ditemukan.")
 
         doc_id = report["document_id"]
+        # 1b. Update verification_code di database jika belum terisi
+        raw_created = str(report["created_at"]) if report.get("created_at") else str(datetime.now())
+        overall_sim = float(report.get("overall_similarity") or 0)
+        cert_hash = generate_verification_hash(report_id, doc_id, raw_created, overall_sim)
+        try:
+            cursor.execute("UPDATE reports SET verification_code = %s WHERE id = %s AND (verification_code IS NULL OR verification_code = '')", (cert_hash, report_id))
+            conn.commit()
+        except Exception:
+            pass
+
         # 2. Fetch Document
         cursor.execute("SELECT * FROM documents WHERE id = %s", (doc_id,))
         document = cursor.fetchone() or {}

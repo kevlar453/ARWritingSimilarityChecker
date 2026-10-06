@@ -208,4 +208,117 @@ class DocumentController extends BaseController
             'message' => "Naskah '{$document['title']}' berhasil didaftarkan sebagai Korpus Institusi permanen."
         ]);
     }
+
+    /**
+     * Endpoint Integrasi Eksternal (OJS 3 & LMS Moodle Plugin)
+     * Mengunggah dokumen dan langsung menjadwalkan pemeriksaan dalam 1 panggilan API.
+     */
+    public function checkSubmission()
+    {
+        $file = $this->request->getFile('document');
+        if (! $file || ! $file->isValid()) {
+            return $this->response->setStatusCode(400)->setJSON([
+                'status'  => 'error',
+                'message' => 'Berkas naskah tidak valid atau belum diunggah.'
+            ]);
+        }
+
+        $allowed = [
+            'application/pdf',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'text/plain'
+        ];
+
+        $mime = $file->getMimeType();
+        if (! in_array($mime, $allowed, true) && ! in_array($file->getClientExtension(), ['pdf', 'docx', 'txt'], true)) {
+            return $this->response->setStatusCode(415)->setJSON([
+                'status'  => 'error',
+                'message' => 'Hanya format PDF, DOCX, dan TXT yang didukung.'
+            ]);
+        }
+
+        if ($file->getSize() > 25 * 1024 * 1024) {
+            return $this->response->setStatusCode(413)->setJSON([
+                'status'  => 'error',
+                'message' => 'Ukuran berkas maksimal 25 MB.'
+            ]);
+        }
+
+        $storagePath = WRITEPATH . 'documents/';
+        if (! is_dir($storagePath)) {
+            mkdir($storagePath, 0775, true);
+        }
+
+        $filename = $file->getRandomName();
+        $file->move($storagePath, $filename);
+
+        $customTitle = trim((string)$this->request->getPost('title'));
+        $title = !empty($customTitle) ? $customTitle : pathinfo($file->getClientName(), PATHINFO_FILENAME);
+        $engine = $this->request->getPost('engine') ?: 'hybrid';
+        $now = date('Y-m-d H:i:s');
+
+        $documentModel = new DocumentModel();
+        $documentId = $documentModel->insert([
+            'user_id'           => null,
+            'title'             => $title,
+            'original_filename' => $file->getClientName(),
+            'mime_type'         => $mime,
+            'file_size'         => $file->getSize(),
+            'storage_path'      => $storagePath . $filename,
+            'status'            => 'uploaded',
+            'document_type'     => 'submission',
+            'corpus_visibility' => 'private',
+            'indexing_status'   => 'not_required',
+            'created_at'        => $now,
+            'updated_at'        => $now,
+        ]);
+
+        $reportModel = new ReportModel();
+        $reportId = $reportModel->insert([
+            'document_id'        => $documentId,
+            'engine'             => $engine,
+            'predicted_decision' => 'no_match',
+            'overall_similarity' => 0,
+            'source_count'       => 0,
+            'match_count'        => 0,
+            'status'             => 'pending',
+            'created_at'         => $now,
+        ]);
+
+        // Hitung kode sertifikat deterministik awal
+        $seed = "ARTILIK:{$reportId}:{$documentId}:{$now}:0.00:OFFICIAL_CERTIFICATE";
+        $h = strtoupper(substr(hash('sha256', $seed), 0, 12));
+        $certHash = "ART-" . substr($h, 0, 4) . "-" . substr($h, 4, 4) . "-" . substr($h, 8, 4);
+
+        $db = db_connect();
+        $db->table('reports')->where('id', $reportId)->update(['verification_code' => $certHash]);
+
+        // Masukkan ke antrean worker
+        $db->table('jobs')->insert([
+            'type'         => 'similarity_check',
+            'payload'      => json_encode([
+                'document_id' => (int) $documentId,
+                'report_id'   => (int) $reportId,
+                'engine'      => $engine,
+            ]),
+            'status'       => 'pending',
+            'available_at' => $now,
+            'created_at'   => $now,
+            'updated_at'   => $now,
+        ]);
+
+        $publicUrl = "https://tilik.arsetontong.top";
+
+        return $this->response->setStatusCode(202)->setJSON([
+            'status'            => 'queued',
+            'document_id'       => (int) $documentId,
+            'report_id'         => (int) $reportId,
+            'verification_code' => $certHash,
+            'report_url'        => "{$publicUrl}/report/{$reportId}",
+            'verification_url'  => "{$publicUrl}/verify/{$certHash}",
+            'pdf_export_url'    => "{$publicUrl}/report/{$reportId}/export",
+            'status_api_url'    => "{$publicUrl}/api/reports/{$reportId}",
+            'message'           => 'Pemeriksaan similarity berhasil dijadwalkan ke antrean AR Tilik.'
+        ]);
+    }
 }

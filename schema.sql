@@ -110,12 +110,14 @@ CREATE TABLE IF NOT EXISTS reports (
     match_count INT UNSIGNED NOT NULL DEFAULT 0,
     longest_match_words INT UNSIGNED NOT NULL DEFAULT 0,
     status ENUM('pending', 'processing', 'completed', 'failed') NOT NULL DEFAULT 'pending',
+    verification_code VARCHAR(64) NULL,
     error_message TEXT NULL,
     created_at DATETIME NOT NULL,
     completed_at DATETIME NULL,
     updated_at DATETIME NULL,
     INDEX idx_reports_document (document_id),
-    INDEX idx_reports_status (status)
+    INDEX idx_reports_status (status),
+    INDEX idx_reports_verification (verification_code)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS report_sources (
