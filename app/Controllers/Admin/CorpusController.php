@@ -42,9 +42,10 @@ class CorpusController extends BaseController
         $filename = $file->getRandomName();
         $file->move($storagePath, $filename);
 
+        $userId = session()->get('user_id');
         $documentModel = new DocumentModel();
         $docId = $documentModel->insert([
-            'user_id'           => null,
+            'user_id'           => $userId ?: null,
             'title'             => pathinfo($clientName, PATHINFO_FILENAME),
             'original_filename' => $clientName,
             'mime_type'         => $mime,
@@ -58,6 +59,11 @@ class CorpusController extends BaseController
             'created_at'        => date('Y-m-d H:i:s'),
             'updated_at'        => date('Y-m-d H:i:s'),
         ]);
+
+        if ($userId) {
+            $userModel = new \App\Models\UserModel();
+            $userModel->recordCorpusUpload($userId);
+        }
 
         $this->queueIndexJob($docId);
 

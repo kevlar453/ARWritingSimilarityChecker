@@ -1161,9 +1161,10 @@
             if (alertBox) alertBox.classList.add('hidden');
         }
 
-        document.getElementById('formContributeCorpus')?.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const form = this;
+        async function handleContributeCorpusSubmit(e) {
+            if (e) e.preventDefault();
+            const form = document.getElementById('formContributeCorpus');
+            if (!form) return;
             const btn = document.getElementById('btnSubmitContribute');
             const alertBox = document.getElementById('contributeAlert');
             const fileInput = document.getElementById('contributeFileInput');
@@ -1175,7 +1176,7 @@
 
             btn.disabled = true;
             btn.innerHTML = `
-                <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                <svg class="animate-spin h-4 w-4 text-white inline-block mr-1" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
@@ -1188,14 +1189,19 @@
             try {
                 const res = await fetch('<?= base_url('api/corpus/contribute') ?>', {
                     method: 'POST',
-                    body: formData
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
                 });
                 const data = await res.json();
 
                 if (res.status === 201) {
                     alertBox.className = 'p-3 rounded-xl text-xs bg-emerald-50 text-emerald-800 border border-emerald-200 block';
                     alertBox.innerHTML = '<strong>Sukses!</strong> ' + data.message;
-                    setTimeout(() => location.reload(), 1400);
+                    setTimeout(() => {
+                        window.location.href = '<?= base_url('dashboard') ?>';
+                    }, 1200);
                 } else if (res.status === 409) {
                     alertBox.className = 'p-3 rounded-xl text-xs bg-amber-50 text-amber-900 border border-amber-300 block';
                     alertBox.innerHTML = '<strong>Duplikat Terdeteksi:</strong> ' + data.message;
@@ -1210,7 +1216,7 @@
                 btn.disabled = false;
                 btn.innerHTML = '<span>📤 Unggah & Tambah Kuota</span>';
             }
-        });
+        }
     </script>
 
     <!-- Contribute Corpus Modal (+3 Korpus = +1 Submisi) -->
@@ -1224,7 +1230,7 @@
                 <button type="button" onclick="closeContributeCorpusModal()" class="text-slate-400 hover:text-slate-600 text-2xl font-bold p-1 leading-none">&times;</button>
             </div>
             
-            <form id="formContributeCorpus" class="p-6 space-y-4" enctype="multipart/form-data">
+            <form id="formContributeCorpus" action="<?= base_url('api/corpus/contribute') ?>" method="POST" class="p-6 space-y-4" enctype="multipart/form-data" onsubmit="handleContributeCorpusSubmit(event)">
                 <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-xs text-emerald-800 leading-relaxed">
                     💡 <strong>Aturan Validasi:</strong> Naskah harus berupa karya ilmiah (jurnal, skripsi, tesis, makalah) dalam format PDF, DOCX, atau TXT. Berkas duplikat yang sudah ada di database akan ditolak secara otomatis dan tidak menambah kuota.
                 </div>
