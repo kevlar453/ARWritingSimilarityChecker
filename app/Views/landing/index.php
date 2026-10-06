@@ -315,12 +315,13 @@
         .grid-4 {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 24px;
+            gap: 20px;
         }
 
-        @media (max-width: 1200px) {
+        @media (max-width: 1120px) {
             .grid-4 {
                 grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
             }
         }
 
@@ -497,27 +498,42 @@
         }
 
         /* Pricing Cards */
+        #langganan .container {
+            max-width: 1240px;
+        }
+
         .pricing-card {
             background: #ffffff;
             border: 1px solid var(--border);
-            border-radius: 22px;
-            padding: 36px;
+            border-radius: 20px;
+            padding: 26px 20px;
             position: relative;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            transition: all 0.3s ease;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 32px -6px rgba(15, 23, 42, 0.08);
         }
 
         .pricing-card.featured {
             border: 2px solid var(--primary);
-            box-shadow: 0 12px 30px -4px rgba(67, 56, 202, 0.15);
+            box-shadow: 0 10px 28px -4px rgba(67, 56, 202, 0.15);
         }
 
         .pricing-card.popular {
             border: 2px solid #f59e0b;
-            box-shadow: 0 12px 30px -4px rgba(245, 158, 11, 0.2);
-            background: linear-gradient(180deg, #fffdfa 0%, #ffffff 100%);
+            box-shadow: 0 12px 30px -4px rgba(245, 158, 11, 0.18);
+            background: linear-gradient(180deg, #fffdf8 0%, #ffffff 100%);
+        }
+
+        .pricing-card.popular:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 18px 36px -6px rgba(245, 158, 11, 0.25);
         }
 
         .pricing-badge {
@@ -533,53 +549,148 @@
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            white-space: nowrap;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
         .pricing-badge.popular {
             background: #f59e0b;
         }
 
+        .plan-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: 9999px;
+            font-size: 10.5px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .plan-pill-free {
+            background: #ecfdf5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
+        }
+
+        .plan-pill-payg {
+            background: #f0f9ff;
+            color: #0284c7;
+            border: 1px solid #bae6fd;
+        }
+
+        .plan-pill-popular {
+            background: #fffbeb;
+            color: #d97706;
+            border: 1px solid #fde68a;
+        }
+
+        .plan-pill-pro {
+            background: #f5f3ff;
+            color: #7c3aed;
+            border: 1px solid #ddd6fe;
+        }
+
         .plan-name {
-            font-size: 20px;
+            font-size: 19px;
             font-weight: 800;
             color: var(--dark);
             margin-bottom: 8px;
+            line-height: 1.25;
+            letter-spacing: -0.3px;
         }
 
         .plan-price {
-            font-size: 36px;
+            font-size: 26px;
             font-weight: 800;
             color: var(--dark);
-            font-family: 'JetBrains Mono', monospace;
-            margin-bottom: 16px;
+            font-family: inherit;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 4px;
+            line-height: 1.15;
+        }
+
+        .plan-price .currency {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .plan-price .amount {
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
         }
 
         .plan-period {
-            font-size: 13px;
+            font-size: 12.5px;
             color: var(--text-muted);
-            font-weight: 500;
+            font-weight: 600;
+            letter-spacing: normal;
+        }
+
+        .plan-desc {
+            font-size: 12.5px;
+            color: var(--text-muted);
+            line-height: 1.5;
+            min-height: 52px;
+            margin-bottom: 16px;
         }
 
         .plan-features {
             list-style: none;
+            padding: 16px 0 0 0;
+            margin: 0 0 24px 0;
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            margin: 24px 0 32px;
-            font-size: 14px;
+            gap: 11px;
+            font-size: 12.5px;
+            line-height: 1.45;
             color: var(--text-main);
+            border-top: 1px dashed var(--border);
         }
 
         .plan-features li {
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            position: relative;
+            padding-left: 20px;
+            display: block;
+            text-align: left;
+            word-break: normal;
         }
 
         .plan-features li::before {
             content: "✓";
+            position: absolute;
+            left: 0;
+            top: 0;
             color: #10b981;
             font-weight: 800;
+            font-size: 13px;
+            line-height: 1.45;
+        }
+
+        .plan-features li strong {
+            color: var(--dark);
+            font-weight: 700;
+        }
+
+        .pricing-card .btn {
+            width: 100%;
+            padding: 11px 16px;
+            font-size: 13.5px;
+            font-weight: 700;
+            border-radius: 12px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
 
         /* Modal Dialog */
@@ -1533,29 +1644,32 @@
                 <!-- Plan 1: Free Academic -->
                 <div class="pricing-card" data-aos="fade-up" data-aos-delay="100" data-aos-duration="700">
                     <div>
-                        <div style="font-size: 11px; text-transform: uppercase; font-weight: 800; color: #10b981; margin-bottom: 4px;">Tier Dasar Selamanya</div>
+                        <span class="plan-pill plan-pill-free">Tier Gratis</span>
                         <div class="plan-name">Civitas Akademika</div>
-                        <div class="plan-price">Gratis <span class="plan-period">/ selamanya</span></div>
-                        <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">
-                            Cocok untuk mahasiswa, dosen, dan peneliti mandiri yang memeriksa tugas atau draf artikel berkala.
+                        <div class="plan-price">
+                            <span class="amount">Gratis</span>
+                            <span class="plan-period">/ selamanya</span>
+                        </div>
+                        <p class="plan-desc">
+                            Cocok untuk mahasiswa, dosen, dan peneliti mandiri yang memeriksa tugas atau draf artikel secara berkala.
                         </p>
 
                         <ul class="plan-features">
-                            <li><strong>3 Submisi Gratis</strong> per minggu (reset tiap 7 hari)</li>
-                            <li><strong>Bonus +1 Submisi</strong> tiap sumbang 3 korpus valid</li>
-                            <li>Akses Dual-Reader (Layar Ganda)</li>
-                            <li>Filter Eksklusi Sitasi & Daftar Pustaka</li>
-                            <li>Sertifikat Resmi Ber-QR Code</li>
-                            <li>Deteksi sitasi APA / IEEE / Harvard</li>
+                            <li><strong>3 submisi gratis</strong> per minggu (reset tiap Senin)</li>
+                            <li><strong>Bonus gotong royong</strong> (+1 cek tiap 3 korpus valid)</li>
+                            <li>Akses Dual-Reader (layar komparasi berdampingan)</li>
+                            <li>Filter cerdas sitasi pustaka (eksklusi referensi)</li>
+                            <li>Sertifikat resmi keaslian naskah ber-QR Code</li>
+                            <li>Deteksi sitasi format APA, IEEE, dan Harvard</li>
                         </ul>
                     </div>
 
                     <?php if ($currentUser) : ?>
-                        <a href="<?= base_url('dashboard') ?>" class="btn btn-outline" style="width: 100%;">
+                        <a href="<?= base_url('dashboard') ?>" class="btn btn-outline">
                             Gunakan Kuota Saya
                         </a>
                     <?php else : ?>
-                        <button type="button" onclick="openAuthModal('register')" class="btn btn-outline" style="width: 100%;">
+                        <button type="button" onclick="openAuthModal('register')" class="btn btn-outline">
                             Daftar Akun Gratis
                         </button>
                     <?php endif; ?>
@@ -1564,29 +1678,32 @@
                 <!-- Plan 2: Top-Up Fleksibel (Pay-As-You-Go) -->
                 <div class="pricing-card" data-aos="fade-up" data-aos-delay="150" data-aos-duration="700">
                     <div>
-                        <div style="font-size: 11px; text-transform: uppercase; font-weight: 800; color: #0284c7; margin-bottom: 4px;">Pay-As-You-Go</div>
-                        <div class="plan-name">Top-Up Fleksibel</div>
-                        <div class="plan-price">Rp 10.000 <span class="plan-period">/ 3 cek</span></div>
-                        <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">
-                            Beli kuota saat dibutuhkan. Tersedia opsi hemat <strong>Rp 25.000 / 10 cek</strong> (Rp 2.500/cek).
+                        <span class="plan-pill plan-pill-payg">Top-Up Fleksibel</span>
+                        <div class="plan-name">Top-Up Kuota</div>
+                        <div class="plan-price">
+                            <span class="currency">Rp</span><span class="amount">10.000</span>
+                            <span class="plan-period">/ 3 cek</span>
+                        </div>
+                        <p class="plan-desc">
+                            Beli kuota saat dibutuhkan tanpa komitmen bulanan. Tersedia opsi hemat <strong>Rp 25.000 / 10 cek</strong>.
                         </p>
 
                         <ul class="plan-features">
-                            <li><strong>Aktif selamanya</strong> (tanpa kedaluwarsa)</li>
-                            <li>Pilihan paket 3 submisi (Rp 10.000)</li>
-                            <li>Pilihan paket 10 submisi (Rp 25.000, hemat 16%)</li>
-                            <li>Prioritas pemrosesan dokumen antrean</li>
-                            <li>Semua fitur deteksi hybrid AI aktif</li>
+                            <li><strong>Aktif selamanya</strong> (kuota tanpa masa kedaluwarsa)</li>
+                            <li>Pilihan paket isi ulang 3 cek atau 10 cek</li>
+                            <li>Prioritas pemrosesan antrean dokumen cepat</li>
+                            <li>Semua fitur deteksi kecerdasan buatan aktif</li>
+                            <li>Ekspor PDF laporan resmi lengkap ber-QR</li>
                             <li>Aktivasi instan via QRIS & Virtual Account</li>
                         </ul>
                     </div>
 
                     <?php if ($currentUser) : ?>
-                        <a href="<?= base_url('dashboard') ?>" class="btn btn-primary" style="width: 100%;">
+                        <a href="<?= base_url('dashboard') ?>" class="btn btn-primary">
                             ⚡ Top-Up di Dashboard
                         </a>
                     <?php else : ?>
-                        <button type="button" onclick="openAuthModal('login')" class="btn btn-primary" style="width: 100%;">
+                        <button type="button" onclick="openAuthModal('login')" class="btn btn-primary">
                             Masuk & Beli Kuota
                         </button>
                     <?php endif; ?>
@@ -1594,19 +1711,22 @@
 
                 <!-- Plan 3: Paket Pejuang Skripsi (Featured) -->
                 <div class="pricing-card popular" data-aos="fade-up" data-aos-delay="200" data-aos-duration="700">
-                    <div class="pricing-badge popular">⭐ Rekomendasi Mahasiswa</div>
+                    <div class="pricing-badge popular">⭐ Paling Diminati</div>
                     <div>
-                        <div style="font-size: 11px; text-transform: uppercase; font-weight: 800; color: #d97706; margin-bottom: 4px;">Paket Bulanan Favorit</div>
+                        <span class="plan-pill plan-pill-popular">Paket Skripsi</span>
                         <div class="plan-name">Pejuang Skripsi</div>
-                        <div class="plan-price">Rp 25.000 <span class="plan-period">/ bulan</span></div>
-                        <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">
+                        <div class="plan-price">
+                            <span class="currency">Rp</span><span class="amount">25.000</span>
+                            <span class="plan-period">/ bulan</span>
+                        </div>
+                        <p class="plan-desc">
                             Hanya <strong>Rp 1.250 / dokumen</strong>. Solusi hemat untuk persiapan sidang & revisi bab skripsi/tesis.
                         </p>
 
                         <ul class="plan-features">
-                            <li><strong>20 Submisi Dokumen</strong> per bulan</li>
+                            <li><strong>20 submisi dokumen</strong> selama masa aktif</li>
                             <li>Prioritas antrean pemrosesan cepat</li>
-                            <li>Ekspor PDF laporan resmi lengkap</li>
+                            <li>Ekspor PDF laporan resmi lengkap tanpa batas</li>
                             <li>Verifikasi keaslian naskah ber-QR Code</li>
                             <li>Masa aktif paket 30 hari penuh</li>
                             <li>Aktivasi instan via QRIS & Virtual Account</li>
@@ -1614,12 +1734,12 @@
                     </div>
 
                     <?php if ($currentUser) : ?>
-                        <a href="<?= base_url('dashboard') ?>" class="btn btn-primary" style="width: 100%; background: #f59e0b; border-color: #f59e0b; color: #ffffff;">
-                            Langganan di Dashboard
+                        <a href="<?= base_url('dashboard') ?>" class="btn" style="background: #f59e0b; border: 1px solid #d97706; color: #ffffff; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);">
+                            Langganan di Dashboard →
                         </a>
                     <?php else : ?>
-                        <button type="button" onclick="openAuthModal('register')" class="btn btn-primary" style="width: 100%; background: #f59e0b; border-color: #f59e0b; color: #ffffff;">
-                            Daftar & Langganan
+                        <button type="button" onclick="openAuthModal('register')" class="btn" style="background: #f59e0b; border: 1px solid #d97706; color: #ffffff; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);">
+                            Daftar & Langganan →
                         </button>
                     <?php endif; ?>
                 </div>
@@ -1627,15 +1747,18 @@
                 <!-- Plan 4: Dosen & Peneliti Pro -->
                 <div class="pricing-card" data-aos="fade-up" data-aos-delay="250" data-aos-duration="700">
                     <div>
-                        <div style="font-size: 11px; text-transform: uppercase; font-weight: 800; color: #7c3aed; margin-bottom: 4px;">Kapasitas Besar</div>
+                        <span class="plan-pill plan-pill-pro">Kapasitas Besar</span>
                         <div class="plan-name">Dosen & Peneliti Pro</div>
-                        <div class="plan-price">Rp 75.000 <span class="plan-period">/ bulan</span></div>
-                        <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">
+                        <div class="plan-price">
+                            <span class="currency">Rp</span><span class="amount">75.000</span>
+                            <span class="plan-period">/ bulan</span>
+                        </div>
+                        <p class="plan-desc">
                             Hanya <strong>Rp 1.000 / dokumen</strong>. Dirancang untuk dosen pembimbing, reviewer, dan peneliti aktif.
                         </p>
 
                         <ul class="plan-features">
-                            <li><strong>75 Submisi Dokumen</strong> per bulan</li>
+                            <li><strong>75 submisi dokumen</strong> selama masa aktif</li>
                             <li>Prioritas antrean tertinggi sistem</li>
                             <li>Dukungan berkas besar hingga <strong>30 MB</strong></li>
                             <li>Pemeriksaan draf jurnal & tugas kelas</li>
@@ -1645,11 +1768,11 @@
                     </div>
 
                     <?php if ($currentUser) : ?>
-                        <a href="<?= base_url('dashboard') ?>" class="btn btn-outline" style="width: 100%;">
+                        <a href="<?= base_url('dashboard') ?>" class="btn btn-outline">
                             Pilih Paket Dosen
                         </a>
                     <?php else : ?>
-                        <button type="button" onclick="openAuthModal('register')" class="btn btn-outline" style="width: 100%;">
+                        <button type="button" onclick="openAuthModal('register')" class="btn btn-outline">
                             Daftar & Langganan
                         </button>
                     <?php endif; ?>
