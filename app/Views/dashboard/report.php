@@ -1487,9 +1487,147 @@
         const submissionFullText = <?= json_encode($submissionText ?? '', JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>;
         const sourceTextsMap = <?= json_encode($sourceTexts ?? [], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>;
         const reportSources = <?= json_encode($sources ?? [], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>;
+        
+        let currentDualMode = 'exact'; // 'exact' (pasase sekuensial) atau 'lexical' (kosakata topikal)
         let currentDualMatches = [];
         let currentDualMatchIndex = 0;
+        let currentDualLexicalItems = [];
         let isSyncScrolling = false;
+
+        const INDO_STOP_WORDS = new Set([
+            'dan', 'yang', 'di', 'ke', 'dari', 'pada', 'untuk', 'ini', 'itu', 'dengan', 'atau',
+            'oleh', 'dalam', 'adalah', 'sebagai', 'akan', 'dapat', 'juga', 'ada', 'tidak',
+            'bisa', 'karena', 'hal', 'tersebut', 'bahwa', 'secara', 'ia', 'mereka', 'kita',
+            'kami', 'saya', 'dia', 'namun', 'serta', 'bagi', 'antara', 'sudah', 'telah',
+            'tentang', 'atas', 'hanya', 'lebih', 'sangat', 'maka', 'bila', 'jika', 'bukan',
+            'seperti', 'terhadap', 'menjadi', 'saat', 'ketika', 'para', 'lain', 'lagi',
+            '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'no', 'hal', 'halaman', 'bab', 'vol',
+            'tahun', 'nomor', 'link', 'data', 'tabel', 'prodi', 'pendidikan', 'program', 'studi'
+        ]);
+
+        function extractTopSharedTerms(textA, textB, topK = 15) {
+            if (!textA || !textB) return [];
+            const re = /\b[a-zA-Z]{4,}\b/gu;
+            const tokensA = textA.toLowerCase().match(re) || [];
+            const tokensB = textB.toLowerCase().match(re) || [];
+
+            const countA = {};
+            for (const w of tokensA) {
+                if (!INDO_STOP_WORDS.has(w)) countA[w] = (countA[w] || 0) + 1;
+            }
+            const countB = {};
+            for (const w of tokensB) {
+                if (!INDO_STOP_WORDS.has(w)) countB[w] = (countB[w] || 0) + 1;
+            }
+
+            const shared = [];
+            for (const w in countA) {
+                if (countB[w]) {
+                    shared.push({
+                        word: w,
+                        score: countA[w] * countB[w],
+                        countA: countA[w],
+                        countB: countB[w]
+                    });
+                }
+            }
+            shared.sort((a, b) => b.score - a.score);
+            return shared.slice(0, topK);
+        }
+
+        function escapeHtml(text) {
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return String(text).replace(/[&<>"']/g, m => map[m]);
+        }
+
+        function buildHighlightedSequentialHtml(rawText, matchRanges, markClass, idPrefix) {
+            if (!rawText) return '<p class="text-slate-400 italic py-8 text-center">Teks tidak tersedia.</p>';
+            const tokenRegex = /\b[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*\b/gu;
+            const tokens = [];
+            let match;
+            while ((match = tokenRegex.exec(rawText)) !== null) {
+                tokens.push({
+                    start: match.index,
+                    end: match.index + match[0].length,
+                    text: match[0]
+                });
+            }
+
+            if (tokens.length === 0 || matchRanges.length === 0) {
+                return `<div class="leading-relaxed whitespace-pre-wrap">${escapeHtml(rawText)}</div>`;
+            }
+
+            const charIntervals = [];
+            matchRanges.forEach(mr => {
+                const wStart = mr.tokenStart;
+                const wEnd = mr.tokenEnd;
+                if (wStart < tokens.length) {
+                    const startChar = tokens[wStart].start;
+                    const safeEndToken = Math.min(tokens.length - 1, wEnd);
+                    const endChar = tokens[safeEndToken].end;
+                    charIntervals.push({
+                        startChar,
+                        endChar,
+                        matchIdx: mr.matchIdx,
+                        tooltip: mr.tooltip || `Pasase #${mr.matchIdx + 1}`
+                    });
+                }
+            });
+
+            charIntervals.sort((a, b) => a.startChar - b.startChar);
+            const merged = [];
+            charIntervals.forEach(curr => {
+                if (merged.length === 0) {
+                    merged.push({ ...curr });
+                } else {
+                    const prev = merged[merged.length - 1];
+                    if (curr.startChar <= prev.endChar) {
+                        prev.endChar = Math.max(prev.endChar, curr.endChar);
+                    } else {
+                        merged.push({ ...curr });
+                    }
+                }
+            });
+
+            let resultHtml = '';
+            let lastIdx = 0;
+            merged.forEach(interval => {
+                resultHtml += escapeHtml(rawText.substring(lastIdx, interval.startChar));
+                const slice = rawText.substring(interval.startChar, interval.endChar);
+                resultHtml += `<mark id="${idPrefix}-${interval.matchIdx}" onclick="jumpToDualMatch(${interval.matchIdx})" class="${markClass} cursor-pointer px-1.5 py-0.5 rounded transition-all shadow-2xs font-semibold" title="${escapeHtml(interval.tooltip)}">${escapeHtml(slice)}</mark>`;
+                lastIdx = interval.endChar;
+            });
+            resultHtml += escapeHtml(rawText.substring(lastIdx));
+            return `<div class="leading-relaxed whitespace-pre-wrap">${resultHtml}</div>`;
+        }
+
+        function buildHighlightedLexicalHtml(rawText, sharedTermsSet, markClass, idPrefix) {
+            if (!rawText) return { html: '<p class="text-slate-400 italic py-8 text-center">Teks tidak tersedia.</p>', count: 0 };
+            if (!sharedTermsSet || sharedTermsSet.size === 0) {
+                return { html: `<div class="leading-relaxed whitespace-pre-wrap">${escapeHtml(rawText)}</div>`, count: 0 };
+            }
+
+            const tokenRegex = /\b[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*\b/gu;
+            let resultHtml = '';
+            let lastIdx = 0;
+            let match;
+            let termOccurrenceIdx = 0;
+
+            while ((match = tokenRegex.exec(rawText)) !== null) {
+                const wordLower = match[0].toLowerCase();
+                if (sharedTermsSet.has(wordLower)) {
+                    resultHtml += escapeHtml(rawText.substring(lastIdx, match.index));
+                    resultHtml += `<mark id="${idPrefix}-${termOccurrenceIdx}" data-term="${wordLower}" onclick="jumpToSpecificTerm('${wordLower}')" class="${markClass} cursor-pointer px-1 py-0.5 rounded font-medium border-b transition-all shadow-2xs" title="Kosakata bersama: ${escapeHtml(wordLower)} (${escapeHtml(match[0])})">${escapeHtml(match[0])}</mark>`;
+                    lastIdx = match.index + match[0].length;
+                    termOccurrenceIdx++;
+                }
+            }
+            resultHtml += escapeHtml(rawText.substring(lastIdx));
+            return {
+                html: `<div class="leading-relaxed whitespace-pre-wrap">${resultHtml}</div>`,
+                count: termOccurrenceIdx
+            };
+        }
 
         function openDualReaderModal(preferredSourceId = null, focusMatchIdx = null) {
             const modal = document.getElementById('dualReaderModal');
@@ -1501,18 +1639,25 @@
                 return;
             }
 
+            const sourceIdsWithDirectMatches = new Set(allMatches.map(m => parseInt(m.source_document_id)));
+
             reportSources.forEach((s, idx) => {
+                const sId = parseInt(s.source_document_id);
+                const hasDirect = sourceIdsWithDirectMatches.has(sId);
                 const opt = document.createElement('option');
-                opt.value = s.source_document_id;
-                opt.text = `#${idx + 1} - ${s.source_title} (${parseFloat(s.similarity || 0).toFixed(1)}%)`;
-                if (preferredSourceId && parseInt(preferredSourceId) === parseInt(s.source_document_id)) {
+                opt.value = sId;
+                const matchCount = allMatches.filter(m => parseInt(m.source_document_id) === sId).length;
+                const badgeLabel = hasDirect ? `[🔍 ${matchCount} Pasase Sekuensial]` : `[📚 Kesepadanan Leksikal]`;
+                opt.text = `#${idx + 1} - ${s.source_title} (${parseFloat(s.similarity || s.cosine_similarity || 0).toFixed(1)}%) ${badgeLabel}`;
+                if (preferredSourceId && parseInt(preferredSourceId) === sId) {
                     opt.selected = true;
                 }
                 select.appendChild(opt);
             });
 
             if (!preferredSourceId && reportSources.length > 0) {
-                select.value = reportSources[0].source_document_id;
+                const firstWithDirect = reportSources.find(s => sourceIdsWithDirectMatches.has(parseInt(s.source_document_id)));
+                select.value = firstWithDirect ? firstWithDirect.source_document_id : reportSources[0].source_document_id;
             }
 
             modal.classList.remove('hidden');
@@ -1547,134 +1692,195 @@
 
             document.getElementById('dualSrcHeaderTitle').innerText = selectedSourceObj ? selectedSourceObj.source_title : 'Dokumen Rujukan';
 
-            // Filter pasase yang cocok untuk sumber terpilih
+            // Filter pasase sekuensial langsung
             currentDualMatches = allMatches
                 .map((m, originalIdx) => ({ ...m, match_original_idx: originalIdx }))
                 .filter(m => parseInt(m.source_document_id) === selectedSrcId);
 
             currentDualMatchIndex = 0;
-            updateDualMatchNavCounter();
 
+            const bannerEl = document.getElementById('dualReaderModeBanner');
+            const legendEl = document.getElementById('dualReaderLegend');
             const subPane = document.getElementById('dualSubPane');
             const srcPane = document.getElementById('dualSrcPane');
-
-            // 1. Render Teks Submisi dengan Penandaan (Marks)
-            const subWords = submissionFullText ? submissionFullText.split(/\s+/) : [];
-            document.getElementById('dualSubInfoText').innerText = `${subWords.length} kata • ${currentDualMatches.length} pasase cocok`;
-
-            if (subWords.length === 0) {
-                subPane.innerHTML = '<p class="text-slate-400 italic py-8 text-center">Naskah submisi tidak dapat dimuat.</p>';
-            } else {
-                let subHtml = '';
-                let currentWordIdx = 0;
-                
-                // Urutkan kecocokan berdasarkan submission_start
-                const sortedSubMatches = [...currentDualMatches].sort((a, b) => parseInt(a.submission_start) - parseInt(b.submission_start));
-                
-                while (currentWordIdx < subWords.length) {
-                    // Cek apakah ada match yang dimulai di kata ini
-                    const activeMatch = sortedSubMatches.find(m => currentWordIdx >= parseInt(m.submission_start) && currentWordIdx <= parseInt(m.submission_end));
-                    if (activeMatch) {
-                        const mStart = parseInt(activeMatch.submission_start);
-                        const mEnd = parseInt(activeMatch.submission_end);
-                        const sliceWords = subWords.slice(mStart, mEnd + 1).join(' ');
-                        const matchItemIdx = currentDualMatches.findIndex(m => m.match_original_idx === activeMatch.match_original_idx);
-                        
-                        subHtml += ` <mark id="dual-sub-m-${matchItemIdx}" onclick="jumpToDualMatch(${matchItemIdx})" class="dual-match-item cursor-pointer px-1.5 py-0.5 rounded bg-amber-200/90 hover:bg-amber-300 text-amber-950 font-semibold border-b-2 border-amber-500 transition-all shadow-2xs" title="Klik untuk fokus pasase #${matchItemIdx + 1}">` + escapeHtml(sliceWords) + `</mark> `;
-                        currentWordIdx = mEnd + 1;
-                    } else {
-                        // Tambahkan kata normal
-                        subHtml += escapeHtml(subWords[currentWordIdx]) + ' ';
-                        currentWordIdx++;
-                    }
-                }
-                subPane.innerHTML = `<div class="leading-relaxed whitespace-pre-wrap">${subHtml}</div>`;
-            }
-
-            // 2. Render Teks Sumber dengan Penandaan (Marks)
             const srcFullText = sourceTextsMap[selectedSrcId] || '';
-            const srcWords = srcFullText ? srcFullText.split(/\s+/) : [];
-            document.getElementById('dualSrcInfoText').innerText = `${srcWords.length} kata`;
 
-            if (srcWords.length === 0) {
-                // Fallback jika chunk sumber tidak lengkap, render cuplikan snippet pasase
-                let fallbackSrcHtml = '<div class="space-y-4">';
-                currentDualMatches.forEach((m, mIdx) => {
-                    fallbackSrcHtml += `
-                        <div id="dual-src-m-${mIdx}" onclick="jumpToDualMatch(${mIdx})" class="p-3 rounded-xl border border-indigo-200 bg-indigo-50/50 cursor-pointer hover:bg-indigo-100/60 transition">
-                            <div class="text-[10px] font-bold font-mono-code text-indigo-700 mb-1">Pasase Rujukan #${mIdx + 1} (Kata ke-${m.source_start} s/d ${m.source_end})</div>
-                            <div class="text-sm font-semibold text-slate-800">"${escapeHtml(m.source_snippet || '-')}"</div>
+            const subWords = submissionFullText ? submissionFullText.split(/\s+/) : [];
+            const srcWords = srcFullText ? srcFullText.split(/\s+/) : [];
+
+            if (currentDualMatches.length > 0) {
+                // ═════════════════════════════════════════════════════════════
+                // MODE 1: BUKTI SEKUENSIAL LANGSUNG (EXACT OVERLAP)
+                // ═════════════════════════════════════════════════════════════
+                currentDualMode = 'exact';
+                updateDualMatchNavCounter();
+
+                const simVal = parseFloat(selectedSourceObj ? (selectedSourceObj.exact_similarity || selectedSourceObj.similarity || 0) : 0).toFixed(1);
+
+                if (bannerEl) {
+                    bannerEl.className = 'px-5 py-2.5 bg-indigo-50/90 border-b border-indigo-200 flex flex-wrap items-center justify-between gap-3 text-xs';
+                    bannerEl.innerHTML = `
+                        <div class="flex items-center gap-2">
+                            <span class="text-lg">🔍</span>
+                            <div>
+                                <div class="font-bold text-indigo-950 font-mono-code uppercase flex items-center gap-2">
+                                    <span>Mode Bukti Sekuensial Langsung (Exact Overlap: ${simVal}%)</span>
+                                    <span class="text-[10px] px-2 py-0.5 rounded bg-indigo-200 text-indigo-900 font-bold">${currentDualMatches.length} Pasase Cocok</span>
+                                </div>
+                                <p class="text-[11px] text-indigo-800 leading-snug pt-0.5">
+                                    Ditemukan pasase kata-demi-kata berurutan. Klik pasase tersorot atau gunakan tombol navigasi (◄ ►) untuk menyinkronkan posisi kedua dokumen.
+                                </p>
+                            </div>
                         </div>
                     `;
-                });
-                fallbackSrcHtml += '</div>';
-                srcPane.innerHTML = fallbackSrcHtml;
-            } else {
-                let srcHtml = '';
-                let currentWordIdx = 0;
-                const sortedSrcMatches = [...currentDualMatches].sort((a, b) => parseInt(a.source_start) - parseInt(b.source_start));
-
-                while (currentWordIdx < srcWords.length) {
-                    const activeMatch = sortedSrcMatches.find(m => currentWordIdx >= parseInt(m.source_start) && currentWordIdx <= parseInt(m.source_end));
-                    if (activeMatch) {
-                        const mStart = parseInt(activeMatch.source_start);
-                        const mEnd = parseInt(activeMatch.source_end);
-                        const sliceWords = srcWords.slice(mStart, mEnd + 1).join(' ');
-                        const matchItemIdx = currentDualMatches.findIndex(m => m.match_original_idx === activeMatch.match_original_idx);
-
-                        srcHtml += ` <mark id="dual-src-m-${matchItemIdx}" onclick="jumpToDualMatch(${matchItemIdx})" class="dual-match-item cursor-pointer px-1.5 py-0.5 rounded bg-indigo-200/90 hover:bg-indigo-300 text-indigo-950 font-semibold border-b-2 border-indigo-600 transition-all shadow-2xs" title="Klik untuk fokus pasase #${matchItemIdx + 1}">` + escapeHtml(sliceWords) + `</mark> `;
-                        currentWordIdx = mEnd + 1;
-                    } else {
-                        srcHtml += escapeHtml(srcWords[currentWordIdx]) + ' ';
-                        currentWordIdx++;
-                    }
                 }
-                srcPane.innerHTML = `<div class="leading-relaxed whitespace-pre-wrap">${srcHtml}</div>`;
+
+                if (legendEl) {
+                    legendEl.innerHTML = `
+                        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-amber-200 border border-amber-400 inline-block"></span> Teks Submisi Cocok</span>
+                        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-indigo-200 border border-indigo-400 inline-block"></span> Teks Sumber Cocok</span>
+                        <span class="hidden sm:inline text-slate-400">• Klik pasase tersorot untuk menyinkronkan posisi kedua dokumen</span>
+                    `;
+                }
+
+                document.getElementById('dualSubInfoText').innerText = `${subWords.length} kata • ${currentDualMatches.length} pasase cocok`;
+                document.getElementById('dualSrcInfoText').innerText = `${srcWords.length} kata • ${currentDualMatches.length} pasase cocok`;
+
+                // Highlight Submisi
+                const subRanges = currentDualMatches.map((m, idx) => ({
+                    tokenStart: parseInt(m.submission_start),
+                    tokenEnd: parseInt(m.submission_end),
+                    matchIdx: idx,
+                    tooltip: `Pasase #${idx + 1} (${m.word_count} kata)`
+                }));
+                subPane.innerHTML = buildHighlightedSequentialHtml(
+                    submissionFullText,
+                    subRanges,
+                    'bg-amber-200/95 hover:bg-amber-300 text-amber-950 border-b-2 border-amber-500',
+                    'dual-sub-m'
+                );
+
+                // Highlight Sumber
+                const srcRanges = currentDualMatches.map((m, idx) => ({
+                    tokenStart: parseInt(m.source_start),
+                    tokenEnd: parseInt(m.source_end),
+                    matchIdx: idx,
+                    tooltip: `Pasase Rujukan #${idx + 1} (${m.word_count} kata)`
+                }));
+                srcPane.innerHTML = buildHighlightedSequentialHtml(
+                    srcFullText,
+                    srcRanges,
+                    'bg-indigo-200/95 hover:bg-indigo-300 text-indigo-950 border-b-2 border-indigo-600',
+                    'dual-src-m'
+                );
+
+            } else {
+                // ═════════════════════════════════════════════════════════════
+                // MODE 2: KESEPADANAN LEKSIKAL & TOPIKAL (TF-IDF SIMILARITY)
+                // ═════════════════════════════════════════════════════════════
+                currentDualMode = 'lexical';
+
+                const simVal = parseFloat(selectedSourceObj ? (selectedSourceObj.cosine_similarity || selectedSourceObj.similarity || 0) : 0).toFixed(1);
+                const matchedWords = selectedSourceObj ? parseInt(selectedSourceObj.matched_words || 0) : 0;
+
+                // Hitung kosakata substantif bersama teratas
+                const topSharedTerms = extractTopSharedTerms(submissionFullText, srcFullText, 12);
+                const sharedTermsSet = new Set(topSharedTerms.map(t => t.word));
+
+                // Buat chips kosakata interaktif
+                let chipsHtml = '';
+                topSharedTerms.forEach(item => {
+                    chipsHtml += `
+                        <button type="button" onclick="jumpToSpecificTerm('${item.word}')" class="px-2 py-0.5 rounded-full bg-teal-100 hover:bg-teal-200 text-teal-900 border border-teal-300 text-[10px] font-bold font-mono-code transition cursor-pointer" title="Submisi: ${item.countA}x | Sumber: ${item.countB}x">
+                            ${escapeHtml(item.word)} <span class="text-teal-600 text-[9px]">(${item.countA}x/${item.countB}x)</span>
+                        </button>
+                    `;
+                });
+
+                if (bannerEl) {
+                    bannerEl.className = 'px-5 py-2.5 bg-teal-50/90 border-b border-teal-200 flex flex-col md:flex-row md:items-center justify-between gap-2.5 text-xs';
+                    bannerEl.innerHTML = `
+                        <div class="flex items-center gap-2.5">
+                            <span class="text-lg">📚</span>
+                            <div>
+                                <div class="font-bold text-teal-950 font-mono-code uppercase flex items-center gap-2">
+                                    <span>Mode Kesepadanan Topikal & Kosakata (TF-IDF: ${simVal}%)</span>
+                                    <span class="text-[10px] px-2 py-0.5 rounded bg-teal-200 text-teal-900 font-bold">Verbatim: 0%</span>
+                                </div>
+                                <p class="text-[11px] text-teal-800 leading-snug pt-0.5">
+                                    Kedua naskah berbagi orientasi bidang ilmu dan kosakata tematik (${matchedWords} kata bersama), bukan salinan sekuensial kata-demi-kata. Kosakata tematik bersama ditandai dengan warna toska di bawah.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1.5 flex-wrap pt-1 md:pt-0">
+                            <span class="text-[10px] font-bold text-teal-900 uppercase font-mono-code">Kata Kunci:</span>
+                            ${chipsHtml || '<span class="text-slate-400 italic text-[11px]">Tidak ada kata kunci dominan</span>'}
+                        </div>
+                    `;
+                }
+
+                if (legendEl) {
+                    legendEl.innerHTML = `
+                        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-teal-200 border border-teal-400 inline-block"></span> Kosakata Tematik Bersama (Topikal)</span>
+                        <span class="hidden sm:inline text-slate-400">• Klik kata kunci di atas atau kata tersorot untuk menelusuri persebaran konsep</span>
+                    `;
+                }
+
+                // Highlight Submisi
+                const subRes = buildHighlightedLexicalHtml(
+                    submissionFullText,
+                    sharedTermsSet,
+                    'bg-teal-200/90 hover:bg-teal-300 text-teal-950 border-b-2 border-teal-500',
+                    'dual-sub-term'
+                );
+                subPane.innerHTML = subRes.html;
+
+                // Highlight Sumber
+                const srcRes = buildHighlightedLexicalHtml(
+                    srcFullText,
+                    sharedTermsSet,
+                    'bg-teal-200/90 hover:bg-teal-300 text-teal-950 border-b-2 border-teal-500',
+                    'dual-src-term'
+                );
+                srcPane.innerHTML = srcRes.html;
+
+                currentDualLexicalItems = [];
+                const maxTermCount = Math.max(subRes.count, srcRes.count);
+                for (let i = 0; i < maxTermCount; i++) {
+                    currentDualLexicalItems.push(i);
+                }
+
+                updateDualMatchNavCounter();
+
+                document.getElementById('dualSubInfoText').innerText = `${subWords.length} kata • ${topSharedTerms.length} kata kunci (${subRes.count} kemunculan)`;
+                document.getElementById('dualSrcInfoText').innerText = `${srcWords.length} kata • ${topSharedTerms.length} kata kunci (${srcRes.count} kemunculan)`;
             }
 
             // Setup Sinkronisasi Gulir (Sync-Scroll)
             setupDualSyncScroll();
         }
 
-        function escapeHtml(text) {
-            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-            return String(text).replace(/[&<>"']/g, m => map[m]);
-        }
-
-        function setupDualSyncScroll() {
-            const subPane = document.getElementById('dualSubPane');
-            const srcPane = document.getElementById('dualSrcPane');
-            const syncToggle = document.getElementById('dualSyncToggle');
-
-            subPane.onscroll = function() {
-                if (!syncToggle.checked || isSyncScrolling) return;
-                isSyncScrolling = true;
-                const pct = subPane.scrollTop / (subPane.scrollHeight - subPane.clientHeight || 1);
-                srcPane.scrollTop = pct * (srcPane.scrollHeight - srcPane.clientHeight);
-                setTimeout(() => { isSyncScrolling = false; }, 30);
-            };
-
-            srcPane.onscroll = function() {
-                if (!syncToggle.checked || isSyncScrolling) return;
-                isSyncScrolling = true;
-                const pct = srcPane.scrollTop / (srcPane.scrollHeight - srcPane.clientHeight || 1);
-                subPane.scrollTop = pct * (subPane.scrollHeight - subPane.clientHeight);
-                setTimeout(() => { isSyncScrolling = false; }, 30);
-            };
-        }
-
         function updateDualMatchNavCounter() {
             const counter = document.getElementById('dualMatchNavCounter');
-            if (currentDualMatches.length === 0) {
-                counter.innerText = '0 / 0';
+            if (currentDualMode === 'exact') {
+                if (currentDualMatches.length === 0) {
+                    counter.innerText = '0 / 0';
+                } else {
+                    counter.innerText = `${currentDualMatchIndex + 1} / ${currentDualMatches.length}`;
+                }
             } else {
-                counter.innerText = `${currentDualMatchIndex + 1} / ${currentDualMatches.length}`;
+                if (currentDualLexicalItems.length === 0) {
+                    counter.innerText = '0 / 0';
+                } else {
+                    counter.innerText = `${currentDualMatchIndex + 1} / ${currentDualLexicalItems.length}`;
+                }
             }
         }
 
         function navigateDualMatch(direction) {
-            if (currentDualMatches.length === 0) return;
-            currentDualMatchIndex = (currentDualMatchIndex + direction + currentDualMatches.length) % currentDualMatches.length;
+            const total = (currentDualMode === 'exact') ? currentDualMatches.length : currentDualLexicalItems.length;
+            if (total === 0) return;
+            currentDualMatchIndex = (currentDualMatchIndex + direction + total) % total;
             jumpToDualMatch(currentDualMatchIndex);
         }
 
@@ -1684,19 +1890,43 @@
 
             // Lepas highlight aktif sebelumnya
             document.querySelectorAll('.dual-active-focus').forEach(el => {
-                el.classList.remove('dual-active-focus', 'ring-4', 'ring-indigo-500', 'ring-offset-2', 'z-20');
+                el.classList.remove('dual-active-focus', 'ring-4', 'ring-indigo-500', 'ring-teal-500', 'ring-offset-2', 'z-20');
             });
 
-            const subTarget = document.getElementById(`dual-sub-m-${matchIndex}`);
-            const srcTarget = document.getElementById(`dual-src-m-${matchIndex}`);
+            const ringColor = (currentDualMode === 'exact') ? 'ring-indigo-500' : 'ring-teal-500';
+            const subId = (currentDualMode === 'exact') ? `dual-sub-m-${matchIndex}` : `dual-sub-term-${matchIndex}`;
+            const srcId = (currentDualMode === 'exact') ? `dual-src-m-${matchIndex}` : `dual-src-term-${matchIndex}`;
+
+            const subTarget = document.getElementById(subId);
+            const srcTarget = document.getElementById(srcId);
 
             if (subTarget) {
-                subTarget.classList.add('dual-active-focus', 'ring-4', 'ring-indigo-500', 'ring-offset-2', 'z-20');
+                subTarget.classList.add('dual-active-focus', 'ring-4', ringColor, 'ring-offset-2', 'z-20');
                 subTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
 
             if (srcTarget) {
-                srcTarget.classList.add('dual-active-focus', 'ring-4', 'ring-indigo-500', 'ring-offset-2', 'z-20');
+                srcTarget.classList.add('dual-active-focus', 'ring-4', ringColor, 'ring-offset-2', 'z-20');
+                srcTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        function jumpToSpecificTerm(termWord) {
+            const termLower = termWord.toLowerCase();
+            document.querySelectorAll('.dual-active-focus').forEach(el => {
+                el.classList.remove('dual-active-focus', 'ring-4', 'ring-indigo-500', 'ring-teal-500', 'ring-offset-2', 'z-20');
+            });
+
+            const subTarget = document.querySelector(`#dualSubPane mark[data-term="${termLower}"]`);
+            const srcTarget = document.querySelector(`#dualSrcPane mark[data-term="${termLower}"]`);
+
+            if (subTarget) {
+                subTarget.classList.add('dual-active-focus', 'ring-4', 'ring-teal-500', 'ring-offset-2', 'z-20');
+                subTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            if (srcTarget) {
+                srcTarget.classList.add('dual-active-focus', 'ring-4', 'ring-teal-500', 'ring-offset-2', 'z-20');
                 srcTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         }
@@ -1916,6 +2146,9 @@
                 </div>
             </div>
 
+            <!-- Mode Banner (Sequential Overlap vs Topical Lexical Overlap) -->
+            <div id="dualReaderModeBanner" class="hidden"></div>
+
             <!-- Modal Body: 2 Columns Split Screen -->
             <div class="flex-1 grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-200 min-h-0 bg-slate-100">
                 <!-- Left Column: Naskah Mahasiswa (Submisi) -->
@@ -1949,7 +2182,7 @@
 
             <!-- Modal Footer -->
             <div class="px-5 py-2.5 border-t border-slate-200 bg-slate-50 flex items-center justify-between text-xs text-slate-500">
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-3" id="dualReaderLegend">
                     <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-amber-200 border border-amber-400 inline-block"></span> Teks Submisi Cocok</span>
                     <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-indigo-200 border border-indigo-400 inline-block"></span> Teks Sumber Cocok</span>
                     <span class="hidden sm:inline text-slate-400">• Klik pada teks tersorot untuk menyinkronkan posisi kedua dokumen</span>
