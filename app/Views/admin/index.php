@@ -17,15 +17,31 @@
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         .font-mono-code { font-family: 'JetBrains Mono', monospace; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        /* Sleek horizontal tab scroll styling */
+        .admin-tab-scroll {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(99, 102, 241, 0.4) transparent;
+        }
+        .admin-tab-scroll::-webkit-scrollbar {
+            height: 3px;
+        }
+        .admin-tab-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .admin-tab-scroll::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.4);
+            border-radius: 9999px;
+        }
+        .admin-tab-scroll::-webkit-scrollbar-thumb:hover {
+            background: rgba(99, 102, 241, 0.8);
+        }
     </style>
 </head>
 <body class="bg-slate-900 text-slate-100 antialiased min-h-screen flex flex-col">
 
     <!-- Top Admin Header -->
     <header class="bg-slate-950/90 border-b border-slate-800 sticky top-0 z-40 backdrop-blur-md">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16 gap-4">
                 <!-- Brand & Admin Badge -->
                 <div class="flex items-center gap-3">
@@ -42,7 +58,7 @@
                 </div>
 
                 <!-- Search Bar -->
-                <form action="<?= base_url('admin') ?>" method="get" class="hidden md:flex items-center flex-1 max-w-md mx-4">
+                <form action="<?= base_url('admin') ?>" method="get" class="hidden md:flex items-center flex-1 max-w-sm lg:max-w-md mx-4">
                     <input type="hidden" name="tab" value="<?= esc($activeTab) ?>">
                     <div class="relative w-full">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
@@ -74,40 +90,40 @@
             </div>
 
             <!-- Tab Navigation Bar -->
-            <div class="flex items-center gap-1 overflow-x-auto no-scrollbar py-2 border-t border-slate-800/80 text-xs font-medium">
-                <a href="<?= base_url('admin?tab=overview') ?>" class="px-3.5 py-1.5 rounded-lg flex items-center gap-2 whitespace-nowrap transition-colors <?= $activeTab === 'overview' ? 'bg-indigo-600/20 text-indigo-300 font-semibold border border-indigo-500/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50' ?>">
+            <div class="flex items-center gap-1.5 overflow-x-auto admin-tab-scroll py-2 border-t border-slate-800/80 text-xs font-medium scroll-smooth">
+                <a href="<?= base_url('admin?tab=overview') ?>" class="flex-shrink-0 px-3 py-1.5 rounded-lg flex items-center gap-2 whitespace-nowrap transition-colors <?= $activeTab === 'overview' ? 'bg-indigo-600/20 text-indigo-300 font-semibold border border-indigo-500/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50' ?>">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
-                    Ringkasan Utama
+                    Ringkasan
                 </a>
-                <a href="<?= base_url('admin?tab=users') ?>" class="px-3.5 py-1.5 rounded-lg flex items-center gap-2 whitespace-nowrap transition-colors <?= $activeTab === 'users' ? 'bg-indigo-600/20 text-indigo-300 font-semibold border border-indigo-500/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50' ?>">
+                <a href="<?= base_url('admin?tab=users') ?>" class="flex-shrink-0 px-3 py-1.5 rounded-lg flex items-center gap-2 whitespace-nowrap transition-colors <?= $activeTab === 'users' ? 'bg-indigo-600/20 text-indigo-300 font-semibold border border-indigo-500/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50' ?>">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                     Pengguna & Kuota
                     <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-slate-800 text-slate-300 font-semibold"><?= (int) $metrics['total_users'] ?></span>
                 </a>
-                <a href="<?= base_url('admin?tab=documents') ?>" class="px-3.5 py-1.5 rounded-lg flex items-center gap-2 whitespace-nowrap transition-colors <?= $activeTab === 'documents' ? 'bg-indigo-600/20 text-indigo-300 font-semibold border border-indigo-500/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50' ?>">
+                <a href="<?= base_url('admin?tab=documents') ?>" class="flex-shrink-0 px-3 py-1.5 rounded-lg flex items-center gap-2 whitespace-nowrap transition-colors <?= $activeTab === 'documents' ? 'bg-indigo-600/20 text-indigo-300 font-semibold border border-indigo-500/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50' ?>">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                     Dokumen & Antrean
                     <?php if ($metrics['queue_uploaded'] + $metrics['queue_processing'] > 0): ?>
                         <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold animate-pulse"><?= $metrics['queue_uploaded'] + $metrics['queue_processing'] ?> proses</span>
                     <?php endif; ?>
                 </a>
-                <a href="<?= base_url('admin?tab=corpus') ?>" class="px-3.5 py-1.5 rounded-lg flex items-center gap-2 whitespace-nowrap transition-colors <?= $activeTab === 'corpus' ? 'bg-indigo-600/20 text-indigo-300 font-semibold border border-indigo-500/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50' ?>">
+                <a href="<?= base_url('admin?tab=corpus') ?>" class="flex-shrink-0 px-3 py-1.5 rounded-lg flex items-center gap-2 whitespace-nowrap transition-colors <?= $activeTab === 'corpus' ? 'bg-indigo-600/20 text-indigo-300 font-semibold border border-indigo-500/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50' ?>">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
                     Korpus Repositori
                     <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-slate-800 text-slate-300 font-semibold"><?= (int) $metrics['total_corpus'] ?></span>
                 </a>
-                <a href="<?= base_url('admin?tab=security') ?>" class="px-3.5 py-1.5 rounded-lg flex items-center gap-2 whitespace-nowrap transition-colors <?= $activeTab === 'security' ? 'bg-indigo-600/20 text-indigo-300 font-semibold border border-indigo-500/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50' ?>">
+                <a href="<?= base_url('admin?tab=security') ?>" class="flex-shrink-0 px-3 py-1.5 rounded-lg flex items-center gap-2 whitespace-nowrap transition-colors <?= $activeTab === 'security' ? 'bg-indigo-600/20 text-indigo-300 font-semibold border border-indigo-500/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50' ?>">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-                    Keamanan & Rate Limit
+                    Keamanan & Limit
                     <?php if ($metrics['active_locks_count'] > 0): ?>
                         <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-rose-500/20 text-rose-300 border border-rose-500/30 font-semibold"><?= $metrics['active_locks_count'] ?> terkunci</span>
                     <?php endif; ?>
                 </a>
-                <a href="<?= base_url('admin?tab=visitors') ?>" class="px-3.5 py-1.5 rounded-lg flex items-center gap-2 whitespace-nowrap transition-colors <?= $activeTab === 'visitors' ? 'bg-indigo-600/20 text-indigo-300 font-semibold border border-indigo-500/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50' ?>">
+                <a href="<?= base_url('admin?tab=visitors') ?>" class="flex-shrink-0 px-3 py-1.5 rounded-lg flex items-center gap-2 whitespace-nowrap transition-colors <?= $activeTab === 'visitors' ? 'bg-indigo-600/20 text-indigo-300 font-semibold border border-indigo-500/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50' ?>">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                    Analitik Pengunjung
+                    Pengunjung
                 </a>
-                <a href="<?= base_url('admin?tab=system') ?>" class="px-3.5 py-1.5 rounded-lg flex items-center gap-2 whitespace-nowrap transition-colors <?= $activeTab === 'system' ? 'bg-indigo-600/20 text-indigo-300 font-semibold border border-indigo-500/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50' ?>">
+                <a href="<?= base_url('admin?tab=system') ?>" class="flex-shrink-0 px-3 py-1.5 rounded-lg flex items-center gap-2 whitespace-nowrap transition-colors <?= $activeTab === 'system' ? 'bg-indigo-600/20 text-indigo-300 font-semibold border border-indigo-500/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50' ?>">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                     Sistem Server
                 </a>
@@ -116,7 +132,7 @@
     </header>
 
     <!-- Main Content Area -->
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <main class="flex-1 max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
         <!-- Flash Notice / Toast -->
         <?php if (session()->getFlashdata('message')): ?>
