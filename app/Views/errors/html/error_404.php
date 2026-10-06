@@ -1,84 +1,300 @@
+<?php
+/**
+ * AR Tilik - Custom 404 Not Found View
+ * Desain modern bertema AR Tilik dengan navigasi kembali yang jelas.
+ */
+$homeUrl = function_exists('base_url') ? base_url('/') : '/';
+$verifyUrl = function_exists('base_url') ? base_url('verify') : '/verify';
+?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-    <meta charset="utf-8">
-    <title><?= lang('Errors.pageNotFound') ?></title>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>404 Halaman Tidak Ditemukan — AR Tilik</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
-        div.logo {
-            height: 200px;
-            width: 155px;
-            display: inline-block;
-            opacity: 0.08;
-            position: absolute;
-            top: 2rem;
-            left: 50%;
-            margin-left: -73px;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            height: 100%;
-            background: #fafafa;
-            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-            color: #777;
-            font-weight: 300;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            line-height: 1.5;
         }
-        h1 {
-            font-weight: lighter;
-            letter-spacing: normal;
-            font-size: 3rem;
-            margin-top: 0;
-            margin-bottom: 0;
-            color: #222;
+        .header {
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 14px 24px;
         }
-        .wrap {
-            max-width: 1024px;
-            margin: 5rem auto;
-            padding: 2rem;
-            background: #fff;
-            text-align: center;
-            border: 1px solid #efefef;
-            border-radius: 0.5rem;
+        .header-inner {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: #0f172a;
+            font-weight: 800;
+            font-size: 16px;
+        }
+        .brand-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #1e1b4b, #3730a3);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #ffffff;
+            box-shadow: 0 2px 4px rgba(30, 27, 75, 0.2);
+        }
+        .brand-badge {
+            font-size: 10px;
+            text-transform: uppercase;
+            font-weight: 700;
+            background: #f1f5f9;
+            color: #475569;
+            padding: 3px 8px;
+            border-radius: 20px;
+            border: 1px solid #cbd5e1;
+        }
+        .main-container {
+            max-width: 680px;
+            width: 100%;
+            margin: 40px auto;
+            padding: 0 20px;
+            flex: 1;
+        }
+        .card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+        }
+        .card-header-bar {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            padding: 24px 28px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(99, 102, 241, 0.2);
+            border: 1px solid rgba(129, 140, 248, 0.4);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+        .card-title {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+        }
+        .card-subtitle {
+            font-size: 13px;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+        .card-body {
+            padding: 28px;
+        }
+        .info-desc {
+            font-size: 14px;
+            color: #475569;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .hint-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+        .hint-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #334155;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .hint-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 13px;
+            color: #64748b;
+        }
+        .hint-list li {
             position: relative;
+            padding-left: 18px;
         }
-        pre {
-            white-space: normal;
-            margin-top: 1.5rem;
+        .hint-list li::before {
+            content: "•";
+            position: absolute;
+            left: 4px;
+            color: #6366f1;
+            font-weight: bold;
         }
-        code {
-            background: #fafafa;
-            border: 1px solid #efefef;
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
-            display: block;
+        .debug-box {
+            background: #fffbeb;
+            border: 1px solid #fef3c7;
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: #92400e;
+            word-break: break-all;
         }
-        p {
-            margin-top: 1.5rem;
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+        }
+        .btn-primary {
+            background: #4338ca;
+            color: #ffffff;
+            box-shadow: 0 2px 4px rgba(67, 56, 202, 0.2);
+        }
+        .btn-primary:hover {
+            background: #3730a3;
+        }
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+        }
+        .btn-secondary:hover {
+            background: #e2e8f0;
+            color: #0f172a;
         }
         .footer {
-            margin-top: 2rem;
-            border-top: 1px solid #efefef;
-            padding: 1em 2em 0 2em;
-            font-size: 85%;
-            color: #999;
+            background: #ffffff;
+            border-top: 1px solid #e2e8f0;
+            padding: 16px 24px;
+            font-size: 12px;
+            color: #64748b;
+            text-align: center;
         }
-        a:active,
-        a:link,
-        a:visited {
-            color: #dd4814;
+        @media (max-width: 640px) {
+            .card-header-bar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .actions {
+                flex-direction: column;
+                width: 100%;
+            }
+            .btn {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="wrap">
-        <h1>404</h1>
 
-        <p>
-            <?php if (ENVIRONMENT !== 'production') : ?>
-                <?= nl2br(esc($message)) ?>
-            <?php else : ?>
-                <?= lang('Errors.sorryCannotFind') ?>
-            <?php endif; ?>
-        </p>
-    </div>
+    <header class="header">
+        <div class="header-inner">
+            <a href="<?= esc($homeUrl) ?>" class="brand">
+                <div class="brand-icon">🔬</div>
+                <div>
+                    <div>AR TILIK</div>
+                </div>
+            </a>
+            <span class="brand-badge">Pemeriksa Kesepadanan Teks</span>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <div class="card">
+            <div class="card-header-bar">
+                <div class="card-icon">🧭</div>
+                <div>
+                    <h1 class="card-title">404 — Halaman Tidak Ditemukan</h1>
+                    <p class="card-subtitle">Alamat tautan yang Anda tuju tidak terdaftar di sistem AR Tilik.</p>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <?php if (ENVIRONMENT !== 'production' && !empty($message) && $message !== 'Page Not Found') : ?>
+                    <div class="debug-box">
+                        <strong>Keterangan Pengembang:</strong><br>
+                        <?= nl2br(esc($message)) ?>
+                    </div>
+                <?php endif; ?>
+
+                <p class="info-desc">
+                    Halaman atau sumber data yang Anda minta mungkin telah dipindahkan, dihapus, atau tautan yang Anda masukkan kurang tepat.
+                </p>
+
+                <div class="hint-box">
+                    <div class="hint-title">Kemungkinan Penyebab:</div>
+                    <ul class="hint-list">
+                        <li>Penulisan URL atau parameter identifikasi dokumen salah ketik.</li>
+                        <li>Laporan atau berkas analisis yang dicari sudah diperbarui atau telah diarsipkan.</li>
+                        <li>Sesi verifikasi telah kedaluwarsa atau membutuhkan tautan langsung dari QR Code sertifikat.</li>
+                    </ul>
+                </div>
+
+                <div class="actions">
+                    <a href="javascript:history.back()" class="btn btn-primary">
+                        <span>←</span> Kembali ke Halaman Sebelumnya
+                    </a>
+                    <a href="<?= esc($homeUrl) ?>" class="btn btn-secondary">
+                        <span>📊</span> Buka Dashboard
+                    </a>
+                    <a href="<?= esc($verifyUrl) ?>" class="btn btn-secondary">
+                        <span>🛡️</span> Portal Verifikasi
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        AR Tilik &copy; <?= date('Y') ?> &bull; Sistem Deteksi Kesepadanan Naskah Akademik Mandiri &bull; Universitas Sanata Dharma
+    </footer>
+
 </body>
 </html>

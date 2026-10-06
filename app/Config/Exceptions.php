@@ -101,6 +101,15 @@ class Exceptions extends BaseConfig
      */
     public function handler(int $statusCode, Throwable $exception): ExceptionHandlerInterface
     {
+        // Otomatis laporkan galat sistem (500 / unhandled exception) ke Telegram Bot
+        if ($statusCode >= 500 || (!in_array($statusCode, [400, 404], true) && !($exception instanceof \CodeIgniter\Exceptions\PageNotFoundException))) {
+            try {
+                \App\Libraries\TelegramNotifier::notifyException($exception, ['status_code' => $statusCode]);
+            } catch (\Throwable $t) {
+                // Failsafe
+            }
+        }
+
         return new ExceptionHandler($this);
     }
 }
