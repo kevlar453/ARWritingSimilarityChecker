@@ -133,7 +133,7 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
                 </tr>
             </table>
             <div style="font-size: 7.5pt; color: #64748b; margin-top: 6px; line-height: 1.35;">
-                &bull; Pemisahan zonasi memastikan kemiripan format lembar pengesahan/kata pengantar (Front Matter) dan daftar pustaka (Back Matter) tidak mendistorsi evaluasi keaslian naskah.
+                • Pemisahan zonasi memastikan kemiripan format lembar pengesahan/kata pengantar (Front Matter) dan daftar pustaka (Back Matter) tidak mendistorsi evaluasi keaslian naskah.
             </div>
         </div>
         """
@@ -223,7 +223,7 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
             <td style="text-align: center; font-weight: bold; width: 40px;">#{s_rank}</td>
             <td>
                 <strong>{s_title}</strong>
-                <div style="font-size: 8pt; color: #64748b;">ID #{s.get('source_document_id')} &bull; {s_type}</div>
+                <div style="font-size: 8pt; color: #64748b;">ID #{s.get('source_document_id')} • {s_type}</div>
             </td>
             <td style="text-align: right; font-weight: bold; width: 75px; color: #1e3a8a;">{s_sim:.1f}%</td>
             <td style="text-align: right; width: 65px; color: #475569;">{s_exact:.1f}%</td>
@@ -320,15 +320,15 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
             bp_rat = m.get("boilerplate_rationale", "")
             bp_html = f"""
             <div style="margin-top: 6px; padding: 4px 8px; background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 4px; font-size: 7.5pt; color: #3730a3;">
-                <strong>&bull; Formulasi Ilmiah Baku ({bp_cat}):</strong> &ldquo;{bp_phr}&rdquo; &mdash; {bp_rat} (Konvensi penulisan standar).
+                <strong>• Formulasi Ilmiah Baku ({bp_cat}):</strong> &ldquo;{bp_phr}&rdquo; &mdash; {bp_rat} (Konvensi penulisan standar).
             </div>
             """
 
         matches_html += f"""
         <div class="match-item" style="margin-bottom: 12px; padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px; background-color: #f8fafc; page-break-inside: avoid;">
             <div style="display: flex; justify-content: space-between; font-size: 8.5pt; margin-bottom: 6px; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px;">
-                <span><strong>Pasase #{idx}</strong> &bull; {sub_span} ({w_cnt} kata)</span>
-                <span>Rujukan: <strong>Doc #{src_id}</strong> &bull; Tipe: <strong>{m_type}</strong></span>
+                <span><strong>Pasase #{idx}</strong> • {sub_span} ({w_cnt} kata)</span>
+                <span>Rujukan: <strong>Doc #{src_id}</strong> • Tipe: <strong>{m_type}</strong></span>
             </div>
             <div style="font-size: 8pt; line-height: 1.4; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
                 <div style="background: #ffffff; padding: 6px; border: 1px solid #e2e8f0; border-radius: 4px;">
@@ -352,6 +352,16 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
         """
 
     verify_url = f"{VERIFY_BASE_URL}/verify/{cert_hash}"
+    logo_path = Path(__file__).resolve().parents[1] / "public" / "images" / "logo.png"
+    logo_b64 = ""
+    if logo_path.exists():
+        try:
+            with open(logo_path, "rb") as f:
+                logo_b64 = base64.b64encode(f.read()).decode("utf-8")
+        except Exception as e:
+            print(f"[EXPORTER WARNING] Gagal memuat logo: {e}")
+    logo_img_tag = f'<img src="data:image/png;base64,{logo_b64}" alt="AR Tilik Logo" style="width: 44px; height: 44px; object-fit: contain; display: block;" />' if logo_b64 else ''
+
     qr_code_base64 = generate_qr_code_base64(verify_url)
     qr_img_tag = f'<img src="data:image/png;base64,{qr_code_base64}" alt="QR Verifikasi" style="width: 52px; height: 52px; border: 1px solid #cbd5e1; border-radius: 4px; padding: 2px; background: #ffffff;" />' if qr_code_base64 else ''
 
@@ -365,13 +375,13 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
         size: A4;
         margin: 15mm 15mm 18mm 15mm;
         @top-right {{
-            content: "AR Tilik v1.0.0 &bull; Sertifikasi #{cert_hash}";
+            content: "AR Tilik v1.0.0 • Sertifikasi #{cert_hash}";
             font-size: 7pt;
             font-family: 'Liberation Sans', 'Helvetica Neue', Arial, sans-serif;
             color: #94a3b8;
         }}
         @bottom-left {{
-            content: "Dicetak secara otomatis oleh Sistem AR Tilik &bull; Keabsahan digital terverifikasi";
+            content: "Dicetak secara otomatis oleh Sistem AR Tilik • Keabsahan digital terverifikasi";
             font-size: 7pt;
             font-family: 'Liberation Sans', 'Helvetica Neue', Arial, sans-serif;
             color: #94a3b8;
@@ -661,8 +671,15 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
     <table class="header-table">
         <tr>
             <td style="vertical-align: middle;">
-                <div class="brand-title">AR TILIK</div>
-                <div class="brand-sub">Academic Writing Similarity &bull; Evidence Decomposition Engine</div>
+                <table cellpadding="0" cellspacing="0" style="border: none; margin: 0; padding: 0;">
+                    <tr>
+                        {f'<td style="vertical-align: middle; padding-right: 12px; width: 44px; border: none;">{logo_img_tag}</td>' if logo_img_tag else ''}
+                        <td style="vertical-align: middle; border: none; padding: 0;">
+                            <div class="brand-title">AR TILIK</div>
+                            <div class="brand-sub">Academic Writing Similarity • Evidence Decomposition Engine</div>
+                        </td>
+                    </tr>
+                </table>
             </td>
             <td class="cert-box" style="vertical-align: middle;">
                 <div style="display: flex; align-items: center; justify-content: flex-end; gap: 10px;">
@@ -729,7 +746,7 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
     <div class="dual-lens-grid">
         <div class="lens-card">
             <div class="lens-card-header">
-                <span class="lens-card-title">Lensa 1 &bull; Exact Matcher</span>
+                <span class="lens-card-title">Lensa 1 • Exact Matcher</span>
                 <span class="lens-card-sub">5-gram Sequential Shingling</span>
             </div>
             <div class="metric-row">
@@ -748,7 +765,7 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
 
         <div class="lens-card">
             <div class="lens-card-header">
-                <span class="lens-card-title">Lensa 2 &bull; TF-IDF Vectorizer</span>
+                <span class="lens-card-title">Lensa 2 • TF-IDF Vectorizer</span>
                 <span class="lens-card-sub">Sparse Cosine Vector Space</span>
             </div>
             <div class="metric-row">

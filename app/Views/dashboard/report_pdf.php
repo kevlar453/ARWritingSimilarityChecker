@@ -350,13 +350,25 @@ if ($dec === 'match') {
     <?php
         $verifyUrl = "https://tilik.arsetontong.top/verify/" . urlencode($cert_hash);
         $qrApiUrl = "https://api.qrserver.com/v1/create-qr-code/?size=120x120&color=0f-29-4a&data=" . urlencode($verifyUrl);
+        $logoPath = FCPATH . 'images/logo.png';
+        $logoBase64 = file_exists($logoPath) ? base64_encode(file_get_contents($logoPath)) : '';
+        $logoSrc = $logoBase64 ? 'data:image/png;base64,' . $logoBase64 : base_url('images/logo.png');
     ?>
     <!-- Header / Kop -->
     <table class="header-table">
         <tr>
             <td style="vertical-align: middle;">
-                <div class="brand-title">AR TILIK</div>
-                <div class="brand-sub">Academic Writing Similarity &bull; Evidence Decomposition Engine</div>
+                <table cellpadding="0" cellspacing="0" style="border: none; margin: 0; padding: 0;">
+                    <tr>
+                        <td style="vertical-align: middle; padding-right: 12px; width: 44px; border: none;">
+                            <img src="<?= $logoSrc ?>" alt="AR Tilik Logo" style="width: 44px; height: 44px; object-fit: contain; display: block;" />
+                        </td>
+                        <td style="vertical-align: middle; border: none; padding: 0;">
+                            <div class="brand-title">AR TILIK</div>
+                            <div class="brand-sub">Academic Writing Similarity • Evidence Decomposition Engine</div>
+                        </td>
+                    </tr>
+                </table>
             </td>
             <td class="cert-box" style="vertical-align: middle;">
                 <div style="display: flex; align-items: center; justify-content: flex-end; gap: 10px;">
@@ -425,7 +437,7 @@ if ($dec === 'match') {
     <div class="dual-lens-grid">
         <div class="lens-card">
             <div class="lens-card-header">
-                <span class="lens-card-title">Lensa 1 &bull; Exact Matcher</span>
+                <span class="lens-card-title">Lensa 1 • Exact Matcher</span>
                 <span class="lens-card-sub">5-gram Sequential Shingling</span>
             </div>
             <div class="metric-row">
@@ -444,7 +456,7 @@ if ($dec === 'match') {
 
         <div class="lens-card">
             <div class="lens-card-header">
-                <span class="lens-card-title">Lensa 2 &bull; TF-IDF Vectorizer</span>
+                <span class="lens-card-title">Lensa 2 • TF-IDF Vectorizer</span>
                 <span class="lens-card-sub">Sparse Cosine Vector Space</span>
             </div>
             <div class="metric-row">
@@ -502,7 +514,7 @@ if ($dec === 'match') {
                         <td style="text-align: center; font-weight: bold; width: 40px;">#<?= $s['source_rank'] ?? 1 ?></td>
                         <td>
                             <strong><?= esc($s['source_title'] ?? $s['title'] ?? ('Rujukan #' . $s['source_document_id'])) ?></strong>
-                            <div style="font-size: 7.5pt; color: #64748b;">ID #<?= $s['source_document_id'] ?> &bull; <?= ($s['source_type'] ?? '') === 'corpus' ? 'Korpus Institusi' : 'Naskah Terpublikasi' ?></div>
+                            <div style="font-size: 7.5pt; color: #64748b;">ID #<?= $s['source_document_id'] ?> • <?= ($s['source_type'] ?? '') === 'corpus' ? 'Korpus Institusi' : 'Naskah Terpublikasi' ?></div>
                         </td>
                         <td style="text-align: right; font-weight: bold; width: 80px; color: #1e3a8a;"><?= number_format($s['exact_similarity'] ?? $s['similarity'] ?? 0, 1) ?>%</td>
                         <td style="text-align: right; width: 90px; color: #475569;"><?= number_format($s['matched_words'] ?? 0) ?> kata</td>
@@ -536,7 +548,7 @@ if ($dec === 'match') {
                         <td style="text-align: center; font-weight: bold; width: 40px;">#<?= $s['source_rank'] ?? 1 ?></td>
                         <td>
                             <strong><?= esc($s['source_title'] ?? $s['title'] ?? ('Rujukan #' . $s['source_document_id'])) ?></strong>
-                            <div style="font-size: 7.5pt; color: #64748b;">ID #<?= $s['source_document_id'] ?> &bull; <?= ($s['source_type'] ?? '') === 'corpus' ? 'Korpus Institusi' : 'Naskah Terpublikasi' ?></div>
+                            <div style="font-size: 7.5pt; color: #64748b;">ID #<?= $s['source_document_id'] ?> • <?= ($s['source_type'] ?? '') === 'corpus' ? 'Korpus Institusi' : 'Naskah Terpublikasi' ?></div>
                         </td>
                         <td style="text-align: right; font-weight: bold; width: 80px; color: #0d9488;"><?= number_format($s['cosine_similarity'] ?? 0, 1) ?>%</td>
                         <td style="text-align: right; width: 90px; color: #475569;"><?= number_format($s['matched_words'] ?? 0) ?> istilah</td>
@@ -614,8 +626,8 @@ if ($dec === 'match') {
         <?php foreach (array_slice($matches, 0, 8) as $idx => $m): ?>
             <div class="match-item" style="margin-bottom: 12px; padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px; background-color: #f8fafc; page-break-inside: avoid;">
                 <div style="display: flex; justify-content: space-between; font-size: 8.5pt; margin-bottom: 6px; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px;">
-                    <span><strong>Pasase #<?= $idx + 1 ?></strong> &bull; Kata <?= $m['submission_start'] ?> &ndash; <?= $m['submission_end'] ?> (<?= $m['word_count'] ?> kata)</span>
-                    <span>Rujukan: <strong>Doc #<?= $m['source_document_id'] ?></strong> &bull; Tipe: <strong><?= strtoupper(esc($m['match_type'] ?? 'exact')) ?></strong></span>
+                    <span><strong>Pasase #<?= $idx + 1 ?></strong> • Kata <?= $m['submission_start'] ?> &ndash; <?= $m['submission_end'] ?> (<?= $m['word_count'] ?> kata)</span>
+                    <span>Rujukan: <strong>Doc #<?= $m['source_document_id'] ?></strong> • Tipe: <strong><?= strtoupper(esc($m['match_type'] ?? 'exact')) ?></strong></span>
                 </div>
                 <div style="font-size: 8pt; line-height: 1.4; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
                     <div style="background: #ffffff; padding: 6px; border: 1px solid #e2e8f0; border-radius: 4px;">
