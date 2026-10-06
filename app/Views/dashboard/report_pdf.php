@@ -552,8 +552,64 @@ if ($dec === 'match') {
         </tbody>
     </table>
 
+    <!-- Section 3: Audit Integritas Naskah Akademik & Multibahasa -->
+    <?php
+        $evAudit = $evidenceData['evasion_detection'] ?? $evidenceData['v1_1_presentation']['v1_2_evolution']['evasion_detection'] ?? [];
+        $citAudit = $evidenceData['citation_audit'] ?? $evidenceData['v1_1_presentation']['v1_2_evolution']['citation_audit'] ?? [];
+        $clAudit = $evidenceData['cross_lingual'] ?? $evidenceData['v1_1_presentation']['v1_2_evolution']['cross_lingual'] ?? [];
+
+        $evRisk = (float)($evAudit['evasion_risk_score'] ?? 0);
+        $evStatus = $evAudit['integrity_status'] ?? 'CLEAN';
+        $citHealth = (float)($citAudit['citation_health_score'] ?? 100);
+        $citVerdict = $citAudit['health_verdict'] ?? 'GOOD';
+        $clScorePdf = (float)($clAudit['cross_lingual_score'] ?? 0);
+        $clMatchPdf = !empty($clAudit['is_cross_lingual_match']);
+    ?>
+    <h3 class="section-header">3. Audit Integritas Naskah, Sitasi &amp; Analisis Lintas Bahasa</h3>
+    <table class="data-table" style="margin-bottom: 14px; page-break-inside: avoid;">
+        <thead>
+            <tr>
+                <th style="text-align: left; width: 35%;">Parameter Audit</th>
+                <th style="text-align: center; width: 25%;">Skor / Indikator</th>
+                <th style="text-align: left; width: 40%;">Status &amp; Keterangan</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Integritas Karakter &amp; Anti-Evasion</strong><br><span style="font-size: 7.5pt; color: #64748b;">Deteksi Homoglif, Zero-Width, White-Text</span></td>
+                <td style="text-align: center; font-weight: bold; color: <?= $evRisk >= 35 ? '#b91c1c' : ($evRisk >= 10 ? '#b45309' : '#047857') ?>; font-size: 10pt;">
+                    <?= number_format($evRisk, 1) ?>% Risiko
+                </td>
+                <td>
+                    <strong><?= $evStatus === 'MANIPULATED' ? 'Manipulasi Terencana Terdeteksi' : ($evStatus === 'SUSPICIOUS' ? 'Perlu Tinjauan Karakter' : 'Otentik &amp; Bebas Rekayasa') ?></strong>
+                    <div style="font-size: 7.5pt; color: #475569;">Homoglif: <?= (int)($evAudit['homoglyph_count'] ?? 0) ?>, Invisible: <?= (int)($evAudit['zero_width_count'] ?? 0) ?></div>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Konsistensi Sitasi &amp; Daftar Pustaka</strong><br><span style="font-size: 7.5pt; color: #64748b;">Audit Sitasi Gaib (Phantom Citations)</span></td>
+                <td style="text-align: center; font-weight: bold; color: <?= $citHealth >= 80 ? '#047857' : ($citHealth >= 50 ? '#b45309' : '#b91c1c') ?>; font-size: 10pt;">
+                    <?= number_format($citHealth, 1) ?> / 100
+                </td>
+                <td>
+                    <strong><?= esc($citAudit['verdict_label'] ?? 'Sitasi Selaras') ?></strong>
+                    <div style="font-size: 7.5pt; color: #475569;">Sitasi Gaib: <?= (int)($citAudit['phantom_citations_count'] ?? 0) ?>, Pustaka Yatim: <?= (int)($citAudit['orphan_references_count'] ?? 0) ?></div>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Plagiarisme Terjemahan (ID ↔ EN)</strong><br><span style="font-size: 7.5pt; color: #64748b;">Analisis Semantik Proyeksi Konsep Dwibahasa</span></td>
+                <td style="text-align: center; font-weight: bold; color: <?= $clScorePdf >= 35 ? '#b91c1c' : ($clScorePdf >= 15 ? '#b45309' : '#047857') ?>; font-size: 10pt;">
+                    <?= number_format($clScorePdf, 1) ?>% Keselarasan
+                </td>
+                <td>
+                    <strong><?= $clMatchPdf ? 'Terindikasi Terjemahan Langsung' : ($clScorePdf >= 15 ? 'Parafrasa Lintas Bahasa' : 'Orisinal / Bebas Terjemahan Mesin') ?></strong>
+                    <div style="font-size: 7.5pt; color: #475569;">Konsep terpadan: <?= (int)($clAudit['shared_concept_count'] ?? 0) ?> istilah, Pasase: <?= count($clAudit['aligned_passages'] ?? []) ?></div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
     <!-- Matching Passages -->
-    <h3 class="section-header">Cuplikan Pasase Beririsan (Sampel Kontekstual)</h3>
+    <h3 class="section-header">4. Cuplikan Pasase Beririsan (Sampel Kontekstual)</h3>
     <?php if (!empty($matches)): ?>
         <?php foreach (array_slice($matches, 0, 8) as $idx => $m): ?>
             <div class="match-item" style="margin-bottom: 12px; padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px; background-color: #f8fafc; page-break-inside: avoid;">

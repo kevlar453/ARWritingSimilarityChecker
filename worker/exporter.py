@@ -240,6 +240,69 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
         </tr>
         """
 
+    # Ekstraksi Audit Integritas Naskah, Sitasi & Lintas Bahasa
+    ev_audit = evidence_data.get("evasion_detection") or v12_evol.get("evasion_detection") or {}
+    cit_audit = evidence_data.get("citation_audit") or v12_evol.get("citation_audit") or {}
+    cl_audit = evidence_data.get("cross_lingual") or v12_evol.get("cross_lingual") or {}
+
+    ev_risk = float(ev_audit.get("evasion_risk_score") or 0.0)
+    ev_status = ev_audit.get("integrity_status") or "CLEAN"
+    cit_health = float(cit_audit.get("citation_health_score") or 100.0)
+    cit_label = cit_audit.get("verdict_label") or "Sitasi Selaras"
+    cl_score = float(cl_audit.get("cross_lingual_score") or 0.0)
+    cl_match = bool(cl_audit.get("is_cross_lingual_match"))
+
+    ev_color = "#b91c1c" if ev_risk >= 35 else ("#b45309" if ev_risk >= 10 else "#047857")
+    ev_lbl = "Manipulasi Terencana" if ev_status == "MANIPULATED" else ("Perlu Tinjauan Karakter" if ev_status == "SUSPICIOUS" else "Otentik & Bebas Rekayasa")
+    cit_color = "#047857" if cit_health >= 80 else ("#b45309" if cit_health >= 50 else "#b91c1c")
+    cl_color = "#b91c1c" if cl_score >= 35 else ("#b45309" if cl_score >= 15 else "#047857")
+    cl_lbl = "Terindikasi Terjemahan Langsung" if cl_match else ("Parafrasa Lintas Bahasa" if cl_score >= 15 else "Orisinal / Bebas Terjemahan Mesin")
+
+    audit_html = f"""
+    <h3 class="section-header">Audit Integritas Naskah, Sitasi &amp; Analisis Lintas Bahasa</h3>
+    <table class="data-table" style="margin-bottom: 14px; page-break-inside: avoid;">
+        <thead>
+            <tr>
+                <th style="text-align: left; width: 35%;">Parameter Audit</th>
+                <th style="text-align: center; width: 25%;">Skor / Indikator</th>
+                <th style="text-align: left; width: 40%;">Status &amp; Keterangan</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Integritas Karakter &amp; Anti-Evasion</strong><br><span style="font-size: 7.5pt; color: #64748b;">Deteksi Homoglif, Zero-Width, White-Text</span></td>
+                <td style="text-align: center; font-weight: bold; color: {ev_color}; font-size: 10pt;">
+                    {ev_risk:.1f}% Risiko
+                </td>
+                <td>
+                    <strong>{ev_lbl}</strong>
+                    <div style="font-size: 7.5pt; color: #475569;">Homoglif: {int(ev_audit.get('homoglyph_count') or 0)}, Invisible: {int(ev_audit.get('zero_width_count') or 0)}</div>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Konsistensi Sitasi &amp; Daftar Pustaka</strong><br><span style="font-size: 7.5pt; color: #64748b;">Audit Sitasi Gaib (Phantom Citations)</span></td>
+                <td style="text-align: center; font-weight: bold; color: {cit_color}; font-size: 10pt;">
+                    {cit_health:.1f} / 100
+                </td>
+                <td>
+                    <strong>{cit_label}</strong>
+                    <div style="font-size: 7.5pt; color: #475569;">Sitasi Gaib: {int(cit_audit.get('phantom_citations_count') or 0)}, Pustaka Yatim: {int(cit_audit.get('orphan_references_count') or 0)}</div>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Plagiarisme Terjemahan (ID ↔ EN)</strong><br><span style="font-size: 7.5pt; color: #64748b;">Analisis Semantik Proyeksi Konsep Dwibahasa</span></td>
+                <td style="text-align: center; font-weight: bold; color: {cl_color}; font-size: 10pt;">
+                    {cl_score:.1f}% Keselarasan
+                </td>
+                <td>
+                    <strong>{cl_lbl}</strong>
+                    <div style="font-size: 7.5pt; color: #475569;">Konsep terpadan: {int(cl_audit.get('shared_concept_count') or 0)} istilah, Pasase: {len(cl_audit.get('aligned_passages') or [])}</div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    """
+
     # Matches rows
     matches_html = ""
     for idx, m in enumerate(matches[:8], 1):
@@ -732,6 +795,9 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
             {sources_html}
         </tbody>
     </table>
+
+    <!-- Audit Integritas Naskah, Sitasi & Lintas Bahasa -->
+    {audit_html}
 
     <!-- Matching Passages -->
     <h3 class="section-header">Cuplikan Pasase Beririsan (Sampel Kontekstual)</h3>

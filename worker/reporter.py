@@ -206,13 +206,34 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
             ai_stylometrics_res = analyze_ai_stylometrics(submission_text)
             result["ai_stylometrics"] = ai_stylometrics_res
 
-            # 5. Cross-Lingual Semantic Similarity Engine (Fitur 5)
-            cross_lingual_res = None
-            if ref_text:
-                cross_lingual_res = calculate_cross_lingual_similarity(submission_text, ref_text)
-                if cross_lingual_res and result.get("sources"):
-                    result["sources"][0]["cross_lingual"] = cross_lingual_res
+            # 5. Cross-Lingual Semantic Similarity Engine (Fitur 5 / Opsi A)
+            from worker.cross_lingual import scan_cross_lingual_corpus
+            cross_lingual_res = scan_cross_lingual_corpus(
+                submission_text=submission_text,
+                connection=connection,
+                candidate_sources=result.get("sources", [])
+            )
             result["cross_lingual"] = cross_lingual_res
+
+            # Jika terdeteksi direct translation match terhadap dokumen korpus asing yang belum ada di daftar sources,
+            # sematkan ke dalam daftar sources agar pengguna bisa mengeklik dan membukanya di Layar Ganda!
+            if cross_lingual_res and cross_lingual_res.get("is_cross_lingual_match"):
+                cl_doc_id = cross_lingual_res.get("source_document_id")
+                if cl_doc_id:
+                    existing_src_ids = {s.get("source_document_id") for s in result.get("sources", [])}
+                    if cl_doc_id not in existing_src_ids:
+                        result.setdefault("sources", []).append({
+                            "source_document_id": cl_doc_id,
+                            "source_title": cross_lingual_res.get("source_title", f"Dokumen #{cl_doc_id}"),
+                            "source_type": "corpus",
+                            "source_rank": len(result.get("sources", [])) + 1,
+                            "exact_similarity": 0.0,
+                            "cosine_similarity": float(cross_lingual_res.get("cross_lingual_score", 0.0)),
+                            "matched_words": len(cross_lingual_res.get("matched_concepts", [])),
+                            "matched_shingles": 0,
+                            "cross_lingual": cross_lingual_res,
+                            "is_cross_lingual_discovered": True,
+                        })
 
             # 6. Citation & Bibliography Consistency Auditor (Pilar 1 - Audit Konsistensi Sitasi)
             from worker.citation_auditor import audit_citations_and_bibliography
@@ -469,6 +490,9 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
             ev_score = None
             if evasion_res is not None and hasattr(evasion_res, "evasion_risk_score"):
                 ev_score = float(evasion_res.evasion_risk_score)
+            cl_score = None
+            if cross_lingual_res and isinstance(cross_lingual_res, dict) and cross_lingual_res.get("is_cross_lingual_match"):
+                cl_score = float(cross_lingual_res.get("cross_lingual_score", 0.0))
 
             notify_user_report_completed(
                 document_id=document_id,
@@ -481,6 +505,7 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
                 citation_health_score=c_score,
                 ai_probability_score=ai_score,
                 evasion_risk_score=ev_score,
+                cross_lingual_score=cl_score,
             )
         except Exception as mail_err:
             print(f"  [EMAIL WARNING] Gagal mengirim notifikasi email untuk Report #{report_id}: {mail_err}")

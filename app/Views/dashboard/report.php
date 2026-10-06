@@ -1238,51 +1238,213 @@
         <!-- ═════════════════════════════════════════════════════════════════════ -->
         <!-- FITUR 5: KEMIRIPAN LINTAS BAHASA (CROSS-LINGUAL SIMILARITY ID <-> EN) -->
         <!-- ═════════════════════════════════════════════════════════════════════ -->
-        <?php if (!empty($crossLingual) && !empty($crossLingual['is_cross_lingual_match'])): ?>
-        <div class="bg-white border-2 border-indigo-200 rounded-2xl p-6 shadow-xs space-y-5">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-indigo-100 pb-3">
+        <!-- ═════════════════════════════════════════════════════════════════════ -->
+        <!-- FITUR 5 (OPSI A): DETEKSI PLAGIARISME LINTAS BAHASA (CROSS-LINGUAL ID ↔ EN) -->
+        <!-- ═════════════════════════════════════════════════════════════════════ -->
+        <?php if (!empty($crossLingual)): ?>
+        <?php
+            $clScore = (float)($crossLingual['cross_lingual_score'] ?? 0.0);
+            $clMatch = !empty($crossLingual['is_cross_lingual_match']);
+            $clConfidence = $crossLingual['confidence'] ?? 'NONE';
+            $clPair = $crossLingual['detected_pair'] ?? 'EN -> ID';
+            $clConceptsCount = (int)($crossLingual['shared_concept_count'] ?? 0);
+            $clPairsCount = (int)($crossLingual['shared_pairs_count'] ?? 0);
+            $clMatchedConcepts = $crossLingual['matched_concepts'] ?? [];
+            $clAligned = $crossLingual['aligned_passages'] ?? [];
+            $clSrcTitle = $crossLingual['source_title'] ?? '';
+            $clSrcId = $crossLingual['source_document_id'] ?? null;
+            $clVerdict = $crossLingual['verdict_label'] ?? ($clMatch ? 'Terindikasi Terjemahan Langsung' : 'Otentik / Bebas Terjemahan');
+
+            $clBadgeClass = match(true) {
+                $clScore >= 35.0 || $clConfidence === 'HIGH' => 'bg-rose-50 text-rose-700 border-rose-300',
+                $clScore >= 15.0 || $clConfidence === 'MODERATE' => 'bg-amber-50 text-amber-800 border-amber-300',
+                default => 'bg-emerald-50 text-emerald-700 border-emerald-300'
+            };
+
+            $clScoreColor = match(true) {
+                $clScore >= 35.0 => 'text-rose-600',
+                $clScore >= 15.0 => 'text-amber-600',
+                default => 'text-emerald-600'
+            };
+        ?>
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-5" id="crossLingualSection">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
                 <div class="flex items-center gap-2.5">
                     <span class="text-2xl">🌐</span>
                     <div>
                         <div class="flex items-center gap-2">
-                            <h3 class="font-bold text-base text-slate-900">Deteksi Kemiripan Lintas Bahasa (Cross-Lingual ID ↔ EN)</h3>
-                            <span class="text-[10px] font-bold font-mono-code uppercase px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200">Fitur 5</span>
+                            <h3 class="font-bold text-base text-slate-800">
+                                Deteksi Plagiarisme Lintas Bahasa &amp; Terjemahan (ID ↔ EN)
+                            </h3>
+                            <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200 font-mono-code">
+                                Opsi A: Cross-Language
+                            </span>
                         </div>
-                        <p class="text-xs text-slate-400">Deteksi naskah hasil terjemahan langsung (direct translation) dari literatur berbahasa Inggris tanpa pencantuman sitasi sah</p>
+                        <p class="text-xs text-slate-500 mt-0.5">
+                            Menganalisis indikasi penerjemahan langsung (*machine translation / direct paraphrase*) dari naskah internasional berbahasa Inggris tanpa sitasi primer.
+                        </p>
                     </div>
                 </div>
+
                 <div class="flex items-center gap-2 self-start sm:self-auto">
-                    <span class="text-xs font-mono-code font-bold px-3 py-1 rounded-full bg-indigo-50 text-indigo-800 border border-indigo-300 shadow-2xs">
-                        Pasangan: <strong><?= esc($crossLingual['detected_pair'] ?? 'EN -> ID') ?></strong> • Skor: <strong><?= number_format($crossLingual['cross_lingual_score'] ?? 0, 1) ?>%</strong>
+                    <span class="text-xs font-bold px-3 py-1.5 rounded-xl border <?= $clBadgeClass ?> flex items-center gap-1.5 shadow-2xs">
+                        <?php if ($clScore >= 35.0 || $clConfidence === 'HIGH'): ?>
+                            <span>🚨</span> <span>Terindikasi Plagiarisme Terjemahan (<?= number_format($clScore, 1) ?>%)</span>
+                        <?php elseif ($clScore >= 15.0): ?>
+                            <span>⚠️</span> <span>Parafrasa Lintas Bahasa (<?= number_format($clScore, 1) ?>%)</span>
+                        <?php else: ?>
+                            <span>✓</span> <span>Naskah Orisinal Bebas Terjemahan Mesin</span>
+                        <?php endif; ?>
                     </span>
                 </div>
             </div>
 
-            <!-- Metrics Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-                <div class="p-3.5 rounded-xl border border-indigo-100 bg-indigo-50/40 space-y-1">
-                    <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-700">Skor Keselarasan Konsep</span>
-                    <div class="text-2xl font-extrabold text-indigo-900"><?= number_format($crossLingual['cross_lingual_score'] ?? 0, 1) ?>%</div>
-                    <p class="text-[11px] text-indigo-800/70">Tingkat kesamaan semantik terstruktur lintas bahasa.</p>
+            <!-- Matched Foreign Document Callout (if match detected) -->
+            <?php if (!empty($clSrcTitle)): ?>
+                <div class="p-4 rounded-xl bg-indigo-50/60 border border-indigo-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-indigo-100 text-indigo-800 font-mono-code">
+                                Dokumen Rujukan Asing Terdeteksi
+                            </span>
+                            <span class="text-xs text-slate-400">•</span>
+                            <span class="text-xs text-slate-600 font-mono-code"><?= esc($clPair) ?></span>
+                        </div>
+                        <h4 class="font-bold text-sm text-slate-900 leading-snug">
+                            <?= esc($clSrcTitle) ?>
+                        </h4>
+                        <p class="text-[11px] text-slate-500">
+                            Ditemukan pola struktur gagasan dan irisan konsep akademik yang identik dengan karya ilmiah berbahasa Inggris di atas.
+                        </p>
+                    </div>
+                    <?php if (!empty($clSrcId)): ?>
+                        <div class="shrink-0">
+                            <button type="button" onclick="openDualReaderModal(<?= (int)$clSrcId ?>)" class="w-full sm:w-auto px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer">
+                                <span>📖</span> Buka di Layar Ganda
+                            </button>
+                        </div>
+                    <?php endif; ?>
                 </div>
-                <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 space-y-1">
-                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-600">Konsep Bersama (Concepts)</span>
-                    <div class="text-2xl font-extrabold text-slate-800"><?= (int)($crossLingual['shared_concept_count'] ?? 0) ?> istilah</div>
-                    <p class="text-[11px] text-slate-500">Terminologi akademik kunci yang dipetakan secara kanonikal.</p>
+            <?php endif; ?>
+
+            <!-- 4 Grid KPI Cards -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 font-mono-code">
+                <!-- KPI 1: Cross-Lingual Score -->
+                <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                    <div class="text-[11px] text-slate-500">Keselarasan Semantik</div>
+                    <div class="text-xl sm:text-2xl font-extrabold mt-1 <?= $clScoreColor ?>">
+                        <?= number_format($clScore, 1) ?>%
+                    </div>
+                    <div class="text-[10px] text-slate-400 mt-0.5">
+                        Indeks Dwibahasa
+                    </div>
                 </div>
-                <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 space-y-1">
-                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-600">Pasangan Relasi Gagasan</span>
-                    <div class="text-2xl font-extrabold text-slate-800"><?= (int)($crossLingual['shared_pairs_count'] ?? 0) ?> relasi</div>
-                    <p class="text-[11px] text-slate-500">Struktur ko-okurensi gagasan dalam jendela kalimat.</p>
+
+                <!-- KPI 2: Shared Academic Concepts -->
+                <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                    <div class="text-[11px] text-slate-500">Konsep Terpadan</div>
+                    <div class="text-xl sm:text-2xl font-extrabold mt-1 text-indigo-700">
+                        <?= $clConceptsCount ?>
+                    </div>
+                    <div class="text-[10px] text-slate-400 mt-0.5">
+                        Istilah Akademik Kunci
+                    </div>
+                </div>
+
+                <!-- KPI 3: Idea Co-occurrence Pairs -->
+                <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                    <div class="text-[11px] text-slate-500">Relasi Gagasan</div>
+                    <div class="text-xl sm:text-2xl font-extrabold mt-1 text-slate-800">
+                        <?= $clPairsCount ?>
+                    </div>
+                    <div class="text-[10px] text-slate-400 mt-0.5">
+                        Pola Ko-okurensi
+                    </div>
+                </div>
+
+                <!-- KPI 4: Aligned Passages Count -->
+                <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                    <div class="text-[11px] text-slate-500">Pasase Terpadan</div>
+                    <div class="text-xl sm:text-2xl font-extrabold mt-1 <?= count($clAligned) > 0 ? 'text-rose-600' : 'text-slate-800' ?>">
+                        <?= count($clAligned) ?>
+                    </div>
+                    <div class="text-[10px] text-slate-400 mt-0.5">
+                        Kalimat Bersesuaian
+                    </div>
                 </div>
             </div>
 
+            <!-- Aligned Bilingual Passages (Side-by-Side Comparison) -->
+            <?php if (!empty($clAligned)): ?>
+                <div class="space-y-3">
+                    <div class="text-xs font-bold text-slate-700 flex items-center justify-between">
+                        <span class="flex items-center gap-1.5">
+                            <span>🔍</span> Perbandingan Pasase Terjemahan Bersisian (Aligned Bilingual Passages):
+                        </span>
+                        <span class="text-[11px] text-slate-400 font-normal">
+                            Dipadankan menggunakan proyeksi konsep kanonikal
+                        </span>
+                    </div>
+
+                    <div class="space-y-3">
+                        <?php foreach ($clAligned as $idx => $p): ?>
+                            <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/60 space-y-2.5">
+                                <div class="flex items-center justify-between text-[11px] border-b border-slate-200/60 pb-2">
+                                    <span class="font-bold text-slate-700 font-mono-code flex items-center gap-1.5">
+                                        <span class="px-2 py-0.5 rounded bg-indigo-100 text-indigo-800 font-bold">Pasase #<?= $idx + 1 ?></span>
+                                        <span>Kemiripan Makna: <strong><?= number_format($p['passage_similarity'] ?? 0, 1) ?>%</strong></span>
+                                    </span>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs leading-relaxed">
+                                    <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-2xs space-y-1">
+                                        <div class="text-[10px] font-bold text-indigo-700 uppercase tracking-wider flex items-center gap-1">
+                                            <span>🇮🇩</span> Naskah Mahasiswa (Bahasa Indonesia)
+                                        </div>
+                                        <p class="text-slate-800">
+                                            <?= esc($p['submission_passage'] ?? '') ?>
+                                        </p>
+                                    </div>
+                                    <div class="bg-indigo-50/40 p-3 rounded-lg border border-indigo-200 shadow-2xs space-y-1">
+                                        <div class="text-[10px] font-bold text-indigo-900 uppercase tracking-wider flex items-center gap-1">
+                                            <span>🇬🇧</span> Sumber Asli Rujukan (Bahasa Inggris)
+                                        </div>
+                                        <p class="text-slate-700 italic">
+                                            "<?= esc($p['source_passage'] ?? '') ?>"
+                                        </p>
+                                    </div>
+                                </div>
+                                <?php if (!empty($p['shared_concepts'])): ?>
+                                    <div class="flex flex-wrap items-center gap-1.5 pt-1">
+                                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Konsep Padanan:</span>
+                                        <?php foreach ($p['shared_concepts'] as $term): ?>
+                                            <span class="px-2 py-0.5 rounded bg-white text-indigo-800 border border-indigo-200 font-mono-code text-[10px] font-medium shadow-2xs">
+                                                <?= esc($term) ?>
+                                            </span>
+                                        <?php endforeach; ?>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            <?php else: ?>
+                <div class="p-4 rounded-xl bg-emerald-50/50 border border-emerald-200 text-xs text-emerald-900 flex items-start gap-3">
+                    <span class="text-base flex-shrink-0">✨</span>
+                    <div>
+                        <div class="font-bold text-emerald-950">Struktur Naskah Terverifikasi Orisinal Tanpa Terjemahan Mesin Langsung</div>
+                        <p class="text-emerald-800 mt-0.5 leading-relaxed">
+                            Pemeriksaan semantik dwibahasa (ID ↔ EN) tidak menemukan indikasi penyaduran langsung atau parafrasa mesin dari literatur asing di korpus. Alur gagasan dan struktur terminologi naskah tersusun secara independen.
+                        </p>
+                    </div>
+                </div>
+            <?php endif; ?>
+
             <!-- Matched Academic Concepts Pills -->
-            <?php if (!empty($crossLingual['matched_concepts'])): ?>
+            <?php if (!empty($clMatchedConcepts)): ?>
                 <div class="space-y-1.5">
-                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500 font-mono-code block">Konsep Kunci yang Selaras Lintas Bahasa:</span>
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-600 font-mono-code block">Konsep Kunci yang Selaras Lintas Bahasa (Canonical Terms):</span>
                     <div class="flex flex-wrap gap-1.5">
-                        <?php foreach ($crossLingual['matched_concepts'] as $mc): ?>
+                        <?php foreach ($clMatchedConcepts as $mc): ?>
                             <span class="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-800 font-mono-code text-xs font-semibold border border-indigo-200 flex items-center gap-1 shadow-2xs">
                                 <span>🎯</span> <?= esc($mc) ?>
                             </span>
@@ -1291,17 +1453,20 @@
                 </div>
             <?php endif; ?>
 
-            <!-- Rationale Box -->
-            <div class="p-4 rounded-xl bg-slate-50 border border-indigo-200 text-xs sm:text-sm text-slate-700 leading-relaxed space-y-1.5">
-                <div class="font-bold text-indigo-950 flex items-center gap-1.5 text-xs uppercase tracking-wider font-mono-code">
-                    <span>💡</span> Analisis Semantik Terjemahan:
+            <!-- Rationale Box & Academic Guidance -->
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-700 leading-relaxed space-y-2">
+                <div class="font-bold text-slate-700 flex items-center justify-between text-xs font-mono-code">
+                    <span class="flex items-center gap-1.5">
+                        <span>💬</span> KESIMPULAN ANALISIS LINTAS BAHASA: <span class="<?= $clScoreColor ?>"><?= esc($clVerdict) ?></span>
+                    </span>
                 </div>
                 <p class="text-slate-800 leading-relaxed italic bg-white p-3 rounded-lg border border-slate-200 shadow-2xs">
                     "<?= esc($crossLingual['rationale'] ?? '') ?>"
                 </p>
-                <p class="text-[11px] text-slate-500 pt-0.5">
-                    Prinsip Keadilan: Mengidentifikasi penulisan yang menyalin alur pemikiran dari literatur asing tanpa penyebutan rujukan primer.
-                </p>
+                <div class="flex items-start gap-2 pt-1 text-[11px] text-slate-600">
+                    <span class="text-sm">⚖️</span>
+                    <span><strong>Prinsip Integritas Akademik:</strong> Menerjemahkan karya ilmiah bahasa asing menggunakan alat penerjemah (Google Translate, DeepL, atau generative AI) tanpa menyertakan sitasi eksplisit kepada pengarang aslinya tergolong dalam <em>machine translation plagiarism</em>. AR Tilik memetakan konsep naskah secara dwibahasa untuk menjamin perlindungan terhadap karya rujukan internasional.</span>
+                </div>
             </div>
         </div>
         <?php endif; ?>

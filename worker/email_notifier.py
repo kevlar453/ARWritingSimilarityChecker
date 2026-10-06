@@ -23,6 +23,7 @@ def notify_user_report_completed(
     citation_health_score: Optional[float] = None,
     ai_probability_score: Optional[float] = None,
     evasion_risk_score: Optional[float] = None,
+    cross_lingual_score: Optional[float] = None,
 ) -> bool:
     """
     Mengirimkan notifikasi email kepada pemilik dokumen saat laporan selesai diproses.
@@ -103,6 +104,19 @@ def notify_user_report_completed(
             </tr>
             """
 
+        cross_lingual_row = ""
+        if cross_lingual_score is not None and cross_lingual_score >= 15.0:
+            cl_color = "#b91c1c" if cross_lingual_score >= 35 else "#b45309"
+            cl_label = "Terindikasi Terjemahan Langsung" if cross_lingual_score >= 35 else "Parafrasa Lintas Bahasa"
+            cross_lingual_row = f"""
+            <tr>
+                <td style="padding: 10px 14px; border-bottom: 1px solid #f1f5f9; color: #64748b; font-size: 13px;">Plagiarisme Terjemahan (EN ↔ ID)</td>
+                <td style="padding: 10px 14px; border-bottom: 1px solid #f1f5f9; font-weight: 700; color: {cl_color}; font-size: 13px;">
+                    {cross_lingual_score:.1f}% ({cl_label})
+                </td>
+            </tr>
+            """
+
         report_url = f"https://tilik.arsetontong.top/reports/{report_id}"
 
         # Template Email HTML
@@ -175,6 +189,7 @@ def notify_user_report_completed(
                                     {audit_row}
                                     {ai_row}
                                     {evasion_row}
+                                    {cross_lingual_row}
                                 </table>
                             </div>
 
