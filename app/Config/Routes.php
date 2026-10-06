@@ -42,16 +42,25 @@ $routes->group('api', function ($routes) {
     $routes->get('reports/(:num)/matches', 'Api\ReportController::matches/$1');
 });
 
-// Admin Corpus Routes
-$routes->group('admin/corpus', function ($routes) {
-    $routes->get('/', 'Admin\CorpusController::index');
-    $routes->post('/', 'Admin\CorpusController::create');
-    $routes->post('sync-dropzone', 'Admin\CorpusController::syncDropzone');
-    $routes->post('auto-discover', 'Admin\CorpusController::autoDiscover');
-    $routes->post('enroll/(:num)', 'Api\DocumentController::enroll/$1');
-    $routes->get('(:num)', 'Admin\CorpusController::show/$1');
-    $routes->delete('(:num)', 'Admin\CorpusController::delete/$1');
-    $routes->post('(:num)/reindex', 'Admin\CorpusController::reindex/$1');
+// Admin Portal & Management Routes (Protected by AdminFilter)
+$routes->group('admin', ['filter' => 'admin'], function ($routes) {
+    $routes->get('/', 'Admin\DashboardController::index');
+    $routes->post('users/update', 'Admin\DashboardController::updateUser');
+    $routes->post('documents/reprocess', 'Admin\DashboardController::reprocessDocument');
+    $routes->post('documents/delete', 'Admin\DashboardController::deleteDocument');
+    $routes->post('corpus/visibility', 'Admin\DashboardController::updateCorpusVisibility');
+    $routes->post('security/unblock', 'Admin\DashboardController::unblockSecurity');
+    $routes->post('security/clear-all', 'Admin\DashboardController::clearAllLocks');
+
+    // Corpus management API routes
+    $routes->get('corpus/list', 'Admin\CorpusController::index');
+    $routes->post('corpus', 'Admin\CorpusController::create');
+    $routes->post('corpus/sync-dropzone', 'Admin\CorpusController::syncDropzone');
+    $routes->post('corpus/auto-discover', 'Admin\CorpusController::autoDiscover');
+    $routes->post('corpus/enroll/(:num)', 'Api\DocumentController::enroll/$1');
+    $routes->get('corpus/(:num)', 'Admin\CorpusController::show/$1');
+    $routes->delete('corpus/(:num)', 'Admin\CorpusController::delete/$1');
+    $routes->post('corpus/(:num)/reindex', 'Admin\CorpusController::reindex/$1');
 });
 
 // Human Review & Evaluation Subsystem (Phase HR-1 Isolated Module)

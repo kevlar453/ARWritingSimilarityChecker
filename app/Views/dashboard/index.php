@@ -101,6 +101,11 @@
 
                     <?php if (!empty($currentUser)): ?>
                     <div class="flex items-center gap-2 pl-2 border-l border-slate-200">
+                        <?php if (($currentUser['role'] ?? '') === 'admin'): ?>
+                        <a href="<?= base_url('admin') ?>" class="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-2.5 py-1.5 rounded-lg border border-emerald-300 transition shadow-2xs" title="Buka Portal Administrator">
+                            👑 <span class="hidden sm:inline">Portal Admin</span>
+                        </a>
+                        <?php endif; ?>
                         <div class="hidden sm:flex flex-col text-right">
                             <span class="text-xs font-bold text-slate-800 leading-tight"><?= esc($currentUser['name']) ?></span>
                             <span class="text-[10px] text-slate-500 leading-tight"><?= esc($currentUser['institution'] ?? 'Pengguna Terdaftar') ?></span>
