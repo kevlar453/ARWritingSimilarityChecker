@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $status === 'valid' ? 'Verifikasi Sertifikat #' . esc($code) . ' — AR Tilik' : 'Verifikasi Sertifikat Resmi — AR Tilik' ?></title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="<?= base_url('favicon.ico') ?>">
+    <link rel="icon" type="image/png" sizes="32x32" href="<?= base_url('images/logo.png') ?>">
+    <link rel="apple-touch-icon" href="<?= base_url('images/logo.png') ?>">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,13 +27,11 @@
     <!-- Top Navigation -->
     <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-xs">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-            <a href="/" class="flex items-center gap-2.5 hover:opacity-90 transition">
-                <span class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-900 to-indigo-700 flex items-center justify-center text-white font-bold text-lg shadow-sm">
-                    🏛️
-                </span>
-                <div>
-                    <span class="font-extrabold text-base tracking-tight text-slate-900">AR TILIK</span>
-                    <span class="hidden sm:inline-block text-[10px] font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full ml-1.5 border border-indigo-200">
+            <a href="<?= base_url() ?>" class="flex items-center gap-2.5 hover:opacity-90 transition group">
+                <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik Logo" class="w-9 h-9 object-contain drop-shadow-xs group-hover:scale-105 transition-transform duration-200">
+                <div class="flex items-center gap-2">
+                    <span class="font-bold text-lg tracking-tight bg-gradient-to-r from-indigo-700 to-indigo-500 bg-clip-text text-transparent">AR Tilik</span>
+                    <span class="hidden sm:inline-block text-[10px] font-bold uppercase tracking-wider text-indigo-700 bg-indigo-50 px-2.5 py-0.5 rounded-full border border-indigo-200">
                         Official Verification Portal
                     </span>
                 </div>

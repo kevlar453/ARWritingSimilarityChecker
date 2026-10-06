@@ -37,8 +37,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.1165,
-    "evaluated_at": "2026-10-06T00:17:45.137022"
+    "citation_parsing_ms": 0.1733,
+    "evaluated_at": "2026-10-06T15:33:32.359910"
   },
   {
     "case_id": "EV11-UNC-002",
@@ -78,8 +78,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.0907,
-    "evaluated_at": "2026-10-06T00:17:45.137274"
+    "citation_parsing_ms": 0.1185,
+    "evaluated_at": "2026-10-06T15:33:32.360301"
   },
   {
     "case_id": "EV11-UNC-003",
@@ -119,8 +119,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.1282,
-    "evaluated_at": "2026-10-06T00:17:45.137558"
+    "citation_parsing_ms": 0.1674,
+    "evaluated_at": "2026-10-06T15:33:32.360711"
   },
   {
     "case_id": "EV11-UNC-004",
@@ -160,8 +160,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.0841,
-    "evaluated_at": "2026-10-06T00:17:45.137767"
+    "citation_parsing_ms": 0.1177,
+    "evaluated_at": "2026-10-06T15:33:32.361016"
   },
   {
     "case_id": "EV11-UNC-005",
@@ -201,8 +201,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.0771,
-    "evaluated_at": "2026-10-06T00:17:45.137967"
+    "citation_parsing_ms": 0.1076,
+    "evaluated_at": "2026-10-06T15:33:32.361299"
   },
   {
     "case_id": "EV11-UNC-006",
@@ -242,8 +242,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.0778,
-    "evaluated_at": "2026-10-06T00:17:45.138166"
+    "citation_parsing_ms": 0.1066,
+    "evaluated_at": "2026-10-06T15:33:32.361572"
   },
   {
     "case_id": "EV11-UNC-007",
@@ -283,8 +283,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.0802,
-    "evaluated_at": "2026-10-06T00:17:45.138363"
+    "citation_parsing_ms": 0.1075,
+    "evaluated_at": "2026-10-06T15:33:32.361845"
   },
   {
     "case_id": "EV11-UNC-008",
@@ -324,8 +324,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.0848,
-    "evaluated_at": "2026-10-06T00:17:45.138564"
+    "citation_parsing_ms": 0.1607,
+    "evaluated_at": "2026-10-06T15:33:32.362191"
   },
   {
     "case_id": "EV11-UNC-009",
@@ -365,8 +365,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.0763,
-    "evaluated_at": "2026-10-06T00:17:45.138745"
+    "citation_parsing_ms": 0.1134,
+    "evaluated_at": "2026-10-06T15:33:32.362502"
   },
   {
     "case_id": "EV11-UNC-010",
@@ -406,8 +406,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.0833,
-    "evaluated_at": "2026-10-06T00:17:45.138936"
+    "citation_parsing_ms": 0.1197,
+    "evaluated_at": "2026-10-06T15:33:32.362784"
   },
   {
     "case_id": "EV11-PAR-001",
@@ -429,7 +429,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": true,
     "exact_similarity": 89.29,
-    "cosine_similarity": 94.08,
+    "cosine_similarity": 95.07,
     "longest_match_words": 25,
     "matched_words": 25,
     "shared_terms_count": 25,
@@ -447,8 +447,8 @@
     "span_start": 0,
     "span_end": 20,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.0867,
-    "evaluated_at": "2026-10-06T00:17:45.139157"
+    "citation_parsing_ms": 0.127,
+    "evaluated_at": "2026-10-06T15:33:32.363105"
   },
   {
     "case_id": "EV11-PAR-002",
@@ -470,7 +470,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": true,
     "exact_similarity": 80.77,
-    "cosine_similarity": 91.0,
+    "cosine_similarity": 90.17,
     "longest_match_words": 21,
     "matched_words": 21,
     "shared_terms_count": 21,
@@ -488,8 +488,8 @@
     "span_start": 0,
     "span_end": 32,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.0779,
-    "evaluated_at": "2026-10-06T00:17:45.139358"
+    "citation_parsing_ms": 0.1128,
+    "evaluated_at": "2026-10-06T15:33:32.363398"
   },
   {
     "case_id": "EV11-PAR-003",
@@ -511,7 +511,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": true,
     "exact_similarity": 83.33,
-    "cosine_similarity": 90.99,
+    "cosine_similarity": 93.31,
     "longest_match_words": 25,
     "matched_words": 25,
     "shared_terms_count": 25,
@@ -529,8 +529,8 @@
     "span_start": 0,
     "span_end": 43,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.114,
-    "evaluated_at": "2026-10-06T00:17:45.139604"
+    "citation_parsing_ms": 0.1643,
+    "evaluated_at": "2026-10-06T15:33:32.363764"
   },
   {
     "case_id": "EV11-PAR-004",
@@ -552,7 +552,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": true,
     "exact_similarity": 88.0,
-    "cosine_similarity": 94.21,
+    "cosine_similarity": 91.07,
     "longest_match_words": 22,
     "matched_words": 22,
     "shared_terms_count": 21,
@@ -570,8 +570,8 @@
     "span_start": 182,
     "span_end": 201,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.0904,
-    "evaluated_at": "2026-10-06T00:17:45.139812"
+    "citation_parsing_ms": 0.1287,
+    "evaluated_at": "2026-10-06T15:33:32.364074"
   },
   {
     "case_id": "EV11-PAR-005",
@@ -593,7 +593,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": true,
     "exact_similarity": 84.62,
-    "cosine_similarity": 91.88,
+    "cosine_similarity": 92.43,
     "longest_match_words": 22,
     "matched_words": 22,
     "shared_terms_count": 22,
@@ -611,8 +611,8 @@
     "span_start": 0,
     "span_end": 27,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.0711,
-    "evaluated_at": "2026-10-06T00:17:45.140002"
+    "citation_parsing_ms": 0.105,
+    "evaluated_at": "2026-10-06T15:33:32.364369"
   },
   {
     "case_id": "EV11-PAR-006",
@@ -634,7 +634,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": true,
     "exact_similarity": 87.5,
-    "cosine_similarity": 93.54,
+    "cosine_similarity": 94.48,
     "longest_match_words": 21,
     "matched_words": 21,
     "shared_terms_count": 21,
@@ -652,8 +652,8 @@
     "span_start": 168,
     "span_end": 188,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.0846,
-    "evaluated_at": "2026-10-06T00:17:45.140203"
+    "citation_parsing_ms": 0.1188,
+    "evaluated_at": "2026-10-06T15:33:32.364659"
   },
   {
     "case_id": "EV11-PAR-007",
@@ -675,7 +675,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": true,
     "exact_similarity": 77.78,
-    "cosine_similarity": 88.39,
+    "cosine_similarity": 88.58,
     "longest_match_words": 21,
     "matched_words": 21,
     "shared_terms_count": 20,
@@ -693,8 +693,8 @@
     "span_start": 0,
     "span_end": 34,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.087,
-    "evaluated_at": "2026-10-06T00:17:45.140432"
+    "citation_parsing_ms": 0.1083,
+    "evaluated_at": "2026-10-06T15:33:32.364943"
   },
   {
     "case_id": "EV11-PAR-008",
@@ -716,7 +716,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": true,
     "exact_similarity": 86.96,
-    "cosine_similarity": 93.81,
+    "cosine_similarity": 93.86,
     "longest_match_words": 20,
     "matched_words": 20,
     "shared_terms_count": 19,
@@ -734,8 +734,8 @@
     "span_start": 175,
     "span_end": 198,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.096,
-    "evaluated_at": "2026-10-06T00:17:45.140644"
+    "citation_parsing_ms": 0.131,
+    "evaluated_at": "2026-10-06T15:33:32.365242"
   },
   {
     "case_id": "EV11-PAR-009",
@@ -757,7 +757,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": true,
     "exact_similarity": 79.17,
-    "cosine_similarity": 88.82,
+    "cosine_similarity": 88.57,
     "longest_match_words": 19,
     "matched_words": 19,
     "shared_terms_count": 19,
@@ -775,8 +775,8 @@
     "span_start": 0,
     "span_end": 43,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.0837,
-    "evaluated_at": "2026-10-06T00:17:45.140848"
+    "citation_parsing_ms": 0.1747,
+    "evaluated_at": "2026-10-06T15:33:32.365624"
   },
   {
     "case_id": "EV11-PAR-010",
@@ -798,7 +798,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": true,
     "exact_similarity": 90.91,
-    "cosine_similarity": 94.9,
+    "cosine_similarity": 94.24,
     "longest_match_words": 20,
     "matched_words": 20,
     "shared_terms_count": 20,
@@ -816,8 +816,8 @@
     "span_start": 182,
     "span_end": 197,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.092,
-    "evaluated_at": "2026-10-06T00:17:45.141055"
+    "citation_parsing_ms": 0.1476,
+    "evaluated_at": "2026-10-06T15:33:32.366006"
   },
   {
     "case_id": "EV11-INL-001",
@@ -839,7 +839,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": true,
     "exact_similarity": 96.15,
-    "cosine_similarity": 98.55,
+    "cosine_similarity": 99.18,
     "longest_match_words": 25,
     "matched_words": 25,
     "shared_terms_count": 25,
@@ -857,8 +857,8 @@
     "span_start": 209,
     "span_end": 212,
     "rationale": "Detected bracketed inline reference marker adjacent to evidence span.",
-    "citation_parsing_ms": 0.0927,
-    "evaluated_at": "2026-10-06T00:17:45.141276"
+    "citation_parsing_ms": 0.1629,
+    "evaluated_at": "2026-10-06T15:33:32.366399"
   },
   {
     "case_id": "EV11-INL-002",
@@ -880,7 +880,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": true,
     "exact_similarity": 91.3,
-    "cosine_similarity": 95.36,
+    "cosine_similarity": 94.07,
     "longest_match_words": 21,
     "matched_words": 21,
     "shared_terms_count": 21,
@@ -898,8 +898,8 @@
     "span_start": 175,
     "span_end": 188,
     "rationale": "Detected bracketed inline reference marker adjacent to evidence span.",
-    "citation_parsing_ms": 0.0963,
-    "evaluated_at": "2026-10-06T00:17:45.141495"
+    "citation_parsing_ms": 0.1314,
+    "evaluated_at": "2026-10-06T15:33:32.366703"
   },
   {
     "case_id": "EV11-INL-003",
@@ -921,7 +921,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": true,
     "exact_similarity": 92.59,
-    "cosine_similarity": 97.26,
+    "cosine_similarity": 98.21,
     "longest_match_words": 25,
     "matched_words": 25,
     "shared_terms_count": 25,
@@ -939,8 +939,8 @@
     "span_start": 205,
     "span_end": 211,
     "rationale": "Detected bracketed inline reference marker adjacent to evidence span.",
-    "citation_parsing_ms": 0.1172,
-    "evaluated_at": "2026-10-06T00:17:45.141758"
+    "citation_parsing_ms": 0.2434,
+    "evaluated_at": "2026-10-06T15:33:32.367189"
   },
   {
     "case_id": "EV11-INL-004",
@@ -962,7 +962,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": true,
     "exact_similarity": 84.62,
-    "cosine_similarity": 92.49,
+    "cosine_similarity": 91.28,
     "longest_match_words": 22,
     "matched_words": 22,
     "shared_terms_count": 21,
@@ -980,8 +980,8 @@
     "span_start": 182,
     "span_end": 203,
     "rationale": "Detected bracketed inline reference marker adjacent to evidence span.",
-    "citation_parsing_ms": 0.0882,
-    "evaluated_at": "2026-10-06T00:17:45.141971"
+    "citation_parsing_ms": 0.2279,
+    "evaluated_at": "2026-10-06T15:33:32.367866"
   },
   {
     "case_id": "EV11-INL-005",
@@ -1003,7 +1003,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": true,
     "exact_similarity": 95.65,
-    "cosine_similarity": 97.77,
+    "cosine_similarity": 96.18,
     "longest_match_words": 22,
     "matched_words": 22,
     "shared_terms_count": 22,
@@ -1021,8 +1021,8 @@
     "span_start": 171,
     "span_end": 176,
     "rationale": "Detected bracketed inline reference marker adjacent to evidence span.",
-    "citation_parsing_ms": 0.0869,
-    "evaluated_at": "2026-10-06T00:17:45.142177"
+    "citation_parsing_ms": 0.1794,
+    "evaluated_at": "2026-10-06T15:33:32.368378"
   },
   {
     "case_id": "EV11-INL-006",
@@ -1044,7 +1044,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": true,
     "exact_similarity": 91.3,
-    "cosine_similarity": 95.55,
+    "cosine_similarity": 96.34,
     "longest_match_words": 21,
     "matched_words": 21,
     "shared_terms_count": 21,
@@ -1062,8 +1062,8 @@
     "span_start": 168,
     "span_end": 183,
     "rationale": "Detected bracketed inline reference marker adjacent to evidence span.",
-    "citation_parsing_ms": 0.1088,
-    "evaluated_at": "2026-10-06T00:17:45.142426"
+    "citation_parsing_ms": 0.1695,
+    "evaluated_at": "2026-10-06T15:33:32.368862"
   },
   {
     "case_id": "EV11-INL-007",
@@ -1085,7 +1085,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": true,
     "exact_similarity": 95.45,
-    "cosine_similarity": 98.44,
+    "cosine_similarity": 98.68,
     "longest_match_words": 21,
     "matched_words": 21,
     "shared_terms_count": 20,
@@ -1103,8 +1103,8 @@
     "span_start": 177,
     "span_end": 180,
     "rationale": "Detected bracketed inline reference marker adjacent to evidence span.",
-    "citation_parsing_ms": 0.143,
-    "evaluated_at": "2026-10-06T00:17:45.142791"
+    "citation_parsing_ms": 0.2193,
+    "evaluated_at": "2026-10-06T15:33:32.369420"
   },
   {
     "case_id": "EV11-INL-008",
@@ -1126,7 +1126,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": true,
     "exact_similarity": 90.91,
-    "cosine_similarity": 95.74,
+    "cosine_similarity": 95.99,
     "longest_match_words": 20,
     "matched_words": 20,
     "shared_terms_count": 19,
@@ -1144,8 +1144,8 @@
     "span_start": 175,
     "span_end": 189,
     "rationale": "Detected bracketed inline reference marker adjacent to evidence span.",
-    "citation_parsing_ms": 0.1032,
-    "evaluated_at": "2026-10-06T00:17:45.143104"
+    "citation_parsing_ms": 0.1593,
+    "evaluated_at": "2026-10-06T15:33:32.369927"
   },
   {
     "case_id": "EV11-INL-009",
@@ -1167,7 +1167,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": true,
     "exact_similarity": 90.48,
-    "cosine_similarity": 96.52,
+    "cosine_similarity": 96.71,
     "longest_match_words": 19,
     "matched_words": 19,
     "shared_terms_count": 19,
@@ -1185,8 +1185,8 @@
     "span_start": 170,
     "span_end": 176,
     "rationale": "Detected bracketed inline reference marker adjacent to evidence span.",
-    "citation_parsing_ms": 0.0936,
-    "evaluated_at": "2026-10-06T00:17:45.143373"
+    "citation_parsing_ms": 0.143,
+    "evaluated_at": "2026-10-06T15:33:32.370292"
   },
   {
     "case_id": "EV11-INL-010",
@@ -1208,7 +1208,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": true,
     "exact_similarity": 90.91,
-    "cosine_similarity": 94.9,
+    "cosine_similarity": 94.24,
     "longest_match_words": 20,
     "matched_words": 20,
     "shared_terms_count": 20,
@@ -1226,8 +1226,8 @@
     "span_start": 182,
     "span_end": 196,
     "rationale": "Detected bracketed inline reference marker adjacent to evidence span.",
-    "citation_parsing_ms": 0.1016,
-    "evaluated_at": "2026-10-06T00:17:45.143609"
+    "citation_parsing_ms": 0.1388,
+    "evaluated_at": "2026-10-06T15:33:32.370628"
   },
   {
     "case_id": "EV11-QUO-001",
@@ -1249,7 +1249,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": true,
     "exact_similarity": 89.29,
-    "cosine_similarity": 94.65,
+    "cosine_similarity": 97.62,
     "longest_match_words": 25,
     "matched_words": 25,
     "shared_terms_count": 25,
@@ -1267,8 +1267,8 @@
     "span_start": 25,
     "span_end": 236,
     "rationale": "Detected passage enclosed within typographic or direct quotation marks.",
-    "citation_parsing_ms": 0.1158,
-    "evaluated_at": "2026-10-06T00:17:45.143879"
+    "citation_parsing_ms": 0.1427,
+    "evaluated_at": "2026-10-06T15:33:32.370995"
   },
   {
     "case_id": "EV11-QUO-002",
@@ -1290,7 +1290,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": true,
     "exact_similarity": 87.5,
-    "cosine_similarity": 93.91,
+    "cosine_similarity": 96.58,
     "longest_match_words": 21,
     "matched_words": 21,
     "shared_terms_count": 21,
@@ -1308,8 +1308,8 @@
     "span_start": 25,
     "span_end": 202,
     "rationale": "Detected passage enclosed within typographic or direct quotation marks.",
-    "citation_parsing_ms": 0.0997,
-    "evaluated_at": "2026-10-06T00:17:45.144117"
+    "citation_parsing_ms": 0.1252,
+    "evaluated_at": "2026-10-06T15:33:32.371293"
   },
   {
     "case_id": "EV11-QUO-003",
@@ -1331,7 +1331,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": true,
     "exact_similarity": 89.29,
-    "cosine_similarity": 94.85,
+    "cosine_similarity": 97.38,
     "longest_match_words": 25,
     "matched_words": 25,
     "shared_terms_count": 25,
@@ -1349,8 +1349,8 @@
     "span_start": 25,
     "span_end": 232,
     "rationale": "Detected passage enclosed within typographic or direct quotation marks.",
-    "citation_parsing_ms": 0.1461,
-    "evaluated_at": "2026-10-06T00:17:45.144433"
+    "citation_parsing_ms": 0.1676,
+    "evaluated_at": "2026-10-06T15:33:32.371655"
   },
   {
     "case_id": "EV11-QUO-004",
@@ -1372,7 +1372,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": true,
     "exact_similarity": 88.0,
-    "cosine_similarity": 94.77,
+    "cosine_similarity": 96.76,
     "longest_match_words": 22,
     "matched_words": 22,
     "shared_terms_count": 21,
@@ -1390,8 +1390,8 @@
     "span_start": 25,
     "span_end": 209,
     "rationale": "Detected passage enclosed within typographic or direct quotation marks.",
-    "citation_parsing_ms": 0.0994,
-    "evaluated_at": "2026-10-06T00:17:45.144677"
+    "citation_parsing_ms": 0.1225,
+    "evaluated_at": "2026-10-06T15:33:32.371965"
   },
   {
     "case_id": "EV11-QUO-005",
@@ -1413,7 +1413,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": true,
     "exact_similarity": 88.0,
-    "cosine_similarity": 95.35,
+    "cosine_similarity": 95.59,
     "longest_match_words": 22,
     "matched_words": 22,
     "shared_terms_count": 22,
@@ -1431,8 +1431,8 @@
     "span_start": 27,
     "span_end": 200,
     "rationale": "Detected passage enclosed within typographic or direct quotation marks.",
-    "citation_parsing_ms": 0.0982,
-    "evaluated_at": "2026-10-06T00:17:45.144927"
+    "citation_parsing_ms": 0.1434,
+    "evaluated_at": "2026-10-06T15:33:32.372313"
   },
   {
     "case_id": "EV11-QUO-006",
@@ -1454,7 +1454,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": true,
     "exact_similarity": 87.5,
-    "cosine_similarity": 95.21,
+    "cosine_similarity": 96.41,
     "longest_match_words": 21,
     "matched_words": 21,
     "shared_terms_count": 21,
@@ -1472,8 +1472,8 @@
     "span_start": 27,
     "span_end": 197,
     "rationale": "Detected passage enclosed within typographic or direct quotation marks.",
-    "citation_parsing_ms": 0.0938,
-    "evaluated_at": "2026-10-06T00:17:45.145151"
+    "citation_parsing_ms": 0.123,
+    "evaluated_at": "2026-10-06T15:33:32.372629"
   },
   {
     "case_id": "EV11-QUO-007",
@@ -1495,7 +1495,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": true,
     "exact_similarity": 80.77,
-    "cosine_similarity": 90.87,
+    "cosine_similarity": 93.6,
     "longest_match_words": 21,
     "matched_words": 21,
     "shared_terms_count": 20,
@@ -1513,8 +1513,8 @@
     "span_start": 48,
     "span_end": 229,
     "rationale": "Detected indented block quotation formatting structure.",
-    "citation_parsing_ms": 0.0629,
-    "evaluated_at": "2026-10-06T00:17:45.145339"
+    "citation_parsing_ms": 0.1148,
+    "evaluated_at": "2026-10-06T15:33:32.373009"
   },
   {
     "case_id": "EV11-QUO-008",
@@ -1536,7 +1536,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": true,
     "exact_similarity": 80.0,
-    "cosine_similarity": 90.27,
+    "cosine_similarity": 95.46,
     "longest_match_words": 20,
     "matched_words": 20,
     "shared_terms_count": 19,
@@ -1554,8 +1554,8 @@
     "span_start": 48,
     "span_end": 227,
     "rationale": "Detected indented block quotation formatting structure.",
-    "citation_parsing_ms": 0.0682,
-    "evaluated_at": "2026-10-06T00:17:45.145531"
+    "citation_parsing_ms": 0.0912,
+    "evaluated_at": "2026-10-06T15:33:32.373282"
   },
   {
     "case_id": "EV11-QUO-009",
@@ -1577,7 +1577,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": true,
     "exact_similarity": 76.0,
-    "cosine_similarity": 88.71,
+    "cosine_similarity": 89.36,
     "longest_match_words": 19,
     "matched_words": 19,
     "shared_terms_count": 19,
@@ -1595,8 +1595,8 @@
     "span_start": 51,
     "span_end": 223,
     "rationale": "Detected indented block quotation formatting structure.",
-    "citation_parsing_ms": 0.0636,
-    "evaluated_at": "2026-10-06T00:17:45.145716"
+    "citation_parsing_ms": 0.0849,
+    "evaluated_at": "2026-10-06T15:33:32.373536"
   },
   {
     "case_id": "EV11-QUO-010",
@@ -1618,7 +1618,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": true,
     "exact_similarity": 76.92,
-    "cosine_similarity": 88.41,
+    "cosine_similarity": 92.4,
     "longest_match_words": 20,
     "matched_words": 20,
     "shared_terms_count": 20,
@@ -1636,8 +1636,8 @@
     "span_start": 51,
     "span_end": 235,
     "rationale": "Detected indented block quotation formatting structure.",
-    "citation_parsing_ms": 0.068,
-    "evaluated_at": "2026-10-06T00:17:45.145907"
+    "citation_parsing_ms": 0.0926,
+    "evaluated_at": "2026-10-06T15:33:32.373799"
   },
   {
     "case_id": "EV11-PRA-001",
@@ -1659,7 +1659,7 @@
     "predicted_evidence_type": "LEXICAL_TOPIC_SIMILARITY",
     "evidence_type_match": true,
     "exact_similarity": 0.0,
-    "cosine_similarity": 29.72,
+    "cosine_similarity": 37.2,
     "longest_match_words": 0,
     "matched_words": 0,
     "shared_terms_count": 7,
@@ -1677,8 +1677,8 @@
     "span_start": 0,
     "span_end": 20,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.0832,
-    "evaluated_at": "2026-10-06T00:17:45.146104"
+    "citation_parsing_ms": 0.116,
+    "evaluated_at": "2026-10-06T15:33:32.374105"
   },
   {
     "case_id": "EV11-PRA-002",
@@ -1700,7 +1700,7 @@
     "predicted_evidence_type": "LEXICAL_TOPIC_SIMILARITY",
     "evidence_type_match": true,
     "exact_similarity": 0.0,
-    "cosine_similarity": 18.21,
+    "cosine_similarity": 20.8,
     "longest_match_words": 0,
     "matched_words": 0,
     "shared_terms_count": 4,
@@ -1718,8 +1718,8 @@
     "span_start": 166,
     "span_end": 187,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.0878,
-    "evaluated_at": "2026-10-06T00:17:45.146295"
+    "citation_parsing_ms": 0.1346,
+    "evaluated_at": "2026-10-06T15:33:32.374400"
   },
   {
     "case_id": "EV11-PRA-003",
@@ -1741,7 +1741,7 @@
     "predicted_evidence_type": "LEXICAL_TOPIC_SIMILARITY",
     "evidence_type_match": true,
     "exact_similarity": 0.0,
-    "cosine_similarity": 33.25,
+    "cosine_similarity": 30.75,
     "longest_match_words": 0,
     "matched_words": 0,
     "shared_terms_count": 8,
@@ -1759,8 +1759,8 @@
     "span_start": 0,
     "span_end": 32,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.0712,
-    "evaluated_at": "2026-10-06T00:17:45.146478"
+    "citation_parsing_ms": 0.0978,
+    "evaluated_at": "2026-10-06T15:33:32.374688"
   },
   {
     "case_id": "EV11-PRA-004",
@@ -1782,7 +1782,7 @@
     "predicted_evidence_type": "LEXICAL_TOPIC_SIMILARITY",
     "evidence_type_match": true,
     "exact_similarity": 0.0,
-    "cosine_similarity": 34.14,
+    "cosine_similarity": 32.23,
     "longest_match_words": 0,
     "matched_words": 0,
     "shared_terms_count": 6,
@@ -1800,8 +1800,8 @@
     "span_start": 148,
     "span_end": 151,
     "rationale": "Detected bracketed inline reference marker adjacent to evidence span.",
-    "citation_parsing_ms": 0.0693,
-    "evaluated_at": "2026-10-06T00:17:45.146644"
+    "citation_parsing_ms": 0.1032,
+    "evaluated_at": "2026-10-06T15:33:32.374936"
   },
   {
     "case_id": "EV11-PRA-005",
@@ -1823,7 +1823,7 @@
     "predicted_evidence_type": "LEXICAL_TOPIC_SIMILARITY",
     "evidence_type_match": true,
     "exact_similarity": 0.0,
-    "cosine_similarity": 25.54,
+    "cosine_similarity": 19.91,
     "longest_match_words": 0,
     "matched_words": 0,
     "shared_terms_count": 6,
@@ -1841,8 +1841,8 @@
     "span_start": 0,
     "span_end": 40,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.0751,
-    "evaluated_at": "2026-10-06T00:17:45.146822"
+    "citation_parsing_ms": 0.1103,
+    "evaluated_at": "2026-10-06T15:33:32.375200"
   },
   {
     "case_id": "EV11-PRA-006",
@@ -1864,7 +1864,7 @@
     "predicted_evidence_type": "LEXICAL_TOPIC_SIMILARITY",
     "evidence_type_match": true,
     "exact_similarity": 0.0,
-    "cosine_similarity": 25.68,
+    "cosine_similarity": 32.1,
     "longest_match_words": 0,
     "matched_words": 0,
     "shared_terms_count": 5,
@@ -1882,8 +1882,8 @@
     "span_start": 145,
     "span_end": 161,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.0763,
-    "evaluated_at": "2026-10-06T00:17:45.146993"
+    "citation_parsing_ms": 0.1021,
+    "evaluated_at": "2026-10-06T15:33:32.375448"
   },
   {
     "case_id": "EV11-PRA-007",
@@ -1905,7 +1905,7 @@
     "predicted_evidence_type": "LEXICAL_TOPIC_SIMILARITY",
     "evidence_type_match": true,
     "exact_similarity": 0.0,
-    "cosine_similarity": 15.3,
+    "cosine_similarity": 10.3,
     "longest_match_words": 0,
     "matched_words": 0,
     "shared_terms_count": 3,
@@ -1923,8 +1923,8 @@
     "span_start": 0,
     "span_end": 43,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.0707,
-    "evaluated_at": "2026-10-06T00:17:45.147166"
+    "citation_parsing_ms": 0.0956,
+    "evaluated_at": "2026-10-06T15:33:32.375688"
   },
   {
     "case_id": "EV11-PRA-008",
@@ -1946,7 +1946,7 @@
     "predicted_evidence_type": "LEXICAL_TOPIC_SIMILARITY",
     "evidence_type_match": true,
     "exact_similarity": 0.0,
-    "cosine_similarity": 24.66,
+    "cosine_similarity": 27.34,
     "longest_match_words": 0,
     "matched_words": 0,
     "shared_terms_count": 4,
@@ -1964,8 +1964,8 @@
     "span_start": 147,
     "span_end": 150,
     "rationale": "Detected bracketed inline reference marker adjacent to evidence span.",
-    "citation_parsing_ms": 0.0698,
-    "evaluated_at": "2026-10-06T00:17:45.147331"
+    "citation_parsing_ms": 0.0984,
+    "evaluated_at": "2026-10-06T15:33:32.375953"
   },
   {
     "case_id": "EV11-PRA-009",
@@ -1987,7 +1987,7 @@
     "predicted_evidence_type": "LEXICAL_TOPIC_SIMILARITY",
     "evidence_type_match": true,
     "exact_similarity": 0.0,
-    "cosine_similarity": 9.72,
+    "cosine_similarity": 4.48,
     "longest_match_words": 0,
     "matched_words": 0,
     "shared_terms_count": 2,
@@ -2007,8 +2007,8 @@
     "span_start": 0,
     "span_end": 23,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.0629,
-    "evaluated_at": "2026-10-06T00:17:45.147488"
+    "citation_parsing_ms": 0.0957,
+    "evaluated_at": "2026-10-06T15:33:32.376201"
   },
   {
     "case_id": "EV11-PRA-010",
@@ -2030,7 +2030,7 @@
     "predicted_evidence_type": "LEXICAL_TOPIC_SIMILARITY",
     "evidence_type_match": true,
     "exact_similarity": 0.0,
-    "cosine_similarity": 19.84,
+    "cosine_similarity": 15.25,
     "longest_match_words": 0,
     "matched_words": 0,
     "shared_terms_count": 3,
@@ -2048,8 +2048,8 @@
     "span_start": 152,
     "span_end": 167,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.0821,
-    "evaluated_at": "2026-10-06T00:17:45.147673"
+    "citation_parsing_ms": 0.1398,
+    "evaluated_at": "2026-10-06T15:33:32.376531"
   },
   {
     "case_id": "EV11-MET-001",
@@ -2071,7 +2071,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": false,
     "exact_similarity": 76.19,
-    "cosine_similarity": 88.08,
+    "cosine_similarity": 91.98,
     "longest_match_words": 16,
     "matched_words": 16,
     "shared_terms_count": 16,
@@ -2092,8 +2092,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.0711,
-    "evaluated_at": "2026-10-06T00:17:45.147851"
+    "citation_parsing_ms": 0.0979,
+    "evaluated_at": "2026-10-06T15:33:32.376791"
   },
   {
     "case_id": "EV11-MET-002",
@@ -2115,7 +2115,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": false,
     "exact_similarity": 75.0,
-    "cosine_similarity": 89.2,
+    "cosine_similarity": 93.19,
     "longest_match_words": 15,
     "matched_words": 15,
     "shared_terms_count": 15,
@@ -2136,8 +2136,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.0687,
-    "evaluated_at": "2026-10-06T00:17:45.148025"
+    "citation_parsing_ms": 0.096,
+    "evaluated_at": "2026-10-06T15:33:32.377049"
   },
   {
     "case_id": "EV11-MET-003",
@@ -2159,7 +2159,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": false,
     "exact_similarity": 76.19,
-    "cosine_similarity": 90.86,
+    "cosine_similarity": 92.28,
     "longest_match_words": 16,
     "matched_words": 16,
     "shared_terms_count": 16,
@@ -2180,8 +2180,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.0679,
-    "evaluated_at": "2026-10-06T00:17:45.148198"
+    "citation_parsing_ms": 0.0942,
+    "evaluated_at": "2026-10-06T15:33:32.377294"
   },
   {
     "case_id": "EV11-MET-004",
@@ -2203,7 +2203,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": false,
     "exact_similarity": 79.17,
-    "cosine_similarity": 92.49,
+    "cosine_similarity": 95.53,
     "longest_match_words": 19,
     "matched_words": 19,
     "shared_terms_count": 18,
@@ -2224,8 +2224,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.0868,
-    "evaluated_at": "2026-10-06T00:17:45.148421"
+    "citation_parsing_ms": 0.1102,
+    "evaluated_at": "2026-10-06T15:33:32.377566"
   },
   {
     "case_id": "EV11-MET-005",
@@ -2247,7 +2247,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": false,
     "exact_similarity": 78.26,
-    "cosine_similarity": 90.19,
+    "cosine_similarity": 92.57,
     "longest_match_words": 18,
     "matched_words": 18,
     "shared_terms_count": 18,
@@ -2268,8 +2268,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.0764,
-    "evaluated_at": "2026-10-06T00:17:45.148616"
+    "citation_parsing_ms": 0.0928,
+    "evaluated_at": "2026-10-06T15:33:32.377818"
   },
   {
     "case_id": "EV11-MET-006",
@@ -2291,7 +2291,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": false,
     "exact_similarity": 75.0,
-    "cosine_similarity": 91.05,
+    "cosine_similarity": 91.49,
     "longest_match_words": 15,
     "matched_words": 15,
     "shared_terms_count": 15,
@@ -2312,8 +2312,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.0676,
-    "evaluated_at": "2026-10-06T00:17:45.148794"
+    "citation_parsing_ms": 0.0915,
+    "evaluated_at": "2026-10-06T15:33:32.378052"
   },
   {
     "case_id": "EV11-MET-007",
@@ -2335,7 +2335,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": false,
     "exact_similarity": 73.68,
-    "cosine_similarity": 89.56,
+    "cosine_similarity": 93.89,
     "longest_match_words": 14,
     "matched_words": 14,
     "shared_terms_count": 13,
@@ -2356,8 +2356,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.0769,
-    "evaluated_at": "2026-10-06T00:17:45.149009"
+    "citation_parsing_ms": 0.1049,
+    "evaluated_at": "2026-10-06T15:33:32.378292"
   },
   {
     "case_id": "EV11-MET-008",
@@ -2379,7 +2379,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": false,
     "exact_similarity": 79.17,
-    "cosine_similarity": 94.0,
+    "cosine_similarity": 95.8,
     "longest_match_words": 19,
     "matched_words": 19,
     "shared_terms_count": 17,
@@ -2400,8 +2400,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.0894,
-    "evaluated_at": "2026-10-06T00:17:45.149422"
+    "citation_parsing_ms": 0.1057,
+    "evaluated_at": "2026-10-06T15:33:32.378567"
   },
   {
     "case_id": "EV11-MET-009",
@@ -2423,7 +2423,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": false,
     "exact_similarity": 78.26,
-    "cosine_similarity": 91.59,
+    "cosine_similarity": 94.21,
     "longest_match_words": 18,
     "matched_words": 18,
     "shared_terms_count": 18,
@@ -2444,8 +2444,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.0926,
-    "evaluated_at": "2026-10-06T00:17:45.149668"
+    "citation_parsing_ms": 0.0947,
+    "evaluated_at": "2026-10-06T15:33:32.378819"
   },
   {
     "case_id": "EV11-MET-010",
@@ -2467,7 +2467,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": false,
     "exact_similarity": 75.0,
-    "cosine_similarity": 89.65,
+    "cosine_similarity": 92.21,
     "longest_match_words": 15,
     "matched_words": 15,
     "shared_terms_count": 15,
@@ -2488,8 +2488,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.0829,
-    "evaluated_at": "2026-10-06T00:17:45.149881"
+    "citation_parsing_ms": 0.0846,
+    "evaluated_at": "2026-10-06T15:33:32.379040"
   },
   {
     "case_id": "EV11-DIV-001",
@@ -2511,7 +2511,7 @@
     "predicted_evidence_type": "LEXICAL_TOPIC_SIMILARITY",
     "evidence_type_match": true,
     "exact_similarity": 0.0,
-    "cosine_similarity": 37.07,
+    "cosine_similarity": 42.37,
     "longest_match_words": 0,
     "matched_words": 0,
     "shared_terms_count": 7,
@@ -2529,8 +2529,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.1334,
-    "evaluated_at": "2026-10-06T00:17:45.150172"
+    "citation_parsing_ms": 0.0903,
+    "evaluated_at": "2026-10-06T15:33:32.379279"
   },
   {
     "case_id": "EV11-DIV-002",
@@ -2552,7 +2552,7 @@
     "predicted_evidence_type": "LEXICAL_TOPIC_SIMILARITY",
     "evidence_type_match": true,
     "exact_similarity": 0.0,
-    "cosine_similarity": 23.02,
+    "cosine_similarity": 27.98,
     "longest_match_words": 0,
     "matched_words": 0,
     "shared_terms_count": 4,
@@ -2570,8 +2570,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.1269,
-    "evaluated_at": "2026-10-06T00:17:45.150456"
+    "citation_parsing_ms": 0.0965,
+    "evaluated_at": "2026-10-06T15:33:32.379510"
   },
   {
     "case_id": "EV11-DIV-003",
@@ -2593,7 +2593,7 @@
     "predicted_evidence_type": "LEXICAL_TOPIC_SIMILARITY",
     "evidence_type_match": true,
     "exact_similarity": 0.0,
-    "cosine_similarity": 27.13,
+    "cosine_similarity": 29.63,
     "longest_match_words": 0,
     "matched_words": 0,
     "shared_terms_count": 5,
@@ -2611,8 +2611,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.1466,
-    "evaluated_at": "2026-10-06T00:17:45.150776"
+    "citation_parsing_ms": 0.084,
+    "evaluated_at": "2026-10-06T15:33:32.379739"
   },
   {
     "case_id": "EV11-DIV-004",
@@ -2634,7 +2634,7 @@
     "predicted_evidence_type": "LEXICAL_TOPIC_SIMILARITY",
     "evidence_type_match": true,
     "exact_similarity": 0.0,
-    "cosine_similarity": 15.92,
+    "cosine_similarity": 19.67,
     "longest_match_words": 0,
     "matched_words": 0,
     "shared_terms_count": 3,
@@ -2652,8 +2652,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.1304,
-    "evaluated_at": "2026-10-06T00:17:45.151107"
+    "citation_parsing_ms": 0.0835,
+    "evaluated_at": "2026-10-06T15:33:32.379949"
   },
   {
     "case_id": "EV11-DIV-005",
@@ -2675,7 +2675,7 @@
     "predicted_evidence_type": "LEXICAL_TOPIC_SIMILARITY",
     "evidence_type_match": true,
     "exact_similarity": 0.0,
-    "cosine_similarity": 32.15,
+    "cosine_similarity": 39.5,
     "longest_match_words": 0,
     "matched_words": 0,
     "shared_terms_count": 6,
@@ -2693,8 +2693,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.1342,
-    "evaluated_at": "2026-10-06T00:17:45.151448"
+    "citation_parsing_ms": 0.0836,
+    "evaluated_at": "2026-10-06T15:33:32.380160"
   },
   {
     "case_id": "EV11-DIV-006",
@@ -2716,7 +2716,7 @@
     "predicted_evidence_type": "LEXICAL_TOPIC_SIMILARITY",
     "evidence_type_match": true,
     "exact_similarity": 0.0,
-    "cosine_similarity": 28.47,
+    "cosine_similarity": 35.69,
     "longest_match_words": 0,
     "matched_words": 0,
     "shared_terms_count": 5,
@@ -2734,8 +2734,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.1234,
-    "evaluated_at": "2026-10-06T00:17:45.151779"
+    "citation_parsing_ms": 0.0843,
+    "evaluated_at": "2026-10-06T15:33:32.380385"
   },
   {
     "case_id": "EV11-DIV-007",
@@ -2757,7 +2757,7 @@
     "predicted_evidence_type": "LEXICAL_TOPIC_SIMILARITY",
     "evidence_type_match": true,
     "exact_similarity": 0.0,
-    "cosine_similarity": 37.21,
+    "cosine_similarity": 32.85,
     "longest_match_words": 0,
     "matched_words": 0,
     "shared_terms_count": 6,
@@ -2775,8 +2775,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.1505,
-    "evaluated_at": "2026-10-06T00:17:45.152113"
+    "citation_parsing_ms": 0.0846,
+    "evaluated_at": "2026-10-06T15:33:32.380596"
   },
   {
     "case_id": "EV11-DIV-008",
@@ -2798,7 +2798,7 @@
     "predicted_evidence_type": "LEXICAL_TOPIC_SIMILARITY",
     "evidence_type_match": true,
     "exact_similarity": 0.0,
-    "cosine_similarity": 28.49,
+    "cosine_similarity": 26.8,
     "longest_match_words": 0,
     "matched_words": 0,
     "shared_terms_count": 5,
@@ -2816,8 +2816,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.1605,
-    "evaluated_at": "2026-10-06T00:17:45.152509"
+    "citation_parsing_ms": 0.0848,
+    "evaluated_at": "2026-10-06T15:33:32.380803"
   },
   {
     "case_id": "EV11-DIV-009",
@@ -2839,7 +2839,7 @@
     "predicted_evidence_type": "LEXICAL_TOPIC_SIMILARITY",
     "evidence_type_match": true,
     "exact_similarity": 0.0,
-    "cosine_similarity": 24.73,
+    "cosine_similarity": 24.46,
     "longest_match_words": 0,
     "matched_words": 0,
     "shared_terms_count": 4,
@@ -2857,8 +2857,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.1594,
-    "evaluated_at": "2026-10-06T00:17:45.152897"
+    "citation_parsing_ms": 0.0793,
+    "evaluated_at": "2026-10-06T15:33:32.381000"
   },
   {
     "case_id": "EV11-DIV-010",
@@ -2880,7 +2880,7 @@
     "predicted_evidence_type": "LEXICAL_TOPIC_SIMILARITY",
     "evidence_type_match": true,
     "exact_similarity": 0.0,
-    "cosine_similarity": 19.05,
+    "cosine_similarity": 22.72,
     "longest_match_words": 0,
     "matched_words": 0,
     "shared_terms_count": 3,
@@ -2898,8 +2898,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.1384,
-    "evaluated_at": "2026-10-06T00:17:45.153240"
+    "citation_parsing_ms": 0.078,
+    "evaluated_at": "2026-10-06T15:33:32.381198"
   },
   {
     "case_id": "EV11-DIS-001",
@@ -2907,49 +2907,6 @@
     "group_index": 8,
     "group_name": "Unrelated citation to overlap",
     "domain": "Renewable Energy",
-    "expected_class": "match",
-    "predicted_class": "review",
-    "predicted_pattern": "COPY_EDIT",
-    "decision_match": false,
-    "expected_context": "PARENTHETICAL_CITATION",
-    "predicted_context": "PARENTHETICAL_CITATION",
-    "context_match": true,
-    "expected_citation_status": "CITED",
-    "predicted_citation_status": "CITED",
-    "citation_status_match": true,
-    "expected_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
-    "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
-    "evidence_type_match": true,
-    "exact_similarity": 71.43,
-    "cosine_similarity": 83.55,
-    "longest_match_words": 25,
-    "matched_words": 25,
-    "shared_terms_count": 25,
-    "has_divergence": false,
-    "has_direct_overlap": true,
-    "has_lexical_similarity": true,
-    "v1_decision": "review",
-    "v11_decision": "review",
-    "decision_invariant_passed": true,
-    "non_suppression_passed": true,
-    "is_overall_pass": true,
-    "mismatch_reasons": [
-      "Decision mismatch: expected 'match', got 'review' (pattern: COPY_EDIT)"
-    ],
-    "failure_classification": "BOUNDARY_BEHAVIOR:THRESHOLD_TRANSITION",
-    "context_span": "Kartodirdjo (1982)",
-    "span_start": 256,
-    "span_end": 274,
-    "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.28,
-    "evaluated_at": "2026-10-06T00:17:45.153846"
-  },
-  {
-    "case_id": "EV11-DIS-002",
-    "case_type": "TARGETED_V1_1",
-    "group_index": 8,
-    "group_name": "Unrelated citation to overlap",
-    "domain": "Computer Science / NLP",
     "expected_class": "match",
     "predicted_class": "match",
     "predicted_pattern": "VERBATIM_MATCH",
@@ -2963,11 +2920,11 @@
     "expected_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": true,
-    "exact_similarity": 75.0,
-    "cosine_similarity": 86.1,
-    "longest_match_words": 21,
-    "matched_words": 21,
-    "shared_terms_count": 21,
+    "exact_similarity": 71.43,
+    "cosine_similarity": 88.62,
+    "longest_match_words": 25,
+    "matched_words": 25,
+    "shared_terms_count": 25,
     "has_divergence": false,
     "has_direct_overlap": true,
     "has_lexical_similarity": true,
@@ -2978,12 +2935,55 @@
     "is_overall_pass": true,
     "mismatch_reasons": [],
     "failure_classification": null,
+    "context_span": "Kartodirdjo (1982)",
+    "span_start": 256,
+    "span_end": 274,
+    "rationale": "Detected author-year citation pattern adjacent to evidence span.",
+    "citation_parsing_ms": 0.1583,
+    "evaluated_at": "2026-10-06T15:33:32.381555"
+  },
+  {
+    "case_id": "EV11-DIS-002",
+    "case_type": "TARGETED_V1_1",
+    "group_index": 8,
+    "group_name": "Unrelated citation to overlap",
+    "domain": "Computer Science / NLP",
+    "expected_class": "match",
+    "predicted_class": "review",
+    "predicted_pattern": "COPY_EDIT",
+    "decision_match": false,
+    "expected_context": "PARENTHETICAL_CITATION",
+    "predicted_context": "PARENTHETICAL_CITATION",
+    "context_match": true,
+    "expected_citation_status": "CITED",
+    "predicted_citation_status": "CITED",
+    "citation_status_match": true,
+    "expected_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
+    "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
+    "evidence_type_match": true,
+    "exact_similarity": 75.0,
+    "cosine_similarity": 84.06,
+    "longest_match_words": 21,
+    "matched_words": 21,
+    "shared_terms_count": 21,
+    "has_divergence": false,
+    "has_direct_overlap": true,
+    "has_lexical_similarity": true,
+    "v1_decision": "review",
+    "v11_decision": "review",
+    "decision_invariant_passed": true,
+    "non_suppression_passed": true,
+    "is_overall_pass": true,
+    "mismatch_reasons": [
+      "Decision mismatch: expected 'match', got 'review' (pattern: COPY_EDIT)"
+    ],
+    "failure_classification": "BOUNDARY_BEHAVIOR:THRESHOLD_TRANSITION",
     "context_span": "(bdk. Teori relativitas umum oleh Einstein, 1915)",
     "span_start": 176,
     "span_end": 225,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.1463,
-    "evaluated_at": "2026-10-06T00:17:45.154192"
+    "citation_parsing_ms": 0.1371,
+    "evaluated_at": "2026-10-06T15:33:32.381883"
   },
   {
     "case_id": "EV11-DIS-003",
@@ -3005,7 +3005,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": true,
     "exact_similarity": 73.53,
-    "cosine_similarity": 85.31,
+    "cosine_similarity": 88.21,
     "longest_match_words": 25,
     "matched_words": 25,
     "shared_terms_count": 25,
@@ -3023,8 +3023,8 @@
     "span_start": 256,
     "span_end": 268,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.191,
-    "evaluated_at": "2026-10-06T00:17:45.154614"
+    "citation_parsing_ms": 0.1934,
+    "evaluated_at": "2026-10-06T15:33:32.382283"
   },
   {
     "case_id": "EV11-DIS-004",
@@ -3046,7 +3046,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": true,
     "exact_similarity": 70.97,
-    "cosine_similarity": 87.14,
+    "cosine_similarity": 86.51,
     "longest_match_words": 22,
     "matched_words": 22,
     "shared_terms_count": 21,
@@ -3064,8 +3064,8 @@
     "span_start": 183,
     "span_end": 249,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.1319,
-    "evaluated_at": "2026-10-06T00:17:45.154915"
+    "citation_parsing_ms": 0.1463,
+    "evaluated_at": "2026-10-06T15:33:32.382621"
   },
   {
     "case_id": "EV11-DIS-005",
@@ -3073,47 +3073,6 @@
     "group_index": 8,
     "group_name": "Unrelated citation to overlap",
     "domain": "Economics",
-    "expected_class": "match",
-    "predicted_class": "match",
-    "predicted_pattern": "VERBATIM_MATCH",
-    "decision_match": true,
-    "expected_context": "PARENTHETICAL_CITATION",
-    "predicted_context": "PARENTHETICAL_CITATION",
-    "context_match": true,
-    "expected_citation_status": "CITED",
-    "predicted_citation_status": "CITED",
-    "citation_status_match": true,
-    "expected_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
-    "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
-    "evidence_type_match": true,
-    "exact_similarity": 75.86,
-    "cosine_similarity": 86.95,
-    "longest_match_words": 22,
-    "matched_words": 22,
-    "shared_terms_count": 22,
-    "has_divergence": false,
-    "has_direct_overlap": true,
-    "has_lexical_similarity": true,
-    "v1_decision": "match",
-    "v11_decision": "match",
-    "decision_invariant_passed": true,
-    "non_suppression_passed": true,
-    "is_overall_pass": true,
-    "mismatch_reasons": [],
-    "failure_classification": null,
-    "context_span": "Konsep etika deontologi dipelopori oleh Kant (1788)",
-    "span_start": 172,
-    "span_end": 223,
-    "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.128,
-    "evaluated_at": "2026-10-06T00:17:45.155213"
-  },
-  {
-    "case_id": "EV11-DIS-006",
-    "case_type": "TARGETED_V1_1",
-    "group_index": 8,
-    "group_name": "Unrelated citation to overlap",
-    "domain": "Environmental Science",
     "expected_class": "match",
     "predicted_class": "review",
     "predicted_pattern": "COPY_EDIT",
@@ -3127,11 +3086,11 @@
     "expected_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": true,
-    "exact_similarity": 70.0,
-    "cosine_similarity": 83.67,
-    "longest_match_words": 21,
-    "matched_words": 21,
-    "shared_terms_count": 21,
+    "exact_similarity": 75.86,
+    "cosine_similarity": 84.78,
+    "longest_match_words": 22,
+    "matched_words": 22,
+    "shared_terms_count": 22,
     "has_divergence": false,
     "has_direct_overlap": true,
     "has_lexical_similarity": true,
@@ -3144,19 +3103,19 @@
       "Decision mismatch: expected 'match', got 'review' (pattern: COPY_EDIT)"
     ],
     "failure_classification": "BOUNDARY_BEHAVIOR:THRESHOLD_TRANSITION",
-    "context_span": "Mengenai linguistik struktural dapat merujuk pada de Saussure (1916)",
-    "span_start": 169,
-    "span_end": 237,
+    "context_span": "Konsep etika deontologi dipelopori oleh Kant (1788)",
+    "span_start": 172,
+    "span_end": 223,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.134,
-    "evaluated_at": "2026-10-06T00:17:45.155525"
+    "citation_parsing_ms": 0.1262,
+    "evaluated_at": "2026-10-06T15:33:32.382926"
   },
   {
-    "case_id": "EV11-DIS-007",
+    "case_id": "EV11-DIS-006",
     "case_type": "TARGETED_V1_1",
     "group_index": 8,
     "group_name": "Unrelated citation to overlap",
-    "domain": "Law",
+    "domain": "Environmental Science",
     "expected_class": "match",
     "predicted_class": "match",
     "predicted_pattern": "VERBATIM_MATCH",
@@ -3170,11 +3129,11 @@
     "expected_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": true,
-    "exact_similarity": 75.0,
-    "cosine_similarity": 86.82,
+    "exact_similarity": 70.0,
+    "cosine_similarity": 85.8,
     "longest_match_words": 21,
     "matched_words": 21,
-    "shared_terms_count": 20,
+    "shared_terms_count": 21,
     "has_divergence": false,
     "has_direct_overlap": true,
     "has_lexical_similarity": true,
@@ -3185,12 +3144,55 @@
     "is_overall_pass": true,
     "mismatch_reasons": [],
     "failure_classification": null,
+    "context_span": "Mengenai linguistik struktural dapat merujuk pada de Saussure (1916)",
+    "span_start": 169,
+    "span_end": 237,
+    "rationale": "Detected author-year citation pattern adjacent to evidence span.",
+    "citation_parsing_ms": 0.1317,
+    "evaluated_at": "2026-10-06T15:33:32.383232"
+  },
+  {
+    "case_id": "EV11-DIS-007",
+    "case_type": "TARGETED_V1_1",
+    "group_index": 8,
+    "group_name": "Unrelated citation to overlap",
+    "domain": "Law",
+    "expected_class": "match",
+    "predicted_class": "review",
+    "predicted_pattern": "COPY_EDIT",
+    "decision_match": false,
+    "expected_context": "PARENTHETICAL_CITATION",
+    "predicted_context": "PARENTHETICAL_CITATION",
+    "context_match": true,
+    "expected_citation_status": "CITED",
+    "predicted_citation_status": "CITED",
+    "citation_status_match": true,
+    "expected_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
+    "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
+    "evidence_type_match": true,
+    "exact_similarity": 75.0,
+    "cosine_similarity": 83.2,
+    "longest_match_words": 21,
+    "matched_words": 21,
+    "shared_terms_count": 20,
+    "has_divergence": false,
+    "has_direct_overlap": true,
+    "has_lexical_similarity": true,
+    "v1_decision": "review",
+    "v11_decision": "review",
+    "decision_invariant_passed": true,
+    "non_suppression_passed": true,
+    "is_overall_pass": true,
+    "mismatch_reasons": [
+      "Decision mismatch: expected 'match', got 'review' (pattern: COPY_EDIT)"
+    ],
+    "failure_classification": "BOUNDARY_BEHAVIOR:THRESHOLD_TRANSITION",
     "context_span": "Kajian antropoligi ragawi diuraikan oleh Koentjaraningrat (1990)",
     "span_start": 178,
     "span_end": 242,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.1374,
-    "evaluated_at": "2026-10-06T00:17:45.155850"
+    "citation_parsing_ms": 0.2449,
+    "evaluated_at": "2026-10-06T15:33:32.383716"
   },
   {
     "case_id": "EV11-DIS-008",
@@ -3212,7 +3214,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": true,
     "exact_similarity": 74.07,
-    "cosine_similarity": 87.1,
+    "cosine_similarity": 89.19,
     "longest_match_words": 20,
     "matched_words": 20,
     "shared_terms_count": 19,
@@ -3230,8 +3232,8 @@
     "span_start": 176,
     "span_end": 236,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.125,
-    "evaluated_at": "2026-10-06T00:17:45.156137"
+    "citation_parsing_ms": 0.3146,
+    "evaluated_at": "2026-10-06T15:33:32.384441"
   },
   {
     "case_id": "EV11-DIS-009",
@@ -3240,9 +3242,9 @@
     "group_name": "Unrelated citation to overlap",
     "domain": "Education",
     "expected_class": "match",
-    "predicted_class": "match",
-    "predicted_pattern": "VERBATIM_MATCH",
-    "decision_match": true,
+    "predicted_class": "review",
+    "predicted_pattern": "COPY_EDIT",
+    "decision_match": false,
     "expected_context": "PARENTHETICAL_CITATION",
     "predicted_context": "PARENTHETICAL_CITATION",
     "context_match": true,
@@ -3253,26 +3255,28 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": true,
     "exact_similarity": 70.37,
-    "cosine_similarity": 85.08,
+    "cosine_similarity": 79.47,
     "longest_match_words": 19,
     "matched_words": 19,
     "shared_terms_count": 19,
     "has_divergence": false,
     "has_direct_overlap": true,
     "has_lexical_similarity": true,
-    "v1_decision": "match",
-    "v11_decision": "match",
+    "v1_decision": "review",
+    "v11_decision": "review",
     "decision_invariant_passed": true,
     "non_suppression_passed": true,
     "is_overall_pass": true,
-    "mismatch_reasons": [],
-    "failure_classification": null,
+    "mismatch_reasons": [
+      "Decision mismatch: expected 'match', got 'review' (pattern: COPY_EDIT)"
+    ],
+    "failure_classification": "BOUNDARY_BEHAVIOR:THRESHOLD_TRANSITION",
     "context_span": "Teori drama dan pementasan dibahas oleh Stanislavski (1936)",
     "span_start": 171,
     "span_end": 230,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.1147,
-    "evaluated_at": "2026-10-06T00:17:45.156423"
+    "citation_parsing_ms": 0.198,
+    "evaluated_at": "2026-10-06T15:33:32.385041"
   },
   {
     "case_id": "EV11-DIS-010",
@@ -3294,7 +3298,7 @@
     "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
     "evidence_type_match": true,
     "exact_similarity": 74.07,
-    "cosine_similarity": 84.93,
+    "cosine_similarity": 83.42,
     "longest_match_words": 20,
     "matched_words": 20,
     "shared_terms_count": 20,
@@ -3314,7 +3318,7 @@
     "span_start": 183,
     "span_end": 245,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.1234,
-    "evaluated_at": "2026-10-06T00:17:45.156692"
+    "citation_parsing_ms": 0.1748,
+    "evaluated_at": "2026-10-06T15:33:32.385478"
   }
 ]

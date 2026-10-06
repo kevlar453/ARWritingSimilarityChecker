@@ -3,7 +3,7 @@
 use CodeIgniter\Router\RouteCollection;
 
 /** @var RouteCollection $routes */
-$routes->match(['get', 'head'], '/', 'DashboardController::index');
+$routes->match(['get', 'head'], '/', 'LandingController::index');
 $routes->match(['get', 'head'], 'dashboard', 'DashboardController::index');
 $routes->match(['get', 'head'], 'report/(:num)', 'DashboardController::report/$1');
 $routes->match(['get', 'head'], 'dashboard/report/(:num)', 'DashboardController::report/$1');
@@ -14,6 +14,15 @@ $routes->get('dashboard/report/(:num)/preview', 'DashboardController::previewPdf
 $routes->match(['get', 'head'], 'verify/(:segment)', 'DashboardController::verify/$1');
 $routes->match(['get', 'head'], 'verify', 'DashboardController::verify');
 
+// Auth Routes
+$routes->group('auth', function ($routes) {
+    $routes->post('register', 'AuthController::register');
+    $routes->post('login', 'AuthController::login');
+    $routes->get('logout', 'AuthController::logout');
+    $routes->post('logout', 'AuthController::logout');
+    $routes->get('status', 'AuthController::status');
+});
+
 // API Routes
 $routes->group('api', function ($routes) {
     // Documents
@@ -22,6 +31,7 @@ $routes->group('api', function ($routes) {
     $routes->post('documents/(:num)/check', 'Api\DocumentController::check/$1');
     $routes->post('documents/(:num)/enroll', 'Api\DocumentController::enroll/$1');
     $routes->post('integration/check', 'Api\DocumentController::checkSubmission');
+    $routes->post('corpus/contribute', 'Api\DocumentController::contributeCorpus');
 
     // Reports
     $routes->get('reports/(:num)', 'Api\ReportController::show/$1');

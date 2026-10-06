@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AR Tilik - Academic Writing Similarity Checker</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="<?= base_url('favicon.ico') ?>">
+    <link rel="icon" type="image/png" sizes="32x32" href="<?= base_url('images/logo.png') ?>">
+    <link rel="apple-touch-icon" href="<?= base_url('images/logo.png') ?>">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -81,14 +85,34 @@
 
                 <!-- Worker Status Badge & Actions -->
                 <div class="flex items-center gap-2 flex-shrink-0">
+                    <a href="<?= base_url('/') ?>" class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 hover:text-indigo-600 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 transition shadow-2xs">
+                        🏠 <span class="hidden sm:inline">Beranda &amp; Teori</span>
+                    </a>
                     <a href="<?= base_url('evaluation/quality') ?>" class="hidden md:inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-indigo-600 px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-white transition">
                         📊 Observabilitas
                     </a>
                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 sm:px-3 sm:py-1 rounded-full text-[11px] sm:text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-xs">
                         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <span class="hidden sm:inline">Python Worker Ready</span>
-                        <span class="sm:hidden">Worker Online</span>
+                        <span class="hidden sm:inline">Worker Ready</span>
                     </span>
+
+                    <?php if (!empty($currentUser)): ?>
+                    <div class="flex items-center gap-2 pl-2 border-l border-slate-200">
+                        <div class="hidden sm:flex flex-col text-right">
+                            <span class="text-xs font-bold text-slate-800 leading-tight"><?= esc($currentUser['name']) ?></span>
+                            <span class="text-[10px] text-slate-500 leading-tight"><?= esc($currentUser['institution'] ?? 'Pengguna Terdaftar') ?></span>
+                        </div>
+                        <a href="<?= base_url('auth/logout') ?>" class="inline-flex items-center gap-1 text-xs font-semibold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 px-2.5 py-1.5 rounded-lg border border-rose-200 transition" title="Keluar Akun">
+                            🚪 <span class="hidden sm:inline">Keluar</span>
+                        </a>
+                    </div>
+                    <?php else: ?>
+                    <div class="flex items-center gap-2 pl-2 border-l border-slate-200">
+                        <a href="<?= base_url('/#auth-section') ?>" class="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 px-3 py-1.5 rounded-lg transition shadow-xs">
+                            🔑 Masuk / Daftar
+                        </a>
+                    </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -122,6 +146,80 @@
                 </div>
             </div>
         </div>
+
+        <!-- Quota & Crowdsourced Corpus Banner -->
+        <?php if (!empty($currentUser) && !empty($quotaInfo)): ?>
+        <div class="mb-6 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-2xl p-5 text-white shadow-md border border-indigo-800/40 relative overflow-hidden">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-5 relative z-10">
+                <div class="space-y-1.5">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-indigo-500/30 text-indigo-300 border border-indigo-500/40 uppercase tracking-wider">
+                            Akun Terdaftar: <?= esc($currentUser['name']) ?>
+                        </span>
+                        <span class="text-xs text-slate-400">• <?= esc($currentUser['email']) ?></span>
+                    </div>
+                    <h2 class="text-lg font-bold text-white flex items-center gap-2 flex-wrap">
+                        <span>🎯 Status Kuota Submisi:</span>
+                        <span class="text-emerald-400 font-mono-code text-xl font-extrabold"><?= $quotaInfo['total_available'] ?? 3 ?> Submisi Tersedia</span>
+                    </h2>
+                    <p class="text-xs text-slate-300 leading-relaxed max-w-2xl">
+                        Kuota gratis: <strong class="text-white"><?= $quotaInfo['free_remaining'] ?? 3 ?>/<?= $quotaInfo['free_weekly_limit'] ?? $quotaInfo['free_limit'] ?? 3 ?> submisi</strong> minggu ini (reset otomatis dalam <?= $quotaInfo['days_until_reset'] ?? 7 ?> hari). 
+                        Bonus korpus: <strong class="text-amber-300">+<?= $quotaInfo['bonus_submissions'] ?? $quotaInfo['bonus_remaining'] ?? 0 ?> submisi</strong>. 
+                        Tiap sumbangan <strong class="text-sky-300">3 naskah korpus valid</strong> memberikan reward <strong class="text-emerald-300">+1 submisi gratis</strong>!
+                    </p>
+                </div>
+                
+                <div class="flex flex-wrap sm:flex-nowrap items-center gap-2.5 flex-shrink-0">
+                    <button type="button" onclick="openContributeCorpusModal()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-sm transition transform hover:-translate-y-0.5">
+                        <span>➕ Sumbang Korpus (+1 Kuota)</span>
+                    </button>
+                    <a href="<?= base_url('/#pricing') ?>" class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl font-semibold text-xs bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white border border-white/20 transition">
+                        <span>💎 Rencana Paket</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Progress to next bonus -->
+            <div class="mt-4 pt-3 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between text-xs text-slate-300 gap-2">
+                <div class="flex items-center gap-2">
+                    <span>Progres Reward Korpus:</span>
+                    <div class="w-32 bg-slate-800 rounded-full h-2 overflow-hidden border border-slate-700">
+                        <div class="bg-gradient-to-r from-emerald-500 to-teal-400 h-2 rounded-full" style="width: <?= min(100, ((($quotaInfo['uploaded_corpus_count'] ?? $quotaInfo['corpus_count'] ?? 0) % 3) / 3) * 100) ?>%"></div>
+                    </div>
+                    <span class="font-mono-code text-white font-bold"><?= (($quotaInfo['uploaded_corpus_count'] ?? $quotaInfo['corpus_count'] ?? 0) % 3) ?>/3 Dokumen</span>
+                </div>
+                <div class="text-[11px] text-slate-400">
+                    <?php if (($quotaInfo['corpus_to_next_bonus'] ?? 3) === 3): ?>
+                        Sumbang 3 korpus valid untuk mendapatkan bonus submisi berikutnya.
+                    <?php else: ?>
+                        Tinggal <strong class="text-amber-300"><?= $quotaInfo['corpus_to_next_bonus'] ?? 3 ?> korpus lagi</strong> untuk klaim reward +1 submisi!
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+        <?php else: ?>
+        <div class="mb-6 bg-gradient-to-r from-indigo-900 to-indigo-950 rounded-2xl p-4 sm:p-5 text-white shadow-md border border-indigo-700/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="space-y-1">
+                <div class="flex items-center gap-2">
+                    <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                        Akses Tamu / Pengunjung
+                    </span>
+                    <span class="text-xs text-indigo-200">Dapatkan Kuota Gratis Mingguan</span>
+                </div>
+                <p class="text-xs text-indigo-100 leading-relaxed">
+                    Daftarkan akun gratis untuk memperoleh kuota <strong>3 submisi per minggu</strong> dan dapatkan kuota tambahan tanpa batas dengan menyumbangkan korpus rujukan karya ilmiah!
+                </p>
+            </div>
+            <div class="flex items-center gap-2 flex-shrink-0">
+                <a href="<?= base_url('/#auth-section') ?>" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-xs bg-indigo-500 hover:bg-indigo-400 text-white shadow-sm transition">
+                    ✨ Daftar Gratis Sekarang
+                </a>
+                <a href="<?= base_url('/#pricing') ?>" class="inline-flex items-center gap-1 px-3 py-2 rounded-xl font-medium text-xs bg-indigo-800/60 hover:bg-indigo-800 text-indigo-200 border border-indigo-700 transition">
+                    Paket Langganan
+                </a>
+            </div>
+        </div>
+        <?php endif; ?>
 
         <!-- Navigation Tabs (Horizontally Scrollable on Mobile) -->
         <div class="flex border-b border-slate-200 mb-6 gap-2 sm:gap-6 overflow-x-auto no-scrollbar scroll-smooth">
@@ -716,6 +814,24 @@
                     } else {
                         throw new Error(checkData.message || 'Gagal menjadwalkan pemeriksaan.');
                     }
+                } else if (res.status === 403 && data.status === 'quota_exceeded') {
+                    hideProcessingModal();
+                    alertBox.className = 'mt-4 p-4 rounded-xl text-xs sm:text-sm bg-amber-50 text-amber-900 border border-amber-300 block space-y-2.5';
+                    alertBox.innerHTML = `
+                        <div class="font-bold flex items-center gap-1.5 text-amber-950">
+                            <span>⚠️</span> <span>Batas Kuota Gratis Mingguan Telah Habis</span>
+                        </div>
+                        <p class="text-xs leading-relaxed text-amber-900">${data.message}</p>
+                        <div class="pt-1 flex flex-wrap items-center gap-2">
+                            <button type="button" onclick="openContributeCorpusModal()" class="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition">
+                                ➕ Sumbang Korpus (+1 Submisi)
+                            </button>
+                            <a href="<?= base_url('/#pricing') ?>" class="px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-900 text-white font-medium text-xs shadow-xs transition">
+                                💎 Rencana Paket Berlangganan
+                            </a>
+                        </div>
+                    `;
+                    return;
                 } else {
                     throw new Error(data.message || 'Gagal mengunggah dokumen.');
                 }
@@ -1002,6 +1118,126 @@
         document.addEventListener('DOMContentLoaded', function() {
             checkAndPollSubmissions();
         });
+
+        // Modal Sumbang Korpus (+3 Korpus = +1 Submisi)
+        function openContributeCorpusModal() {
+            <?php if (empty($currentUser)): ?>
+            alert('Silakan daftar atau masuk terlebih dahulu untuk menyumbang korpus rujukan dan memperoleh bonus kuota.');
+            window.location.href = '<?= base_url('/#auth-section') ?>';
+            return;
+            <?php endif; ?>
+            const modal = document.getElementById('contributeCorpusModal');
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeContributeCorpusModal() {
+            const modal = document.getElementById('contributeCorpusModal');
+            if (modal) modal.classList.add('hidden');
+            const alertBox = document.getElementById('contributeAlert');
+            if (alertBox) alertBox.classList.add('hidden');
+        }
+
+        document.getElementById('formContributeCorpus')?.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const form = this;
+            const btn = document.getElementById('btnSubmitContribute');
+            const alertBox = document.getElementById('contributeAlert');
+            const fileInput = document.getElementById('contributeFileInput');
+
+            if (!fileInput.files || !fileInput.files[0]) {
+                alert('Silakan pilih berkas korpus ilmiah terlebih dahulu.');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = `
+                <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Memvalidasi & Mengindeks...</span>
+            `;
+            alertBox.className = 'hidden';
+
+            const formData = new FormData(form);
+
+            try {
+                const res = await fetch('<?= base_url('api/corpus/contribute') ?>', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+
+                if (res.status === 201) {
+                    alertBox.className = 'p-3 rounded-xl text-xs bg-emerald-50 text-emerald-800 border border-emerald-200 block';
+                    alertBox.innerHTML = '<strong>Sukses!</strong> ' + data.message;
+                    setTimeout(() => location.reload(), 1400);
+                } else if (res.status === 409) {
+                    alertBox.className = 'p-3 rounded-xl text-xs bg-amber-50 text-amber-900 border border-amber-300 block';
+                    alertBox.innerHTML = '<strong>Duplikat Terdeteksi:</strong> ' + data.message;
+                } else {
+                    alertBox.className = 'p-3 rounded-xl text-xs bg-rose-50 text-rose-800 border border-rose-200 block';
+                    alertBox.innerHTML = '<strong>Gagal:</strong> ' + (data.message || 'Terjadi kesalahan saat memproses korpus.');
+                }
+            } catch (err) {
+                alertBox.className = 'p-3 rounded-xl text-xs bg-rose-50 text-rose-800 border border-rose-200 block';
+                alertBox.innerHTML = '<strong>Kendala Sistem:</strong> ' + err.message;
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span>📤 Unggah & Tambah Kuota</span>';
+            }
+        });
     </script>
+
+    <!-- Contribute Corpus Modal (+3 Korpus = +1 Submisi) -->
+    <div id="contributeCorpusModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+                <div>
+                    <h3 class="text-base font-bold text-slate-800">Sumbang Korpus Rujukan Ilmiah</h3>
+                    <p class="text-[11px] text-slate-500">Mekanisme Gotong-Royong: +3 Korpus Valid = +1 Submisi Gratis</p>
+                </div>
+                <button type="button" onclick="closeContributeCorpusModal()" class="text-slate-400 hover:text-slate-600 text-2xl font-bold p-1 leading-none">&times;</button>
+            </div>
+            
+            <form id="formContributeCorpus" class="p-6 space-y-4" enctype="multipart/form-data">
+                <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-xs text-emerald-800 leading-relaxed">
+                    💡 <strong>Aturan Validasi:</strong> Naskah harus berupa karya ilmiah (jurnal, skripsi, tesis, makalah) dalam format PDF, DOCX, atau TXT. Berkas duplikat yang sudah ada di database akan ditolak secara otomatis dan tidak menambah kuota.
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Judul Karya Ilmiah / Artikel:</label>
+                    <input type="text" name="title" id="contributeTitleInput" placeholder="Contoh: Pengaruh Algoritma Terdistribusi pada Sistem Edukasi" class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    <p class="text-[10px] text-slate-400 mt-1">Kosongkan jika ingin menggunakan judul otomatis dari nama berkas.</p>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Jenis Sumber Rujukan:</label>
+                    <select name="source_type" class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
+                        <option value="journal">Artikel Jurnal Ilmiah</option>
+                        <option value="thesis">Skripsi / Tesis / Disertasi</option>
+                        <option value="conference">Prosiding Konferensi</option>
+                        <option value="book">Buku / Monograf / Bab Buku</option>
+                        <option value="report">Laporan Penelitian Institusi</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Pilih Berkas Naskah (PDF, DOCX, TXT):</label>
+                    <input type="file" name="corpus_document" id="contributeFileInput" accept=".pdf,.docx,.txt" required class="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer">
+                    <p class="text-[10px] text-slate-400 mt-1">Maksimal 25 MB per berkas. Sistem memverifikasi konten tanpa duplikasi.</p>
+                </div>
+
+                <div id="contributeAlert" class="hidden p-3 rounded-xl text-xs"></div>
+
+                <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                    <button type="button" onclick="closeContributeCorpusModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition">Batal</button>
+                    <button type="submit" id="btnSubmitContribute" class="px-5 py-2 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition shadow-xs flex items-center gap-1.5">
+                        <span>📤 Unggah & Tambah Kuota</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </body>
 </html>

@@ -247,7 +247,7 @@
 
         .stats-bar {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(5, 1fr);
             gap: 20px;
             background: #ffffff;
             border: 1px solid var(--border);
@@ -738,6 +738,51 @@
             color: #64748b;
         }
 
+        .footer-counter-wrap {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .visitor-counter-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 30px;
+            padding: 8px 22px;
+            font-size: 13px;
+            color: #cbd5e1;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .visitor-counter-badge strong {
+            color: #38bdf8;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 800;
+        }
+
+        .counter-sep {
+            color: #64748b;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10b981;
+            display: inline-block;
+            box-shadow: 0 0 8px #10b981;
+            animation: livePulse 2s infinite;
+        }
+
+        @keyframes livePulse {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
+
         /* Hero Visual & Layout */
         .hero-grid {
             display: grid;
@@ -1171,15 +1216,19 @@
             <div class="stats-bar" data-aos="fade-up" data-aos-delay="300" data-aos-duration="800">
                 <div class="stat-item">
                     <div class="stat-val"><?= number_format($totalCorpus) ?>+</div>
-                    <div class="stat-lbl">Korpus Rujukan Terindeks</div>
+                    <div class="stat-lbl">Korpus Terindeks</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-val"><?= number_format($totalReports) ?></div>
-                    <div class="stat-lbl">Laporan Telah Diterbitkan</div>
+                    <div class="stat-lbl">Laporan Terbit</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-val"><?= number_format($visitorStats['total_unique'] ?? 1) ?></div>
+                    <div class="stat-lbl">Pengunjung Unik</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-val">100%</div>
-                    <div class="stat-lbl">Reviewer Agreement Rate</div>
+                    <div class="stat-lbl">Reviewer Agreement</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-val">&lt; 150ms</div>
@@ -1583,6 +1632,17 @@
                         <li><a href="javascript:void(0)">Kebijakan Privasi</a></li>
                         <li><a href="javascript:void(0)">Kontak Pengembang</a></li>
                     </ul>
+                </div>
+            </div>
+
+            <div class="footer-counter-wrap">
+                <div class="visitor-counter-badge">
+                    <span class="live-dot"></span>
+                    <span>Pengunjung Unik: <strong><?= number_format($visitorStats['total_unique'] ?? 1) ?></strong></span>
+                    <span class="counter-sep">&bull;</span>
+                    <span>Hari Ini: <strong><?= number_format($visitorStats['today_unique'] ?? 1) ?></strong></span>
+                    <span class="counter-sep">&bull;</span>
+                    <span>Total Kunjungan: <strong><?= number_format($visitorStats['total_hits'] ?? 1) ?></strong></span>
                 </div>
             </div>
 

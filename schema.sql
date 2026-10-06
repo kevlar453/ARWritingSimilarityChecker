@@ -2,6 +2,25 @@
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
+CREATE TABLE IF NOT EXISTS users (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(150) NOT NULL,
+    email VARCHAR(191) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    institution VARCHAR(191) NULL,
+    role ENUM('user', 'admin') NOT NULL DEFAULT 'user',
+    status ENUM('active', 'inactive') NOT NULL DEFAULT 'active',
+    free_submissions_used_this_week INT UNSIGNED NOT NULL DEFAULT 0,
+    week_reset_at DATETIME NOT NULL,
+    bonus_submissions INT UNSIGNED NOT NULL DEFAULT 0,
+    uploaded_corpus_count INT UNSIGNED NOT NULL DEFAULT 0,
+    last_login_at DATETIME NULL,
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
+    INDEX idx_users_email (email),
+    INDEX idx_users_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS documents (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT UNSIGNED NULL,
@@ -198,6 +217,20 @@ CREATE TABLE IF NOT EXISTS benchmark_results (
     created_at DATETIME NOT NULL,
     INDEX idx_benchmark_results_run (benchmark_run_id),
     INDEX idx_benchmark_results_case (test_case_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS landing_visitors (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    visitor_hash VARCHAR(64) NOT NULL,
+    ip_address VARCHAR(45) NOT NULL,
+    user_agent VARCHAR(500) NULL,
+    visit_date DATE NOT NULL,
+    hits INT UNSIGNED NOT NULL DEFAULT 1,
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
+    UNIQUE KEY uq_visitor_date (visitor_hash, visit_date),
+    INDEX idx_visit_date (visit_date),
+    INDEX idx_visitor_hash (visitor_hash)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 SET FOREIGN_KEY_CHECKS = 1;

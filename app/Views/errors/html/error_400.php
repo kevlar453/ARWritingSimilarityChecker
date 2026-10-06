@@ -12,6 +12,10 @@ $homeUrl = function_exists('base_url') ? base_url('/') : '/';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>400 Permintaan Tidak Valid — AR Tilik</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/logo.png">
+    <link rel="apple-touch-icon" href="/images/logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
@@ -236,10 +240,8 @@ $homeUrl = function_exists('base_url') ? base_url('/') : '/';
     <header class="header">
         <div class="header-inner">
             <a href="<?= esc($homeUrl) ?>" class="brand">
-                <div class="brand-icon">🔬</div>
-                <div>
-                    <div>AR TILIK</div>
-                </div>
+                <img src="/images/logo.png" alt="AR Tilik Logo" style="width: 28px; height: 28px; object-fit: contain;">
+                <span>AR Tilik</span>
             </a>
             <span class="brand-badge">Pemeriksa Kesepadanan Teks</span>
         </div>
