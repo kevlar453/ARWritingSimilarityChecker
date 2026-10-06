@@ -112,6 +112,16 @@
                     Korpus Repositori
                     <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-slate-800 text-slate-300 font-semibold"><?= (int) $metrics['total_corpus'] ?></span>
                 </a>
+                <a href="<?= base_url('admin?tab=analytics') ?>" class="flex-shrink-0 px-3 py-1.5 rounded-lg flex items-center gap-2 whitespace-nowrap transition-colors <?= $activeTab === 'analytics' ? 'bg-indigo-600/20 text-indigo-300 font-semibold border border-indigo-500/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50' ?>">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                    Analitik Institusi
+                    <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold"><?= (int) ($integrityAnalytics['total_audited'] ?? 0) ?> audit</span>
+                </a>
+                <a href="<?= base_url('admin?tab=api_keys') ?>" class="flex-shrink-0 px-3 py-1.5 rounded-lg flex items-center gap-2 whitespace-nowrap transition-colors <?= $activeTab === 'api_keys' ? 'bg-indigo-600/20 text-indigo-300 font-semibold border border-indigo-500/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50' ?>">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
+                    Integrasi API & OJS
+                    <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-semibold"><?= count($apiKeysList ?? []) ?> kunci</span>
+                </a>
                 <a href="<?= base_url('admin?tab=security') ?>" class="flex-shrink-0 px-3 py-1.5 rounded-lg flex items-center gap-2 whitespace-nowrap transition-colors <?= $activeTab === 'security' ? 'bg-indigo-600/20 text-indigo-300 font-semibold border border-indigo-500/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50' ?>">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
                     Keamanan & Limit
@@ -587,6 +597,138 @@
                     <p class="text-xs text-slate-400">Basis data naskah pembanding untuk algoritma pencocokan kemiripan</p>
                 </div>
 
+                <!-- Auto-Harvester Berkala: Neliti & GARUDA Dikti (Opsi C) -->
+                <div class="bg-gradient-to-r from-slate-900/90 via-slate-800/80 to-slate-900/90 border border-indigo-500/30 rounded-2xl p-5 shadow-lg space-y-4">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-700/60 pb-3">
+                        <div class="flex items-center gap-2.5">
+                            <div class="p-2 rounded-xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                                    Auto-Harvester Berkala Nasional (Neliti & GARUDA Dikti)
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold">Aktif & Siap Pemanenan</span>
+                                </h3>
+                                <p class="text-[11px] text-slate-400">Pemanenan berkala karya ilmiah & jurnal akreditasi nasional tanpa unggahan manual untuk memperluas korpus institusi</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="handleHarvestScheduled()" id="btn-harvest-sched" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow transition-colors flex items-center gap-1.5">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                Jalankan Seluruh Jadwal
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Pemanen Grid: Neliti & GARUDA -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Card 1: Neliti -->
+                        <div class="bg-slate-950/60 border border-slate-800 rounded-xl p-4 space-y-3">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-base">🏛️</span>
+                                    <div>
+                                        <div class="text-xs font-bold text-white">Portal Riset Neliti</div>
+                                        <div class="text-[10px] text-slate-400">Protokol OAI-PMH 2.0 (neliti.com/oai)</div>
+                                    </div>
+                                </div>
+                                <span class="px-2 py-0.5 rounded text-[10px] bg-sky-500/10 text-sky-300 border border-sky-500/20">OAI-DC 2.0</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <input type="text" id="neliti-query" placeholder="Filter topik (mis: pendidikan, sains)..." class="flex-1 bg-slate-900 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500">
+                                <select id="neliti-limit" class="bg-slate-900 border border-slate-700/80 rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+                                    <option value="5">5 naskah</option>
+                                    <option value="10" selected>10 naskah</option>
+                                    <option value="20">20 naskah</option>
+                                </select>
+                            </div>
+                            <button onclick="handleHarvestNeliti()" id="btn-harvest-neliti" class="w-full py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-xs font-medium transition-colors flex items-center justify-center gap-1.5">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path></svg>
+                                Mulai Pemanenan Neliti
+                            </button>
+                        </div>
+
+                        <!-- Card 2: GARUDA Dikti -->
+                        <div class="bg-slate-950/60 border border-slate-800 rounded-xl p-4 space-y-3">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-base">🦅</span>
+                                    <div>
+                                        <div class="text-xs font-bold text-white">GARUDA Dikti (Garba Rujukan Digital)</div>
+                                        <div class="text-[10px] text-slate-400">Kemdiktisaintek Jurnal SINTA Terakreditasi</div>
+                                    </div>
+                                </div>
+                                <span class="px-2 py-0.5 rounded text-[10px] bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">SINTA Index</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <input type="text" id="garuda-query" placeholder="Kata kunci topik (mis: kecerdasan buatan, ekonomi)..." value="kecerdasan buatan" class="flex-1 bg-slate-900 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500">
+                                <select id="garuda-limit" class="bg-slate-900 border border-slate-700/80 rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+                                    <option value="5">5 naskah</option>
+                                    <option value="10" selected>10 naskah</option>
+                                    <option value="20">20 naskah</option>
+                                </select>
+                            </div>
+                            <button onclick="handleHarvestGaruda()" id="btn-harvest-garuda" class="w-full py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium transition-colors flex items-center justify-center gap-1.5">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path></svg>
+                                Mulai Pemanenan GARUDA
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Log Status Box (Hidden by default, shown during harvest) -->
+                    <div id="harvest-console" class="hidden bg-slate-950 border border-slate-800 rounded-xl p-3 text-[11px] font-mono-code text-slate-300 space-y-1.5 max-h-36 overflow-y-auto">
+                        <div class="flex items-center justify-between text-indigo-400 font-bold border-b border-slate-800 pb-1">
+                            <span>Console Pemanenan Aktif:</span>
+                            <span id="harvest-spinner" class="animate-pulse text-amber-400">Sedang memproses...</span>
+                        </div>
+                        <pre id="harvest-output" class="whitespace-pre-wrap text-slate-300 text-[10px]"></pre>
+                    </div>
+
+                    <!-- Riwayat Pemanenan Terakhir -->
+                    <?php if (! empty($harvestLogs)): ?>
+                        <div class="border-t border-slate-800/80 pt-3">
+                            <div class="text-[11px] font-bold text-slate-300 mb-2 flex items-center justify-between">
+                                <span>Riwayat Pemanenan Korpus Terakhir</span>
+                                <span class="text-[10px] text-slate-400">Total <?= count($harvestLogs) ?> log rekaman</span>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-[11px] text-left">
+                                    <thead class="text-slate-400 text-[10px] uppercase border-b border-slate-800">
+                                        <tr>
+                                            <th class="py-1.5 px-2">Waktu</th>
+                                            <th class="py-1.5 px-2">Sumber Portal</th>
+                                            <th class="py-1.5 px-2">Topik / Query</th>
+                                            <th class="py-1.5 px-2 text-center">Ditemukan</th>
+                                            <th class="py-1.5 px-2 text-center">Terindeks</th>
+                                            <th class="py-1.5 px-2 text-center">Duplikat</th>
+                                            <th class="py-1.5 px-2">Status</th>
+                                            <th class="py-1.5 px-2 text-right">Durasi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-800/60">
+                                        <?php foreach (array_slice($harvestLogs, 0, 5) as $hl): ?>
+                                            <tr class="hover:bg-slate-800/30">
+                                                <td class="py-1.5 px-2 text-slate-400 font-mono-code"><?= date('d M H:i', strtotime($hl['started_at'])) ?></td>
+                                                <td class="py-1.5 px-2 font-medium text-slate-200"><?= esc($hl['source_name']) ?></td>
+                                                <td class="py-1.5 px-2 text-slate-400"><?= esc($hl['query_or_set'] ?: '-') ?></td>
+                                                <td class="py-1.5 px-2 text-center text-slate-300 font-mono-code"><?= (int) $hl['items_found'] ?></td>
+                                                <td class="py-1.5 px-2 text-center font-bold text-emerald-400 font-mono-code">+<?= (int) $hl['items_indexed'] ?></td>
+                                                <td class="py-1.5 px-2 text-center text-slate-500 font-mono-code"><?= (int) $hl['items_skipped'] ?></td>
+                                                <td class="py-1.5 px-2">
+                                                    <span class="px-1.5 py-0.5 rounded text-[9px] font-semibold <?= $hl['status'] === 'completed' ? 'bg-emerald-500/20 text-emerald-300' : ($hl['status'] === 'running' ? 'bg-indigo-500/20 text-indigo-300 animate-pulse' : 'bg-amber-500/20 text-amber-300') ?>">
+                                                        <?= strtoupper(esc($hl['status'])) ?>
+                                                    </span>
+                                                </td>
+                                                <td class="py-1.5 px-2 text-right text-slate-400 font-mono-code"><?= number_format((float) ($hl['duration_seconds'] ?? 0), 1) ?>s</td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
                 <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl overflow-hidden shadow-sm">
                     <div class="overflow-x-auto">
                         <table class="w-full text-xs text-left">
@@ -902,6 +1044,378 @@
             </div>
 
         <!-- ========================================== -->
+        <!-- TAB: ANALITIK INTEGRITAS INSTITUSI (OPSI D) -->
+        <!-- ========================================== -->
+        <?php elseif ($activeTab === 'analytics'): ?>
+            <div class="space-y-6">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                            Dashboard Analitik & Integritas Akademik Institusi
+                            <span class="px-2 py-0.5 rounded text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">BAN-PT & LAM Ready</span>
+                        </h2>
+                        <p class="text-xs text-slate-400">Audit makro orisinalitas naskah akademik, kepatuhan sitasi, deteksi manipulasi & pelaporan mutu universitas</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <a href="<?= base_url('admin/analytics/export-csv') ?>" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow transition-colors flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            Ekspor Rekapitulasi Integritas (.CSV)
+                        </a>
+                    </div>
+                </div>
+
+                <!-- KPI Cards Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Rata-rata Kemiripan -->
+                    <div class="bg-slate-800/60 border border-slate-700/60 rounded-2xl p-5 shadow-sm">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Rata-Rata Kemiripan</span>
+                            <div class="p-2 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                            </div>
+                        </div>
+                        <div class="mt-3 flex items-baseline gap-2">
+                            <span class="text-3xl font-extrabold text-white tracking-tight"><?= number_format($integrityAnalytics['avg_similarity'], 1) ?>%</span>
+                            <span class="text-xs text-slate-400 font-medium">Batas Aman Kampus: &lt; 20%</span>
+                        </div>
+                        <div class="mt-2 text-[11px] text-emerald-400 flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            <span>Standar Keadilan Dual-Lens Terpenuhi</span>
+                        </div>
+                    </div>
+
+                    <!-- Total Naskah Terverifikasi -->
+                    <div class="bg-slate-800/60 border border-slate-700/60 rounded-2xl p-5 shadow-sm">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Naskah Diaudit</span>
+                            <div class="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            </div>
+                        </div>
+                        <div class="mt-3 flex items-baseline gap-2">
+                            <span class="text-3xl font-extrabold text-white tracking-tight"><?= number_format($integrityAnalytics['total_audited']) ?></span>
+                            <span class="text-xs text-emerald-400 font-medium">Sertifikat Resmi</span>
+                        </div>
+                        <div class="mt-2 text-[11px] text-slate-400">
+                            Tersebar di skripsi, tesis & artikel jurnal
+                        </div>
+                    </div>
+
+                    <!-- Manipulasi & Evasif -->
+                    <div class="bg-slate-800/60 border border-slate-700/60 rounded-2xl p-5 shadow-sm">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Indikasi Evasif / Manipulasi</span>
+                            <div class="p-2 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                            </div>
+                        </div>
+                        <div class="mt-3 flex items-baseline gap-2">
+                            <span class="text-3xl font-extrabold text-white tracking-tight"><?= number_format($integrityAnalytics['evasion_count']) ?></span>
+                            <span class="text-xs text-rose-400 font-medium">Naskah</span>
+                        </div>
+                        <div class="mt-2 text-[11px] text-slate-400">
+                            Deteksi Homoglif Cyrillic, Font Camouflage, Zero-Width
+                        </div>
+                    </div>
+
+                    <!-- Sitasi Gaib & Lintas Bahasa -->
+                    <div class="bg-slate-800/60 border border-slate-700/60 rounded-2xl p-5 shadow-sm">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Sitasi Gaib & Lintas Bahasa</span>
+                            <div class="p-2 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path></svg>
+                            </div>
+                        </div>
+                        <div class="mt-3 flex items-baseline gap-2">
+                            <span class="text-3xl font-extrabold text-white tracking-tight"><?= number_format($integrityAnalytics['phantom_count'] + $integrityAnalytics['cross_lingual_count']) ?></span>
+                            <span class="text-xs text-amber-400 font-medium">Insiden</span>
+                        </div>
+                        <div class="mt-2 text-[11px] text-slate-400">
+                            <?= $integrityAnalytics['phantom_count'] ?> Sitasi Gaib, <?= $integrityAnalytics['cross_lingual_count'] ?> Mesin Terjemahan
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Distribusi Klasifikasi & Tren -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Card 1: Distribusi Kategori Integritas -->
+                    <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-5 space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-700/60 pb-3">
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">Distribusi Orisinalitas Naskah</h3>
+                            <span class="text-[11px] text-slate-400"><?= (int) $integrityAnalytics['total_audited'] ?> Sampel Terverifikasi</span>
+                        </div>
+                        <?php 
+                            $tot = max(1, (int) $integrityAnalytics['total_audited']);
+                            $pClean = round(($integrityAnalytics['clean_count'] / $tot) * 100, 1);
+                            $pMod = round(($integrityAnalytics['moderate_count'] / $tot) * 100, 1);
+                            $pSub = round(($integrityAnalytics['substantial_count'] / $tot) * 100, 1);
+                            $pCrit = round(($integrityAnalytics['critical_count'] / $tot) * 100, 1);
+                        ?>
+                        <div class="space-y-3.5">
+                            <div>
+                                <div class="flex justify-between text-xs mb-1">
+                                    <span class="text-emerald-300 font-medium">Sangat Bersih (&lt; 15%) &mdash; Orisinal</span>
+                                    <span class="font-bold text-white"><?= $integrityAnalytics['clean_count'] ?> (<?= $pClean ?>%)</span>
+                                </div>
+                                <div class="w-full bg-slate-900 rounded-full h-2.5 overflow-hidden">
+                                    <div class="bg-emerald-500 h-2.5 rounded-full" style="width: <?= $pClean ?>%"></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-xs mb-1">
+                                    <span class="text-sky-300 font-medium">Moderat (15% &ndash; 25%) &mdash; Perlu Telaah Rujukan</span>
+                                    <span class="font-bold text-white"><?= $integrityAnalytics['moderate_count'] ?> (<?= $pMod ?>%)</span>
+                                </div>
+                                <div class="w-full bg-slate-900 rounded-full h-2.5 overflow-hidden">
+                                    <div class="bg-sky-500 h-2.5 rounded-full" style="width: <?= $pMod ?>%"></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-xs mb-1">
+                                    <span class="text-amber-300 font-medium">Kemiripan Substansial (25% &ndash; 40%) &mdash; Revisi Mayor</span>
+                                    <span class="font-bold text-white"><?= $integrityAnalytics['substantial_count'] ?> (<?= $pSub ?>%)</span>
+                                </div>
+                                <div class="w-full bg-slate-900 rounded-full h-2.5 overflow-hidden">
+                                    <div class="bg-amber-500 h-2.5 rounded-full" style="width: <?= $pSub ?>%"></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-xs mb-1">
+                                    <span class="text-rose-300 font-medium">Kritis (&gt; 40%) &mdash; Indikasi Pelanggaran Berat</span>
+                                    <span class="font-bold text-white"><?= $integrityAnalytics['critical_count'] ?> (<?= $pCrit ?>%)</span>
+                                </div>
+                                <div class="w-full bg-slate-900 rounded-full h-2.5 overflow-hidden">
+                                    <div class="bg-rose-500 h-2.5 rounded-full" style="width: <?= $pCrit ?>%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 2: Tren Bulanan -->
+                    <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-5 space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-700/60 pb-3">
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">Tren Kemiripan Naskah (6 Bulan Terakhir)</h3>
+                            <span class="text-[11px] text-slate-400">Periode Evaluasi Terkini</span>
+                        </div>
+                        <?php if (empty($integrityAnalytics['monthly_trends'])): ?>
+                            <div class="py-8 text-center text-slate-500 text-xs">Belum cukup data tren historis.</div>
+                        <?php else: ?>
+                            <div class="space-y-3">
+                                <?php foreach ($integrityAnalytics['monthly_trends'] as $mt): ?>
+                                    <?php $sim = round((float) $mt['avg_sim'], 1); ?>
+                                    <div class="flex items-center justify-between text-xs">
+                                        <span class="text-slate-300 font-mono-code w-20"><?= esc($mt['period']) ?></span>
+                                        <div class="flex-1 mx-3 bg-slate-900 rounded-full h-2 overflow-hidden">
+                                            <div class="h-2 rounded-full <?= $sim < 15 ? 'bg-emerald-500' : ($sim < 25 ? 'bg-sky-500' : 'bg-amber-500') ?>" style="width: <?= min(100, $sim * 2.5) ?>%"></div>
+                                        </div>
+                                        <span class="text-slate-400 font-mono-code text-[11px] w-24 text-right">
+                                            <?= (int) $mt['total_submissions'] ?> naskah &bull; <strong class="text-white"><?= $sim ?>%</strong>
+                                        </span>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <!-- Sumber Korpus Teratas yang Menjadi Rujukan Kemiripan -->
+                <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl overflow-hidden shadow-sm">
+                    <div class="px-5 py-3 border-b border-slate-700/60 flex items-center justify-between bg-slate-900/60">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">Sumber Rujukan Teratas yang Sering Beririsan</h3>
+                        <span class="text-[11px] text-slate-400">Analisis Klaster Korpus Kampus</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-xs text-left">
+                            <thead class="bg-slate-900/80 text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-700/60">
+                                <tr>
+                                    <th class="py-2.5 px-4">Judul Dokumen Korpus</th>
+                                    <th class="py-2.5 px-3">Tipe Sumber</th>
+                                    <th class="py-2.5 px-3 text-center">Frekuensi Terdeteksi</th>
+                                    <th class="py-2.5 px-3 text-right">Rata-rata Kemiripan</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800/80">
+                                <?php if (empty($integrityAnalytics['top_sources'])): ?>
+                                    <tr><td colspan="4" class="py-4 text-center text-slate-500">Belum ada data irisan naskah yang terakumulasi.</td></tr>
+                                <?php else: ?>
+                                    <?php foreach ($integrityAnalytics['top_sources'] as $ts): ?>
+                                        <tr class="hover:bg-slate-800/40">
+                                            <td class="py-2.5 px-4 font-medium text-slate-200">
+                                                <?= esc($ts['title'] ?? ('Rujukan #' . $ts['source_document_id'])) ?>
+                                            </td>
+                                            <td class="py-2.5 px-3 text-slate-400">
+                                                <span class="px-2 py-0.5 rounded text-[10px] bg-slate-800 border border-slate-700/60">
+                                                    <?= esc($ts['source_type'] ?: 'corpus') ?>
+                                                </span>
+                                            </td>
+                                            <td class="py-2.5 px-3 text-center text-indigo-400 font-bold font-mono-code">
+                                                <?= (int) $ts['match_occurrences'] ?> kali
+                                            </td>
+                                            <td class="py-2.5 px-3 text-right text-slate-300 font-mono-code">
+                                                <?= number_format((float) ($ts['avg_similarity'] ?? 0), 1) ?>%
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        <!-- ========================================== -->
+        <!-- TAB: INTEGRASI API & PLUGIN OJS (OPSI B)   -->
+        <!-- ========================================== -->
+        <?php elseif ($activeTab === 'api_keys'): ?>
+            <div class="space-y-6">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                            Integrasi REST API Publik & Plugin OJS (Open Journal Systems)
+                            <span class="px-2 py-0.5 rounded text-[10px] bg-sky-500/20 text-sky-300 border border-sky-500/30">OJS 3.x Ready</span>
+                        </h2>
+                        <p class="text-xs text-slate-400">Hubungkan jurnal ilmiah kampus ke AR Tilik untuk verifikasi otomatis artikel dan penerbitan sertifikat digital</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <a href="<?= base_url('integrations/ojs/ARTilikOJSConnector.php') ?>" download class="px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold shadow transition-colors flex items-center gap-1.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            Unduh Konektor OJS (PHP)
+                        </a>
+                        <a href="<?= base_url('integrations/ojs/README.md') ?>" target="_blank" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-medium transition-colors flex items-center gap-1.5">
+                            Dokumentasi OJS
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Form Buat API Key Baru -->
+                <div class="bg-gradient-to-r from-slate-900/90 via-slate-800/80 to-slate-900/90 border border-sky-500/30 rounded-2xl p-5 shadow-lg space-y-4">
+                    <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                        <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                        Buat API Key Baru untuk Jurnal / Sistem Eksternal
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div>
+                            <label class="block text-[11px] font-medium text-slate-400 mb-1">Nama Jurnal / Aplikasi</label>
+                            <input type="text" id="api-key-name" placeholder="mis: Jurnal Informatika SINTA 2" class="w-full bg-slate-900 border border-slate-700/80 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-medium text-slate-400 mb-1">Tipe Sistem Target</label>
+                            <select id="api-system-type" class="w-full bg-slate-900 border border-slate-700/80 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-sky-500">
+                                <option value="ojs" selected>Open Journal Systems (OJS 3.x)</option>
+                                <option value="web">Sistem Akademik Kampus (Web / SIAKAD)</option>
+                                <option value="integration">Repositori Institusi (EPrints / DSpace)</option>
+                                <option value="cli">Automasi Skrip CLI / Python</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-medium text-slate-400 mb-1">Batas Kuota Dokumen / Bulan</label>
+                            <input type="number" id="api-quota-limit" value="1000" min="50" max="10000" class="w-full bg-slate-900 border border-slate-700/80 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-sky-500">
+                        </div>
+                    </div>
+                    <div class="flex justify-end">
+                        <button onclick="handleGenerateApiKey()" id="btn-generate-key" class="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold shadow transition-colors flex items-center gap-1.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
+                            Generate API Key
+                        </button>
+                    </div>
+
+                    <!-- Modal / Alert API Key Baru -->
+                    <div id="key-result-box" class="hidden bg-slate-950 border border-emerald-500/40 rounded-xl p-4 space-y-2">
+                        <div class="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            API Key Berhasil Dibuat! Simpan kunci ini sekarang:
+                        </div>
+                        <div class="flex items-center gap-2 bg-slate-900 p-2.5 rounded-lg border border-slate-800">
+                            <code id="new-key-value" class="text-xs font-mono-code text-sky-300 flex-1 break-all"></code>
+                            <button onclick="navigator.clipboard.writeText(document.getElementById('new-key-value').innerText); alert('API Key disalin ke clipboard!');" class="px-3 py-1 rounded bg-sky-600 hover:bg-sky-500 text-white text-[11px] font-semibold whitespace-nowrap">
+                                Salin
+                            </button>
+                        </div>
+                        <p class="text-[10px] text-slate-400">Kunci rahasia ini di-hash di basis data dan tidak akan ditampilkan secara utuh kembali demi keamanan.</p>
+                    </div>
+                </div>
+
+                <!-- Tabel API Key Aktif -->
+                <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl overflow-hidden shadow-sm">
+                    <div class="px-5 py-3 border-b border-slate-700/60 flex items-center justify-between bg-slate-900/60">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">Daftar Kunci Integrasi Terdaftar</h3>
+                        <span class="text-[11px] text-slate-400">Total <?= count($apiKeysList ?? []) ?> kunci aktif</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-xs text-left">
+                            <thead class="bg-slate-900/80 text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-700/60">
+                                <tr>
+                                    <th class="py-2.5 px-4">Nama Kunci</th>
+                                    <th class="py-2.5 px-3">Prefix Identifikasi</th>
+                                    <th class="py-2.5 px-3">Sistem</th>
+                                    <th class="py-2.5 px-3 text-center">Kuota Terpakai</th>
+                                    <th class="py-2.5 px-3">Penggunaan Terakhir</th>
+                                    <th class="py-2.5 px-3">Status</th>
+                                    <th class="py-2.5 px-4 text-right">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800/80">
+                                <?php if (empty($apiKeysList)): ?>
+                                    <tr><td colspan="7" class="py-6 text-center text-slate-500">Belum ada API Key yang dibuat.</td></tr>
+                                <?php else: ?>
+                                    <?php foreach ($apiKeysList as $ak): ?>
+                                        <tr class="hover:bg-slate-800/40 transition-colors">
+                                            <td class="py-2.5 px-4">
+                                                <div class="font-bold text-slate-200"><?= esc($ak['key_name']) ?></div>
+                                                <div class="text-[10px] text-slate-400"><?= esc($ak['user_name'] ?? $ak['user_email'] ?? 'Admin') ?></div>
+                                            </td>
+                                            <td class="py-2.5 px-3 font-mono-code text-sky-400 text-[11px]">
+                                                <?= esc($ak['key_prefix']) ?>
+                                            </td>
+                                            <td class="py-2.5 px-3">
+                                                <span class="px-2 py-0.5 rounded text-[10px] bg-slate-800 text-slate-300 border border-slate-700">
+                                                    <?= strtoupper(esc($ak['system_type'])) ?>
+                                                </span>
+                                            </td>
+                                            <td class="py-2.5 px-3 text-center font-mono-code text-slate-200">
+                                                <strong><?= (int) $ak['quota_used'] ?></strong> / <?= (int) $ak['quota_limit'] ?>
+                                            </td>
+                                            <td class="py-2.5 px-3 text-slate-400 text-[11px] font-mono-code">
+                                                <?= $ak['last_used_at'] ? date('d M H:i', strtotime($ak['last_used_at'])) : 'Belum pernah' ?>
+                                            </td>
+                                            <td class="py-2.5 px-3">
+                                                <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold <?= $ak['is_active'] ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20' ?>">
+                                                    <?= $ak['is_active'] ? 'Aktif' : 'Dicabut' ?>
+                                                </span>
+                                            </td>
+                                            <td class="py-2.5 px-4 text-right">
+                                                <?php if ($ak['is_active']): ?>
+                                                    <button onclick="handleRevokeApiKey(<?= (int) $ak['id'] ?>)" class="px-2 py-1 rounded bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 text-[10px] transition-colors">
+                                                        Cabut Kunci
+                                                    </button>
+                                                <?php else: ?>
+                                                    <span class="text-slate-500 text-[10px] italic">Nonaktif</span>
+                                                <?php endif; ?>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Card Spesifikasi REST API & Quick Start -->
+                <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-5 space-y-3">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 border-b border-slate-700/60 pb-2">Contoh Request cURL Integrasi OJS</h3>
+                    <pre class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-[11px] font-mono-code text-sky-300 overflow-x-auto">curl -X POST https://tilik.arsetontong.top/api/v1/check \
+  -H "X-API-Key: artilik_ojs_YOUR_KEY" \
+  -F "document=@/path/to/manuscript.pdf" \
+  -F "title=Judul Naskah Ilmiah" \
+  -F "author=Nama Penulis" \
+  -F "ojs_submission_id=1240"</pre>
+                </div>
+            </div>
+
+        <!-- ========================================== -->
         <!-- TAB 7: SISTEM SERVER                       -->
         <!-- ========================================== -->
         <?php elseif ($activeTab === 'system'): ?>
@@ -1026,6 +1540,133 @@
                 const res = await postJson('<?= base_url('admin/security/clear-all') ?>', {});
                 alert(res.message);
                 window.location.reload();
+            } catch (err) {
+                alert('Terjadi kesalahan koneksi.');
+            }
+        }
+
+        // Auto-Harvester Handlers (Opsi C)
+        function showHarvestConsole(text) {
+            const consoleBox = document.getElementById('harvest-console');
+            const output = document.getElementById('harvest-output');
+            if (consoleBox && output) {
+                consoleBox.classList.remove('hidden');
+                output.innerText = text;
+            }
+        }
+
+        async function handleHarvestNeliti() {
+            const query = document.getElementById('neliti-query').value.trim();
+            const limit = document.getElementById('neliti-limit').value;
+            const btn = document.getElementById('btn-harvest-neliti');
+            if (btn) btn.disabled = true;
+
+            showHarvestConsole('[*] Menghubungi repositori Neliti (OAI-PMH 2.0)...\n[*] Memanen metadata artikel ilmiah open-access...');
+
+            try {
+                const res = await postJson('<?= base_url('admin/corpus/harvest-neliti') ?>', { query: query, limit: limit });
+                showHarvestConsole(res.output || res.message);
+                alert(res.message);
+                window.location.reload();
+            } catch (err) {
+                showHarvestConsole('[!] Terjadi kesalahan koneksi atau timeout pemanenan.');
+                alert('Gagal mengeksekusi pemanenan Neliti.');
+            } finally {
+                if (btn) btn.disabled = false;
+            }
+        }
+
+        async function handleHarvestGaruda() {
+            const query = document.getElementById('garuda-query').value.trim();
+            const limit = document.getElementById('garuda-limit').value;
+            const btn = document.getElementById('btn-harvest-garuda');
+            if (btn) btn.disabled = true;
+
+            showHarvestConsole('[*] Menghubungi portal GARUDA Dikti Kemdiktisaintek...\n[*] Memindai jurnal SINTA terakreditasi dan mengunduh berkas PDF...');
+
+            try {
+                const res = await postJson('<?= base_url('admin/corpus/harvest-garuda') ?>', { query: query, limit: limit });
+                showHarvestConsole(res.output || res.message);
+                alert(res.message);
+                window.location.reload();
+            } catch (err) {
+                showHarvestConsole('[!] Terjadi kesalahan koneksi atau timeout pemanenan.');
+                alert('Gagal mengeksekusi pemanenan GARUDA.');
+            } finally {
+                if (btn) btn.disabled = false;
+            }
+        }
+
+        async function handleHarvestScheduled() {
+            if (!confirm('Jalankan seluruh antrean pemanenan terjadwal dari basis data sekarang?')) return;
+            const btn = document.getElementById('btn-harvest-sched');
+            if (btn) btn.disabled = true;
+
+            showHarvestConsole('[*] Menjalankan pemanenan terjadwal (Neliti & GARUDA Dikti)...');
+
+            try {
+                const res = await postJson('<?= base_url('admin/corpus/harvest-scheduled') ?>', {});
+                showHarvestConsole(res.output || res.message);
+                alert(res.message);
+                window.location.reload();
+            } catch (err) {
+                showHarvestConsole('[!] Terjadi kendala saat menjalankan pemanenan terjadwal.');
+                alert('Gagal menjalankan jadwal pemanenan.');
+            } finally {
+                if (btn) btn.disabled = false;
+            }
+        }
+
+        // API Key Handlers (Opsi B)
+        async function handleGenerateApiKey() {
+            const keyName = document.getElementById('api-key-name').value.trim();
+            const systemType = document.getElementById('api-system-type').value;
+            const quotaLimit = document.getElementById('api-quota-limit').value;
+            const btn = document.getElementById('btn-generate-key');
+
+            if (!keyName) {
+                alert('Silakan isi nama jurnal atau aplikasi target.');
+                return;
+            }
+
+            if (btn) btn.disabled = true;
+
+            try {
+                const res = await postJson('<?= base_url('api-keys/generate') ?>', {
+                    key_name: keyName,
+                    system_type: systemType,
+                    quota_limit: quotaLimit
+                });
+
+                if (res.status === 'success') {
+                    const resultBox = document.getElementById('key-result-box');
+                    const keyVal = document.getElementById('new-key-value');
+                    if (resultBox && keyVal) {
+                        keyVal.innerText = res.data.raw_key;
+                        resultBox.classList.remove('hidden');
+                    }
+                    alert('API Key baru berhasil dibuat! Salin kunci sebelum menutup halaman.');
+                } else {
+                    alert('Gagal: ' + res.message);
+                }
+            } catch (err) {
+                alert('Terjadi kesalahan koneksi.');
+            } finally {
+                if (btn) btn.disabled = false;
+            }
+        }
+
+        async function handleRevokeApiKey(keyId) {
+            if (!confirm('Apakah Anda yakin ingin mencabut (menonaktifkan) API Key ini? Sistem eksternal tidak akan dapat mengakses API kembali.')) return;
+
+            try {
+                const res = await postJson('<?= base_url('api-keys/revoke') ?>/' + keyId, {});
+                if (res.status === 'success') {
+                    alert(res.message);
+                    window.location.reload();
+                } else {
+                    alert('Gagal: ' + res.message);
+                }
             } catch (err) {
                 alert('Terjadi kesalahan koneksi.');
             }

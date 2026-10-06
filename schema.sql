@@ -278,4 +278,60 @@ CREATE TABLE IF NOT EXISTS payment_transactions (
     CONSTRAINT fk_trans_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS harvest_logs (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    source VARCHAR(50) NOT NULL COMMENT 'neliti, garuda, openalex, oai_repository',
+    source_name VARCHAR(150) NOT NULL,
+    query_or_set VARCHAR(255) NULL,
+    items_found INT UNSIGNED NOT NULL DEFAULT 0,
+    items_indexed INT UNSIGNED NOT NULL DEFAULT 0,
+    items_skipped INT UNSIGNED NOT NULL DEFAULT 0,
+    items_failed INT UNSIGNED NOT NULL DEFAULT 0,
+    status ENUM('running', 'completed', 'failed', 'partial') NOT NULL DEFAULT 'running',
+    summary TEXT NULL,
+    error_message TEXT NULL,
+    duration_seconds DECIMAL(8,2) NULL,
+    started_at DATETIME NOT NULL,
+    finished_at DATETIME NULL,
+    created_at DATETIME NOT NULL,
+    INDEX idx_harvest_source (source),
+    INDEX idx_harvest_status (status),
+    INDEX idx_harvest_created (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS harvest_schedules (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    source ENUM('neliti', 'garuda', 'all') NOT NULL DEFAULT 'all',
+    name VARCHAR(150) NOT NULL,
+    keywords VARCHAR(255) NOT NULL DEFAULT 'informatika, pendidikan, ekonomi, hukum, sains',
+    frequency ENUM('hourly', 'daily', 'weekly', 'monthly') NOT NULL DEFAULT 'daily',
+    limit_per_run INT UNSIGNED NOT NULL DEFAULT 15,
+    is_active TINYINT(1) NOT NULL DEFAULT 1,
+    last_run_at DATETIME NULL,
+    next_run_at DATETIME NULL,
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS api_keys (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT UNSIGNED NOT NULL,
+    key_name VARCHAR(150) NOT NULL,
+    key_prefix VARCHAR(32) NOT NULL,
+    api_key VARCHAR(128) NOT NULL UNIQUE,
+    system_type ENUM('ojs', 'web', 'cli', 'integration') NOT NULL DEFAULT 'ojs',
+    rate_limit_per_minute INT UNSIGNED NOT NULL DEFAULT 60,
+    quota_limit INT UNSIGNED NOT NULL DEFAULT 1000,
+    quota_used INT UNSIGNED NOT NULL DEFAULT 0,
+    is_active TINYINT(1) NOT NULL DEFAULT 1,
+    last_used_at DATETIME NULL,
+    expires_at DATETIME NULL,
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
+    INDEX idx_api_user (user_id),
+    INDEX idx_api_prefix (key_prefix),
+    INDEX idx_api_key (api_key),
+    CONSTRAINT fk_api_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 SET FOREIGN_KEY_CHECKS = 1;

@@ -33,7 +33,7 @@ def notify_user_report_completed(
         conn = get_connection()
         cursor = conn.cursor(dictionary=True)
         cursor.execute("""
-            SELECT u.id AS user_id, u.email, u.full_name
+            SELECT u.id AS user_id, u.email, u.name AS full_name
             FROM documents d
             JOIN users u ON d.user_id = u.id
             WHERE d.id = %s

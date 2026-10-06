@@ -761,7 +761,7 @@ def scan_cross_lingual_corpus(
     # 2. Jika naskah adalah bahasa Indonesia, telusuri korpus dokumen bahasa Inggris di database
     if sub_lang == "ID" and connection:
         try:
-            with connection.cursor() as cursor:
+            with connection.cursor(dictionary=True) as cursor:
                 # Query dokumen korpus yang berpotensi berbahasa Inggris
                 cursor.execute("""
                     SELECT id, title, storage_path, mime_type

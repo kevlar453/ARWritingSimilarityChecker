@@ -51,10 +51,25 @@ $routes->group('api', function ($routes) {
     $routes->post('integration/check', 'Api\DocumentController::checkSubmission');
     $routes->post('corpus/contribute', 'Api\DocumentController::contributeCorpus');
 
+    // Public REST API v1 & OJS Integration Endpoints
+    $routes->group('v1', function ($routes) {
+        $routes->post('check', 'Api\PublicApiController::checkSubmission');
+        $routes->get('status/(:num)', 'Api\PublicApiController::getStatus/$1');
+        $routes->get('report/(:num)', 'Api\PublicApiController::getReport/$1');
+        $routes->get('quota', 'Api\PublicApiController::getQuota');
+    });
+
     // Reports
     $routes->get('reports/(:num)', 'Api\ReportController::show/$1');
     $routes->get('reports/(:num)/sources', 'Api\ReportController::sources/$1');
     $routes->get('reports/(:num)/matches', 'Api\ReportController::matches/$1');
+});
+
+// API Key Management Routes (Protected by Auth/Session)
+$routes->group('api-keys', function ($routes) {
+    $routes->get('list', 'Api\ApiKeyController::listKeys');
+    $routes->post('generate', 'Api\ApiKeyController::generate');
+    $routes->post('revoke/(:num)', 'Api\ApiKeyController::revoke/$1');
 });
 
 // Admin Portal & Management Routes (Protected by AdminFilter)
@@ -66,12 +81,18 @@ $routes->group('admin', ['filter' => 'admin'], function ($routes) {
     $routes->post('corpus/visibility', 'Admin\DashboardController::updateCorpusVisibility');
     $routes->post('security/unblock', 'Admin\DashboardController::unblockSecurity');
     $routes->post('security/clear-all', 'Admin\DashboardController::clearAllLocks');
+    $routes->get('analytics/export-csv', 'Admin\DashboardController::exportIntegrityCsv');
 
     // Corpus management API routes
     $routes->get('corpus/list', 'Admin\CorpusController::index');
     $routes->post('corpus', 'Admin\CorpusController::create');
     $routes->post('corpus/sync-dropzone', 'Admin\CorpusController::syncDropzone');
     $routes->post('corpus/auto-discover', 'Admin\CorpusController::autoDiscover');
+    $routes->post('corpus/harvest-neliti', 'Admin\CorpusController::harvestNeliti');
+    $routes->post('corpus/harvest-garuda', 'Admin\CorpusController::harvestGaruda');
+    $routes->post('corpus/harvest-scheduled', 'Admin\CorpusController::harvestScheduled');
+    $routes->get('corpus/harvest-logs', 'Admin\CorpusController::harvestLogs');
+    $routes->post('corpus/harvest-schedule-update', 'Admin\CorpusController::updateHarvestSchedule');
     $routes->post('corpus/enroll/(:num)', 'Api\DocumentController::enroll/$1');
     $routes->get('corpus/(:num)', 'Admin\CorpusController::show/$1');
     $routes->delete('corpus/(:num)', 'Admin\CorpusController::delete/$1');

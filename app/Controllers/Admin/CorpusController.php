@@ -230,6 +230,114 @@ class CorpusController extends BaseController
         ]);
     }
 
+    public function harvestNeliti()
+    {
+        $pythonBin = ROOTPATH . '.venv/bin/python';
+        if (! file_exists($pythonBin)) {
+            $pythonBin = 'python3';
+        }
+        $query = trim($this->request->getPost('query') ?: '');
+        $limit = max(1, min((int) ($this->request->getPost('limit') ?: 10), 50));
+
+        $rootPath = escapeshellarg(rtrim(ROOTPATH, '/'));
+        $escapedQuery = escapeshellarg($query);
+        $cmd = "cd {$rootPath} && PYTHONPATH={$rootPath} " . escapeshellcmd("{$pythonBin} -m worker.national_harvester --source neliti --query {$escapedQuery} --limit {$limit}") . ' 2>&1';
+        $output = shell_exec($cmd);
+
+        return $this->response->setJSON([
+            'status'  => 'success',
+            'message' => 'Proses pemanenan naskah dari portal Neliti selesai dijalankan.',
+            'output'  => $output
+        ]);
+    }
+
+    public function harvestGaruda()
+    {
+        $pythonBin = ROOTPATH . '.venv/bin/python';
+        if (! file_exists($pythonBin)) {
+            $pythonBin = 'python3';
+        }
+        $query = trim($this->request->getPost('query') ?: 'informatika');
+        $limit = max(1, min((int) ($this->request->getPost('limit') ?: 10), 50));
+
+        $rootPath = escapeshellarg(rtrim(ROOTPATH, '/'));
+        $escapedQuery = escapeshellarg($query);
+        $cmd = "cd {$rootPath} && PYTHONPATH={$rootPath} " . escapeshellcmd("{$pythonBin} -m worker.national_harvester --source garuda --query {$escapedQuery} --limit {$limit}") . ' 2>&1';
+        $output = shell_exec($cmd);
+
+        return $this->response->setJSON([
+            'status'  => 'success',
+            'message' => 'Proses pemanenan jurnal dari GARUDA Dikti selesai dijalankan.',
+            'output'  => $output
+        ]);
+    }
+
+    public function harvestScheduled()
+    {
+        $pythonBin = ROOTPATH . '.venv/bin/python';
+        if (! file_exists($pythonBin)) {
+            $pythonBin = 'python3';
+        }
+
+        $rootPath = escapeshellarg(rtrim(ROOTPATH, '/'));
+        $cmd = "cd {$rootPath} && PYTHONPATH={$rootPath} " . escapeshellcmd("{$pythonBin} -m worker.national_harvester --scheduled") . ' 2>&1';
+        $output = shell_exec($cmd);
+
+        return $this->response->setJSON([
+            'status'  => 'success',
+            'message' => 'Pemanenan otomatis terjadwal (Neliti & GARUDA) berhasil dieksekusi.',
+            'output'  => $output
+        ]);
+    }
+
+    public function harvestLogs()
+    {
+        $db = db_connect();
+        $logs = $db->table('harvest_logs')
+                   ->orderBy('id', 'DESC')
+                   ->limit(30)
+                   ->get()
+                   ->getResultArray();
+
+        $schedules = $db->table('harvest_schedules')
+                        ->orderBy('id', 'ASC')
+                        ->get()
+                        ->getResultArray();
+
+        return $this->response->setJSON([
+            'status'    => 'success',
+            'logs'      => $logs,
+            'schedules' => $schedules
+        ]);
+    }
+
+    public function updateHarvestSchedule()
+    {
+        $id = (int) $this->request->getPost('id');
+        $isActive = (int) ($this->request->getPost('is_active') ?? 1);
+        $keywords = trim($this->request->getPost('keywords') ?: '');
+        $limit = max(1, min((int) ($this->request->getPost('limit_per_run') ?: 15), 100));
+        $frequency = $this->request->getPost('frequency') ?: 'daily';
+
+        $db = db_connect();
+        $data = [
+            'is_active'     => $isActive,
+            'limit_per_run' => $limit,
+            'frequency'     => $frequency,
+            'updated_at'    => date('Y-m-d H:i:s'),
+        ];
+        if (! empty($keywords)) {
+            $data['keywords'] = $keywords;
+        }
+
+        $db->table('harvest_schedules')->where('id', $id)->update($data);
+
+        return $this->response->setJSON([
+            'status'  => 'success',
+            'message' => 'Pengaturan jadwal pemanenan korpus berhasil diperbarui.'
+        ]);
+    }
+
     private function queueIndexJob($documentId)
     {
         $db = db_connect();

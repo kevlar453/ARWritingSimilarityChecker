@@ -138,6 +138,87 @@ class DashboardController extends BaseController
             'server_time'         => date('d M Y, H:i:s T'),
         ];
 
+        // 12. Data Pemanen Korpus Nasional (Neliti & GARUDA)
+        $harvestLogs = $db->table('harvest_logs')
+                          ->orderBy('id', 'DESC')
+                          ->limit(20)
+                          ->get()
+                          ->getResultArray();
+        $harvestSchedules = $db->table('harvest_schedules')
+                               ->orderBy('id', 'ASC')
+                               ->get()
+                               ->getResultArray();
+
+        // 13. Data Kunci Integrasi API & OJS
+        $apiKeysList = $db->table('api_keys ak')
+                          ->select('ak.*, u.name as user_name, u.email as user_email')
+                          ->join('users u', 'u.id = ak.user_id', 'left')
+                          ->orderBy('ak.id', 'DESC')
+                          ->limit(50)
+                          ->get()
+                          ->getResultArray();
+
+        // 14. Data Analitik Integritas Institusi (Opsi D)
+        $avgSimRow = $db->table('reports')
+                        ->select('AVG(overall_similarity) as avg_similarity, COUNT(id) as total_reports')
+                        ->where('status', 'completed')
+                        ->get()
+                        ->getRowArray();
+        $avgSimilarity = (float) ($avgSimRow['avg_similarity'] ?? 0);
+        $totalReportsCompleted = (int) ($avgSimRow['total_reports'] ?? 0);
+
+        // Distribusi Kategori Integritas
+        $cleanCount = $db->table('reports')->where('status', 'completed')->where('overall_similarity <', 15)->countAllResults();
+        $moderateCount = $db->table('reports')->where('status', 'completed')->where('overall_similarity >=', 15)->where('overall_similarity <', 25)->countAllResults();
+        $substantialCount = $db->table('reports')->where('status', 'completed')->where('overall_similarity >=', 25)->where('overall_similarity <', 40)->countAllResults();
+        $criticalCount = $db->table('reports')->where('status', 'completed')->where('overall_similarity >=', 40)->countAllResults();
+
+        // Tren Bulanan (6 Bulan Terakhir)
+        $monthlyTrends = $db->table('reports')
+                            ->select("DATE_FORMAT(created_at, '%Y-%m') as period, COUNT(id) as total_submissions, AVG(overall_similarity) as avg_sim")
+                            ->where('created_at >=', date('Y-m-d', strtotime('-6 months')))
+                            ->groupBy('period')
+                            ->orderBy('period', 'ASC')
+                            ->get()
+                            ->getResultArray();
+
+        // Sumber Teratas yang Sering Menjadi Rujukan Kemiripan
+        $topReferencedSources = $db->table('report_sources rs')
+                                   ->select('rs.source_document_id, d.title, d.source_type, COUNT(rs.id) as match_occurrences, AVG(rs.similarity) as avg_similarity')
+                                   ->join('documents d', 'd.id = rs.source_document_id', 'left')
+                                   ->groupBy('rs.source_document_id, d.title, d.source_type')
+                                   ->orderBy('match_occurrences', 'DESC')
+                                   ->limit(8)
+                                   ->get()
+                                   ->getResultArray();
+
+        // Metrik Anti-Cheat & Keadilan Akademik
+        $reportsSample = $db->table('reports')
+                            ->select('id, evidence_data')
+                            ->where('status', 'completed')
+                            ->orderBy('id', 'DESC')
+                            ->limit(100)
+                            ->get()
+                            ->getResultArray();
+
+        $evasionCount = 0;
+        $phantomCount = 0;
+        $crossLingualCount = 0;
+        foreach ($reportsSample as $rep) {
+            if (! empty($rep['evidence_data'])) {
+                $evData = json_decode($rep['evidence_data'], true);
+                if (! empty($evData['evasion']['is_manipulated'])) {
+                    $evasionCount++;
+                }
+                if (! empty($evData['citation_audit']['phantom_citations_count']) && $evData['citation_audit']['phantom_citations_count'] > 0) {
+                    $phantomCount++;
+                }
+                if (! empty($evData['cross_lingual']['is_cross_lingual_match'])) {
+                    $crossLingualCount++;
+                }
+            }
+        }
+
         return view('admin/index', [
             'activeTab'            => $activeTab,
             'searchQuery'          => $searchQuery,
@@ -166,6 +247,22 @@ class DashboardController extends BaseController
             'dailyVisitors'        => $dailyVisitors,
             'paymentsList'         => $paymentsList,
             'systemInfo'           => $systemInfo,
+            'harvestLogs'          => $harvestLogs,
+            'harvestSchedules'     => $harvestSchedules,
+            'apiKeysList'          => $apiKeysList,
+            'integrityAnalytics'   => [
+                'avg_similarity'          => $avgSimilarity,
+                'total_audited'           => $totalReportsCompleted,
+                'clean_count'             => $cleanCount,
+                'moderate_count'          => $moderateCount,
+                'substantial_count'       => $substantialCount,
+                'critical_count'          => $criticalCount,
+                'monthly_trends'          => $monthlyTrends,
+                'top_sources'             => $topReferencedSources,
+                'evasion_count'           => $evasionCount,
+                'phantom_count'           => $phantomCount,
+                'cross_lingual_count'     => $crossLingualCount,
+            ],
             'currentAdmin'         => $userModel->find(session()->get('user_id')),
         ]);
     }
@@ -430,5 +527,67 @@ class DashboardController extends BaseController
             'status'  => 'success',
             'message' => "Visibilitas korpus '{$doc['title']}' berhasil diubah menjadi {$visibility}.",
         ]);
+    }
+
+    /**
+     * Ekspor Rekapitulasi Integritas Naskah ke Format CSV (BAN-PT / LAM Ready)
+     */
+    public function exportIntegrityCsv()
+    {
+        $db = db_connect();
+        $reports = $db->table('reports r')
+                      ->select('r.id, r.document_id, d.title, u.name as author_name, u.institution, r.overall_similarity, r.exact_similarity, r.cosine_similarity, r.predicted_decision, r.verification_code, r.created_at, r.completed_at')
+                      ->join('documents d', 'd.id = r.document_id', 'left')
+                      ->join('users u', 'u.id = d.user_id', 'left')
+                      ->where('r.status', 'completed')
+                      ->orderBy('r.id', 'DESC')
+                      ->limit(1000)
+                      ->get()
+                      ->getResultArray();
+
+        $filename = 'Rekapitulasi_Integritas_AR_Tilik_' . date('Ymd_His') . '.csv';
+
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+
+        $output = fopen('php://output', 'w');
+        // UTF-8 BOM agar Excel membacanya rapi
+        fputs($output, "\xEF\xBB\xBF");
+
+        // Header kolom CSV
+        fputcsv($output, [
+            'No',
+            'ID Laporan',
+            'ID Dokumen',
+            'Judul Naskah',
+            'Penulis / Mahasiswa',
+            'Institusi / Fakultas',
+            'Skor Kemiripan (%)',
+            'Lensa 1 Exact (%)',
+            'Lensa 2 Kosinus (%)',
+            'Status Keputusan',
+            'Nomor Sertifikat Digital',
+            'Tanggal Audit',
+        ]);
+
+        foreach ($reports as $idx => $r) {
+            fputcsv($output, [
+                $idx + 1,
+                $r['id'],
+                $r['document_id'],
+                $r['title'] ?? 'Naskah Tidak Berjudul',
+                $r['author_name'] ?? 'Penulis Tamu / Eksternal',
+                $r['institution'] ?? 'Universitas Sanata Dharma',
+                number_format((float) ($r['overall_similarity'] ?? 0), 2),
+                number_format((float) ($r['exact_similarity'] ?? 0), 2),
+                number_format((float) ($r['cosine_similarity'] ?? 0), 2),
+                strtoupper($r['predicted_decision'] ?? 'NO_MATCH'),
+                $r['verification_code'] ?? '-',
+                $r['created_at'],
+            ]);
+        }
+
+        fclose($output);
+        exit;
     }
 }
