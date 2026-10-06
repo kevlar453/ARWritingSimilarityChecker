@@ -455,12 +455,23 @@
                 $cosineSimVal = (float) ($report['cosine_similarity'] ?? 0);
                 $hasDivergence = ($exactSimVal <= 0.05 && $cosineSimVal > 0.0);
 
-                $directOverlapSources = array_filter($sources ?? [], function($s) {
-                    $ex = (float) ($s['exact_similarity'] ?? $s['similarity'] ?? 0);
-                    $mw = (int) ($s['matched_words'] ?? 0);
-                    return $ex > 0.0 || $mw > 0;
+                // Kumpulkan ID sumber yang benar-benar memiliki pasase sekuensial di daftar matches
+                $sourceIdsWithMatches = [];
+                foreach ($matches as $m) {
+                    if (!empty($m['source_document_id'])) {
+                        $sourceIdsWithMatches[(int)$m['source_document_id']] = true;
+                    }
+                }
+
+                // Group 1: Hanya sumber yang terbukti memiliki irisan pasase sekuensial riil
+                $directOverlapSources = array_filter($sources ?? [], function($s) use ($sourceIdsWithMatches) {
+                    $sId = (int) ($s['source_document_id'] ?? 0);
+                    $ex = (float) ($s['exact_similarity'] ?? 0);
+                    $mShingles = (int) ($s['matched_shingles'] ?? 0);
+                    return ($ex > 0.05 && $mShingles > 0) || isset($sourceIdsWithMatches[$sId]);
                 });
 
+                // Group 2: Sumber yang memiliki kemiripan kosinus leksikal / topikal TF-IDF
                 $lexicalSources = array_filter($sources ?? [], function($s) {
                     $cos = (float) ($s['cosine_similarity'] ?? 0);
                     return $cos > 0.0;
@@ -592,9 +603,14 @@
                                         </div>
                                     </div>
 
-                                    <div>
-                                        <button onclick="openPassageModal(<?= $src['source_document_id'] ?>, '<?= esc($src['source_title']) ?>')" class="w-full sm:w-auto px-4 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 font-bold text-xs rounded-lg border border-teal-200 transition shadow-2xs flex items-center justify-center gap-1.5">
-                                            <span>🔍</span> [View passage]
+                                    <div class="flex items-center gap-1.5 self-start sm:self-auto">
+                                        <?php if (!empty($sourceIdsWithMatches[(int)$src['source_document_id']])): ?>
+                                            <button onclick="openPassageModal(<?= $src['source_document_id'] ?>, '<?= esc($src['source_title']) ?>')" class="w-full sm:w-auto px-3.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-lg border border-indigo-200 transition shadow-2xs flex items-center justify-center gap-1 cursor-pointer">
+                                                <span>🔍</span> [View passage]
+                                            </button>
+                                        <?php endif; ?>
+                                        <button onclick="openDualReaderModal(<?= $src['source_document_id'] ?>)" class="w-full sm:w-auto px-3.5 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-800 font-bold text-xs rounded-lg border border-teal-200 transition shadow-2xs flex items-center justify-center gap-1.5 cursor-pointer" title="Buka kedua dokumen berdampingan di Layar Ganda">
+                                            <span>📖</span> Layar Ganda
                                         </button>
                                     </div>
                                 </div>
@@ -1397,7 +1413,24 @@
             const sourceMatches = allMatches.filter(m => parseInt(m.source_document_id) === parseInt(sourceId));
 
             if (sourceMatches.length === 0) {
-                content.innerHTML = '<p class="text-xs text-slate-400 text-center py-6">Tidak ada pasase teks sekuensial untuk dokumen ini (hanya kemiripan leksikal kosinus global).</p>';
+                content.innerHTML = `
+                    <div class="text-center py-6 px-4 space-y-3">
+                        <div class="w-12 h-12 rounded-full bg-teal-50 border border-teal-200 text-teal-600 flex items-center justify-center mx-auto text-xl shadow-2xs">
+                            📚
+                        </div>
+                        <div class="space-y-1">
+                            <h4 class="font-bold text-sm text-slate-900">Kemiripan Topikal / Kosakata Bidang Ilmu (Lexical Match)</h4>
+                            <p class="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
+                                Dokumen ini adalah pembanding topikal (TF-IDF Cosine), <strong>bukan salinan sekuensial kata-demi-kata (Verbatim: 0%)</strong>. Kesamaan berasal dari irisan terminologi ilmiah dan konsep bahasan yang sebidang.
+                            </p>
+                        </div>
+                        <div class="pt-3">
+                            <button type="button" onclick="closePassageModal(); openDualReaderModal(${sourceId});" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-xs transition inline-flex items-center gap-1.5 cursor-pointer">
+                                <span>📖</span> Buka Penelaahan di Layar Ganda (Dual Reader)
+                            </button>
+                        </div>
+                    </div>
+                `;
             } else {
                 sourceMatches.forEach((m, idx) => {
                     let bpBanner = '';
