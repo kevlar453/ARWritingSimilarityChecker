@@ -2,6 +2,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -762,19 +763,40 @@ def export_report_pdf(report_id: int, output_path: str | None = None) -> bytes:
         # 5. Extract snippets using precise start_word_position
         def fetch_snippet(document_id: int, start_word: int, word_count: int) -> str:
             cursor.execute("""
-                SELECT text, start_word_position, end_word_position
+                SELECT text, normalized_text, start_word_position, end_word_position
                 FROM document_chunks
                 WHERE document_id = %s AND start_word_position <= %s
                 ORDER BY start_word_position DESC LIMIT 1
             """, (document_id, start_word))
             chunk = cursor.fetchone()
-            if not chunk or not chunk["text"]:
+            if not chunk or not chunk.get("text"):
                 return "Teks tidak tersedia."
-            words = chunk["text"].split()
-            offset = max(0, start_word - chunk["start_word_position"])
+
+            raw_text = chunk["text"]
+            offset = max(0, start_word - int(chunk.get("start_word_position") or 0))
             count = max(1, word_count)
-            snippet = " ".join(words[offset:offset + count])
-            return snippet if snippet else "Teks tidak tersedia."
+
+            # 1. Ekstraksi token presisi dari teks asli dengan regex untuk mempertahankan tanda baca & kapitalisasi
+            raw_tokens = list(re.finditer(r'\b[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*\b', raw_text))
+            if raw_tokens and offset < len(raw_tokens):
+                end_idx = min(len(raw_tokens) - 1, offset + count - 1)
+                start_byte = raw_tokens[offset].start()
+                end_byte = raw_tokens[end_idx].end()
+                snippet = " ".join(raw_text[start_byte:end_byte].split())
+                if snippet:
+                    return snippet
+
+            # 2. Fallback deterministik ke normalized_text
+            norm_text = chunk.get("normalized_text")
+            if norm_text:
+                words = norm_text.split()
+                slice_words = words[offset:offset + count]
+                if slice_words:
+                    return " ".join(slice_words)
+
+            # 3. Fallback pemecahan spasi sederhana
+            words = raw_text.split()
+            return " ".join(words[offset:offset + count]) if words else "Teks tidak tersedia."
 
         for m in matches:
             m["submission_snippet"] = fetch_snippet(doc_id, int(m["submission_start"]), int(m["word_count"]))

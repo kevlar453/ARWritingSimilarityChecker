@@ -90,6 +90,32 @@ def test_administrative_formula_detection():
     assert res2.is_boilerplate is True
     assert res2.category == BoilerplateCategory.ADMINISTRATIVE_FORMULA
 
+    # Periode akademik semester/tahun ajaran
+    t3 = "Laporan Kinerja Program Studi Semester Genap Tahun Akademik 2025/2026."
+    res3 = detect_academic_boilerplate(t3)
+    assert res3.is_boilerplate is True
+    assert res3.category == BoilerplateCategory.ADMINISTRATIVE_FORMULA
+
+    # Penugasan/pengangkatan dosen penguji
+    t4 = "Surat Keputusan tentang Pengangkatan Dosen Penguji II Skripsi Semester Genap."
+    res4 = detect_academic_boilerplate(t4)
+    assert res4.is_boilerplate is True
+    assert res4.category == BoilerplateCategory.ADMINISTRATIVE_FORMULA
+
+
+def test_legal_citation_detection():
+    # 1. Undang-Undang
+    t1 = "Undang-Undang Nomor 20 Tahun 2003 tentang Sistem Pendidikan Nasional."
+    res1 = detect_academic_boilerplate(t1)
+    assert res1.is_boilerplate is True
+    assert res1.category == BoilerplateCategory.LEGAL_CITATION
+
+    # 2. Peraturan Pemerintah
+    t2 = "Peraturan Pemerintah Nomor 60 tahun 1999 tentang Pendidikan Tinggi."
+    res2 = detect_academic_boilerplate(t2)
+    assert res2.is_boilerplate is True
+    assert res2.category == BoilerplateCategory.LEGAL_CITATION
+
 
 def test_author_original_substantive_text():
     # Teks orisinal gagasan teologi/filsafat yang bukan template
@@ -98,3 +124,4 @@ def test_author_original_substantive_text():
     assert res.is_boilerplate is False
     assert res.category == BoilerplateCategory.NONE
     assert res.matched_phrase is None
+

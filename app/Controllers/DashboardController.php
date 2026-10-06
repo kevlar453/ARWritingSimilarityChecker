@@ -97,14 +97,7 @@ class DashboardController extends BaseController
                          ->orderBy('start_word_position', 'DESC')
                          ->limit(1)
                          ->get()->getRowArray();
-            if ($sChunk) {
-                $sw = preg_split('/\s+/', trim($sChunk['text']));
-                $sOffset = max(0, (int) $m['submission_start'] - (int) $sChunk['start_word_position']);
-                $sCount = max(1, (int) $m['word_count']);
-                $m['submission_snippet'] = implode(' ', array_slice($sw, $sOffset, $sCount));
-            } else {
-                $m['submission_snippet'] = 'Teks submisi tidak tersedia.';
-            }
+            $m['submission_snippet'] = $this->extractSnippet($sChunk, (int) $m['submission_start'], (int) $m['word_count']);
 
             // Potongan dokumen sumber berdasarkan posisi kata
             $srcChunk = $db->table('document_chunks')
@@ -113,14 +106,7 @@ class DashboardController extends BaseController
                           ->orderBy('start_word_position', 'DESC')
                           ->limit(1)
                           ->get()->getRowArray();
-            if ($srcChunk) {
-                $srcw = preg_split('/\s+/', trim($srcChunk['text']));
-                $srcOffset = max(0, (int) $m['source_start'] - (int) $srcChunk['start_word_position']);
-                $srcCount = max(1, (int) $m['word_count']);
-                $m['source_snippet'] = implode(' ', array_slice($srcw, $srcOffset, $srcCount));
-            } else {
-                $m['source_snippet'] = 'Teks sumber tidak tersedia.';
-            }
+            $m['source_snippet'] = $this->extractSnippet($srcChunk, (int) $m['source_start'], (int) $m['word_count']);
 
             // Anotasi Academic Boilerplate dari evidenceData jika tersedia
             $m['is_boilerplate'] = false;
@@ -148,6 +134,12 @@ class DashboardController extends BaseController
             }
             unset($m);
         }
+
+        // Anotasi pelengkap: evaluasi boilerplate formula administratif / legal untuk laporan historis
+        foreach ($matches as &$m) {
+            $this->annotateBoilerplateSnippet($m);
+        }
+        unset($m);
 
         $highAttentionCount = 0;
         $commonPassagesCount = 0;
@@ -417,14 +409,7 @@ class DashboardController extends BaseController
                          ->orderBy('start_word_position', 'DESC')
                          ->limit(1)
                          ->get()->getRowArray();
-            if ($sChunk) {
-                $sw = preg_split('/\s+/', trim($sChunk['text']));
-                $sOffset = max(0, (int) $m['submission_start'] - (int) $sChunk['start_word_position']);
-                $sCount = max(1, (int) $m['word_count']);
-                $m['submission_snippet'] = implode(' ', array_slice($sw, $sOffset, $sCount));
-            } else {
-                $m['submission_snippet'] = 'Teks submisi tidak tersedia.';
-            }
+            $m['submission_snippet'] = $this->extractSnippet($sChunk, (int) $m['submission_start'], (int) $m['word_count']);
 
             $srcChunk = $db->table('document_chunks')
                           ->where('document_id', $srcDocId)
@@ -432,14 +417,7 @@ class DashboardController extends BaseController
                           ->orderBy('start_word_position', 'DESC')
                           ->limit(1)
                           ->get()->getRowArray();
-            if ($srcChunk) {
-                $srcw = preg_split('/\s+/', trim($srcChunk['text']));
-                $srcOffset = max(0, (int) $m['source_start'] - (int) $srcChunk['start_word_position']);
-                $srcCount = max(1, (int) $m['word_count']);
-                $m['source_snippet'] = implode(' ', array_slice($srcw, $srcOffset, $srcCount));
-            } else {
-                $m['source_snippet'] = 'Teks sumber tidak tersedia.';
-            }
+            $m['source_snippet'] = $this->extractSnippet($srcChunk, (int) $m['source_start'], (int) $m['word_count']);
         }
         unset($m);
 
@@ -530,5 +508,85 @@ class DashboardController extends BaseController
                 'quote_ratio' => $qRatio,
             ]
         ];
+    }
+
+    /**
+     * Ekstraksi cuplikan teks (snippet) secara presisi berdasarkan word offset tokenisasi.
+     * Menggunakan PREG_OFFSET_CAPTURE pada raw text untuk mempertahankan huruf kapital/tanda baca asli,
+     * dengan fallback deterministik ke normalized_text bila batas token terdeviasi.
+     */
+    private function extractSnippet(?array $chunk, int $startWordPos, int $wordCount): string
+    {
+        if (!$chunk) {
+            return 'Teks tidak tersedia.';
+        }
+
+        $offset = max(0, $startWordPos - (int) ($chunk['start_word_position'] ?? 0));
+        $count = max(1, $wordCount);
+
+        // 1. Ekstraksi token presisi dari teks asli (raw text)
+        $rawText = $chunk['text'] ?? '';
+        if (!empty($rawText)) {
+            preg_match_all('/\b[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*\b/u', $rawText, $tokens, PREG_OFFSET_CAPTURE);
+            $tokenList = $tokens[0] ?? [];
+            $totalTokens = count($tokenList);
+            if ($totalTokens > 0 && isset($tokenList[$offset])) {
+                $endIndex = min($totalTokens - 1, $offset + $count - 1);
+                $startByte = $tokenList[$offset][1];
+                $endByte = $tokenList[$endIndex][1] + strlen($tokenList[$endIndex][0]);
+                $snippet = trim(substr($rawText, $startByte, $endByte - $startByte));
+                $snippet = preg_replace('/\s+/', ' ', $snippet);
+                if (!empty($snippet)) {
+                    return $snippet;
+                }
+            }
+        }
+
+        // 2. Fallback deterministik ke normalized_text
+        $normText = $chunk['normalized_text'] ?? '';
+        if (!empty($normText)) {
+            $words = explode(' ', trim($normText));
+            $slice = array_slice($words, $offset, $count);
+            if (!empty($slice)) {
+                return implode(' ', $slice);
+            }
+        }
+
+        // 3. Fallback spasi mentah
+        if (!empty($rawText)) {
+            $words = preg_split('/\s+/', trim($rawText));
+            return implode(' ', array_slice($words, $offset, $count));
+        }
+
+        return 'Teks tidak tersedia.';
+    }
+
+    /**
+     * Evaluasi formulasi baku akademik (Boilerplate / Legal Citations) secara instan
+     * untuk laporan historis atau pasase administratif umum.
+     */
+    private function annotateBoilerplateSnippet(array &$m): void
+    {
+        if (!empty($m['is_boilerplate'])) {
+            return;
+        }
+
+        $text = ($m['submission_snippet'] ?? '') . ' ' . ($m['source_snippet'] ?? '');
+        if (preg_match('/(?i)\b(?:semester\s+(?:ganjil|genap)|tahun\s+akademik|tahun\s+ajaran)\s+\d{4}(?:[\/\-]\d{4})?\b/', $text, $match)) {
+            $m['is_boilerplate'] = true;
+            $m['boilerplate_category'] = 'ADMINISTRATIVE_FORMULA';
+            $m['boilerplate_phrase'] = $match[0];
+            $m['boilerplate_rationale'] = 'Formulasi administratif baku penetapan periode akademik semester dan tahun ajaran.';
+        } elseif (preg_match('/(?i)\b(?:undang-undang|peraturan\s+pemerintah|peraturan\s+menteri|surat\s+keputusan|keputusan\s+menteri|keputusan\s+dekan|keputusan\s+rektor)\s+nomor\b/', $text, $match)) {
+            $m['is_boilerplate'] = true;
+            $m['boilerplate_category'] = 'LEGAL_CITATION';
+            $m['boilerplate_phrase'] = $match[0];
+            $m['boilerplate_rationale'] = 'Rujukan formal peraturan perundang-undangan atau instrumen hukum akademik baku.';
+        } elseif (preg_match('/(?i)\b(?:pengangkatan|penunjukan|susunan)\s+dosen\s+penguji(?:\s+(?:[ivx\d]+|utama|ketua|anggota))?\s+(?:skripsi|tesis|disertasi)\b/', $text, $match)) {
+            $m['is_boilerplate'] = true;
+            $m['boilerplate_category'] = 'ADMINISTRATIVE_FORMULA';
+            $m['boilerplate_phrase'] = $match[0];
+            $m['boilerplate_rationale'] = 'Formulasi administratif penugasan sivitas akademika dalam pengujian tugas akhir.';
+        }
     }
 }

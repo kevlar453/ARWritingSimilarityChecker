@@ -142,17 +142,21 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
         # 4b. Ekstraksi Konteks Sitasi, Presentasi Terdekomposisi, & Telemetri Observabilitas v1.1
         try:
             submission_text = ""
+            sub_tokens = []
             cursor.execute(
-                "SELECT text FROM document_chunks WHERE document_id = %s ORDER BY chunk_index ASC",
+                "SELECT text, normalized_text FROM document_chunks WHERE document_id = %s ORDER BY chunk_index ASC",
                 (document_id,)
             )
             chunks = cursor.fetchall()
             if chunks:
                 submission_text = " ".join(c["text"] for c in chunks if c.get("text"))
+                norm_combined = " ".join(c["normalized_text"] for c in chunks if c.get("normalized_text"))
+                sub_tokens = norm_combined.split() if norm_combined else submission_text.split()
             elif document.get("storage_path") and os.path.exists(document["storage_path"]):
                 from worker.extractor import extract_document
                 pages = extract_document(document["storage_path"], document.get("mime_type"))
                 submission_text = " ".join(p["text"] for p in pages if p.get("text"))
+                sub_tokens = submission_text.split()
 
             t_cite_start = time.perf_counter()
             context_res = detect_citation_context(submission_text)
@@ -211,20 +215,22 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
             result["cross_lingual"] = cross_lingual_res
 
             # Anotasi pasase individu dengan teks pasase & status boilerplate
-            sub_words = submission_text.split()
             for match in result.get("matches", []):
                 s_start = match.get("submission_start", 0)
                 s_end = match.get("submission_end", s_start)
-                if 0 <= s_start < len(sub_words):
-                    passage_slice = sub_words[s_start : s_end + 1]
+                p_text = ""
+                if 0 <= s_start < len(sub_tokens):
+                    passage_slice = sub_tokens[s_start : s_end + 1]
                     p_text = " ".join(passage_slice)
                     match["passage_text"] = p_text
-                    bp_pass = detect_academic_boilerplate(p_text)
-                    if not bp_pass.is_boilerplate:
-                        ctx_slice = sub_words[max(0, s_start - 2) : min(len(sub_words), s_end + 4)]
-                        ctx_text = " ".join(ctx_slice)
-                        bp_pass = detect_academic_boilerplate(ctx_text)
 
+                bp_pass = detect_academic_boilerplate(p_text) if p_text else None
+                if bp_pass and not bp_pass.is_boilerplate and 0 <= s_start < len(sub_tokens):
+                    ctx_slice = sub_tokens[max(0, s_start - 2) : min(len(sub_tokens), s_end + 4)]
+                    ctx_text = " ".join(ctx_slice)
+                    bp_pass = detect_academic_boilerplate(ctx_text)
+
+                if bp_pass:
                     match["is_boilerplate"] = bp_pass.is_boilerplate
                     match["boilerplate_category"] = bp_pass.category.value
                     match["boilerplate_phrase"] = bp_pass.matched_phrase

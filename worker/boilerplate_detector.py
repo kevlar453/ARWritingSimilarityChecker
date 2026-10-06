@@ -27,6 +27,7 @@ class BoilerplateCategory(str, Enum):
     METHODOLOGY_PROCEDURE = "METHODOLOGY_PROCEDURE"      # Formulasi baku metode & sampling
     STATISTICAL_ANALYSIS = "STATISTICAL_ANALYSIS"        # Prosedur uji statistik terstandarisasi (SPSS, Likert, dll)
     ADMINISTRATIVE_FORMULA = "ADMINISTRATIVE_FORMULA"    # Kalimat template pengesahan/keaslian/kata pengantar
+    LEGAL_CITATION = "LEGAL_CITATION"                    # Rujukan regulasi perundang-undangan dan instrumen hukum baku
     NONE = "NONE"
     UNKNOWN = "UNKNOWN"
 
@@ -184,6 +185,28 @@ BOILERPLATE_RULES = [
         re.compile(r"(?i)\bsebagai\s+salah\s+satu\s+syarat\s+untuk\s+memperoleh\s+gelar\b"),
         BoilerplateCategory.ADMINISTRATIVE_FORMULA,
         "Keterangan administratif formalitas pengajuan ujian kelulusan program studi."
+    ),
+    (
+        re.compile(r"(?i)\b(?:semester\s+(?:ganjil|genap)|tahun\s+akademik|tahun\s+ajaran)\s+\d{4}(?:[/-]\d{4})?\b"),
+        BoilerplateCategory.ADMINISTRATIVE_FORMULA,
+        "Formulasi administratif baku penetapan periode akademik semester dan tahun ajaran."
+    ),
+    (
+        re.compile(r"(?i)\b(?:pengangkatan|penunjukan|susunan)\s+dosen\s+penguji(?:\s+(?:[ivx\d]+|utama|ketua|anggota))?\s+(?:skripsi|tesis|disertasi)\b"),
+        BoilerplateCategory.ADMINISTRATIVE_FORMULA,
+        "Formulasi administratif penugasan sivitas akademika dalam pengujian tugas akhir."
+    ),
+    (
+        re.compile(r"(?i)\b(?:keputusan\s+dekan|keputusan\s+rektor)\b"),
+        BoilerplateCategory.ADMINISTRATIVE_FORMULA,
+        "Nomenklatur baku produk surat keputusan kepemimpinan perguruan tinggi."
+    ),
+
+    # 5. Rujukan Regulasi Perundang-Undangan & Produk Hukum Baku
+    (
+        re.compile(r"(?i)\b(?:undang-undang|peraturan\s+pemerintah|peraturan\s+menteri|surat\s+keputusan|keputusan\s+menteri)\s+nomor\b"),
+        BoilerplateCategory.LEGAL_CITATION,
+        "Rujukan formal peraturan perundang-undangan atau produk hukum akademik baku."
     ),
 ]
 
