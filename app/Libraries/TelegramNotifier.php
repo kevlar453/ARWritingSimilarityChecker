@@ -13,8 +13,11 @@ class TelegramNotifier
 
     public function __construct()
     {
-        $this->botToken = env('TELEGRAM_BOT_TOKEN', '688091201:AAFQ0TiJfDZg2wSsuPvIPJtNa_5NaQetfm4');
-        $this->chatId = env('TELEGRAM_CHAT_ID', '674868958');
+        $token = function_exists('env') ? env('TELEGRAM_BOT_TOKEN') : getenv('TELEGRAM_BOT_TOKEN');
+        $chat = function_exists('env') ? env('TELEGRAM_CHAT_ID') : getenv('TELEGRAM_CHAT_ID');
+
+        $this->botToken = $token ?: '688091201:AAFQ0TiJfDZg2wSsuPvIPJtNa_5NaQetfm4';
+        $this->chatId = $chat ?: '674868958';
     }
 
     /**
@@ -23,7 +26,9 @@ class TelegramNotifier
     public function sendMessage(string $message): bool
     {
         if (empty($this->botToken) || empty($this->chatId)) {
-            log_message('warning', 'TelegramNotifier: Token atau Chat ID tidak disetel.');
+            if (function_exists('log_message')) {
+                log_message('warning', 'TelegramNotifier: Token atau Chat ID tidak disetel.');
+            }
             return false;
         }
 
@@ -68,16 +73,18 @@ class TelegramNotifier
         $hash = md5(get_class($exception) . $exception->getMessage() . $exception->getFile() . $exception->getLine());
         $incidentId = 'INC-' . strtoupper(substr($hash, 0, 8));
 
-        // Anti-spam lock check (60 detik)
-        $lockFile = WRITEPATH . 'cache/tg_err_' . $hash . '.lock';
+        // Tentukan direktori writable secara aman (baik saat di dalam framework CI maupun standalone)
+        $writableDir = defined('WRITEPATH') ? WRITEPATH : (defined('APPPATH') ? dirname(APPPATH) . '/writable/' : sys_get_temp_dir() . '/');
+        $cacheDir = rtrim($writableDir, '/\\') . '/cache/';
+        $lockFile = $cacheDir . 'tg_err_' . $hash . '.lock';
         $now = time();
         if (file_exists($lockFile) && ($now - filemtime($lockFile)) < 60) {
             return $incidentId;
         }
 
         // Tulis lock file
-        if (!is_dir(WRITEPATH . 'cache/')) {
-            @mkdir(WRITEPATH . 'cache/', 0775, true);
+        if (!is_dir($cacheDir)) {
+            @mkdir($cacheDir, 0775, true);
         }
         @touch($lockFile);
 
@@ -87,8 +94,9 @@ class TelegramNotifier
         $line = $exception->getLine();
         $env = defined('ENVIRONMENT') ? ENVIRONMENT : 'unknown';
 
-        $method = $_SERVER['REQUEST_METHOD'] ?? (is_cli() ? 'CLI' : 'GET');
-        $uri = $_SERVER['REQUEST_URI'] ?? (is_cli() ? implode(' ', $_SERVER['argv'] ?? []) : '/');
+        $isCli = (PHP_SAPI === 'cli') || (function_exists('is_cli') && is_cli());
+        $method = $_SERVER['REQUEST_METHOD'] ?? ($isCli ? 'CLI' : 'GET');
+        $uri = $_SERVER['REQUEST_URI'] ?? ($isCli ? implode(' ', $_SERVER['argv'] ?? []) : '/');
         $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
         $timeStr = date('d M Y, H:i:s') . ' WIB';
 
