@@ -640,6 +640,266 @@
         </div>
 
         <!-- ═════════════════════════════════════════════════════════════════════ -->
+        <!-- PILAR 1: AUDIT KONSISTENSI SITASI & DAFTAR PUSTAKA (PHANTOM AUDITOR)   -->
+        <!-- ═════════════════════════════════════════════════════════════════════ -->
+        <?php if (!empty($citationAudit)): ?>
+        <?php
+            $healthScore = (float)($citationAudit['citation_health_score'] ?? 0);
+            $healthVerdict = $citationAudit['health_verdict'] ?? 'GOOD';
+            $healthLabel = $citationAudit['verdict_label'] ?? 'Audit Sitasi Selesai';
+            $cStyle = $citationAudit['detected_style'] ?? 'APA / Harvard';
+            $hasBib = (bool)($citationAudit['has_bibliography_section'] ?? false);
+            $totalInText = (int)($citationAudit['total_in_text_citations'] ?? 0);
+            $uniqueInText = (int)($citationAudit['unique_in_text_count'] ?? 0);
+            $totalBib = (int)($citationAudit['total_bibliography_entries'] ?? 0);
+            $matchedCount = (int)($citationAudit['matched_citations_count'] ?? 0);
+            $phantomCount = (int)($citationAudit['phantom_citations_count'] ?? 0);
+            $orphanCount = (int)($citationAudit['orphan_references_count'] ?? 0);
+            $phantomItems = $citationAudit['phantom_citations'] ?? [];
+            $orphanItems = $citationAudit['orphan_references'] ?? [];
+            $matchedItems = $citationAudit['matched_items'] ?? [];
+
+            $healthBadgeClass = match($healthVerdict) {
+                'CRITICAL' => 'bg-rose-50 text-rose-700 border-rose-200',
+                'NEEDS_ATTENTION' => 'bg-amber-50 text-amber-700 border-amber-200',
+                'GOOD' => 'bg-blue-50 text-blue-700 border-blue-200',
+                default => 'bg-emerald-50 text-emerald-700 border-emerald-200'
+            };
+            $healthColor = match($healthVerdict) {
+                'CRITICAL' => 'text-rose-600',
+                'NEEDS_ATTENTION' => 'text-amber-600',
+                'GOOD' => 'text-blue-600',
+                default => 'text-emerald-600'
+            };
+        ?>
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-5" id="citationAuditSection">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-2xl">📑</span>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="font-bold text-base text-slate-900">Audit Konsistensi Sitasi &amp; Daftar Pustaka</h3>
+                            <span class="text-[10px] font-bold font-mono-code uppercase px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-100">Pilar 1</span>
+                        </div>
+                        <p class="text-xs text-slate-400">Pencocokan silang antara sitasi di dalam bab naskah (in-text citations) dengan entri Daftar Pustaka (References list)</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 self-start sm:self-auto">
+                    <span class="text-xs font-mono-code font-bold px-3 py-1 rounded-full border shadow-2xs <?= $healthBadgeClass ?>">
+                        Kesehatan Sitasi: <strong class="<?= $healthColor ?>"><?= number_format($healthScore, 1) ?>%</strong> (<?= esc($healthLabel) ?>)
+                    </span>
+                </div>
+            </div>
+
+            <!-- Metric Cards Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                <!-- 1. Style & Total Sitasi -->
+                <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 space-y-1.5">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">1. Gaya Sitasi &amp; Total</span>
+                        <span class="text-xs font-mono-code font-bold text-slate-700"><?= $totalInText ?> kutipan</span>
+                    </div>
+                    <div class="text-sm font-extrabold text-slate-800">
+                        <?= esc($cStyle) ?>
+                    </div>
+                    <p class="text-[11px] text-slate-500 leading-tight">
+                        Terdeteksi <?= $uniqueInText ?> rujukan unik di tubuh naskah.
+                    </p>
+                </div>
+
+                <!-- 2. Sitasi Terverifikasi (Cocok) -->
+                <div class="p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/30 space-y-1.5">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-700">2. Sitasi Tervalidasi</span>
+                        <span class="text-xs font-mono-code font-bold text-emerald-700"><?= $matchedCount ?> / <?= max(1, $uniqueInText) ?></span>
+                    </div>
+                    <div class="text-sm font-extrabold text-emerald-800">
+                        <?= $matchedCount ?> Sitasi Terhubung
+                    </div>
+                    <p class="text-[11px] text-emerald-700/80 leading-tight">
+                        Dikutip di bab naskah dan terdaftar lengkap di Daftar Pustaka.
+                    </p>
+                </div>
+
+                <!-- 3. Sitasi Gaib (Phantom Citations) -->
+                <div class="p-3.5 rounded-xl border <?= $phantomCount > 0 ? 'border-rose-300 bg-rose-50/60' : 'border-slate-200 bg-slate-50/50' ?> space-y-1.5">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-bold uppercase tracking-wider <?= $phantomCount > 0 ? 'text-rose-700' : 'text-slate-500' ?>">3. Sitasi Gaib (Phantom)</span>
+                        <span class="text-xs font-mono-code font-bold <?= $phantomCount > 0 ? 'text-rose-700' : 'text-slate-500' ?>"><?= $phantomCount ?> sitasi</span>
+                    </div>
+                    <div class="text-sm font-extrabold <?= $phantomCount > 0 ? 'text-rose-900' : 'text-slate-700' ?>">
+                        <?= $phantomCount > 0 ? '⚠️ ' . $phantomCount . ' Hilang dari Pustaka' : '✅ 0 Sitasi Gaib' ?>
+                    </div>
+                    <p class="text-[11px] <?= $phantomCount > 0 ? 'text-rose-700' : 'text-slate-500' ?> leading-tight">
+                        <?= $phantomCount > 0 ? 'Dikutip di bab naskah tetapi TIDAK DITEMUKAN di Daftar Pustaka.' : 'Seluruh sitasi naskah tercantum di Daftar Pustaka.' ?>
+                    </p>
+                </div>
+
+                <!-- 4. Pustaka Yatim (Orphan References) -->
+                <div class="p-3.5 rounded-xl border <?= $orphanCount > 0 ? 'border-amber-300 bg-amber-50/60' : 'border-slate-200 bg-slate-50/50' ?> space-y-1.5">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-bold uppercase tracking-wider <?= $orphanCount > 0 ? 'text-amber-800' : 'text-slate-500' ?>">4. Pustaka Yatim (Orphan)</span>
+                        <span class="text-xs font-mono-code font-bold <?= $orphanCount > 0 ? 'text-amber-800' : 'text-slate-500' ?>"><?= $orphanCount ?> entri</span>
+                    </div>
+                    <div class="text-sm font-extrabold <?= $orphanCount > 0 ? 'text-amber-900' : 'text-slate-700' ?>">
+                        <?= $orphanCount > 0 ? '⚠️ ' . $orphanCount . ' Tanpa Kutipan' : '✅ 0 Pustaka Yatim' ?>
+                    </div>
+                    <p class="text-[11px] <?= $orphanCount > 0 ? 'text-amber-800' : 'text-slate-500' ?> leading-tight">
+                        <?= $orphanCount > 0 ? 'Tertulis di Daftar Pustaka tetapi TIDAK PERNAH dikutip di bab teks.' : 'Seluruh entri daftar pustaka benar-benar dikutip di naskah.' ?>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Tab / Interactive Filter -->
+            <div class="space-y-3 pt-2">
+                <div class="flex flex-wrap items-center gap-2 border-b border-slate-100 pb-2">
+                    <button type="button" onclick="switchCitationAuditTab('phantom')" id="tabBtnPhantom" class="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer bg-rose-100 text-rose-800 border border-rose-300">
+                        <span>⚠️ Sitasi Gaib (Phantom)</span>
+                        <span class="px-1.5 py-0.2 rounded-full bg-rose-200 text-rose-900 text-[10px]"><?= $phantomCount ?></span>
+                    </button>
+                    <button type="button" onclick="switchCitationAuditTab('orphan')" id="tabBtnOrphan" class="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer bg-slate-100 text-slate-700 hover:bg-slate-200">
+                        <span>📚 Pustaka Yatim (Orphan)</span>
+                        <span class="px-1.5 py-0.2 rounded-full bg-slate-200 text-slate-800 text-[10px]"><?= $orphanCount ?></span>
+                    </button>
+                    <button type="button" onclick="switchCitationAuditTab('matched')" id="tabBtnMatched" class="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer bg-slate-100 text-slate-700 hover:bg-slate-200">
+                        <span>✅ Terverifikasi Cocok</span>
+                        <span class="px-1.5 py-0.2 rounded-full bg-slate-200 text-slate-800 text-[10px]"><?= $matchedCount ?></span>
+                    </button>
+                </div>
+
+                <!-- Tab Panel 1: Phantom Citations -->
+                <div id="panelCitationPhantom" class="space-y-2">
+                    <?php if (empty($phantomItems)): ?>
+                        <div class="p-4 rounded-xl bg-emerald-50/50 border border-emerald-100 text-xs text-emerald-800 flex items-center gap-2">
+                            <span>✅</span>
+                            <span><strong>Luar Biasa!</strong> Tidak terdeteksi adanya Sitasi Gaib. Setiap kutipan di dalam bab naskah memiliki rujukan padanannya di Daftar Pustaka.</span>
+                        </div>
+                    <?php else: ?>
+                        <div class="space-y-2 max-h-72 overflow-y-auto pr-1">
+                            <?php foreach ($phantomItems as $pItem): ?>
+                                <div class="p-3 rounded-xl border border-rose-200 bg-rose-50/40 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                    <div class="space-y-1">
+                                        <div class="flex items-center gap-2">
+                                            <span class="font-mono-code font-bold text-rose-700 text-sm"><?= esc($pItem['citation']) ?></span>
+                                            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-100 text-rose-800">Dikutip <?= (int)($pItem['occurrences'] ?? 1) ?>x di naskah</span>
+                                        </div>
+                                        <?php if (!empty($pItem['context_sample'])): ?>
+                                            <p class="text-[11px] text-slate-600 italic bg-white/70 p-2 rounded border border-rose-100">
+                                                "...<?= esc($pItem['context_sample']) ?>..."
+                                            </p>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="sm:text-right shrink-0">
+                                        <span class="text-[11px] font-bold text-rose-600 block">❌ Tidak Ada di Daftar Pustaka</span>
+                                        <span class="text-[10px] text-slate-400">Tambahkan entri rujukan ini ke Daftar Pustaka</span>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Tab Panel 2: Orphan References -->
+                <div id="panelCitationOrphan" class="space-y-2 hidden">
+                    <?php if (empty($orphanItems)): ?>
+                        <div class="p-4 rounded-xl bg-emerald-50/50 border border-emerald-100 text-xs text-emerald-800 flex items-center gap-2">
+                            <span>✅</span>
+                            <span><strong>Pustaka Bersih!</strong> Seluruh entri yang tertulis di Daftar Pustaka terbukti benar-benar disitasi di dalam isi naskah.</span>
+                        </div>
+                    <?php else: ?>
+                        <div class="space-y-2 max-h-72 overflow-y-auto pr-1">
+                            <?php foreach ($orphanItems as $oItem): ?>
+                                <div class="p-3 rounded-xl border border-amber-200 bg-amber-50/40 text-xs flex flex-col sm:flex-row sm:items-start justify-between gap-2">
+                                    <div class="space-y-1">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-mono-code">#<?= (int)($oItem['entry_id'] ?? 1) ?></span>
+                                            <span class="font-bold text-slate-800 text-xs leading-snug"><?= esc($oItem['entry_text']) ?></span>
+                                        </div>
+                                    </div>
+                                    <div class="sm:text-right shrink-0 mt-1 sm:mt-0">
+                                        <span class="text-[11px] font-bold text-amber-700 block">⚠️ Tidak Pernah Disitasi</span>
+                                        <span class="text-[10px] text-slate-400">Gunakan di naskah atau hapus dari Daftar Pustaka</span>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Tab Panel 3: Matched Items -->
+                <div id="panelCitationMatched" class="space-y-2 hidden">
+                    <?php if (empty($matchedItems)): ?>
+                        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-500">
+                            Belum ada sitasi yang berhasil dipadankan dengan Daftar Pustaka.
+                        </div>
+                    <?php else: ?>
+                        <div class="space-y-2 max-h-72 overflow-y-auto pr-1">
+                            <?php foreach ($matchedItems as $mItem): ?>
+                                <div class="p-3 rounded-xl border border-emerald-200 bg-emerald-50/30 text-xs flex flex-col sm:flex-row sm:items-start justify-between gap-2">
+                                    <div class="space-y-1">
+                                        <div class="flex items-center gap-2">
+                                            <span class="font-mono-code font-bold text-emerald-800 text-sm"><?= esc($mItem['citation']) ?></span>
+                                            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">Dikutip <?= (int)($mItem['occurrences'] ?? 1) ?>x</span>
+                                        </div>
+                                        <p class="text-[11px] text-slate-700 bg-white/70 p-2 rounded border border-emerald-100 leading-relaxed">
+                                            <?= esc($mItem['matched_entry_text']) ?>
+                                        </p>
+                                    </div>
+                                    <div class="sm:text-right shrink-0 mt-1 sm:mt-0">
+                                        <span class="text-[11px] font-bold text-emerald-700 block">✅ Valid &amp; Konsisten</span>
+                                        <span class="text-[10px] text-slate-400">Entri padanan ditemukan</span>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <!-- Narrative Box & Academic Guidance -->
+            <div class="p-4 rounded-xl bg-blue-50/60 border border-blue-200 text-xs sm:text-sm text-blue-950 space-y-2">
+                <div class="flex items-center justify-between font-bold text-xs font-mono-code">
+                    <span class="flex items-center gap-1.5">
+                        <span>💬</span> KESIMPULAN AUDIT SITASI: <span class="<?= $healthColor ?>"><?= esc($healthLabel) ?></span>
+                    </span>
+                </div>
+                <p class="text-slate-700 text-xs sm:text-sm leading-relaxed italic bg-white p-3 rounded-lg border border-blue-100 shadow-2xs">
+                    "<?= esc($citationAudit['summary_rationale'] ?? '') ?>"
+                </p>
+                <div class="flex items-start gap-2 pt-1 text-[11px] text-blue-800/80">
+                    <span class="text-sm">🎓</span>
+                    <span><strong>Panduan Kualitas Naskah:</strong> Sitasi Gaib (*Phantom Citation*) sering menjadi temuan sidang skripsi/tesis yang menghambat yudisium. Pastikan seluruh sitasi di bab naskah tertulis di Daftar Pustaka dan hindari menempelkan referensi yang tidak pernah dikutip.</span>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        function switchCitationAuditTab(tab) {
+            const tabs = ['phantom', 'orphan', 'matched'];
+            tabs.forEach(t => {
+                const btn = document.getElementById('tabBtn' + t.charAt(0).toUpperCase() + t.slice(1));
+                const panel = document.getElementById('panelCitation' + t.charAt(0).toUpperCase() + t.slice(1));
+                if (btn && panel) {
+                    if (t === tab) {
+                        panel.classList.remove('hidden');
+                        if (t === 'phantom') {
+                            btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer bg-rose-100 text-rose-800 border border-rose-300';
+                        } else if (t === 'orphan') {
+                            btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer bg-amber-100 text-amber-800 border border-amber-300';
+                        } else {
+                            btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer bg-emerald-100 text-emerald-800 border border-emerald-300';
+                        }
+                    } else {
+                        panel.classList.add('hidden');
+                        btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer bg-slate-100 text-slate-700 hover:bg-slate-200';
+                    }
+                }
+            });
+        }
+        </script>
+        <?php endif; ?>
+
+        <!-- ═════════════════════════════════════════════════════════════════════ -->
         <!-- FITUR 2: INDIKATOR TEKS BUATAN AI & PROFIL STYLOMETRI                 -->
         <!-- ═════════════════════════════════════════════════════════════════════ -->
         <?php if (!empty($aiStylometrics)): ?>

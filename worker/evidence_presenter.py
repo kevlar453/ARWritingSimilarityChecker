@@ -123,6 +123,7 @@ def present_hybrid_report(
     cross_lingual: Optional[Any] = None,
     xgboost_risk: Optional[Any] = None,
     jit_harvesting: Optional[Any] = None,
+    citation_audit: Optional[Any] = None,
 ) -> Dict[str, Any]:
     """
     Membangun struktur presentasi bukti terdekomposisi lengkap v1.1.
@@ -225,5 +226,6 @@ def present_hybrid_report(
             "cross_lingual": cross_lingual.to_dict() if hasattr(cross_lingual, "to_dict") else cross_lingual,
             "xgboost_risk": xgboost_risk.to_dict() if hasattr(xgboost_risk, "to_dict") else xgboost_risk,
             "jit_harvesting": jit_harvesting.to_dict() if hasattr(jit_harvesting, "to_dict") else jit_harvesting,
+            "citation_audit": citation_audit.to_dict() if hasattr(citation_audit, "to_dict") else citation_audit,
         }
     }

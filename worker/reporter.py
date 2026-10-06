@@ -214,6 +214,11 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
                     result["sources"][0]["cross_lingual"] = cross_lingual_res
             result["cross_lingual"] = cross_lingual_res
 
+            # 6. Citation & Bibliography Consistency Auditor (Pilar 1 - Audit Konsistensi Sitasi)
+            from worker.citation_auditor import audit_citations_and_bibliography
+            citation_audit_res = audit_citations_and_bibliography(submission_text, segmentation_res)
+            result["citation_audit"] = citation_audit_res.to_dict()
+
             # Anotasi pasase individu dengan teks pasase & status boilerplate
             for match in result.get("matches", []):
                 s_start = match.get("submission_start", 0)
@@ -289,6 +294,7 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
                 cross_lingual=cross_lingual_res,
                 xgboost_risk=xgboost_risk_res,
                 jit_harvesting=jit_harvest_res,
+                citation_audit=citation_audit_res,
             )
             pres_latency_ms = (time.perf_counter() - t_pres_start) * 1000.0
 

@@ -224,6 +224,12 @@ class DashboardController extends BaseController
             }
         }
 
+        // Resolusi Audit Konsistensi Sitasi & Daftar Pustaka (Pilar 1)
+        $citationAudit = $evidenceData['citation_audit'] ?? $evidenceData['v1_1_presentation']['v1_2_evolution']['citation_audit'] ?? null;
+        if (!$citationAudit && !empty($submissionText)) {
+            $citationAudit = $this->computeFallbackCitationAudit($submissionText);
+        }
+
         return view('dashboard/report', [
             'report'              => $report,
             'document'            => $document,
@@ -239,6 +245,7 @@ class DashboardController extends BaseController
             'xgboostRisk'         => $xgboostRisk,
             'jitHarvesting'       => $jitHarvesting,
             'jitDiscoveredIds'    => $jitDiscoveredIds,
+            'citationAudit'       => $citationAudit,
         ]);
     }
 
@@ -340,6 +347,333 @@ class DashboardController extends BaseController
             ],
             'anomalies' => []
         ];
+    }
+
+    private function computeFallbackCitationAudit(string $text): array
+    {
+        if (empty($text)) {
+            return [
+                'detected_style' => 'None Detected',
+                'has_bibliography_section' => false,
+                'total_in_text_citations' => 0,
+                'unique_in_text_count' => 0,
+                'total_bibliography_entries' => 0,
+                'matched_citations_count' => 0,
+                'phantom_citations_count' => 0,
+                'orphan_references_count' => 0,
+                'citation_health_score' => 100.0,
+                'health_verdict' => 'EXCELLENT',
+                'verdict_label' => 'Naskah Kosong',
+                'summary_rationale' => 'Tidak ada teks yang dapat dianalisis.',
+                'matched_items' => [],
+                'phantom_citations' => [],
+                'orphan_references' => []
+            ];
+        }
+
+        $bodyText = $text;
+        $bibText = '';
+        $hasBib = false;
+
+        if (preg_match('/(?:\n|\A)(?:[0-9\.\s]*\b(?:DAFTAR\s+PUSTAKA|REFERENCES|BIBLIOGRAFI|DAFTAR\s+REFERENSI)\b[^\n]*\n)/iu', $text, $matches, PREG_OFFSET_CAPTURE)) {
+            $hasBib = true;
+            $pos = $matches[0][1];
+            $bodyText = substr($text, 0, $pos);
+            $bibText = substr($text, $pos + strlen($matches[0][0]));
+
+            if (preg_match('/(?:\n|\A)(?:[0-9\.\s]*\b(?:LAMPIRAN|APPENDICES|APPENDIX)\b[^\n]*\n)/iu', $bibText, $lampMatch, PREG_OFFSET_CAPTURE)) {
+                $bibText = substr($bibText, 0, $lampMatch[0][1]);
+            }
+        }
+
+        $citations = [];
+
+        // Parenthetical Author-Year: (Smith, 2021) atau (Pratama & Santoso, 2020)
+        if (preg_match_all('/\(\s*([A-Z][a-zA-Z\s\-\'\.\&]+?(?:(?:et\s+al\.|dkk\.)|\s*(?:&|and|dan)\s*[A-Z][a-zA-Z\s\-\']+)?)\s*,\s*((?:19|20)\d{2}[a-z]?)(?::\s*\d+(?:[\-\–]\d+)?)?\s*\)/u', $bodyText, $mParen, PREG_SET_ORDER)) {
+            foreach ($mParen as $m) {
+                $raw = $m[0];
+                $authRaw = trim($m[1]);
+                $year = trim($m[2]);
+                $authKey = $this->normalizeAuthorName($authRaw);
+                if (strlen($authKey) >= 2) {
+                    $citations[] = [
+                        'raw_citation' => $raw,
+                        'author_key' => $authKey,
+                        'year' => $year,
+                        'citation_type' => 'author_year',
+                        'numeric_id' => null,
+                        'context_sentence' => $raw,
+                    ];
+                }
+            }
+        }
+
+        // Narrative Author-Year: Menurut Santoso (2021)
+        if (preg_match_all('/\b([A-Z][a-zA-Z\s\-\'\&]+?(?:(?:et\s+al\.|dkk\.)|\s*(?:&|and|dan)\s*[A-Z][a-zA-Z\s\-\']+)?)\s*\(((?:19|20)\d{2}[a-z]?)(?::\s*\d+(?:[\-\–]\d+)?)?\)/u', $bodyText, $mNarr, PREG_SET_ORDER)) {
+            foreach ($mNarr as $m) {
+                $raw = $m[0];
+                $authRaw = trim($m[1]);
+                $year = trim($m[2]);
+                if (in_array(strtolower($authRaw), ['gambar', 'tabel', 'lampiran', 'grafik', 'bagan', 'figure', 'table'], true)) {
+                    continue;
+                }
+                $authKey = $this->normalizeAuthorName($authRaw);
+                if (strlen($authKey) >= 2) {
+                    $citations[] = [
+                        'raw_citation' => $raw,
+                        'author_key' => $authKey,
+                        'year' => $year,
+                        'citation_type' => 'author_year',
+                        'numeric_id' => null,
+                        'context_sentence' => $raw,
+                    ];
+                }
+            }
+        }
+
+        // Numeric IEEE: [1], [2, 3]
+        if (preg_match_all('/(?<!\w)\[\s*(\d+(?:\s*,\s*\d+|\s*[\-\–]\s*\d+)*)\s*\]/u', $bodyText, $mNum, PREG_SET_ORDER)) {
+            foreach ($mNum as $m) {
+                $inner = trim($m[1]);
+                $parts = explode(',', $inner);
+                foreach ($parts as $p) {
+                    $p = trim($p);
+                    if (preg_match('/^(\d+)\s*[\-\–]\s*(\d+)$/', $p, $rMatch)) {
+                        $rStart = (int) $rMatch[1];
+                        $rEnd = (int) $rMatch[2];
+                        if ($rStart <= $rEnd && ($rEnd - $rStart) <= 50) {
+                            for ($n = $rStart; $n <= $rEnd; $n++) {
+                                $citations[] = [
+                                    'raw_citation' => "[{$n}]",
+                                    'author_key' => "ref_{$n}",
+                                    'year' => null,
+                                    'citation_type' => 'numeric',
+                                    'numeric_id' => $n,
+                                    'context_sentence' => "[{$n}]",
+                                ];
+                            }
+                        }
+                    } elseif (preg_match('/^\d+$/', $p)) {
+                        $n = (int) $p;
+                        $citations[] = [
+                            'raw_citation' => "[{$n}]",
+                            'author_key' => "ref_{$n}",
+                            'year' => null,
+                            'citation_type' => 'numeric',
+                            'numeric_id' => $n,
+                            'context_sentence' => "[{$n}]",
+                        ];
+                    }
+                }
+            }
+        }
+
+        // Ekstrak Entri Daftar Pustaka
+        $entries = [];
+        if ($hasBib && !empty($bibText)) {
+            $lines = explode("\n", $bibText);
+            $currLines = [];
+            $commitEntry = function(array $lines) use (&$entries) {
+                $textEntry = trim(implode(' ', $lines));
+                if (strlen($textEntry) < 15) return;
+
+                $year = null;
+                if (preg_match('/\b((?:19|20)\d{2})[a-z]?\b/u', $textEntry, $ym)) {
+                    $year = $ym[1];
+                }
+
+                $numericId = null;
+                if (preg_match('/^(?:\[(\d+)\]|(\d+)\.\s)/u', $textEntry, $nm)) {
+                    $numericId = (int) ($nm[1] ?: $nm[2]);
+                }
+
+                $authorKeys = [];
+                $prefix = $year ? substr($textEntry, 0, strpos($textEntry, $year)) : substr($textEntry, 0, 80);
+                if (preg_match_all('/[A-Z][a-zA-Z]+/u', $prefix, $wm)) {
+                    foreach ($wm[0] as $w) {
+                        $cleanW = $this->normalizeAuthorName($w);
+                        if (!empty($cleanW) && !in_array($cleanW, ['dkk', 'dan', 'and', 'al', 'vol', 'no', 'pp', 'hal', 'jurnal', 'prosiding', 'in', 'the', 'of'], true)) {
+                            if (!in_array($cleanW, $authorKeys, true)) {
+                                $authorKeys[] = $cleanW;
+                            }
+                        }
+                    }
+                }
+
+                $entries[] = [
+                    'entry_id' => count($entries) + 1,
+                    'raw_text' => $textEntry,
+                    'author_keys' => $authorKeys,
+                    'year' => $year,
+                    'numeric_id' => $numericId,
+                ];
+            };
+
+            foreach ($lines as $line) {
+                $cleanL = trim($line);
+                if (empty($cleanL)) continue;
+                $isNumStart = (bool) preg_match('/^(?:\[\d+\]|\d+\.)\s+/u', $cleanL);
+                $isAuthStart = (bool) preg_match('/^[A-Z][a-zA-Z\s\-\.\,]+,\s*[A-Z]/u', $cleanL);
+
+                if (($isNumStart || $isAuthStart) && !empty($currLines)) {
+                    $commitEntry($currLines);
+                    $currLines = [$cleanL];
+                } else {
+                    $currLines[] = $cleanL;
+                }
+            }
+            if (!empty($currLines)) {
+                $commitEntry($currLines);
+            }
+        }
+
+        // Deteksi Style
+        $authorYearCount = count(array_filter($citations, fn($c) => $c['citation_type'] === 'author_year'));
+        $numericCount = count(array_filter($citations, fn($c) => $c['citation_type'] === 'numeric'));
+        if ($authorYearCount > 0 && $numericCount === 0) $style = "APA / Harvard (Author-Year)";
+        elseif ($numericCount > 0 && $authorYearCount === 0) $style = "IEEE / Vancouver (Numbered)";
+        elseif ($authorYearCount > 0 && $numericCount > 0) $style = "Mixed (Author-Year & Numbered)";
+        else $style = "None Detected";
+
+        // Pencocokan Silang
+        $uniqueKeys = [];
+        foreach ($citations as $c) {
+            $k = ($c['citation_type'] === 'author_year') ? "{$c['author_key']}_{$c['year']}" : "num_{$c['numeric_id']}";
+            if (!isset($uniqueKeys[$k])) $uniqueKeys[$k] = [];
+            $uniqueKeys[$k][] = $c;
+        }
+
+        $matchedItems = [];
+        $phantomCitations = [];
+        $citedEntryIds = [];
+
+        foreach ($uniqueKeys as $k => $cList) {
+            $s = $cList[0];
+            $foundMatch = false;
+            $matchingEntry = null;
+
+            if ($s['citation_type'] === 'numeric') {
+                foreach ($entries as $e) {
+                    if ($e['numeric_id'] === $s['numeric_id']) {
+                        $foundMatch = true;
+                        $matchingEntry = $e;
+                        $citedEntryIds[] = $e['entry_id'];
+                        break;
+                    }
+                }
+            } else {
+                foreach ($entries as $e) {
+                    $authMatch = in_array($s['author_key'], $e['author_keys'], true);
+                    $yearMatch = (!$s['year'] || !$e['year'] || substr($s['year'], 0, 4) === substr($e['year'], 0, 4));
+                    if ($authMatch && $yearMatch) {
+                        $foundMatch = true;
+                        $matchingEntry = $e;
+                        $citedEntryIds[] = $e['entry_id'];
+                        break;
+                    }
+                }
+            }
+
+            if ($foundMatch && $matchingEntry) {
+                $matchedItems[] = [
+                    'citation' => $s['raw_citation'],
+                    'occurrences' => count($cList),
+                    'author_key' => $s['author_key'],
+                    'year' => $s['year'],
+                    'matched_entry_id' => $matchingEntry['entry_id'],
+                    'matched_entry_text' => $matchingEntry['raw_text'],
+                    'context_sample' => $s['context_sentence'],
+                ];
+            } else {
+                $phantomCitations[] = [
+                    'citation' => $s['raw_citation'],
+                    'occurrences' => count($cList),
+                    'author_key' => $s['author_key'],
+                    'year' => $s['year'],
+                    'context_sample' => $s['context_sentence'],
+                    'reason' => 'Tidak ditemukan entri yang cocok pada Daftar Pustaka',
+                ];
+            }
+        }
+
+        $orphanReferences = [];
+        foreach ($entries as $e) {
+            if (!in_array($e['entry_id'], $citedEntryIds, true)) {
+                $orphanReferences[] = [
+                    'entry_id' => $e['entry_id'],
+                    'entry_text' => $e['raw_text'],
+                    'author_keys' => $e['author_keys'],
+                    'year' => $e['year'],
+                    'reason' => 'Tercantum di Daftar Pustaka tetapi tidak pernah disitasi di naskah',
+                ];
+            }
+        }
+
+        $uniqueCount = count($uniqueKeys);
+        $matchedCount = count($matchedItems);
+        $phantomCount = count($phantomCitations);
+        $orphanCount = count($orphanReferences);
+        $totalBib = count($entries);
+
+        if (!$hasBib) {
+            $healthScore = ($uniqueCount > 0) ? 0.0 : 100.0;
+            $healthVerdict = ($uniqueCount > 0) ? 'CRITICAL' : 'EXCELLENT';
+            $verdictLabel = 'Daftar Pustaka Belum Terdeteksi';
+            $rationale = 'Bagian Daftar Pustaka tidak terdeteksi dalam dokumen. Seluruh sitasi di naskah tidak memiliki rujukan acuan.';
+        } elseif ($uniqueCount === 0) {
+            $healthScore = ($totalBib === 0) ? 100.0 : 50.0;
+            $healthVerdict = ($totalBib === 0) ? 'GOOD' : 'NEEDS_ATTENTION';
+            $verdictLabel = 'Tidak Ada Sitasi di Tubuh Teks';
+            $rationale = "Tidak ditemukan sitasi in-text di tubuh naskah. Terdapat {$totalBib} entri pada Daftar Pustaka.";
+        } else {
+            $baseRatio = ($matchedCount / $uniqueCount) * 100.0;
+            $orphanPenalty = min(15.0, ($orphanCount / max(1, $totalBib)) * 15.0);
+            $healthScore = max(0.0, min(100.0, round($baseRatio - $orphanPenalty, 1)));
+
+            if ($healthScore >= 85.0) {
+                $healthVerdict = 'EXCELLENT';
+                $verdictLabel = 'Sangat Konsisten (Sehat)';
+                $rationale = "Korelasi sitasi sangat kuat ({$matchedCount}/{$uniqueCount} sitasi terhubung). Terdapat {$phantomCount} sitasi gaib dan {$orphanCount} pustaka tanpa sitasi.";
+            } elseif ($healthScore >= 65.0) {
+                $healthVerdict = 'GOOD';
+                $verdictLabel = 'Cukup Konsisten (Perlu Pengecekan)';
+                $rationale = "Sebagian besar sitasi cocok ({$matchedCount}/{$uniqueCount}), namun terdeteksi {$phantomCount} sitasi gaib dan {$orphanCount} pustaka yatim.";
+            } elseif ($healthScore >= 40.0) {
+                $healthVerdict = 'NEEDS_ATTENTION';
+                $verdictLabel = 'Inkonsistensi Sedang';
+                $rationale = "Tingkat ketidakcocokan sitasi cukup tinggi: {$phantomCount} sitasi tidak ada di Daftar Pustaka, serta {$orphanCount} entri pustaka tidak pernah dikutip.";
+            } else {
+                $healthVerdict = 'CRITICAL';
+                $verdictLabel = 'Inkonsistensi Kritis';
+                $rationale = "Sebagian besar sitasi ({$phantomCount} dari {$uniqueCount}) tidak memiliki padanan di Daftar Pustaka. Diperlukan peninjauan ulang menyeluruh sebelum sidang.";
+            }
+        }
+
+        return [
+            'detected_style' => $style,
+            'has_bibliography_section' => $hasBib,
+            'total_in_text_citations' => count($citations),
+            'unique_in_text_count' => $uniqueCount,
+            'total_bibliography_entries' => $totalBib,
+            'matched_citations_count' => $matchedCount,
+            'phantom_citations_count' => $phantomCount,
+            'orphan_references_count' => $orphanCount,
+            'citation_health_score' => $healthScore,
+            'health_verdict' => $healthVerdict,
+            'verdict_label' => $verdictLabel,
+            'summary_rationale' => $rationale,
+            'matched_items' => $matchedItems,
+            'phantom_citations' => $phantomCitations,
+            'orphan_references' => $orphanReferences,
+        ];
+    }
+
+    private function normalizeAuthorName(string $name): string
+    {
+        $cleaned = preg_replace('/\b(?:dkk|et\s+al|Prof|Dr|Drs|Ir|M\.Si|Ph\.D|M\.Kom|S\.T|S\.Kom)\b\.?/iu', '', $name);
+        $cleaned = preg_replace('/[^a-zA-Z\s]/u', '', $cleaned);
+        $tokens = preg_split('/\s+/u', trim(mb_strtolower($cleaned)));
+        return !empty($tokens) ? end($tokens) : '';
     }
 
     public function exportPdf($id)
