@@ -1568,7 +1568,11 @@
                         <li><a href="<?= base_url('verify') ?>">Portal Verifikasi QR</a></li>
                         <li><a href="#kuota-korpus">Sumbang Korpus Institusi</a></li>
                         <li><a href="#langganan">Paket Berlangganan</a></li>
-                        <li><a href="<?= base_url('dashboard') ?>">Dashboard Akses</a></li>
+                        <?php if ($currentUser) : ?>
+                            <li><a href="<?= base_url('dashboard') ?>">Dashboard Akses</a></li>
+                        <?php else : ?>
+                            <li><a href="javascript:void(0)" onclick="openAuthModal('login')">Dashboard Akses</a></li>
+                        <?php endif; ?>
                     </ul>
                 </div>
 
@@ -1781,6 +1785,17 @@
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Auto open modal when redirected from protected route
+            const urlParams = new URLSearchParams(window.location.search);
+            const authParam = urlParams.get('auth');
+            if (authParam === 'login' || authParam === 'register') {
+                openAuthModal(authParam);
+                <?php $flashNotice = session()->getFlashdata('auth_notice'); ?>
+                <?php if (!empty($flashNotice)) : ?>
+                    showAlert(<?= json_encode($flashNotice) ?>, true);
+                <?php endif; ?>
+            }
+
             // Directional scroll tracker for bidirectional AOS (fade-up when scrolling down, fade-down when scrolling up)
             let lastScrollTop = window.pageYOffset || document.documentElement.scrollTop;
             document.body.classList.add('scrolling-down');

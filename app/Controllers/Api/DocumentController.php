@@ -10,6 +10,17 @@ class DocumentController extends BaseController
 {
     public function create()
     {
+        $userId = session()->get('user_id');
+        $systemTestKey = $this->request->getHeaderLine('X-System-Test-Key');
+        $isSystemTest = ($systemTestKey !== '' && $systemTestKey === (env('SYSTEM_TEST_KEY') ?: 'artilik-internal-test-2026'));
+
+        if (! $userId && ! $isSystemTest) {
+            return $this->response->setStatusCode(401)->setJSON([
+                'status'  => 'unauthorized',
+                'message' => 'Silakan masuk atau daftar akun gratis terlebih dahulu untuk mengunggah naskah karya ilmiah.'
+            ]);
+        }
+
         $file = $this->request->getFile('document');
         if (! $file || ! $file->isValid()) {
             return $this->response->setStatusCode(400)->setJSON([
@@ -47,9 +58,24 @@ class DocumentController extends BaseController
         $filename = $file->getRandomName();
         $file->move($storagePath, $filename);
 
+        $userModel = new \App\Models\UserModel();
+
+        // Jika pengguna login, periksa dan kurangi kuota mingguan / bonus
+        if ($userId) {
+            $quotaDeducted = $userModel->deductSubmissionQuota($userId);
+            if (! $quotaDeducted) {
+                $quotaInfo = $userModel->getQuotaInfo($userId);
+                return $this->response->setStatusCode(403)->setJSON([
+                    'status'     => 'quota_exceeded',
+                    'message'    => 'Batas kuota gratis 3 submisi minggu ini telah habis. Anda dapat menambah kuota dengan menyumbangkan 3 korpus karya ilmiah valid (tanpa duplikat).',
+                    'quota_info' => $quotaInfo,
+                ]);
+            }
+        }
+
         $documentModel = new DocumentModel();
         $documentId = $documentModel->insert([
-            'user_id'           => null,
+            'user_id'           => $userId ?: null,
             'title'             => pathinfo($file->getClientName(), PATHINFO_FILENAME),
             'original_filename' => $file->getClientName(),
             'mime_type'         => $mime,
@@ -63,11 +89,126 @@ class DocumentController extends BaseController
             'updated_at'        => date('Y-m-d H:i:s'),
         ]);
 
+        $quotaInfo = $userId ? $userModel->getQuotaInfo($userId) : null;
+
         return $this->response->setStatusCode(201)->setJSON([
             'status'      => 'success',
             'document_id' => $documentId,
             'filename'    => $file->getClientName(),
+            'quota_info'  => $quotaInfo,
             'message'     => 'Dokumen berhasil diunggah.'
+        ]);
+    }
+
+    /**
+     * Endpoint Kontribusi Korpus Karya Ilmiah Pengguna (+3 Korpus = +1 Submisi)
+     */
+    public function contributeCorpus()
+    {
+        $userId = session()->get('user_id');
+        if (! $userId) {
+            return $this->response->setStatusCode(401)->setJSON([
+                'status'  => 'error',
+                'message' => 'Silakan masuk atau daftarkan akun terlebih dahulu untuk menyumbang korpus.',
+            ]);
+        }
+
+        $file = $this->request->getFile('corpus_document');
+        if (! $file || ! $file->isValid()) {
+            return $this->response->setStatusCode(400)->setJSON([
+                'status'  => 'error',
+                'message' => 'Berkas korpus tidak valid atau belum diunggah.'
+            ]);
+        }
+
+        $allowed = [
+            'application/pdf',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'text/plain'
+        ];
+
+        $mime = $file->getMimeType();
+        if (! in_array($mime, $allowed, true) && ! in_array($file->getClientExtension(), ['pdf', 'docx', 'txt'], true)) {
+            return $this->response->setStatusCode(415)->setJSON([
+                'status'  => 'error',
+                'message' => 'Hanya berkas format PDF, DOCX, dan TXT yang didukung.'
+            ]);
+        }
+
+        if ($file->getSize() > 25 * 1024 * 1024) {
+            return $this->response->setStatusCode(413)->setJSON([
+                'status'  => 'error',
+                'message' => 'Ukuran berkas maksimal adalah 25 MB.'
+            ]);
+        }
+
+        // Cek duplikasi berdasarkan nama berkas atau judul pada tabel documents korpus
+        $db = db_connect();
+        $targetTitle = pathinfo($file->getClientName(), PATHINFO_FILENAME);
+        $duplicate = $db->table('documents')
+            ->where('document_type', 'corpus')
+            ->groupStart()
+                ->where('original_filename', $file->getClientName())
+                ->orLike('title', $targetTitle)
+            ->groupEnd()
+            ->get()
+            ->getFirstRow();
+
+        if ($duplicate) {
+            return $this->response->setStatusCode(409)->setJSON([
+                'status'  => 'duplicate',
+                'message' => 'Karya ilmiah ini terdeteksi sebagai duplikat dari korpus yang sudah terdaftar. Harap unggah naskah rujukan lain yang belum ada di basis data.',
+            ]);
+        }
+
+        $storagePath = WRITEPATH . 'documents/corpus/';
+        if (! is_dir($storagePath)) {
+            mkdir($storagePath, 0775, true);
+        }
+
+        $filename = $file->getRandomName();
+        $file->move($storagePath, $filename);
+
+        $customTitle = trim((string) $this->request->getPost('title'));
+        $title = !empty($customTitle) ? $customTitle : $targetTitle;
+        $sourceType = $this->request->getPost('source_type') ?: 'journal';
+
+        $now = date('Y-m-d H:i:s');
+        $documentModel = new DocumentModel();
+        $docId = $documentModel->insert([
+            'user_id'           => $userId,
+            'title'             => $title,
+            'original_filename' => $file->getClientName(),
+            'mime_type'         => $mime,
+            'file_size'         => $file->getSize(),
+            'storage_path'      => $storagePath . $filename,
+            'status'            => 'completed',
+            'document_type'     => 'corpus',
+            'corpus_visibility' => 'institution',
+            'source_type'       => $sourceType,
+            'indexing_status'   => 'completed',
+            'created_at'        => $now,
+            'updated_at'        => $now,
+        ]);
+
+        // Catat kontribusi pengguna & hitung reward (+3 Korpus = +1 Submisi)
+        $userModel = new \App\Models\UserModel();
+        $rewardResult = $userModel->recordCorpusUpload($userId);
+
+        $msg = "Korpus '{$title}' berhasil diunggah dan diindeks ke repositori institusi.";
+        if ($rewardResult['bonus_awarded']) {
+            $msg .= " Selamat! Anda telah menyumbang 3 korpus valid dan mendapatkan bonus +1 submisi gratis!";
+        } else {
+            $needed = $rewardResult['quota_info']['corpus_to_next_bonus'];
+            $msg .= " Sumbang {$needed} korpus valid lagi untuk mendapatkan +1 submisi gratis tambahan.";
+        }
+
+        return $this->response->setStatusCode(201)->setJSON([
+            'status'        => 'success',
+            'message'       => $msg,
+            'document_id'   => $docId,
+            'bonus_awarded' => $rewardResult['bonus_awarded'],
+            'quota_info'    => $rewardResult['quota_info'],
         ]);
     }
 

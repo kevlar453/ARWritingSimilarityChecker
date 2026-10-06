@@ -9,15 +9,34 @@ class DashboardController extends BaseController
 {
     public function index()
     {
+        $userId = session()->get('user_id');
+        if (! $userId) {
+            return redirect()->to(base_url('/?auth=login'))->with('auth_notice', 'Silakan masuk atau daftar akun gratis terlebih dahulu untuk mengakses dashboard AR Tilik.');
+        }
+
+        $userModel = new \App\Models\UserModel();
+        $currentUser = $userModel->find($userId);
+        if (! $currentUser) {
+            session()->destroy();
+            return redirect()->to(base_url('/?auth=login'))->with('auth_notice', 'Sesi login telah berakhir. Silakan masuk kembali.');
+        }
+
+        $currentUser = $userModel->refreshWeeklyQuota($currentUser);
+        $quotaInfo = $userModel->getQuotaInfo($currentUser);
+
         $docModel = new DocumentModel();
         $reportModel = new ReportModel();
         $db = db_connect();
 
-        // Dokumen submisi terbaru dengan laporan terakhir
-        $submissions = $docModel->where('document_type', 'submission')
-                                ->where('benchmark_run_id IS NULL', null, false)
-                                ->orderBy('id', 'DESC')
-                                ->findAll(20);
+        // Dokumen submisi: hanya tampilkan submisi milik user yang sedang login (kecuali admin)
+        $subBuilder = $docModel->where('document_type', 'submission')
+                               ->where('benchmark_run_id IS NULL', null, false);
+
+        if (($currentUser['role'] ?? 'user') !== 'admin') {
+            $subBuilder->where('user_id', $userId);
+        }
+
+        $submissions = $subBuilder->orderBy('id', 'DESC')->findAll(20);
 
         foreach ($submissions as &$sub) {
             $latestReport = $reportModel->where('document_id', $sub['id'])
@@ -48,6 +67,8 @@ class DashboardController extends BaseController
             'totalSubmissions' => $totalSubmissions,
             'totalCorpus'      => $totalCorpus,
             'totalReports'     => $totalReports,
+            'currentUser'      => $currentUser,
+            'quotaInfo'        => $quotaInfo,
         ]);
     }
 
