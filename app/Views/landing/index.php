@@ -312,6 +312,18 @@
         }
 
         /* Theory Cards */
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+
+        @media (max-width: 1200px) {
+            .grid-4 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
         .grid-3 {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -502,6 +514,12 @@
             box-shadow: 0 12px 30px -4px rgba(67, 56, 202, 0.15);
         }
 
+        .pricing-card.popular {
+            border: 2px solid #f59e0b;
+            box-shadow: 0 12px 30px -4px rgba(245, 158, 11, 0.2);
+            background: linear-gradient(180deg, #fffdfa 0%, #ffffff 100%);
+        }
+
         .pricing-badge {
             position: absolute;
             top: -12px;
@@ -515,6 +533,10 @@
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+        }
+
+        .pricing-badge.popular {
+            background: #f59e0b;
         }
 
         .plan-name {
@@ -1120,7 +1142,7 @@
             .dual-reader-features { grid-template-columns: 1fr; gap: 14px; }
             .dual-reader-showcase { padding: 24px 18px; }
             .dual-reader-title { font-size: 24px; }
-            .grid-3, .grid-2 { grid-template-columns: 1fr; }
+            .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
             .stats-bar { grid-template-columns: repeat(2, 1fr); gap: 16px; }
             .incentive-grid { grid-template-columns: 1fr; }
             .footer-grid { grid-template-columns: 1fr; }
@@ -1494,97 +1516,173 @@
         </div>
     </section>
 
-    <!-- Section 4: Paket Berlangganan (Roadmap Pricing) -->
-    <section id="langganan" class="section" style="background: #ffffff; border-top: 1px solid var(--border);">
+    <!-- Section 4: Paket Berlangganan & Top-Up Kuota (Midtrans Aligned) -->
+    <section id="langganan" class="section" style="background: #ffffff; border-top: 1px solid var(--border); position: relative;">
+        <!-- Anchor link alias for #pricing -->
+        <span id="pricing" style="position: absolute; top: -70px; left: 0;"></span>
         <div class="container">
             <div class="section-header" data-aos="fade-up" data-aos-duration="700">
-                <div class="section-tag">Pilihan Akses & Rencana Pengembangan</div>
-                <h2 class="section-title">Pilihan Paket AR Tilik</h2>
+                <div class="section-tag">Tarif Transparan & Pilihan Akses</div>
+                <h2 class="section-title">Pilihan Paket & Top-Up Kuota AR Tilik</h2>
                 <p class="section-desc">
-                    Mulai dari penggunaan mandiri gratis hingga integrasi komprehensif tingkat fakultas dan universitas:
+                    Mulai dari penggunaan mandiri gratis, top-up fleksibel tanpa batas waktu, paket bulanan pejuang skripsi, hingga integrasi institusi kampus:
                 </p>
             </div>
 
-            <div class="grid-3">
+            <div class="grid-4">
                 <!-- Plan 1: Free Academic -->
-                <div class="pricing-card featured" data-aos="fade-up" data-aos-delay="100" data-aos-duration="700">
-                    <div class="pricing-badge">Paling Populer</div>
+                <div class="pricing-card" data-aos="fade-up" data-aos-delay="100" data-aos-duration="700">
                     <div>
+                        <div style="font-size: 11px; text-transform: uppercase; font-weight: 800; color: #10b981; margin-bottom: 4px;">Tier Dasar Selamanya</div>
                         <div class="plan-name">Civitas Akademika</div>
                         <div class="plan-price">Gratis <span class="plan-period">/ selamanya</span></div>
-                        <p style="font-size: 13px; color: var(--text-muted);">
-                            Cocok untuk mahasiswa, dosen, dan peneliti mandiri yang memeriksa tugas atau draf artikel.
+                        <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">
+                            Cocok untuk mahasiswa, dosen, dan peneliti mandiri yang memeriksa tugas atau draf artikel berkala.
                         </p>
 
                         <ul class="plan-features">
-                            <li>3 Submisi Gratis per Minggu</li>
-                            <li>Bonus +1 Submisi per 3 Korpus Valid</li>
+                            <li><strong>3 Submisi Gratis</strong> per minggu (reset tiap 7 hari)</li>
+                            <li><strong>Bonus +1 Submisi</strong> tiap sumbang 3 korpus valid</li>
                             <li>Akses Dual-Reader (Layar Ganda)</li>
-                            <li>Filter Eksklusi Kutipan & Daftar Pustaka</li>
+                            <li>Filter Eksklusi Sitasi & Daftar Pustaka</li>
                             <li>Sertifikat Resmi Ber-QR Code</li>
-                            <li>Deteksi Sitasi APA / IEEE / Harvard</li>
+                            <li>Deteksi sitasi APA / IEEE / Harvard</li>
                         </ul>
                     </div>
 
                     <?php if ($currentUser) : ?>
-                        <a href="<?= base_url('dashboard') ?>" class="btn btn-primary" style="width: 100%;">
+                        <a href="<?= base_url('dashboard') ?>" class="btn btn-outline" style="width: 100%;">
                             Gunakan Kuota Saya
                         </a>
                     <?php else : ?>
-                        <button type="button" onclick="openAuthModal('register')" class="btn btn-primary" style="width: 100%;">
+                        <button type="button" onclick="openAuthModal('register')" class="btn btn-outline" style="width: 100%;">
                             Daftar Akun Gratis
                         </button>
                     <?php endif; ?>
                 </div>
 
-                <!-- Plan 2: Peneliti Produktif (Roadmap) -->
-                <div class="pricing-card" data-aos="fade-up" data-aos-delay="200" data-aos-duration="700">
+                <!-- Plan 2: Top-Up Fleksibel (Pay-As-You-Go) -->
+                <div class="pricing-card" data-aos="fade-up" data-aos-delay="150" data-aos-duration="700">
                     <div>
-                        <div style="font-size: 11px; text-transform: uppercase; font-weight: 800; color: #0284c7; margin-bottom: 4px;">Tahap Perencanaan</div>
-                        <div class="plan-name">Peneliti Produktif</div>
-                        <div class="plan-price">Paket Riset <span class="plan-period">(Segera Hadir)</span></div>
-                        <p style="font-size: 13px; color: var(--text-muted);">
-                            Dirancang untuk peneliti aktif, pengelola jurnal, dan pembimbing skripsi berfrekuensi tinggi.
+                        <div style="font-size: 11px; text-transform: uppercase; font-weight: 800; color: #0284c7; margin-bottom: 4px;">Pay-As-You-Go</div>
+                        <div class="plan-name">Top-Up Fleksibel</div>
+                        <div class="plan-price">Rp 10.000 <span class="plan-period">/ 3 cek</span></div>
+                        <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">
+                            Beli kuota saat dibutuhkan. Tersedia opsi hemat <strong>Rp 25.000 / 10 cek</strong> (Rp 2.500/cek).
                         </p>
 
                         <ul class="plan-features">
-                            <li>Submisi Fleksibel Tanpa Kuota Mingguan</li>
-                            <li>Prioritas Antrean Worker Daemon</li>
-                            <li>Analisis Estilometri AI (Burstiness & TTR)</li>
-                            <li>Cross-Lingual Semantic Matching (ID-EN)</li>
-                            <li>Ekspor Batch & Riwayat Arsip 1 Tahun</li>
-                            <li>Penyelarasan OpenAlex JIT Tak Terbatas</li>
+                            <li><strong>Aktif selamanya</strong> (tanpa kedaluwarsa)</li>
+                            <li>Pilihan paket 3 submisi (Rp 10.000)</li>
+                            <li>Pilihan paket 10 submisi (Rp 25.000, hemat 16%)</li>
+                            <li>Prioritas pemrosesan dokumen antrean</li>
+                            <li>Semua fitur deteksi hybrid AI aktif</li>
+                            <li>Aktivasi instan via QRIS & Virtual Account</li>
                         </ul>
                     </div>
 
-                    <button type="button" onclick="alert('Rencana paket berlangganan peneliti sedang disiapkan. Anda dapat mendaftar gratis terlebih dahulu!')" class="btn btn-outline" style="width: 100%;">
-                        Daftar Minat / Waiting List
-                    </button>
+                    <?php if ($currentUser) : ?>
+                        <a href="<?= base_url('dashboard') ?>" class="btn btn-primary" style="width: 100%;">
+                            ⚡ Top-Up di Dashboard
+                        </a>
+                    <?php else : ?>
+                        <button type="button" onclick="openAuthModal('login')" class="btn btn-primary" style="width: 100%;">
+                            Masuk & Beli Kuota
+                        </button>
+                    <?php endif; ?>
                 </div>
 
-                <!-- Plan 3: Institusi Enterprise (Roadmap) -->
-                <div class="pricing-card" data-aos="fade-up" data-aos-delay="300" data-aos-duration="700">
+                <!-- Plan 3: Paket Pejuang Skripsi (Featured) -->
+                <div class="pricing-card popular" data-aos="fade-up" data-aos-delay="200" data-aos-duration="700">
+                    <div class="pricing-badge popular">⭐ Rekomendasi Mahasiswa</div>
                     <div>
-                        <div style="font-size: 11px; text-transform: uppercase; font-weight: 800; color: #d97706; margin-bottom: 4px;">Tahap Perencanaan</div>
-                        <div class="plan-name">Kampus & LPPM</div>
-                        <div class="plan-price">Enterprise <span class="plan-period">(Institusional)</span></div>
-                        <p style="font-size: 13px; color: var(--text-muted);">
-                            Integrasi menyeluruh ekosistem digital kampus dan repositori skripsi internal program studi.
+                        <div style="font-size: 11px; text-transform: uppercase; font-weight: 800; color: #d97706; margin-bottom: 4px;">Paket Bulanan Favorit</div>
+                        <div class="plan-name">Pejuang Skripsi</div>
+                        <div class="plan-price">Rp 25.000 <span class="plan-period">/ bulan</span></div>
+                        <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">
+                            Hanya <strong>Rp 1.250 / dokumen</strong>. Solusi hemat untuk persiapan sidang & revisi bab skripsi/tesis.
                         </p>
 
                         <ul class="plan-features">
-                            <li>Integrasi Moodle LMS & OJS 3 Plugin</li>
-                            <li>Korpus Tertutup Khusus Fakultas/Prodi</li>
-                            <li>Dashboard Manajemen & Analitik LPPM</li>
-                            <li>Deploy On-Premise / Dedicated VPS</li>
-                            <li>Penyelarasan OAI-PMH Otomatis Terjadwal</li>
-                            <li>SLA Bantuan Teknis Khusus</li>
+                            <li><strong>20 Submisi Dokumen</strong> per bulan</li>
+                            <li>Prioritas antrean pemrosesan cepat</li>
+                            <li>Ekspor PDF laporan resmi lengkap</li>
+                            <li>Verifikasi keaslian naskah ber-QR Code</li>
+                            <li>Masa aktif paket 30 hari penuh</li>
+                            <li>Aktivasi instan via QRIS & Virtual Account</li>
                         </ul>
                     </div>
 
-                    <button type="button" onclick="alert('Hubungi tim pengembang AR Tilik untuk diskusi integrasi institusi perguruan tinggi.')" class="btn btn-outline" style="width: 100%;">
-                        Konsultasi Institusi
-                    </button>
+                    <?php if ($currentUser) : ?>
+                        <a href="<?= base_url('dashboard') ?>" class="btn btn-primary" style="width: 100%; background: #f59e0b; border-color: #f59e0b; color: #ffffff;">
+                            Langganan di Dashboard
+                        </a>
+                    <?php else : ?>
+                        <button type="button" onclick="openAuthModal('register')" class="btn btn-primary" style="width: 100%; background: #f59e0b; border-color: #f59e0b; color: #ffffff;">
+                            Daftar & Langganan
+                        </button>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Plan 4: Dosen & Peneliti Pro -->
+                <div class="pricing-card" data-aos="fade-up" data-aos-delay="250" data-aos-duration="700">
+                    <div>
+                        <div style="font-size: 11px; text-transform: uppercase; font-weight: 800; color: #7c3aed; margin-bottom: 4px;">Kapasitas Besar</div>
+                        <div class="plan-name">Dosen & Peneliti Pro</div>
+                        <div class="plan-price">Rp 75.000 <span class="plan-period">/ bulan</span></div>
+                        <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">
+                            Hanya <strong>Rp 1.000 / dokumen</strong>. Dirancang untuk dosen pembimbing, reviewer, dan peneliti aktif.
+                        </p>
+
+                        <ul class="plan-features">
+                            <li><strong>75 Submisi Dokumen</strong> per bulan</li>
+                            <li>Prioritas antrean tertinggi sistem</li>
+                            <li>Dukungan berkas besar hingga <strong>30 MB</strong></li>
+                            <li>Pemeriksaan draf jurnal & tugas kelas</li>
+                            <li>Masa aktif paket 30 hari penuh</li>
+                            <li>Aktivasi instan via QRIS & Virtual Account</li>
+                        </ul>
+                    </div>
+
+                    <?php if ($currentUser) : ?>
+                        <a href="<?= base_url('dashboard') ?>" class="btn btn-outline" style="width: 100%;">
+                            Pilih Paket Dosen
+                        </a>
+                    <?php else : ?>
+                        <button type="button" onclick="openAuthModal('register')" class="btn btn-outline" style="width: 100%;">
+                            Daftar & Langganan
+                        </button>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <!-- Institutional & Enterprise Banner -->
+            <div data-aos="fade-up" data-aos-delay="300" data-aos-duration="700" style="margin-top: 36px; background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); border-radius: 20px; padding: 32px 36px; color: #ffffff; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 24px; border: 1px solid rgba(99, 102, 241, 0.25); box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.3);">
+                <div style="max-width: 780px;">
+                    <div style="display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: 20px; background: rgba(99, 102, 241, 0.2); border: 1px solid rgba(99, 102, 241, 0.4); font-size: 11px; font-weight: 800; color: #a5b4fc; text-transform: uppercase; margin-bottom: 12px;">
+                        🏛️ Solusi Kampus & Lembaga Riset
+                    </div>
+                    <h3 style="font-size: 22px; font-weight: 800; margin-bottom: 8px; color: #ffffff;">Paket Kampus, OJS Jurnal & LPPM (Enterprise)</h3>
+                    <p style="font-size: 14px; color: #cbd5e1; line-height: 1.6; margin: 0;">
+                        Butuh integrasi dengan repositori skripsi internal prodi, plugin OJS 3 untuk penerbitan jurnal, atau plugin Moodle LMS kampus? Kami menyediakan instalasi mandiri (on-premise / private cloud), korpus tertutup institusi, serta sinkronisasi OAI-PMH otomatis dengan SLA dukungan teknis dedicated.
+                    </p>
+                </div>
+                <div style="flex-shrink: 0; width: 100%; max-width: 260px; text-align: center;">
+                    <a href="mailto:admin@tilik.arsetontong.top?subject=Konsultasi%20Integrasi%20Institusi%20AR%20Tilik" class="btn" style="background: #ffffff; color: #0f172a; font-weight: 800; width: 100%; border: none; padding: 14px 20px; display: inline-block; text-decoration: none; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                        Konsultasi Institusi →
+                    </a>
+                    <div style="font-size: 11px; color: #94a3b8; margin-top: 8px;">Mulai Rp 250.000 / bln untuk pengelolaan jurnal</div>
+                </div>
+            </div>
+
+            <!-- Payment Methods Supported Bar -->
+            <div style="margin-top: 24px; padding: 18px 24px; background: #f8fafc; border: 1px solid var(--border); border-radius: 16px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 14px; font-size: 13px; color: var(--text-muted);" data-aos="fade-up" data-aos-delay="350">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 18px;">💳</span>
+                    <span><strong>Metode Pembayaran Resmi (Midtrans Gateway):</strong> QRIS (GoPay, OVO, Dana, ShopeePay, LinkAja) & Virtual Account (BCA, BRI, BNI, Mandiri)</span>
+                </div>
+                <div style="font-size: 12px; color: #64748b;">
+                    🔒 Terenkripsi SSL 256-bit • Kuota langsung bertambah otomatis dalam hitungan detik
                 </div>
             </div>
         </div>
