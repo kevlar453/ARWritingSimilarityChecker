@@ -1037,6 +1037,33 @@
             line-height: 1.6;
         }
 
+        /* Dynamic Bidirectional AOS Transitions (Scroll-Down vs Scroll-Up) */
+        body.scrolling-down [data-aos="fade-up"]:not(.aos-animate) {
+            transform: translate3d(0, 50px, 0);
+        }
+        body.scrolling-down [data-aos="fade-down"]:not(.aos-animate) {
+            transform: translate3d(0, -50px, 0);
+        }
+
+        body.scrolling-up [data-aos="fade-up"]:not(.aos-animate) {
+            transform: translate3d(0, -50px, 0);
+        }
+        body.scrolling-up [data-aos="fade-down"]:not(.aos-animate) {
+            transform: translate3d(0, 50px, 0);
+        }
+
+        body.scrolling-up [data-aos="fade-left"]:not(.aos-animate) {
+            transform: translate3d(-50px, 0, 0);
+        }
+        body.scrolling-up [data-aos="fade-right"]:not(.aos-animate) {
+            transform: translate3d(50px, 0, 0);
+        }
+
+        /* Instant reaction on reverse scroll (eliminate delay on upward reading) */
+        body.scrolling-up [data-aos] {
+            transition-delay: 0s !important;
+        }
+
         /* Responsive */
         @media (max-width: 900px) {
             .hero-grid { grid-template-columns: 1fr; gap: 32px; margin-bottom: 36px; }
@@ -1754,12 +1781,31 @@
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Directional scroll tracker for bidirectional AOS (fade-up when scrolling down, fade-down when scrolling up)
+            let lastScrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            document.body.classList.add('scrolling-down');
+
+            window.addEventListener('scroll', function() {
+                const currentScrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                if (Math.abs(currentScrollTop - lastScrollTop) > 6) {
+                    if (currentScrollTop > lastScrollTop) {
+                        document.body.classList.add('scrolling-down');
+                        document.body.classList.remove('scrolling-up');
+                    } else if (currentScrollTop < lastScrollTop) {
+                        document.body.classList.add('scrolling-up');
+                        document.body.classList.remove('scrolling-down');
+                    }
+                    lastScrollTop = currentScrollTop <= 0 ? 0 : currentScrollTop;
+                }
+            }, { passive: true });
+
             if (typeof AOS !== 'undefined') {
                 AOS.init({
-                    duration: 800,
-                    once: true,
+                    duration: 750,
                     easing: 'ease-out-cubic',
-                    offset: 80
+                    once: false,
+                    mirror: true,
+                    offset: 70
                 });
             }
         });
