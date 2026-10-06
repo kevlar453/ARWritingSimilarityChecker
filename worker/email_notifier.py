@@ -22,6 +22,7 @@ def notify_user_report_completed(
     cosine_similarity: float,
     citation_health_score: Optional[float] = None,
     ai_probability_score: Optional[float] = None,
+    evasion_risk_score: Optional[float] = None,
 ) -> bool:
     """
     Mengirimkan notifikasi email kepada pemilik dokumen saat laporan selesai diproses.
@@ -85,6 +86,19 @@ def notify_user_report_completed(
                 <td style="padding: 10px 14px; border-bottom: 1px solid #f1f5f9; color: #64748b; font-size: 13px;">Indikator Teks Buatan AI</td>
                 <td style="padding: 10px 14px; border-bottom: 1px solid #f1f5f9; font-weight: 700; color: {ai_color}; font-size: 13px;">
                     {ai_probability_score:.1f}% ({ai_label})
+                </td>
+            </tr>
+            """
+
+        evasion_row = ""
+        if evasion_risk_score is not None:
+            ev_color = "#b91c1c" if evasion_risk_score >= 35 else ("#b45309" if evasion_risk_score >= 10 else "#047857")
+            ev_label = "Manipulasi Terencana" if evasion_risk_score >= 35 else ("Anomali Karakter" if evasion_risk_score >= 10 else "Otentik / Bersih")
+            evasion_row = f"""
+            <tr>
+                <td style="padding: 10px 14px; border-bottom: 1px solid #f1f5f9; color: #64748b; font-size: 13px;">Integritas &amp; Anti-Evasion</td>
+                <td style="padding: 10px 14px; border-bottom: 1px solid #f1f5f9; font-weight: 700; color: {ev_color}; font-size: 13px;">
+                    {evasion_risk_score:.1f}% ({ev_label})
                 </td>
             </tr>
             """
@@ -160,6 +174,7 @@ def notify_user_report_completed(
                                     </tr>
                                     {audit_row}
                                     {ai_row}
+                                    {evasion_row}
                                 </table>
                             </div>
 

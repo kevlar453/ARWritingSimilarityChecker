@@ -219,6 +219,15 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
             citation_audit_res = audit_citations_and_bibliography(submission_text, segmentation_res)
             result["citation_audit"] = citation_audit_res.to_dict()
 
+            # 7. Academic Integrity & Anti-Cheat Evasion Detector (Opsi 2)
+            from worker.evasion_detector import detect_document_evasion
+            evasion_res = detect_document_evasion(
+                text=submission_text,
+                storage_path=document.get("storage_path"),
+                mime_type=document.get("mime_type")
+            )
+            result["evasion_detection"] = evasion_res.to_dict()
+
             # Anotasi pasase individu dengan teks pasase & status boilerplate
             for match in result.get("matches", []):
                 s_start = match.get("submission_start", 0)
@@ -295,6 +304,7 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
                 xgboost_risk=xgboost_risk_res,
                 jit_harvesting=jit_harvest_res,
                 citation_audit=citation_audit_res,
+                evasion_detection=evasion_res,
             )
             pres_latency_ms = (time.perf_counter() - t_pres_start) * 1000.0
 
@@ -456,6 +466,9 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
             ai_score = None
             if isinstance(ai_stylometrics_res, dict) and "ai_probability_score" in ai_stylometrics_res:
                 ai_score = float(ai_stylometrics_res["ai_probability_score"])
+            ev_score = None
+            if evasion_res is not None and hasattr(evasion_res, "evasion_risk_score"):
+                ev_score = float(evasion_res.evasion_risk_score)
 
             notify_user_report_completed(
                 document_id=document_id,
@@ -467,6 +480,7 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
                 cosine_similarity=cosine_sim,
                 citation_health_score=c_score,
                 ai_probability_score=ai_score,
+                evasion_risk_score=ev_score,
             )
         except Exception as mail_err:
             print(f"  [EMAIL WARNING] Gagal mengirim notifikasi email untuk Report #{report_id}: {mail_err}")

@@ -230,6 +230,12 @@ class DashboardController extends BaseController
             $citationAudit = $this->computeFallbackCitationAudit($submissionText);
         }
 
+        // Resolusi Deteksi Manipulasi Naskah & Anti-Cheat (Opsi 2)
+        $evasionDetection = $evidenceData['evasion_detection'] ?? $evidenceData['v1_1_presentation']['v1_2_evolution']['evasion_detection'] ?? null;
+        if (!$evasionDetection && !empty($submissionText)) {
+            $evasionDetection = $this->computeFallbackEvasionDetection($submissionText);
+        }
+
         return view('dashboard/report', [
             'report'              => $report,
             'document'            => $document,
@@ -246,6 +252,7 @@ class DashboardController extends BaseController
             'jitHarvesting'       => $jitHarvesting,
             'jitDiscoveredIds'    => $jitDiscoveredIds,
             'citationAudit'       => $citationAudit,
+            'evasionDetection'    => $evasionDetection,
         ]);
     }
 
@@ -674,6 +681,191 @@ class DashboardController extends BaseController
         $cleaned = preg_replace('/[^a-zA-Z\s]/u', '', $cleaned);
         $tokens = preg_split('/\s+/u', trim(mb_strtolower($cleaned)));
         return !empty($tokens) ? end($tokens) : '';
+    }
+
+    private function computeFallbackEvasionDetection(string $text): array
+    {
+        if (empty(trim($text))) {
+            return [
+                'evasion_risk_score'     => 0.0,
+                'integrity_status'       => 'CLEAN',
+                'verdict_label'          => 'Naskah Otentik (Tanpa Teks)',
+                'summary_rationale'      => 'Tidak ada teks yang dapat diuji integritasnya.',
+                'total_words_inspected'  => 0,
+                'total_anomalies_count'  => 0,
+                'homoglyph_count'        => 0,
+                'zero_width_count'       => 0,
+                'white_text_count'       => 0,
+                'micro_font_count'       => 0,
+                'has_mixed_script_words' => false,
+                'anomalies'              => [],
+                'deobfuscated_preview'   => '',
+            ];
+        }
+
+        // Karakter tak kasat mata (Zero-width chars)
+        $invisibleChars = [
+            "\xE2\x80\x8B" => 'Zero-Width Space (ZWSP / U+200B)',
+            "\xE2\x80\x8C" => 'Zero-Width Non-Joiner (ZWNJ / U+200C)',
+            "\xE2\x80\x8D" => 'Zero-Width Joiner (ZWJ / U+200D)',
+            "\xE2\x81\xA0" => 'Word Joiner (WJ / U+2060)',
+            "\xEF\xBB\xBF" => 'Zero-Width No-Break Space / BOM (U+FEFF)',
+            "\xC2\xAD"     => 'Soft Hyphen (SHY / U+00AD)',
+            "\xE2\x80\x8E" => 'Left-to-Right Mark (LRM / U+200E)',
+            "\xE2\x80\x8F" => 'Right-to-Left Mark (RLM / U+200F)',
+            "\xE2\x80\xAA" => 'Left-to-Right Embedding (LRE / U+202A)',
+            "\xE2\x80\xAB" => 'Right-to-Left Embedding (RLE / U+202B)',
+            "\xE2\x80\xAC" => 'Pop Directional Formatting (PDF / U+202C)',
+            "\xE2\x80\xAD" => 'Left-to-Right Override (LRO / U+202D)',
+            "\xE2\x80\xAE" => 'Right-to-Left Override (RLO / U+202E)',
+        ];
+
+        // Homoglif umum Cyrillic & Yunani yang menyerupai huruf Latin
+        $homoglyphs = [
+            'а' => ['a', 'Cyrillic Small Letter A (U+0430)', 'U+0430'],
+            'е' => ['e', 'Cyrillic Small Letter E (U+0435)', 'U+0435'],
+            'о' => ['o', 'Cyrillic Small Letter O (U+043E)', 'U+043E'],
+            'р' => ['p', 'Cyrillic Small Letter ER (U+0440)', 'U+0440'],
+            'с' => ['c', 'Cyrillic Small Letter ES (U+0441)', 'U+0441'],
+            'у' => ['y', 'Cyrillic Small Letter U (U+0443)', 'U+0443'],
+            'х' => ['x', 'Cyrillic Small Letter HA (U+0445)', 'U+0445'],
+            'і' => ['i', 'Cyrillic Small Letter I (U+0456)', 'U+0456'],
+            'ј' => ['j', 'Cyrillic Small Letter JE (U+0458)', 'U+0458'],
+            'ѕ' => ['s', 'Cyrillic Small Letter DZE (U+0455)', 'U+0455'],
+            'ԁ' => ['d', 'Cyrillic Small Letter KOMI DE (U+0501)', 'U+0501'],
+            'А' => ['A', 'Cyrillic Capital Letter A (U+0410)', 'U+0410'],
+            'В' => ['B', 'Cyrillic Capital Letter VE (U+0412)', 'U+0412'],
+            'Е' => ['E', 'Cyrillic Capital Letter IE (U+0415)', 'U+0415'],
+            'К' => ['K', 'Cyrillic Capital Letter KA (U+041A)', 'U+041A'],
+            'М' => ['M', 'Cyrillic Capital Letter EM (U+041C)', 'U+041C'],
+            'Н' => ['H', 'Cyrillic Capital Letter EN (U+041D)', 'U+041D'],
+            'О' => ['O', 'Cyrillic Capital Letter O (U+041E)', 'U+041E'],
+            'Р' => ['P', 'Cyrillic Capital Letter ER (U+0420)', 'U+0420'],
+            'С' => ['C', 'Cyrillic Capital Letter ES (U+0421)', 'U+0421'],
+            'Т' => ['T', 'Cyrillic Capital Letter TE (U+0422)', 'U+0422'],
+            'Х' => ['X', 'Cyrillic Capital Letter HA (U+0425)', 'U+0425'],
+            'α' => ['a', 'Greek Small Letter Alpha (U+03B1)', 'U+03B1'],
+            'ο' => ['o', 'Greek Small Letter Omicron (U+03BF)', 'U+03BF'],
+            'ν' => ['v', 'Greek Small Letter Nu (U+03BD)', 'U+03BD'],
+            'ι' => ['i', 'Greek Small Letter Iota (U+03B9)', 'U+03B9'],
+            'ρ' => ['p', 'Greek Small Letter Rho (U+03C1)', 'U+03C1'],
+            'κ' => ['k', 'Greek Small Letter Kappa (U+03BA)', 'U+03BA'],
+        ];
+
+        $anomalies = [];
+        $totalZeroWidth = 0;
+        $totalHomoglyphs = 0;
+
+        foreach ($invisibleChars as $bytes => $name) {
+            $cnt = substr_count($text, $bytes);
+            if ($cnt > 0) {
+                $totalZeroWidth += $cnt;
+                $anomalies[] = [
+                    'category'          => 'ZERO_WIDTH_INJECTION',
+                    'detected_item'     => $name,
+                    'deobfuscated_item' => '[Dihapus]',
+                    'char_code'         => explode(' ', $name)[0],
+                    'description'       => "Ditemukan {$cnt} karakter tak kasat mata diselipkan di dalam teks.",
+                    'occurrences'       => $cnt,
+                    'sample_context'    => $name,
+                ];
+            }
+        }
+
+        $rawTokens = preg_split('/\s+/u', trim($text));
+        $totalWords = count($rawTokens);
+        $homoStats = [];
+        $hasMixedScript = false;
+
+        foreach ($rawTokens as $w) {
+            $clean = preg_replace('/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/u', '', $w);
+            if (empty($clean)) continue;
+
+            $hasLatin = (bool) preg_match('/[a-zA-Z]/', $clean);
+            $hasHomoInWord = false;
+
+            foreach ($homoglyphs as $hChar => $hInfo) {
+                if (mb_strpos($clean, $hChar) !== false) {
+                    $cCnt = mb_substr_count($clean, $hChar);
+                    $totalHomoglyphs += $cCnt;
+                    $hasHomoInWord = true;
+
+                    if (!isset($homoStats[$hChar])) {
+                        $homoStats[$hChar] = [
+                            'info'    => $hInfo,
+                            'count'   => 0,
+                            'samples' => [],
+                        ];
+                    }
+                    $homoStats[$hChar]['count'] += $cCnt;
+                    if (count($homoStats[$hChar]['samples']) < 4 && !in_array($clean, $homoStats[$hChar]['samples'], true)) {
+                        $homoStats[$hChar]['samples'][] = $clean;
+                    }
+                }
+            }
+
+            if ($hasLatin && $hasHomoInWord) {
+                $hasMixedScript = true;
+            }
+        }
+
+        foreach ($homoStats as $hChar => $data) {
+            $hInfo = $data['info'];
+            $sampleStr = implode(', ', array_map(fn($s) => "'{$s}'", $data['samples']));
+            $anomalies[] = [
+                'category'          => 'HOMOGLYPH_SUBSTITUTION',
+                'detected_item'     => "'{$hChar}' -> '{$hInfo[0]}'",
+                'deobfuscated_item' => $hInfo[0],
+                'char_code'         => $hInfo[2],
+                'description'       => "Huruf alfabet Latin diganti dengan aksara {$hInfo[1]}. Contoh kata: {$sampleStr}",
+                'occurrences'       => $data['count'],
+                'sample_context'    => $sampleStr,
+            ];
+        }
+
+        $totalAnomalies = $totalZeroWidth + $totalHomoglyphs;
+        $riskScore = 0.0;
+        if ($totalAnomalies > 0) {
+            if ($totalAnomalies <= 2 && !$hasMixedScript) {
+                $riskScore = 6.5;
+            } else {
+                $density = ($totalAnomalies / max(50, $totalWords)) * 100.0;
+                $base = min(80.0, $density * 12.0);
+                if ($hasMixedScript) $base += 25.0;
+                $riskScore = min(100.0, max(15.0, $base));
+            }
+        }
+
+        $riskScore = round($riskScore, 1);
+        if ($riskScore >= 35.0 || ($hasMixedScript && $totalHomoglyphs >= 3)) {
+            $integrityStatus = 'MANIPULATED';
+            $verdictLabel = 'Manipulasi Naskah Terencana Terdeteksi';
+            $summaryRationale = "Ditemukan indikasi kuat rekayasa teks ({$totalAnomalies} anomali) berupa substitusi aksara homoglif atau karakter spasi tersembunyi yang bertujuan mengaburkan kemiripan leksikal.";
+        } elseif ($riskScore >= 10.0) {
+            $integrityStatus = 'SUSPICIOUS';
+            $verdictLabel = 'Indikasi Anomali Karakter Perlu Tinjauan';
+            $summaryRationale = "Terdeteksi {$totalAnomalies} anomali karakter khusus yang tidak lazim dalam penulisan ilmiah standar.";
+        } else {
+            $integrityStatus = 'CLEAN';
+            $verdictLabel = 'Integritas Naskah Otentik & Bersih';
+            $summaryRationale = 'Tidak ditemukan penyisipan karakter tak kasat mata maupun substitusi aksara homoglif. Struktur karakter memenuhi kaidah akademik yang murni.';
+        }
+
+        return [
+            'evasion_risk_score'     => $riskScore,
+            'integrity_status'       => $integrityStatus,
+            'verdict_label'          => $verdictLabel,
+            'summary_rationale'      => $summaryRationale,
+            'total_words_inspected'  => $totalWords,
+            'total_anomalies_count'  => $totalAnomalies,
+            'homoglyph_count'        => $totalHomoglyphs,
+            'zero_width_count'       => $totalZeroWidth,
+            'white_text_count'       => 0,
+            'micro_font_count'       => 0,
+            'has_mixed_script_words' => $hasMixedScript,
+            'anomalies'              => $anomalies,
+            'deobfuscated_preview'   => '',
+        ];
     }
 
     public function exportPdf($id)

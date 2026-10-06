@@ -900,6 +900,205 @@
         <?php endif; ?>
 
         <!-- ═════════════════════════════════════════════════════════════════════ -->
+        <!-- OPSI 2: DETEKSI MANIPULASI NASKAH & ANTI-CHEAT (EVASION AUDITOR)       -->
+        <!-- ═════════════════════════════════════════════════════════════════════ -->
+        <?php if (!empty($evasionDetection)): ?>
+        <?php
+            $evScore = (float)($evasionDetection['evasion_risk_score'] ?? 0);
+            $evStatus = $evasionDetection['integrity_status'] ?? 'CLEAN';
+            $evLabel = $evasionDetection['verdict_label'] ?? 'Integritas Naskah Otentik';
+            $totalAnomalies = (int)($evasionDetection['total_anomalies_count'] ?? 0);
+            $homoCount = (int)($evasionDetection['homoglyph_count'] ?? 0);
+            $zwCount = (int)($evasionDetection['zero_width_count'] ?? 0);
+            $whiteCount = (int)($evasionDetection['white_text_count'] ?? 0);
+            $microCount = (int)($evasionDetection['micro_font_count'] ?? 0);
+            $evAnomalies = $evasionDetection['anomalies'] ?? [];
+
+            $evBadgeClass = match($evStatus) {
+                'MANIPULATED' => 'bg-rose-50 text-rose-700 border-rose-300',
+                'SUSPICIOUS'  => 'bg-amber-50 text-amber-800 border-amber-300',
+                default       => 'bg-emerald-50 text-emerald-700 border-emerald-300'
+            };
+
+            $evScoreColor = match($evStatus) {
+                'MANIPULATED' => 'text-rose-600',
+                'SUSPICIOUS'  => 'text-amber-600',
+                default       => 'text-emerald-600'
+            };
+        ?>
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-5" id="evasionDetectionSection">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-2xl">🛡️</span>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="font-bold text-base text-slate-800">
+                                Audit Integritas Karakter &amp; Anti-Cheat Evasion
+                            </h3>
+                            <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+                                Opsi 2: Anti-Bypass
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-0.5">
+                            Mendeteksi teknik manipulasi bypass: aksara serupa (*Homoglyphs*), spasi tak kasat mata (*Zero-Width*), dan teks tersembunyi (*White-Text*).
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 self-start sm:self-auto">
+                    <span class="text-xs font-bold px-3 py-1.5 rounded-xl border <?= $evBadgeClass ?> flex items-center gap-1.5 shadow-2xs">
+                        <?php if ($evStatus === 'CLEAN'): ?>
+                            <span>✓</span> <span>Naskah Otentik &amp; Bersih</span>
+                        <?php elseif ($evStatus === 'SUSPICIOUS'): ?>
+                            <span>⚠️</span> <span>Perlu Tinjauan Karakter (<?= $evScore ?>% Risiko)</span>
+                        <?php else: ?>
+                            <span>🚨</span> <span>Manipulasi Naskah Terdeteksi (<?= $evScore ?>% Risiko)</span>
+                        <?php endif; ?>
+                    </span>
+                </div>
+            </div>
+
+            <!-- 4 Grid KPI Cards -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 font-mono-code">
+                <!-- KPI 1: Evasion Risk Score -->
+                <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                    <div class="text-[11px] text-slate-500">Skor Risiko Evasion</div>
+                    <div class="text-xl sm:text-2xl font-extrabold mt-1 <?= $evScoreColor ?>">
+                        <?= number_format($evScore, 1) ?>%
+                    </div>
+                    <div class="text-[10px] text-slate-400 mt-0.5">
+                        <?= $evStatus === 'CLEAN' ? 'Bebas Rekayasa' : 'Indeks Anomali' ?>
+                    </div>
+                </div>
+
+                <!-- KPI 2: Homoglyph Substitutions -->
+                <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                    <div class="text-[11px] text-slate-500">Aksara Homoglif</div>
+                    <div class="text-xl sm:text-2xl font-extrabold mt-1 <?= $homoCount > 0 ? 'text-rose-600' : 'text-slate-800' ?>">
+                        <?= $homoCount ?>
+                    </div>
+                    <div class="text-[10px] text-slate-400 mt-0.5">
+                        Cyrillic / Greek lookalikes
+                    </div>
+                </div>
+
+                <!-- KPI 3: Zero-Width Characters -->
+                <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                    <div class="text-[11px] text-slate-500">Spasi Tak Kasat Mata</div>
+                    <div class="text-xl sm:text-2xl font-extrabold mt-1 <?= $zwCount > 0 ? 'text-amber-600' : 'text-slate-800' ?>">
+                        <?= $zwCount ?>
+                    </div>
+                    <div class="text-[10px] text-slate-400 mt-0.5">
+                        Zero-Width / Joiner
+                    </div>
+                </div>
+
+                <!-- KPI 4: Hidden Text / White Text -->
+                <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                    <div class="text-[11px] text-slate-500">Teks Tersembunyi</div>
+                    <div class="text-xl sm:text-2xl font-extrabold mt-1 <?= ($whiteCount + $microCount) > 0 ? 'text-rose-600' : 'text-slate-800' ?>">
+                        <?= $whiteCount + $microCount ?>
+                    </div>
+                    <div class="text-[10px] text-slate-400 mt-0.5">
+                        White-Text &amp; Mikro-font
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detail Anomali Terdeteksi -->
+            <div class="space-y-3">
+                <?php if (!empty($evAnomalies)): ?>
+                    <div class="text-xs font-bold text-slate-700 flex items-center justify-between">
+                        <span class="flex items-center gap-1.5">
+                            <span>🔍</span> Rincian Bukti Modifikasi Karakter yang Ditemukan (<?= count($evAnomalies) ?> jenis anomali):
+                        </span>
+                        <span class="text-[11px] text-slate-400 font-normal">
+                            AR Tilik secara otomatis menormalisasi token ini ke huruf Latin
+                        </span>
+                    </div>
+
+                    <div class="overflow-x-auto rounded-xl border border-slate-200">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
+                                <tr>
+                                    <th class="py-2.5 px-3">Kategori Anomali</th>
+                                    <th class="py-2.5 px-3">Karakter / Aksara Asli</th>
+                                    <th class="py-2.5 px-3">Kode Unicode</th>
+                                    <th class="py-2.5 px-3">Normalisasi (Latin)</th>
+                                    <th class="py-2.5 px-3">Frekuensi</th>
+                                    <th class="py-2.5 px-3">Keterangan &amp; Contoh Kata</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 font-mono-code text-[11px]">
+                                <?php foreach ($evAnomalies as $anom): ?>
+                                    <tr class="hover:bg-slate-50/70 transition">
+                                        <td class="py-2.5 px-3 font-bold">
+                                            <?php if ($anom['category'] === 'HOMOGLYPH_SUBSTITUTION'): ?>
+                                                <span class="px-2 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200 text-[10px]">
+                                                    Homoglyph
+                                                </span>
+                                            <?php elseif ($anom['category'] === 'ZERO_WIDTH_INJECTION'): ?>
+                                                <span class="px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200 text-[10px]">
+                                                    Zero-Width
+                                                </span>
+                                            <?php else: ?>
+                                                <span class="px-2 py-0.5 rounded bg-purple-50 text-purple-700 border border-purple-200 text-[10px]">
+                                                    Teks Putih / Mikro
+                                                </span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td class="py-2.5 px-3 font-extrabold text-slate-900">
+                                            <?= esc($anom['detected_item']) ?>
+                                        </td>
+                                        <td class="py-2.5 px-3 text-slate-500">
+                                            <?= esc($anom['char_code']) ?>
+                                        </td>
+                                        <td class="py-2.5 px-3 text-emerald-700 font-bold">
+                                            <?= esc($anom['deobfuscated_item']) ?>
+                                        </td>
+                                        <td class="py-2.5 px-3 font-bold text-slate-800">
+                                            <?= (int)($anom['occurrences'] ?? 1) ?>x
+                                        </td>
+                                        <td class="py-2.5 px-3 text-slate-600 font-sans text-xs">
+                                            <?= esc($anom['description']) ?>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php else: ?>
+                    <div class="p-4 rounded-xl bg-emerald-50/60 border border-emerald-200 text-xs text-emerald-900 flex items-start gap-2.5">
+                        <span class="text-base flex-shrink-0">✨</span>
+                        <div>
+                            <div class="font-bold text-emerald-950">Struktur Karakter Naskah Terverifikasi Otentik</div>
+                            <p class="text-emerald-800 mt-0.5 leading-relaxed">
+                                Tidak terdeteksi adanya substitusi alfabet serupa (*Cyrillic/Greek homoglyphs*), karakter spasi tak kasat mata (*zero-width spaces*), maupun injeksi teks putih tersembunyi. Naskah disusun menggunakan karakter ortografi ilmiah standar.
+                            </p>
+                        </div>
+                    </div>
+                <?php endif; ?>
+            </div>
+
+            <!-- Kesimpulan Integritas & Edukasi Akademik -->
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2 text-xs">
+                <div class="font-bold text-slate-700 flex items-center justify-between">
+                    <span class="flex items-center gap-1.5">
+                        <span>💬</span> KESIMPULAN INTEGRITAS NASKAH: <span class="<?= $evScoreColor ?>"><?= esc($evLabel) ?></span>
+                    </span>
+                </div>
+                <p class="text-slate-700 text-xs sm:text-sm leading-relaxed italic bg-white p-3 rounded-lg border border-slate-200 shadow-2xs">
+                    "<?= esc($evasionDetection['summary_rationale'] ?? '') ?>"
+                </p>
+                <div class="flex items-start gap-2 pt-1 text-[11px] text-slate-600">
+                    <span class="text-sm">⚖️</span>
+                    <span><strong>Prinsip Integritas Akademik:</strong> Praktik penggantian huruf alfabet dengan karakter Cyrillic/Greek yang tampak serupa atau penyelundupan spasi tak kasat mata adalah teknik pelanggaran etik yang dimaksudkan untuk merusak tokenisasi n-gram similarity. AR Tilik dilengkapi mesin deobfuskasi otomatis (*self-healing*) untuk memulihkan teks asli dan memastikan evaluasi kemiripan tetap adil dan objektif.</span>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
+
+        <!-- ═════════════════════════════════════════════════════════════════════ -->
         <!-- FITUR 2: INDIKATOR TEKS BUATAN AI & PROFIL STYLOMETRI                 -->
         <!-- ═════════════════════════════════════════════════════════════════════ -->
         <?php if (!empty($aiStylometrics)): ?>
