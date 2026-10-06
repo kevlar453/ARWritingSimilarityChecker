@@ -447,6 +447,30 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
         except Exception as tele_err:
             print(f"  [TELEGRAM WARNING] Gagal mengirim notifikasi untuk Report #{report_id}: {tele_err}")
 
+        # 9. Notifikasi Email Pengguna Otomatis (Failsafe)
+        try:
+            from worker.email_notifier import notify_user_report_completed
+            c_score = None
+            if citation_audit_res is not None and hasattr(citation_audit_res, "health_score"):
+                c_score = float(citation_audit_res.health_score)
+            ai_score = None
+            if isinstance(ai_stylometrics_res, dict) and "ai_probability_score" in ai_stylometrics_res:
+                ai_score = float(ai_stylometrics_res["ai_probability_score"])
+
+            notify_user_report_completed(
+                document_id=document_id,
+                report_id=report_id,
+                document_title=document.get("title", f"Dokumen #{document_id}"),
+                decision=predicted_decision,
+                overall_similarity=overall_sim,
+                exact_similarity=exact_sim,
+                cosine_similarity=cosine_sim,
+                citation_health_score=c_score,
+                ai_probability_score=ai_score,
+            )
+        except Exception as mail_err:
+            print(f"  [EMAIL WARNING] Gagal mengirim notifikasi email untuk Report #{report_id}: {mail_err}")
+
         return result
     except Exception as e:
         connection.rollback()

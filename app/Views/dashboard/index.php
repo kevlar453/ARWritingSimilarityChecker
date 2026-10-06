@@ -266,13 +266,29 @@
                 <p class="text-xs sm:text-sm text-slate-500 mb-4">Pilih file naskah skripsi, jurnal, tesis, atau makalah (PDF, DOCX, TXT) untuk diuji terhadap korpus rujukan institusi.</p>
                 
                 <form id="uploadSubmissionForm" class="space-y-4" enctype="multipart/form-data">
-                    <div class="border-2 border-dashed border-slate-300 hover:border-indigo-400 transition-colors rounded-xl p-5 sm:p-6 text-center cursor-pointer bg-slate-50/50" onclick="document.getElementById('submissionFileInput').click()">
-                        <input type="file" id="submissionFileInput" name="document" accept=".pdf,.docx,.txt" class="hidden" onchange="handleFileSelect(this, 'submissionFileLabel')">
+                    <div id="submissionDropZone" class="border-2 border-dashed border-slate-300 hover:border-indigo-400 transition-colors rounded-xl p-5 sm:p-6 text-center cursor-pointer bg-slate-50/50" onclick="document.getElementById('submissionFileInput').click()">
+                        <input type="file" id="submissionFileInput" name="document" multiple accept=".pdf,.docx,.txt" class="hidden" onchange="handleSubmissionFilesSelect(this)">
                         <div class="w-12 h-12 mx-auto mb-2 sm:mb-3 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-2xl">
                             📤
                         </div>
-                        <p id="submissionFileLabel" class="text-xs sm:text-sm font-semibold text-slate-700">Klik untuk memilih file dokumen (PDF, DOCX, TXT)</p>
-                        <p class="text-[11px] text-slate-400 mt-1">Ukuran maksimal berkas: 25 MB</p>
+                        <p id="submissionFileLabel" class="text-xs sm:text-sm font-semibold text-slate-700">Klik atau geser (drag &amp; drop) berkas naskah di sini</p>
+                        <p class="text-[11px] text-slate-400 mt-1">Mendukung Batch Upload sekaligus (PDF, DOCX, TXT) • Maksimal 25 MB per berkas</p>
+                    </div>
+
+                    <!-- Selected Files Preview Container (Batch List) -->
+                    <div id="submissionFilesPreviewContainer" class="hidden bg-slate-50/80 border border-slate-200 rounded-xl p-3.5 space-y-2.5">
+                        <div class="flex items-center justify-between text-xs font-bold text-slate-700 border-b border-slate-200/80 pb-2">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-indigo-600 animate-pulse"></span>
+                                <span id="submissionFilesCountText">0 berkas terpilih</span>
+                            </div>
+                            <button type="button" onclick="clearSubmissionFiles()" class="text-rose-600 hover:text-rose-700 font-semibold text-[11px] hover:underline cursor-pointer flex items-center gap-1">
+                                <span>✕</span> <span>Hapus Semua</span>
+                            </button>
+                        </div>
+                        <div id="submissionFilesList" class="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+                            <!-- Populated dynamically via JS -->
+                        </div>
                     </div>
 
                     <div class="space-y-2.5 pt-1">
@@ -327,8 +343,8 @@
                     </div>
 
                     <div class="flex justify-end pt-2">
-                        <button type="submit" id="btnUploadSubmit" class="w-full sm:w-auto px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-semibold rounded-xl text-xs sm:text-sm shadow-sm transition flex items-center justify-center gap-2">
-                            <span>Unggah &amp; Periksa Similarity</span>
+                        <button type="submit" id="btnUploadSubmit" class="w-full sm:w-auto px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-semibold rounded-xl text-xs sm:text-sm shadow-sm transition flex items-center justify-center gap-2 cursor-pointer">
+                            <span id="btnUploadSubmitText">Unggah &amp; Periksa Similarity</span>
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                         </button>
                     </div>
@@ -760,12 +776,22 @@
         });
 
         // Processing Modal Functions
-        function showProcessingModal(title, subtitle) {
+        function showProcessingModal(title, subtitle, progressPercent = null) {
             const modal = document.getElementById('processingModal');
             const tEl = document.getElementById('processingTitle');
             const sEl = document.getElementById('processingSubtitle');
+            const bar = document.getElementById('processingProgressBar');
             if (title && tEl) tEl.innerText = title;
             if (subtitle && sEl) sEl.innerText = subtitle;
+            if (bar) {
+                if (progressPercent !== null) {
+                    bar.classList.remove('animate-pulse');
+                    bar.style.width = Math.min(100, Math.max(0, progressPercent)) + '%';
+                } else {
+                    bar.classList.add('animate-pulse');
+                    bar.style.width = '66%';
+                }
+            }
             if (modal) modal.classList.remove('hidden');
         }
 
@@ -795,76 +821,269 @@
             }
         }
 
-        // Handle upload submission
+        // ==========================================
+        // BATCH UPLOAD & MULTI-FILE LOGIC
+        // ==========================================
+        let selectedSubmissionFiles = [];
+
+        function formatFileSize(bytes) {
+            if (!bytes || bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+
+        function getFileIcon(filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            if (ext === 'pdf') return '📕';
+            if (ext === 'docx') return '📘';
+            return '📄';
+        }
+
+        function handleSubmissionFilesSelect(input) {
+            if (input.files && input.files.length > 0) {
+                addSubmissionFiles(input.files);
+            }
+        }
+
+        function addSubmissionFiles(newFiles) {
+            const allowedExts = ['pdf', 'docx', 'txt'];
+            const maxSizeBytes = 25 * 1024 * 1024; // 25 MB
+
+            Array.from(newFiles).forEach(file => {
+                const ext = file.name.split('.').pop().toLowerCase();
+                if (!allowedExts.includes(ext)) {
+                    alert(`Format berkas "${file.name}" tidak didukung. Hanya PDF, DOCX, dan TXT.`);
+                    return;
+                }
+                if (file.size > maxSizeBytes) {
+                    alert(`Berkas "${file.name}" melebihi batas maksimal 25 MB.`);
+                    return;
+                }
+                // Cegah duplikasi file berdasarkan nama & ukuran
+                const exists = selectedSubmissionFiles.some(f => f.name === file.name && f.size === file.size);
+                if (!exists) {
+                    selectedSubmissionFiles.push(file);
+                }
+            });
+
+            updateSubmissionFilesUI();
+        }
+
+        function removeSubmissionFile(index) {
+            if (index >= 0 && index < selectedSubmissionFiles.length) {
+                selectedSubmissionFiles.splice(index, 1);
+                updateSubmissionFilesUI();
+            }
+        }
+
+        function clearSubmissionFiles() {
+            selectedSubmissionFiles = [];
+            const fileInput = document.getElementById('submissionFileInput');
+            if (fileInput) fileInput.value = '';
+            updateSubmissionFilesUI();
+        }
+
+        function updateSubmissionFilesUI() {
+            const container = document.getElementById('submissionFilesPreviewContainer');
+            const countText = document.getElementById('submissionFilesCountText');
+            const listEl = document.getElementById('submissionFilesList');
+            const labelEl = document.getElementById('submissionFileLabel');
+            const btnText = document.getElementById('btnUploadSubmitText');
+
+            if (!container || !listEl) return;
+
+            if (selectedSubmissionFiles.length === 0) {
+                container.classList.add('hidden');
+                if (labelEl) labelEl.innerText = "Klik atau geser (drag & drop) berkas naskah di sini";
+                if (btnText) btnText.innerText = "Unggah & Periksa Similarity";
+                listEl.innerHTML = '';
+                return;
+            }
+
+            container.classList.remove('hidden');
+            const totalBytes = selectedSubmissionFiles.reduce((acc, f) => acc + f.size, 0);
+            if (countText) {
+                countText.innerText = `${selectedSubmissionFiles.length} berkas naskah terpilih (Total: ${formatFileSize(totalBytes)})`;
+            }
+            if (labelEl) {
+                labelEl.innerText = `+ Tambah berkas lainnya (${selectedSubmissionFiles.length} berkas telah dipilih)`;
+            }
+            if (btnText) {
+                btnText.innerText = selectedSubmissionFiles.length > 1
+                    ? `Unggah & Periksa Similarity (${selectedSubmissionFiles.length} Berkas)`
+                    : `Unggah & Periksa Similarity`;
+            }
+
+            listEl.innerHTML = selectedSubmissionFiles.map((file, idx) => `
+                <div class="flex items-center justify-between p-2 sm:p-2.5 bg-white rounded-lg border border-slate-200 text-xs shadow-2xs hover:border-indigo-300 transition">
+                    <div class="flex items-center gap-2.5 min-w-0 pr-2">
+                        <span class="text-base flex-shrink-0">${getFileIcon(file.name)}</span>
+                        <div class="min-w-0">
+                            <div class="font-bold text-slate-800 truncate text-[12px]">${escapeHtml(file.name)}</div>
+                            <div class="text-[10px] text-slate-400">${formatFileSize(file.size)}</div>
+                        </div>
+                    </div>
+                    <button type="button" onclick="removeSubmissionFile(${idx})" class="p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded transition cursor-pointer flex-shrink-0" title="Keluarkan berkas ini">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
+        }
+
+        // Drag & Drop handler for submission drop zone
+        const subDropZone = document.getElementById('submissionDropZone');
+        if (subDropZone) {
+            ['dragenter', 'dragover'].forEach(eventName => {
+                subDropZone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    subDropZone.classList.add('border-indigo-500', 'bg-indigo-50/60');
+                });
+            });
+            ['dragleave', 'drop'].forEach(eventName => {
+                subDropZone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    subDropZone.classList.remove('border-indigo-500', 'bg-indigo-50/60');
+                });
+            });
+            subDropZone.addEventListener('drop', (e) => {
+                if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                    addSubmissionFiles(e.dataTransfer.files);
+                }
+            });
+        }
+
+        // Handle upload submission (Batch & Single)
         document.getElementById('uploadSubmissionForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const btn = document.getElementById('btnUploadSubmit');
             const alertBox = document.getElementById('uploadAlert');
-            const formData = new FormData(this);
 
-            if (!document.getElementById('submissionFileInput').files[0]) {
-                alert('Silakan pilih file terlebih dahulu.');
+            // Jika belum ada file di array, periksa input file langsung
+            const fileInput = document.getElementById('submissionFileInput');
+            if (selectedSubmissionFiles.length === 0 && fileInput && fileInput.files && fileInput.files.length > 0) {
+                addSubmissionFiles(fileInput.files);
+            }
+
+            if (selectedSubmissionFiles.length === 0) {
+                alert('Silakan pilih setidaknya satu file naskah dokumen terlebih dahulu.');
                 return;
             }
 
             btn.disabled = true;
             alertBox.classList.add('hidden');
-            showProcessingModal('Mengunggah Karya Ilmiah...', 'Sistem sedang memverifikasi format berkas dan menyiapkan antrean analisis.');
 
-            try {
-                const res = await fetch('<?= base_url('api/documents') ?>', {
-                    method: 'POST',
-                    body: formData
-                });
-                const data = await res.json();
+            const total = selectedSubmissionFiles.length;
+            const engineMode = document.querySelector('input[name="engine"]:checked')?.value || 'hybrid';
+            let successCount = 0;
+            let failedFiles = [];
 
-                if (res.ok) {
-                    showProcessingModal('Menjalankan Pemeriksaan...', 'Menganalisis 5-gram shingle pasase dan vektor TF-IDF leksikal.');
+            for (let i = 0; i < total; i++) {
+                const file = selectedSubmissionFiles[i];
+                const currentPct = Math.round((i / total) * 100);
+                
+                showProcessingModal(
+                    `Mengunggah Naskah (${i + 1} dari ${total})`,
+                    `Mengunggah "${file.name}" ke antrean analisis...`,
+                    currentPct
+                );
 
-                    // Otomatis jadwalkan check
-                    const engineMode = document.querySelector('input[name="engine"]:checked').value;
-                    const checkFormData = new FormData();
-                    checkFormData.append('engine', engineMode);
-
-                    const checkRes = await fetch(`<?= base_url('api/documents') ?>/${data.document_id}/check`, {
-                        method: 'POST',
-                        body: checkFormData
-                    });
-                    const checkData = await checkRes.json();
-
-                    if (checkRes.ok) {
-                        showProcessingModal('Pemeriksaan Berhasil Dijadwalkan!', 'Memuat ulang dashboard untuk menampilkan perkembangan laporan.');
-                        setTimeout(() => location.reload(), 1200);
-                    } else {
-                        throw new Error(checkData.message || 'Gagal menjadwalkan pemeriksaan.');
-                    }
-                } else if (res.status === 403 && data.status === 'quota_exceeded') {
-                    hideProcessingModal();
-                    alertBox.className = 'mt-4 p-4 rounded-xl text-xs sm:text-sm bg-amber-50 text-amber-900 border border-amber-300 block space-y-2.5';
-                    alertBox.innerHTML = `
-                        <div class="font-bold flex items-center gap-1.5 text-amber-950">
-                            <span>⚠️</span> <span>Batas Kuota Gratis Mingguan Telah Habis</span>
-                        </div>
-                        <p class="text-xs leading-relaxed text-amber-900">${data.message}</p>
-                        <div class="pt-1 flex flex-wrap items-center gap-2">
-                            <button type="button" onclick="openContributeCorpusModal()" class="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition">
-                                ➕ Sumbang Korpus (+1 Submisi)
-                            </button>
-                            <a href="<?= base_url('/#pricing') ?>" class="px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-900 text-white font-medium text-xs shadow-xs transition">
-                                💎 Rencana Paket Berlangganan
-                            </a>
-                        </div>
-                    `;
-                    return;
-                } else {
-                    throw new Error(data.message || 'Gagal mengunggah dokumen.');
+                const formData = new FormData();
+                formData.append('document', file);
+                
+                const optFormalities = document.getElementById('optAutoExcludeFormalities');
+                if (optFormalities && optFormalities.checked) {
+                    formData.append('auto_exclude_formalities', '1');
                 }
-            } catch (err) {
+                const optJIT = document.getElementById('optJITHarvest');
+                if (optJIT && optJIT.checked) {
+                    formData.append('jit_harvest', '1');
+                }
+
+                try {
+                    const res = await fetch('<?= base_url('api/documents') ?>', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const data = await res.json();
+
+                    if (res.ok && data.document_id) {
+                        showProcessingModal(
+                            `Menjadwalkan Analisis (${i + 1} dari ${total})`,
+                            `Mendaftarkan "${file.name}" ke antrean worker (${engineMode.toUpperCase()})...`,
+                            Math.round(((i + 0.5) / total) * 100)
+                        );
+
+                        const checkFormData = new FormData();
+                        checkFormData.append('engine', engineMode);
+
+                        const checkRes = await fetch(`<?= base_url('api/documents') ?>/${data.document_id}/check`, {
+                            method: 'POST',
+                            body: checkFormData
+                        });
+
+                        if (checkRes.ok) {
+                            successCount++;
+                        } else {
+                            failedFiles.push({ name: file.name, error: 'Gagal menjadwalkan pemeriksaan worker' });
+                        }
+                    } else if (res.status === 403 && data.status === 'quota_exceeded') {
+                        // Kuota habis!
+                        hideProcessingModal();
+                        let quotaMsg = data.message;
+                        if (successCount > 0) {
+                            quotaMsg = `${successCount} berkas pertama berhasil dijadwalkan. Berkas "${file.name}" dan berkas berikutnya dihentikan karena: ${data.message}`;
+                        }
+                        alertBox.className = 'mt-4 p-4 rounded-xl text-xs sm:text-sm bg-amber-50 text-amber-900 border border-amber-300 block space-y-2.5';
+                        alertBox.innerHTML = `
+                            <div class="font-bold flex items-center gap-1.5 text-amber-950">
+                                <span>⚠️</span> <span>Batas Kuota Telah Habis</span>
+                            </div>
+                            <p class="text-xs leading-relaxed text-amber-900">${quotaMsg}</p>
+                            <div class="pt-1 flex flex-wrap items-center gap-2">
+                                <button type="button" onclick="openContributeCorpusModal()" class="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition">
+                                    ➕ Sumbang Korpus (+1 Submisi)
+                                </button>
+                                <a href="<?= base_url('/#pricing') ?>" class="px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-900 text-white font-medium text-xs shadow-xs transition">
+                                    💎 Rencana Paket Berlangganan
+                                </a>
+                            </div>
+                        `;
+                        if (successCount > 0) {
+                            fetchSubmissionsTableSilently();
+                        }
+                        btn.disabled = false;
+                        return;
+                    } else {
+                        failedFiles.push({ name: file.name, error: data.message || 'Gagal mengunggah berkas' });
+                    }
+                } catch (err) {
+                    failedFiles.push({ name: file.name, error: err.message || 'Terjadi kesalahan koneksi' });
+                }
+            }
+
+            if (successCount > 0) {
+                showProcessingModal(
+                    'Pemeriksaan Berhasil Dijadwalkan!',
+                    `Sebanyak ${successCount} dari ${total} berkas telah masuk antrean worker. Memuat ulang dashboard...`,
+                    100
+                );
+                setTimeout(() => location.reload(), 1400);
+            } else {
                 hideProcessingModal();
-                alertBox.className = 'mt-4 p-4 rounded-xl text-xs sm:text-sm bg-rose-50 text-rose-800 border border-rose-200 block';
-                alertBox.innerText = 'Error: ' + err.message;
-            } finally {
                 btn.disabled = false;
+                alertBox.className = 'mt-4 p-4 rounded-xl text-xs sm:text-sm bg-rose-50 text-rose-800 border border-rose-200 block';
+                const errList = failedFiles.map(f => `• ${f.name}: ${f.error}`).join('<br>');
+                alertBox.innerHTML = `<strong>Gagal mengunggah berkas:</strong><br>${errList}`;
             }
         });
 
