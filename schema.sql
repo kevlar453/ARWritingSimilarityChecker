@@ -25,6 +25,20 @@ CREATE TABLE IF NOT EXISTS users (
     INDEX idx_users_token (verification_token)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS auth_rate_limits (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ip_address VARCHAR(45) NOT NULL,
+    action_type ENUM('login', 'register', 'resend_verification') NOT NULL,
+    identifier VARCHAR(191) NOT NULL,
+    attempts INT UNSIGNED NOT NULL DEFAULT 1,
+    first_attempt_at DATETIME NOT NULL,
+    last_attempt_at DATETIME NOT NULL,
+    locked_until DATETIME NULL,
+    INDEX idx_rate_lookup (action_type, identifier, ip_address),
+    INDEX idx_rate_ip (ip_address, action_type),
+    INDEX idx_locked (locked_until)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS documents (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT UNSIGNED NULL,

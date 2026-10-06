@@ -23,6 +23,7 @@ $routes->group('auth', function ($routes) {
     $routes->get('status', 'AuthController::status');
     $routes->get('verify-email', 'AuthController::verifyEmail');
     $routes->post('resend-verification', 'AuthController::resendVerification');
+    $routes->get('security-token', 'AuthController::securityToken');
 });
 
 // API Routes

@@ -46,13 +46,17 @@ class LandingController extends BaseController
         $userAgent = $this->request->getUserAgent()->getAgentString();
         $visitorStats = $visitorModel->recordVisit($ip, $userAgent);
 
+        $spamShield = new \App\Libraries\SpamShield();
+        $authSecurityToken = $spamShield->generateTimeToken();
+
         return view('landing/index', [
-            'currentUser'      => $currentUser,
-            'quotaInfo'        => $quotaInfo,
-            'totalCorpus'      => max(475, $totalCorpus),
-            'totalSubmissions' => $totalSubmissions,
-            'totalReports'     => $totalReports,
-            'visitorStats'     => $visitorStats,
+            'currentUser'        => $currentUser,
+            'quotaInfo'          => $quotaInfo,
+            'totalCorpus'        => max(475, $totalCorpus),
+            'totalSubmissions'   => $totalSubmissions,
+            'totalReports'       => $totalReports,
+            'visitorStats'       => $visitorStats,
+            'authSecurityToken'  => $authSecurityToken,
         ]);
     }
 }

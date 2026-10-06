@@ -61,7 +61,8 @@ def test_user_registration_validation():
         "name": "Budi Santoso",
         "email": "not-an-email",
         "password": "secretpassword",
-        "institution": "Universitas Indonesia"
+        "institution": "Universitas Indonesia",
+        "security_token": "TEST_TOKEN"
     }, headers={"Accept": "application/json"})
     assert res.status_code == 400
     data = res.json()
@@ -73,7 +74,8 @@ def test_user_registration_validation():
         "name": "Budi Santoso",
         "email": f"budi_{uuid.uuid4().hex[:6]}@ui.ac.id",
         "password": "123",
-        "institution": "Universitas Indonesia"
+        "institution": "Universitas Indonesia",
+        "security_token": "TEST_TOKEN"
     }, headers={"Accept": "application/json"})
     assert res.status_code == 400
     data = res.json()
@@ -108,7 +110,8 @@ def test_full_auth_quota_and_corpus_incentive_lifecycle(db_conn):
             "name": test_name,
             "email": test_email,
             "password": test_password,
-            "institution": "Institut Teknologi Bandung"
+            "institution": "Institut Teknologi Bandung",
+            "security_token": "TEST_TOKEN"
         }, headers={"Accept": "application/json"})
 
         assert res_reg.status_code == 201
@@ -164,7 +167,8 @@ def test_full_auth_quota_and_corpus_incentive_lifecycle(db_conn):
         res_dup = session.post(f"{BASE_URL}/auth/register", json={
             "name": test_name,
             "email": test_email,
-            "password": test_password
+            "password": test_password,
+            "security_token": "TEST_TOKEN"
         }, headers={"Accept": "application/json"})
         assert res_dup.status_code == 409
 
@@ -295,6 +299,98 @@ def test_full_auth_quota_and_corpus_incentive_lifecycle(db_conn):
             cursor.execute("DELETE FROM users WHERE id = %s", (created_user_id,))
         db_conn.commit()
         cursor.close()
+
+
+def test_anti_spam_and_brute_force_protections(db_conn):
+    """
+    Menguji lapisan proteksi Anti-Spam & Anti-Brute-Force:
+    1. Trap Honeypot: field fax_number pada registrasi -> Ditolak (400)
+    2. Trap Honeypot: field website_hp pada login -> Ditolak (400)
+    3. Disposable email: pendaftaran menggunakan @mailinator.com -> Ditolak (400)
+    4. Anti-Brute-Force login: 5 kali percobaan gagal berturut-turut -> Percobaan ke-6 diblokir (429 Too Many Requests)
+    """
+    session = requests.Session()
+    random_str = uuid.uuid4().hex[:8]
+
+    # 1. Honeypot registrasi
+    res_hp_reg = session.post(f"{BASE_URL}/auth/register", json={
+        "name": "Spam Bot",
+        "email": f"bot_{random_str}@kampus.ac.id",
+        "password": "validPassword123",
+        "institution": "Bot University",
+        "fax_number": "http://spamsite.xyz"  # Trapped!
+    }, headers={"Accept": "application/json"})
+    assert res_hp_reg.status_code == 400
+    assert "tidak sah" in res_hp_reg.json()["message"].lower()
+
+    # 2. Honeypot login
+    res_hp_login = session.post(f"{BASE_URL}/auth/login", json={
+        "email": f"user_{random_str}@kampus.ac.id",
+        "password": "somePassword123",
+        "website_hp": "automated-bot"  # Trapped!
+    }, headers={"Accept": "application/json"})
+    assert res_hp_login.status_code == 400
+    assert "tidak sah" in res_hp_login.json()["message"].lower()
+
+    # 3. Form Timing Token Protection
+    # 3a. Registrasi tanpa security_token -> Ditolak (400)
+    res_no_tok = session.post(f"{BASE_URL}/auth/register", json={
+        "name": "Bot No Token",
+        "email": f"notok_{random_str}@kampus.ac.id",
+        "password": "validPassword123",
+        "institution": "Test Inst"
+    }, headers={"Accept": "application/json"})
+    assert res_no_tok.status_code == 400
+    assert "token keamanan" in res_no_tok.json()["message"].lower()
+
+    # 3b. Registrasi terlalu cepat (< 1.5 detik) menggunakan live security token -> Ditolak (400)
+    res_tok = session.get(f"{BASE_URL}/auth/security-token")
+    assert res_tok.status_code == 200
+    live_token = res_tok.json()["token"]
+
+    res_fast = session.post(f"{BASE_URL}/auth/register", json={
+        "name": "Bot Too Fast",
+        "email": f"fast_{random_str}@kampus.ac.id",
+        "password": "validPassword123",
+        "institution": "Test Inst",
+        "security_token": live_token
+    }, headers={"Accept": "application/json"})
+    assert res_fast.status_code == 400
+    assert "terlalu cepat" in res_fast.json()["message"].lower()
+
+    # 4. Disposable email: pendaftaran menggunakan @mailinator.com -> Ditolak (400)
+    res_disp = session.post(f"{BASE_URL}/auth/register", json={
+        "name": "Disposable User",
+        "email": f"temp_{random_str}@mailinator.com",
+        "password": "validPassword123",
+        "institution": "Test Inst",
+        "security_token": "TEST_TOKEN"
+    }, headers={"Accept": "application/json"})
+    assert res_disp.status_code == 400
+    assert "sementara" in res_disp.json()["message"].lower()
+
+    # 4. Anti-Brute-Force Login: coba 5x salah, ke-6 harus 429
+    attack_email = f"target_{random_str}@kampus.ac.id"
+    for i in range(5):
+        res_fail = session.post(f"{BASE_URL}/auth/login", json={
+            "email": attack_email,
+            "password": "wrong_password_attempt"
+        }, headers={"Accept": "application/json"})
+        assert res_fail.status_code == 401
+
+    # Percobaan ke-6 harus ditolak oleh Rate Limiter / Lockout (429)
+    res_locked = session.post(f"{BASE_URL}/auth/login", json={
+        "email": attack_email,
+        "password": "wrong_password_attempt"
+    }, headers={"Accept": "application/json"})
+    assert res_locked.status_code == 429
+    assert "dibatasi" in res_locked.json()["message"].lower() or "terlampaui" in res_locked.json()["message"].lower()
+
+    # Cleanup rate limit records for this test
+    cursor = db_conn.cursor()
+    cursor.execute("DELETE FROM auth_rate_limits WHERE identifier = %s", (attack_email,))
+    db_conn.commit()
+    cursor.close()
 
 
 def test_guest_dashboard_access_and_upload_protection():

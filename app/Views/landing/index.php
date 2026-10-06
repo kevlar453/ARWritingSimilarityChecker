@@ -1676,6 +1676,11 @@
 
                 <!-- Login Form -->
                 <form id="formLogin" onsubmit="handleLogin(event)">
+                    <!-- Invisible Honeypot Trap for Bots -->
+                    <div style="display:none; visibility:hidden; opacity:0; position:absolute; left:-9999px;" aria-hidden="true">
+                        <input type="text" name="website_hp" tabindex="-1" autocomplete="off">
+                    </div>
+
                     <div class="form-group">
                         <label class="form-label" for="loginEmail">Alamat Email</label>
                         <input type="email" id="loginEmail" name="email" class="form-control" placeholder="nama@kampus.ac.id" required>
@@ -1693,6 +1698,12 @@
 
                 <!-- Register Form -->
                 <form id="formRegister" onsubmit="handleRegister(event)" style="display: none;">
+                    <!-- Anti-Spam Time Token & Honeypot Trap -->
+                    <input type="hidden" name="security_token" id="regSecurityToken" value="<?= esc($authSecurityToken ?? '') ?>">
+                    <div style="display:none; visibility:hidden; opacity:0; position:absolute; left:-9999px;" aria-hidden="true">
+                        <input type="text" name="fax_number" tabindex="-1" autocomplete="off">
+                    </div>
+
                     <div class="form-group">
                         <label class="form-label" for="regName">Nama Lengkap</label>
                         <input type="text" id="regName" name="name" class="form-control" placeholder="Nama Anda" required>
@@ -1726,10 +1737,21 @@
 
     <!-- Scripts -->
     <script>
-        function openAuthModal(mode) {
+        async function openAuthModal(mode) {
             const modal = document.getElementById('authModal');
             modal.style.display = 'flex';
             switchTab(mode);
+
+            const tokenInput = document.getElementById('regSecurityToken');
+            if (tokenInput && (!tokenInput.value || tokenInput.value === '')) {
+                try {
+                    const res = await fetch('<?= base_url('auth/security-token') ?>');
+                    const data = await res.json();
+                    if (data.token) {
+                        tokenInput.value = data.token;
+                    }
+                } catch (e) {}
+            }
         }
 
         function closeAuthModal() {

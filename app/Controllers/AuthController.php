@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Libraries\EmailService;
+use App\Libraries\SpamShield;
 use App\Models\UserModel;
 use CodeIgniter\HTTP\ResponseInterface;
 
@@ -14,10 +15,32 @@ class AuthController extends BaseController
     public function register()
     {
         $data = $this->getRequestData();
-        $name = trim((string) ($data['name'] ?? ''));
+        $spamShield = new SpamShield();
+        $ip = $this->request->getIPAddress();
+
+        // 1. Pemeriksaan Honeypot anti-bot
+        if ($spamShield->isHoneypotTriggered($data)) {
+            log_message('warning', "Spam bot honeypot terdeteksi pada registrasi dari IP {$ip}");
+            return $this->respondError('Permintaan tidak sah terdeteksi sistem keamanan.', 400);
+        }
+
+        // 2. Proteksi Rate Limit Pendaftaran (Maksimal 5 pendaftaran per IP per jam)
+        $ipRate = $spamShield->checkRateLimit('register', $ip, $ip, 5, 3600);
+        if (! $ipRate['allowed']) {
+            return $this->respondError($ipRate['message'], 429);
+        }
+
+        // 3. Pemeriksaan Token Waktu Formulir (Mencegah bot submit instan)
+        $timeToken = $data['security_token'] ?? $data['form_time_token'] ?? null;
+        $timingCheck = $spamShield->validateTimeToken($timeToken, 1.5, 7200);
+        if (! $timingCheck['valid']) {
+            return $this->respondError($timingCheck['reason'], 400);
+        }
+
+        $name = trim(strip_tags((string) ($data['name'] ?? '')));
         $email = strtolower(trim((string) ($data['email'] ?? '')));
         $password = (string) ($data['password'] ?? '');
-        $institution = trim((string) ($data['institution'] ?? ''));
+        $institution = trim(strip_tags((string) ($data['institution'] ?? '')));
 
         if (empty($name) || empty($email) || empty($password)) {
             return $this->respondError('Nama, email, dan kata sandi wajib diisi.', 400);
@@ -25,6 +48,17 @@ class AuthController extends BaseController
 
         if (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return $this->respondError('Alamat email tidak valid. Harap gunakan format email yang benar.', 400);
+        }
+
+        // 4. Blokir Penyedia Disposable / Temporary Email (Burner Mail)
+        if ($spamShield->isDisposableEmail($email)) {
+            return $this->respondError('Alamat email sementara (disposable/burner email) tidak diizinkan. Harap gunakan email institusi atau email resmi Anda.', 400);
+        }
+
+        // 5. Validasi Keberadaan Server Penerima Surat (DNS MX/A Record)
+        [$dnsValid, $dnsMsg] = $spamShield->validateEmailDomainDns($email);
+        if (! $dnsValid) {
+            return $this->respondError($dnsMsg, 400);
         }
 
         if (strlen($password) < 6) {
@@ -144,10 +178,24 @@ class AuthController extends BaseController
     public function resendVerification()
     {
         $data = $this->getRequestData();
+        $spamShield = new SpamShield();
+        $ip = $this->request->getIPAddress();
+
+        // 1. Pemeriksaan Honeypot anti-bot
+        if ($spamShield->isHoneypotTriggered($data)) {
+            return $this->respondError('Permintaan tidak sah.', 400);
+        }
+
         $email = strtolower(trim((string) ($data['email'] ?? '')));
 
         if (empty($email) || ! filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return $this->respondError('Harap cantumkan alamat email yang valid.', 400);
+        }
+
+        // 2. Proteksi Rate Limit Kirim Ulang (Maksimal 3 kali per 15 menit)
+        $rateCheck = $spamShield->checkRateLimit('resend_verification', $email, $ip, 3, 900);
+        if (! $rateCheck['allowed']) {
+            return $this->respondError($rateCheck['message'], 429);
         }
 
         $userModel = new UserModel();
@@ -167,6 +215,9 @@ class AuthController extends BaseController
                 'message'   => 'Akun Anda sudah terverifikasi dan aktif. Silakan langsung masuk.',
             ]);
         }
+
+        // Catat percobaan pengiriman ulang
+        $spamShield->recordFailedAttempt('resend_verification', $email, $ip, 3, 900, 900);
 
         // Buat token baru berlaku 24 jam ke depan
         $token = bin2hex(random_bytes(32));
@@ -190,11 +241,19 @@ class AuthController extends BaseController
     }
 
     /**
-     * Masuk ke akun pengguna
+     * Masuk ke akun pengguna dengan proteksi Anti-Brute-Force
      */
     public function login()
     {
         $data = $this->getRequestData();
+        $spamShield = new SpamShield();
+        $ip = $this->request->getIPAddress();
+
+        // 1. Pemeriksaan Honeypot anti-bot
+        if ($spamShield->isHoneypotTriggered($data)) {
+            return $this->respondError('Permintaan tidak sah.', 400);
+        }
+
         $email = strtolower(trim((string) ($data['email'] ?? '')));
         $password = (string) ($data['password'] ?? '');
 
@@ -202,11 +261,29 @@ class AuthController extends BaseController
             return $this->respondError('Email dan kata sandi wajib diisi.', 400);
         }
 
+        // 2. Proteksi Rate Limit & Anti-Brute-Force (Maksimal 5 kegagalan per 15 menit)
+        $rateCheck = $spamShield->checkRateLimit('login', $email, $ip, 5, 900);
+        if (! $rateCheck['allowed']) {
+            return $this->respondError($rateCheck['message'], 429);
+        }
+
         $userModel = new UserModel();
         $user = $userModel->where('email', $email)->first();
 
         if (! $user || ! password_verify($password, $user['password_hash'])) {
-            return $this->respondError('Email atau kata sandi tidak cocok. Silakan periksa kembali.', 401);
+            // Catat kegagalan untuk memicu penguncian akun jika serangan brute force
+            $spamShield->recordFailedAttempt('login', $email, $ip, 5, 900, 900);
+            $recheck = $spamShield->checkRateLimit('login', $email, $ip, 5, 900);
+            $remaining = $recheck['attempts_remaining'] ?? 0;
+
+            $msg = 'Email atau kata sandi tidak cocok. Silakan periksa kembali.';
+            if ($remaining > 0 && $remaining <= 3) {
+                $msg .= " (Sisa {$remaining} kesempatan percobaan sebelum akses dikunci sementara).";
+            } elseif ($remaining === 0) {
+                $msg = 'Batas percobaan terlampaui. Akses masuk dibatasi sementara selama 15 menit demi keamanan.';
+            }
+
+            return $this->respondError($msg, 401);
         }
 
         if ($user['status'] === 'pending_verification') {
@@ -221,6 +298,9 @@ class AuthController extends BaseController
         if ($user['status'] !== 'active') {
             return $this->respondError('Akun Anda dinonaktifkan. Silakan hubungi administrator.', 403);
         }
+
+        // Berhasil login: bersihkan catatan rate limit untuk email & IP ini
+        $spamShield->clearRateLimit('login', $email, $ip);
 
         // Perbarui masa kuota mingguan jika telah melewati 7 hari
         $user = $userModel->refreshWeeklyQuota($user);
@@ -289,6 +369,18 @@ class AuthController extends BaseController
                 'institution' => $user['institution'],
             ],
             'quota_info'    => $userModel->getQuotaInfo($user),
+        ]);
+    }
+
+    /**
+     * Mengambil token keamanan waktu formulir (Anti-Spam Time Token)
+     */
+    public function securityToken(): ResponseInterface
+    {
+        $shield = new SpamShield();
+        return $this->response->setJSON([
+            'status' => 'success',
+            'token'  => $shield->generateTimeToken(),
         ]);
     }
 
