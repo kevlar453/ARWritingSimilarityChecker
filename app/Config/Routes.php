@@ -21,6 +21,8 @@ $routes->group('auth', function ($routes) {
     $routes->get('logout', 'AuthController::logout');
     $routes->post('logout', 'AuthController::logout');
     $routes->get('status', 'AuthController::status');
+    $routes->get('verify-email', 'AuthController::verifyEmail');
+    $routes->post('resend-verification', 'AuthController::resendVerification');
 });
 
 // API Routes

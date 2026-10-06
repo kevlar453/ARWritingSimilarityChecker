@@ -26,6 +26,7 @@ BASE_URL = os.getenv("TEST_BASE_URL", "http://localhost:8085")
 @pytest.fixture(scope="module")
 def db_conn():
     conn = get_connection()
+    conn.autocommit = True
     yield conn
     conn.close()
 
@@ -102,7 +103,7 @@ def test_full_auth_quota_and_corpus_incentive_lifecycle(db_conn):
     created_user_id = None
 
     try:
-        # Step 1: Registrasi
+        # Step 1: Registrasi pengguna baru
         res_reg = session.post(f"{BASE_URL}/auth/register", json={
             "name": test_name,
             "email": test_email,
@@ -113,14 +114,51 @@ def test_full_auth_quota_and_corpus_incentive_lifecycle(db_conn):
         assert res_reg.status_code == 201
         reg_data = res_reg.json()
         assert reg_data["status"] == "success"
+        assert reg_data.get("needs_verification") is True
         created_user_id = int(reg_data["user"]["id"])
-        quota = reg_data["quota_info"]
-        assert quota["free_limit"] == 3
-        assert quota["free_used"] == 0
-        assert quota["free_remaining"] == 3
-        assert quota["bonus_remaining"] == 0
-        assert quota["total_available"] == 3
-        assert quota["corpus_count"] == 0
+
+        # Step 1b: Login sebelum verifikasi email harus ditolak (403 Forbidden)
+        res_prelogin = session.post(f"{BASE_URL}/auth/login", json={
+            "email": test_email,
+            "password": test_password
+        }, headers={"Accept": "application/json"})
+        assert res_prelogin.status_code == 403
+        prelogin_data = res_prelogin.json()
+        assert prelogin_data.get("needs_verification") is True
+
+        # Step 1c: Mengambil token verifikasi dari database dan menguji link verifikasi
+        cursor = db_conn.cursor()
+        cursor.execute("SELECT verification_token, status FROM users WHERE id = %s", (created_user_id,))
+        token_row = cursor.fetchone()
+        cursor.close()
+        assert token_row is not None
+        v_token = token_row[0]
+        assert token_row[1] == "pending_verification"
+        assert v_token is not None and len(v_token) > 10
+
+        # Step 1d: Uji endpoint resend verification
+        res_resend = session.post(f"{BASE_URL}/auth/resend-verification", json={
+            "email": test_email
+        }, headers={"Accept": "application/json"})
+        assert res_resend.status_code == 200
+        assert res_resend.json()["status"] == "success"
+
+        # Ambil token terbaru setelah resend
+        cursor = db_conn.cursor()
+        cursor.execute("SELECT verification_token FROM users WHERE id = %s", (created_user_id,))
+        v_token = cursor.fetchone()[0]
+        cursor.close()
+
+        # Step 1e: Akses link verifikasi email
+        res_verify = session.get(f"{BASE_URL}/auth/verify-email?token={v_token}", allow_redirects=True)
+        assert res_verify.status_code == 200
+        # Akun sekarang harus berstatus active
+        cursor = db_conn.cursor()
+        cursor.execute("SELECT status, email_verified_at FROM users WHERE id = %s", (created_user_id,))
+        post_verify_row = cursor.fetchone()
+        cursor.close()
+        assert post_verify_row[0] == "active"
+        assert post_verify_row[1] is not None
 
         # Step 2: Registrasi duplikat harus ditolak (409)
         res_dup = session.post(f"{BASE_URL}/auth/register", json={
@@ -130,7 +168,7 @@ def test_full_auth_quota_and_corpus_incentive_lifecycle(db_conn):
         }, headers={"Accept": "application/json"})
         assert res_dup.status_code == 409
 
-        # Step 3: Login
+        # Step 3: Login setelah verifikasi email harus berhasil
         res_login = session.post(f"{BASE_URL}/auth/login", json={
             "email": test_email,
             "password": test_password
@@ -138,12 +176,19 @@ def test_full_auth_quota_and_corpus_incentive_lifecycle(db_conn):
         assert res_login.status_code == 200
         assert res_login.json()["status"] == "success"
 
-        # Step 4: Status Auth
+        # Step 4: Status Auth & Kuota Inisial
         res_status = session.get(f"{BASE_URL}/auth/status", headers={"Accept": "application/json"})
         assert res_status.status_code == 200
         status_data = res_status.json()
         assert status_data["authenticated"] is True
         assert status_data["user"]["email"] == test_email
+        quota = status_data["quota_info"]
+        assert quota["free_limit"] == 3
+        assert quota["free_used"] == 0
+        assert quota["free_remaining"] == 3
+        assert quota["bonus_remaining"] == 0
+        assert quota["total_available"] == 3
+        assert quota["corpus_count"] == 0
 
         # Step 5: Submisi 3 naskah (menghabiskan kuota gratis)
         for i in range(1, 4):

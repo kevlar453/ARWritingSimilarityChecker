@@ -1702,7 +1702,7 @@
                         <label class="form-label" for="regEmail">Alamat Email Valid</label>
                         <input type="email" id="regEmail" name="email" class="form-control" placeholder="nama@kampus.ac.id" required>
                         <small style="font-size: 11px; color: var(--text-muted); margin-top: 4px; display: block;">
-                            Email digunakan untuk verifikasi kuota 3 submisi gratis/minggu.
+                            ✉️ Tautan aktivasi akun akan dikirimkan ke email ini sebelum Anda dapat masuk.
                         </small>
                     </div>
 
@@ -1777,7 +1777,7 @@
 
         function showAlert(msg, isError = true) {
             const alertBox = document.getElementById('authAlert');
-            alertBox.textContent = msg;
+            alertBox.innerHTML = msg;
             alertBox.className = 'alert-box ' + (isError ? 'alert-error' : 'alert-success');
             alertBox.style.display = 'block';
         }
@@ -1792,7 +1792,13 @@
             hideAlert();
 
             const form = e.target;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span>Memverifikasi...</span>';
+
             const formData = new FormData(form);
+            const loginEmailVal = formData.get('email');
 
             try {
                 const res = await fetch('<?= base_url('auth/login') ?>', {
@@ -1803,7 +1809,12 @@
                 const data = await res.json();
 
                 if (!res.ok || data.status === 'error') {
-                    showAlert(data.message || 'Gagal masuk akun. Periksa email & kata sandi.');
+                    if (data.needs_verification) {
+                        showAlert('⚠️ ' + data.message + 
+                            '<br><a href="javascript:void(0)" onclick="resendVerification(\'' + (data.email || loginEmailVal) + '\')" style="color:var(--primary); font-weight:700; text-decoration:underline; display:inline-block; margin-top:8px;">✉️ Kirim Ulang Tautan Aktivasi Sekarang</a>', true);
+                    } else {
+                        showAlert(data.message || 'Gagal masuk akun. Periksa email & kata sandi.', true);
+                    }
                 } else {
                     showAlert(data.message || 'Berhasil masuk! Mengarahkan...', false);
                     setTimeout(() => {
@@ -1811,7 +1822,10 @@
                     }, 600);
                 }
             } catch (err) {
-                showAlert('Kendala koneksi peladen. Silakan coba kembali.');
+                showAlert('Kendala koneksi peladen. Silakan coba kembali.', true);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
             }
         }
 
@@ -1820,7 +1834,13 @@
             hideAlert();
 
             const form = e.target;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span>Mengirim Email Aktivasi...</span>';
+
             const formData = new FormData(form);
+            const userEmail = formData.get('email');
 
             try {
                 const res = await fetch('<?= base_url('auth/register') ?>', {
@@ -1831,15 +1851,51 @@
                 const data = await res.json();
 
                 if (!res.ok || data.status === 'error') {
-                    showAlert(data.message || 'Gagal mendaftar. Silakan lengkapi formulir.');
+                    if (data.needs_verification) {
+                        showAlert('⚠️ ' + (data.message || 'Email sudah terdaftar namun belum diverifikasi.') + 
+                            '<br><a href="javascript:void(0)" onclick="resendVerification(\'' + userEmail + '\')" style="color:var(--primary); font-weight:700; text-decoration:underline; display:inline-block; margin-top:6px;">Kirim Ulang Email Aktivasi</a>', true);
+                    } else {
+                        showAlert(data.message || 'Gagal mendaftar. Silakan lengkapi formulir.', true);
+                    }
                 } else {
-                    showAlert(data.message || 'Pendaftaran berhasil! Mengarahkan...', false);
-                    setTimeout(() => {
-                        window.location.href = data.redirect || '<?= base_url('dashboard') ?>';
-                    }, 800);
+                    form.reset();
+                    showAlert('🎉 <strong>Pendaftaran Berhasil!</strong><br>' + 
+                        'Kami telah mengirimkan tautan verifikasi ke <strong>' + userEmail + '</strong>.<br>' +
+                        '<span style="font-size:12px; color:#475569; display:block; margin-top:6px;">Silakan buka kotak masuk atau spam email Anda dan klik tautan aktivasi untuk mengaktifkan akun AR Tilik.</span>' +
+                        '<div style="margin-top:10px;"><a href="javascript:void(0)" onclick="resendVerification(\'' + userEmail + '\')" style="font-size:12px; color:var(--primary); font-weight:700; text-decoration:underline;">Belum menerima email? Kirim Ulang</a></div>', false);
                 }
             } catch (err) {
-                showAlert('Kendala koneksi peladen. Silakan coba kembali.');
+                showAlert('Kendala koneksi peladen. Silakan coba kembali.', true);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
+            }
+        }
+
+        async function resendVerification(email) {
+            if (!email) {
+                email = prompt('Masukkan alamat email yang Anda daftarkan:');
+            }
+            if (!email) return;
+
+            showAlert('⏳ Sedang mengirimkan ulang tautan verifikasi...', false);
+            try {
+                const res = await fetch('<?= base_url('auth/resend-verification') ?>', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ email: email })
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    showAlert('✉️ ' + data.message, false);
+                } else {
+                    showAlert(data.message || 'Gagal mengirim ulang email verifikasi.', true);
+                }
+            } catch (err) {
+                showAlert('Kendala koneksi peladen. Silakan coba kembali.', true);
             }
         }
     </script>
@@ -1851,9 +1907,24 @@
             // Auto open modal when redirected from protected route
             const urlParams = new URLSearchParams(window.location.search);
             const authParam = urlParams.get('auth');
-            if (authParam === 'login' || authParam === 'register') {
+            const verifiedParam = urlParams.get('verified');
+            const reasonParam = urlParams.get('reason');
+
+            if (verifiedParam === 'error') {
+                openAuthModal('login');
+                let errText = 'Tautan verifikasi tidak valid atau telah kedaluwarsa.';
+                if (reasonParam === 'expired') {
+                    const unvEmail = urlParams.get('email') || '';
+                    errText = '⏱️ Tautan verifikasi telah kedaluwarsa (berlaku 24 jam).<br>' +
+                        '<a href="javascript:void(0)" onclick="resendVerification(\'' + unvEmail + '\')" style="color:var(--primary); font-weight:700; text-decoration:underline; display:inline-block; margin-top:6px;">Klik di sini untuk mengirimkan tautan aktivasi baru.</a>';
+                }
+                showAlert(errText, true);
+            } else if (verifiedParam === 'success') {
+                openAuthModal('login');
+                showAlert('🎉 Alamat email Anda telah berhasil diverifikasi! Silakan masuk ke akun Anda.', false);
+            } else if (authParam === 'login' || authParam === 'register') {
                 openAuthModal(authParam);
-                <?php $flashNotice = session()->getFlashdata('auth_notice'); ?>
+                <?php $flashNotice = session()->getFlashdata('auth_notice') ?: session()->getFlashdata('error'); ?>
                 <?php if (!empty($flashNotice)) : ?>
                     showAlert(<?= json_encode($flashNotice) ?>, true);
                 <?php endif; ?>

@@ -9,7 +9,10 @@ CREATE TABLE IF NOT EXISTS users (
     password_hash VARCHAR(255) NOT NULL,
     institution VARCHAR(191) NULL,
     role ENUM('user', 'admin') NOT NULL DEFAULT 'user',
-    status ENUM('active', 'inactive') NOT NULL DEFAULT 'active',
+    status ENUM('pending_verification', 'active', 'inactive') NOT NULL DEFAULT 'pending_verification',
+    verification_token VARCHAR(128) NULL,
+    verification_token_expires_at DATETIME NULL,
+    email_verified_at DATETIME NULL,
     free_submissions_used_this_week INT UNSIGNED NOT NULL DEFAULT 0,
     week_reset_at DATETIME NOT NULL,
     bonus_submissions INT UNSIGNED NOT NULL DEFAULT 0,
@@ -18,7 +21,8 @@ CREATE TABLE IF NOT EXISTS users (
     created_at DATETIME NOT NULL,
     updated_at DATETIME NOT NULL,
     INDEX idx_users_email (email),
-    INDEX idx_users_status (status)
+    INDEX idx_users_status (status),
+    INDEX idx_users_token (verification_token)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS documents (

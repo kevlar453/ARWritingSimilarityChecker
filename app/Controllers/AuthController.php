@@ -2,13 +2,14 @@
 
 namespace App\Controllers;
 
+use App\Libraries\EmailService;
 use App\Models\UserModel;
 use CodeIgniter\HTTP\ResponseInterface;
 
 class AuthController extends BaseController
 {
     /**
-     * Mendaftarkan pengguna baru dengan email valid
+     * Mendaftarkan pengguna baru dengan email valid & mengirimkan email verifikasi
      */
     public function register()
     {
@@ -33,11 +34,21 @@ class AuthController extends BaseController
         $userModel = new UserModel();
         $existing = $userModel->where('email', $email)->first();
         if ($existing) {
+            if ($existing['status'] === 'pending_verification') {
+                return $this->response->setStatusCode(409)->setJSON([
+                    'status'             => 'error',
+                    'needs_verification' => true,
+                    'email'              => $email,
+                    'message'            => 'Alamat email ini sudah terdaftar namun belum diverifikasi. Silakan periksa email aktivasi Anda atau ajukan kirim ulang.',
+                ]);
+            }
             return $this->respondError('Alamat email ini sudah terdaftar. Silakan langsung masuk.', 409);
         }
 
         $now = date('Y-m-d H:i:s');
         $resetAt = date('Y-m-d H:i:s', strtotime('+7 days'));
+        $token = bin2hex(random_bytes(32));
+        $tokenExpiresAt = date('Y-m-d H:i:s', strtotime('+24 hours'));
 
         $userId = $userModel->insert([
             'name'                            => $name,
@@ -45,12 +56,15 @@ class AuthController extends BaseController
             'password_hash'                   => password_hash($password, PASSWORD_DEFAULT),
             'institution'                     => $institution ?: 'Institusi Akademik',
             'role'                            => 'user',
-            'status'                          => 'active',
+            'status'                          => 'pending_verification',
+            'verification_token'              => $token,
+            'verification_token_expires_at'   => $tokenExpiresAt,
+            'email_verified_at'               => null,
             'free_submissions_used_this_week' => 0,
             'week_reset_at'                   => $resetAt,
             'bonus_submissions'               => 0,
             'uploaded_corpus_count'           => 0,
-            'last_login_at'                   => $now,
+            'last_login_at'                   => null,
             'created_at'                      => $now,
             'updated_at'                      => $now,
         ]);
@@ -60,19 +74,118 @@ class AuthController extends BaseController
         }
 
         $user = $userModel->find($userId);
-        $this->setUserSession($user);
+
+        // Kirimkan email verifikasi aktivasi akun melalui server SMTP
+        $emailService = new EmailService();
+        $emailSent = $emailService->sendVerificationEmail($user, $token);
 
         return $this->response->setStatusCode(201)->setJSON([
-            'status'     => 'success',
-            'message'    => "Pendaftaran berhasil! Selamat datang di AR Tilik, {$name}.",
-            'user'       => [
+            'status'             => 'success',
+            'needs_verification' => true,
+            'email_sent'         => $emailSent,
+            'message'            => "Pendaftaran berhasil! Tautan verifikasi aktivasi akun telah dikirimkan ke {$email}. Silakan buka kotak masuk atau spam email Anda untuk mengaktifkan akun sebelum masuk.",
+            'user'               => [
                 'id'          => $user['id'],
                 'name'        => $user['name'],
                 'email'       => $user['email'],
                 'institution' => $user['institution'],
             ],
-            'quota_info' => $userModel->getQuotaInfo($user),
-            'redirect'   => base_url('dashboard'),
+            // Catatan: Sesi login sengaja belum dibuka sampai email diverifikasi
+        ]);
+    }
+
+    /**
+     * Memverifikasi tautan aktivasi email dari pengguna
+     */
+    public function verifyEmail()
+    {
+        $token = trim((string) ($this->request->getGet('token') ?? ''));
+        if (empty($token)) {
+            return redirect()->to(base_url('/?auth=login&verified=error&reason=empty_token'))
+                ->with('error', 'Token verifikasi tidak ditemukan.');
+        }
+
+        $userModel = new UserModel();
+        $user = $userModel->where('verification_token', $token)->first();
+
+        if (! $user) {
+            return redirect()->to(base_url('/?auth=login&verified=error&reason=invalid_token'))
+                ->with('error', 'Tautan verifikasi tidak valid atau akun Anda telah terverifikasi.');
+        }
+
+        $now = time();
+        $expires = strtotime($user['verification_token_expires_at'] ?? '1970-01-01');
+        if ($now > $expires) {
+            return redirect()->to(base_url('/?auth=login&verified=error&reason=expired&email=' . urlencode($user['email'])))
+                ->with('error', 'Tautan verifikasi telah kedaluwarsa. Silakan ajukan pengiriman ulang tautan aktivasi.');
+        }
+
+        // Aktifkan akun
+        $currentDate = date('Y-m-d H:i:s');
+        $userModel->update($user['id'], [
+            'status'                        => 'active',
+            'verification_token'            => null,
+            'verification_token_expires_at' => null,
+            'email_verified_at'             => $currentDate,
+            'last_login_at'                 => $currentDate,
+            'updated_at'                    => $currentDate,
+        ]);
+
+        $activeUser = $userModel->find($user['id']);
+        $this->setUserSession($activeUser);
+
+        return redirect()->to(base_url('dashboard?verified=success'))
+            ->with('message', 'Alamat email Anda berhasil diverifikasi! Selamat datang di AR Tilik.');
+    }
+
+    /**
+     * Mengirimkan ulang email verifikasi aktivasi akun
+     */
+    public function resendVerification()
+    {
+        $data = $this->getRequestData();
+        $email = strtolower(trim((string) ($data['email'] ?? '')));
+
+        if (empty($email) || ! filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return $this->respondError('Harap cantumkan alamat email yang valid.', 400);
+        }
+
+        $userModel = new UserModel();
+        $user = $userModel->where('email', $email)->first();
+
+        if (! $user) {
+            return $this->response->setJSON([
+                'status'  => 'success',
+                'message' => "Jika alamat {$email} terdaftar dalam sistem, tautan verifikasi baru telah dikirimkan.",
+            ]);
+        }
+
+        if ($user['status'] === 'active') {
+            return $this->response->setJSON([
+                'status'    => 'info',
+                'is_active' => true,
+                'message'   => 'Akun Anda sudah terverifikasi dan aktif. Silakan langsung masuk.',
+            ]);
+        }
+
+        // Buat token baru berlaku 24 jam ke depan
+        $token = bin2hex(random_bytes(32));
+        $tokenExpiresAt = date('Y-m-d H:i:s', strtotime('+24 hours'));
+
+        $userModel->update($user['id'], [
+            'verification_token'            => $token,
+            'verification_token_expires_at' => $tokenExpiresAt,
+            'updated_at'                    => date('Y-m-d H:i:s'),
+        ]);
+
+        $user['verification_token'] = $token;
+        $emailService = new EmailService();
+        $sent = $emailService->sendVerificationEmail($user, $token);
+
+        return $this->response->setJSON([
+            'status'     => 'success',
+            'email_sent' => $sent,
+            'message'    => "Tautan verifikasi baru berhasil dikirimkan ke {$email}. Silakan periksa kotak masuk atau spam email Anda.",
         ]);
     }
 
@@ -94,6 +207,15 @@ class AuthController extends BaseController
 
         if (! $user || ! password_verify($password, $user['password_hash'])) {
             return $this->respondError('Email atau kata sandi tidak cocok. Silakan periksa kembali.', 401);
+        }
+
+        if ($user['status'] === 'pending_verification') {
+            return $this->response->setStatusCode(403)->setJSON([
+                'status'             => 'error',
+                'needs_verification' => true,
+                'email'              => $email,
+                'message'            => 'Alamat email Anda belum diverifikasi. Silakan periksa kotak masuk/spam email aktivasi Anda, atau klik "Kirim Ulang Email Aktivasi".',
+            ]);
         }
 
         if ($user['status'] !== 'active') {

@@ -150,6 +150,17 @@
             </div>
         </div>
 
+        <!-- Email Verification / Flash Message Banner -->
+        <?php if (session()->getFlashdata('message') || (isset($_GET['verified']) && $_GET['verified'] === 'success')): ?>
+        <div class="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center justify-between gap-3 text-emerald-800 text-xs sm:text-sm font-medium shadow-xs">
+            <div class="flex items-center gap-2.5">
+                <span class="text-xl">🎉</span>
+                <span><?= esc(session()->getFlashdata('message')) ?: 'Alamat email Anda berhasil diverifikasi! Selamat datang di dashboard AR Tilik.' ?></span>
+            </div>
+            <button type="button" onclick="this.parentElement.remove()" class="text-emerald-500 hover:text-emerald-800 text-lg font-bold leading-none p-1">&times;</button>
+        </div>
+        <?php endif; ?>
+
         <!-- Quota & Crowdsourced Corpus Banner -->
         <?php if (!empty($currentUser) && !empty($quotaInfo)): ?>
         <div class="mb-6 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-2xl p-5 text-white shadow-md border border-indigo-800/40 relative overflow-hidden">
