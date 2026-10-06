@@ -16,7 +16,7 @@ class App extends BaseConfig
      *
      * E.g., http://example.com/
      */
-    public string $baseURL = 'http://localhost:8080/';
+    public string $baseURL = 'https://tilik.arsetontong.top/';
 
     /**
      * Allowed Hostnames in the Site URL other than the hostname in the baseURL.
@@ -29,7 +29,31 @@ class App extends BaseConfig
      *
      * @var list<string>
      */
-    public array $allowedHostnames = [];
+    public array $allowedHostnames = ['tilik.arsetontong.top', 'localhost', '127.0.0.1'];
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        // Dynamic BaseURL Failsafe:
+        // Jika diakses melalui web browser, deteksi Host & Protokol secara dinamis
+        // bila baseURL masih mengarah ke localhost/127.0.0.1 padahal client mengakses via domain.
+        if (isset($_SERVER['HTTP_HOST'])) {
+            $host = $_SERVER['HTTP_HOST'];
+            $isLocal = in_array($host, ['localhost', '127.0.0.1', 'localhost:8085', 'localhost:8080'], true);
+            $baseContainsLocal = (strpos($this->baseURL, 'localhost') !== false || strpos($this->baseURL, '127.0.0.1') !== false);
+
+            if (!$isLocal && $baseContainsLocal) {
+                $isHttps = (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off')
+                    || (isset($_SERVER['SERVER_PORT']) && (int)$_SERVER['SERVER_PORT'] === 443)
+                    || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https');
+                $scheme = $isHttps ? 'https://' : 'http://';
+                $this->baseURL = $scheme . $host . '/';
+            } elseif ($isLocal) {
+                $this->baseURL = 'http://' . $host . '/';
+            }
+        }
+    }
 
     /**
      * --------------------------------------------------------------------------
