@@ -66,14 +66,43 @@ class LegalController extends BaseController
     }
 
     /**
+     * Endpoint API AJAX untuk memvalidasi keaktifan dan keabsahan email secara real-time
+     */
+    public function validateEmail(): ResponseInterface
+    {
+        $email = trim((string) ($this->request->getVar('email') ?? ''));
+        $spamShield = new SpamShield();
+
+        $result = $spamShield->validateEmailComprehensive($email);
+
+        if (! $result['valid']) {
+            return $this->response->setStatusCode(400)->setJSON([
+                'status'     => 'error',
+                'valid'      => false,
+                'reason'     => $result['reason'],
+                'suggestion' => $result['suggestion'] ?? null,
+                'domain'     => $result['domain'] ?? '',
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'status'     => 'success',
+            'valid'      => true,
+            'message'    => 'Alamat email aktif dan terverifikasi di server internet.',
+            'suggestion' => $result['suggestion'] ?? null,
+            'domain'     => $result['domain'],
+            'mx_host'    => $result['mx_host'] ?? null,
+        ]);
+    }
+
+    /**
      * Mengirimkan pesan/kontak pengunjung ke admin@tilik.arsetontong.top
      * Dilengkapi perlindungan multi-lapis anti-spammer:
      * 1. Honeypot check (field jebakan bot)
      * 2. Time-token validation (mencegah auto-submission instant)
      * 3. Math challenge verification (HMAC signed)
-     * 4. Disposable/burner email blocker
-     * 5. DNS MX record validation
-     * 6. IP rate limiting
+     * 4. Comprehensive Email Screener (Syntax, Disposable, Gibberish/Fake, Real-time DNS MX)
+     * 5. IP rate limiting
      */
     public function sendMessage(): ResponseInterface
     {
@@ -124,27 +153,13 @@ class LegalController extends BaseController
             ]);
         }
 
-        if (empty($email) || ! filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        // 5. Anti-Spam: Penyaringan Email Menyeluruh (Keaktifan, DNS MX, Anti-Gibberish, Anti-Burner)
+        $emailFilter = $spamShield->validateEmailComprehensive($email);
+        if (! $emailFilter['valid']) {
             return $this->response->setStatusCode(400)->setJSON([
-                'status'  => 'error',
-                'message' => 'Alamat email tidak valid. Harap gunakan format email yang benar.',
-            ]);
-        }
-
-        // 5. Anti-Spam: Cek Disposable/Burner Email
-        if ($spamShield->isDisposableEmail($email)) {
-            return $this->response->setStatusCode(400)->setJSON([
-                'status'  => 'error',
-                'message' => 'Alamat email sementara (burner/disposable) tidak diperkenankan. Gunakan email institusi atau email resmi aktif Anda.',
-            ]);
-        }
-
-        // 6. Anti-Spam: Cek DNS Domain Email
-        [$dnsValid, $dnsMsg] = $spamShield->validateEmailDomainDns($email);
-        if (! $dnsValid) {
-            return $this->response->setStatusCode(400)->setJSON([
-                'status'  => 'error',
-                'message' => $dnsMsg,
+                'status'     => 'error',
+                'message'    => $emailFilter['reason'],
+                'suggestion' => $emailFilter['suggestion'] ?? null,
             ]);
         }
 

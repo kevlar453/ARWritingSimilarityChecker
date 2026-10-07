@@ -2430,7 +2430,10 @@
                         </div>
                         <div class="form-group" style="margin-bottom: 12px;">
                             <label class="form-label" for="contactEmail">Email Aktif *</label>
-                            <input type="email" id="contactEmail" name="email" class="form-control" placeholder="nama@kampus.ac.id" required>
+                            <input type="email" id="contactEmail" name="email" class="form-control" placeholder="nama@kampus.ac.id" required oninput="handleEmailInputDebounced(this.value)">
+                            <div id="emailVerifyFeedback" style="font-size: 11px; margin-top: 5px; min-height: 18px; color: var(--text-muted); line-height: 1.4; transition: all 0.2s;">
+                                <span>✉️ Masukkan email aktif (domain institusi atau email resmi Anda)</span>
+                            </div>
                         </div>
                     </div>
 
@@ -2460,7 +2463,7 @@
                     <!-- Math Captcha Challenge to defeat Automated AI / Spambots -->
                     <div class="form-group" style="margin-bottom: 16px; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 12px; padding: 12px 16px;">
                         <label class="form-label" style="font-size: 12px; color: #475569; display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
-                            <span>🛡️ Uji Anti-Spam: Berapakah hasil dari <strong id="mathProblemLabel" style="color: var(--primary); font-size: 13px;">...</strong>?</span>
+                            <span>🛡️ Uji Anti-Spam: Hitung <strong id="mathProblemLabel" style="color: var(--primary); font-size: 13px;">...</strong></span>
                             <button type="button" onclick="generateMathCaptcha()" style="background:none; border:none; color:var(--primary); font-size:11px; font-weight:700; cursor:pointer; text-decoration:underline;">Ganti Soal</button>
                         </label>
                         <div style="display: flex; gap: 10px; align-items: center;">
@@ -2760,9 +2763,79 @@
             if (alertBox) alertBox.style.display = 'none';
         }
 
+        let emailDebounceTimer = null;
+        let isEmailVerifiedActive = null;
+
+        function handleEmailInputDebounced(val) {
+            clearTimeout(emailDebounceTimer);
+            const feedbackEl = document.getElementById('emailVerifyFeedback');
+            const emailInput = document.getElementById('contactEmail');
+            if (!feedbackEl || !emailInput) return;
+
+            val = (val || '').trim();
+
+            if (val === '') {
+                feedbackEl.innerHTML = '<span style="color:var(--text-muted);">✉️ Masukkan email aktif (domain institusi atau email resmi Anda)</span>';
+                emailInput.style.borderColor = '';
+                isEmailVerifiedActive = null;
+                return;
+            }
+
+            if (!val.includes('@') || !val.includes('.') || val.length < 5) {
+                feedbackEl.innerHTML = '<span style="color:#64748b;">⏳ Melengkapi format email...</span>';
+                emailInput.style.borderColor = '';
+                isEmailVerifiedActive = null;
+                return;
+            }
+
+            feedbackEl.innerHTML = '<span style="color:var(--primary); font-weight:600;">⏳ Memeriksa keaktifan server email di internet...</span>';
+
+            emailDebounceTimer = setTimeout(async () => {
+                try {
+                    const res = await fetch('<?= base_url('contact/validate-email') ?>?email=' + encodeURIComponent(val));
+                    const data = await res.json();
+
+                    if (data.status === 'success' && data.valid) {
+                        isEmailVerifiedActive = true;
+                        emailInput.style.borderColor = '#10b981';
+                        let html = '<span style="color:#059669; font-weight:600;">✓ Server email aktif & domain valid (' + (data.domain || '') + ')</span>';
+                        if (data.suggestion) {
+                            html += '<span style="color:#d97706; margin-top:2px;">💡 Apakah maksud Anda: <a href="javascript:void(0)" onclick="applyEmailSuggestion(\'' + data.suggestion + '\')" style="color:#d97706; font-weight:700; text-decoration:underline;">' + data.suggestion + '</a>?</span>';
+                        }
+                        feedbackEl.innerHTML = html;
+                    } else {
+                        isEmailVerifiedActive = false;
+                        emailInput.style.borderColor = '#ef4444';
+                        let html = '<span style="color:#dc2626; font-weight:600;">⚠️ ' + (data.reason || 'Email terindikasi tidak aktif atau fiktif.') + '</span>';
+                        if (data.suggestion) {
+                            html += '<span style="color:#d97706; margin-top:2px;">💡 Apakah maksud Anda: <a href="javascript:void(0)" onclick="applyEmailSuggestion(\'' + data.suggestion + '\')" style="color:#d97706; font-weight:700; text-decoration:underline;">' + data.suggestion + '</a>?</span>';
+                        }
+                        feedbackEl.innerHTML = html;
+                    }
+                } catch (e) {
+                    feedbackEl.innerHTML = '<span style="color:var(--text-muted);">Format email diterima.</span>';
+                }
+            }, 350);
+        }
+
+        function applyEmailSuggestion(correctedEmail) {
+            const emailInput = document.getElementById('contactEmail');
+            if (emailInput) {
+                emailInput.value = correctedEmail;
+                handleEmailInputDebounced(correctedEmail);
+            }
+        }
+
         async function handleContactSubmit(e) {
             e.preventDefault();
             hideContactAlert();
+
+            if (isEmailVerifiedActive === false) {
+                showContactAlert('⚠️ Alamat email yang Anda masukkan tidak valid atau tidak memiliki server email aktif. Harap gunakan email aktif yang dapat menerima balasan.', true);
+                const emailInput = document.getElementById('contactEmail');
+                if (emailInput) emailInput.focus();
+                return;
+            }
 
             const form = e.target;
             const submitBtn = document.getElementById('btnSubmitContact');

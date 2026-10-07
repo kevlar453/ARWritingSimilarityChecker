@@ -26,6 +26,7 @@ $routes->match(['get', 'head'], 'docs/ojs/pdf', 'DashboardController::downloadOj
 $routes->match(['get', 'head'], 'privacy', 'LegalController::privacy');
 $routes->match(['get', 'head'], 'terms', 'LegalController::terms');
 $routes->get('contact/challenge', 'LegalController::challenge');
+$routes->match(['get', 'post'], 'contact/validate-email', 'LegalController::validateEmail');
 $routes->post('contact/send', 'LegalController::sendMessage');
 
 // Auth Routes
