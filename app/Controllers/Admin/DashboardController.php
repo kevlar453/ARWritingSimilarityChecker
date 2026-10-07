@@ -577,7 +577,7 @@ class DashboardController extends BaseController
                 $r['document_id'],
                 $r['title'] ?? 'Naskah Tidak Berjudul',
                 $r['author_name'] ?? 'Penulis Tamu / Eksternal',
-                $r['institution'] ?? 'Universitas Sanata Dharma',
+                $r['institution'] ?? 'Institusi / Mandiri',
                 number_format((float) ($r['overall_similarity'] ?? 0), 2),
                 number_format((float) ($r['exact_similarity'] ?? 0), 2),
                 number_format((float) ($r['cosine_similarity'] ?? 0), 2),

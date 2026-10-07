@@ -2309,7 +2309,7 @@
             </div>
 
             <div class="footer-bottom">
-                AR Tilik &copy; <?= date('Y') ?> &bull; Academic Writing Similarity & Evidence Checker &bull; Universitas Sanata Dharma
+                AR Tilik &copy; <?= date('Y') ?> &bull; Academic Writing Similarity & Evidence Checker &bull; <a href="https://www.arsetontong.top" target="_blank" rel="noopener noreferrer" style="color: #94a3b8; text-decoration: underline; text-underline-offset: 2px;">Powered by ARSetontong</a>
             </div>
         </div>
     </footer>
@@ -2378,7 +2378,7 @@
 
                     <div class="form-group">
                         <label class="form-label" for="regInstitution">Institusi / Universitas</label>
-                        <input type="text" id="regInstitution" name="institution" class="form-control" placeholder="Contoh: Universitas Sanata Dharma">
+                        <input type="text" id="regInstitution" name="institution" class="form-control" placeholder="Contoh: Universitas Indonesia / UGM">
                     </div>
 
                     <div class="form-group">
@@ -2437,7 +2437,7 @@
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
                         <div class="form-group" style="margin-bottom: 12px;">
                             <label class="form-label" for="contactInstitution">Institusi / Kampus</label>
-                            <input type="text" id="contactInstitution" name="institution" class="form-control" placeholder="Contoh: Univ. Sanata Dharma">
+                            <input type="text" id="contactInstitution" name="institution" class="form-control" placeholder="Contoh: Univ. Indonesia / UGM">
                         </div>
                         <div class="form-group" style="margin-bottom: 12px;">
                             <label class="form-label" for="contactSubject">Subjek Kebutuhan *</label>

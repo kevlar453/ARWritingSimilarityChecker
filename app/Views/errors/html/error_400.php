@@ -293,7 +293,7 @@ $homeUrl = function_exists('base_url') ? base_url('/') : '/';
     </main>
 
     <footer class="footer">
-        AR Tilik &copy; <?= date('Y') ?> &bull; Sistem Deteksi Kesepadanan Naskah Akademik Mandiri &bull; Universitas Sanata Dharma
+        AR Tilik &copy; <?= date('Y') ?> &bull; Sistem Deteksi Kesepadanan Naskah Akademik Mandiri &bull; <a href="https://www.arsetontong.top" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline;">Powered by ARSetontong</a>
     </footer>
 
 </body>

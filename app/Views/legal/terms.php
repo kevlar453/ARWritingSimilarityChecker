@@ -235,7 +235,7 @@
 
     <footer class="footer">
         <div class="container">
-            AR Tilik &copy; <?= date('Y') ?> &bull; Sistem Penelaah Kesepadanan Naskah Akademik Mandiri &bull; Universitas Sanata Dharma
+            AR Tilik &copy; <?= date('Y') ?> &bull; Sistem Penelaah Kesepadanan Naskah Akademik Mandiri &bull; <a href="https://www.arsetontong.top" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline;">Powered by ARSetontong</a>
         </div>
     </footer>
 </body>

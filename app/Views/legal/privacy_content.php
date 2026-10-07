@@ -92,7 +92,7 @@
         <div class="legal-contact-card">
             <strong>Tim Pengembang &amp; Kepatuhan Data AR Tilik</strong><br>
             Surat Elektronik: <a href="mailto:admin@tilik.arsetontong.top">admin@tilik.arsetontong.top</a><br>
-            Alamat Peladen: Kampus Universitas Sanata Dharma, D.I. Yogyakarta, Indonesia
+            Pengembang &amp; Infrastruktur: <a href="https://www.arsetontong.top" target="_blank" rel="noopener noreferrer">Powered by ARSetontong</a> &bull; Indonesia
         </div>
     </section>
 </div>
