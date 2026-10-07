@@ -752,6 +752,54 @@
             padding: 24px;
         }
 
+        .modal-card-md {
+            background: #ffffff;
+            border-radius: 20px;
+            max-width: 540px;
+            width: 100%;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: modalFadeIn 0.25s ease-out;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-card-lg {
+            background: #ffffff;
+            border-radius: 20px;
+            max-width: 860px;
+            width: 100%;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: modalFadeIn 0.25s ease-out;
+            max-height: 88vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-body-scroll {
+            overflow-y: auto;
+            padding: 28px 32px;
+            flex: 1;
+        }
+
+        /* Legal Document Styling inside Modal */
+        .legal-document { font-size: 14px; color: #334155; line-height: 1.7; }
+        .legal-header { margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 18px; }
+        .legal-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; background: rgba(67, 56, 202, 0.1); color: var(--primary); font-size: 11px; font-weight: 700; margin-bottom: 10px; text-transform: uppercase; }
+        .legal-title { font-size: 24px; font-weight: 800; color: var(--dark); line-height: 1.3; letter-spacing: -0.5px; margin-bottom: 6px; }
+        .legal-subtitle { font-size: 12px; color: var(--text-muted); }
+        .legal-callout { background: #eff6ff; border: 1px solid #bfdbfe; border-left: 4px solid #3b82f6; border-radius: 12px; padding: 16px 20px; margin-bottom: 28px; font-size: 13px; color: #1e3a8a; line-height: 1.6; }
+        .legal-section { margin-bottom: 28px; }
+        .legal-section h2 { font-size: 17px; font-weight: 800; color: var(--dark); margin-bottom: 10px; letter-spacing: -0.2px; }
+        .legal-section p { font-size: 13.5px; color: #334155; line-height: 1.65; margin-bottom: 10px; }
+        .legal-section ul { padding-left: 20px; margin-bottom: 12px; }
+        .legal-section li { font-size: 13.5px; color: #334155; line-height: 1.65; margin-bottom: 6px; }
+        .legal-contact-card { background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; font-size: 13px; color: #475569; line-height: 1.6; margin-top: 12px; }
+        .legal-contact-card a { color: var(--primary); font-weight: 700; text-decoration: underline; }
+
+
         .tab-switch {
             display: flex;
             background: #f1f5f9;
@@ -2174,9 +2222,9 @@
                     </p>
                 </div>
                 <div style="flex-shrink: 0; width: 100%; max-width: 260px; text-align: center;">
-                    <a href="mailto:admin@tilik.arsetontong.top?subject=Konsultasi%20Integrasi%20Institusi%20AR%20Tilik" class="btn" style="background: #ffffff; color: #0f172a; font-weight: 800; width: 100%; border: none; padding: 14px 20px; display: inline-block; text-decoration: none; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                    <button type="button" onclick="openContactModal('Konsultasi Institusi & Lisensi Kampus')" class="btn" style="background: #ffffff; color: #0f172a; font-weight: 800; width: 100%; border: none; padding: 14px 20px; display: inline-block; text-decoration: none; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); cursor: pointer;">
                         Konsultasi Institusi →
-                    </a>
+                    </button>
                     <div style="font-size: 11px; color: #94a3b8; margin-top: 8px;">Mulai Rp 250.000 / bln untuk pengelolaan jurnal</div>
                 </div>
             </div>
@@ -2237,13 +2285,14 @@
                 </div>
 
                 <div>
-                    <strong style="color: #ffffff; display: block; margin-bottom: 14px;">Dokumentasi &amp; OJS</strong>
+                    <strong style="color: #ffffff; display: block; margin-bottom: 14px;">Dokumentasi &amp; Legal</strong>
                     <ul class="footer-links">
                         <li><a href="<?= base_url('integrations/ojs/Panduan_Integrasi_OJS_ARTilik.pdf') ?>" target="_blank" download="Panduan_Integrasi_OJS_ARTilik.pdf">Buku Panduan OJS (PDF)</a></li>
                         <li><a href="<?= base_url('integrations/ojs/ARTilikOJSConnector.php') ?>" download>Konektor PHP OJS 3.x</a></li>
                         <li><a href="<?= base_url('integrations/ojs/README.md') ?>" target="_blank">Spesifikasi REST API v1</a></li>
-                        <li><a href="javascript:void(0)">Kebijakan Privasi</a></li>
-                        <li><a href="javascript:void(0)">Kontak Pengembang</a></li>
+                        <li><a href="<?= base_url('privacy') ?>" onclick="openLegalModal('privacy', event)">Kebijakan Privasi</a></li>
+                        <li><a href="<?= base_url('terms') ?>" onclick="openLegalModal('terms', event)">Ketentuan Layanan (ToS)</a></li>
+                        <li><a href="javascript:void(0)" onclick="openContactModal('Pertanyaan Umum')">Kontak Pengembang</a></li>
                     </ul>
                 </div>
             </div>
@@ -2345,6 +2394,117 @@
         </div>
     </div>
 
+    <!-- Contact & Inquiry Modal -->
+    <div id="contactModal" class="modal-overlay">
+        <div class="modal-card modal-card-md">
+            <div class="modal-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(79, 70, 229, 0.1); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 16px;">
+                        📬
+                    </div>
+                    <div>
+                        <div class="modal-title" style="font-size: 17px; font-weight: 800; color: var(--dark);">Hubungi Tim Pengembang</div>
+                        <div style="font-size: 12px; color: var(--text-muted);">Pesan langsung diteruskan ke tim pengembang AR Tilik</div>
+                    </div>
+                </div>
+                <button type="button" class="modal-close" onclick="closeContactModal()">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <div id="contactAlert" class="alert-box"></div>
+
+                <form id="formContact" onsubmit="handleContactSubmit(event)">
+                    <!-- Anti-Spam Security Token -->
+                    <input type="hidden" name="security_token" id="contactSecurityToken" value="<?= esc($authSecurityToken ?? '') ?>">
+                    
+                    <!-- Hidden Honeypot Traps (Invisibly trapped for spambots) -->
+                    <div style="display:none; visibility:hidden; opacity:0; position:absolute; left:-9999px;" aria-hidden="true">
+                        <input type="text" name="website_hp" tabindex="-1" autocomplete="off">
+                        <input type="text" name="fax_number" tabindex="-1" autocomplete="off">
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+                        <div class="form-group" style="margin-bottom: 12px;">
+                            <label class="form-label" for="contactName">Nama Lengkap *</label>
+                            <input type="text" id="contactName" name="name" class="form-control" placeholder="Prof. / Dr. / Bpk / Ibu" required>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 12px;">
+                            <label class="form-label" for="contactEmail">Email Aktif *</label>
+                            <input type="email" id="contactEmail" name="email" class="form-control" placeholder="nama@kampus.ac.id" required>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+                        <div class="form-group" style="margin-bottom: 12px;">
+                            <label class="form-label" for="contactInstitution">Institusi / Kampus</label>
+                            <input type="text" id="contactInstitution" name="institution" class="form-control" placeholder="Contoh: Univ. Sanata Dharma">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 12px;">
+                            <label class="form-label" for="contactSubject">Subjek Kebutuhan *</label>
+                            <select id="contactSubject" name="subject" class="form-control" required style="padding: 10px 14px; height: 42px;">
+                                <option value="Pertanyaan Umum">Pertanyaan Umum</option>
+                                <option value="Konsultasi Institusi & Lisensi Kampus">Konsultasi Institusi & Lisensi Kampus</option>
+                                <option value="Integrasi Plugin OJS 3.x">Integrasi Plugin OJS 3.x</option>
+                                <option value="Kemitraan Korpus & Repositori">Kemitraan Korpus & Repositori</option>
+                                <option value="Kebijakan Privasi & Hak Cipta">Kebijakan Privasi & Hak Cipta</option>
+                                <option value="Laporan Kendala Teknis">Laporan Kendala Teknis</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 12px;">
+                        <label class="form-label" for="contactMessage">Pesan / Pertanyaan Detail *</label>
+                        <textarea id="contactMessage" name="message" class="form-control" rows="4" placeholder="Jelaskan kebutuhan, jumlah jurnal/mahasiswa, atau kendala teknis Anda..." required style="resize: vertical; min-height: 85px;"></textarea>
+                    </div>
+
+                    <!-- Math Captcha Challenge to defeat Automated AI / Spambots -->
+                    <div class="form-group" style="margin-bottom: 16px; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 12px; padding: 12px 16px;">
+                        <label class="form-label" style="font-size: 12px; color: #475569; display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                            <span>🛡️ Uji Anti-Spam: Berapakah hasil dari <strong id="mathProblemLabel" style="color: var(--primary); font-size: 13px;">...</strong>?</span>
+                            <button type="button" onclick="generateMathCaptcha()" style="background:none; border:none; color:var(--primary); font-size:11px; font-weight:700; cursor:pointer; text-decoration:underline;">Ganti Soal</button>
+                        </label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="number" id="mathAnswerInput" name="captcha_ans" class="form-control" placeholder="Jawaban angka" required style="max-width: 140px; font-weight: 700; text-align: center;">
+                            <input type="hidden" id="mathChallengeToken" name="captcha_token">
+                            <span style="font-size: 11px; color: var(--text-muted); line-height: 1.4;">Diperlukan untuk memvalidasi bahwa pengirim adalah akademisi sungguhan.</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="btnSubmitContact" class="btn btn-primary" style="width: 100%;">
+                        Kirim Pesan ke Pengembang 🚀
+                    </button>
+                    <div style="font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 10px;">
+                        📧 Pesan Anda langsung diteruskan ke <strong>admin@tilik.arsetontong.top</strong>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Legal Document Modal (Privacy Policy & Terms) -->
+    <div id="legalModal" class="modal-overlay">
+        <div class="modal-card modal-card-lg">
+            <div class="modal-header" style="border-bottom: 1px solid var(--border); padding: 18px 24px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik Logo" style="width: 24px; height: 24px; object-fit: contain;">
+                    <div class="modal-title" id="legalModalTitle" style="font-size: 17px; font-weight: 800; color: var(--dark);">Dokumen Legal</div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <a id="legalFullPageLink" href="#" target="_blank" style="font-size: 12px; color: var(--primary); font-weight: 700; text-decoration: underline;">
+                        Buka Halaman Penuh ↗
+                    </a>
+                    <button type="button" class="modal-close" onclick="closeLegalModal()">&times;</button>
+                </div>
+            </div>
+            <div id="legalModalBody" class="modal-body-scroll">
+                <div style="text-align: center; padding: 40px; color: var(--text-muted);">
+                    <div class="spinner" style="margin: 0 auto 14px;"></div>
+                    <span>Memuat dokumen legal...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script>
         async function openAuthModal(mode) {
@@ -2371,15 +2531,20 @@
         }
 
         window.onclick = function(event) {
-            const modal = document.getElementById('authModal');
-            if (event.target === modal) {
-                closeAuthModal();
-            }
+            const authModal = document.getElementById('authModal');
+            const contactModal = document.getElementById('contactModal');
+            const legalModal = document.getElementById('legalModal');
+
+            if (event.target === authModal) closeAuthModal();
+            if (event.target === contactModal) closeContactModal();
+            if (event.target === legalModal) closeLegalModal();
         };
 
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Escape') {
                 closeAuthModal();
+                closeContactModal();
+                closeLegalModal();
             }
         });
 
@@ -2529,6 +2694,163 @@
             } catch (err) {
                 showAlert('Kendala koneksi peladen. Silakan coba kembali.', true);
             }
+        }
+
+        /* --- Contact Form & Anti-Spam Functions --- */
+        async function openContactModal(subject = 'Pertanyaan Umum') {
+            const modal = document.getElementById('contactModal');
+            modal.style.display = 'flex';
+            hideContactAlert();
+
+            const subjectSelect = document.getElementById('contactSubject');
+            if (subjectSelect) {
+                for (let i = 0; i < subjectSelect.options.length; i++) {
+                    if (subjectSelect.options[i].value === subject || subjectSelect.options[i].text.includes(subject)) {
+                        subjectSelect.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+
+            await generateMathCaptcha();
+        }
+
+        function closeContactModal() {
+            const modal = document.getElementById('contactModal');
+            modal.style.display = 'none';
+            hideContactAlert();
+        }
+
+        async function generateMathCaptcha() {
+            const label = document.getElementById('mathProblemLabel');
+            const tokenInput = document.getElementById('mathChallengeToken');
+            const ansInput = document.getElementById('mathAnswerInput');
+            const secTokenInput = document.getElementById('contactSecurityToken');
+
+            if (label) label.textContent = 'Memuat soal...';
+            if (ansInput) ansInput.value = '';
+
+            try {
+                const res = await fetch('<?= base_url('contact/challenge') ?>');
+                const data = await res.json();
+                if (data.status === 'success' && data.challenge) {
+                    if (label) label.textContent = data.challenge.question + ' = ?';
+                    if (tokenInput) tokenInput.value = data.challenge.token;
+                    if (data.time_token && secTokenInput) {
+                        secTokenInput.value = data.time_token;
+                    }
+                } else {
+                    if (label) label.textContent = '3 + 4 = ?';
+                }
+            } catch (e) {
+                if (label) label.textContent = '3 + 4 = ?';
+            }
+        }
+
+        function showContactAlert(msg, isError = true) {
+            const alertBox = document.getElementById('contactAlert');
+            if (!alertBox) return;
+            alertBox.innerHTML = msg;
+            alertBox.className = 'alert-box ' + (isError ? 'alert-error' : 'alert-success');
+            alertBox.style.display = 'block';
+        }
+
+        function hideContactAlert() {
+            const alertBox = document.getElementById('contactAlert');
+            if (alertBox) alertBox.style.display = 'none';
+        }
+
+        async function handleContactSubmit(e) {
+            e.preventDefault();
+            hideContactAlert();
+
+            const form = e.target;
+            const submitBtn = document.getElementById('btnSubmitContact');
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span>Mengirim Pesan...</span>';
+
+            const formData = new FormData(form);
+
+            try {
+                const res = await fetch('<?= base_url('contact/send') ?>', {
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json' },
+                    body: formData
+                });
+                const data = await res.json();
+
+                if (!res.ok || data.status === 'error') {
+                    showContactAlert(data.message || 'Gagal mengirimkan pesan. Silakan periksa kembali formulir Anda.', true);
+                    generateMathCaptcha();
+                } else {
+                    form.reset();
+                    showContactAlert('🎉 <strong>Pesan Berhasil Terkirim!</strong><br>' + 
+                        (data.message || 'Terima kasih, tim pengembang akan merespons pesan Anda via email dalam 1x24 jam kerja.'), false);
+                    setTimeout(() => {
+                        generateMathCaptcha();
+                    }, 500);
+                }
+            } catch (err) {
+                showContactAlert('Kendala koneksi peladen saat mengirim pesan. Silakan coba kembali.', true);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
+            }
+        }
+
+        /* --- Legal Document Modal (Privacy Policy & Terms) --- */
+        const legalCache = {};
+
+        async function openLegalModal(type, e) {
+            if (e) {
+                e.preventDefault();
+            }
+
+            const modal = document.getElementById('legalModal');
+            const titleEl = document.getElementById('legalModalTitle');
+            const bodyEl = document.getElementById('legalModalBody');
+            const fullLink = document.getElementById('legalFullPageLink');
+
+            const isPrivacy = (type === 'privacy');
+            const endpoint = isPrivacy ? '<?= base_url('privacy') ?>' : '<?= base_url('terms') ?>';
+            const pageTitle = isPrivacy ? 'Kebijakan Privasi & Kedaulatan Data' : 'Ketentuan Layanan (Terms of Service)';
+
+            if (titleEl) titleEl.textContent = pageTitle;
+            if (fullLink) fullLink.href = endpoint;
+            modal.style.display = 'flex';
+
+            if (legalCache[type]) {
+                if (bodyEl) bodyEl.innerHTML = legalCache[type];
+                return;
+            }
+
+            if (bodyEl) {
+                bodyEl.innerHTML = '<div style="text-align: center; padding: 50px 20px; color: var(--text-muted);">' +
+                    '<div style="font-size: 24px; margin-bottom: 8px;">⏳</div>' +
+                    '<div>Memuat dokumen ' + pageTitle + '...</div>' +
+                    '</div>';
+            }
+
+            try {
+                const res = await fetch(endpoint, {
+                    headers: { 'Accept': 'application/json' }
+                });
+                const data = await res.json();
+                if (data.status === 'success' && data.html) {
+                    legalCache[type] = data.html;
+                    if (bodyEl) bodyEl.innerHTML = data.html;
+                } else {
+                    if (bodyEl) bodyEl.innerHTML = '<div class="alert-box alert-error" style="display:block;">Gagal memuat dokumen. Silakan buka melalui <a href="' + endpoint + '" target="_blank" style="color:var(--primary); font-weight:700;">Halaman Penuh</a>.</div>';
+                }
+            } catch (err) {
+                if (bodyEl) bodyEl.innerHTML = '<div class="alert-box alert-error" style="display:block;">Kendala koneksi jaringan saat memuat dokumen. Silakan buka melalui <a href="' + endpoint + '" target="_blank" style="color:var(--primary); font-weight:700;">Halaman Penuh</a>.</div>';
+            }
+        }
+
+        function closeLegalModal() {
+            const modal = document.getElementById('legalModal');
+            modal.style.display = 'none';
         }
     </script>
 

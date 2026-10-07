@@ -132,4 +132,164 @@ class EmailService
 </html>
 HTML;
     }
+
+    /**
+     * Mengirimkan notifikasi pesan/kontak pengunjung ke admin@tilik.arsetontong.top
+     */
+    public function sendContactNotification(array $data): bool
+    {
+        $email = Services::email();
+        $adminEmail = 'admin@tilik.arsetontong.top';
+
+        $visitorName = esc($data['name'] ?? 'Pengunjung');
+        $visitorEmail = filter_var($data['email'] ?? '', FILTER_SANITIZE_EMAIL);
+        $subject = '[Pesan Pengunjung] ' . esc($data['subject'] ?? 'Pertanyaan Umum') . ' — ' . $visitorName;
+
+        $htmlMessage = $this->buildContactNotificationTemplate($data);
+
+        $email->setTo($adminEmail);
+        $email->setReplyTo($visitorEmail, $visitorName);
+        $email->setSubject($subject);
+        $email->setMessage($htmlMessage);
+        $email->setMailType('html');
+
+        $plainText = "Pesan baru dari pengunjung AR Tilik:\n\n" .
+            "Nama: " . ($data['name'] ?? '-') . "\n" .
+            "Email: {$visitorEmail}\n" .
+            "Institusi: " . ($data['institution'] ?? '-') . "\n" .
+            "Subjek: " . ($data['subject'] ?? '-') . "\n" .
+            "IP Address: " . ($data['ip_address'] ?? '-') . "\n" .
+            "Waktu: " . date('Y-m-d H:i:s') . " WIB\n\n" .
+            "Isi Pesan:\n" . ($data['message'] ?? '-') . "\n\n" .
+            "Balas langsung ke email ini untuk merespons pengunjung ({$visitorEmail}).\n\n" .
+            "— AR Tilik System Notification";
+        $email->setAltMessage($plainText);
+
+        try {
+            $sent = $email->send();
+            if (! $sent) {
+                log_message('error', 'Gagal mengirim email pesan pengunjung ke ' . $adminEmail . ': ' . $email->printDebugger(['headers']));
+            }
+            return (bool) $sent;
+        } catch (\Throwable $e) {
+            log_message('error', 'Exception saat mengirim email pesan pengunjung: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Template email HTML untuk notifikasi pesan masuk admin
+     */
+    protected function buildContactNotificationTemplate(array $data): string
+    {
+        $logoUrl = base_url('images/logo.png');
+        $name = esc($data['name'] ?? 'Pengunjung');
+        $email = esc($data['email'] ?? '');
+        $institution = esc($data['institution'] ?: '-');
+        $subject = esc($data['subject'] ?? 'Pertanyaan Umum');
+        $message = nl2br(esc($data['message'] ?? ''));
+        $ip = esc($data['ip_address'] ?? '-');
+        $time = date('d F Y, H:i:s') . ' WIB';
+        $replyMailto = 'mailto:' . urlencode($email) . '?subject=' . urlencode('Re: ' . $subject . ' — AR Tilik');
+
+        return <<<HTML
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pesan Masuk Pengunjung AR Tilik</title>
+</head>
+<body style="margin:0; padding:0; background-color:#f1f5f9; font-family:'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color:#1e293b; -webkit-font-smoothing:antialiased;">
+    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:#f1f5f9; padding: 40px 15px;">
+        <tr>
+            <td align="center">
+                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 620px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0;">
+                    <!-- Header -->
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 60%, #4338ca 100%); padding: 30px 32px; text-align: left;">
+                            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                                <tr>
+                                    <td>
+                                        <div style="display:flex; align-items:center; gap:12px;">
+                                            <img src="{$logoUrl}" alt="AR Tilik" width="44" height="44" style="object-fit:contain; vertical-align:middle;">
+                                            <div style="display:inline-block; vertical-align:middle; margin-left:10px;">
+                                                <span style="color:#ffffff; font-size:18px; font-weight:800; display:block;">AR Tilik</span>
+                                                <span style="color:#38bdf8; font-size:12px; font-weight:600;">Notifikasi Pesan Kontak Pengunjung</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td align="right">
+                                        <span style="display:inline-block; padding:4px 10px; background:rgba(56,189,248,0.2); border:1px solid rgba(56,189,248,0.4); border-radius:20px; color:#e0f2fe; font-size:11px; font-weight:700;">Inquiry Baru</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Body -->
+                    <tr>
+                        <td style="padding: 32px;">
+                            <h2 style="font-size: 17px; font-weight: 800; color: #0f172a; margin: 0 0 20px 0; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px;">
+                                {$subject}
+                            </h2>
+
+                            <!-- Metadata Table -->
+                            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 24px; font-size: 13px; line-height: 1.6;">
+                                <tr>
+                                    <td width="120" style="color: #64748b; font-weight: 600; padding: 6px 0;">Pengirim:</td>
+                                    <td style="color: #0f172a; font-weight: 700; padding: 6px 0;">{$name}</td>
+                                </tr>
+                                <tr>
+                                    <td style="color: #64748b; font-weight: 600; padding: 6px 0;">Email:</td>
+                                    <td style="color: #4338ca; font-weight: 700; padding: 6px 0;"><a href="mailto:{$email}" style="color:#4338ca; text-decoration:none;">{$email}</a></td>
+                                </tr>
+                                <tr>
+                                    <td style="color: #64748b; font-weight: 600; padding: 6px 0;">Institusi:</td>
+                                    <td style="color: #334155; padding: 6px 0;">{$institution}</td>
+                                </tr>
+                                <tr>
+                                    <td style="color: #64748b; font-weight: 600; padding: 6px 0;">Waktu Kirim:</td>
+                                    <td style="color: #64748b; padding: 6px 0;">{$time}</td>
+                                </tr>
+                                <tr>
+                                    <td style="color: #64748b; font-weight: 600; padding: 6px 0;">IP Pelapor:</td>
+                                    <td style="color: #64748b; font-family:monospace; padding: 6px 0;">{$ip}</td>
+                                </tr>
+                            </table>
+
+                            <!-- Message Content -->
+                            <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #4338ca; border-radius: 10px; padding: 18px 20px; margin-bottom: 26px;">
+                                <div style="font-size: 11px; font-weight: 800; color: #4338ca; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Uraian Pesan:</div>
+                                <div style="font-size: 14px; line-height: 1.6; color: #1e293b;">
+                                    {$message}
+                                </div>
+                            </div>
+
+                            <!-- Action Button -->
+                            <div style="text-align: center; margin: 30px 0 10px 0;">
+                                <a href="{$replyMailto}" style="display: inline-block; background: linear-gradient(135deg, #4338ca 0%, #312e81 100%); color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 700; padding: 12px 28px; border-radius: 10px; box-shadow: 0 4px 12px rgba(67, 56, 202, 0.25);">
+                                    ✉️ Balas Pesan ke Pengirim Langsung
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #f8fafc; border-top: 1px solid #e2e8f0; padding: 20px 32px; text-align: center;">
+                            <p style="font-size: 11px; color: #94a3b8; margin: 0; line-height: 1.5;">
+                                Notifikasi ini dikirimkan otomatis oleh sistem formulir kontak terlindungi spam AR Tilik ke <strong>admin@tilik.arsetontong.top</strong>.<br>
+                                &copy; 2026 AR Tilik — Platform Penelaah Kesepadanan Naskah Akademik.
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+HTML;
+    }
 }

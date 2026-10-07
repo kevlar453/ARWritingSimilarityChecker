@@ -22,6 +22,12 @@ $routes->match(['get', 'head'], 'verify', 'DashboardController::verify');
 $routes->match(['get', 'head'], 'integrations/ojs/pdf', 'DashboardController::downloadOjsPdf');
 $routes->match(['get', 'head'], 'docs/ojs/pdf', 'DashboardController::downloadOjsPdf');
 
+// Legal & Contact Routes
+$routes->match(['get', 'head'], 'privacy', 'LegalController::privacy');
+$routes->match(['get', 'head'], 'terms', 'LegalController::terms');
+$routes->get('contact/challenge', 'LegalController::challenge');
+$routes->post('contact/send', 'LegalController::sendMessage');
+
 // Auth Routes
 $routes->group('auth', function ($routes) {
     $routes->post('register', 'AuthController::register');
