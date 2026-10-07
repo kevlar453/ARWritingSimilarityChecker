@@ -282,26 +282,176 @@
         .nav-links {
             display: flex;
             align-items: center;
-            gap: 24px;
+            gap: 4px;
             list-style: none;
+            margin: 0;
+            padding: 0;
         }
 
-        .nav-links a {
+        .nav-links > li > a {
             text-decoration: none;
             color: var(--text-muted);
-            font-size: 14px;
+            font-size: 13.5px;
             font-weight: 600;
-            transition: color 0.2s ease;
+            padding: 7px 12px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
 
-        .nav-links a:hover {
+        .nav-links > li > a:hover {
             color: var(--primary);
+            background: rgba(67, 56, 202, 0.06);
+        }
+
+        /* Nav Dropdown */
+        .nav-item-dropdown {
+            position: relative;
+        }
+
+        .nav-dropdown-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 13.5px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            padding: 7px 12px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .nav-dropdown-toggle:hover,
+        .nav-item-dropdown:hover .nav-dropdown-toggle,
+        .nav-item-dropdown.active .nav-dropdown-toggle {
+            color: var(--primary);
+            background: rgba(67, 56, 202, 0.06);
+        }
+
+        .dropdown-chevron {
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            color: var(--text-muted);
+        }
+
+        .nav-item-dropdown:hover .dropdown-chevron,
+        .nav-item-dropdown.active .dropdown-chevron {
+            transform: rotate(180deg);
+            color: var(--primary);
+        }
+
+        .nav-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            width: 320px;
+            background: #ffffff;
+            border-radius: 14px;
+            border: 1px solid rgba(226, 232, 240, 0.95);
+            box-shadow: 0 16px 36px -4px rgba(15, 23, 42, 0.12), 0 4px 12px -2px rgba(15, 23, 42, 0.06);
+            padding: 8px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(8px);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 120;
+            pointer-events: none;
+        }
+
+        .nav-dropdown-menu::before {
+            content: '';
+            position: absolute;
+            top: -12px;
+            left: 0;
+            right: 0;
+            height: 12px;
+        }
+
+        .nav-item-dropdown:hover .nav-dropdown-menu,
+        .nav-item-dropdown:focus-within .nav-dropdown-menu,
+        .nav-item-dropdown.active .nav-dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: var(--text-main);
+            transition: background 0.15s ease, transform 0.15s ease;
+        }
+
+        .dropdown-item:hover {
+            background: #f8fafc;
+            transform: translateX(3px);
+        }
+
+        .dropdown-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+            flex-shrink: 0;
+        }
+
+        .dropdown-content {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .dropdown-title {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--text-main);
+            line-height: 1.3;
+        }
+
+        .dropdown-item:hover .dropdown-title {
+            color: var(--primary);
+        }
+
+        .dropdown-sub {
+            font-size: 11.5px;
+            color: var(--text-muted);
+            line-height: 1.35;
+            margin-top: 2px;
+        }
+
+        /* QR Verify Pill */
+        .nav-link-verify {
+            border: 1px solid rgba(67, 56, 202, 0.18) !important;
+            background: rgba(67, 56, 202, 0.04) !important;
+            color: var(--primary) !important;
+            font-weight: 700 !important;
+        }
+
+        .nav-link-verify:hover {
+            background: rgba(67, 56, 202, 0.1) !important;
+            border-color: rgba(67, 56, 202, 0.35) !important;
         }
 
         .nav-actions {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
+            flex-shrink: 0;
         }
 
         .btn {
@@ -1924,10 +2074,17 @@
             font-weight: 600;
         }
 
+        @media (min-width: 993px) and (max-width: 1160px) {
+            .nav-links { gap: 2px; }
+            .nav-links > li > a, .nav-dropdown-toggle { font-size: 12.8px; padding: 6px 8px; }
+            .brand-title { font-size: 18px; }
+            .brand-badge { display: none; }
+        }
+
         /* ========================================================
            Responsive Media Queries (Mobile First Tuning)
            ======================================================== */
-        @media (max-width: 900px) {
+        @media (max-width: 992px) {
             .nav-links { display: none; }
             .hamburger-btn { display: flex; }
             .btn-desktop-only { display: none !important; }
@@ -2041,14 +2198,51 @@
             </a>
 
             <ul class="nav-links">
-                <li><a href="#teori">Filosofi & Teori</a></li>
-                <li><a href="#fitur-unggulan">Inovasi Mesin</a></li>
-                <li><a href="#cara-kerja">Cara Kerja</a></li>
+                <!-- Dropdown: Fitur & Teknologi -->
+                <li class="nav-item-dropdown">
+                    <button type="button" class="nav-dropdown-toggle" onclick="toggleNavDropdown(event)" aria-expanded="false" aria-haspopup="true">
+                        <span>Fitur &amp; Teknologi</span>
+                        <svg class="dropdown-chevron" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                            <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <div class="nav-dropdown-menu">
+                        <a href="#fitur-unggulan" class="dropdown-item" onclick="closeAllNavDropdowns()">
+                            <div class="dropdown-icon" style="background: #eef2ff; color: #4338ca;">⚡</div>
+                            <div class="dropdown-content">
+                                <span class="dropdown-title">Inovasi Mesin</span>
+                                <span class="dropdown-sub">Dual-Lens 5-Gram &amp; Anti-Cheat Shield</span>
+                            </div>
+                        </a>
+                        <a href="#cara-kerja" class="dropdown-item" onclick="closeAllNavDropdowns()">
+                            <div class="dropdown-icon" style="background: #e0f2fe; color: #0284c7;">🔄</div>
+                            <div class="dropdown-content">
+                                <span class="dropdown-title">Cara Kerja</span>
+                                <span class="dropdown-sub">Alur 4 tahap telaah kesepadanan naskah</span>
+                            </div>
+                        </a>
+                        <a href="#teori" class="dropdown-item" onclick="closeAllNavDropdowns()">
+                            <div class="dropdown-icon" style="background: #fdf4ff; color: #9333ea;">🏛️</div>
+                            <div class="dropdown-content">
+                                <span class="dropdown-title">Filosofi &amp; Teori Bukti</span>
+                                <span class="dropdown-sub">Keadilan akademik &amp; kedaulatan naskah</span>
+                            </div>
+                        </a>
+                    </div>
+                </li>
+
                 <li><a href="#integrasi-ojs">Integrasi OJS 3.x</a></li>
                 <li><a href="#solusi">Solusi Institusi</a></li>
                 <li><a href="#langganan">Paket Tarif</a></li>
                 <li><a href="#faq">FAQ</a></li>
-                <li><a href="<?= base_url('verify') ?>">Verifikasi QR</a></li>
+                <li>
+                    <a href="<?= base_url('verify') ?>" class="nav-link-verify">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                        </svg>
+                        <span>Verifikasi QR</span>
+                    </a>
+                </li>
             </ul>
 
             <div class="nav-actions">
@@ -3797,6 +3991,34 @@
             }
         }
 
+        /* --- Desktop Navigation Dropdown Controls --- */
+        function toggleNavDropdown(event) {
+            event.stopPropagation();
+            const dropdown = event.currentTarget.closest('.nav-item-dropdown');
+            if (!dropdown) return;
+            const isOpen = dropdown.classList.contains('active');
+            closeAllNavDropdowns();
+            if (!isOpen) {
+                dropdown.classList.add('active');
+                event.currentTarget.setAttribute('aria-expanded', 'true');
+            }
+        }
+
+        function closeAllNavDropdowns() {
+            document.querySelectorAll('.nav-item-dropdown').forEach(function(d) {
+                d.classList.remove('active');
+                const btn = d.querySelector('.nav-dropdown-toggle');
+                if (btn) btn.setAttribute('aria-expanded', 'false');
+            });
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.nav-item-dropdown')) {
+                closeAllNavDropdowns();
+            }
+        });
+
         /* --- Mobile Navigation Drawer Controls --- */
         function toggleMobileNav() {
             const drawer = document.getElementById('mobileNavDrawer');
@@ -3841,10 +4063,11 @@
             document.body.style.overflow = '';
         }
 
-        // Close mobile drawer on Escape key
+        // Close mobile drawer and dropdowns on Escape key
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 closeMobileNav();
+                closeAllNavDropdowns();
             }
         });
 
