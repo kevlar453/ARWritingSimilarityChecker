@@ -1,5 +1,9 @@
 # Panduan Integrasi AR Tilik untuk Open Journal Systems (OJS 3.x)
 
+> 📕 **DOKUMENTASI RESMI VERSI PDF SIAP UNDUH**:  
+> Buku panduan lengkap berformat PDF visual resolusi tinggi (8 Halaman) kini telah tersedia. Buku panduan ini dilengkapi dengan **diagram alur kerja end-to-end, konsep komputasi Dual-Lens, tangkapan layar panduan langkah-demi-langkah, contoh kode PHP siap pakai, spesifikasi REST API publik v1, serta informasi keunggulan & kemitraan institusi AR Tilik**.  
+> 👉 **[Unduh Panduan Integrasi OJS 3.x (PDF)](Panduan_Integrasi_OJS_ARTilik.pdf)** *(atau buka via browser: `/integrations/ojs/pdf`)*
+
 Modul ini memungkinkan pengelola jurnal ilmiah di lingkungan kampus yang menggunakan **PKP Open Journal Systems (OJS 3.x)** untuk melakukan pengecekan orisinalitas naskah secara otomatis menggunakan mesin **Dual-Lens Academic Writing Similarity Checker (AR Tilik)**.
 
 ---

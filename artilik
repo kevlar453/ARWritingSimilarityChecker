@@ -100,6 +100,10 @@ case "$1" in
         shift
         exec "$PYTHON_BIN" -m worker.risk_classifier "$@"
         ;;
+    ojs:pdf)
+        shift
+        exec "$PYTHON_BIN" worker/generate_ojs_pdf.py "$@"
+        ;;
     *)
         echo "============================================="
         echo "        AR Tilik CLI Management Tool         "

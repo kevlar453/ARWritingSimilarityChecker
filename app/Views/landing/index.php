@@ -1852,7 +1852,7 @@
                 <div>
                     <strong style="color: #ffffff; display: block; margin-bottom: 14px;">Informasi</strong>
                     <ul class="footer-links">
-                        <li><a href="javascript:void(0)">Dokumentasi API OJS/Moodle</a></li>
+                        <li><a href="<?= base_url('integrations/ojs/Panduan_Integrasi_OJS_ARTilik.pdf') ?>" target="_blank" download="Panduan_Integrasi_OJS_ARTilik.pdf">Dokumentasi API OJS (PDF)</a></li>
                         <li><a href="javascript:void(0)">Kebijakan Privasi</a></li>
                         <li><a href="javascript:void(0)">Kontak Pengembang</a></li>
                     </ul>

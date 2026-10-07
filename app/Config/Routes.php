@@ -19,6 +19,8 @@ $routes->get('dashboard/report/(:num)/preview', 'DashboardController::previewPdf
 $routes->get('dashboard/reports/(:num)/preview', 'DashboardController::previewPdf/$1');
 $routes->match(['get', 'head'], 'verify/(:segment)', 'DashboardController::verify/$1');
 $routes->match(['get', 'head'], 'verify', 'DashboardController::verify');
+$routes->match(['get', 'head'], 'integrations/ojs/pdf', 'DashboardController::downloadOjsPdf');
+$routes->match(['get', 'head'], 'docs/ojs/pdf', 'DashboardController::downloadOjsPdf');
 
 // Auth Routes
 $routes->group('auth', function ($routes) {

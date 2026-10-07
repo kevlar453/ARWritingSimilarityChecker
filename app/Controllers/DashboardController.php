@@ -1263,4 +1263,35 @@ class DashboardController extends BaseController
             'evidenceData' => $evidenceData,
         ]);
     }
+
+    /**
+     * Mengunduh Berkas PDF Dokumentasi & Panduan Resmi Integrasi OJS 3.x
+     */
+    public function downloadOjsPdf()
+    {
+        $pdfPath = FCPATH . 'integrations/ojs/Panduan_Integrasi_OJS_ARTilik.pdf';
+
+        if (! file_exists($pdfPath)) {
+            $pythonBin = ROOTPATH . '.venv/bin/python';
+            if (! file_exists($pythonBin)) {
+                $pythonBin = 'python3';
+            }
+            exec(escapeshellcmd($pythonBin) . ' ' . escapeshellarg(ROOTPATH . 'worker/generate_ojs_pdf.py'));
+        }
+
+        if (! file_exists($pdfPath)) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Dokumen panduan OJS belum tersedia.");
+        }
+
+        $pdfContent = file_get_contents($pdfPath);
+        $filename   = 'Panduan_Integrasi_OJS_ARTilik.pdf';
+
+        return $this->response
+            ->setHeader('Content-Type', 'application/pdf')
+            ->setHeader('Content-Disposition', 'inline; filename="' . $filename . '"')
+            ->setHeader('Content-Length', (string) strlen($pdfContent))
+            ->setHeader('Cache-Control', 'public, max-age=86400')
+            ->setBody($pdfContent);
+    }
 }
+
