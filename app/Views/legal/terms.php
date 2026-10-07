@@ -3,7 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= esc($title ?? 'Ketentuan Layanan — AR Tilik') ?></title>
+    <title><?= esc($title ?? 'Ketentuan Layanan — AR Tilik | Integritas Akademik & Ketentuan Penggunaan') ?></title>
+    <meta name="description" content="Ketentuan Layanan (Terms of Service) AR Tilik: Pedoman integritas akademik, lisensi pengujian naskah, hak kekayaan intelektual, dan batasan tanggung jawab.">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+    <link rel="canonical" href="<?= base_url('terms') ?>">
+    <meta name="theme-color" content="#4338ca">
+    
+    <!-- Open Graph -->
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="id_ID">
+    <meta property="og:site_name" content="AR Tilik">
+    <meta property="og:title" content="Ketentuan Layanan & Integritas Akademik — AR Tilik">
+    <meta property="og:description" content="Pedoman penggunaan dan ketentuan lisensi pengujian naskah ilmiah di platform AR Tilik.">
+    <meta property="og:url" content="<?= base_url('terms') ?>">
+    <meta property="og:image" content="<?= base_url('images/og-artilik.png') ?>">
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Ketentuan Layanan — AR Tilik">
+    <meta name="twitter:description" content="Ketentuan penggunaan dan integritas pengujian naskah akademik di AR Tilik.">
+    <meta name="twitter:image" content="<?= base_url('images/og-artilik.png') ?>">
+
+    <!-- Breadcrumb Schema.org -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Beranda",
+          "item": "<?= base_url() ?>"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Ketentuan Layanan",
+          "item": "<?= base_url('terms') ?>"
+        }
+      ]
+    }
+    </script>
+
     <!-- Favicon & Brand Icons -->
     <link rel="icon" type="image/x-icon" href="<?= base_url('favicon.ico?v=20261006') ?>">
     <link rel="icon" type="image/png" sizes="32x32" href="<?= base_url('favicon-32x32.png?v=20261006') ?>">

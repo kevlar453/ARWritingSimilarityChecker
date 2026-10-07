@@ -3,7 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $status === 'valid' ? 'Verifikasi Sertifikat #' . esc($code) . ' — AR Tilik' : 'Verifikasi Sertifikat Resmi — AR Tilik' ?></title>
+    <title><?= $status === 'valid' ? 'Verifikasi Sertifikat #' . esc($code) . ' — AR Tilik' : 'Verifikasi Sertifikat Resmi — AR Tilik | Portal Validasi QR Ilmiah' ?></title>
+    <meta name="description" content="Portal Verifikasi Resmi Sertifikat Keaslian Hasil Telaah Kesepadanan Naskah AR Tilik. Validasi kode QR kriptografis dan tanda tangan digital keabsahan karya ilmiah.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="<?= base_url('verify' . (!empty($code) ? '/' . esc($code) : '')) ?>">
+    <meta name="theme-color" content="#4338ca">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="id_ID">
+    <meta property="og:site_name" content="AR Tilik">
+    <meta property="og:title" content="<?= $status === 'valid' ? 'Verifikasi Sertifikat #' . esc($code) . ' — AR Tilik' : 'Verifikasi Sertifikat Resmi — AR Tilik' ?>">
+    <meta property="og:description" content="Portal verifikasi keaslian sertifikat digital telaah kesepadanan naskah akademik ber-QR Code resmi.">
+    <meta property="og:url" content="<?= base_url('verify' . (!empty($code) ? '/' . esc($code) : '')) ?>">
+    <meta property="og:image" content="<?= base_url('images/og-artilik.png') ?>">
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Portal Verifikasi Sertifikat — AR Tilik">
+    <meta name="twitter:description" content="Validasi sertifikat digital orisinalitas naskah karya ilmiah AR Tilik.">
+    <meta name="twitter:image" content="<?= base_url('images/og-artilik.png') ?>">
+
     <!-- Favicon & Brand Icons -->
     <link rel="icon" type="image/x-icon" href="<?= base_url('favicon.ico?v=20261006') ?>">
     <link rel="icon" type="image/png" sizes="32x32" href="<?= base_url('favicon-32x32.png?v=20261006') ?>">

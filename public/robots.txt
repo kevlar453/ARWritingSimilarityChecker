@@ -1,2 +1,26 @@
+# robots.txt for AR Tilik (https://tilik.arsetontong.top)
+# Powered by ARSetontong
+
 User-agent: *
-Disallow: 
+Allow: /
+Allow: /privacy
+Allow: /terms
+Allow: /verify
+Allow: /integrations/
+Allow: /images/
+Allow: /sitemap.xml
+
+# Disallow crawl of administrative, internal API, payment, and private user areas
+Disallow: /admin/
+Disallow: /auth/
+Disallow: /api/
+Disallow: /api-keys/
+Disallow: /evaluation/
+Disallow: /payment/
+Disallow: /contact/
+Disallow: /dashboard/
+Disallow: /report/
+Disallow: /reports/
+
+# XML Sitemap Location
+Sitemap: https://tilik.arsetontong.top/sitemap.xml

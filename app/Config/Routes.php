@@ -24,6 +24,7 @@ $routes->match(['get', 'head'], 'docs/ojs/pdf', 'DashboardController::downloadOj
 $routes->match(['get', 'head'], 'integrations/ojs/connector', 'DashboardController::downloadOjsConnector');
 $routes->match(['get', 'head'], 'docs/ojs/connector', 'DashboardController::downloadOjsConnector');
 $routes->match(['get', 'head'], 'integrations/ojs/ARTilikOJSConnector.php', 'DashboardController::downloadOjsConnector');
+$routes->match(['get', 'head'], 'sitemap.xml', 'SitemapController::index');
 
 // Legal & Contact Routes
 $routes->match(['get', 'head'], 'privacy', 'LegalController::privacy');

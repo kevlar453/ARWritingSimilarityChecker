@@ -3,7 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= esc($title ?? 'Kebijakan Privasi — AR Tilik') ?></title>
+    <title><?= esc($title ?? 'Kebijakan Privasi — AR Tilik | Kedaulatan & Kerahasiaan Naskah Ilmiah') ?></title>
+    <meta name="description" content="Kebijakan Privasi AR Tilik: Perlindungan data pribadi sivitas akademika, kedaulatan naskah ilmiah, kebijakan non-repository, dan kepatuhan enkripsi dokumen.">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+    <link rel="canonical" href="<?= base_url('privacy') ?>">
+    <meta name="theme-color" content="#4338ca">
+    
+    <!-- Open Graph -->
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="id_ID">
+    <meta property="og:site_name" content="AR Tilik">
+    <meta property="og:title" content="Kebijakan Privasi & Kedaulatan Naskah — AR Tilik">
+    <meta property="og:description" content="Komitmen kerahasiaan dan kedaulatan naskah akademik di AR Tilik: bebas repositori publik, privasi penuh, dan enkripsi data ilmiah.">
+    <meta property="og:url" content="<?= base_url('privacy') ?>">
+    <meta property="og:image" content="<?= base_url('images/og-artilik.png') ?>">
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Kebijakan Privasi — AR Tilik">
+    <meta name="twitter:description" content="Kedaulatan dan kerahasiaan naskah ilmiah di platform AR Tilik.">
+    <meta name="twitter:image" content="<?= base_url('images/og-artilik.png') ?>">
+
+    <!-- Breadcrumb Schema.org -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Beranda",
+          "item": "<?= base_url() ?>"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Kebijakan Privasi",
+          "item": "<?= base_url('privacy') ?>"
+        }
+      ]
+    }
+    </script>
+
     <!-- Favicon & Brand Icons -->
     <link rel="icon" type="image/x-icon" href="<?= base_url('favicon.ico?v=20261006') ?>">
     <link rel="icon" type="image/png" sizes="32x32" href="<?= base_url('favicon-32x32.png?v=20261006') ?>">

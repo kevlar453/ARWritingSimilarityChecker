@@ -1,6 +1,19 @@
 {
-  "name": "AR Tilik — Academic Similarity Checker",
+  "name": "AR Tilik — Cek Plagiarisme & Penelaah Kesepadanan Naskah Akademik",
   "short_name": "AR Tilik",
+  "description": "Instrumen penelaah kesepadanan naskah akademik dan cek plagiarisme mandiri berbasis bukti ilmiah terbuka, arsitektur Dual-Lens, dan integrasi OJS 3.x.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#4338ca",
+  "lang": "id-ID",
+  "categories": [
+    "education",
+    "productivity",
+    "utilities"
+  ],
   "icons": [
     {
       "src": "/favicon-16x16.png",
@@ -15,15 +28,14 @@
     {
       "src": "/android-chrome-192x192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "/android-chrome-512x512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
-  ],
-  "theme_color": "#4338ca",
-  "background_color": "#ffffff",
-  "display": "standalone"
+  ]
 }

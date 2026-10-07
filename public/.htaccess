@@ -1,6 +1,21 @@
 # Disable directory browsing
 Options -Indexes
 
+# Set MIME types for SEO files
+AddType application/xml .xml
+AddType application/xml .xml.gz
+
+<IfModule mod_headers.c>
+	# Cache static assets for improved Core Web Vitals and PageSpeed
+	<FilesMatch "\.(ico|pdf|jpg|jpeg|png|gif|webp|svg|woff2|woff|ttf)$">
+		Header set Cache-Control "max-age=2592000, public"
+	</FilesMatch>
+	<FilesMatch "\.xml$">
+		Header set Cache-Control "max-age=86400, public"
+		Header set Content-Type "application/xml; charset=utf-8"
+	</FilesMatch>
+</IfModule>
+
 # ----------------------------------------------------------------------
 # Rewrite engine
 # ----------------------------------------------------------------------

@@ -3,8 +3,157 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AR Tilik — Sistem Penelaah Kesepadanan Naskah Akademik Mandiri & Keadilan Bukti</title>
-    <meta name="description" content="AR Tilik adalah instrumen penelaah kesepadanan karya ilmiah institusional berbasis bukti ilmiah, arsitektur Dual-Lens, kesadaran konteks sitasi, dan transparansi akademik.">
+    <title>AR Tilik — Cek Plagiarisme &amp; Penelaah Kesepadanan Naskah Akademik Mandiri</title>
+    
+    <!-- Primary SEO Meta Tags -->
+    <meta name="description" content="AR Tilik adalah instrumen penelaah kesepadanan naskah akademik &amp; cek plagiarisme mandiri berbasis bukti ilmiah, arsitektur Dual-Lens 5-Gram &amp; TF-IDF, integrasi OJS 3.x, audit sitasi APA/IEEE, serta transparansi keadilan akademik.">
+    <meta name="keywords" content="cek plagiasi, cek plagiarisme, similarity checker indonesia, uji kesepadanan naskah, plagiarism checker ojs, anti plagiasi karya ilmiah, turnitin alternatif, cek plagiasi gratis, ojs 3 similarity plugin, ar tilik, arsetontong, integritas akademik">
+    <meta name="author" content="ARSetontong">
+    <meta name="publisher" content="ARSetontong">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <link rel="canonical" href="<?= base_url() ?>">
+    <meta name="theme-color" content="#4338ca">
+    <meta name="language" content="Indonesian">
+    <meta name="geo.region" content="ID">
+    <meta name="geo.placename" content="Indonesia">
+
+    <!-- Open Graph / Facebook / LinkedIn / WhatsApp -->
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="id_ID">
+    <meta property="og:site_name" content="AR Tilik">
+    <meta property="og:title" content="AR Tilik — Cek Plagiarisme &amp; Penelaah Kesepadanan Naskah Akademik">
+    <meta property="og:description" content="Platform penelaah kesepadanan karya ilmiah mandiri berbasis bukti transparan, arsitektur Dual-Lens 5-Gram &amp; TF-IDF, integrasi otomatis OJS 3.x, dan perlindungan privasi naskah.">
+    <meta property="og:url" content="<?= base_url() ?>">
+    <meta property="og:image" content="<?= base_url('images/og-artilik.png') ?>">
+    <meta property="og:image:secure_url" content="<?= base_url('images/og-artilik.png') ?>">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:alt" content="AR Tilik Academic Writing Similarity Checker &amp; Evidence Reviewer">
+
+    <!-- Twitter / X Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@ARSetontong">
+    <meta name="twitter:creator" content="@ARSetontong">
+    <meta name="twitter:title" content="AR Tilik — Cek Plagiarisme &amp; Penelaah Kesepadanan Naskah">
+    <meta name="twitter:description" content="Platform penelaah kesepadanan karya ilmiah mandiri berbasis bukti ilmiah, integrasi OJS 3.x, dan transparansi keadilan sitasi.">
+    <meta name="twitter:image" content="<?= base_url('images/og-artilik.png') ?>">
+
+    <!-- Schema.org JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "<?= base_url('#website') ?>",
+          "url": "<?= base_url() ?>",
+          "name": "AR Tilik",
+          "alternateName": ["ARTilik", "AR Tilik Similarity Checker"],
+          "description": "Sistem Penelaah Kesepadanan Naskah Akademik & Cek Plagiarisme Mandiri Berbasis Bukti Ilmiah Terbuka",
+          "inLanguage": "id-ID",
+          "publisher": {
+            "@id": "<?= base_url('#organization') ?>"
+          }
+        },
+        {
+          "@type": "Organization",
+          "@id": "<?= base_url('#organization') ?>",
+          "name": "ARSetontong",
+          "url": "https://www.arsetontong.top",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "<?= base_url('android-chrome-512x512.png') ?>",
+            "width": 512,
+            "height": 512
+          },
+          "sameAs": [
+            "https://www.arsetontong.top"
+          ]
+        },
+        {
+          "@type": "WebApplication",
+          "@id": "<?= base_url('#software') ?>",
+          "name": "AR Tilik",
+          "applicationCategory": "EducationalApplication",
+          "operatingSystem": "All modern web browsers",
+          "url": "<?= base_url() ?>",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "IDR",
+            "availability": "https://schema.org/InStock",
+            "name": "Kuota Sivitas Akademika Gratis (3 Submisi/Minggu)"
+          },
+          "featureList": [
+            "Dual-Lens 5-Gram & TF-IDF Cosine Similarity Engine",
+            "Citation Context Awareness (APA, IEEE, Harvard)",
+            "Open Journal Systems (OJS 3.x) Automatic REST Integration",
+            "Anti-Cheat Homoglyph & Font Spoofing Shield",
+            "Interactive Dual-Reader Side-by-Side Comparison",
+            "Cryptographic QR Code Verification Certificate"
+          ],
+          "author": {
+            "@id": "<?= base_url('#organization') ?>"
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "@id": "<?= base_url('#faq') ?>",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Apa perbedaan mendasar antara AR Tilik dan aplikasi pemeriksa plagiarisme lainnya?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "AR Tilik berfokus pada Keadilan Bukti (Evidence-Based Fairness) menggunakan arsitektur Dual-Lens (5-Gram Sintaktis & TF-IDF Semantik) serta kesadaran konteks sitasi. Berbeda dengan matcher konvensional yang kerap menandai kutipan resmi, rumus, dan frasa umum sebagai plagiarisme, AR Tilik mengisolasi daftar pustaka, mengenali blok kutipan bertanda, dan menyediakan sintesis risiko terkalibrasi melalui XGBoost Synthesizer serta penampil perbandingan berdampingan (Dual-Reader)."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Apakah naskah karya ilmiah yang saya unggah akan disimpan ke repositori publik?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Sama sekali tidak. AR Tilik menerapkan kebijakan non-repository default untuk melindungi kerahasiaan dan kedaulatan naskah submisi sivitas akademika. Naskah hanya diproses di lingkungan memori terisolasi untuk menghasilkan laporan telaah kesepadanan dan tidak pernah dibagikan atau dijadikan korpus terbuka tanpa izin eksplisit penulis."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Bagaimana cara mengintegrasikan AR Tilik ke jurnal Open Journal Systems (OJS 3.x)?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Integrasi OJS sangat praktis tanpa perlu mengubah core OJS. Pengelola jurnal cukup mengunduh berkas konektor mandiri ARTilikOJSConnector.php dan mengikuti panduan di Buku Panduan OJS (PDF). Konektor ini memanfaatkan REST API v1 AR Tilik untuk melakukan pemeriksaan submisi naskah secara otomatis saat penulis mengunggah artikel di OJS."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Bagaimana AR Tilik mendeteksi kecurangan manipulasi karakter (Font Spoofing & Zero-Width Space)?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "AR Tilik dilengkapi modul Anti-Cheat Font & Homoglyph Shield yang secara otomatis menormalisasi karakter Cyrillic/Greek yang mirip dengan Latin, menghapus karakter tak kasat mata (Zero-Width Spaces/Joiners), dan mendeteksi injeksi teks tersembunyi yang lazim digunakan untuk mengelabui deteksi similarity tradisional."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Apakah sivitas akademika (mahasiswa & dosen) dapat menggunakan AR Tilik secara gratis?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Ya, 100% gratis. Setiap akun yang mendaftar langsung memperoleh kuota 3 submisi per minggu yang diperbarui secara otomatis. Selain itu, sivitas akademika dapat menambah kuota permanen secara gratis melalui program Gotong Royong Korpus dengan menyumbangkan repositori skripsi/tesis berlisensi terbuka (Open Access), atau melakukan top-up terjangkau mulai Rp 5.000 via QRIS."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Bagaimana cara memeriksa keabsahan dan keaslian Sertifikat Digital AR Tilik?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Setiap laporan hasil telaah AR Tilik dilengkapi kode hash kriptografis unik dan tautan QR Code resmi yang mengarah ke portal verifikasi publik (https://tilik.arsetontong.top/verify/{hash}). Pihak perpustakaan prodi, dewan penguji skripsi, atau editor jurnal dapat memindai QR tersebut kapan saja untuk memvalidasi skor kesepadanan, tanggal terbit, dan keaslian sertifikat tanpa risiko pemalsuan PDF."
+              }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
     <!-- Favicon & Brand Icons -->
     <link rel="icon" type="image/x-icon" href="<?= base_url('favicon.ico?v=20261006') ?>">
     <link rel="icon" type="image/png" sizes="32x32" href="<?= base_url('favicon-32x32.png?v=20261006') ?>">
@@ -1416,6 +1565,108 @@
             margin-top: 1px;
         }
 
+        /* FAQ Accordion Section */
+        .faq-section {
+            background: #ffffff;
+            border-bottom: 1px solid var(--border);
+            padding: 84px 0;
+        }
+
+        .faq-list {
+            max-width: 860px;
+            margin: 40px auto 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .faq-card {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            transition: all 0.25s ease;
+        }
+
+        .faq-card:hover {
+            border-color: #cbd5e1;
+            background: #ffffff;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+        }
+
+        .faq-card.active {
+            border-color: var(--primary-light);
+            background: #ffffff;
+            box-shadow: 0 10px 25px -5px rgba(67, 56, 202, 0.12);
+        }
+
+        .faq-btn {
+            width: 100%;
+            padding: 20px 24px;
+            text-align: left;
+            background: none;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            font-family: inherit;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--dark);
+            line-height: 1.45;
+        }
+
+        .faq-btn:hover {
+            color: var(--primary);
+        }
+
+        .faq-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 800;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+
+        .faq-card.active .faq-icon {
+            background: var(--primary);
+            color: #ffffff;
+            transform: rotate(180deg);
+        }
+
+        .faq-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s ease, padding 0.35s ease;
+            padding: 0 24px;
+            color: var(--text-muted);
+            font-size: 14.5px;
+            line-height: 1.7;
+        }
+
+        .faq-card.active .faq-content {
+            padding: 0 24px 22px 24px;
+            max-height: 600px;
+        }
+
+        .faq-content p {
+            margin-bottom: 8px;
+        }
+
+        .faq-content p:last-child {
+            margin-bottom: 0;
+        }
+
         /* Responsive */
         @media (max-width: 900px) {
             .hero-grid { grid-template-columns: 1fr; gap: 32px; margin-bottom: 36px; }
@@ -1454,6 +1705,7 @@
                 <li><a href="#integrasi-ojs">Integrasi OJS 3.x</a></li>
                 <li><a href="#solusi">Solusi Institusi</a></li>
                 <li><a href="#langganan">Paket Tarif</a></li>
+                <li><a href="#faq">FAQ</a></li>
                 <li><a href="<?= base_url('verify') ?>">Verifikasi QR</a></li>
             </ul>
 
@@ -1486,7 +1738,7 @@
                         <span>🏛️</span> Standar Keadilan Akademik &bull; OJS 3.x Ready &bull; Lintas Bahasa EN⇄ID &bull; Anti-Cheat Shield
                     </div>
                     <h1 class="hero-title" data-aos="fade-up" data-aos-duration="700">
-                        Deteksi Kesepadanan Naskah Akademik Berbasis <span>Bukti Ilmiah Terbuka</span>
+                        Cek Plagiarisme &amp; Penelaah Kesepadanan Naskah Berbasis <span>Bukti Ilmiah Terbuka</span>
                     </h1>
                     <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="100" data-aos-duration="700">
                         AR Tilik hadir bukan untuk memvonis karya, melainkan menyediakan dekomposisi bukti kemiripan transparan, kesadaran konteks sitasi, audit kepatuhan daftar pustaka, integrasi otomatis OJS 3.x, serta sintesis risiko akademik terkalibrasi untuk sivitas perguruan tinggi.
@@ -1903,6 +2155,22 @@
                 </div>
             </div>
 
+            <!-- Visual OJS Dashboard Interface Preview -->
+            <div data-aos="fade-up" data-aos-duration="700" style="margin-top: 32px;">
+                <div style="background: #0f172a; border: 1px solid rgba(244, 63, 94, 0.25); border-radius: 16px; padding: 14px; box-shadow: 0 16px 36px -8px rgba(15, 23, 42, 0.25);">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding: 0 6px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #ef4444;"></span>
+                            <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #f59e0b;"></span>
+                            <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #10b981;"></span>
+                            <span style="font-size: 12px; color: #94a3b8; font-family: 'JetBrains Mono', monospace; margin-left: 8px;">OJS 3.x Editorial Review Stage &bull; AR Tilik Live Integration</span>
+                        </div>
+                        <span style="font-size: 11px; color: #f43f5e; font-weight: 700;">● Terhubung REST API v1</span>
+                    </div>
+                    <img src="<?= base_url('images/ojs_integration_admin.png') ?>" alt="Integrasi AR Tilik pada Alur Kerja Editor OJS 3.x" style="width: 100%; height: auto; border-radius: 10px; display: block;" loading="lazy">
+                </div>
+            </div>
+
             <!-- 3 Alur Kerja Integrasi Jurnal -->
             <div class="grid-3" style="margin-top: 40px;">
                 <div class="step-card" data-aos="fade-up" data-aos-delay="100" data-aos-duration="700">
@@ -2242,6 +2510,99 @@
         </div>
     </section>
 
+    <!-- FAQ Section (Schema.org Aligned) -->
+    <section id="faq" class="faq-section">
+        <div class="container">
+            <div class="section-header" data-aos="fade-up" data-aos-duration="700">
+                <div class="section-tag" style="color: var(--primary);">Pertanyaan Umum (FAQ)</div>
+                <h2 class="section-title">Semua Hal yang Perlu Anda Ketahui Tentang AR Tilik</h2>
+                <p class="section-desc">
+                    Penjelasan terbuka mengenai cara kerja mesin penelaah kesepadanan naskah, privasi dokumen karya ilmiah, integrasi OJS 3.x, serta sertifikasi keabsahan.
+                </p>
+            </div>
+
+            <div class="faq-list" data-aos="fade-up" data-aos-delay="100" data-aos-duration="700">
+                <!-- FAQ 1 -->
+                <div class="faq-card">
+                    <button type="button" class="faq-btn" onclick="toggleFaq(this)" aria-expanded="false">
+                        <span>Apa perbedaan mendasar antara AR Tilik dan aplikasi pemeriksa plagiarisme lainnya?</span>
+                        <span class="faq-icon">▼</span>
+                    </button>
+                    <div class="faq-content">
+                        <p>
+                            AR Tilik berfokus pada <strong>Keadilan Bukti (Evidence-Based Fairness)</strong> menggunakan arsitektur <em>Dual-Lens</em> (5-Gram Sintaktis &amp; TF-IDF Semantik) serta kesadaran konteks sitasi. Berbeda dengan matcher konvensional yang kerap menandai kutipan resmi, rumus, dan frasa umum sebagai plagiarisme, AR Tilik mengisolasi daftar pustaka, mengenali blok kutipan bertanda, dan menyediakan sintesis risiko terkalibrasi melalui XGBoost Synthesizer serta penampil perbandingan berdampingan (Dual-Reader).
+                        </p>
+                    </div>
+                </div>
+
+                <!-- FAQ 2 -->
+                <div class="faq-card">
+                    <button type="button" class="faq-btn" onclick="toggleFaq(this)" aria-expanded="false">
+                        <span>Apakah naskah karya ilmiah yang saya unggah akan disimpan ke repositori publik?</span>
+                        <span class="faq-icon">▼</span>
+                    </button>
+                    <div class="faq-content">
+                        <p>
+                            <strong>Sama sekali tidak.</strong> AR Tilik menerapkan kebijakan <em>non-repository default</em> untuk melindungi kerahasiaan dan kedaulatan naskah submisi sivitas akademika. Naskah hanya diproses di lingkungan memori terisolasi untuk menghasilkan laporan telaah kesepadanan dan tidak pernah dibagikan atau dijadikan korpus terbuka tanpa izin eksplisit penulis.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- FAQ 3 -->
+                <div class="faq-card">
+                    <button type="button" class="faq-btn" onclick="toggleFaq(this)" aria-expanded="false">
+                        <span>Bagaimana cara mengintegrasikan AR Tilik ke jurnal Open Journal Systems (OJS 3.x)?</span>
+                        <span class="faq-icon">▼</span>
+                    </button>
+                    <div class="faq-content">
+                        <p>
+                            Integrasi OJS sangat praktis tanpa perlu mengubah core OJS. Pengelola jurnal cukup mengunduh berkas konektor mandiri <code>ARTilikOJSConnector.php</code> dan mengikuti panduan di Buku Panduan OJS (PDF). Konektor ini memanfaatkan REST API v1 AR Tilik untuk melakukan pemeriksaan submisi naskah secara otomatis saat penulis mengunggah artikel di OJS, serta langsung menyematkan skor kemiripan dan tautan sertifikat QR ke meja editor.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- FAQ 4 -->
+                <div class="faq-card">
+                    <button type="button" class="faq-btn" onclick="toggleFaq(this)" aria-expanded="false">
+                        <span>Bagaimana AR Tilik mendeteksi kecurangan manipulasi karakter (Font Spoofing &amp; Zero-Width Space)?</span>
+                        <span class="faq-icon">▼</span>
+                    </button>
+                    <div class="faq-content">
+                        <p>
+                            AR Tilik dilengkapi modul <em>Anti-Cheat Font &amp; Homoglyph Shield</em> yang secara otomatis menormalisasi karakter Cyrillic/Greek yang mirip dengan Latin, menghapus karakter tak kasat mata (Zero-Width Spaces/Joiners), dan mendeteksi injeksi teks tersembunyi yang lazim digunakan untuk mengelabui deteksi similarity tradisional.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- FAQ 5 -->
+                <div class="faq-card">
+                    <button type="button" class="faq-btn" onclick="toggleFaq(this)" aria-expanded="false">
+                        <span>Apakah sivitas akademika (mahasiswa &amp; dosen) dapat menggunakan AR Tilik secara gratis?</span>
+                        <span class="faq-icon">▼</span>
+                    </button>
+                    <div class="faq-content">
+                        <p>
+                            <strong>Ya, 100% gratis.</strong> Setiap akun yang mendaftar langsung memperoleh kuota 3 submisi per minggu yang diperbarui secara otomatis. Selain itu, sivitas akademika dapat menambah kuota permanen secara gratis melalui program <em>Gotong Royong Korpus</em> dengan menyumbangkan repositori skripsi/tesis berlisensi terbuka (Open Access), atau melakukan top-up terjangkau mulai Rp 5.000 via QRIS.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- FAQ 6 -->
+                <div class="faq-card">
+                    <button type="button" class="faq-btn" onclick="toggleFaq(this)" aria-expanded="false">
+                        <span>Bagaimana cara memeriksa keabsahan dan keaslian Sertifikat Digital AR Tilik?</span>
+                        <span class="faq-icon">▼</span>
+                    </button>
+                    <div class="faq-content">
+                        <p>
+                            Setiap laporan hasil telaah AR Tilik dilengkapi kode hash kriptografis unik dan tautan QR Code resmi yang mengarah ke portal verifikasi publik (<code>https://tilik.arsetontong.top/verify/{hash}</code>). Pihak perpustakaan prodi, dewan penguji skripsi, atau editor jurnal dapat memindai QR tersebut kapan saja untuk memvalidasi skor kesepadanan, tanggal terbit, dan keaslian sertifikat tanpa risiko pemalsuan PDF.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Footer -->
     <footer class="footer" data-aos="fade-in" data-aos-duration="800">
         <div class="container">
@@ -2290,6 +2651,8 @@
                         <li><a href="<?= base_url('integrations/ojs/Panduan_Integrasi_OJS_ARTilik.pdf') ?>" target="_blank" download="Panduan_Integrasi_OJS_ARTilik.pdf">Buku Panduan OJS (PDF)</a></li>
                         <li><a href="<?= base_url('integrations/ojs/connector') ?>" download="ARTilikOJSConnector.php">Konektor PHP OJS 3.x</a></li>
                         <li><a href="<?= base_url('integrations/ojs/README.md') ?>" target="_blank">Spesifikasi REST API v1</a></li>
+                        <li><a href="#faq">Tanya Jawab (FAQ)</a></li>
+                        <li><a href="<?= base_url('sitemap.xml') ?>" target="_blank">Peta Situs (Sitemap XML)</a></li>
                         <li><a href="<?= base_url('privacy') ?>" onclick="openLegalModal('privacy', event)">Kebijakan Privasi</a></li>
                         <li><a href="<?= base_url('terms') ?>" onclick="openLegalModal('terms', event)">Ketentuan Layanan (ToS)</a></li>
                         <li><a href="javascript:void(0)" onclick="openContactModal('Pertanyaan Umum')">Kontak Pengembang</a></li>
@@ -2930,6 +3293,23 @@
     <!-- AOS (Animate On Scroll) Library & Initialization -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
+        function toggleFaq(btn) {
+            const card = btn.closest('.faq-card');
+            const isActive = card.classList.contains('active');
+            
+            // Close other active FAQs for accordion behavior
+            document.querySelectorAll('.faq-card').forEach(function(c) {
+                c.classList.remove('active');
+                const otherBtn = c.querySelector('.faq-btn');
+                if (otherBtn) otherBtn.setAttribute('aria-expanded', 'false');
+            });
+            
+            if (!isActive) {
+                card.classList.add('active');
+                btn.setAttribute('aria-expanded', 'true');
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             // Auto open modal when redirected from protected route
             const urlParams = new URLSearchParams(window.location.search);
