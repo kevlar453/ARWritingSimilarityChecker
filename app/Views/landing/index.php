@@ -1245,6 +1245,129 @@
             transition-delay: 0s !important;
         }
 
+        /* Modern Additions: Badges & Section Components */
+        .badge-rose { background: rgba(244, 63, 94, 0.12); color: #e11d48; }
+        .badge-purple { background: rgba(168, 85, 247, 0.12); color: #9333ea; }
+
+        /* Hero Pills Micro-badges */
+        .hero-pills-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: -30px;
+            margin-bottom: 42px;
+        }
+
+        .hero-pill-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--dark);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            transition: all 0.2s ease;
+        }
+
+        .hero-pill-badge:hover {
+            border-color: var(--primary-light);
+            color: var(--primary);
+            transform: translateY(-1px);
+        }
+
+        /* OJS Banner & Showcase */
+        .ojs-banner-card {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 55%, #1e293b 100%);
+            border: 1px solid rgba(244, 63, 94, 0.35);
+            border-radius: 24px;
+            padding: 42px;
+            color: #ffffff;
+            box-shadow: 0 20px 45px -15px rgba(244, 63, 94, 0.2);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 40px;
+        }
+
+        .ojs-banner-card::before {
+            content: '';
+            position: absolute;
+            top: -40%;
+            right: -15%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(244, 63, 94, 0.16) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .ojs-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 36px;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .ojs-code-card {
+            background: #020617;
+            border: 1px solid rgba(51, 65, 85, 0.8);
+            border-radius: 16px;
+            padding: 22px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: #38bdf8;
+            overflow-x: auto;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Persona Solution Cards */
+        .persona-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 32px;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .persona-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 14px 30px -4px rgba(67, 56, 202, 0.12);
+            border-color: rgba(99, 102, 241, 0.45);
+        }
+
+        .persona-list {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .persona-list li {
+            font-size: 13px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            line-height: 1.5;
+        }
+
+        .persona-list li span.check-icon {
+            color: #10b981;
+            font-weight: 800;
+            font-size: 14px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
         /* Responsive */
         @media (max-width: 900px) {
             .hero-grid { grid-template-columns: 1fr; gap: 32px; margin-bottom: 36px; }
@@ -1258,6 +1381,8 @@
             .incentive-grid { grid-template-columns: 1fr; }
             .footer-grid { grid-template-columns: 1fr; }
             .nav-links { display: none; }
+            .ojs-grid { grid-template-columns: 1fr; }
+            .ojs-banner-card { padding: 24px; }
         }
     </style>
 </head>
@@ -1270,15 +1395,17 @@
                 <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik Logo" class="brand-logo">
                 <div class="brand-text">
                     <span class="brand-title">AR Tilik</span>
-                    <span class="brand-badge">v1.2.0</span>
+                    <span class="brand-badge">v1.3.0</span>
                 </div>
             </a>
 
             <ul class="nav-links">
                 <li><a href="#teori">Filosofi & Teori</a></li>
-                <li><a href="#cara-kerja">Cara Penggunaan</a></li>
-                <li><a href="#kuota-korpus">Gotong Royong Korpus</a></li>
-                <li><a href="#langganan">Paket Berlangganan</a></li>
+                <li><a href="#fitur-unggulan">Inovasi Mesin</a></li>
+                <li><a href="#cara-kerja">Cara Kerja</a></li>
+                <li><a href="#integrasi-ojs">Integrasi OJS 3.x</a></li>
+                <li><a href="#solusi">Solusi Institusi</a></li>
+                <li><a href="#langganan">Paket Tarif</a></li>
                 <li><a href="<?= base_url('verify') ?>">Verifikasi QR</a></li>
             </ul>
 
@@ -1308,13 +1435,13 @@
             <div class="hero-grid">
                 <div>
                     <div class="hero-badge" data-aos="fade-down" data-aos-duration="600">
-                        <span>🏛️</span> Keadilan Akademik &bull; Arsitektur Dual-Lens &bull; Buka Sumber Mandiri
+                        <span>🏛️</span> Standar Keadilan Akademik &bull; OJS 3.x Ready &bull; Lintas Bahasa EN⇄ID &bull; Anti-Cheat Shield
                     </div>
                     <h1 class="hero-title" data-aos="fade-up" data-aos-duration="700">
                         Deteksi Kesepadanan Naskah Akademik Berbasis <span>Bukti Ilmiah Terbuka</span>
                     </h1>
                     <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="100" data-aos-duration="700">
-                        AR Tilik hadir bukan untuk memvonis karya mahasiswa, melainkan menyediakan dekomposisi bukti kemiripan transparan, kesadaran sitasi kutipan, serta sintesis risiko akademik terkalibrasi untuk institusi perguruan tinggi.
+                        AR Tilik hadir bukan untuk memvonis karya, melainkan menyediakan dekomposisi bukti kemiripan transparan, kesadaran konteks sitasi, audit kepatuhan daftar pustaka, integrasi otomatis OJS 3.x, serta sintesis risiko akademik terkalibrasi untuk sivitas perguruan tinggi.
                     </p>
 
                     <div class="hero-buttons" data-aos="fade-up" data-aos-delay="200" data-aos-duration="700">
@@ -1327,9 +1454,21 @@
                                 <span>✨</span> Mulai Gratis (3 Submisi/Minggu)
                             </button>
                         <?php endif; ?>
-                        <a href="#teori" class="btn btn-outline">
-                            <span>📖</span> Pelajari Teori & Cara Kerja
+                        <a href="#integrasi-ojs" class="btn btn-outline" style="border-color: #f43f5e; color: #e11d48; background: #fff1f2;">
+                            <span>📕</span> Panduan OJS 3.x (PDF)
                         </a>
+                        <a href="#fitur-unggulan" class="btn btn-outline">
+                            <span>⚡</span> Inovasi Mesin
+                        </a>
+                    </div>
+
+                    <!-- Micro Feature Badges -->
+                    <div class="hero-pills-wrap" data-aos="fade-up" data-aos-delay="250" data-aos-duration="700">
+                        <div class="hero-pill-badge"><span>⚡</span> Dual-Lens 5-Gram & TF-IDF</div>
+                        <div class="hero-pill-badge"><span>🌐</span> Cross-Lingual EN⇄ID</div>
+                        <div class="hero-pill-badge"><span>🛡️</span> Anti-Cheat Font/Homoglyph</div>
+                        <div class="hero-pill-badge"><span>📑</span> Auditor Sitasi APA/IEEE</div>
+                        <div class="hero-pill-badge"><span>🦅</span> Pemanen Neliti & GARUDA Dikti</div>
                     </div>
                 </div>
 
@@ -1492,7 +1631,62 @@
         </div>
     </section>
 
-    <!-- Section 2: Cara Penggunaan -->
+    <!-- Section 2: Inovasi Mesin Pendeteksi Generasi Baru -->
+    <section id="fitur-unggulan" class="section" style="background: #f8fafc; border-top: 1px solid var(--border);">
+        <div class="container">
+            <div class="section-header" data-aos="fade-up" data-aos-duration="700">
+                <div class="section-tag">Integritas Ilmiah Mutakhir</div>
+                <h2 class="section-title">Lebih Cerdas dari Matcher Teks Biasa</h2>
+                <p class="section-desc">
+                    Plagiarisme modern telah berevolusi melampaui salin-tempel langsung. AR Tilik dipersenjatai 4 pilar komputasi cerdas untuk membongkar alih-bahasa tersembunyi, manipulasi font, sitasi fiktif, dan terhubung ke pangkalan data riset nasional:
+                </p>
+            </div>
+
+            <div class="grid-4">
+                <!-- Fitur 1: Cross-Lingual -->
+                <div class="theory-card" data-aos="fade-up" data-aos-delay="100" data-aos-duration="700">
+                    <div class="card-icon-badge badge-rose">🌐</div>
+                    <div style="font-size: 11px; font-weight: 800; color: #e11d48; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Penyelarasan Bilingual</div>
+                    <h3 class="theory-title">Deteksi Plagiarisme Lintas Bahasa (EN ⇄ ID)</h3>
+                    <p class="theory-desc">
+                        Membongkar modus plagiarisme terjemahan langsung dari literatur asing (bahasa Inggris) ke bahasa Indonesia tanpa atribusi. Model representasi multilingual kami mendeteksi kesepadanan semantik dan susunan alur argumen sekalipun naskah telah dialihbahasakan.
+                    </p>
+                </div>
+
+                <!-- Fitur 2: Anti-Cheat Evasion -->
+                <div class="theory-card" data-aos="fade-up" data-aos-delay="200" data-aos-duration="700">
+                    <div class="card-icon-badge badge-amber">🛡️</div>
+                    <div style="font-size: 11px; font-weight: 800; color: #d97706; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Perisai Manipulasi</div>
+                    <h3 class="theory-title">Perisai Anti-Kecurangan Karakter & Font</h3>
+                    <p class="theory-desc">
+                        Melacak trik manipulasi naskah yang kerap lolos dari sistem komersial: alfabet Cyrillic/Greek homoglyph yang menyerupai Latin, spasi nol-lebar (<em>zero-width space</em>), pemenggalan kata mikro, dan teks putih transparan yang sengaja disisipkan untuk mengecoh persentase mesin.
+                    </p>
+                </div>
+
+                <!-- Fitur 3: Citation Auditor -->
+                <div class="theory-card" data-aos="fade-up" data-aos-delay="300" data-aos-duration="700">
+                    <div class="card-icon-badge badge-emerald">📑</div>
+                    <div style="font-size: 11px; font-weight: 800; color: #059669; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Audit Referensi</div>
+                    <h3 class="theory-title">Auditor Konsistensi Sitasi & Daftar Pustaka</h3>
+                    <p class="theory-desc">
+                        Menganalisis koherensi sitasi (APA/IEEE/Harvard) secara otomatis. Mendeteksi <strong>Ghost Citations</strong> (nama penulis dikutip di badan teks tapi raib dari referensi) dan <strong>Orphan References</strong> (tercantum di bibliografi namun tidak pernah dirujuk dalam tubuh artikel).
+                    </p>
+                </div>
+
+                <!-- Fitur 4: National Harvester -->
+                <div class="theory-card" data-aos="fade-up" data-aos-delay="400" data-aos-duration="700">
+                    <div class="card-icon-badge badge-cyan">🦅</div>
+                    <div style="font-size: 11px; font-weight: 800; color: #0284c7; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Korpus Nasional</div>
+                    <h3 class="theory-title">Pemanenan Neliti & GARUDA Dikti (OAI-PMH)</h3>
+                    <p class="theory-desc">
+                        Terhubung ke protokol OAI-PMH 2.0 untuk pemanenan berkala artikel jurnal nasional terakreditasi SINTA 1–6 dari pangkalan data GARUDA Kemdiktisaintek dan portal riset Neliti. Memastikan basis data pembanding terus bertumbuh tanpa bergantung pada unggahan manual.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3: Cara Penggunaan -->
     <section id="cara-kerja" class="section" style="background: #ffffff; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
         <div class="container">
             <div class="section-header" data-aos="fade-up" data-aos-duration="700">
@@ -1594,7 +1788,196 @@
         </div>
     </section>
 
-    <!-- Section 3: Gotong Royong Korpus (Crowdsourcing Incentive) -->
+    <!-- Section 4: Ekosistem Integrasi OJS 3.x & REST API -->
+    <section id="integrasi-ojs" class="section" style="background: #ffffff; border-bottom: 1px solid var(--border);">
+        <div class="container">
+            <div class="section-header" data-aos="fade-up" data-aos-duration="700">
+                <div class="section-tag" style="color: #e11d48;">Ekosistem Jurnal Ilmiah SINTA</div>
+                <h2 class="section-title">Integrasi Otomatis Open Journal Systems (OJS 3.x)</h2>
+                <p class="section-desc">
+                    Tingkatkan efisiensi dan reputasi jurnal ilmiah kampus Anda. Hubungkan OJS 3.x ke AR Tilik untuk verifikasi naskah masuk secara otomatis dan penerbitan Sertifikat Keabsahan digital ber-QR Code bagi Dewan Editor.
+                </p>
+            </div>
+
+            <!-- OJS Banner Card -->
+            <div class="ojs-banner-card" data-aos="zoom-in" data-aos-duration="800">
+                <div class="ojs-grid">
+                    <div>
+                        <div style="display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; background: rgba(244, 63, 94, 0.2); border: 1px solid rgba(244, 63, 94, 0.4); border-radius: 20px; font-size: 11px; font-weight: 700; color: #fecdd3; text-transform: uppercase; margin-bottom: 16px;">
+                            <span>📕</span> Buku Panduan Resmi &amp; Konektor PHP Siap Pakai
+                        </div>
+                        <h3 style="font-size: 26px; font-weight: 800; color: #ffffff; line-height: 1.3; margin-bottom: 14px;">
+                            Buku Panduan Integrasi OJS 3.x (Format PDF Resolusi Tinggi - 8 Halaman)
+                        </h3>
+                        <p style="font-size: 14px; color: #cbd5e1; line-height: 1.6; margin-bottom: 24px;">
+                            Disusun khusus untuk pengelola jurnal, IT kampus, dan Dewan Redaksi. Dilengkapi diagram alur kerja <em>end-to-end</em> (Penulis &rarr; OJS 3 &rarr; REST API &rarr; Dual-Lens &rarr; Sertifikat Digital), konsep komputasi Dual-Lens, panduan instalasi langkah demi langkah, dan contoh kode PHP konektor.
+                        </p>
+
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                            <a href="<?= base_url('integrations/ojs/Panduan_Integrasi_OJS_ARTilik.pdf') ?>" target="_blank" download="Panduan_Integrasi_OJS_ARTilik.pdf" class="btn" style="background: linear-gradient(135deg, #e11d48 0%, #be123c 100%); color: #ffffff; box-shadow: 0 4px 14px rgba(225, 29, 72, 0.4); border: 1px solid rgba(255,255,255,0.2);">
+                                <span>📥</span> Unduh Panduan PDF (1.9 MB)
+                            </a>
+                            <a href="<?= base_url('integrations/ojs/ARTilikOJSConnector.php') ?>" download class="btn" style="background: rgba(255, 255, 255, 0.1); color: #ffffff; border: 1px solid rgba(255,255,255,0.25);">
+                                <span>💻</span> Unduh Konektor PHP
+                            </a>
+                            <a href="<?= base_url('integrations/ojs/README.md') ?>" target="_blank" class="btn" style="background: transparent; color: #94a3b8; border: 1px solid #334155;">
+                                <span>📖</span> Dokumentasi Online
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Code Box Preview -->
+                    <div>
+                        <div class="ojs-code-card">
+                            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; padding-bottom: 8px; margin-bottom: 12px; color: #94a3b8; font-size: 11px;">
+                                <span>PHP &bull; artilik_ojs_runner.php</span>
+                                <span style="color: #10b981;">● OJS 3.x Ready</span>
+                            </div>
+                            <pre style="margin: 0; line-height: 1.5;"><span style="color: #f43f5e;">require_once</span> <span style="color: #fde047;">'ARTilikOJSConnector.php'</span>;
+
+<span style="color: #64748b;">// 1. Inisialisasi dengan API Key Jurnal</span>
+<span style="color: #38bdf8;">$tilik</span> = <span style="color: #f43f5e;">new</span> <span style="color: #a78bfa;">ARTilikOJSConnector</span>(
+    <span style="color: #fde047;">'artilik_ojs_YOUR_API_KEY'</span>
+);
+
+<span style="color: #64748b;">// 2. Kirim naskah submisi penulis</span>
+<span style="color: #38bdf8;">$res</span> = <span style="color: #38bdf8;">$tilik</span>-&gt;<span style="color: #60a5fa;">submitManuscript</span>(
+    <span style="color: #fde047;">'/path/to/manuscript.pdf'</span>,
+    <span style="color: #fde047;">'Judul Naskah Ilmiah'</span>,
+    <span style="color: #fde047;">'Dr. Penulis Utama'</span>,
+    <span style="color: #fde047;">'submission_4892'</span>
+);
+
+<span style="color: #64748b;">// 3. Ambil sertifikat digital ber-QR</span>
+<span style="color: #f43f5e;">echo</span> <span style="color: #38bdf8;">$res</span>[<span style="color: #fde047;">'certificate_url'</span>];</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3 Alur Kerja Integrasi Jurnal -->
+            <div class="grid-3" style="margin-top: 40px;">
+                <div class="step-card" data-aos="fade-up" data-aos-delay="100" data-aos-duration="700">
+                    <div class="step-index">A</div>
+                    <div class="card-icon-badge badge-rose">🔌</div>
+                    <h3 class="step-title">1 Berkas Tanpa Konfigurasi Rumit</h3>
+                    <p class="step-desc">
+                        Cukup letakkan berkas pustaka <code>ARTilikOJSConnector.php</code> pada folder instalasi OJS Anda. Tidak memerlukan instalasi ekstensi kernel peladen atau dependensi eksternal yang rumit.
+                    </p>
+                </div>
+
+                <div class="step-card" data-aos="fade-up" data-aos-delay="200" data-aos-duration="700">
+                    <div class="step-index">B</div>
+                    <div class="card-icon-badge badge-indigo">⚡</div>
+                    <h3 class="step-title">Pemeriksaan Submisi Otomatis</h3>
+                    <p class="step-desc">
+                        Dipicu saat penulis mengunggah naskah (<em>Author Submission</em>) atau saat naskah dialihkan ke tahap penelaahan mitra bestari (<em>Peer Review Stage</em>) secara otomatis di latar belakang.
+                    </p>
+                </div>
+
+                <div class="step-card" data-aos="fade-up" data-aos-delay="300" data-aos-duration="700">
+                    <div class="step-index">C</div>
+                    <div class="card-icon-badge badge-emerald">📜</div>
+                    <h3 class="step-title">Sertifikat Digital Ber-QR Code</h3>
+                    <p class="step-desc">
+                        Menerbitkan Sertifikat Keabsahan Orisinalitas ber-QR Code kriptografis (SHA-256) yang dapat dilampirkan langsung pada surat keputusan dewan redaksi (<em>Editorial Decision</em>).
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 5: Solusi Tepat Guna Berdasarkan Kebutuhan (Persona) -->
+    <section id="solusi" class="section" style="background: #f8fafc; border-bottom: 1px solid var(--border);">
+        <div class="container">
+            <div class="section-header" data-aos="fade-up" data-aos-duration="700">
+                <div class="section-tag">Segmentasi Pemangku Kepentingan</div>
+                <h2 class="section-title">Solusi Tepat Guna untuk Seluruh Sivitas Akademika</h2>
+                <p class="section-desc">
+                    AR Tilik dirancang untuk memberikan nilai nyata bagi mahasiswa, pengelola jurnal ilmiah, hingga pimpinan universitas:
+                </p>
+            </div>
+
+            <div class="grid-3">
+                <!-- Card 1: Mahasiswa & Peneliti -->
+                <div class="persona-card" data-aos="fade-up" data-aos-delay="100" data-aos-duration="700">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <div class="card-icon-badge badge-indigo" style="margin-bottom: 0;">🎓</div>
+                            <span style="font-size: 11px; font-weight: 800; background: rgba(99, 102, 241, 0.1); color: var(--primary); padding: 4px 10px; border-radius: 20px;">Individu</span>
+                        </div>
+                        <h3 class="theory-title">Mahasiswa &amp; Peneliti Mandiri</h3>
+                        <p class="theory-desc">
+                            Cek mandiri sebelum maju sidang skripsi/tesis tanpa rasa was-was naskah tersimpan ke repositori publik.
+                        </p>
+
+                        <ul class="persona-list">
+                            <li><span class="check-icon">✓</span> <span><strong>Bebas Risiko Self-Plagiarism:</strong> Naskah pra-sidang Anda tidak disimpan ke korpus publik.</span></li>
+                            <li><span class="check-icon">✓</span> <span><strong>Audit Sitasi Otomatis:</strong> Pastikan tidak ada kutipan fiktif sebelum naskah dicetak.</span></li>
+                            <li><span class="check-icon">✓</span> <span><strong>Lensa Ganda (Dual-Reader):</strong> Telusuri kalimat yang perlu diparafrasa berdampingan.</span></li>
+                            <li><span class="check-icon">✓</span> <span><strong>Tarif Ringan Mahasiswa:</strong> Gratis 3x/minggu atau top-up fleksibel Rp 3.500/dokumen.</span></li>
+                        </ul>
+                    </div>
+
+                    <button type="button" onclick="openAuthModal('register')" class="btn btn-outline" style="width: 100%; justify-content: center; font-weight: 700;">
+                        Daftar Akun Mahasiswa
+                    </button>
+                </div>
+
+                <!-- Card 2: Pengelola Jurnal OJS -->
+                <div class="persona-card" style="border-color: rgba(244, 63, 94, 0.4); box-shadow: 0 10px 30px -10px rgba(244, 63, 94, 0.15);" data-aos="fade-up" data-aos-delay="200" data-aos-duration="700">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <div class="card-icon-badge badge-rose" style="margin-bottom: 0;">🏛️</div>
+                            <span style="font-size: 11px; font-weight: 800; background: rgba(244, 63, 94, 0.1); color: #e11d48; padding: 4px 10px; border-radius: 20px;">Jurnal Ilmiah</span>
+                        </div>
+                        <h3 class="theory-title">Pengelola Jurnal (OJS 3.x)</h3>
+                        <p class="theory-desc">
+                            Otomatisasi telaah kemiripan artikel submisi untuk menjaga reputasi dan kepatuhan akreditasi ARJUNA &amp; SINTA.
+                        </p>
+
+                        <ul class="persona-list">
+                            <li><span class="check-icon" style="color: #e11d48;">✓</span> <span><strong>Konektor OJS 3.x Plug &amp; Play:</strong> Cukup pasang 1 berkas pustaka PHP.</span></li>
+                            <li><span class="check-icon" style="color: #e11d48;">✓</span> <span><strong>Deteksi Lintas Bahasa:</strong> Membongkar artikel terjemahan asing tanpa sitasi.</span></li>
+                            <li><span class="check-icon" style="color: #e11d48;">✓</span> <span><strong>Sertifikat Digital Ber-QR Code:</strong> Bukti verifikasi resmi untuk dewan editor.</span></li>
+                            <li><span class="check-icon" style="color: #e11d48;">✓</span> <span><strong>Manajemen Kuota API Jurnal:</strong> Kontrol batas pemakaian per bulan secara presisi.</span></li>
+                        </ul>
+                    </div>
+
+                    <a href="#integrasi-ojs" class="btn btn-primary" style="width: 100%; justify-content: center; font-weight: 700; background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);">
+                        Pelajari Integrasi OJS
+                    </a>
+                </div>
+
+                <!-- Card 3: Pimpinan Perguruan Tinggi -->
+                <div class="persona-card" data-aos="fade-up" data-aos-delay="300" data-aos-duration="700">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <div class="card-icon-badge badge-emerald" style="margin-bottom: 0;">🏢</div>
+                            <span style="font-size: 11px; font-weight: 800; background: rgba(16, 185, 129, 0.1); color: #059669; padding: 4px 10px; border-radius: 20px;">Institusi Kampus</span>
+                        </div>
+                        <h3 class="theory-title">Perguruan Tinggi &amp; Perpustakaan</h3>
+                        <p class="theory-desc">
+                            Kedaulatan data naskah akademik sivitas kampus dengan opsi server mandiri (<em>On-Premise</em>) dan dasbor analitik.
+                        </p>
+
+                        <ul class="persona-list">
+                            <li><span class="check-icon">✓</span> <span><strong>Kedaulatan Data Penuh:</strong> Naskah sivitas tidak dijual/diserahkan ke pihak luar.</span></li>
+                            <li><span class="check-icon">✓</span> <span><strong>Opsi On-Premise / Private Cloud:</strong> Dipasang di pusat data kampus sendiri.</span></li>
+                            <li><span class="check-icon">✓</span> <span><strong>Sinkronisasi OAI-PMH:</strong> Hubungkan repositori EPrints / DSpace institusi.</span></li>
+                            <li><span class="check-icon">✓</span> <span><strong>Dasbor Integritas Kampus:</strong> Analitik tren kemiripan dan risiko antar fakultas.</span></li>
+                        </ul>
+                    </div>
+
+                    <a href="#pricing" class="btn btn-outline" style="width: 100%; justify-content: center; font-weight: 700;">
+                        Konsultasi Paket Kampus
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 6: Gotong Royong Korpus (Crowdsourcing Incentive) -->
     <section id="kuota-korpus" class="section">
         <div class="container">
             <div class="incentive-banner" data-aos="fade-up" data-aos-duration="800">
@@ -1826,33 +2209,39 @@
                 </div>
 
                 <div>
-                    <strong style="color: #ffffff; display: block; margin-bottom: 14px;">Fitur Utama</strong>
+                    <strong style="color: #ffffff; display: block; margin-bottom: 14px;">Fitur &amp; Inovasi</strong>
                     <ul class="footer-links">
-                        <li><a href="#teori">Dual-Lens Engine</a></li>
-                        <li><a href="#teori">Pemisahan Tiga Lapis</a></li>
-                        <li><a href="#teori">XGBoost Risk Synthesizer</a></li>
+                        <li><a href="#teori">Dual-Lens Engine (5-Gram &amp; Cosine)</a></li>
+                        <li><a href="#fitur-unggulan">Deteksi Lintas Bahasa (EN⇄ID)</a></li>
+                        <li><a href="#fitur-unggulan">Perisai Anti-Manipulasi Karakter</a></li>
+                        <li><a href="#fitur-unggulan">Auditor Sitasi &amp; Daftar Pustaka</a></li>
+                        <li><a href="#fitur-unggulan">Pemanen Neliti &amp; GARUDA Dikti</a></li>
                         <li><a href="#cara-kerja">Layar Ganda (Dual-Reader)</a></li>
                     </ul>
                 </div>
 
                 <div>
-                    <strong style="color: #ffffff; display: block; margin-bottom: 14px;">Layanan</strong>
+                    <strong style="color: #ffffff; display: block; margin-bottom: 14px;">Layanan &amp; Solusi</strong>
                     <ul class="footer-links">
+                        <li><a href="#integrasi-ojs">Integrasi OJS 3.x Jurnal</a></li>
+                        <li><a href="#solusi">Solusi Sivitas Akademika</a></li>
                         <li><a href="<?= base_url('verify') ?>">Portal Verifikasi QR</a></li>
-                        <li><a href="#kuota-korpus">Sumbang Korpus Institusi</a></li>
-                        <li><a href="#langganan">Paket Berlangganan</a></li>
+                        <li><a href="#kuota-korpus">Gotong Royong Korpus</a></li>
+                        <li><a href="#langganan">Paket Tarif &amp; Top-Up</a></li>
                         <?php if ($currentUser) : ?>
-                            <li><a href="<?= base_url('dashboard') ?>">Dashboard Akses</a></li>
+                            <li><a href="<?= base_url('dashboard') ?>">Dashboard Pemeriksaan</a></li>
                         <?php else : ?>
-                            <li><a href="javascript:void(0)" onclick="openAuthModal('login')">Dashboard Akses</a></li>
+                            <li><a href="javascript:void(0)" onclick="openAuthModal('login')">Masuk Dashboard</a></li>
                         <?php endif; ?>
                     </ul>
                 </div>
 
                 <div>
-                    <strong style="color: #ffffff; display: block; margin-bottom: 14px;">Informasi</strong>
+                    <strong style="color: #ffffff; display: block; margin-bottom: 14px;">Dokumentasi &amp; OJS</strong>
                     <ul class="footer-links">
-                        <li><a href="<?= base_url('integrations/ojs/Panduan_Integrasi_OJS_ARTilik.pdf') ?>" target="_blank" download="Panduan_Integrasi_OJS_ARTilik.pdf">Dokumentasi API OJS (PDF)</a></li>
+                        <li><a href="<?= base_url('integrations/ojs/Panduan_Integrasi_OJS_ARTilik.pdf') ?>" target="_blank" download="Panduan_Integrasi_OJS_ARTilik.pdf">Buku Panduan OJS (PDF)</a></li>
+                        <li><a href="<?= base_url('integrations/ojs/ARTilikOJSConnector.php') ?>" download>Konektor PHP OJS 3.x</a></li>
+                        <li><a href="<?= base_url('integrations/ojs/README.md') ?>" target="_blank">Spesifikasi REST API v1</a></li>
                         <li><a href="javascript:void(0)">Kebijakan Privasi</a></li>
                         <li><a href="javascript:void(0)">Kontak Pengembang</a></li>
                     </ul>
