@@ -189,12 +189,16 @@
             padding: 0;
         }
 
+        html, body {
+            overflow-x: hidden;
+            max-width: 100vw;
+        }
+
         body {
             font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background: var(--light-bg);
             color: var(--text-main);
             line-height: 1.6;
-            overflow-x: hidden;
         }
 
         /* Container */
@@ -394,7 +398,7 @@
             flex-wrap: wrap;
             gap: 16px;
             align-items: center;
-            margin-bottom: 50px;
+            margin-bottom: 24px;
         }
 
         .stats-bar {
@@ -1451,8 +1455,8 @@
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
-            margin-top: -30px;
-            margin-bottom: 42px;
+            margin-top: 0;
+            margin-bottom: 36px;
         }
 
         .hero-pill-badge {
@@ -1667,21 +1671,354 @@
             margin-bottom: 0;
         }
 
-        /* Responsive */
+        /* ========================================================
+           Mobile Navigation & Drawer Components
+           ======================================================== */
+        .hamburger-btn {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 0;
+            transition: all 0.2s ease;
+            color: var(--dark);
+            flex-shrink: 0;
+        }
+
+        .hamburger-btn:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        .hamburger-btn span {
+            display: block;
+            width: 20px;
+            height: 2px;
+            background: var(--dark);
+            border-radius: 2px;
+            transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: center;
+        }
+
+        .hamburger-btn.active span:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+            background: var(--primary);
+        }
+
+        .hamburger-btn.active span:nth-child(2) {
+            opacity: 0;
+            transform: scaleX(0);
+        }
+
+        .hamburger-btn.active span:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+            background: var(--primary);
+        }
+
+        /* Mobile Nav Overlay & Drawer */
+        .mobile-nav-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: 1040;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .mobile-nav-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .mobile-nav-drawer {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: min(88vw, 360px);
+            background: #ffffff;
+            z-index: 1050;
+            box-shadow: -8px 0 32px rgba(15, 23, 42, 0.25);
+            transform: translateX(100%);
+            transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .mobile-nav-drawer.active {
+            transform: translateX(0);
+        }
+
+        .mobile-drawer-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            background: #f8fafc;
+        }
+
+        .mobile-drawer-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: #ffffff;
+            color: var(--text-muted);
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            line-height: 1;
+        }
+
+        .mobile-drawer-close:hover {
+            background: #fee2e2;
+            color: #ef4444;
+            border-color: #fca5a5;
+        }
+
+        .mobile-drawer-user {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            background: #ffffff;
+        }
+
+        .mobile-user-card {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 14px;
+        }
+
+        .mobile-guest-card {
+            background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+            border: 1px solid #c7d2fe;
+            border-radius: 14px;
+            padding: 14px;
+        }
+
+        .mobile-drawer-body {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 18px 20px;
+        }
+
+        .mobile-nav-group-title {
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+
+        .mobile-nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .mobile-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 14px;
+            border-radius: 12px;
+            text-decoration: none;
+            color: var(--dark);
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .mobile-nav-link:hover, .mobile-nav-link:active {
+            background: #f1f5f9;
+            color: var(--primary);
+        }
+
+        .mobile-nav-link.highlight {
+            background: rgba(99, 102, 241, 0.08);
+            color: var(--primary);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .mobile-nav-link .nav-icon {
+            font-size: 17px;
+            width: 24px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .mobile-nav-link .nav-arrow {
+            margin-left: auto;
+            color: #94a3b8;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .mobile-nav-link .nav-badge {
+            margin-left: auto;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 10px;
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .mobile-drawer-footer {
+            padding: 14px 20px;
+            border-top: 1px solid var(--border);
+            background: #f8fafc;
+            text-align: center;
+        }
+
+        .mobile-footer-links {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .mobile-footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+        }
+
+        .mobile-footer-links a:hover {
+            color: var(--primary);
+            text-decoration: underline;
+        }
+
+        .mobile-footer-brand {
+            font-size: 11px;
+            color: #94a3b8;
+        }
+
+        .mobile-footer-brand a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* ========================================================
+           Responsive Media Queries (Mobile First Tuning)
+           ======================================================== */
         @media (max-width: 900px) {
-            .hero-grid { grid-template-columns: 1fr; gap: 32px; margin-bottom: 36px; }
-            .hero-title { font-size: 34px; }
-            .spotlight-card { grid-template-columns: 1fr; gap: 24px; padding: 24px; }
-            .dual-reader-features { grid-template-columns: 1fr; gap: 14px; }
-            .dual-reader-showcase { padding: 24px 18px; }
-            .dual-reader-title { font-size: 24px; }
-            .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
-            .stats-bar { grid-template-columns: repeat(2, 1fr); gap: 16px; }
-            .incentive-grid { grid-template-columns: 1fr; }
-            .footer-grid { grid-template-columns: 1fr; }
             .nav-links { display: none; }
-            .ojs-grid { grid-template-columns: 1fr; }
-            .ojs-banner-card { padding: 24px; }
+            .hamburger-btn { display: flex; }
+            .btn-desktop-only { display: none !important; }
+            .container { padding: 0 18px; }
+
+            /* Topbar */
+            .navbar { padding: 12px 0; }
+            .nav-actions { gap: 8px; }
+
+            /* Hero */
+            .hero { padding: 44px 0 36px; }
+            .hero-grid { grid-template-columns: 1fr; gap: 28px; margin-bottom: 28px; }
+            .hero-title { font-size: 32px; letter-spacing: -0.5px; line-height: 1.22; }
+            .hero-subtitle { font-size: 15px; margin-bottom: 24px; line-height: 1.6; }
+            .hero-buttons { flex-direction: column; width: 100%; gap: 10px; margin-bottom: 24px; }
+            .hero-buttons .btn { width: 100%; justify-content: center; padding: 13px 18px; font-size: 14px; }
+            
+            /* Anti-overlap for Hero Pills */
+            .hero-pills-wrap { margin-top: 0 !important; margin-bottom: 24px !important; gap: 8px; justify-content: flex-start; }
+            .hero-pill-badge { font-size: 11px; padding: 4px 10px; }
+            .hero-badge { font-size: 11.5px; padding: 6px 12px; line-height: 1.45; max-width: 100%; display: inline-block; word-break: break-word; }
+
+            /* Stats Bar */
+            .stats-bar { grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 18px 16px; border-radius: 14px; }
+            .stat-val { font-size: 22px; }
+            .stat-lbl { font-size: 11.5px; }
+            .stats-bar .stat-item:nth-child(5) { grid-column: span 2; text-align: center; }
+
+            /* General Sections */
+            .section { padding: 64px 0; }
+            .section-header { margin-bottom: 36px; }
+            .section-title { font-size: 26px; letter-spacing: -0.5px; }
+            .section-desc { font-size: 14.5px; }
+            .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; gap: 16px; }
+
+            /* Theory & Spotlight */
+            .theory-card { padding: 22px 18px; border-radius: 16px; }
+            .spotlight-card { grid-template-columns: 1fr; gap: 20px; padding: 20px 16px; border-radius: 16px; }
+            .layer-box { padding: 20px 16px; border-radius: 16px; }
+            .layer-item { flex-direction: column; gap: 8px; padding: 14px; border-radius: 12px; }
+
+            /* Step Cards Anti-overlap */
+            .step-card { padding: 22px 18px; border-radius: 16px; }
+            .step-title { padding-right: 48px; font-size: 17px; }
+            .step-index { font-size: 26px; top: 16px; right: 18px; }
+
+            /* Dual-Reader Showcase */
+            .dual-reader-showcase { padding: 20px 14px; border-radius: 16px; }
+            .dual-reader-title { font-size: 20px; }
+            .dual-reader-features { grid-template-columns: 1fr; gap: 12px; margin-top: 24px; }
+            .browser-url { font-size: 10.5px; padding: 4px 8px; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+            /* OJS Section */
+            .ojs-grid { grid-template-columns: 1fr; gap: 24px; }
+            .ojs-banner-card { padding: 22px 16px; border-radius: 16px; }
+            .ojs-banner-card .btn { width: 100%; justify-content: center; }
+            .ojs-code-card { padding: 14px; font-size: 11px; }
+
+            /* Persona & Incentives */
+            .persona-card { padding: 22px 18px; border-radius: 16px; }
+            .incentive-grid { grid-template-columns: 1fr; gap: 24px; }
+            .incentive-banner { padding: 24px 18px; border-radius: 18px; }
+            .incentive-title { font-size: 24px; }
+
+            /* Pricing */
+            #langganan .pricing-grid { gap: 28px; }
+            .pricing-card { padding: 24px 18px; border-radius: 18px; }
+            .pricing-card.popular { margin-top: 10px; }
+            .pricing-badge { font-size: 10.5px; padding: 3px 12px; }
+
+            /* Footer */
+            .footer { padding: 50px 0 24px; }
+            .footer-grid { grid-template-columns: 1fr; gap: 28px; }
+            .footer-counter-wrap { margin-bottom: 20px; }
+            .visitor-counter-badge { font-size: 11.5px; padding: 8px 14px; gap: 6px 8px; border-radius: 20px; }
+
+            /* Modals Mobile Friendly */
+            .modal-overlay { padding: 12px; }
+            .modal-card, .modal-card-md, .modal-card-lg { max-height: 94vh; width: 100%; border-radius: 16px; }
+            .modal-header { padding: 14px 16px; }
+            .modal-body { padding: 16px; max-height: calc(94vh - 65px); overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        }
+
+        @media (max-width: 480px) {
+            .container { padding: 0 14px; }
+            .navbar { padding: 10px 0; }
+            .brand-logo { width: 32px; height: 32px; }
+            .brand-title { font-size: 18px; }
+            .brand-badge { display: none; }
+            .hero-title { font-size: 25px; line-height: 1.25; }
+            .hero-subtitle { font-size: 14px; }
+            .section-title { font-size: 22px; }
+            .hero-buttons .btn { font-size: 13.5px; padding: 11px 14px; }
+            .stat-val { font-size: 20px; }
+            .nav-actions .btn-outline { display: none !important; }
+            .browser-url { max-width: 150px; }
         }
     </style>
 </head>
@@ -1711,23 +2048,168 @@
 
             <div class="nav-actions">
                 <?php if ($currentUser) : ?>
-                    <a href="<?= base_url('dashboard') ?>" class="btn btn-outline btn-sm">
+                    <a href="<?= base_url('dashboard') ?>" class="btn btn-primary btn-sm">
                         <span>📊</span> Dashboard
                     </a>
-                    <a href="<?= base_url('auth/logout') ?>" class="btn btn-secondary btn-sm">
+                    <a href="<?= base_url('auth/logout') ?>" class="btn btn-secondary btn-sm btn-desktop-only">
                         Keluar
                     </a>
                 <?php else : ?>
-                    <button type="button" onclick="openAuthModal('login')" class="btn btn-outline btn-sm">
+                    <button type="button" onclick="openAuthModal('login')" class="btn btn-outline btn-sm btn-desktop-only">
                         Masuk
                     </button>
                     <button type="button" onclick="openAuthModal('register')" class="btn btn-primary btn-sm">
                         Daftar Gratis
                     </button>
                 <?php endif; ?>
+
+                <!-- Mobile Hamburger Toggle Button -->
+                <button type="button" id="hamburgerBtn" class="hamburger-btn" onclick="toggleMobileNav()" aria-label="Buka Menu Navigasi" aria-expanded="false">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
             </div>
         </div>
     </header>
+
+    <!-- Mobile Navigation Drawer Overlay -->
+    <div id="mobileNavOverlay" class="mobile-nav-overlay" onclick="closeMobileNav()"></div>
+
+    <!-- Mobile Navigation Drawer -->
+    <div id="mobileNavDrawer" class="mobile-nav-drawer" aria-hidden="true">
+        <div class="mobile-drawer-header">
+            <a href="<?= base_url() ?>" class="brand" onclick="closeMobileNav()">
+                <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik Logo" style="width: 30px; height: 30px; object-fit: contain; border-radius: 8px;">
+                <div class="brand-text">
+                    <span class="brand-title" style="font-size: 18px;">AR Tilik</span>
+                    <span class="brand-badge">v1.3.0</span>
+                </div>
+            </a>
+            <button type="button" class="mobile-drawer-close" onclick="closeMobileNav()" aria-label="Tutup Menu">
+                &times;
+            </button>
+        </div>
+
+        <!-- Mobile User Status Card -->
+        <div class="mobile-drawer-user">
+            <?php if ($currentUser) : ?>
+                <div class="mobile-user-card">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                        <div style="width: 38px; height: 38px; border-radius: 50%; background: #e0e7ff; color: #4338ca; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; flex-shrink: 0;">
+                            <?= strtoupper(substr($currentUser['name'] ?? 'U', 0, 1)) ?>
+                        </div>
+                        <div style="overflow: hidden;">
+                            <div style="font-weight: 800; font-size: 14px; color: var(--dark); white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><?= esc($currentUser['name'] ?? 'Akun Pengguna') ?></div>
+                            <div style="font-size: 11px; color: var(--text-muted); white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"><?= esc($currentUser['email'] ?? '') ?></div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <a href="<?= base_url('dashboard') ?>" class="btn btn-primary btn-sm" style="flex: 1; justify-content: center;" onclick="closeMobileNav()">
+                            <span>📊</span> Buka Dashboard
+                        </a>
+                        <a href="<?= base_url('auth/logout') ?>" class="btn btn-secondary btn-sm" style="padding: 6px 12px;">
+                            Keluar
+                        </a>
+                    </div>
+                </div>
+            <?php else : ?>
+                <div class="mobile-guest-card">
+                    <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px; line-height: 1.4;">
+                        ✨ Hak Akses Sivitas: <strong>3 Submisi Gratis Tiap Minggu</strong>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <button type="button" onclick="closeMobileNav(); openAuthModal('register');" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 11px 14px; font-size: 13.5px;">
+                            Daftar Akun Gratis
+                        </button>
+                        <button type="button" onclick="closeMobileNav(); openAuthModal('login');" class="btn btn-outline" style="width: 100%; justify-content: center; padding: 10px 14px; font-size: 13px;">
+                            Masuk ke Akun
+                        </button>
+                    </div>
+                </div>
+            <?php endif; ?>
+        </div>
+
+        <!-- Mobile Navigation Links -->
+        <div class="mobile-drawer-body">
+            <div class="mobile-nav-group-title">Eksplorasi Layanan</div>
+            <nav class="mobile-nav-menu">
+                <a href="#teori" class="mobile-nav-link" onclick="closeMobileNav()">
+                    <span class="nav-icon">🔍</span>
+                    <span>Filosofi &amp; Teori Bukti</span>
+                    <span class="nav-arrow">›</span>
+                </a>
+                <a href="#fitur-unggulan" class="mobile-nav-link" onclick="closeMobileNav()">
+                    <span class="nav-icon">⚡</span>
+                    <span>Inovasi Mesin Cerdas</span>
+                    <span class="nav-arrow">›</span>
+                </a>
+                <a href="#cara-kerja" class="mobile-nav-link" onclick="closeMobileNav()">
+                    <span class="nav-icon">🔄</span>
+                    <span>Cara Kerja 4 Langkah</span>
+                    <span class="nav-arrow">›</span>
+                </a>
+                <a href="#integrasi-ojs" class="mobile-nav-link" onclick="closeMobileNav()">
+                    <span class="nav-icon">🔌</span>
+                    <span>Integrasi OJS 3.x Jurnal</span>
+                    <span class="nav-arrow">›</span>
+                </a>
+                <a href="#solusi" class="mobile-nav-link" onclick="closeMobileNav()">
+                    <span class="nav-icon">👥</span>
+                    <span>Solusi Sivitas &amp; Kampus</span>
+                    <span class="nav-arrow">›</span>
+                </a>
+                <a href="#langganan" class="mobile-nav-link" onclick="closeMobileNav()">
+                    <span class="nav-icon">💳</span>
+                    <span>Paket Tarif &amp; Top-Up</span>
+                    <span class="nav-arrow">›</span>
+                </a>
+                <a href="#faq" class="mobile-nav-link" onclick="closeMobileNav()">
+                    <span class="nav-icon">❓</span>
+                    <span>Tanya Jawab (FAQ)</span>
+                    <span class="nav-arrow">›</span>
+                </a>
+                <a href="<?= base_url('verify') ?>" class="mobile-nav-link highlight" onclick="closeMobileNav()">
+                    <span class="nav-icon">🛡️</span>
+                    <span>Portal Verifikasi Sertifikat QR</span>
+                    <span class="nav-arrow">›</span>
+                </a>
+            </nav>
+
+            <div class="mobile-nav-group-title" style="margin-top: 20px;">Unduhan &amp; Bantuan</div>
+            <nav class="mobile-nav-menu">
+                <a href="<?= base_url('integrations/ojs/Panduan_Integrasi_OJS_ARTilik.pdf') ?>" target="_blank" download="Panduan_Integrasi_OJS_ARTilik.pdf" class="mobile-nav-link" onclick="closeMobileNav()">
+                    <span class="nav-icon">📕</span>
+                    <span>Buku Panduan OJS (PDF)</span>
+                    <span class="nav-badge">1.9 MB</span>
+                </a>
+                <a href="<?= base_url('integrations/ojs/connector') ?>" download="ARTilikOJSConnector.php" class="mobile-nav-link" onclick="closeMobileNav()">
+                    <span class="nav-icon">💻</span>
+                    <span>Konektor PHP OJS 3.x</span>
+                    <span class="nav-badge">PHP</span>
+                </a>
+                <a href="javascript:void(0)" onclick="closeMobileNav(); openContactModal('Pertanyaan Umum');" class="mobile-nav-link">
+                    <span class="nav-icon">💬</span>
+                    <span>Hubungi Tim Pengembang</span>
+                    <span class="nav-arrow">›</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- Mobile Drawer Footer -->
+        <div class="mobile-drawer-footer">
+            <div class="mobile-footer-links">
+                <a href="<?= base_url('privacy') ?>" onclick="closeMobileNav(); openLegalModal('privacy', event)">Privasi</a>
+                <span>&bull;</span>
+                <a href="<?= base_url('terms') ?>" onclick="closeMobileNav(); openLegalModal('terms', event)">Ketentuan</a>
+                <span>&bull;</span>
+                <a href="<?= base_url('sitemap.xml') ?>" target="_blank">Sitemap</a>
+            </div>
+            <div class="mobile-footer-brand">
+                AR Tilik &copy; <?= date('Y') ?> &bull; <a href="https://www.arsetontong.top" target="_blank" rel="noopener noreferrer">Powered by ARSetontong</a>
+            </div>
+        </div>
+    </div>
 
     <!-- Hero Section -->
     <section class="hero">
@@ -3309,6 +3791,57 @@
                 btn.setAttribute('aria-expanded', 'true');
             }
         }
+
+        /* --- Mobile Navigation Drawer Controls --- */
+        function toggleMobileNav() {
+            const drawer = document.getElementById('mobileNavDrawer');
+            if (!drawer) return;
+            const isOpen = drawer.classList.contains('active');
+            if (isOpen) {
+                closeMobileNav();
+            } else {
+                openMobileNav();
+            }
+        }
+
+        function openMobileNav() {
+            const drawer = document.getElementById('mobileNavDrawer');
+            const overlay = document.getElementById('mobileNavOverlay');
+            const btn = document.getElementById('hamburgerBtn');
+            if (!drawer || !overlay) return;
+
+            drawer.classList.add('active');
+            overlay.classList.add('active');
+            drawer.setAttribute('aria-hidden', 'false');
+            if (btn) {
+                btn.classList.add('active');
+                btn.setAttribute('aria-expanded', 'true');
+            }
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeMobileNav() {
+            const drawer = document.getElementById('mobileNavDrawer');
+            const overlay = document.getElementById('mobileNavOverlay');
+            const btn = document.getElementById('hamburgerBtn');
+            if (!drawer || !overlay) return;
+
+            drawer.classList.remove('active');
+            overlay.classList.remove('active');
+            drawer.setAttribute('aria-hidden', 'true');
+            if (btn) {
+                btn.classList.remove('active');
+                btn.setAttribute('aria-expanded', 'false');
+            }
+            document.body.style.overflow = '';
+        }
+
+        // Close mobile drawer on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeMobileNav();
+            }
+        });
 
         document.addEventListener('DOMContentLoaded', function() {
             // Auto open modal when redirected from protected route
