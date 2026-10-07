@@ -26,6 +26,9 @@ Options -Indexes
 	RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
 	RewriteRule ^ http://%1%{REQUEST_URI} [R=301,L]
 
+	# Force ARTilikOJSConnector.php to be served through CodeIgniter download controller so it downloads as source code rather than being executed by PHP
+	RewriteRule ^integrations/ojs/ARTilikOJSConnector\.php$ index.php/integrations/ojs/connector [L,NC,QSA]
+
 	# Checks to see if the user is attempting to access a valid file,
 	# such as an image or css document, if this isn't true it sends the
 	# request to the front controller, index.php
@@ -37,6 +40,13 @@ Options -Indexes
 	RewriteCond %{HTTP:Authorization} .
 	RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 </IfModule>
+
+<Files "ARTilikOJSConnector.php">
+	ForceType text/plain
+	<IfModule mod_headers.c>
+		Header set Content-Disposition "attachment; filename=\"ARTilikOJSConnector.php\""
+	</IfModule>
+</Files>
 
 <IfModule !mod_rewrite.c>
 	# If we don't have mod_rewrite installed, all 404's

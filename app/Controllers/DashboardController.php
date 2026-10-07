@@ -1293,5 +1293,31 @@ class DashboardController extends BaseController
             ->setHeader('Cache-Control', 'public, max-age=86400')
             ->setBody($pdfContent);
     }
+
+    /**
+     * Mengunduh Berkas Pustaka Konektor PHP OJS 3.x (ARTilikOJSConnector.php)
+     * Mengirimkan kode sumber asli sebagai lampiran berkas unduhan
+     */
+    public function downloadOjsConnector()
+    {
+        $filePath = FCPATH . 'integrations/ojs/ARTilikOJSConnector.php';
+        if (! file_exists($filePath)) {
+            $filePath = ROOTPATH . 'public/integrations/ojs/ARTilikOJSConnector.php';
+        }
+
+        if (! file_exists($filePath)) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Berkas konektor PHP OJS 3.x belum tersedia.");
+        }
+
+        $content  = file_get_contents($filePath);
+        $filename = 'ARTilikOJSConnector.php';
+
+        return $this->response
+            ->setHeader('Content-Type', 'text/x-php; charset=utf-8')
+            ->setHeader('Content-Disposition', 'attachment; filename="' . $filename . '"')
+            ->setHeader('Content-Length', (string) strlen($content))
+            ->setHeader('Cache-Control', 'public, max-age=86400')
+            ->setBody($content);
+    }
 }
 

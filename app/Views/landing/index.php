@@ -1865,7 +1865,7 @@
                             <a href="<?= base_url('integrations/ojs/Panduan_Integrasi_OJS_ARTilik.pdf') ?>" target="_blank" download="Panduan_Integrasi_OJS_ARTilik.pdf" class="btn" style="background: linear-gradient(135deg, #e11d48 0%, #be123c 100%); color: #ffffff; box-shadow: 0 4px 14px rgba(225, 29, 72, 0.4); border: 1px solid rgba(255,255,255,0.2);">
                                 <span>📥</span> Unduh Panduan PDF (1.9 MB)
                             </a>
-                            <a href="<?= base_url('integrations/ojs/ARTilikOJSConnector.php') ?>" download class="btn" style="background: rgba(255, 255, 255, 0.1); color: #ffffff; border: 1px solid rgba(255,255,255,0.25);">
+                            <a href="<?= base_url('integrations/ojs/connector') ?>" download="ARTilikOJSConnector.php" class="btn" style="background: rgba(255, 255, 255, 0.1); color: #ffffff; border: 1px solid rgba(255,255,255,0.25);">
                                 <span>💻</span> Unduh Konektor PHP
                             </a>
                             <a href="<?= base_url('integrations/ojs/README.md') ?>" target="_blank" class="btn" style="background: transparent; color: #94a3b8; border: 1px solid #334155;">
@@ -2288,7 +2288,7 @@
                     <strong style="color: #ffffff; display: block; margin-bottom: 14px;">Dokumentasi &amp; Legal</strong>
                     <ul class="footer-links">
                         <li><a href="<?= base_url('integrations/ojs/Panduan_Integrasi_OJS_ARTilik.pdf') ?>" target="_blank" download="Panduan_Integrasi_OJS_ARTilik.pdf">Buku Panduan OJS (PDF)</a></li>
-                        <li><a href="<?= base_url('integrations/ojs/ARTilikOJSConnector.php') ?>" download>Konektor PHP OJS 3.x</a></li>
+                        <li><a href="<?= base_url('integrations/ojs/connector') ?>" download="ARTilikOJSConnector.php">Konektor PHP OJS 3.x</a></li>
                         <li><a href="<?= base_url('integrations/ojs/README.md') ?>" target="_blank">Spesifikasi REST API v1</a></li>
                         <li><a href="<?= base_url('privacy') ?>" onclick="openLegalModal('privacy', event)">Kebijakan Privasi</a></li>
                         <li><a href="<?= base_url('terms') ?>" onclick="openLegalModal('terms', event)">Ketentuan Layanan (ToS)</a></li>

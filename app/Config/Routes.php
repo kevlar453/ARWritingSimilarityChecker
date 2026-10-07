@@ -21,6 +21,9 @@ $routes->match(['get', 'head'], 'verify/(:segment)', 'DashboardController::verif
 $routes->match(['get', 'head'], 'verify', 'DashboardController::verify');
 $routes->match(['get', 'head'], 'integrations/ojs/pdf', 'DashboardController::downloadOjsPdf');
 $routes->match(['get', 'head'], 'docs/ojs/pdf', 'DashboardController::downloadOjsPdf');
+$routes->match(['get', 'head'], 'integrations/ojs/connector', 'DashboardController::downloadOjsConnector');
+$routes->match(['get', 'head'], 'docs/ojs/connector', 'DashboardController::downloadOjsConnector');
+$routes->match(['get', 'head'], 'integrations/ojs/ARTilikOJSConnector.php', 'DashboardController::downloadOjsConnector');
 
 // Legal & Contact Routes
 $routes->match(['get', 'head'], 'privacy', 'LegalController::privacy');
