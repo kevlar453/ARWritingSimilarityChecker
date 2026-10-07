@@ -199,11 +199,17 @@
             max-width: 100vw;
         }
 
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 80px;
+        }
+
         body {
             font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background: var(--light-bg);
             color: var(--text-main);
             line-height: 1.6;
+            padding-top: 72px;
         }
 
         /* Container */
@@ -213,17 +219,74 @@
             padding: 0 24px;
         }
 
-        /* Navbar */
+        /* Navbar (Fixed Glassmorphism) */
         .navbar {
-            position: sticky;
+            position: fixed;
             top: 0;
-            z-index: 100;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            left: 0;
+            right: 0;
+            width: 100%;
+            z-index: 990;
+            background: rgba(255, 255, 255, 0.90);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
             border-bottom: 1px solid var(--border);
-            padding: 16px 0;
-            transition: all 0.3s ease;
+            padding: 14px 0;
+            transition: padding 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .navbar.scrolled {
+            padding: 10px 0;
+            background: rgba(255, 255, 255, 0.96);
+            box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08);
+            border-bottom-color: rgba(226, 232, 240, 0.8);
+        }
+
+        /* Floating Go to Top Button */
+        .btn-scroll-top {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            width: 46px;
+            height: 46px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 24px -4px rgba(67, 56, 202, 0.45), 0 2px 6px rgba(0, 0, 0, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 900;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(14px) scale(0.9);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .btn-scroll-top.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+
+        .btn-scroll-top:hover {
+            transform: translateY(-3px) scale(1.06);
+            box-shadow: 0 12px 28px -4px rgba(67, 56, 202, 0.6), 0 4px 10px rgba(0, 0, 0, 0.12);
+            color: #ffffff;
+        }
+
+        .btn-scroll-top:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .btn-scroll-top svg {
+            transition: transform 0.2s ease;
+        }
+
+        .btn-scroll-top:hover svg {
+            transform: translateY(-2px);
         }
 
         .nav-inner {
@@ -2085,14 +2148,24 @@
            Responsive Media Queries (Mobile First Tuning)
            ======================================================== */
         @media (max-width: 992px) {
+            body { padding-top: 62px; }
             .nav-links { display: none; }
             .hamburger-btn { display: flex; }
             .btn-desktop-only { display: none !important; }
             .container { padding: 0 18px; }
 
             /* Topbar */
-            .navbar { padding: 12px 0; }
+            .navbar { padding: 10px 0; }
             .nav-actions { gap: 8px; }
+
+            /* Go to Top Mobile */
+            .btn-scroll-top {
+                bottom: 20px;
+                right: 20px;
+                width: 42px;
+                height: 42px;
+                border-radius: 12px;
+            }
 
             /* Hero */
             .hero { padding: 44px 0 36px; }
@@ -3358,6 +3431,13 @@
         </div>
     </footer>
 
+    <!-- Floating Go to Top Button -->
+    <button type="button" id="scrollTopBtn" class="btn-scroll-top" onclick="scrollToTop()" aria-label="Kembali ke atas" title="Kembali ke atas">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="18 15 12 9 6 15"></polyline>
+        </svg>
+    </button>
+
     <!-- Auth Modal (Registration & Login) -->
     <div id="authModal" class="modal-overlay">
         <div class="modal-card">
@@ -3990,6 +4070,38 @@
                 btn.setAttribute('aria-expanded', 'true');
             }
         }
+
+        /* --- Scroll to Top & Fixed Navbar Controls --- */
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        window.addEventListener('scroll', function() {
+            const scrollY = window.pageYOffset || document.documentElement.scrollTop;
+            const scrollBtn = document.getElementById('scrollTopBtn');
+            const navbar = document.querySelector('.navbar');
+
+            // Toggle Go to Top visibility (> 280px)
+            if (scrollBtn) {
+                if (scrollY > 280) {
+                    scrollBtn.classList.add('visible');
+                } else {
+                    scrollBtn.classList.remove('visible');
+                }
+            }
+
+            // Compact shadow on fixed navbar when scrolled
+            if (navbar) {
+                if (scrollY > 15) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            }
+        }, { passive: true });
 
         /* --- Desktop Navigation Dropdown Controls --- */
         function toggleNavDropdown(event) {
