@@ -316,5 +316,5 @@ def run_tfidf_similarity_check(
         "match_count": len(match_records),
         "sources": sources,
         "matches": match_records,
-        "idf_dict": idf_dict
+        "idf_dict": idf_table
     }
