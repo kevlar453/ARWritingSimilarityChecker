@@ -208,7 +208,9 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
                 term_drilldown_res = compute_term_drilldown(
                     submission_text=submission_text,
                     reference_text=ref_text,
-                    top_k=10
+                    top_k=10,
+                    idf_table=result.get("idf_dict"),
+                    filter_stopwords=True
                 )
 
             # 3. Academic Boilerplate Detector

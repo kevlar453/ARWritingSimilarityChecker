@@ -395,5 +395,6 @@ def run_hybrid_similarity_check(
         "exact_evidence": exact_ev,
         "tfidf_evidence": tfidf_ev,
         "sources": merged_sources,
-        "matches": exact_raw.get("matches", [])
+        "matches": exact_raw.get("matches", []),
+        "idf_dict": tfidf_raw.get("idf_dict", {})
     }

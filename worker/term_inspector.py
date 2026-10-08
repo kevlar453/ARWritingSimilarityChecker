@@ -109,6 +109,7 @@ def compute_term_drilldown(
     top_k: int = 15,
     submission_text: Optional[str] = None,
     reference_text: Optional[str] = None,
+    filter_stopwords: bool = False,
 ) -> TermDrillDownReport:
     """
     Menghitung dekomposisi kontribusi per kata antara submisi dan satu dokumen rujukan.
@@ -123,6 +124,13 @@ def compute_term_drilldown(
         reference_tokens = tokenize(normalize_text(reference_text))
     elif isinstance(reference_tokens, str):
         reference_tokens = tokenize(normalize_text(reference_tokens))
+
+    if filter_stopwords:
+        from worker.tfidf import INDONESIAN_STOPWORDS
+        if submission_tokens:
+            submission_tokens = [t for t in submission_tokens if t not in INDONESIAN_STOPWORDS]
+        if reference_tokens:
+            reference_tokens = [t for t in reference_tokens if t not in INDONESIAN_STOPWORDS]
 
     if not submission_tokens or not reference_tokens:
         return TermDrillDownReport(
