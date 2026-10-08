@@ -521,6 +521,35 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
                 updated_at = NOW()
             WHERE id = %s
         """, (str(e), report_id))
+
+        # Kembalikan kuota submisi ke pengguna jika report gagal akibat kesalahan sistem worker
+        try:
+            cursor.execute("""
+                SELECT d.user_id 
+                FROM documents d 
+                JOIN reports r ON r.document_id = d.id 
+                WHERE r.id = %s
+            """, (report_id,))
+            user_row = cursor.fetchone()
+            if user_row and user_row[0]:
+                uid = user_row[0]
+                cursor.execute("""
+                    UPDATE users 
+                    SET free_submissions_used_this_week = free_submissions_used_this_week - 1,
+                        updated_at = NOW()
+                    WHERE id = %s AND free_submissions_used_this_week > 0
+                """, (uid,))
+                if cursor.rowcount == 0:
+                    cursor.execute("""
+                        UPDATE users 
+                        SET bonus_submissions = bonus_submissions + 1,
+                            updated_at = NOW()
+                        WHERE id = %s
+                    """, (uid,))
+                print(f"  [QUOTA REFUND] Kuota berhasil dikembalikan untuk User #{uid} (Report #{report_id} gagal).")
+        except Exception as q_err:
+            print(f"  [QUOTA REFUND WARNING] Gagal mengembalikan kuota: {q_err}")
+
         connection.commit()
         cursor.close()
         raise e

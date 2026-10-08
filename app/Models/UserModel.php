@@ -33,20 +33,25 @@ class UserModel extends Model
     protected $useTimestamps = false;
 
     /**
-     * Memeriksa dan memperbarui masa berlaku kuota gratis mingguan (7 hari)
+     * Memeriksa dan memperbarui masa berlaku kuota gratis mingguan (7 hari) secara aman
      */
     public function refreshWeeklyQuota(array $user): array
     {
         $now = time();
-        $resetTime = strtotime($user['week_reset_at']);
+        $resetTime = !empty($user['week_reset_at']) ? strtotime($user['week_reset_at']) : 0;
 
         if ($now >= $resetTime) {
             $newResetAt = date('Y-m-d H:i:s', strtotime('+7 days'));
-            $this->update($user['id'], [
-                'free_submissions_used_this_week' => 0,
-                'week_reset_at'                   => $newResetAt,
-                'updated_at'                      => date('Y-m-d H:i:s'),
-            ]);
+            $nowStr = date('Y-m-d H:i:s');
+
+            $this->db->query("
+                UPDATE {$this->table}
+                SET free_submissions_used_this_week = 0,
+                    week_reset_at = ?,
+                    updated_at = ?
+                WHERE id = ? AND (week_reset_at <= ? OR week_reset_at IS NULL)
+            ", [$newResetAt, $nowStr, $user['id'], $nowStr]);
+
             $user['free_submissions_used_this_week'] = 0;
             $user['week_reset_at'] = $newResetAt;
         }
@@ -60,7 +65,7 @@ class UserModel extends Model
     public function getQuotaInfo($user): array
     {
         if (is_numeric($user)) {
-            $user = $this->find($user);
+            $user = $this->find((int) $user);
         }
 
         if (!$user) {
@@ -78,6 +83,11 @@ class UserModel extends Model
                 'corpus_progress_percent' => 0,
                 'reset_date'              => date('Y-m-d H:i:s', strtotime('+7 days')),
                 'days_until_reset'        => 7,
+                'subscription_tier'       => 'free',
+                'subscription_expires_at' => null,
+                'subscription_label'      => 'Paket Standar (Gratis)',
+                'is_subscribed'           => false,
+                'subscription_days_left'  => 0,
             ];
         }
 
@@ -130,43 +140,115 @@ class UserModel extends Model
     }
 
     /**
-     * Mengurangi kuota submisi (prioritas kuota gratis mingguan, lalu bonus korpus)
+     * Mengurangi kuota submisi secara atomik di database (mencegah race condition/TOCTOU)
+     * Prioritas: kuota gratis mingguan (< 3), lalu bonus kuota.
      */
     public function deductSubmissionQuota(int $userId): bool
     {
-        $user = $this->find($userId);
-        if (!$user) {
-            return false;
+        $db = \Config\Database::connect();
+        $nowStr = date('Y-m-d H:i:s');
+        $nextReset = date('Y-m-d H:i:s', strtotime('+7 days'));
+
+        // 1. Reset otomatis kuota mingguan jika sudah melewati batas waktu 7 hari
+        $db->query("
+            UPDATE {$this->table}
+            SET free_submissions_used_this_week = 0,
+                week_reset_at = ?,
+                updated_at = ?
+            WHERE id = ? AND (week_reset_at <= ? OR week_reset_at IS NULL)
+        ", [$nextReset, $nowStr, $userId, $nowStr]);
+
+        // 2. Coba potong kuota gratis mingguan secara atomik (hanya jika < 3)
+        $db->query("
+            UPDATE {$this->table}
+            SET free_submissions_used_this_week = free_submissions_used_this_week + 1,
+                updated_at = ?
+            WHERE id = ? AND free_submissions_used_this_week < 3
+        ", [$nowStr, $userId]);
+
+        if ($db->affectedRows() === 1) {
+            return true;
         }
 
-        $user = $this->refreshWeeklyQuota($user);
-        $freeLimit = 3;
-        $freeUsed = (int) $user['free_submissions_used_this_week'];
-        $bonus = (int) $user['bonus_submissions'];
+        // 3. Jika kuota gratis mingguan habis, coba potong bonus_submissions secara atomik
+        $db->query("
+            UPDATE {$this->table}
+            SET bonus_submissions = bonus_submissions - 1,
+                updated_at = ?
+            WHERE id = ? AND bonus_submissions > 0
+        ", [$nowStr, $userId]);
 
-        if ($freeUsed < $freeLimit) {
-            return $this->update($userId, [
-                'free_submissions_used_this_week' => $freeUsed + 1,
-                'updated_at'                      => date('Y-m-d H:i:s'),
-            ]);
-        } elseif ($bonus > 0) {
-            return $this->update($userId, [
-                'bonus_submissions' => $bonus - 1,
-                'updated_at'        => date('Y-m-d H:i:s'),
-            ]);
+        if ($db->affectedRows() === 1) {
+            return true;
         }
 
         return false;
     }
 
     /**
-     * Mencatat kontribusi unggahan korpus valid dan memberikan reward jika mencapai kelipatan 3
+     * Mengembalikan 1 kuota submisi (rollback) jika pemrosesan dokumen/antrean worker gagal
+     */
+    public function refundSubmissionQuota(int $userId, string $type = 'auto'): bool
+    {
+        $db = \Config\Database::connect();
+        $nowStr = date('Y-m-d H:i:s');
+
+        if ($type === 'bonus') {
+            $db->query("
+                UPDATE {$this->table}
+                SET bonus_submissions = bonus_submissions + 1,
+                    updated_at = ?
+                WHERE id = ?
+            ", [$nowStr, $userId]);
+            return $db->affectedRows() > 0;
+        }
+
+        if ($type === 'free') {
+            $db->query("
+                UPDATE {$this->table}
+                SET free_submissions_used_this_week = GREATEST(0, CAST(free_submissions_used_this_week AS SIGNED) - 1),
+                    updated_at = ?
+                WHERE id = ?
+            ", [$nowStr, $userId]);
+            return $db->affectedRows() > 0;
+        }
+
+        // Mode auto: kurangi pemakaian gratis jika > 0, jika tidak tambahkan bonus
+        $db->query("
+            UPDATE {$this->table}
+            SET free_submissions_used_this_week = free_submissions_used_this_week - 1,
+                updated_at = ?
+            WHERE id = ? AND free_submissions_used_this_week > 0
+        ", [$nowStr, $userId]);
+
+        if ($db->affectedRows() === 1) {
+            return true;
+        }
+
+        $db->query("
+            UPDATE {$this->table}
+            SET bonus_submissions = bonus_submissions + 1,
+                updated_at = ?
+            WHERE id = ?
+        ", [$nowStr, $userId]);
+
+        return $db->affectedRows() > 0;
+    }
+
+    /**
+     * Mencatat kontribusi unggahan korpus valid dan memberikan reward jika mencapai kelipatan 3 (aman konkruensi)
      */
     public function recordCorpusUpload(int $userId): array
     {
-        $user = $this->find($userId);
-        if (!$user) {
-            return ['bonus_awarded' => false, 'new_bonus_count' => 0];
+        $db = \Config\Database::connect();
+        $nowStr = date('Y-m-d H:i:s');
+
+        $db->transStart();
+
+        $user = $db->table($this->table)->where('id', $userId)->get()->getRowArray();
+        if (! $user) {
+            $db->transRollback();
+            return ['bonus_awarded' => false, 'new_bonus_count' => 0, 'total_corpus' => 0, 'quota_info' => null];
         }
 
         $newCorpusCount = (int) $user['uploaded_corpus_count'] + 1;
@@ -179,11 +261,13 @@ class UserModel extends Model
             $bonusAwarded = true;
         }
 
-        $this->update($userId, [
+        $db->table($this->table)->where('id', $userId)->update([
             'uploaded_corpus_count' => $newCorpusCount,
             'bonus_submissions'     => $currentBonus,
-            'updated_at'            => date('Y-m-d H:i:s'),
+            'updated_at'            => $nowStr,
         ]);
+
+        $db->transComplete();
 
         $updatedUser = $this->find($userId);
         $quotaInfo = $this->getQuotaInfo($updatedUser);

@@ -152,67 +152,78 @@ class PublicApiController extends BaseController
         }
 
         if (! $savedFile || ! file_exists($savedFile)) {
+            $userModel->refundSubmissionQuota($userId);
             return $this->response->setStatusCode(400)->setJSON([
                 'status'  => 'error',
                 'code'    => 400,
-                'message' => 'Naskah tidak ditemukan. Sertakan berkas file (multipart/form-data "document") atau teks (POST "text").'
+                'message' => 'Naskah tidak ditemukan. Sertakan berkas file (multipart/form-data "document") atau teks (POST "text"). Kuota submisi telah dipulihkan.'
             ]);
         }
 
-        $faculty = trim((string) ($this->request->getPost('faculty') ?? ''));
-        $department = trim((string) ($this->request->getPost('department') ?? ''));
+        try {
+            $faculty = trim((string) ($this->request->getPost('faculty') ?? ''));
+            $department = trim((string) ($this->request->getPost('department') ?? ''));
 
-        // Simpan ke tabel documents
-        $docId = $this->documentModel->insert([
-            'user_id'           => $userId,
-            'title'             => $title,
-            'original_filename' => $clientFilename,
-            'mime_type'         => $mimeType,
-            'file_size'         => $fileSize,
-            'storage_path'      => $savedFile,
-            'status'            => 'uploaded',
-            'document_type'     => 'submission',
-            'corpus_visibility' => 'private',
-            'source_type'       => ($keyData['system_type'] === 'ojs') ? 'journal' : 'other',
-            'faculty'           => !empty($faculty) ? $faculty : null,
-            'department'        => !empty($department) ? $department : null,
-            'indexing_status'   => 'not_required',
-            'created_at'        => date('Y-m-d H:i:s'),
-            'updated_at'        => date('Y-m-d H:i:s'),
-        ]);
+            // Simpan ke tabel documents
+            $docId = $this->documentModel->insert([
+                'user_id'           => $userId,
+                'title'             => $title,
+                'original_filename' => $clientFilename,
+                'mime_type'         => $mimeType,
+                'file_size'         => $fileSize,
+                'storage_path'      => $savedFile,
+                'status'            => 'uploaded',
+                'document_type'     => 'submission',
+                'corpus_visibility' => 'private',
+                'source_type'       => ($keyData['system_type'] === 'ojs') ? 'journal' : 'other',
+                'faculty'           => !empty($faculty) ? $faculty : null,
+                'department'        => !empty($department) ? $department : null,
+                'indexing_status'   => 'not_required',
+                'created_at'        => date('Y-m-d H:i:s'),
+                'updated_at'        => date('Y-m-d H:i:s'),
+            ]);
 
-        // Buat kode verifikasi sertifikat acak aman (12 karakter hex acak kriptografis)
-        $rnd = strtoupper(bin2hex(random_bytes(6)));
-        $verificationCode = "ART-" . substr($rnd, 0, 4) . "-" . substr($rnd, 4, 4) . "-" . substr($rnd, 8, 4);
+            // Buat kode verifikasi sertifikat acak aman (12 karakter hex acak kriptografis)
+            $rnd = strtoupper(bin2hex(random_bytes(6)));
+            $verificationCode = "ART-" . substr($rnd, 0, 4) . "-" . substr($rnd, 4, 4) . "-" . substr($rnd, 8, 4);
 
-        // Buat Report awal berstatus pending
-        $reportId = $this->reportModel->insert([
-            'document_id'        => $docId,
-            'engine'             => 'hybrid',
-            'predicted_decision' => 'no_match',
-            'verification_code'  => $verificationCode,
-            'status'             => 'pending',
-            'created_at'         => date('Y-m-d H:i:s'),
-            'updated_at'         => date('Y-m-d H:i:s'),
-        ]);
+            // Buat Report awal berstatus pending
+            $reportId = $this->reportModel->insert([
+                'document_id'        => $docId,
+                'engine'             => 'hybrid',
+                'predicted_decision' => 'no_match',
+                'verification_code'  => $verificationCode,
+                'status'             => 'pending',
+                'created_at'         => date('Y-m-d H:i:s'),
+                'updated_at'         => date('Y-m-d H:i:s'),
+            ]);
 
-        // Masukkan job antrean worker
-        $db = db_connect();
-        $db->table('jobs')->insert([
-            'type'         => 'similarity_check',
-            'payload'      => json_encode([
-                'document_id'  => (int) $docId,
-                'report_id'    => (int) $reportId,
-                'engine'       => 'hybrid',
-                'callback_url' => $callbackUrl,
-                'external_id'  => $extRef,
-                'api_key_id'   => (int) $keyData['id'],
-            ]),
-            'status'       => 'pending',
-            'available_at' => date('Y-m-d H:i:s'),
-            'created_at'   => date('Y-m-d H:i:s'),
-            'updated_at'   => date('Y-m-d H:i:s'),
-        ]);
+            // Masukkan job antrean worker
+            $db = db_connect();
+            $db->table('jobs')->insert([
+                'type'         => 'similarity_check',
+                'payload'      => json_encode([
+                    'document_id'  => (int) $docId,
+                    'report_id'    => (int) $reportId,
+                    'engine'       => 'hybrid',
+                    'callback_url' => $callbackUrl,
+                    'external_id'  => $extRef,
+                    'api_key_id'   => (int) $keyData['id'],
+                ]),
+                'status'       => 'pending',
+                'available_at' => date('Y-m-d H:i:s'),
+                'created_at'   => date('Y-m-d H:i:s'),
+                'updated_at'   => date('Y-m-d H:i:s'),
+            ]);
+        } catch (\Throwable $e) {
+            $userModel->refundSubmissionQuota($userId);
+            log_message('error', 'PublicApiController checkSubmission error: ' . $e->getMessage());
+            return $this->response->setStatusCode(500)->setJSON([
+                'status'  => 'error',
+                'code'    => 500,
+                'message' => 'Terjadi kesalahan sistem saat menjadwalkan pemeriksaan. Kuota submisi Anda telah dipulihkan.'
+            ]);
+        }
 
         // Catat penggunaan kuota API Key
         $this->apiKeyModel->recordUsage((int) $keyData['id']);

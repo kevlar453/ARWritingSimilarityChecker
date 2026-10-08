@@ -63,8 +63,8 @@ class PaymentController extends BaseController
             ]);
         }
 
-        // Buat Order ID unik dengan prefix resmi AR Tilik: TILIK-{timestamp}-{random}
-        $orderId = 'TILIK-' . date('YmdHis') . '-' . strtoupper(substr(bin2hex(random_bytes(3)), 0, 5));
+        // Buat Order ID unik dengan entropi tinggi AR Tilik: TILIK-{timestamp}-{random12hex}
+        $orderId = 'TILIK-' . date('YmdHis') . '-' . strtoupper(bin2hex(random_bytes(6)));
 
         // Catat transaksi pending di database
         $this->transModel->insert([
@@ -159,7 +159,7 @@ class PaymentController extends BaseController
         $fraudStatus       = (string) ($notif['fraud_status'] ?? '');
         $paymentType       = (string) ($notif['payment_type'] ?? 'unknown');
 
-        // Validasi Keaslian Signature Midtrans
+        // 1. Validasi Keaslian Signature Midtrans (HMAC-SHA512)
         if (!$this->midtransService->verifyWebhookSignature($orderId, $statusCode, $grossAmount, $receivedSignature)) {
             log_message('warning', "Midtrans Webhook: Signature mismatch untuk Order {$orderId}");
             return $this->response->setStatusCode(403)->setJSON([
@@ -177,8 +177,17 @@ class PaymentController extends BaseController
             ]);
         }
 
-        // Idempotensi: Jika transaksi sudah sukses, hindari penambahan kuota ganda
-        if (in_array($transaction['transaction_status'], ['settlement', 'capture'], true)) {
+        // 2. Verifikasi Konsistensi Nominal (Gross Amount) terhadap Database
+        if (abs((float) $grossAmount - (float) $transaction['amount']) > 0.01) {
+            log_message('critical', "Midtrans Webhook: Gross amount mismatch untuk Order {$orderId}. DB: {$transaction['amount']}, Webhook: {$grossAmount}");
+            return $this->response->setStatusCode(400)->setJSON([
+                'status'  => 'error',
+                'message' => 'Gross amount mismatch',
+            ]);
+        }
+
+        // Idempotensi awal: Jika transaksi di memori sudah selesai, beri respons cepat
+        if (in_array($transaction['transaction_status'], ['settlement', 'capture'], true) && !in_array($transactionStatus, ['refund', 'chargeback'], true)) {
             return $this->response->setJSON([
                 'status'   => 'already_settled',
                 'order_id' => $orderId,
@@ -188,68 +197,142 @@ class PaymentController extends BaseController
         $isSuccess = ($transactionStatus === 'settlement') || ($transactionStatus === 'capture' && $fraudStatus === 'accept');
 
         if ($isSuccess) {
+            $db = \Config\Database::connect();
             $paidAt = date('Y-m-d H:i:s');
 
-            // 1. Perbarui status transaksi
-            $this->transModel->where('id', $transaction['id'])->set([
-                'transaction_status' => 'settlement',
-                'fraud_status'       => $fraudStatus,
-                'payment_type'       => $paymentType,
-                'midtrans_response'  => $rawPayload,
-                'paid_at'            => $paidAt,
-                'updated_at'         => $paidAt,
-            ])->update();
+            $db->transStart();
 
-            // 2. Kreditkan kuota dan paket langganan ke pengguna
-            $user = $this->userModel->find($transaction['user_id']);
-            if ($user) {
-                $newBonus = (int) $user['bonus_submissions'] + (int) $transaction['submissions_added'];
-                $updateUserData = [
-                    'bonus_submissions' => $newBonus,
-                    'updated_at'        => $paidAt,
-                ];
+            // 3. Transisi status atomik: hanya ubah jika belum berstatus settlement/capture
+            $db->query("
+                UPDATE payment_transactions
+                SET transaction_status = 'settlement',
+                    fraud_status = ?,
+                    payment_type = ?,
+                    midtrans_response = ?,
+                    paid_at = ?,
+                    updated_at = ?
+                WHERE id = ? AND transaction_status NOT IN ('settlement', 'capture')
+            ", [$fraudStatus, $paymentType, $rawPayload, $paidAt, $paidAt, $transaction['id']]);
 
-                // Jika paket memiliki tier langganan bulanan
-                if (!empty($transaction['subscription_tier'])) {
-                    $days = (int) $transaction['subscription_days'] ?: 30;
-                    $currentExpires = !empty($user['subscription_expires_at']) ? strtotime($user['subscription_expires_at']) : 0;
-                    $baseTime = ($currentExpires > time()) ? $currentExpires : time();
-                    $newExpiresAt = date('Y-m-d H:i:s', $baseTime + ($days * 86400));
+            $affectedRows = $db->affectedRows();
 
-                    $updateUserData['subscription_tier'] = $transaction['subscription_tier'];
-                    $updateUserData['subscription_expires_at'] = $newExpiresAt;
+            if ($affectedRows === 1) {
+                // Kueri ini memperoleh lock atomik dan berhak mengkreditkan kuota
+                $user = $db->table('users')->where('id', $transaction['user_id'])->get()->getRowArray();
+                if ($user) {
+                    $submissionsToAdd = (int) $transaction['submissions_added'];
+                    if ($submissionsToAdd > 0) {
+                        $db->query("
+                            UPDATE users
+                            SET bonus_submissions = bonus_submissions + ?,
+                                updated_at = ?
+                            WHERE id = ?
+                        ", [$submissionsToAdd, $paidAt, $user['id']]);
+                    }
+
+                    // Perpanjang masa aktif langganan jika paket langganan
+                    if (!empty($transaction['subscription_tier'])) {
+                        $days = (int) $transaction['subscription_days'] ?: 30;
+                        $currentExpires = !empty($user['subscription_expires_at']) ? strtotime($user['subscription_expires_at']) : 0;
+                        $baseTime = ($currentExpires > time()) ? $currentExpires : time();
+                        $newExpiresAt = date('Y-m-d H:i:s', $baseTime + ($days * 86400));
+
+                        $db->table('users')->where('id', $user['id'])->update([
+                            'subscription_tier'       => $transaction['subscription_tier'],
+                            'subscription_expires_at' => $newExpiresAt,
+                            'updated_at'              => $paidAt,
+                        ]);
+                    }
                 }
 
-                $this->userModel->update($user['id'], $updateUserData);
+                $db->transComplete();
 
-                // 3. Kirim notifikasi instan ke Telegram Bot
+                if ($db->transStatus() === false) {
+                    log_message('critical', "Midtrans Webhook: Database transaction gagal untuk Order {$orderId}");
+                    return $this->response->setStatusCode(500)->setJSON([
+                        'status'  => 'error',
+                        'message' => 'Database transaction failed',
+                    ]);
+                }
+
+                // Kirim notifikasi instan ke Telegram Bot
                 try {
-                    $telegram = new TelegramNotifier();
-                    $formattedAmount = 'Rp ' . number_format($transaction['amount'], 0, ',', '.');
-                    $msg = "💳 <b>PEMBAYARAN AR TILIK BERHASIL</b>\n\n"
-                         . "• <b>Order ID:</b> <code>{$orderId}</code>\n"
-                         . "• <b>Pelanggan:</b> " . htmlspecialchars($user['name']) . " (" . htmlspecialchars($user['email']) . ")\n"
-                         . "• <b>Paket:</b> {$transaction['package_name']}\n"
-                         . "• <b>Nominal:</b> {$formattedAmount}\n"
-                         . "• <b>Metode:</b> {$paymentType}\n"
-                         . "• <b>Kredit Diberikan:</b> +{$transaction['submissions_added']} Submisi\n"
-                         . "• <b>Waktu:</b> {$paidAt}";
-                    $telegram->sendMessage($msg);
+                    if ($user) {
+                        $telegram = new TelegramNotifier();
+                        $formattedAmount = 'Rp ' . number_format($transaction['amount'], 0, ',', '.');
+                        $msg = "💳 <b>PEMBAYARAN AR TILIK BERHASIL</b>\n\n"
+                             . "• <b>Order ID:</b> <code>{$orderId}</code>\n"
+                             . "• <b>Pelanggan:</b> " . htmlspecialchars($user['name']) . " (" . htmlspecialchars($user['email']) . ")\n"
+                             . "• <b>Paket:</b> {$transaction['package_name']}\n"
+                             . "• <b>Nominal:</b> {$formattedAmount}\n"
+                             . "• <b>Metode:</b> {$paymentType}\n"
+                             . "• <b>Kredit Diberikan:</b> +{$transaction['submissions_added']} Submisi\n"
+                             . "• <b>Waktu:</b> {$paidAt}";
+                        $telegram->sendMessage($msg);
+                    }
                 } catch (\Throwable $te) {
                     log_message('warning', 'Gagal mengirim notif Telegram: ' . $te->getMessage());
                 }
+
+                return $this->response->setJSON([
+                    'status'   => 'settlement_success',
+                    'order_id' => $orderId,
+                ]);
+            } else {
+                // Webhook konkruen lain telah menyelesaikan transaksi ini lebih awal
+                $db->transComplete();
+                return $this->response->setJSON([
+                    'status'   => 'already_settled',
+                    'order_id' => $orderId,
+                ]);
+            }
+        } elseif (in_array($transactionStatus, ['refund', 'chargeback'], true)) {
+            $db = \Config\Database::connect();
+            $db->transStart();
+
+            $curr = $db->table('payment_transactions')->where('id', $transaction['id'])->get()->getRowArray();
+            if ($curr && in_array($curr['transaction_status'], ['settlement', 'capture'], true)) {
+                // Transaksi sebelumnya sudah settled, maka tarik kembali kuota & tier langganan
+                $submissionsToRevoke = (int) $transaction['submissions_added'];
+                if ($submissionsToRevoke > 0) {
+                    $db->query("
+                        UPDATE users
+                        SET bonus_submissions = GREATEST(0, CAST(bonus_submissions AS SIGNED) - ?),
+                            updated_at = NOW()
+                        WHERE id = ?
+                    ", [$submissionsToRevoke, $transaction['user_id']]);
+                }
+
+                if (!empty($transaction['subscription_tier'])) {
+                    $db->table('users')->where('id', $transaction['user_id'])->update([
+                        'subscription_tier'       => 'free',
+                        'subscription_expires_at' => null,
+                        'updated_at'              => date('Y-m-d H:i:s'),
+                    ]);
+                }
             }
 
-            return $this->response->setJSON([
-                'status'   => 'settlement_success',
-                'order_id' => $orderId,
-            ]);
-        } elseif (in_array($transactionStatus, ['cancel', 'deny', 'expire'], true)) {
-            $this->transModel->where('id', $transaction['id'])->set([
+            $db->table('payment_transactions')->where('id', $transaction['id'])->update([
                 'transaction_status' => $transactionStatus,
                 'midtrans_response'  => $rawPayload,
                 'updated_at'         => date('Y-m-d H:i:s'),
-            ])->update();
+            ]);
+
+            $db->transComplete();
+
+            return $this->response->setJSON([
+                'status'   => 'transaction_' . $transactionStatus,
+                'order_id' => $orderId,
+            ]);
+        } elseif (in_array($transactionStatus, ['cancel', 'deny', 'expire'], true)) {
+            $db = \Config\Database::connect();
+            $db->query("
+                UPDATE payment_transactions
+                SET transaction_status = ?,
+                    midtrans_response = ?,
+                    updated_at = NOW()
+                WHERE id = ? AND transaction_status NOT IN ('settlement', 'capture')
+            ", [$transactionStatus, $rawPayload, $transaction['id']]);
 
             return $this->response->setJSON([
                 'status'   => 'transaction_' . $transactionStatus,
@@ -277,7 +360,17 @@ class PaymentController extends BaseController
         }
 
         $userId = session()->get('user_id');
-        $user = $userId ? $this->userModel->find($userId) : null;
+        $isAdmin = (session()->get('user_role') === 'admin');
+
+        // Pastikan hanya pemilik transaksi atau admin yang berhak memeriksa status pesanan
+        if (! $userId || ((int)$transaction['user_id'] !== (int)$userId && ! $isAdmin)) {
+            return $this->response->setStatusCode(404)->setJSON([
+                'status'  => 'error',
+                'message' => 'Transaksi tidak ditemukan atau akses ditolak.',
+            ]);
+        }
+
+        $user = $this->userModel->find($userId);
         $quotaInfo = $user ? $this->userModel->getQuotaInfo($user) : null;
 
         return $this->response->setJSON([

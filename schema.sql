@@ -271,7 +271,7 @@ CREATE TABLE IF NOT EXISTS payment_transactions (
     subscription_tier VARCHAR(50) NULL DEFAULT NULL,
     subscription_days INT UNSIGNED NOT NULL DEFAULT 0,
     payment_type VARCHAR(50) NULL DEFAULT NULL,
-    transaction_status ENUM('pending', 'settlement', 'capture', 'deny', 'expire', 'cancel') NOT NULL DEFAULT 'pending',
+    transaction_status ENUM('pending', 'settlement', 'capture', 'deny', 'expire', 'cancel', 'refund', 'chargeback') NOT NULL DEFAULT 'pending',
     fraud_status VARCHAR(50) NULL DEFAULT NULL,
     snap_token VARCHAR(255) NULL DEFAULT NULL,
     snap_redirect_url TEXT NULL DEFAULT NULL,

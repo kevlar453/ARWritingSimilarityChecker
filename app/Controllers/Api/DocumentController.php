@@ -67,32 +67,45 @@ class DocumentController extends BaseController
             mkdir($storagePath, 0775, true);
         }
 
-        $filename = $file->getRandomName();
-        $file->move($storagePath, $filename);
+        try {
+            $filename = $file->getRandomName();
+            $file->move($storagePath, $filename);
 
-        $faculty = trim((string) ($this->request->getPost('faculty') ?? ''));
-        $department = trim((string) ($this->request->getPost('department') ?? ''));
+            $faculty = trim((string) ($this->request->getPost('faculty') ?? ''));
+            $department = trim((string) ($this->request->getPost('department') ?? ''));
 
-        $rawVisibility = (string) $this->request->getPost('corpus_visibility');
-        $visibility = in_array($rawVisibility, ['private', 'institution', 'corpus'], true) ? $rawVisibility : 'private';
+            $rawVisibility = (string) $this->request->getPost('corpus_visibility');
+            $visibility = in_array($rawVisibility, ['private', 'institution', 'corpus'], true) ? $rawVisibility : 'private';
 
-        $documentModel = new DocumentModel();
-        $documentId = $documentModel->insert([
-            'user_id'           => $userId,
-            'title'             => pathinfo($file->getClientName(), PATHINFO_FILENAME),
-            'original_filename' => $file->getClientName(),
-            'mime_type'         => $mime,
-            'file_size'         => $file->getSize(),
-            'storage_path'      => $storagePath . $filename,
-            'status'            => 'uploaded',
-            'document_type'     => 'submission',
-            'corpus_visibility' => $visibility,
-            'faculty'           => !empty($faculty) ? $faculty : null,
-            'department'        => !empty($department) ? $department : null,
-            'indexing_status'   => 'not_required',
-            'created_at'        => date('Y-m-d H:i:s'),
-            'updated_at'        => date('Y-m-d H:i:s'),
-        ]);
+            $documentModel = new DocumentModel();
+            $documentId = $documentModel->insert([
+                'user_id'           => $userId,
+                'title'             => pathinfo($file->getClientName(), PATHINFO_FILENAME),
+                'original_filename' => $file->getClientName(),
+                'mime_type'         => $mime,
+                'file_size'         => $file->getSize(),
+                'storage_path'      => $storagePath . $filename,
+                'status'            => 'uploaded',
+                'document_type'     => 'submission',
+                'corpus_visibility' => $visibility,
+                'faculty'           => !empty($faculty) ? $faculty : null,
+                'department'        => !empty($department) ? $department : null,
+                'indexing_status'   => 'not_required',
+                'created_at'        => date('Y-m-d H:i:s'),
+                'updated_at'        => date('Y-m-d H:i:s'),
+            ]);
+
+            if (! $documentId) {
+                throw new \RuntimeException('Gagal menyimpan metadata dokumen ke basis data.');
+            }
+        } catch (\Throwable $e) {
+            $userModel->refundSubmissionQuota($userId);
+            log_message('error', 'Gagal memproses unggahan dokumen: ' . $e->getMessage());
+            return $this->response->setStatusCode(500)->setJSON([
+                'status'  => 'error',
+                'message' => 'Terjadi kesalahan sistem saat menyimpan dokumen. Kuota submisi Anda telah dipulihkan.'
+            ]);
+        }
 
         $quotaInfo = $userModel->getQuotaInfo($userId);
 
@@ -126,6 +139,15 @@ class DocumentController extends BaseController
             ]);
         }
 
+        $userModel = new \App\Models\UserModel();
+        $user = $userModel->find($userId);
+        if (! $user || $user['status'] !== 'active') {
+            return $this->response->setStatusCode(403)->setJSON([
+                'status'  => 'error',
+                'message' => 'Akun Anda belum aktif atau belum diverifikasi untuk menyumbang korpus.',
+            ]);
+        }
+
         $allowed = [
             'application/pdf',
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
@@ -140,6 +162,13 @@ class DocumentController extends BaseController
             ]);
         }
 
+        if ($file->getSize() < 2048) {
+            return $this->response->setStatusCode(400)->setJSON([
+                'status'  => 'error',
+                'message' => 'Ukuran berkas terlalu kecil (minimal 2 KB) untuk dianggap sebagai naskah karya ilmiah yang valid.'
+            ]);
+        }
+
         if ($file->getSize() > 25 * 1024 * 1024) {
             return $this->response->setStatusCode(413)->setJSON([
                 'status'  => 'error',
@@ -147,14 +176,34 @@ class DocumentController extends BaseController
             ]);
         }
 
-        // Cek duplikasi berdasarkan nama berkas atau judul pada tabel documents korpus
         $db = db_connect();
+
+        // Batasi kontribusi korpus maksimal 20 berkas per hari per akun untuk mencegah farming bot
+        $todayCorpusCount = $db->table('documents')
+            ->where('user_id', $userId)
+            ->where('document_type', 'corpus')
+            ->where('created_at >=', date('Y-m-d 00:00:00'))
+            ->countAllResults();
+
+        if ($todayCorpusCount >= 20) {
+            return $this->response->setStatusCode(429)->setJSON([
+                'status'  => 'error',
+                'message' => 'Batas maksimal kontribusi korpus harian Anda (20 dokumen/hari) telah tercapai. Silakan coba kembali besok.'
+            ]);
+        }
+
+        // Cek duplikasi berdasarkan nama berkas, judul, atau kesamaan ukuran berkas persis
         $targetTitle = pathinfo($file->getClientName(), PATHINFO_FILENAME);
+        $fileSize = $file->getSize();
         $duplicate = $db->table('documents')
             ->where('document_type', 'corpus')
             ->groupStart()
                 ->where('original_filename', $file->getClientName())
-                ->orLike('title', $targetTitle)
+                ->orWhere('title', $targetTitle)
+                ->orGroupStart()
+                    ->where('file_size', $fileSize)
+                    ->where('mime_type', $mime)
+                ->groupEnd()
             ->groupEnd()
             ->get()
             ->getFirstRow();
@@ -285,9 +334,14 @@ class DocumentController extends BaseController
             ]);
         }
 
-        // Potong kuota pengguna jika bukan admin
-        if (! $isAdmin && $userId) {
-            $userModel = new \App\Models\UserModel();
+        // Potong kuota pengguna jika bukan admin dan dokumen ini adalah pengujian ulang (re-check)
+        // Catatan: Dokumen baru yang belum pernah memiliki report sudah dipotong kuotanya saat upload().
+        $reportModel = new ReportModel();
+        $existingReportsCount = $reportModel->where('document_id', $id)->countAllResults();
+        $userModel = new \App\Models\UserModel();
+        $deductedInThisRequest = false;
+
+        if (! $isAdmin && $userId && $existingReportsCount > 0) {
             $quotaDeducted = $userModel->deductSubmissionQuota($userId);
             if (! $quotaDeducted) {
                 return $this->response->setStatusCode(403)->setJSON([
@@ -295,42 +349,53 @@ class DocumentController extends BaseController
                     'message' => 'Batas kuota gratis minggu ini telah habis. Sumbang korpus atau lakukan top-up untuk melanjutkan.'
                 ]);
             }
+            $deductedInThisRequest = true;
         }
 
         $engine = $this->request->getPost('engine') ?: 'hybrid';
 
-        $reportModel = new ReportModel();
-        $reportId = $reportModel->insert([
-            'document_id'        => $id,
-            'engine'             => $engine,
-            'predicted_decision' => 'no_match',
-            'overall_similarity' => 0,
-            'source_count'       => 0,
-            'match_count'        => 0,
-            'status'             => 'pending',
-            'created_at'         => date('Y-m-d H:i:s'),
-        ]);
+        try {
+            $reportId = $reportModel->insert([
+                'document_id'        => $id,
+                'engine'             => $engine,
+                'predicted_decision' => 'no_match',
+                'overall_similarity' => 0,
+                'source_count'       => 0,
+                'match_count'        => 0,
+                'status'             => 'pending',
+                'created_at'         => date('Y-m-d H:i:s'),
+            ]);
 
-        $db = db_connect();
-        $db->table('jobs')->insert([
-            'type'         => 'similarity_check',
-            'payload'      => json_encode([
+            $db = db_connect();
+            $db->table('jobs')->insert([
+                'type'         => 'similarity_check',
+                'payload'      => json_encode([
+                    'document_id' => (int) $id,
+                    'report_id'   => (int) $reportId,
+                    'engine'      => $engine,
+                ]),
+                'status'       => 'pending',
+                'available_at' => date('Y-m-d H:i:s'),
+                'created_at'   => date('Y-m-d H:i:s'),
+                'updated_at'   => date('Y-m-d H:i:s'),
+            ]);
+
+            return $this->response->setStatusCode(202)->setJSON([
+                'status'      => 'queued',
                 'document_id' => (int) $id,
                 'report_id'   => (int) $reportId,
-                'engine'      => $engine,
-            ]),
-            'status'       => 'pending',
-            'available_at' => date('Y-m-d H:i:s'),
-            'created_at'   => date('Y-m-d H:i:s'),
-            'updated_at'   => date('Y-m-d H:i:s'),
-        ]);
-
-        return $this->response->setStatusCode(202)->setJSON([
-            'status'      => 'queued',
-            'document_id' => (int) $id,
-            'report_id'   => (int) $reportId,
-            'message'     => 'Pemeriksaan similarity berhasil dijadwalkan ke antrean worker.'
-        ]);
+                'message'     => 'Pemeriksaan similarity berhasil dijadwalkan ke antrean worker.'
+            ]);
+        } catch (\Throwable $e) {
+            if ($deductedInThisRequest) {
+                $userModel->refundSubmissionQuota($userId);
+            }
+            log_message('error', 'Gagal menjadwalkan pemeriksaan naskah: ' . $e->getMessage());
+            return $this->response->setStatusCode(500)->setJSON([
+                'status'  => 'error',
+                'message' => 'Terjadi kesalahan sistem saat menjadwalkan pemeriksaan dokumen.'
+            ]);
+        }
     }
 
     public function enroll($id)
@@ -511,66 +576,75 @@ class DocumentController extends BaseController
             mkdir($storagePath, 0775, true);
         }
 
-        $filename = $file->getRandomName();
-        $file->move($storagePath, $filename);
+        try {
+            $filename = $file->getRandomName();
+            $file->move($storagePath, $filename);
 
-        $customTitle = trim((string)$this->request->getPost('title'));
-        $title = !empty($customTitle) ? $customTitle : pathinfo($file->getClientName(), PATHINFO_FILENAME);
-        $engine = $this->request->getPost('engine') ?: 'hybrid';
-        $now = date('Y-m-d H:i:s');
+            $customTitle = trim((string)$this->request->getPost('title'));
+            $title = !empty($customTitle) ? $customTitle : pathinfo($file->getClientName(), PATHINFO_FILENAME);
+            $engine = $this->request->getPost('engine') ?: 'hybrid';
+            $now = date('Y-m-d H:i:s');
 
-        $faculty = trim((string) ($this->request->getPost('faculty') ?? ''));
-        $department = trim((string) ($this->request->getPost('department') ?? ''));
+            $faculty = trim((string) ($this->request->getPost('faculty') ?? ''));
+            $department = trim((string) ($this->request->getPost('department') ?? ''));
 
-        $documentModel = new DocumentModel();
-        $documentId = $documentModel->insert([
-            'user_id'           => $userId,
-            'title'             => $title,
-            'original_filename' => $file->getClientName(),
-            'mime_type'         => $mime,
-            'file_size'         => $file->getSize(),
-            'storage_path'      => $storagePath . $filename,
-            'status'            => 'uploaded',
-            'document_type'     => 'submission',
-            'corpus_visibility' => 'private',
-            'faculty'           => !empty($faculty) ? $faculty : null,
-            'department'        => !empty($department) ? $department : null,
-            'indexing_status'   => 'not_required',
-            'created_at'        => $now,
-            'updated_at'        => $now,
-        ]);
+            $documentModel = new DocumentModel();
+            $documentId = $documentModel->insert([
+                'user_id'           => $userId,
+                'title'             => $title,
+                'original_filename' => $file->getClientName(),
+                'mime_type'         => $mime,
+                'file_size'         => $file->getSize(),
+                'storage_path'      => $storagePath . $filename,
+                'status'            => 'uploaded',
+                'document_type'     => 'submission',
+                'corpus_visibility' => 'private',
+                'faculty'           => !empty($faculty) ? $faculty : null,
+                'department'        => !empty($department) ? $department : null,
+                'indexing_status'   => 'not_required',
+                'created_at'        => $now,
+                'updated_at'        => $now,
+            ]);
 
-        // Buat kode verifikasi acak aman
-        $rnd = strtoupper(bin2hex(random_bytes(6)));
-        $certHash = "ART-" . substr($rnd, 0, 4) . "-" . substr($rnd, 4, 4) . "-" . substr($rnd, 8, 4);
+            // Buat kode verifikasi acak aman
+            $rnd = strtoupper(bin2hex(random_bytes(6)));
+            $certHash = "ART-" . substr($rnd, 0, 4) . "-" . substr($rnd, 4, 4) . "-" . substr($rnd, 8, 4);
 
-        $reportModel = new ReportModel();
-        $reportId = $reportModel->insert([
-            'document_id'        => $documentId,
-            'engine'             => $engine,
-            'predicted_decision' => 'no_match',
-            'overall_similarity' => 0,
-            'source_count'       => 0,
-            'match_count'        => 0,
-            'verification_code'  => $certHash,
-            'status'             => 'pending',
-            'created_at'         => $now,
-        ]);
+            $reportModel = new ReportModel();
+            $reportId = $reportModel->insert([
+                'document_id'        => $documentId,
+                'engine'             => $engine,
+                'predicted_decision' => 'no_match',
+                'overall_similarity' => 0,
+                'source_count'       => 0,
+                'match_count'        => 0,
+                'verification_code'  => $certHash,
+                'status'             => 'pending',
+                'created_at'         => $now,
+            ]);
 
-        // Masukkan ke antrean worker
-        $db = db_connect();
-        $db->table('jobs')->insert([
-            'type'         => 'similarity_check',
-            'payload'      => json_encode([
-                'document_id' => (int) $documentId,
-                'report_id'   => (int) $reportId,
-                'engine'      => $engine,
-            ]),
-            'status'       => 'pending',
-            'available_at' => $now,
-            'created_at'   => $now,
-            'updated_at'   => $now,
-        ]);
+            // Masukkan ke antrean worker
+            $db = db_connect();
+            $db->table('jobs')->insert([
+                'type'         => 'similarity_check',
+                'payload'      => json_encode([
+                    'document_id' => (int) $documentId,
+                    'report_id'   => (int) $reportId,
+                    'engine'      => $engine,
+                ]),
+                'status'       => 'pending',
+                'available_at' => $now,
+                'created_at'   => $now,
+                'updated_at'   => $now,
+            ]);
+        } catch (\Throwable $e) {
+            $userModel->refundSubmissionQuota($userId);
+            log_message('error', 'Gagal memproses checkSubmission: ' . $e->getMessage());
+            return $this->response->setStatusCode(500)->setJSON([
+                'status'  => 'error',
+                'message' => 'Terjadi kesalahan sistem saat menjadwalkan pemeriksaan. Kuota submisi Anda telah dipulihkan.'
+            ]);
+        }
 
         $publicUrl = rtrim(base_url(), '/');
 
