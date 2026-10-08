@@ -160,6 +160,11 @@ class DashboardController extends BaseController
                           ->get()
                           ->getResultArray();
 
+        // 13b. Data Kunci Google AI / Gemini API Keys (Round-Robin Pool)
+        $googleKeyModel = new \App\Models\GoogleApiKeyModel();
+        $googleKeysList = $googleKeyModel->getAllKeys();
+        $activeGoogleKeysCount = count(array_filter($googleKeysList, fn($k) => $k['status'] === 'active'));
+
         // 14. Data Analitik Integritas Institusi (Opsi D)
         $avgSimRow = $db->table('reports')
                         ->select('AVG(overall_similarity) as avg_similarity, COUNT(id) as total_reports')
@@ -252,6 +257,8 @@ class DashboardController extends BaseController
             'harvestLogs'          => $harvestLogs,
             'harvestSchedules'     => $harvestSchedules,
             'apiKeysList'          => $apiKeysList,
+            'googleKeysList'       => $googleKeysList,
+            'activeGoogleKeysCount'=> $activeGoogleKeysCount,
             'integrityAnalytics'   => [
                 'avg_similarity'          => $avgSimilarity,
                 'total_audited'           => $totalReportsCompleted,

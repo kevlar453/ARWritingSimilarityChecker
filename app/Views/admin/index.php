@@ -183,6 +183,15 @@
                             <?= count($apiKeysList ?? []) ?>
                         </span>
                     </a>
+                    <a href="<?= base_url('admin?tab=google_keys') ?>" class="group flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 <?= $activeTab === 'google_keys' ? 'bg-indigo-600/15 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent' ?>">
+                        <div class="flex items-center gap-2.5">
+                            <svg class="w-4 h-4 <?= $activeTab === 'google_keys' ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            <span>Google AI Keys (Pool)</span>
+                        </div>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold <?= ($activeGoogleKeysCount ?? 0) > 0 ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-slate-800 text-slate-400' ?>">
+                            <?= (int) ($activeGoogleKeysCount ?? 0) ?> aktif
+                        </span>
+                    </a>
                     <a href="<?= base_url('admin?tab=payments') ?>" class="group flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 <?= $activeTab === 'payments' ? 'bg-indigo-600/15 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent' ?>">
                         <div class="flex items-center gap-2.5">
                             <svg class="w-4 h-4 <?= $activeTab === 'payments' ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
@@ -1545,6 +1554,259 @@
             </div>
 
         <!-- ========================================== -->
+        <!-- TAB 6B: GOOGLE AI / GEMINI KEYS POOL       -->
+        <!-- ========================================== -->
+        <?php elseif ($activeTab === 'google_keys'): ?>
+            <div class="space-y-6">
+                <!-- Header -->
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                            Kumpulan Kunci Google Gemini API (Pool &amp; Round-Robin)
+                            <span class="px-2 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Free Tier Ready</span>
+                        </h2>
+                        <p class="text-xs text-slate-400">Rotasi otomatis multi-kunci untuk audit forensik semantik, pencegahan rate-limit (15 RPM / 1.500 RPD), dan auto-failover saat kuota habis</p>
+                    </div>
+                </div>
+
+                <!-- KPI Metric Cards Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Total Keys -->
+                    <div class="bg-slate-800/60 border border-slate-700/60 rounded-2xl p-5 shadow-sm">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Kunci Terdaftar</span>
+                            <div class="p-2 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
+                            </div>
+                        </div>
+                        <div class="mt-3 flex items-baseline gap-2">
+                            <span class="text-3xl font-extrabold text-white tracking-tight"><?= count($googleKeysList ?? []) ?></span>
+                            <span class="text-xs text-slate-400 font-medium">akun pool</span>
+                        </div>
+                        <div class="mt-2 text-xs text-slate-400">
+                            <span>Mendukung multi-kunci Google AI Studio</span>
+                        </div>
+                    </div>
+
+                    <!-- Active Keys -->
+                    <div class="bg-slate-800/60 border border-slate-700/60 rounded-2xl p-5 shadow-sm">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Kunci Aktif (Siaga)</span>
+                            <div class="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            </div>
+                        </div>
+                        <div class="mt-3 flex items-baseline gap-2">
+                            <span class="text-3xl font-extrabold text-emerald-400 tracking-tight"><?= (int) ($activeGoogleKeysCount ?? 0) ?></span>
+                            <span class="text-xs text-emerald-300 font-medium">siap rotasi</span>
+                        </div>
+                        <div class="mt-2 text-xs text-slate-400">
+                            <span>Tersedia untuk rotasi round-robin worker</span>
+                        </div>
+                    </div>
+
+                    <!-- Cooldown / Rate-Limited Keys -->
+                    <?php 
+                        $rateLimitedCount = count(array_filter($googleKeysList ?? [], fn($k) => $k['status'] === 'rate_limited'));
+                    ?>
+                    <div class="bg-slate-800/60 border border-slate-700/60 rounded-2xl p-5 shadow-sm">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Status Cooldown (429)</span>
+                            <div class="p-2 rounded-xl <?= $rateLimitedCount > 0 ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-slate-700/20 text-slate-400 border border-slate-700/30' ?>">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            </div>
+                        </div>
+                        <div class="mt-3 flex items-baseline gap-2">
+                            <span class="text-3xl font-extrabold <?= $rateLimitedCount > 0 ? 'text-amber-400' : 'text-slate-300' ?> tracking-tight"><?= $rateLimitedCount ?></span>
+                            <span class="text-xs text-amber-300 font-medium">sedang jeda</span>
+                        </div>
+                        <div class="mt-2 text-xs text-slate-400">
+                            <span>Pulih otomatis setelah waktu jeda selesai</span>
+                        </div>
+                    </div>
+
+                    <!-- Total Usage Calls -->
+                    <?php 
+                        $totalCalls = array_sum(array_column($googleKeysList ?? [], 'usage_count'));
+                    ?>
+                    <div class="bg-slate-800/60 border border-slate-700/60 rounded-2xl p-5 shadow-sm">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Audit Sukses</span>
+                            <div class="p-2 rounded-xl bg-sky-500/10 text-sky-400 border border-sky-500/20">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            </div>
+                        </div>
+                        <div class="mt-3 flex items-baseline gap-2">
+                            <span class="text-3xl font-extrabold text-sky-400 tracking-tight"><?= number_format($totalCalls) ?></span>
+                            <span class="text-xs text-sky-300 font-medium">panggilan</span>
+                        </div>
+                        <div class="mt-2 text-xs text-slate-400">
+                            <span>Kumulatif audit semantik berhasil</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Tambah Google Key Baru -->
+                <div class="bg-gradient-to-r from-slate-900/90 via-slate-800/80 to-slate-900/90 border border-emerald-500/30 rounded-2xl p-5 shadow-lg space-y-4">
+                    <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                        Daftarkan Google Gemini API Key Baru ke Kumpulan Rotasi
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div>
+                            <label class="block text-[11px] font-medium text-slate-400 mb-1">Label Akun / Nama Kunci</label>
+                            <input type="text" id="google-key-name" placeholder="mis: Akun Google 1 (Pribadi)" class="w-full bg-slate-900 border border-slate-700/80 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-medium text-slate-400 mb-1">Google API Key (AI Studio)</label>
+                            <input type="password" id="google-api-key" placeholder="AIzaSy..." class="w-full bg-slate-900 border border-slate-700/80 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 font-mono-code">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-medium text-slate-400 mb-1">Model Gemini</label>
+                            <select id="google-model-name" class="w-full bg-slate-900 border border-slate-700/80 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
+                                <option value="gemini-1.5-flash" selected>gemini-1.5-flash (Cepat, Hemat Kuota, Disarankan)</option>
+                                <option value="gemini-2.0-flash">gemini-2.0-flash (Generasi Terkini)</option>
+                                <option value="gemini-1.5-pro">gemini-1.5-pro (Penalaran Kompleks)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="flex justify-end">
+                        <button onclick="handleCreateGoogleKey()" id="btn-add-google-key" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow transition-colors flex items-center gap-1.5 cursor-pointer">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            Tambahkan ke Pool Rotasi
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Table Daftar Google API Keys -->
+                <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-5 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                            Daftar Kunci Google Gemini Terdaftar
+                        </h3>
+                        <span class="text-xs text-slate-400">Total: <strong class="text-slate-200"><?= count($googleKeysList ?? []) ?></strong> kunci</span>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-xs text-left">
+                            <thead class="text-slate-400 uppercase tracking-wider border-b border-slate-700/60 text-[10px]">
+                                <tr>
+                                    <th class="py-2.5 px-3">Label &amp; Model</th>
+                                    <th class="py-2.5 px-3">Kunci (Masked)</th>
+                                    <th class="py-2.5 px-3">Status</th>
+                                    <th class="py-2.5 px-3">Panggilan &amp; Error</th>
+                                    <th class="py-2.5 px-3">Terakhir Digunakan</th>
+                                    <th class="py-2.5 px-3 text-right">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800/80">
+                                <?php if (empty($googleKeysList)): ?>
+                                    <tr>
+                                        <td colspan="6" class="py-8 text-center text-slate-500">
+                                            Belum ada Google API Key terdaftar. Silakan tambahkan API Key dari Google AI Studio melalui formulir di atas.
+                                        </td>
+                                    </tr>
+                                <?php else: ?>
+                                    <?php foreach ($googleKeysList as $k): ?>
+                                        <tr class="hover:bg-slate-800/40 transition-colors">
+                                            <td class="py-3 px-3">
+                                                <div class="font-semibold text-white"><?= esc($k['key_name']) ?></div>
+                                                <div class="text-[10px] text-slate-400 font-mono-code"><?= esc($k['model_name']) ?></div>
+                                            </td>
+                                            <td class="py-3 px-3">
+                                                <span class="font-mono-code text-[11px] text-slate-300 bg-slate-900 px-2 py-1 rounded border border-slate-800">
+                                                    <?= esc($k['masked_key'] ?? (substr($k['api_key'] ?? '', 0, 8) . '...' . substr($k['api_key'] ?? '', -4))) ?>
+                                                </span>
+                                            </td>
+                                            <td class="py-3 px-3">
+                                                <?php if ($k['status'] === 'active'): ?>
+                                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1 w-max">
+                                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                                                        Aktif Siaga
+                                                    </span>
+                                                <?php elseif ($k['status'] === 'rate_limited'): ?>
+                                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1 w-max" title="<?= esc($k['last_error_message'] ?? 'Rate limit') ?>">
+                                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+                                                        Dijeda s.d. <?= esc(substr($k['rate_limited_until'] ?? '', 11, 8)) ?>
+                                                    </span>
+                                                <?php elseif ($k['status'] === 'exhausted'): ?>
+                                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/30 flex items-center gap-1 w-max">
+                                                        <span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>
+                                                        Habis Kuota
+                                                    </span>
+                                                <?php else: ?>
+                                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-700/40 text-slate-400 border border-slate-700/60 flex items-center gap-1 w-max">
+                                                        Nonaktif
+                                                    </span>
+                                                <?php endif; ?>
+                                                <?php if (!empty($k['last_error_message'])): ?>
+                                                    <div class="text-[10px] text-rose-400/80 truncate max-w-[200px] mt-0.5" title="<?= esc($k['last_error_message']) ?>">
+                                                        <?= esc($k['last_error_message']) ?>
+                                                    </div>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td class="py-3 px-3 font-mono-code text-[11px]">
+                                                <span class="text-emerald-400 font-bold"><?= (int) $k['usage_count'] ?></span> sukses
+                                                <?php if ((int)$k['error_count'] > 0): ?>
+                                                    / <span class="text-rose-400"><?= (int) $k['error_count'] ?></span> err
+                                                <?php endif; ?>
+                                            </td>
+                                            <td class="py-3 px-3 text-slate-400 text-[11px]">
+                                                <?= !empty($k['last_used_at']) ? esc(date('d M H:i', strtotime($k['last_used_at']))) : '-' ?>
+                                            </td>
+                                            <td class="py-3 px-3 text-right">
+                                                <div class="flex items-center justify-end gap-1.5">
+                                                    <button onclick="handleTestGoogleKey(<?= $k['id'] ?>, this)" class="px-2 py-1 rounded bg-slate-700 hover:bg-slate-600 text-[11px] text-slate-200 transition-colors flex items-center gap-1 cursor-pointer" title="Kirim ping prompt uji koneksi ke Google API">
+                                                        <svg class="w-3 h-3 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                                        Uji
+                                                    </button>
+                                                    <button onclick="handleToggleGoogleKey(<?= $k['id'] ?>)" class="px-2 py-1 rounded <?= $k['status'] === 'active' ? 'bg-amber-900/40 hover:bg-amber-900/60 text-amber-300 border border-amber-600/40' : 'bg-emerald-900/40 hover:bg-emerald-900/60 text-emerald-300 border border-emerald-600/40' ?> text-[11px] transition-colors cursor-pointer">
+                                                        <?= $k['status'] === 'active' ? 'Nonaktifkan' : 'Aktifkan' ?>
+                                                    </button>
+                                                    <button onclick="handleDeleteGoogleKey(<?= $k['id'] ?>, '<?= esc($k['key_name']) ?>')" class="px-2 py-1 rounded bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 border border-rose-600/40 text-[11px] transition-colors cursor-pointer" title="Hapus Kunci">
+                                                        Hapus
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Petunjuk & Kebijakan Free Tier Google AI Studio -->
+                <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 space-y-3">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Pedoman Kapasitas &amp; Cara Kerja Rotasi Round-Robin
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-slate-300">
+                        <div class="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80 space-y-1">
+                            <strong class="text-white block">1. Batas Kuota Free Tier</strong>
+                            <p class="text-slate-400 text-[11px] leading-relaxed">
+                                Setiap Google API Key Free Tier menyediakan 15 RPM (permintaan per menit) dan 1.500 RPD (permintaan per hari). Layanan ini sepenuhnya gratis tanpa perlu kartu kredit.
+                            </p>
+                        </div>
+                        <div class="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80 space-y-1">
+                            <strong class="text-white block">2. Rotasi Otomatis (Round-Robin)</strong>
+                            <p class="text-slate-400 text-[11px] leading-relaxed">
+                                Worker AR Tilik memanggil kunci dengan urutan waktu penggunaan terlama. Setiap kunci menerima beban secara merata sehingga tidak ada kunci yang cepat habis kuotanya.
+                            </p>
+                        </div>
+                        <div class="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80 space-y-1">
+                            <strong class="text-white block">3. Failover &amp; Cooldown 60 Detik</strong>
+                            <p class="text-slate-400 text-[11px] leading-relaxed">
+                                Jika satu kunci mengalami limit (HTTP 429), kunci tersebut langsung dijeda selama 60 detik dan worker segera melanjutkan analisis menggunakan kunci berikutnya tanpa interupsi.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        <!-- ========================================== -->
         <!-- TAB 7: SISTEM SERVER                       -->
         <!-- ========================================== -->
         <?php elseif ($activeTab === 'system'): ?>
@@ -1818,6 +2080,93 @@
                 }
             } catch (err) {
                 alert('Terjadi kesalahan koneksi.');
+            }
+        }
+
+        // Google Gemini API Key Handlers (Pool Round-Robin)
+        async function handleCreateGoogleKey() {
+            const keyName = document.getElementById('google-key-name').value.trim();
+            const apiKey = document.getElementById('google-api-key').value.trim();
+            const modelName = document.getElementById('google-model-name').value;
+            const btn = document.getElementById('btn-add-google-key');
+
+            if (!keyName || !apiKey) {
+                alert('Silakan lengkapi label nama dan Google API Key.');
+                return;
+            }
+
+            if (btn) btn.disabled = true;
+
+            try {
+                const res = await postJson('<?= base_url('admin/google-keys/create') ?>', {
+                    key_name: keyName,
+                    api_key: apiKey,
+                    model_name: modelName
+                });
+
+                if (res.status === 'success') {
+                    alert(res.message);
+                    window.location.reload();
+                } else {
+                    alert('Gagal: ' + res.message);
+                }
+            } catch (err) {
+                alert('Terjadi kesalahan koneksi saat menambahkan kunci.');
+            } finally {
+                if (btn) btn.disabled = false;
+            }
+        }
+
+        async function handleToggleGoogleKey(keyId) {
+            try {
+                const res = await postJson('<?= base_url('admin/google-keys/toggle') ?>/' + keyId, {});
+                if (res.status === 'success') {
+                    window.location.reload();
+                } else {
+                    alert('Gagal: ' + res.message);
+                }
+            } catch (err) {
+                alert('Terjadi kesalahan koneksi.');
+            }
+        }
+
+        async function handleDeleteGoogleKey(keyId, keyName) {
+            if (!confirm('Apakah Anda yakin ingin menghapus kunci "' + keyName + '" dari pool rotasi?')) return;
+
+            try {
+                const res = await postJson('<?= base_url('admin/google-keys/delete') ?>/' + keyId, {});
+                if (res.status === 'success') {
+                    alert(res.message);
+                    window.location.reload();
+                } else {
+                    alert('Gagal: ' + res.message);
+                }
+            } catch (err) {
+                alert('Terjadi kesalahan koneksi.');
+            }
+        }
+
+        async function handleTestGoogleKey(keyId, btnElement) {
+            if (btnElement) {
+                btnElement.disabled = true;
+                btnElement.innerHTML = 'Menguji...';
+            }
+
+            try {
+                const res = await postJson('<?= base_url('admin/google-keys/test') ?>/' + keyId, {});
+                if (res.status === 'success') {
+                    alert('✅ Uji Koneksi Sukses!\nModel: ' + res.model + '\nRespon Google Gemini: "' + res.reply + '"');
+                    window.location.reload();
+                } else {
+                    alert('❌ Uji Koneksi Gagal:\n' + (res.message || 'Tidak dapat terhubung ke Google API'));
+                }
+            } catch (err) {
+                alert('Terjadi kesalahan koneksi saat pengujian API.');
+            } finally {
+                if (btnElement) {
+                    btnElement.disabled = false;
+                    btnElement.innerHTML = 'Uji';
+                }
             }
         }
     </script>

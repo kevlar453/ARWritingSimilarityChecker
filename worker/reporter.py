@@ -268,6 +268,25 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
             )
             result["evasion_detection"] = evasion_res.to_dict()
 
+            # 8. Google Gemini AI Semantic Forensic Auditor (Pool Round-Robin)
+            gemini_forensic_res = None
+            try:
+                from worker.gemini_forensic import audit_proposal_with_gemini
+                gemini_forensic_res = audit_proposal_with_gemini(
+                    document_text=submission_text,
+                    substantive_text=subst_body_text,
+                    title=document.get("title", ""),
+                    connection=connection
+                )
+                result["gemini_forensic"] = gemini_forensic_res
+            except Exception as gem_err:
+                print(f"  [GEMINI FORENSIC WARNING] Gagal menjalankan audit Gemini untuk Doc #{document_id}: {gem_err}")
+                result["gemini_forensic"] = {
+                    "status": "skipped",
+                    "is_available": False,
+                    "message": f"Audit semantik Google Gemini dilewati: {gem_err}"
+                }
+
             # Pemetaan rentang karakter token untuk menentukan zonasi setiap pasase
             import re
             token_spans = [m.span() for m in re.finditer(r"[^\W_]+(?:[-\'][^\W_]+)*", submission_text.lower(), re.UNICODE)]
@@ -420,6 +439,7 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
                 jit_harvesting=jit_harvest_res,
                 citation_audit=citation_audit_res,
                 evasion_detection=evasion_res,
+                gemini_forensic=gemini_forensic_res,
             )
             pres_latency_ms = (time.perf_counter() - t_pres_start) * 1000.0
 

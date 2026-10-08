@@ -1,0 +1,274 @@
+"""
+AR Tilik - Google Gemini AI Forensic Audit Engine
+Modul audit semantik, verifikasi integritas metodologi, deteksi halusinasi sitasi,
+dan generator pertanyaan ujian skripsi berbasis Google Gemini API (Pool Round-Robin).
+"""
+
+import json
+import logging
+import re
+import time
+import urllib.request
+import urllib.error
+from typing import Dict, List, Any, Optional
+
+from worker.database import get_connection
+
+logger = logging.getLogger("artilik.gemini_forensic")
+
+
+def get_available_gemini_keys(conn=None) -> List[Dict[str, Any]]:
+    """
+    Mengambil daftar Google API Key aktif dari database dengan rotasi round-robin
+    (diurutkan berdasarkan last_used_at ASC).
+    """
+    close_after = False
+    if conn is None:
+        conn = get_connection()
+        close_after = True
+
+    try:
+        cursor = conn.cursor(dictionary=True)
+        # Pulihkan kunci rate_limited yang sudah melewati batas waktu jeda (cooldown)
+        cursor.execute("""
+            UPDATE google_api_keys 
+            SET status = 'active', rate_limited_until = NULL 
+            WHERE status = 'rate_limited' AND rate_limited_until <= NOW()
+        """)
+        conn.commit()
+
+        # Ambil kunci yang aktif dan siap dipakai
+        cursor.execute("""
+            SELECT id, key_name, api_key, model_name, usage_count, error_count, rate_limited_until
+            FROM google_api_keys
+            WHERE status = 'active' AND (rate_limited_until IS NULL OR rate_limited_until <= NOW())
+            ORDER BY COALESCE(last_used_at, '2000-01-01 00:00:00') ASC, id ASC
+        """)
+        keys = cursor.fetchall() or []
+        cursor.close()
+        return keys
+    except Exception as e:
+        logger.error(f"[GEMINI] Gagal mengambil daftar kunci API dari database: {e}")
+        return []
+    finally:
+        if close_after and conn:
+            conn.close()
+
+
+def mark_key_success(key_id: int, conn=None):
+    """Mencatat penggunaan sukses pada API key."""
+    close_after = False
+    if conn is None:
+        conn = get_connection()
+        close_after = True
+    try:
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE google_api_keys 
+            SET usage_count = usage_count + 1, last_used_at = NOW(), rate_limited_until = NULL, last_error_message = NULL
+            WHERE id = %s
+        """, (key_id,))
+        conn.commit()
+        cursor.close()
+    except Exception as e:
+        logger.warning(f"[GEMINI] Gagal mengupdate status sukses key #{key_id}: {e}")
+    finally:
+        if close_after and conn:
+            conn.close()
+
+
+def mark_key_rate_limited(key_id: int, error_msg: str = "", cooldown_seconds: int = 60, conn=None):
+    """Menandai kunci terkena rate-limit / kuota sesaat dengan masa cooldown."""
+    close_after = False
+    if conn is None:
+        conn = get_connection()
+        close_after = True
+    try:
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE google_api_keys 
+            SET status = 'rate_limited', 
+                error_count = error_count + 1,
+                rate_limited_until = DATE_ADD(NOW(), INTERVAL %s SECOND),
+                last_error_message = %s
+            WHERE id = %s
+        """, (cooldown_seconds, error_msg[:450], key_id))
+        conn.commit()
+        cursor.close()
+        logger.warning(f"[GEMINI] Kunci #{key_id} terkena limit kuota. Dijeda selama {cooldown_seconds} detik.")
+    except Exception as e:
+        logger.error(f"[GEMINI] Gagal menandai rate limit key #{key_id}: {e}")
+    finally:
+        if close_after and conn:
+            conn.close()
+
+
+def call_gemini_api(api_key: str, model_name: str, prompt: str, timeout: int = 30) -> Dict[str, Any]:
+    """
+    Mengirimkan request ke Google Generative Language API via HTTP POST.
+    """
+    model = model_name or "gemini-1.5-flash"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
+
+    payload = {
+        "contents": [
+            {
+                "parts": [
+                    {"text": prompt}
+                ]
+            }
+        ],
+        "generationConfig": {
+            "temperature": 0.2,
+            "maxOutputTokens": 2048,
+            "responseMimeType": "application/json"
+        }
+    }
+
+    req_data = json.dumps(payload).encode("utf-8")
+    req = urllib.request.Request(
+        url,
+        data=req_data,
+        headers={"Content-Type": "application/json"}
+    )
+
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as response:
+            res_body = response.read().decode("utf-8")
+            data = json.loads(res_body)
+            # Ambil teks jawaban
+            candidates = data.get("candidates", [])
+            if candidates:
+                parts = candidates[0].get("content", {}).get("parts", [])
+                if parts:
+                    return {
+                        "success": True,
+                        "raw_text": parts[0].get("text", ""),
+                        "status_code": 200
+                    }
+            return {
+                "success": False,
+                "error": "Respon kosong dari Gemini",
+                "status_code": 200
+            }
+    except urllib.error.HTTPError as e:
+        err_content = e.read().decode("utf-8", errors="ignore")
+        return {
+            "success": False,
+            "status_code": e.code,
+            "error": err_content,
+            "is_quota": (e.code == 429) or ("RESOURCE_EXHAUSTED" in err_content)
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "status_code": 0,
+            "error": str(e),
+            "is_quota": False
+        }
+
+
+def audit_proposal_with_gemini(
+    document_text: str,
+    substantive_text: str = "",
+    title: str = "",
+    connection=None
+) -> Dict[str, Any]:
+    """
+    Menjalankan audit forensik semantik menggunakan Google Gemini API
+    dengan rotasi Round-Robin dan failover otomatis saat kuota habis.
+    """
+    keys = get_available_gemini_keys(connection)
+    if not keys:
+        return {
+            "status": "skipped",
+            "message": "Tidak ada Google API Key aktif di database. Fitur audit semantik dilewati.",
+            "is_available": False
+        }
+
+    # Persiapkan ekstrak teks naskah (maksimal ~25.000 karakter agar hemat token dan cepat)
+    content_sample = substantive_text if (substantive_text and len(substantive_text.strip()) >= 500) else document_text
+    truncated_content = content_sample[:25000]
+
+    system_prompt = f"""Anda adalah Auditor Forensik Integritas Akademik Independen untuk sistem AR Tilik.
+Tugas Anda adalah menganalisis draf karya ilmiah/proposal berikut untuk mendeteksi inkonsistensi logika, 
+kontradiksi metodologi, distorsi sitasi (halusinasi AI), dan memberikan panduan pertanyaan ujian lisan bagi dosen.
+
+Judul Dokumen: {title or 'Karya Ilmiah'}
+
+Potongan Naskah:
+\"\"\"{truncated_content}\"\"\"
+
+Lakukan audit kritis dan kembalikan HANYA format JSON valid dengan struktur persis berikut:
+{{
+    "tingkat_indikasi_ai": "TINGGI" | "SEDANG" | "RENDAH",
+    "alasan_indikasi_ai": "Ringkasan penilaian apakah terdapat perakitan draf/template AI",
+    "inkonsistensi_metodologi_dan_logika": [
+        "Jelaskan kontradiksi jika ada (misal: menyebut regresi tetapi diagram/lampiran menuliskan uji-t, atau variabel di teori berbeda dengan di kuesioner)"
+    ],
+    "integritas_sitasi": [
+        "Jelaskan anomali kutipan jika ada (misal: nama tokoh dijadikan author, tahun referensi janggal, format daftar pustaka berantakan)"
+    ],
+    "pertanyaan_kritis_dosen": [
+        {{
+            "fokus": "Metodologi / Teori / Definisi Operasional / Sitasi",
+            "pertanyaan": "Pertanyaan lisan tajam yang wajib ditanyakan penguji untuk menguji pemahaman mahasiswa",
+            "alasan": "Mengapa pertanyaan ini penting diajukan"
+        }}
+    ]
+}}
+"""
+
+    # Eksekusi dengan Round-Robin & Failover antar API Key
+    last_error = ""
+    for k in keys:
+        key_id = k["id"]
+        key_name = k["key_name"]
+        api_key = k["api_key"]
+        model_name = k.get("model_name") or "gemini-1.5-flash"
+
+        logger.info(f"[GEMINI] Mencoba audit dengan kunci #{key_id} ('{key_name}', model={model_name})...")
+        res = call_gemini_api(api_key, model_name, system_prompt)
+
+        if res.get("success"):
+            # Sukses
+            mark_key_success(key_id, connection)
+            raw_text = res.get("raw_text", "")
+            try:
+                # Bersihkan pembungkus markdown ```json ... ``` bila ada
+                clean_json_str = re.sub(r"^```(?:json)?\s*", "", raw_text.strip(), flags=re.MULTILINE)
+                clean_json_str = re.sub(r"\s*```$", "", clean_json_str.strip(), flags=re.MULTILINE)
+                parsed_audit = json.loads(clean_json_str)
+                return {
+                    "status": "completed",
+                    "is_available": True,
+                    "model_used": model_name,
+                    "key_used": key_name,
+                    "audit": parsed_audit
+                }
+            except Exception as json_err:
+                logger.warning(f"[GEMINI] Gagal mengurai JSON respon dari Gemini: {json_err}. Raw: {raw_text[:200]}")
+                return {
+                    "status": "completed",
+                    "is_available": True,
+                    "model_used": model_name,
+                    "key_used": key_name,
+                    "raw_output": raw_text
+                }
+        else:
+            # Gagal: cek apakah karena kuota / rate limit
+            is_quota = res.get("is_quota", False)
+            err_msg = res.get("error", "Unknown error")
+            last_error = err_msg
+
+            if is_quota:
+                mark_key_rate_limited(key_id, err_msg, cooldown_seconds=60, conn=connection)
+                logger.warning(f"[GEMINI] Kuota kunci '{key_name}' habis (429/ResourceExhausted). Beralih ke kunci berikutnya...")
+            else:
+                logger.warning(f"[GEMINI] Error pada kunci '{key_name}': {err_msg}")
+
+    return {
+        "status": "failed",
+        "is_available": False,
+        "message": f"Seluruh Google API Key dalam pool gagal merespon atau kuota habis: {last_error}"
+    }

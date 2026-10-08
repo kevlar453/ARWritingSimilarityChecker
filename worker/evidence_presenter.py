@@ -125,6 +125,7 @@ def present_hybrid_report(
     jit_harvesting: Optional[Any] = None,
     citation_audit: Optional[Any] = None,
     evasion_detection: Optional[Any] = None,
+    gemini_forensic: Optional[Any] = None,
 ) -> Dict[str, Any]:
     """
     Membangun struktur presentasi bukti terdekomposisi lengkap v1.1.
@@ -229,5 +230,6 @@ def present_hybrid_report(
             "jit_harvesting": jit_harvesting.to_dict() if hasattr(jit_harvesting, "to_dict") else jit_harvesting,
             "citation_audit": citation_audit.to_dict() if hasattr(citation_audit, "to_dict") else citation_audit,
             "evasion_detection": evasion_detection.to_dict() if hasattr(evasion_detection, "to_dict") else evasion_detection,
+            "gemini_forensic": gemini_forensic.to_dict() if hasattr(gemini_forensic, "to_dict") else gemini_forensic,
         }
     }

@@ -324,6 +324,9 @@ class DashboardController extends BaseController
             $evasionDetection = $this->computeFallbackEvasionDetection($submissionText);
         }
 
+        // Resolusi Audit Forensik Cerdas Google Gemini (Semantik & Pertanyaan Ujian Lisan)
+        $geminiForensic = $evidenceData['gemini_forensic'] ?? $evidenceData['v1_1_presentation']['v1_2_evolution']['gemini_forensic'] ?? null;
+
         return view('dashboard/report', [
             'report'              => $report,
             'document'            => $document,
@@ -341,6 +344,7 @@ class DashboardController extends BaseController
             'jitDiscoveredIds'    => $jitDiscoveredIds,
             'citationAudit'       => $citationAudit,
             'evasionDetection'    => $evasionDetection,
+            'geminiForensic'      => $geminiForensic,
             'isOwner'             => $isOwner,
             'isSharedAccess'      => $isSharedToUser,
         ]);

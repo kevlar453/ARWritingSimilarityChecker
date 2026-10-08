@@ -123,6 +123,14 @@ $routes->group('admin', ['filter' => 'admin'], function ($routes) {
     $routes->get('corpus/(:num)', 'Admin\CorpusController::show/$1');
     $routes->delete('corpus/(:num)', 'Admin\CorpusController::delete/$1');
     $routes->post('corpus/(:num)/reindex', 'Admin\CorpusController::reindex/$1');
+
+    // Google AI / Gemini API Keys Management (Protected by AdminFilter)
+    $routes->post('google-keys', 'Admin\GoogleKeyController::create');
+    $routes->post('google-keys/create', 'Admin\GoogleKeyController::create');
+    $routes->post('google-keys/toggle/(:num)', 'Admin\GoogleKeyController::toggle/$1');
+    $routes->delete('google-keys/(:num)', 'Admin\GoogleKeyController::delete/$1');
+    $routes->post('google-keys/delete/(:num)', 'Admin\GoogleKeyController::delete/$1');
+    $routes->post('google-keys/test/(:num)', 'Admin\GoogleKeyController::testConnection/$1');
 });
 
 // Human Review & Evaluation Subsystem (Phase HR-1 Isolated Module - Protected by AdminFilter)

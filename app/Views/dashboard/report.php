@@ -1258,6 +1258,176 @@
         <?php endif; ?>
 
         <!-- ═════════════════════════════════════════════════════════════════════ -->
+        <!-- FITUR 2B: AUDIT FORENSIK CERDAS GOOGLE GEMINI (SEMANTIK & SIDANG LISAN)-->
+        <!-- ═════════════════════════════════════════════════════════════════════ -->
+        <?php if (!empty($geminiForensic) && ($geminiForensic['status'] ?? '') === 'completed'): ?>
+        <?php
+            $gAudit = $geminiForensic['audit'] ?? [];
+            $gAiLevel = strtoupper($gAudit['tingkat_indikasi_ai'] ?? 'RENDAH');
+            $gAiReason = $gAudit['alasan_indikasi_ai'] ?? '';
+            $gContradictions = $gAudit['inkonsistensi_metodologi_dan_logika'] ?? [];
+            $gCitationIssues = $gAudit['integritas_sitasi'] ?? [];
+            $gQuestions = $gAudit['pertanyaan_kritis_dosen'] ?? [];
+            $gModelUsed = $geminiForensic['model_used'] ?? 'gemini-1.5-flash';
+            $gKeyUsed = $geminiForensic['key_used'] ?? 'Google Pool';
+
+            $gLevelBadge = match($gAiLevel) {
+                'TINGGI' => 'bg-rose-50 text-rose-700 border-rose-200',
+                'SEDANG' => 'bg-amber-50 text-amber-700 border-amber-200',
+                default => 'bg-emerald-50 text-emerald-700 border-emerald-200'
+            };
+            $gLevelColor = match($gAiLevel) {
+                'TINGGI' => 'text-rose-600',
+                'SEDANG' => 'text-amber-600',
+                default => 'text-emerald-600'
+            };
+        ?>
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-5">
+            <!-- Header -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-2xl">✨</span>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="font-bold text-base text-slate-900">Audit Forensik Cerdas Google Gemini AI</h3>
+                            <span class="text-[10px] font-bold font-mono-code uppercase px-2 py-0.5 rounded bg-sky-50 text-sky-700 border border-sky-100">Deep Semantic</span>
+                        </div>
+                        <p class="text-xs text-slate-400">Verifikasi konsistensi logika antar-bab, kontradiksi metodologi, integritas sitasi, &amp; panduan pertanyaan ujian lisan sidang skripsi</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 self-start sm:self-auto flex-wrap">
+                    <span class="text-[11px] font-mono-code px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+                        Model: <strong class="text-slate-800"><?= esc($gModelUsed) ?></strong>
+                    </span>
+                    <span class="text-xs font-mono-code font-bold px-3 py-1 rounded-full border shadow-2xs <?= $gLevelBadge ?>">
+                        Indikasi AI: <strong class="<?= $gLevelColor ?>"><?= esc($gAiLevel) ?></strong>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Ringkasan Penilaian Campur Tangan AI -->
+            <?php if (!empty($gAiReason)): ?>
+                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2">
+                    <div class="flex items-center justify-between text-xs font-bold text-slate-700 font-mono-code">
+                        <span class="flex items-center gap-1.5">
+                            <span>🔍</span> PENILAIAN INDIKASI AI &amp; PERAKITAN DRAF:
+                        </span>
+                        <span class="<?= $gLevelColor ?> font-extrabold uppercase">Status <?= esc($gAiLevel) ?></span>
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-700 leading-relaxed italic bg-white p-3 rounded-lg border border-slate-200 shadow-2xs">
+                        "<?= esc($gAiReason) ?>"
+                    </p>
+                </div>
+            <?php endif; ?>
+
+            <!-- Dua Kolom: Inkonsistensi Metodologi & Integritas Sitasi -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Kolom 1: Inkonsistensi Metodologi & Logika Internal -->
+                <div class="p-4 rounded-xl border <?= !empty($gContradictions) ? 'border-amber-200 bg-amber-50/30' : 'border-emerald-200 bg-emerald-50/30' ?> space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h4 class="text-xs font-bold uppercase tracking-wider <?= !empty($gContradictions) ? 'text-amber-900' : 'text-emerald-900' ?> flex items-center gap-1.5">
+                            <span>⚡</span> Inkonsistensi Metodologi &amp; Logika
+                        </h4>
+                        <span class="text-[10px] font-mono-code font-bold px-2 py-0.5 rounded <?= !empty($gContradictions) ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800' ?>">
+                            <?= count($gContradictions) ?> temuan
+                        </span>
+                    </div>
+                    <?php if (empty($gContradictions)): ?>
+                        <p class="text-xs text-emerald-700 leading-relaxed">
+                            Tidak ditemukan kontradiksi logika atau inkonsistensi metodologi antar-bab dalam naskah. Alur penalaran terpadu secara konsisten.
+                        </p>
+                    <?php else: ?>
+                        <ul class="space-y-2 text-xs text-slate-700">
+                            <?php foreach ($gContradictions as $item): ?>
+                                <li class="flex items-start gap-2 bg-white/80 p-2.5 rounded-lg border border-amber-200/60 shadow-2xs">
+                                    <span class="text-amber-600 flex-shrink-0 mt-0.5">⚠️</span>
+                                    <span class="leading-relaxed"><?= esc(is_string($item) ? $item : json_encode($item)) ?></span>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Kolom 2: Integritas Sitasi & Halusinasi AI -->
+                <div class="p-4 rounded-xl border <?= !empty($gCitationIssues) ? 'border-rose-200 bg-rose-50/30' : 'border-emerald-200 bg-emerald-50/30' ?> space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h4 class="text-xs font-bold uppercase tracking-wider <?= !empty($gCitationIssues) ? 'text-rose-900' : 'text-emerald-900' ?> flex items-center gap-1.5">
+                            <span>📚</span> Integritas Sitasi &amp; Anomali Referensi
+                        </h4>
+                        <span class="text-[10px] font-mono-code font-bold px-2 py-0.5 rounded <?= !empty($gCitationIssues) ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800' ?>">
+                            <?= count($gCitationIssues) ?> temuan
+                        </span>
+                    </div>
+                    <?php if (empty($gCitationIssues)): ?>
+                        <p class="text-xs text-emerald-700 leading-relaxed">
+                            Pola sitasi dan rujukan bibliografi bebas dari indikasi halusinasi atau pengutipan sintetik generik AI.
+                        </p>
+                    <?php else: ?>
+                        <ul class="space-y-2 text-xs text-slate-700">
+                            <?php foreach ($gCitationIssues as $cIssue): ?>
+                                <li class="flex items-start gap-2 bg-white/80 p-2.5 rounded-lg border border-rose-200/60 shadow-2xs">
+                                    <span class="text-rose-600 flex-shrink-0 mt-0.5">🚨</span>
+                                    <span class="leading-relaxed"><?= esc(is_string($cIssue) ? $cIssue : json_encode($cIssue)) ?></span>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <!-- Panduan Pertanyaan Kritis Ujian Lisan untuk Dosen / Penguji -->
+            <?php if (!empty($gQuestions)): ?>
+                <div class="border border-indigo-100 bg-indigo-50/30 rounded-xl p-4 sm:p-5 space-y-3.5">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h4 class="text-xs sm:text-sm font-bold text-indigo-950 flex items-center gap-2">
+                                <span>🎯</span> Panduan Pertanyaan Kritis Sidang Ujian Lisan (Untuk Dosen Penguji)
+                            </h4>
+                            <p class="text-[11px] text-slate-500 mt-0.5">Pertanyaan terarah yang dirumuskan oleh AI untuk menguji pemahaman riil mahasiswa terhadap bagian-bagian sensitif naskah</p>
+                        </div>
+                        <span class="text-[10px] font-bold font-mono-code px-2 py-0.5 rounded bg-indigo-100 text-indigo-800 border border-indigo-200">
+                            <?= count($gQuestions) ?> Pertanyaan
+                        </span>
+                    </div>
+
+                    <div class="space-y-3">
+                        <?php foreach ($gQuestions as $qIdx => $q): ?>
+                            <?php 
+                                $qFokus = is_array($q) ? ($q['fokus'] ?? 'Umum') : 'Umum';
+                                $qText = is_array($q) ? ($q['pertanyaan'] ?? '') : (string)$q;
+                                $qAlasan = is_array($q) ? ($q['alasan'] ?? '') : '';
+                            ?>
+                            <div class="bg-white p-3.5 rounded-xl border border-indigo-100 shadow-2xs space-y-2">
+                                <div class="flex items-center justify-between text-[11px]">
+                                    <span class="font-bold text-indigo-700 font-mono-code flex items-center gap-1.5">
+                                        <span class="w-5 h-5 rounded-full bg-indigo-100 text-indigo-800 flex items-center justify-center text-[10px] font-black"><?= $qIdx + 1 ?></span>
+                                        <span>Fokus: <?= esc($qFokus) ?></span>
+                                    </span>
+                                </div>
+                                <div class="text-xs sm:text-sm font-semibold text-slate-800 leading-relaxed pl-6">
+                                    "<?= esc($qText) ?>"
+                                </div>
+                                <?php if (!empty($qAlasan)): ?>
+                                    <div class="text-[11px] text-slate-500 pl-6 flex items-start gap-1.5 italic">
+                                        <span class="text-indigo-400 not-italic">💡</span>
+                                        <span><strong>Tujuan Pengujian:</strong> <?= esc($qAlasan) ?></span>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            <?php endif; ?>
+
+            <!-- Prinsip Etika & Keberlanjutan -->
+            <div class="flex items-start gap-2 pt-1 text-[11px] text-slate-500">
+                <span class="text-sm">⚖️</span>
+                <span><strong>Integritas Dialogis:</strong> Audit semantik Google Gemini dirancang untuk melengkapi penilaian manusia, bukan menggantikannya. Pertanyaan ujian di atas bertujuan memfasilitasi klarifikasi langsung antara dosen penguji dan mahasiswa demi menjaga martabat kejujuran akademik.</span>
+            </div>
+        </div>
+        <?php endif; ?>
+
+        <!-- ═════════════════════════════════════════════════════════════════════ -->
         <!-- FITUR 5: KEMIRIPAN LINTAS BAHASA (CROSS-LINGUAL SIMILARITY ID <-> EN) -->
         <!-- ═════════════════════════════════════════════════════════════════════ -->
         <!-- ═════════════════════════════════════════════════════════════════════ -->

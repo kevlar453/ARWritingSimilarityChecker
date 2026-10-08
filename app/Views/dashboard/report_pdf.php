@@ -623,6 +623,26 @@ if ($dec === 'match') {
                     <div style="font-size: 7.5pt; color: #475569;">Konsep terpadan: <?= (int)($clAudit['shared_concept_count'] ?? 0) ?> istilah, Pasase: <?= count($clAudit['aligned_passages'] ?? []) ?></div>
                 </td>
             </tr>
+            <?php
+                $geminiAuditPdf = $evidenceData['gemini_forensic'] ?? $evidenceData['v1_1_presentation']['v1_2_evolution']['gemini_forensic'] ?? [];
+                $geminiCompleted = !empty($geminiAuditPdf) && ($geminiAuditPdf['status'] ?? '') === 'completed';
+                $gAuditData = $geminiAuditPdf['audit'] ?? [];
+                $gLevelPdf = strtoupper($gAuditData['tingkat_indikasi_ai'] ?? 'RENDAH');
+            ?>
+            <?php if ($geminiCompleted): ?>
+            <tr>
+                <td><strong>Audit Forensik Cerdas Google Gemini</strong><br><span style="font-size: 7.5pt; color: #64748b;">Konsistensi Semantik Antar-Bab &amp; Integritas Logika</span></td>
+                <td style="text-align: center; font-weight: bold; color: <?= $gLevelPdf === 'TINGGI' ? '#b91c1c' : ($gLevelPdf === 'SEDANG' ? '#b45309' : '#047857') ?>; font-size: 10pt;">
+                    Indikasi AI: <?= esc($gLevelPdf) ?>
+                </td>
+                <td>
+                    <strong>Model: <?= esc($geminiAuditPdf['model_used'] ?? 'gemini-1.5-flash') ?></strong>
+                    <div style="font-size: 7.5pt; color: #475569;">
+                        <?= count($gAuditData['inkonsistensi_metodologi_dan_logika'] ?? []) ?> inkonsistensi metodologi, <?= count($gAuditData['pertanyaan_kritis_dosen'] ?? []) ?> panduan pertanyaan sidang dosen
+                    </div>
+                </td>
+            </tr>
+            <?php endif; ?>
         </tbody>
     </table>
 
