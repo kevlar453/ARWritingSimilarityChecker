@@ -106,7 +106,7 @@
               "name": "Apa perbedaan mendasar antara AR Tilik dan aplikasi pemeriksa plagiarisme lainnya?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "AR Tilik berfokus pada Keadilan Bukti (Evidence-Based Fairness) menggunakan arsitektur Dual-Lens (5-Gram Sintaktis & TF-IDF Semantik) serta kesadaran konteks sitasi. Berbeda dengan matcher konvensional yang kerap menandai kutipan resmi, rumus, dan frasa umum sebagai plagiarisme, AR Tilik mengisolasi daftar pustaka, mengenali blok kutipan bertanda, dan menyediakan sintesis risiko terkalibrasi melalui XGBoost Synthesizer serta penampil perbandingan berdampingan (Dual-Reader)."
+                "text": "AR Tilik berfokus pada Keadilan Bukti (Evidence-Based Fairness) menggunakan arsitektur Dual-Lens (5-Gram Sintaktis & TF-IDF Semantik) serta kesadaran konteks sitasi. Berbeda dengan matcher konvensional yang kerap menandai kutipan resmi, rumus, dan frasa umum sebagai plagiarisme, AR Tilik mengisolasi daftar pustaka, mengenali blok kutipan bertanda, dan menyediakan sintesis risiko terkalibrasi melalui Sintesis Risiko Akademik Berbobot serta penampil perbandingan berdampingan (Dual-Reader)."
               }
             },
             {
@@ -2596,10 +2596,10 @@
                 </div>
 
                 <div class="theory-card" data-aos="fade-up" data-aos-delay="300" data-aos-duration="700">
-                    <div class="card-icon-badge badge-amber">🤖</div>
-                    <h3 class="theory-title">XGBoost Risk Synthesizer</h3>
+                    <div class="card-icon-badge badge-amber">⚖️</div>
+                    <h3 class="theory-title">Sintesis Risiko Akademik Berbobot</h3>
                     <p class="theory-desc">
-                        Model Machine Learning Gradient Boosted yang dilatih dengan data telaah dewan etik institusi untuk mensintesis 11 dimensi bukti—termasuk estilometri panjang kalimat (burstiness) dan frasa baku metodologi.
+                        Model komputasi probabilistik terkalibrasi yang mensintesis 11 dimensi bukti keabsahan—termasuk estilometri panjang kalimat (burstiness), frasa baku metodologi, dan konsistensi naskah secara non-linear tanpa vonis kaku.
                     </p>
                 </div>
             </div>
@@ -2692,13 +2692,33 @@
                 <div class="section-tag">Integritas Ilmiah Mutakhir</div>
                 <h2 class="section-title">Lebih Cerdas dari Matcher Teks Biasa</h2>
                 <p class="section-desc">
-                    Plagiarisme modern telah berevolusi melampaui salin-tempel langsung. AR Tilik dipersenjatai 4 pilar komputasi cerdas untuk membongkar alih-bahasa tersembunyi, manipulasi font, sitasi fiktif, dan terhubung ke pangkalan data riset nasional:
+                    Pelanggaran etika akademik modern telah berevolusi melampaui salin-tempel biasa. AR Tilik dipersenjatai 6 pilar komputasi cerdas untuk membongkar perakitan draf otomatis, inkonsistensi metodologi, alih-bahasa tersembunyi, manipulasi tipografi, sitasi fiktif, serta terhubung langsung ke pangkalan data riset nasional:
                 </p>
             </div>
 
-            <div class="grid-4">
-                <!-- Fitur 1: Cross-Lingual -->
+            <div class="grid-3">
+                <!-- Fitur 1: Audit Forensik Cerdas -->
                 <div class="theory-card" data-aos="fade-up" data-aos-delay="100" data-aos-duration="700">
+                    <div class="card-icon-badge badge-indigo">✨</div>
+                    <div style="font-size: 11px; font-weight: 800; color: #4f46e5; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Forensik Semantik</div>
+                    <h3 class="theory-title">Audit Forensik Cerdas &amp; Panduan Ujian Lisan</h3>
+                    <p class="theory-desc">
+                        Membongkar perakitan draf sintetis otomatis (<em>AI-stitching</em>), kontradiksi logika metodologi antar-bab, dan sitasi halusinasi masa depan. Menghasilkan panduan pertanyaan kritis lisan bagi dosen penguji untuk memverifikasi orisinalitas pemahaman mahasiswa dalam sidang.
+                    </p>
+                </div>
+
+                <!-- Fitur 2: Sintesis Risiko Akademik Berbobot -->
+                <div class="theory-card" data-aos="fade-up" data-aos-delay="150" data-aos-duration="700">
+                    <div class="card-icon-badge badge-amber">⚖️</div>
+                    <div style="font-size: 11px; font-weight: 800; color: #d97706; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Sintesis Probabilistik</div>
+                    <h3 class="theory-title">Sintesis Risiko Akademik Berbobot</h3>
+                    <p class="theory-desc">
+                        Penyintesis probabilistik terkalibrasi yang memadukan residu leksikal, estilometri variasi kalimat, dan konsistensi naskah secara non-linear. Membantu dosen membedakan formulasi baku ilmiah dari indikasi penjiplakan substantif tanpa vonis kaku.
+                    </p>
+                </div>
+
+                <!-- Fitur 3: Cross-Lingual -->
+                <div class="theory-card" data-aos="fade-up" data-aos-delay="200" data-aos-duration="700">
                     <div class="card-icon-badge badge-rose">🌐</div>
                     <div style="font-size: 11px; font-weight: 800; color: #e11d48; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Penyelarasan Bilingual</div>
                     <h3 class="theory-title">Deteksi Plagiarisme Lintas Bahasa (EN ⇄ ID)</h3>
@@ -2707,31 +2727,31 @@
                     </p>
                 </div>
 
-                <!-- Fitur 2: Anti-Cheat Evasion -->
-                <div class="theory-card" data-aos="fade-up" data-aos-delay="200" data-aos-duration="700">
+                <!-- Fitur 4: Anti-Cheat Evasion -->
+                <div class="theory-card" data-aos="fade-up" data-aos-delay="250" data-aos-duration="700">
                     <div class="card-icon-badge badge-amber">🛡️</div>
                     <div style="font-size: 11px; font-weight: 800; color: #d97706; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Perisai Manipulasi</div>
-                    <h3 class="theory-title">Perisai Anti-Kecurangan Karakter & Font</h3>
+                    <h3 class="theory-title">Perisai Anti-Kecurangan Karakter &amp; Font</h3>
                     <p class="theory-desc">
                         Melacak trik manipulasi naskah yang kerap lolos dari sistem komersial: alfabet Cyrillic/Greek homoglyph yang menyerupai Latin, spasi nol-lebar (<em>zero-width space</em>), pemenggalan kata mikro, dan teks putih transparan yang sengaja disisipkan untuk mengecoh persentase mesin.
                     </p>
                 </div>
 
-                <!-- Fitur 3: Citation Auditor -->
+                <!-- Fitur 5: Citation Auditor -->
                 <div class="theory-card" data-aos="fade-up" data-aos-delay="300" data-aos-duration="700">
                     <div class="card-icon-badge badge-emerald">📑</div>
                     <div style="font-size: 11px; font-weight: 800; color: #059669; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Audit Referensi</div>
-                    <h3 class="theory-title">Auditor Konsistensi Sitasi & Daftar Pustaka</h3>
+                    <h3 class="theory-title">Auditor Konsistensi Sitasi &amp; Daftar Pustaka</h3>
                     <p class="theory-desc">
                         Menganalisis koherensi sitasi (APA/IEEE/Harvard) secara otomatis. Mendeteksi <strong>Ghost Citations</strong> (nama penulis dikutip di badan teks tapi raib dari referensi) dan <strong>Orphan References</strong> (tercantum di bibliografi namun tidak pernah dirujuk dalam tubuh artikel).
                     </p>
                 </div>
 
-                <!-- Fitur 4: National Harvester -->
-                <div class="theory-card" data-aos="fade-up" data-aos-delay="400" data-aos-duration="700">
+                <!-- Fitur 6: National Harvester -->
+                <div class="theory-card" data-aos="fade-up" data-aos-delay="350" data-aos-duration="700">
                     <div class="card-icon-badge badge-cyan">🦅</div>
                     <div style="font-size: 11px; font-weight: 800; color: #0284c7; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Korpus Nasional</div>
-                    <h3 class="theory-title">Pemanenan Neliti & GARUDA Dikti (OAI-PMH)</h3>
+                    <h3 class="theory-title">Pemanenan Neliti &amp; GARUDA Dikti (OAI-PMH)</h3>
                     <p class="theory-desc">
                         Terhubung ke protokol OAI-PMH 2.0 untuk pemanenan berkala artikel jurnal nasional terakreditasi SINTA 1–6 dari pangkalan data GARUDA Kemdiktisaintek dan portal riset Neliti. Memastikan basis data pembanding terus bertumbuh tanpa bergantung pada unggahan manual.
                     </p>
@@ -3284,7 +3304,7 @@
                     </button>
                     <div class="faq-content">
                         <p>
-                            AR Tilik berfokus pada <strong>Keadilan Bukti (Evidence-Based Fairness)</strong> menggunakan arsitektur <em>Dual-Lens</em> (5-Gram Sintaktis &amp; TF-IDF Semantik) serta kesadaran konteks sitasi. Berbeda dengan matcher konvensional yang kerap menandai kutipan resmi, rumus, dan frasa umum sebagai plagiarisme, AR Tilik mengisolasi daftar pustaka, mengenali blok kutipan bertanda, dan menyediakan sintesis risiko terkalibrasi melalui XGBoost Synthesizer serta penampil perbandingan berdampingan (Dual-Reader).
+                            AR Tilik berfokus pada <strong>Keadilan Bukti (Evidence-Based Fairness)</strong> menggunakan arsitektur <em>Dual-Lens</em> (5-Gram Sintaktis &amp; TF-IDF Semantik) serta kesadaran konteks sitasi. Berbeda dengan matcher konvensional yang kerap menandai kutipan resmi, rumus, dan frasa umum sebagai plagiarisme, AR Tilik mengisolasi daftar pustaka, mengenali blok kutipan bertanda, dan menyediakan sintesis risiko terkalibrasi melalui Sintesis Risiko Akademik Berbobot serta penampil perbandingan berdampingan (Dual-Reader).
                         </p>
                     </div>
                 </div>

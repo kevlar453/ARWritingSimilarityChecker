@@ -931,7 +931,7 @@
                         <span>ℹ️</span> <span>Catatan Metodologi &amp; Integritas Ilmiah</span>
                     </div>
                     <p class="text-slate-500 leading-relaxed text-[11px] sm:text-xs">
-                        Skor F1 100% pada tabel di bawah ini merefleksikan hasil pengujian internal pada 50 kasus uji regresi sintetis terkontrol. Pada skripsi dan artikel ilmiah dunia nyata, AR Tilik menyajikan dekomposisi bukti multi-dimensi (kesamaan sekuensial verbatim, leksikal TF-IDF, analisis alih bahasa, serta klasifikasi risiko XGBoost) agar dosen dan komite akademik dapat menelaah konteks orisinalitas secara berkeadilan.
+                        Skor F1 100% pada tabel di bawah ini merefleksikan hasil pengujian internal pada 50 kasus uji regresi sintetis terkontrol. Pada skripsi dan artikel ilmiah dunia nyata, AR Tilik menyajikan dekomposisi bukti multi-dimensi (kesamaan sekuensial verbatim, leksikal TF-IDF, analisis alih bahasa, serta sintesis risiko akademik berbobot) agar dosen dan komite akademik dapat menelaah konteks orisinalitas secara berkeadilan.
                     </p>
                 </div>
 

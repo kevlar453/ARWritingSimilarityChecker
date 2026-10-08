@@ -40,7 +40,19 @@
     </section>
 
     <section class="legal-section">
-        <h2>3. Penggunaan REST API Publik &amp; Integrasi OJS 3.x</h2>
+        <h2>3. Pemanfaatan Teknologi Kecerdasan Buatan (AI) &amp; Audit Forensik Semantik</h2>
+        <p>
+            Dalam rangka menjaga keaslian dan kemurnian nalar ilmiah, AR Tilik menerapkan pemrosesan komputasi cerdas (termasuk <em>Audit Forensik Cerdas</em> dan <em>Sintesis Risiko Akademik Berbobot</em>):
+        </p>
+        <ul>
+            <li><strong>Persetujuan Evaluasi Semantik:</strong> Pengguna memahami dan menyetujui bahwa naskah yang diajukan akan dianalisis secara semantik untuk menguji konsistensi metodologis, keselarasan logika antar-bab, dan integritas sitasi (mendeteksi rujukan fiktif atau sitasi hasil halusinasi otomatis).</li>
+            <li><strong>Tanggung Jawab Penulis atas Naskah:</strong> Pengguna (mahasiswa atau penulis) bertanggung jawab penuh terhadap setiap klaim, teori, data, dan referensi yang dicantumkan dalam karyanya. Dalih ketidaktahuan atas kutipan fiktif atau inkonsistensi yang dihasilkan oleh bantuan generator teks otomatis tidak membebaskan penulis dari kewajiban etik akademik.</li>
+            <li><strong>Sifat Indikator &amp; Ujian Lisan:</strong> Hasil Audit Forensik Cerdas bukan merupakan vonis hukum mutlak, melainkan instrumen pembuktian ilmiah objektif yang menyajikan panduan pertanyaan ujian lisan (*oral examination guidance*). Penulis wajib mampu membuktikan pemahaman orisinal atas isi naskahnya di hadapan dosen pembimbing atau dewan penguji sidang.</li>
+        </ul>
+    </section>
+
+    <section class="legal-section">
+        <h2>4. Penggunaan REST API Publik &amp; Integrasi OJS 3.x</h2>
         <p>
             Bagi pengelola jurnal ilmiah atau institusi yang memanfaatkan layanan API publik v1 dan konektor PHP OJS 3.x (`ARTilikOJSConnector`):
         </p>
@@ -52,7 +64,7 @@
     </section>
 
     <section class="legal-section">
-        <h2>4. Sertifikat Digital Keabsahan &amp; Verifikasi Publik</h2>
+        <h2>5. Sertifikat Digital Keabsahan &amp; Verifikasi Publik</h2>
         <p>
             Setiap dokumen yang selesai dianalisis berhak memperoleh Sertifikat Digital ber-QR Code kriptografis (SHA-256):
         </p>
@@ -64,7 +76,7 @@
     </section>
 
     <section class="legal-section">
-        <h2>5. Batasan Tanggung Jawab (Limitation of Liability)</h2>
+        <h2>6. Batasan Tanggung Jawab (Limitation of Liability)</h2>
         <p>
             AR Tilik berupaya secara maksimal menghadirkan algoritma presisi tinggi, pustaka berdaya komputasi modern, dan ketersediaan peladen yang stabil. Namun demikian:
         </p>
@@ -75,14 +87,14 @@
     </section>
 
     <section class="legal-section">
-        <h2>6. Hukum yang Berlaku &amp; Asas Integritas Nasional</h2>
+        <h2>7. Hukum yang Berlaku &amp; Asas Integritas Nasional</h2>
         <p>
             Ketentuan Layanan ini tunduk dan ditafsirkan berdasarkan hukum Negara Kesatuan Republik Indonesia, standar etika publikasi ilmiah nasional (ARJUNA / Kemdiktisaintek), serta prinsip kebebasan mimbar akademik.
         </p>
     </section>
 
     <section class="legal-section">
-        <h2>7. Kontak Dukungan &amp; Layanan Bantuan</h2>
+        <h2>8. Kontak Dukungan &amp; Layanan Bantuan</h2>
         <p>
             Untuk pertanyaan terkait implementasi Ketentuan Layanan, kemitraan lisensi kampus, atau aduan etika akademik:
         </p>

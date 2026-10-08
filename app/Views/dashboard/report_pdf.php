@@ -649,12 +649,12 @@ if ($dec === 'match') {
                 $pdfModelDisplay = $pdfModelLabels[$pdfModelName] ?? $pdfModelName;
             ?>
             <tr>
-                <td><strong>Audit Forensik Cerdas Google Gemini</strong><br><span style="font-size: 7.5pt; color: #64748b;">Konsistensi Semantik Antar-Bab &amp; Integritas Logika</span></td>
+                <td><strong>Audit Forensik Cerdas</strong><br><span style="font-size: 7.5pt; color: #64748b;">Konsistensi Semantik Antar-Bab &amp; Integritas Logika</span></td>
                 <td style="text-align: center; font-weight: bold; color: <?= $gLevelPdf === 'TINGGI' ? '#b91c1c' : ($gLevelPdf === 'SEDANG' ? '#b45309' : '#047857') ?>; font-size: 10pt;">
                     Indikasi AI: <?= esc($gLevelPdf) ?>
                 </td>
                 <td>
-                    <strong>Model: <?= esc($pdfModelDisplay) ?></strong>
+                    <strong>Verifikasi Semantik Otomatis</strong>
                     <div style="font-size: 7.5pt; color: #475569;">
                         <?= count($gAuditData['inkonsistensi_metodologi_dan_logika'] ?? []) ?> inkonsistensi metodologi, <?= count($gAuditData['pertanyaan_kritis_dosen'] ?? []) ?> panduan pertanyaan sidang dosen
                     </div>

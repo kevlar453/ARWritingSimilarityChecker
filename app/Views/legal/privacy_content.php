@@ -51,7 +51,19 @@
     </section>
 
     <section class="legal-section">
-        <h2>4. Partisipasi Korpus Gotong Royong (Crowdsourcing)</h2>
+        <h2>4. Pemrosesan Kecerdasan Buatan (AI) &amp; Audit Forensik Semantik yang Bertanggung Jawab</h2>
+        <p>
+            Untuk memberikan perlindungan mutu ilmiah terhadap manipulasi teks canggih, perakitan draf sintetis (*AI-stitching*), dan sitasi halusinasi, AR Tilik mengintegrasikan modul <em>Audit Forensik Cerdas</em> dan <em>Sintesis Risiko Akademik Berbobot</em>:
+        </p>
+        <ul>
+            <li><strong>Inferensi Nir-Penyimpanan (Stateless Inference):</strong> Seluruh pemrosesan teks oleh modul komputasi cerdas bersifat sementara (*transient / stateless*). Teks naskah yang dikirim untuk evaluasi semantik dan validasi sitasi diproses secara terisolasi dan <strong>TIDAK PERNAH disimpan permanen, tidak diindeks ke pangkalan data umum, dan tidak digunakan untuk melatih (*training/fine-tuning*) model kecerdasan buatan komersial pihak ketiga mana pun</strong>.</li>
+            <li><strong>Kerahasiaan &amp; Enkripsi Tingkat Lanjut:</strong> Transmisi data ke simpul inferensi diamankan dengan protokol enkripsi modern (TLS v1.3) berstandar industri, menjamin kerahasiaan naskah penelitian pra-publikasi.</li>
+            <li><strong>Kedaulatan Keputusan Akademik:</strong> Sistem kecerdasan cerdas dalam AR Tilik tidak memvonis integritas moral seseorang. Penilaian yang dihasilkan berfungsi sebagai instrumen forensik objektif, pemetaan inkonsistensi metodologi, dan panduan dialog kritis bagi dosen pembimbing dan dewan penguji sidang.</li>
+        </ul>
+    </section>
+
+    <section class="legal-section">
+        <h2>5. Partisipasi Korpus Gotong Royong (Crowdsourcing)</h2>
         <p>
             Pengguna yang memanfaatkan program insentif gotong royong korpus (menyumbangkan 3 karya ilmiah valid untuk memperoleh kuota submisi tambahan) tunduk pada ketentuan:
         </p>
@@ -62,7 +74,7 @@
     </section>
 
     <section class="legal-section">
-        <h2>5. Perlindungan Data Akun Pribadi (UU PDP No. 27 Tahun 2022)</h2>
+        <h2>6. Perlindungan Data Akun Pribadi (UU PDP No. 27 Tahun 2022)</h2>
         <p>
             Kami mengumpulkan dan mengelola data pribadi pengguna (nama lengkap, alamat email institusi, nama perguruan tinggi, serta log aktivitas) sesuai dengan amanat <strong>Undang-Undang Perlindungan Data Pribadi (UU No. 27/2022)</strong>:
         </p>
@@ -74,7 +86,7 @@
     </section>
 
     <section class="legal-section">
-        <h2>6. Hak Pengguna &amp; Penghapusan Data (Right to Erasure)</h2>
+        <h2>7. Hak Pengguna &amp; Penghapusan Data (Right to Erasure)</h2>
         <p>
             Sebagai sivitas akademika, Anda memiliki kendali penuh atas data Anda:
         </p>
@@ -85,7 +97,7 @@
     </section>
 
     <section class="legal-section">
-        <h2>7. Kontak Pengembang &amp; Tim Kepatuhan Privasi</h2>
+        <h2>8. Kontak Pengembang &amp; Tim Kepatuhan Privasi</h2>
         <p>
             Jika Anda, dewan penjaminan mutu kampus, atau pengelola jurnal memiliki pertanyaan, permintaan khusus terkait kedaulatan data, atau permohonan audit perjanjian kerahasiaan data institusi, silakan hubungi tim kami:
         </p>

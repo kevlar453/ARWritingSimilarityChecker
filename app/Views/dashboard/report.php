@@ -1305,16 +1305,13 @@
                     <span class="text-2xl">✨</span>
                     <div>
                         <div class="flex items-center gap-2">
-                            <h3 class="font-bold text-base text-slate-900">Audit Forensik Cerdas Google Gemini AI</h3>
+                            <h3 class="font-bold text-base text-slate-900">Audit Forensik Cerdas</h3>
                             <span class="text-[10px] font-bold font-mono-code uppercase px-2 py-0.5 rounded bg-sky-50 text-sky-700 border border-sky-100">Deep Semantic</span>
                         </div>
                         <p class="text-xs text-slate-400">Verifikasi konsistensi logika antar-bab, kontradiksi metodologi, integritas sitasi, &amp; panduan pertanyaan ujian lisan sidang skripsi</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-2 self-start sm:self-auto flex-wrap">
-                    <span class="text-[11px] font-mono-code px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
-                        Model: <strong class="text-slate-800"><?= esc($gModelDisplay) ?></strong>
-                    </span>
                     <span class="text-xs font-mono-code font-bold px-3 py-1 rounded-full border shadow-2xs <?= $gLevelBadge ?>">
                         Indikasi AI: <strong class="<?= $gLevelColor ?>"><?= esc($gAiLevel) ?></strong>
                     </span>
@@ -1438,7 +1435,7 @@
             <!-- Prinsip Etika & Keberlanjutan -->
             <div class="flex items-start gap-2 pt-1 text-[11px] text-slate-500">
                 <span class="text-sm">⚖️</span>
-                <span><strong>Integritas Dialogis:</strong> Audit semantik Google Gemini dirancang untuk melengkapi penilaian manusia, bukan menggantikannya. Pertanyaan ujian di atas bertujuan memfasilitasi klarifikasi langsung antara dosen penguji dan mahasiswa demi menjaga martabat kejujuran akademik.</span>
+                <span><strong>Integritas Dialogis:</strong> Audit forensik cerdas dirancang untuk melengkapi penilaian manusia, bukan menggantikannya. Pertanyaan ujian di atas bertujuan memfasilitasi klarifikasi langsung antara dosen penguji dan mahasiswa demi menjaga martabat kejujuran akademik.</span>
             </div>
         </div>
         <?php endif; ?>
@@ -1711,10 +1708,7 @@
                     <span class="text-2xl">🤖</span>
                     <div>
                         <div class="flex items-center gap-2">
-                            <h3 class="font-bold text-base text-slate-900">Sintesis Risiko Akademik Berbobot XGBoost</h3>
-                            <span class="text-[10px] font-bold font-mono-code uppercase px-2 py-0.5 rounded bg-purple-50 text-purple-700 border border-purple-200">
-                                XGBoost v3.4 • 11 Dimensi Tabular
-                            </span>
+                            <h3 class="font-bold text-base text-slate-900">Sintesis Risiko Akademik Berbobot</h3>
                         </div>
                         <p class="text-xs text-slate-400">Penyintesis probabilistik terkalibrasi yang memadukan bukti sekuensial, leksikal, stylometri, dan alih bahasa secara non-linear</p>
                     </div>
@@ -1787,14 +1781,14 @@
             <!-- Summary & Academic Fairness Notice -->
             <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-700 leading-relaxed space-y-2">
                 <div class="font-bold text-slate-900 flex items-center gap-1.5 text-xs uppercase tracking-wider font-mono-code">
-                    <span>💡</span> Rekomendasi Sintesis XGBoost:
+                    <span>💡</span> Rekomendasi Sintesis Risiko Berbobot:
                 </div>
                 <p class="text-slate-800 leading-relaxed italic bg-white p-3 rounded-lg border border-slate-200 shadow-2xs">
                     "<?= esc($xgbRationale) ?>"
                 </p>
                 <div class="flex items-start gap-2 pt-1 text-[11px] text-slate-500">
                     <span class="text-sm">⚖️</span>
-                    <span><strong>Prinsip Keadilan Akademik:</strong> Integrasi XGBoost berfungsi sebagai penimbang bukti probabilistik untuk membantu pembimbing dan penguji memilah formulasi baku atau kutipan sah dari penyalinan substantif, tanpa vonis otomatis yang merugikan integritas mahasiswa.</span>
+                    <span><strong>Prinsip Keadilan Akademik:</strong> Sintesis risiko berbobot berfungsi sebagai penimbang bukti probabilistik untuk membantu pembimbing dan penguji memilah formulasi baku atau kutipan sah dari penyalinan substantif, tanpa vonis otomatis yang merugikan integritas mahasiswa.</span>
                 </div>
             </div>
         </div>
