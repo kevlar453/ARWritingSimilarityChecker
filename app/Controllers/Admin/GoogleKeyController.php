@@ -227,22 +227,41 @@ class GoogleKeyController extends BaseController
             }
         }
 
-        // Tangani Error Quota / Invalid Key
+        // Tangani Error Quota / Invalid Key / Denied Access
         $errorMsg = $resJson['error']['message'] ?? ('HTTP ' . $httpCode);
         $isQuota = ($httpCode === 429) || stripos($errorMsg, 'RESOURCE_EXHAUSTED') !== false;
+        $isDenied = ($httpCode === 403) || stripos($errorMsg, 'denied access') !== false || stripos($errorMsg, 'PERMISSION_DENIED') !== false;
+        $isInvalidKey = ($httpCode === 400) || stripos($errorMsg, 'API_KEY_INVALID') !== false || stripos($errorMsg, 'API key not valid') !== false;
+
+        $newStatus = $key['status'];
+        if ($isQuota) {
+            $newStatus = 'rate_limited';
+        } elseif ($isDenied || $isInvalidKey) {
+            $newStatus = 'inactive';
+        }
 
         $keyModel->update($id, [
             'error_count'        => (int) $key['error_count'] + 1,
             'last_error_message' => $errorMsg,
-            'status'             => $isQuota ? 'rate_limited' : $key['status'],
+            'status'             => $newStatus,
             'rate_limited_until' => $isQuota ? date('Y-m-d H:i:s', time() + 120) : null,
         ]);
+
+        $friendlyMsg = 'Error Google API: ' . $errorMsg;
+        if ($isQuota) {
+            $friendlyMsg = 'Kuota / Rate-limit terlampaui (' . $errorMsg . '). Sistem mengaktifkan cooldown otomatis 2 menit.';
+        } elseif ($isDenied) {
+            $friendlyMsg = "Akses Proyek Ditolak oleh Google:\n\"" . $errorMsg . "\"\n\n👉 Penyebab: Google Cloud Project ini diblokir/dibatasi oleh Google AI Studio.\n\n💡 Solusi Cepat:\n1. Buka https://aistudio.google.com/app/apikey\n2. Klik 'Create API key' dan pilih 'Create API key in NEW project' (jangan pakai project yang lama), atau gunakan akun Google lain.\n3. Salin API Key baru tersebut ke AR Tilik.";
+        } elseif ($isInvalidKey) {
+            $friendlyMsg = "Google API Key tidak valid:\n\"" . $errorMsg . "\"\n\nPeriksa kembali apakah kunci AIzaSy... tersalin secara lengkap tanpa spasi tambahan.";
+        }
 
         return $this->response->setStatusCode($httpCode >= 400 && $httpCode < 600 ? $httpCode : 500)->setJSON([
             'status'    => 'error',
             'http_code' => $httpCode,
             'is_quota'  => $isQuota,
-            'message'   => $isQuota ? 'Kuota / Rate-limit terlampaui (' . $errorMsg . ')' : ('Error Google API: ' . $errorMsg),
+            'is_denied' => $isDenied,
+            'message'   => $friendlyMsg,
         ]);
     }
 }

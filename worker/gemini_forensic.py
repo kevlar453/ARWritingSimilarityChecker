@@ -276,6 +276,21 @@ Lakukan audit kritis dan kembalikan HANYA format JSON valid dengan struktur pers
             if is_quota:
                 mark_key_rate_limited(key_id, err_msg, cooldown_seconds=60, conn=connection)
                 logger.warning(f"[GEMINI] Kuota kunci '{key_name}' habis (429/ResourceExhausted). Beralih ke kunci berikutnya...")
+            elif res.get("status_code") in (400, 403) or "denied access" in err_msg.lower():
+                try:
+                    cursor = connection.cursor() if connection else get_connection().cursor()
+                    cursor.execute("""
+                        UPDATE google_api_keys 
+                        SET status = 'inactive', 
+                            error_count = error_count + 1,
+                            last_error_message = %s 
+                        WHERE id = %s
+                    """, (err_msg[:450], key_id))
+                    if connection:
+                        connection.commit()
+                except Exception as de_err:
+                    logger.error(f"[GEMINI] Gagal menonaktifkan kunci #{key_id}: {de_err}")
+                logger.warning(f"[GEMINI] Kunci '{key_name}' ditolak/tidak valid ({res.get('status_code')}). Dinonaktifkan otomatis: {err_msg}")
             else:
                 logger.warning(f"[GEMINI] Error pada kunci '{key_name}': {err_msg}")
 
