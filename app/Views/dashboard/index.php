@@ -636,13 +636,33 @@
             </div>
 
             <!-- Corpus Table Card -->
-            <div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+            <div id="corpusTableContainer" class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
                 <div class="p-4 sm:p-5 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4">
                     <div>
                         <h2 class="text-base sm:text-lg font-bold text-slate-800">Daftar Dokumen Korpus Terdaftar</h2>
-                        <p class="text-xs text-slate-500">Total: <?= count($corpusDocs) ?> dokumen rujukan aktif.</p>
+                        <p class="text-xs text-slate-500">
+                            Total: <strong class="text-slate-800 font-semibold"><?= number_format($totalCorpus) ?></strong> dokumen rujukan aktif.
+                            <?php if (!empty($corpusSearch)): ?>
+                                <span class="text-indigo-600 font-medium">(Ditemukan <?= number_format($filteredCorpusTotal) ?> untuk kata kunci "<?= esc($corpusSearch) ?>")</span>
+                            <?php else: ?>
+                                <span class="text-slate-400">(Menampilkan <?= count($corpusDocs) ?> dari <?= number_format($totalCorpus) ?> dokumen)</span>
+                            <?php endif; ?>
+                        </p>
                     </div>
-                    <span class="text-[11px] text-slate-400 hidden sm:inline">Geser tabel jika terpotong →</span>
+                    <div class="flex items-center gap-2 w-full sm:w-auto">
+                        <div class="relative flex-1 sm:w-64">
+                            <input type="text" id="corpusSearchInput" value="<?= esc($corpusSearch ?? '') ?>" placeholder="Cari korpus (judul, fakultas, file)..." class="w-full text-xs pl-8 pr-3 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white" onkeydown="if(event.key === 'Enter'){ event.preventDefault(); handleCorpusSearch(); }">
+                            <span class="absolute left-2.5 top-1.5 text-slate-400 text-xs">🔍</span>
+                        </div>
+                        <button type="button" onclick="handleCorpusSearch()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white rounded-lg text-xs font-semibold transition cursor-pointer">
+                            Cari
+                        </button>
+                        <?php if (!empty($corpusSearch)): ?>
+                            <button type="button" onclick="clearCorpusSearch()" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-xs font-semibold transition cursor-pointer" title="Reset pencarian">
+                                Reset
+                            </button>
+                        <?php endif; ?>
+                    </div>
                 </div>
 
                 <div class="overflow-x-auto">
@@ -659,7 +679,9 @@
                         <tbody class="divide-y divide-slate-100">
                             <?php if (empty($corpusDocs)): ?>
                                 <tr>
-                                    <td colspan="5" class="p-8 text-center text-slate-400 text-xs sm:text-sm">Belum ada korpus terdaftar. Unggah dokumen rujukan untuk memulai.</td>
+                                    <td colspan="5" class="p-8 text-center text-slate-400 text-xs sm:text-sm">
+                                        <?= !empty($corpusSearch) ? 'Tidak ditemukan dokumen korpus yang cocok dengan kata kunci "' . esc($corpusSearch) . '".' : 'Belum ada korpus terdaftar. Unggah dokumen rujukan untuk memulai.' ?>
+                                    </td>
                                 </tr>
                             <?php else: ?>
                                 <?php foreach ($corpusDocs as $doc): ?>
@@ -707,6 +729,36 @@
                         </tbody>
                     </table>
                 </div>
+
+                <?php if (($corpusTotalPages ?? 1) > 1): ?>
+                <div class="p-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-600 bg-slate-50/50">
+                    <div>
+                        Menampilkan halaman <strong class="text-slate-800"><?= $corpusPage ?></strong> dari <strong class="text-slate-800"><?= $corpusTotalPages ?></strong>
+                        <span class="text-slate-400">(Total <?= number_format($filteredCorpusTotal) ?> dokumen)</span>
+                    </div>
+                    <div class="flex items-center gap-1 flex-wrap">
+                        <?php if ($corpusPage > 1): ?>
+                            <button type="button" onclick="navigateCorpusPage(1)" class="px-2.5 py-1 rounded border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition" title="Halaman Pertama">««</button>
+                            <button type="button" onclick="navigateCorpusPage(<?= $corpusPage - 1 ?>)" class="px-3 py-1 rounded border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition">Sebelumnya</button>
+                        <?php endif; ?>
+
+                        <?php
+                        $startP = max(1, $corpusPage - 2);
+                        $endP = min($corpusTotalPages, $corpusPage + 2);
+                        for ($p = $startP; $p <= $endP; $p++):
+                        ?>
+                            <button type="button" onclick="navigateCorpusPage(<?= $p ?>)" class="px-3 py-1 rounded border text-xs <?= $p === $corpusPage ? 'bg-indigo-600 border-indigo-600 text-white font-bold' : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-medium' ?> transition">
+                                <?= $p ?>
+                            </button>
+                        <?php endfor; ?>
+
+                        <?php if ($corpusPage < $corpusTotalPages): ?>
+                            <button type="button" onclick="navigateCorpusPage(<?= $corpusPage + 1 ?>)" class="px-3 py-1 rounded border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition">Selanjutnya</button>
+                            <button type="button" onclick="navigateCorpusPage(<?= $corpusTotalPages ?>)" class="px-2.5 py-1 rounded border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition" title="Halaman Terakhir">»»</button>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                <?php endif; ?>
             </div>
         </div>
 
@@ -862,6 +914,12 @@
                 activeBtn.classList.add('border-indigo-600', 'text-indigo-600', 'font-semibold');
                 activeBtn.classList.remove('border-transparent', 'text-slate-500');
             }
+            try {
+                localStorage.setItem('ar_tilik_active_tab', tabId);
+                if (history.replaceState) {
+                    history.replaceState(null, null, '#' + tabId);
+                }
+            } catch (e) {}
         }
 
         function handleFileSelect(input, labelId) {
@@ -1428,7 +1486,73 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             checkAndPollSubmissions();
+            const hashTab = window.location.hash ? window.location.hash.substring(1) : null;
+            const savedTab = hashTab || localStorage.getItem('ar_tilik_active_tab');
+            if (savedTab && document.getElementById(savedTab)) {
+                switchTab(savedTab);
+            }
         });
+
+        // ==========================================
+        // MANAJEMEN KORPUS: PAGINASI & PENCARIAN
+        // ==========================================
+        let currentCorpusSearch = <?= json_encode($corpusSearch ?? '') ?>;
+        let currentCorpusPage = <?= (int) ($corpusPage ?? 1) ?>;
+
+        async function fetchCorpusTable(page, search) {
+            const container = document.getElementById('corpusTableContainer');
+            if (!container) return;
+
+            container.classList.add('opacity-50', 'pointer-events-none');
+
+            try {
+                const url = new URL(window.location.href);
+                url.searchParams.set('corpus_page', page);
+                if (search && search.trim() !== '') {
+                    url.searchParams.set('corpus_search', search.trim());
+                } else {
+                    url.searchParams.delete('corpus_search');
+                }
+                url.hash = 'tab-corpus';
+
+                const res = await fetch(url.toString(), {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                const html = await res.text();
+                const doc = new DOMParser().parseFromString(html, 'text/html');
+                const newContainer = doc.getElementById('corpusTableContainer');
+                if (newContainer) {
+                    container.innerHTML = newContainer.innerHTML;
+                    currentCorpusPage = page;
+                    currentCorpusSearch = search;
+                    if (history.replaceState) {
+                        history.replaceState(null, null, url.toString());
+                    }
+                }
+            } catch (err) {
+                console.error('[AR Tilik] Gagal memuat data korpus:', err);
+            } finally {
+                container.classList.remove('opacity-50', 'pointer-events-none');
+            }
+        }
+
+        function navigateCorpusPage(page) {
+            const input = document.getElementById('corpusSearchInput');
+            const search = input ? input.value : currentCorpusSearch;
+            fetchCorpusTable(page, search);
+        }
+
+        function handleCorpusSearch() {
+            const input = document.getElementById('corpusSearchInput');
+            const q = input ? input.value : '';
+            fetchCorpusTable(1, q);
+        }
+
+        function clearCorpusSearch() {
+            const input = document.getElementById('corpusSearchInput');
+            if (input) input.value = '';
+            fetchCorpusTable(1, '');
+        }
 
         // Modal Sumbang Korpus (+3 Korpus = +1 Submisi)
         function openContributeCorpusModal() {

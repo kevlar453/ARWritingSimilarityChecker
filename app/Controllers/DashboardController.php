@@ -46,29 +46,62 @@ class DashboardController extends BaseController
         }
         unset($sub);
 
-        // Dokumen korpus terbaru
-        $corpusDocs = $docModel->where('document_type', 'corpus')
-                               ->where('benchmark_run_id IS NULL', null, false)
-                               ->orderBy('id', 'DESC')
-                               ->findAll(15);
+        // Dokumen korpus dengan pencarian dan paginasi
+        $corpusSearch = trim((string) ($this->request->getGet('corpus_search') ?? ''));
+        $corpusPage = max(1, (int) ($this->request->getGet('corpus_page') ?? 1));
+        $corpusPerPage = 15;
+
+        $applyCorpusFilter = static function ($builder) use ($corpusSearch) {
+            $builder->where('document_type', 'corpus')
+                    ->where('benchmark_run_id IS NULL', null, false);
+            if ($corpusSearch !== '') {
+                $builder->groupStart()
+                        ->like('title', $corpusSearch)
+                        ->orLike('original_filename', $corpusSearch)
+                        ->orLike('faculty', $corpusSearch)
+                        ->orLike('department', $corpusSearch)
+                        ->orLike('source_type', $corpusSearch)
+                        ->groupEnd();
+            }
+            return $builder;
+        };
+
+        $countModel = new DocumentModel();
+        $filteredCorpusTotal = $applyCorpusFilter($countModel)->countAllResults();
+
+        $corpusTotalPages = max(1, (int) ceil($filteredCorpusTotal / $corpusPerPage));
+        if ($corpusPage > $corpusTotalPages && $filteredCorpusTotal > 0) {
+            $corpusPage = $corpusTotalPages;
+        }
+        $offset = ($corpusPage - 1) * $corpusPerPage;
+
+        $fetchModel = new DocumentModel();
+        $corpusDocs = $applyCorpusFilter($fetchModel)
+            ->orderBy('id', 'DESC')
+            ->findAll($corpusPerPage, $offset);
 
         // Riwayat benchmark runs
         $benchmarkRuns = $db->table('benchmark_runs')->orderBy('id', 'DESC')->get(10)->getResultArray();
 
-        // Statistik
+        // Statistik Keseluruhan
         $totalSubmissions = $docModel->where('document_type', 'submission')->where('benchmark_run_id IS NULL', null, false)->countAllResults();
         $totalCorpus = $docModel->where('document_type', 'corpus')->where('benchmark_run_id IS NULL', null, false)->countAllResults();
         $totalReports = $reportModel->countAllResults();
 
         return view('dashboard/index', [
-            'submissions'      => $submissions,
-            'corpusDocs'       => $corpusDocs,
-            'benchmarkRuns'    => $benchmarkRuns,
-            'totalSubmissions' => $totalSubmissions,
-            'totalCorpus'      => $totalCorpus,
-            'totalReports'     => $totalReports,
-            'currentUser'      => $currentUser,
-            'quotaInfo'        => $quotaInfo,
+            'submissions'         => $submissions,
+            'corpusDocs'          => $corpusDocs,
+            'corpusSearch'        => $corpusSearch,
+            'corpusPage'          => $corpusPage,
+            'corpusPerPage'       => $corpusPerPage,
+            'corpusTotalPages'    => $corpusTotalPages,
+            'filteredCorpusTotal' => $filteredCorpusTotal,
+            'benchmarkRuns'       => $benchmarkRuns,
+            'totalSubmissions'    => $totalSubmissions,
+            'totalCorpus'         => $totalCorpus,
+            'totalReports'        => $totalReports,
+            'currentUser'         => $currentUser,
+            'quotaInfo'           => $quotaInfo,
         ]);
     }
 
