@@ -1951,7 +1951,7 @@
                             <ul class="text-[11px] text-slate-600 space-y-1.5 pt-2 border-t border-slate-100">
                                 <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> +3 submisi dokumen</li>
                                 <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Aktif selamanya (tanpa batas)</li>
-                                <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Ekspor PDF & tautan publik</li>
+                                <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Audit Forensik Cerdas &amp; Ekspor PDF</li>
                             </ul>
                         </div>
                         <button type="button" onclick="checkoutPackage('topup_3', this)" class="mt-4 w-full py-2 px-3 rounded-xl font-bold text-xs bg-slate-900 hover:bg-emerald-600 text-white transition shadow-xs cursor-pointer flex items-center justify-center gap-1">
@@ -1977,6 +1977,7 @@
                                 <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> +10 submisi dokumen</li>
                                 <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Aktif selamanya (tanpa batas)</li>
                                 <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Prioritas pemrosesan dokumen</li>
+                                <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Audit Forensik Cerdas &amp; Panduan Sidang</li>
                             </ul>
                         </div>
                         <button type="button" onclick="checkoutPackage('topup_10', this)" class="mt-4 w-full py-2 px-3 rounded-xl font-bold text-xs bg-amber-500 hover:bg-amber-600 text-white transition shadow-xs cursor-pointer flex items-center justify-center gap-1">
@@ -2001,6 +2002,8 @@
                             <ul class="text-[11px] text-slate-600 space-y-1.5 pt-2 border-t border-slate-100">
                                 <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> 20 submisi dokumen / bulan</li>
                                 <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Prioritas antrean cepat</li>
+                                <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Audit Forensik Cerdas &amp; Panduan Ujian Sidang</li>
+                                <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Deteksi Fabrikasi Sitasi &amp; Metodologi</li>
                                 <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Masa aktif paket 30 hari</li>
                             </ul>
                         </div>
@@ -2026,6 +2029,8 @@
                             <ul class="text-[11px] text-slate-600 space-y-1.5 pt-2 border-t border-slate-100">
                                 <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> 75 submisi dokumen / bulan</li>
                                 <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Prioritas pemrosesan tertinggi</li>
+                                <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Audit Forensik Cerdas &amp; Instrumen Penguji</li>
+                                <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Sintesis Risiko Akademik Berbobot</li>
                                 <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Dukungan berkas hingga 30 MB</li>
                             </ul>
                         </div>

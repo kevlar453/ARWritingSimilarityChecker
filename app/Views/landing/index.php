@@ -3165,7 +3165,8 @@
                             <li><strong>Aktif selamanya</strong> (kuota tanpa masa kedaluwarsa)</li>
                             <li>Pilihan paket isi ulang 3 cek atau 10 cek</li>
                             <li>Prioritas pemrosesan antrean dokumen cepat</li>
-                            <li>Semua fitur deteksi kecerdasan buatan aktif</li>
+                            <li><strong>Audit Forensik Cerdas</strong> & instrumen ujian sidang aktif</li>
+                            <li>Semua fitur deteksi kecerdasan buatan & stylometri aktif</li>
                             <li>Ekspor PDF laporan resmi lengkap ber-QR</li>
                             <li>Aktivasi instan via QRIS & Virtual Account</li>
                         </ul>
@@ -3199,6 +3200,8 @@
                         <ul class="plan-features">
                             <li><strong>20 submisi dokumen</strong> selama masa aktif</li>
                             <li>Prioritas antrean pemrosesan cepat</li>
+                            <li><strong>Audit Forensik Cerdas</strong> & 4 panduan pertanyaan sidang dosen</li>
+                            <li>Deteksi fabrikasi sitasi gaib & inkonsistensi metodologi</li>
                             <li>Ekspor PDF laporan resmi lengkap tanpa batas</li>
                             <li>Verifikasi keaslian naskah ber-QR Code</li>
                             <li>Masa aktif paket 30 hari penuh</li>
@@ -3233,6 +3236,8 @@
                         <ul class="plan-features">
                             <li><strong>75 submisi dokumen</strong> selama masa aktif</li>
                             <li>Prioritas antrean tertinggi sistem</li>
+                            <li><strong>Audit Forensik Cerdas</strong> mendalam & instrumen dewan penguji</li>
+                            <li>Sintesis risiko akademik berbobot & integritas sitasi</li>
                             <li>Dukungan berkas besar hingga <strong>30 MB</strong></li>
                             <li>Pemeriksaan draf jurnal & tugas kelas</li>
                             <li>Masa aktif paket 30 hari penuh</li>
