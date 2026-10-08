@@ -161,11 +161,15 @@ def repair_pdf_math_cmaps(doc):
         obj = doc.xref_object(xref)
         if '/Type /Font' in obj and '/Subtype /Type0' in obj and '/ToUnicode' in obj:
             tu_m = re.search(r'/ToUnicode\s+(\d+)\s+0\s+R', obj)
-            desc_m = re.search(r'/DescendantFonts\s*\[\s*(\d+)\s+0\s+R\s*\]', obj)
+            desc_m = re.search(r'/DescendantFonts\s*(?:\[\s*)?(\d+)\s+0\s+R', obj)
             if tu_m and desc_m:
                 tu_xref = int(tu_m.group(1))
                 desc_xref = int(desc_m.group(1))
                 desc_obj = doc.xref_object(desc_xref)
+                if desc_obj.strip().startswith('['):
+                    inner_refs = re.findall(r'(\d+)\s+0\s+R', desc_obj)
+                    if inner_refs:
+                        desc_obj = doc.xref_object(int(inner_refs[0]))
                 fd_m = re.search(r'/FontDescriptor\s+(\d+)\s+0\s+R', desc_obj)
                 if fd_m:
                     fd_obj = doc.xref_object(int(fd_m.group(1)))
