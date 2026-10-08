@@ -146,6 +146,13 @@ def test_admin_portal_admin_user_access_and_management(db_conn):
         assert "Total Pengguna" in html
         assert "Submisi Dokumen" in html
         assert "Worker Queue" in html
+        assert 'id="adminSidebar"' in html
+        assert 'id="adminSidebarOverlay"' in html
+        assert "toggleAdminSidebar" in html
+        assert "admin-sidebar-scroll" in html
+        assert "Menu Utama" in html
+        assert "Konten &amp; Pengguna" in html or "Konten & Pengguna" in html
+        assert "Sistem &amp; Keamanan" in html or "Sistem & Keamanan" in html
 
         # 3. Akses Tab Pengguna
         res_users_tab = session.get(f"{BASE_URL}/admin?tab=users")
