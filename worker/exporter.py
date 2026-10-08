@@ -50,7 +50,9 @@ def generate_verification_code() -> str:
     return f"ART-{rnd[:4]}-{rnd[4:8]}-{rnd[8:12]}"
 
 def generate_verification_hash(report_id: int, doc_id: int, created_at: str, sim: float) -> str:
-    return generate_verification_code()
+    seed = f"ARTILIK:{report_id}:{doc_id}:{created_at}:{float(sim):.2f}:OFFICIAL_CERTIFICATE"
+    h = hashlib.sha256(seed.encode("utf-8")).hexdigest().upper()[:12]
+    return f"ART-{h[:4]}-{h[4:8]}-{h[8:12]}"
 
 def build_report_html(report: dict, document: dict, sources: list[dict], matches: list[dict]) -> str:
     r_id = report["id"]
@@ -71,6 +73,16 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
 
     doc_title = document.get("title") or "Dokumen Karya Ilmiah"
     filename = document.get("original_filename") or f"document_{d_id}.pdf"
+    faculty = document.get("faculty")
+    department = document.get("department")
+    fac_dept_parts = [str(p).strip() for p in [faculty, department] if p and str(p).strip()]
+    fac_dept_str = " / ".join(fac_dept_parts)
+    fac_dept_row = f"""
+        <tr>
+            <td class="meta-label">Fakultas / Prodi</td>
+            <td class="meta-val" colspan="3">{fac_dept_str}</td>
+        </tr>
+    """ if fac_dept_str else ""
     
     # Parse created_at
     created_at_dt = report.get("created_at")
@@ -252,6 +264,8 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
     ev_audit = evidence_data.get("evasion_detection") or v12_evol.get("evasion_detection") or {}
     cit_audit = evidence_data.get("citation_audit") or v12_evol.get("citation_audit") or {}
     cl_audit = evidence_data.get("cross_lingual") or v12_evol.get("cross_lingual") or {}
+    ai_audit = evidence_data.get("ai_stylometrics") or v12_evol.get("ai_stylometrics") or {}
+    xgb_audit = evidence_data.get("xgboost_risk") or v12_evol.get("xgboost_risk") or {}
 
     ev_risk = float(ev_audit.get("evasion_risk_score") or 0.0)
     ev_status = ev_audit.get("integrity_status") or "CLEAN"
@@ -265,6 +279,47 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
     cit_color = "#047857" if cit_health >= 80 else ("#b45309" if cit_health >= 50 else "#b91c1c")
     cl_color = "#b91c1c" if cl_score >= 35 else ("#b45309" if cl_score >= 15 else "#047857")
     cl_lbl = "Terindikasi Terjemahan Langsung" if cl_match else ("Parafrasa Lintas Bahasa" if cl_score >= 15 else "Orisinal / Bebas Terjemahan Mesin")
+
+    ai_row = ""
+    if ai_audit:
+        ai_prob = float(ai_audit.get("ai_probability_score") or 0.0)
+        ai_lbl = ai_audit.get("verdict_label") or "Gaya Bahasa Alami Manusia (Organik)"
+        ai_metrics = ai_audit.get("metrics") or {}
+        burstiness = float(ai_metrics.get("burstiness") or 0.5)
+        ai_conf = ai_audit.get("ai_confidence_level") or "LOW"
+        ai_color = "#b91c1c" if ai_prob >= 70 else ("#b45309" if ai_prob >= 35 else "#047857")
+        burst_lbl = "Ritme Alami Manusia" if burstiness >= 0.4 else "Ritme Seragam (Khas AI)"
+        ai_row = f"""
+            <tr>
+                <td><strong>Indikator AI &amp; Profil Stylometri</strong><br><span style="font-size: 7.5pt; color: #64748b;">Variabilitas Ritme Sintaksis &amp; Pola LLM</span></td>
+                <td style="text-align: center; font-weight: bold; color: {ai_color}; font-size: 10pt;">
+                    {ai_prob:.1f}% Probabilitas
+                </td>
+                <td>
+                    <strong>{ai_lbl}</strong>
+                    <div style="font-size: 7.5pt; color: #475569;">Burstiness: {burstiness:.2f} ({burst_lbl}) • Keyakinan: {ai_conf}</div>
+                </td>
+            </tr>
+        """
+
+    xgb_row = ""
+    if xgb_audit:
+        xgb_score = float(xgb_audit.get("calibrated_risk_score") or 0.0)
+        xgb_lbl = xgb_audit.get("verdict_label") or "Risiko Rendah / Mandiri"
+        xgb_level = xgb_audit.get("risk_level") or "LOW"
+        xgb_color = "#b91c1c" if xgb_score >= 70 else ("#b45309" if xgb_score >= 35 else "#047857")
+        xgb_row = f"""
+            <tr>
+                <td><strong>Sintesis Risiko Berbobot (XGBoost ML)</strong><br><span style="font-size: 7.5pt; color: #64748b;">Analisis Multi-Dimensi Determinan Risiko</span></td>
+                <td style="text-align: center; font-weight: bold; color: {xgb_color}; font-size: 10pt;">
+                    {xgb_score:.1f}% Indeks Risiko
+                </td>
+                <td>
+                    <strong>{xgb_lbl}</strong>
+                    <div style="font-size: 7.5pt; color: #475569;">Level: {xgb_level} • Evaluasi komposit berbasis model terkalibrasi</div>
+                </td>
+            </tr>
+        """
 
     audit_html = f"""
     <h3 class="section-header">Audit Integritas Naskah, Sitasi &amp; Analisis Lintas Bahasa</h3>
@@ -307,6 +362,8 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
                     <div style="font-size: 7.5pt; color: #475569;">Konsep terpadan: {int(cl_audit.get('shared_concept_count') or 0)} istilah, Pasase: {len(cl_audit.get('aligned_passages') or [])}</div>
                 </td>
             </tr>
+            {ai_row}
+            {xgb_row}
         </tbody>
     </table>
     """
@@ -732,6 +789,7 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
             <td class="meta-label">Durasi Eksekusi</td>
             <td class="meta-val">{exec_time:.2f} detik</td>
         </tr>
+        {fac_dept_row}
     </table>
 
     <!-- Decision Banner -->
