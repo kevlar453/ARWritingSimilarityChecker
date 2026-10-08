@@ -62,6 +62,52 @@ def process_job(job: dict):
             report_id=payload["report_id"],
             engine=payload.get("engine", "hybrid")
         )
+    elif job_type == "process_document":
+        doc_id = payload["document_id"]
+        conn = get_connection()
+        try:
+            cursor = conn.cursor(dictionary=True)
+            cursor.execute("SELECT * FROM documents WHERE id = %s", (doc_id,))
+            doc = cursor.fetchone()
+            if not doc:
+                cursor.close()
+                raise ValueError(f"Dokumen ID {doc_id} tidak ditemukan.")
+            
+            doc_type = doc.get("document_type")
+            cursor.close()
+            
+            if doc_type == "corpus":
+                index_document(
+                    connection=conn,
+                    document_id=doc_id,
+                    storage_path=doc["storage_path"],
+                    mime_type=doc.get("mime_type"),
+                    is_corpus=True
+                )
+            else:
+                cursor = conn.cursor(dictionary=True)
+                cursor.execute(
+                    "SELECT id, engine FROM reports WHERE document_id = %s ORDER BY id DESC LIMIT 1",
+                    (doc_id,)
+                )
+                rep = cursor.fetchone()
+                cursor.close()
+                if rep:
+                    process_similarity_check(
+                        document_id=doc_id,
+                        report_id=rep["id"],
+                        engine=rep.get("engine", "hybrid")
+                    )
+                else:
+                    index_document(
+                        connection=conn,
+                        document_id=doc_id,
+                        storage_path=doc["storage_path"],
+                        mime_type=doc.get("mime_type"),
+                        is_corpus=False
+                    )
+        finally:
+            conn.close()
     else:
         raise ValueError(f"Unknown job type: {job_type}")
 

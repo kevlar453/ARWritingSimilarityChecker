@@ -181,7 +181,8 @@ def index_document(
     document_id: int,
     storage_path: str,
     mime_type: str | None = None,
-    is_corpus: bool = False
+    is_corpus: bool = False,
+    rebuild_stats: bool = True
 ):
     try:
         clear_document_index(connection, document_id)
@@ -261,7 +262,7 @@ def index_document(
         connection.commit()
         cursor.close()
         
-        if is_corpus:
+        if is_corpus and rebuild_stats:
             rebuild_fingerprint_stats(connection)
             
     except Exception as err:
