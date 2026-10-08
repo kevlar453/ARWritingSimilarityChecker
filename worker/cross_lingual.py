@@ -399,6 +399,9 @@ class CrossLingualResult:
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
 
+    def __getitem__(self, item: str) -> Any:
+        return getattr(self, item)
+
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # 3. ATURAN MORFOLOGIS & PROYEKSI KONSEP KANONIKAL
@@ -520,9 +523,9 @@ def detect_language(text: str) -> str:
     id_count = sum(1 for t in tokens if t in id_markers)
     en_count = sum(1 for t in tokens if t in en_markers)
 
-    if id_count >= max(en_count * 1.4, 5):
+    if id_count >= max(en_count * 1.4, 3):
         return "ID"
-    elif en_count >= max(id_count * 1.4, 5):
+    elif en_count >= max(id_count * 1.4, 3):
         return "EN"
     return "MIXED"
 

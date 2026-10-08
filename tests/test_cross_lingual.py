@@ -6,7 +6,7 @@ Memverifikasi fungsionalitas Cross-Lingual Semantic Similarity Engine (ID <-> EN
 import pytest
 from worker.cross_lingual import (
     detect_language,
-    lemmatize_token,
+    lemmatize_english_token as lemmatize_token,
     project_text_to_canonical_concepts,
     generate_unordered_concept_pairs,
     calculate_cross_lingual_similarity,
