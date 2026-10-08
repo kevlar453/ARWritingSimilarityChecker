@@ -624,6 +624,20 @@ if ($dec === 'match') {
                 </td>
             </tr>
             <?php
+                $aiAuditPdf = $evidenceData['ai_stylometrics'] ?? $evidenceData['v1_1_presentation']['v1_2_evolution']['ai_stylometrics'] ?? [];
+                $aiProbPdf = (float)($aiAuditPdf['ai_probability_score'] ?? 0.0);
+                $aiLabelPdf = $aiAuditPdf['verdict_label'] ?? 'Gaya Bahasa Alami Manusia (Organik)';
+                $aiMetricsPdf = $aiAuditPdf['metrics'] ?? [];
+                $aiBurstPdf = (float)($aiMetricsPdf['burstiness'] ?? 0.5);
+                $aiConfPdf = $aiAuditPdf['ai_confidence_level'] ?? 'LOW';
+                $burstLblPdf = $aiBurstPdf >= 0.4 ? 'Ritme Alami Manusia' : 'Ritme Seragam (Khas AI)';
+                $segRatioPdf = (float)($aiMetricsPdf['segmental_monotony_ratio'] ?? 0.0);
+
+                $xgbAuditPdf = $evidenceData['xgboost_risk'] ?? $evidenceData['v1_1_presentation']['v1_2_evolution']['xgboost_risk'] ?? [];
+                $xgbScorePdf = (float)($xgbAuditPdf['calibrated_risk_score'] ?? 0.0);
+                $xgbLabelPdf = $xgbAuditPdf['verdict_label'] ?? 'Risiko Rendah / Mandiri';
+                $xgbLevelPdf = $xgbAuditPdf['risk_level'] ?? 'LOW';
+
                 $geminiAuditPdf = $evidenceData['gemini_forensic'] ?? $evidenceData['v1_1_presentation']['v1_2_evolution']['gemini_forensic'] ?? [];
                 $geminiCompleted = !empty($geminiAuditPdf) && ($geminiAuditPdf['status'] ?? '') === 'completed';
                 $gAuditData = $geminiAuditPdf['audit'] ?? [];
@@ -636,18 +650,39 @@ if ($dec === 'match') {
                     }
                 }
                 $gLevelPdf = strtoupper($gAuditData['tingkat_indikasi_ai'] ?? 'RENDAH');
+                $gContraPdf = $gAuditData['inkonsistensi_metodologi_dan_logika'] ?? [];
+                $gCitPdf = $gAuditData['integritas_sitasi'] ?? [];
+                $gQuestionsPdf = $gAuditData['pertanyaan_kritis_dosen'] ?? [];
             ?>
+            <?php if (!empty($aiAuditPdf)): ?>
+            <tr>
+                <td><strong>Indikator AI &amp; Profil Stylometri</strong><br><span style="font-size: 7.5pt; color: #64748b;">Variabilitas Ritme Sintaksis &amp; Pola LLM</span></td>
+                <td style="text-align: center; font-weight: bold; color: <?= $aiProbPdf >= 70 ? '#b91c1c' : ($aiProbPdf >= 35 ? '#b45309' : '#047857') ?>; font-size: 10pt;">
+                    <?= number_format($aiProbPdf, 1) ?>% Probabilitas
+                </td>
+                <td>
+                    <strong><?= esc($aiLabelPdf) ?></strong>
+                    <div style="font-size: 7.5pt; color: #475569;">
+                        Burstiness: <?= number_format($aiBurstPdf, 2) ?> (<?= esc($burstLblPdf) ?>)<?= $segRatioPdf > 0 ? ' • Monotoni Paragraf: ' . number_format($segRatioPdf, 1) . '%' : '' ?> • Keyakinan: <?= esc($aiConfPdf) ?>
+                    </div>
+                </td>
+            </tr>
+            <?php endif; ?>
+            <?php if (!empty($xgbAuditPdf)): ?>
+            <tr>
+                <td><strong>Sintesis Risiko Akademik Berbobot</strong><br><span style="font-size: 7.5pt; color: #64748b;">Analisis Multi-Dimensi Determinan Risiko</span></td>
+                <td style="text-align: center; font-weight: bold; color: <?= $xgbScorePdf >= 70 ? '#b91c1c' : ($xgbScorePdf >= 35 ? '#b45309' : '#047857') ?>; font-size: 10pt;">
+                    <?= number_format($xgbScorePdf, 1) ?>% Indeks Risiko
+                </td>
+                <td>
+                    <strong><?= esc($xgbLabelPdf) ?></strong>
+                    <div style="font-size: 7.5pt; color: #475569;">
+                        Level: <?= esc($xgbLevelPdf) ?> • Evaluasi komposit berbasis model terkalibrasi
+                    </div>
+                </td>
+            </tr>
+            <?php endif; ?>
             <?php if ($geminiCompleted): ?>
-            <?php
-                $pdfModelLabels = [
-                    'gemini-3.6-flash' => 'Gemini 3.6 Flash (Terbaru 2026)',
-                    'gemini-3.0-flash' => 'Gemini 3.0 Flash (Cepat & Efisien)',
-                    'gemini-1.5-flash' => 'Gemini 1.5 Flash (Legacy Stabil)',
-                    'gemini-1.5-pro'   => 'Gemini 1.5 Pro (Legacy Pro)',
-                ];
-                $pdfModelName = $geminiAuditPdf['model_used'] ?? 'gemini-3.6-flash';
-                $pdfModelDisplay = $pdfModelLabels[$pdfModelName] ?? $pdfModelName;
-            ?>
             <tr>
                 <td><strong>Audit Forensik Cerdas</strong><br><span style="font-size: 7.5pt; color: #64748b;">Konsistensi Semantik Antar-Bab &amp; Integritas Logika</span></td>
                 <td style="text-align: center; font-weight: bold; color: <?= $gLevelPdf === 'TINGGI' ? '#b91c1c' : ($gLevelPdf === 'SEDANG' ? '#b45309' : '#047857') ?>; font-size: 10pt;">
@@ -656,7 +691,7 @@ if ($dec === 'match') {
                 <td>
                     <strong>Verifikasi Semantik Otomatis</strong>
                     <div style="font-size: 7.5pt; color: #475569;">
-                        <?= count($gAuditData['inkonsistensi_metodologi_dan_logika'] ?? []) ?> inkonsistensi metodologi, <?= count($gAuditData['pertanyaan_kritis_dosen'] ?? []) ?> panduan pertanyaan sidang dosen
+                        <?= count($gContraPdf) ?> inkonsistensi metodologi, <?= count($gQuestionsPdf) ?> panduan pertanyaan sidang dosen
                     </div>
                 </td>
             </tr>
@@ -664,8 +699,74 @@ if ($dec === 'match') {
         </tbody>
     </table>
 
+    <!-- Section 4: Audit Forensik Cerdas & Panduan Ujian Lisan Sidang -->
+    <?php if ($geminiCompleted && (!empty($gAuditData['alasan_indikasi_ai']) || !empty($gContraPdf) || !empty($gCitPdf) || !empty($gQuestionsPdf))): ?>
+    <div style="margin-top: 14px; margin-bottom: 14px; page-break-inside: avoid;">
+        <h3 class="section-header" style="margin-bottom: 8px;">4. Audit Forensik Cerdas &amp; Panduan Ujian Lisan Sidang</h3>
+        <?php if (!empty($gAuditData['alasan_indikasi_ai'])): ?>
+            <div style="margin-bottom: 8px; padding: 7px 10px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 7.5pt; color: #334155; line-height: 1.4;">
+                <div style="font-weight: bold; color: <?= $gLevelPdf === 'TINGGI' ? '#b91c1c' : ($gLevelPdf === 'SEDANG' ? '#b45309' : '#047857') ?>; margin-bottom: 2px; font-size: 7pt; text-transform: uppercase;">
+                    &bull; Evaluasi Sintetis &amp; Indikasi Perakitan AI (Status: <?= esc($gLevelPdf) ?>):
+                </div>
+                <div style="font-style: italic;">&ldquo;<?= esc($gAuditData['alasan_indikasi_ai']) ?>&rdquo;</div>
+            </div>
+        <?php endif; ?>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+            <div style="background: #ffffff; padding: 7px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 7.5pt;">
+                <div style="font-weight: bold; color: #9a3412; font-size: 7pt; margin-bottom: 4px; text-transform: uppercase;">
+                    &bull; Inkonsistensi Metodologi &amp; Logika (<?= count($gContraPdf) ?>)
+                </div>
+                <ul style="margin: 0; padding-left: 12px; color: #334155; line-height: 1.35;">
+                    <?php if (!empty($gContraPdf)): ?>
+                        <?php foreach ($gContraPdf as $c): ?>
+                            <li style="margin-bottom: 3px;"><?= esc($c) ?></li>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <li style="color: #64748b; font-style: italic;">Tidak ditemukan kontradiksi logika mayor antar-bab.</li>
+                    <?php endif; ?>
+                </ul>
+            </div>
+            <div style="background: #ffffff; padding: 7px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 7.5pt;">
+                <div style="font-weight: bold; color: #0369a1; font-size: 7pt; margin-bottom: 4px; text-transform: uppercase;">
+                    &bull; Integritas Sitasi &amp; Anomali Rujukan (<?= count($gCitPdf) ?>)
+                </div>
+                <ul style="margin: 0; padding-left: 12px; color: #334155; line-height: 1.35;">
+                    <?php if (!empty($gCitPdf)): ?>
+                        <?php foreach ($gCitPdf as $c): ?>
+                            <li style="margin-bottom: 3px;"><?= esc($c) ?></li>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <li style="color: #64748b; font-style: italic;">Sitasi rujukan selaras dan tidak ditemukan anomali temporal.</li>
+                    <?php endif; ?>
+                </ul>
+            </div>
+        </div>
+
+        <?php if (!empty($gQuestionsPdf)): ?>
+            <div style="background: #faf5ff; border: 1px solid #e9d5ff; border-radius: 6px; padding: 7px; margin-bottom: 8px;">
+                <div style="font-weight: bold; color: #6b21a8; font-size: 7.5pt; margin-bottom: 5px; display: flex; align-items: center; justify-content: space-between;">
+                    <span>Panduan Pertanyaan Kritis Dosen Penguji Sidang</span>
+                    <span style="font-size: 6.8pt; font-weight: normal; color: #7e22ce;">Instrumen Uji Penguasaan Orisinalitas</span>
+                </div>
+                <?php foreach ($gQuestionsPdf as $qIdx => $q): ?>
+                    <div style="margin-bottom: 5px; padding: 6px 9px; background: #ffffff; border: 1px solid #e2e8f0; border-left: 3px solid #6366f1; border-radius: 4px; font-size: 7.5pt;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
+                            <span style="font-weight: bold; color: #312e81; font-size: 7pt;">Pertanyaan #<?= $qIdx + 1 ?> &bull; Fokus: <?= esc($q['fokus'] ?? 'Substansi') ?></span>
+                        </div>
+                        <div style="font-weight: 600; color: #1e293b; margin-bottom: 2px; line-height: 1.35;">&ldquo;<?= esc($q['pertanyaan'] ?? '') ?>&rdquo;</div>
+                        <?php if (!empty($q['alasan'])): ?>
+                            <div style="font-size: 6.8pt; color: #64748b; font-style: italic;">Tujuan Pengujian: <?= esc($q['alasan']) ?></div>
+                        <?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+    </div>
+    <?php endif; ?>
+
     <!-- Matching Passages -->
-    <h3 class="section-header">4. Cuplikan Pasase Beririsan (Sampel Kontekstual)</h3>
+    <h3 class="section-header">5. Cuplikan Pasase Beririsan (Sampel Kontekstual)</h3>
     <?php if (!empty($matches)): ?>
         <?php foreach (array_slice($matches, 0, 8) as $idx => $m): ?>
             <div class="match-item" style="margin-bottom: 12px; padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px; background-color: #f8fafc; page-break-inside: avoid;">

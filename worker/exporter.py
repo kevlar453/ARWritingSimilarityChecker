@@ -14,6 +14,7 @@ import qrcode
 import base64
 import io
 import secrets
+from html import escape as html_escape
 
 # Ensure root directory is on PYTHONPATH and prevent script dir from shadowing worker package
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -316,13 +317,47 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
         xgb_color = "#b91c1c" if xgb_score >= 70 else ("#b45309" if xgb_score >= 35 else "#047857")
         xgb_row = f"""
             <tr>
-                <td><strong>Sintesis Risiko Berbobot (XGBoost ML)</strong><br><span style="font-size: 7.5pt; color: #64748b;">Analisis Multi-Dimensi Determinan Risiko</span></td>
+                <td><strong>Sintesis Risiko Akademik Berbobot</strong><br><span style="font-size: 7.5pt; color: #64748b;">Analisis Multi-Dimensi Determinan Risiko</span></td>
                 <td style="text-align: center; font-weight: bold; color: {xgb_color}; font-size: 10pt;">
                     {xgb_score:.1f}% Indeks Risiko
                 </td>
                 <td>
                     <strong>{xgb_lbl}</strong>
                     <div style="font-size: 7.5pt; color: #475569;">Level: {xgb_level} • Evaluasi komposit berbasis model terkalibrasi</div>
+                </td>
+            </tr>
+        """
+
+    forensic_audit = evidence_data.get("gemini_forensic") or v12_evol.get("gemini_forensic") or {}
+    forensic_completed = bool(forensic_audit and forensic_audit.get("status") == "completed")
+    g_data = forensic_audit.get("audit") or {}
+    if not g_data and forensic_audit.get("raw_output"):
+        m_lvl = re.search(r'"tingkat_indikasi_ai"\s*:\s*"([^"]+)"', forensic_audit["raw_output"], re.I)
+        m_rsn = re.search(r'"alasan_indikasi_ai"\s*:\s*"([^"]+)"', forensic_audit["raw_output"])
+        if m_lvl:
+            g_data["tingkat_indikasi_ai"] = m_lvl.group(1)
+        if m_rsn:
+            g_data["alasan_indikasi_ai"] = m_rsn.group(1)
+
+    g_level = str(g_data.get("tingkat_indikasi_ai") or "RENDAH").upper()
+    g_color = "#b91c1c" if g_level == "TINGGI" else ("#b45309" if g_level == "SEDANG" else "#047857")
+    g_contra = g_data.get("inkonsistensi_metodologi_dan_logika") or []
+    g_cit = g_data.get("integritas_sitasi") or []
+    g_questions = g_data.get("pertanyaan_kritis_dosen") or []
+
+    forensic_row = ""
+    if forensic_completed:
+        forensic_row = f"""
+            <tr>
+                <td><strong>Audit Forensik Cerdas</strong><br><span style="font-size: 7.5pt; color: #64748b;">Konsistensi Semantik Antar-Bab &amp; Integritas Logika</span></td>
+                <td style="text-align: center; font-weight: bold; color: {g_color}; font-size: 10pt;">
+                    Indikasi AI: {g_level}
+                </td>
+                <td>
+                    <strong>Verifikasi Semantik Otomatis</strong>
+                    <div style="font-size: 7.5pt; color: #475569;">
+                        {len(g_contra)} inkonsistensi metodologi, {len(g_questions)} panduan pertanyaan sidang dosen
+                    </div>
                 </td>
             </tr>
         """
@@ -370,9 +405,78 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
             </tr>
             {ai_row}
             {xgb_row}
+            {forensic_row}
         </tbody>
     </table>
     """
+
+    forensic_section_html = ""
+    if forensic_completed and (g_data.get("alasan_indikasi_ai") or g_contra or g_cit or g_questions):
+        g_reason_txt = g_data.get("alasan_indikasi_ai") or ""
+        reason_box = ""
+        if g_reason_txt:
+            reason_box = f"""
+            <div style="margin-bottom: 8px; padding: 7px 10px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 7.5pt; color: #334155; line-height: 1.4;">
+                <div style="font-weight: bold; color: {g_color}; margin-bottom: 2px; font-size: 7pt; text-transform: uppercase;">
+                    &bull; Evaluasi Sintetis &amp; Indikasi Perakitan AI (Status: {g_level}):
+                </div>
+                <div style="font-style: italic;">&ldquo;{html_escape(g_reason_txt)}&rdquo;</div>
+            </div>
+            """
+
+        contra_items = "".join([f"<li style='margin-bottom: 3px;'>{html_escape(c)}</li>" for c in g_contra]) or "<li style='color: #64748b; font-style: italic;'>Tidak ditemukan kontradiksi logika mayor antar-bab.</li>"
+        cit_items = "".join([f"<li style='margin-bottom: 3px;'>{html_escape(c)}</li>" for c in g_cit]) or "<li style='color: #64748b; font-style: italic;'>Sitasi rujukan selaras dan tidak ditemukan anomali temporal.</li>"
+
+        findings_grid = f"""
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+            <div style="background: #ffffff; padding: 7px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 7.5pt;">
+                <div style="font-weight: bold; color: #9a3412; font-size: 7pt; margin-bottom: 4px; text-transform: uppercase;">
+                    &bull; Inkonsistensi Metodologi &amp; Logika ({len(g_contra)})
+                </div>
+                <ul style="margin: 0; padding-left: 12px; color: #334155; line-height: 1.35;">
+                    {contra_items}
+                </ul>
+            </div>
+            <div style="background: #ffffff; padding: 7px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 7.5pt;">
+                <div style="font-weight: bold; color: #0369a1; font-size: 7pt; margin-bottom: 4px; text-transform: uppercase;">
+                    &bull; Integritas Sitasi &amp; Anomali Rujukan ({len(g_cit)})
+                </div>
+                <ul style="margin: 0; padding-left: 12px; color: #334155; line-height: 1.35;">
+                    {cit_items}
+                </ul>
+            </div>
+        </div>
+        """
+
+        questions_boxes = ""
+        for q_idx, q in enumerate(g_questions, 1):
+            q_fokus = html_escape(q.get("fokus") or "Substansi")
+            q_text = html_escape(q.get("pertanyaan") or "")
+            q_alasan = html_escape(q.get("alasan") or "")
+            questions_boxes += f"""
+            <div style="margin-bottom: 5px; padding: 6px 9px; background: #ffffff; border: 1px solid #e2e8f0; border-left: 3px solid #6366f1; border-radius: 4px; font-size: 7.5pt;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
+                    <span style="font-weight: bold; color: #312e81; font-size: 7pt;">Pertanyaan #{q_idx} &bull; Fokus: {q_fokus}</span>
+                </div>
+                <div style="font-weight: 600; color: #1e293b; margin-bottom: 2px; line-height: 1.35;">&ldquo;{q_text}&rdquo;</div>
+                <div style="font-size: 6.8pt; color: #64748b; font-style: italic;">Tujuan Pengujian: {q_alasan}</div>
+            </div>
+            """
+
+        forensic_section_html = f"""
+        <div style="margin-top: 12px; margin-bottom: 12px; page-break-inside: avoid;">
+            <h3 class="section-header" style="margin-bottom: 6px;">Audit Forensik Cerdas &amp; Panduan Ujian Lisan Sidang</h3>
+            {reason_box}
+            {findings_grid}
+            <div style="background: #faf5ff; border: 1px solid #e9d5ff; border-radius: 6px; padding: 7px; margin-bottom: 8px;">
+                <div style="font-weight: bold; color: #6b21a8; font-size: 7.5pt; margin-bottom: 5px; display: flex; align-items: center; justify-content: space-between;">
+                    <span>Panduan Pertanyaan Kritis Dosen Penguji Sidang</span>
+                    <span style="font-size: 6.8pt; font-weight: normal; color: #7e22ce;">Instrumen Uji Penguasaan Orisinalitas</span>
+                </div>
+                {questions_boxes}
+            </div>
+        </div>
+        """
 
     # Matches rows
     matches_html = ""
@@ -891,6 +995,9 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
 
     <!-- Audit Integritas Naskah, Sitasi & Lintas Bahasa -->
     {audit_html}
+
+    <!-- Audit Forensik Cerdas & Panduan Ujian Lisan Sidang -->
+    {forensic_section_html}
 
     <!-- Matching Passages -->
     <h3 class="section-header">Cuplikan Pasase Beririsan (Sampel Kontekstual)</h3>
