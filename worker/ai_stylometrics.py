@@ -28,7 +28,34 @@ AI_TRANSITIONAL_MARKERS = {
         "menjadi katalisator utama",
         "terlebih lagi dalam dinamika",
         "patut menjadi catatan penting",
-        "sebagai kesimpulan akhir dapat dinyatakan"
+        "sebagai kesimpulan akhir dapat dinyatakan",
+        # Formulaik akademis khas draf LLM Indonesia
+        "secara etimologis, kata",
+        "secara kebahasaan, kata",
+        "berdasarkan kajian teori di atas",
+        "dapat disusun sebuah kerangka pemikiran",
+        "merupakan jawaban sementara terhadap rumusan masalah",
+        "pada hakikatnya merupakan",
+        "merupakan pintu gerbang bagi seseorang",
+        "memberikan bukti empiris bahwa",
+        "memberi dasar akademik yang kuat",
+        "menjadi landasan kognitif yang menuntun",
+        "merupakan wilayah generalisasi yang terdiri atas",
+        "merupakan bagian dari jumlah dan karakteristik yang dimiliki",
+        "lazim digunakan dalam penelitian sosial",
+        "bertujuan meminimalkan bias dan menghasilkan",
+        "terdiri atas dua variabel, yaitu variabel bebas",
+        "merupakan prosedur yang dipakai untuk mengetahui",
+        "memiliki tingkat konsistensi internal yang baik",
+        "untuk melihat apakah kelompok data memiliki varians",
+        "adanya hubungan searah antara variabel bebas",
+        "diduga memberikan dampak terhadap variabel terikat",
+        "sebagaimana dinyatakan bahwa",
+        "memperkuat asumsi bahwa",
+        "tidak dapat dipisahkan",
+        "memiliki peran penting, baik dalam",
+        "fenomena yang sering dijumpai",
+        "sebagai satu di antara syarat penyusunan skripsi"
     ],
     "english": [
         "furthermore",
@@ -143,10 +170,42 @@ def detect_spun_synonym_anomalies(text: str) -> List[Dict[str, Any]]:
     return anomalies
 
 
-def analyze_ai_stylometrics(text: str) -> Dict[str, Any]:
+def calculate_segmental_monotony(text: str) -> Dict[str, Any]:
+    """
+    Menganalisis variabilitas ritme sintaksis pada tingkat paragraf / segmen lokal.
+    Paragraf AI: setiap kalimat dalam satu paragraf memiliki panjang yang relatif seragam (CV < 0.32, avg_len 18-45 kata).
+    Paragraf Manusia: memiliki dinamika bervariasi (kalimat pengait pendek + elaborasi panjang).
+    """
+    raw_paras = [p.strip() for p in text.split('\n\n') if len(p.strip()) >= 70]
+    if not raw_paras:
+        raw_paras = [p.strip() for p in text.split('\n') if len(p.strip()) >= 70]
+
+    evaluated = 0
+    monotonous = 0
+    for p in raw_paras:
+        sents = tokenize_sentences(p)
+        if len(sents) >= 3:
+            lens = [len(s.split()) for s in sents]
+            b = calculate_burstiness(lens)
+            avg_l = sum(lens) / len(lens) if lens else 0
+            evaluated += 1
+            if b < 0.32 and 18 <= avg_l <= 45:
+                monotonous += 1
+
+    ratio = round((monotonous / evaluated) * 100.0, 2) if evaluated >= 3 else 0.0
+    return {
+        "evaluated_paragraphs": evaluated,
+        "monotonous_paragraphs": monotonous,
+        "monotony_ratio": ratio
+    }
+
+
+def analyze_ai_stylometrics(text: str, substantive_text: Optional[str] = None) -> Dict[str, Any]:
     """
     Menganalisis profil stylometri naskah secara komprehensif dan menghasilkan
     indikator kemungkinan naskah disusun oleh AI atau mesin parafrase.
+    Mendukung input teks substantif murni (mengecualikan lampiran/tabel/formalitas)
+    guna menghindari bias agregasi global.
     """
     if not text or len(text.strip()) < 50:
         return {
@@ -159,45 +218,65 @@ def analyze_ai_stylometrics(text: str) -> Dict[str, Any]:
                 "burstiness": 0.5,
                 "lexical_diversity": 0.0,
                 "transition_density": 0.0,
-                "average_sentence_length": 0.0
+                "average_sentence_length": 0.0,
+                "segmental_monotony_ratio": 0.0,
+                "monotonous_paragraphs_count": 0,
+                "evaluated_paragraphs_count": 0
             },
             "anomalies": []
         }
 
-    sentences = tokenize_sentences(text)
+    # Gunakan teks substantif jika tersedia untuk menghindari distorsi tabel/angket lampiran
+    analysis_text = substantive_text if (substantive_text and len(substantive_text.strip()) >= 200) else text
+
+    sentences = tokenize_sentences(analysis_text)
     sentence_lengths = [len(s.split()) for s in sentences]
-    words = text.split()
+    words = analysis_text.split()
     total_words = len(words)
 
     avg_sentence_len = sum(sentence_lengths) / len(sentence_lengths) if sentence_lengths else 0
     burstiness = calculate_burstiness(sentence_lengths)
     lex_diversity = calculate_lexical_diversity(words)
-    transition_density = calculate_ai_transition_density(text, total_words)
-    anomalies = detect_spun_synonym_anomalies(text)
+    transition_density = calculate_ai_transition_density(analysis_text, total_words)
+    anomalies = detect_spun_synonym_anomalies(analysis_text)
+    seg_monotony = calculate_segmental_monotony(analysis_text)
+    seg_ratio = seg_monotony["monotony_ratio"]
 
     # Bobot Penilaian AI Probability (0.0 s/d 100.0)
-    # 1. Burstiness rendah (< 0.28) menyumbang indikasi AI tinggi (+35 poin)
     ai_score = 0.0
+
+    # 1. Global Burstiness (< 0.40)
     if burstiness < 0.25:
-        ai_score += 40.0
+        ai_score += 35.0
     elif burstiness < 0.32:
         ai_score += 25.0
     elif burstiness < 0.40:
-        ai_score += 10.0
-
-    # 2. Transisi klise AI tinggi (> 2.5 per 1000 kata) menyumbang +30 poin
-    if transition_density >= 3.5:
-        ai_score += 35.0
-    elif transition_density >= 2.0:
-        ai_score += 20.0
-    elif transition_density >= 1.0:
-        ai_score += 10.0
-
-    # 3. Keseragaman panjang kalimat rata-rata khas LLM (18-28 kata)
-    if 18 <= avg_sentence_len <= 28 and burstiness < 0.35:
         ai_score += 15.0
 
-    # 4. Deteksi parafrase canggung / spinner
+    # 2. Segmental Monotony Ratio (% paragraf seragam khas AI)
+    if seg_monotony["evaluated_paragraphs"] >= 5:
+        if seg_ratio >= 40.0:
+            ai_score += 35.0
+        elif seg_ratio >= 28.0:
+            ai_score += 25.0
+        elif seg_ratio >= 18.0:
+            ai_score += 15.0
+
+    # 3. Kepadatan Frasa Klise / Formulaik Akademik AI
+    if transition_density >= 3.0:
+        ai_score += 35.0
+    elif transition_density >= 2.0:
+        ai_score += 25.0
+    elif transition_density >= 1.0:
+        ai_score += 15.0
+    elif transition_density >= 0.5:
+        ai_score += 8.0
+
+    # 4. Panjang kalimat rata-rata teratur khas LLM (18-32 kata)
+    if 18 <= avg_sentence_len <= 32 and (burstiness < 0.42 or seg_ratio >= 25.0):
+        ai_score += 10.0
+
+    # 5. Deteksi parafrase canggung / spinner
     if anomalies:
         ai_score += min(len(anomalies) * 5.0, 15.0)
 
@@ -205,21 +284,34 @@ def analyze_ai_stylometrics(text: str) -> Dict[str, Any]:
     ai_score = round(min(max(ai_score, 0.0), 100.0), 2)
 
     # Klasifikasi Tingkat Indikasi
-    if ai_score >= 65.0:
+    if ai_score >= 60.0:
         confidence = "HIGH"
         label = "Pola Susunan Terstruktur Khas AI (Tinggi)"
-        rationale = (
-            f"Naskah menunjukkan variasi panjang kalimat yang sangat seragam (Burstiness: {burstiness:.2f}) "
-            f"disertai kepadatan frasa transisi generik ({transition_density:.1f}/1000 kata). "
-            f"Disarankan penguji mengonfirmasi pemahaman konseptual mahasiswa secara lisan."
-        )
-    elif ai_score >= 38.0:
+        if seg_ratio >= 25.0 and transition_density >= 1.0:
+            rationale = (
+                f"Naskah menunjukkan keteraturan ritme sintaksis segmental yang tinggi ({seg_ratio:.1f}% paragraf berpola seragam khas mesin) "
+                f"disertai kepadatan formulaik akademik AI ({transition_density:.1f}/1000 kata). "
+                f"Disarankan penguji melakukan klarifikasi pemahaman konseptual dan sumber rujukan secara lisan."
+            )
+        else:
+            rationale = (
+                f"Naskah menunjukkan variasi panjang kalimat yang sangat seragam (Burstiness: {burstiness:.2f}) "
+                f"disertai kepadatan frasa transisi generik ({transition_density:.1f}/1000 kata). "
+                f"Disarankan penguji mengonfirmasi pemahaman konseptual mahasiswa secara lisan."
+            )
+    elif ai_score >= 35.0:
         confidence = "MODERATE"
         label = "Indikasi Parafrase AI Ringan / Berbantuan Mesin"
-        rationale = (
-            f"Ditemukan beberapa segmen dengan keteraturan sintaksis khas mesin (Burstiness: {burstiness:.2f}). "
-            f"Naskah kemungkinan menggunakan alat bantu parafrase atau penyempurnaan kalimat digital."
-        )
+        if seg_ratio >= 20.0:
+            rationale = (
+                f"Ditemukan beberapa segmen dengan keteraturan sintaksis khas mesin ({seg_ratio:.1f}% paragraf seragam). "
+                f"Naskah kemungkinan menggunakan alat bantu parafrase atau asistensi draf digital."
+            )
+        else:
+            rationale = (
+                f"Ditemukan beberapa segmen dengan keteraturan sintaksis khas mesin (Burstiness: {burstiness:.2f}). "
+                f"Naskah kemungkinan menggunakan alat bantu parafrase atau penyempurnaan kalimat digital."
+            )
     else:
         confidence = "LOW"
         label = "Gaya Bahasa Alami Manusia (Organik)"
@@ -240,7 +332,10 @@ def analyze_ai_stylometrics(text: str) -> Dict[str, Any]:
             "transition_density": transition_density,
             "average_sentence_length": round(avg_sentence_len, 2),
             "total_sentences_analyzed": len(sentences),
-            "total_words_analyzed": total_words
+            "total_words_analyzed": total_words,
+            "segmental_monotony_ratio": seg_ratio,
+            "monotonous_paragraphs_count": seg_monotony["monotonous_paragraphs"],
+            "evaluated_paragraphs_count": seg_monotony["evaluated_paragraphs"]
         },
         "anomalies": anomalies
     }

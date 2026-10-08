@@ -218,6 +218,13 @@ BACK_MATTER_PATTERNS = [
     (re.compile(r"(?im)^\s*(?:LAMPIRAN(?:\s+[A-Z0-9\.\-]+)?)\s*$"), SectionType.LAMPIRAN),
 ]
 
+# Pola Seksi Tubuh Proposal / Karya Ilmiah Standalone (tanpa label kata 'BAB')
+PROPOSAL_BODY_PATTERNS = [
+    (re.compile(r"(?im)^[^\S\r\n]*(?:[A-Z]\.\s*)?LATAR\s+BELAKANG\s*$"), SectionZone.BODY_TEXT, SectionType.BAB_1_PENDAHULUAN),
+    (re.compile(r"(?im)^[^\S\r\n]*(?:[A-Z]\.\s*)?(?:LANDASAN|KAJIAN)\s+TEORI\s*$"), SectionZone.BODY_TEXT, SectionType.BAB_2_LANDASAN_TEORI),
+    (re.compile(r"(?im)^[^\S\r\n]*(?:[A-Z]\.\s*)?(?:METODE|METODOLOGI)\s+PENELITIAN\s*$"), SectionZone.METHODOLOGY, SectionType.BAB_3_METODE_PENELITIAN),
+]
+
 
 def _classify_bab_title(bab_label: str, subtitle: str) -> tuple[Optional[SectionZone], Optional[SectionType]]:
     """
@@ -314,6 +321,18 @@ def parse_document_sections(
                 "zone": SectionZone.BODY_TEXT,
                 "type": SectionType.BAB_4_HASIL_PEMBAHASAN
             })
+
+    # Fallback Proposal Tanpa Label BAB: jika Bab I belum tertangkap (format proposal A, B, C...)
+    has_bab1 = any(c["type"] == SectionType.BAB_1_PENDAHULUAN for c in heading_candidates)
+    if not has_bab1:
+        for pattern, zone, stype in PROPOSAL_BODY_PATTERNS:
+            for m in pattern.finditer(text):
+                heading_candidates.append({
+                    "pos": m.start(),
+                    "title": m.group(0).strip(),
+                    "zone": zone,
+                    "type": stype
+                })
 
     # B. Cek Pola Front Matter
     for pattern, stype in FRONT_MATTER_PATTERNS:

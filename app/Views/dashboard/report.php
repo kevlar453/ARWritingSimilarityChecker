@@ -1198,6 +1198,12 @@
                     <p class="text-[11px] text-slate-500 leading-tight">
                         Frekuensi frasa klise LLM (misal: "dalam era digital", "perlu digarisbawahi").
                     </p>
+                    <?php if (!empty($aiMetrics['segmental_monotony_ratio']) && (float)$aiMetrics['segmental_monotony_ratio'] > 0): ?>
+                        <div class="mt-1 text-[10px] font-mono-code text-indigo-700 bg-indigo-50/80 px-1.5 py-0.5 rounded border border-indigo-100 flex items-center justify-between">
+                            <span>Monotoni Paragraf:</span>
+                            <strong><?= number_format((float)$aiMetrics['segmental_monotony_ratio'], 1) ?>%</strong>
+                        </div>
+                    <?php endif; ?>
                 </div>
 
                 <!-- 3. Rata-rata Panjang Kalimat -->

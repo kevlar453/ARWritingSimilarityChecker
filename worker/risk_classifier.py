@@ -430,6 +430,8 @@ def predict_academic_risk_xgboost(
         drivers.append(f"Kemiripan konsep alih bahasa internasional ({cross_lingual_score:.1f}%) memicu atensi telaah.")
     if burstiness < 0.28:
         drivers.append(f"Ritme kalimat seragam khas AI (Burstiness: {burstiness:.2f}) meningkatkan indikasi berbantuan mesin.")
+    if transition_density >= 2.0:
+        drivers.append(f"Kepadatan frasa formulaik AI ({transition_density:.1f}/1000 kata) meningkatkan atensi verifikasi kepenulisan.")
     if quote_ratio >= 0.5:
         drivers.append(f"Tingginya proporsi kutipan bertanda petik ({quote_ratio*100:.0f}%) meringankan potensi pelanggaran.")
     if boilerplate_ratio >= 0.5:

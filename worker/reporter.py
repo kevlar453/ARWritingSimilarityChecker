@@ -217,7 +217,12 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
             boilerplate_res = detect_academic_boilerplate(submission_text)
 
             # 4. Stylometric & AI-Generated Text Indicator (Fitur 2)
-            ai_stylometrics_res = analyze_ai_stylometrics(submission_text)
+            from worker.section_parser import get_substantive_including_methodology
+            subst_body_text = get_substantive_including_methodology(segmentation_res) if segmentation_res else ""
+            ai_stylometrics_res = analyze_ai_stylometrics(
+                text=submission_text,
+                substantive_text=subst_body_text
+            )
             result["ai_stylometrics"] = ai_stylometrics_res
 
             # 5. Cross-Lingual Semantic Similarity Engine (Fitur 5 / Opsi A)
