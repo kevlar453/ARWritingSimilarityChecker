@@ -13,6 +13,7 @@ from pathlib import Path
 import qrcode
 import base64
 import io
+import secrets
 
 # Ensure root directory is on PYTHONPATH
 sys.path.append(str(Path(__file__).resolve().parents[1]))
@@ -39,10 +40,12 @@ def generate_qr_code_base64(url: str) -> str:
         print(f"[EXPORTER WARNING] Gagal menghasilkan QR code: {e}")
         return ""
 
+def generate_verification_code() -> str:
+    rnd = secrets.token_hex(6).upper()
+    return f"ART-{rnd[:4]}-{rnd[4:8]}-{rnd[8:12]}"
+
 def generate_verification_hash(report_id: int, doc_id: int, created_at: str, sim: float) -> str:
-    seed = f"ARTILIK:{report_id}:{doc_id}:{created_at}:{sim:.2f}:OFFICIAL_CERTIFICATE"
-    h = hashlib.sha256(seed.encode("utf-8")).hexdigest().upper()
-    return f"ART-{h[:4]}-{h[4:8]}-{h[8:12]}"
+    return generate_verification_code()
 
 def build_report_html(report: dict, document: dict, sources: list[dict], matches: list[dict]) -> str:
     r_id = report["id"]
@@ -76,7 +79,7 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
         date_str = datetime.now().strftime("%d %B %Y, %H:%M WIB")
         raw_created = date_str
 
-    cert_hash = generate_verification_hash(r_id, d_id, raw_created, overall_sim)
+    cert_hash = report.get("verification_code") or generate_verification_hash(r_id, d_id, raw_created, overall_sim)
     
     # Evidence data JSON
     evidence_data = {}
@@ -853,14 +856,17 @@ def export_report_pdf(report_id: int, output_path: str | None = None) -> bytes:
 
         doc_id = report["document_id"]
         # 1b. Update verification_code di database jika belum terisi
-        raw_created = str(report["created_at"]) if report.get("created_at") else str(datetime.now())
-        overall_sim = float(report.get("overall_similarity") or 0)
-        cert_hash = generate_verification_hash(report_id, doc_id, raw_created, overall_sim)
-        try:
-            cursor.execute("UPDATE reports SET verification_code = %s WHERE id = %s AND (verification_code IS NULL OR verification_code = '')", (cert_hash, report_id))
-            conn.commit()
-        except Exception:
-            pass
+        cert_hash = report.get("verification_code")
+        if not cert_hash:
+            raw_created = str(report["created_at"]) if report.get("created_at") else str(datetime.now())
+            overall_sim = float(report.get("overall_similarity") or 0)
+            cert_hash = generate_verification_hash(report_id, doc_id, raw_created, overall_sim)
+            report["verification_code"] = cert_hash
+            try:
+                cursor.execute("UPDATE reports SET verification_code = %s WHERE id = %s AND (verification_code IS NULL OR verification_code = '')", (cert_hash, report_id))
+                conn.commit()
+            except Exception:
+                pass
 
         # 2. Fetch Document
         cursor.execute("SELECT * FROM documents WHERE id = %s", (doc_id,))

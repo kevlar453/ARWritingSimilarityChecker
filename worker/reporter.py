@@ -26,9 +26,7 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
             raise ValueError(f"Dokumen ID {document_id} tidak ditemukan.")
             
         # 3. Cek apakah dokumen sudah di-index atau belum
-        cursor.execute("SELECT COUNT(*) AS cnt FROM fingerprints WHERE document_id = %s", (document_id,))
-        fp_count = cursor.fetchone()["cnt"]
-        if fp_count == 0 and document.get("storage_path"):
+        if document.get("indexing_status") != "completed" and document.get("storage_path"):
             index_document(
                 connection=connection,
                 document_id=document_id,

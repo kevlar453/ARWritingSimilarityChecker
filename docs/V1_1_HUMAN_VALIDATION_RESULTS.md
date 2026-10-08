@@ -1,5 +1,5 @@
-# Laporan Validasi Manusia & Penelaahan Pakar AR Tilik v1.1 (WP-06)
-**Dokumen Pembuktian Post-Release Human Review & Evaluasi Kualitatif Pakar**  
+# Laporan Uji Konsistensi Otomatis & Telaah Diagnostik AR Tilik v1.1 (WP-06)
+**Dokumen Pembuktian Post-Release Uji Konsistensi Kasus Sintetis & Evaluasi Diagnostik**  
 **Versi Sistem:** v1.1.0  
 **Baseline Engine:** v1.0.0 (FROZEN — `worker/hybrid.py` 100% Tidak Dimodifikasi)  
 **Tanggal Eksekusi:** 05 Oktober 2026  
@@ -13,9 +13,9 @@
 > **Pedoman Klaim Akademis yang Sah:**
 > Jangan menyatakan: *"AR Tilik memiliki akurasi telaah manusia 100%."*  
 > Pernyataan resmi dan defensibel yang digunakan:  
-> **"Pada 30 kasus uji terarah yang diprioritaskan ke dalam 6 tier diagnostik akademik, seluruh kasus dinilai CORRECT (24/30, 80.0%) atau ACCEPTABLE (6/30, 20.0%) oleh penelaah pakar independen terhadap output sistem AR Tilik v1.1, menghasilkan tingkat kesepakatan penelaah (reviewer agreement rate) sebesar 100.0% (30/30) tanpa ada vonis TOO_STRICT, TOO_LENIENT, atau UNCERTAIN."**
+> **"Pada 30 kasus uji sintetis terarah yang diprioritaskan ke dalam 6 tier diagnostik akademik, seluruh kasus dinilai konsisten CORRECT (24/30, 80.0%) atau ACCEPTABLE (6/30, 20.0%) melalui uji konsistensi otomatis terhadap output sistem AR Tilik v1.1, menghasilkan tingkat keselarasan diagnostik (diagnostic agreement rate) sebesar 100.0% (30/30) pada dataset sintetis terarah."**
 
-Validasi manusia WP-06 membuktikan bahwa lapisan sadar konteks (*Citation & Context Awareness*) dan dekomposisi jenis bukti (*Evidence-Type Source Grouping*) memberikan bantuan yang substansial, transparan, dan objektif bagi penelaah akademik dalam membedakan penjiplakan sejati dari kutipan sah, boilerplate metodologis, atau kesamaan medan makna.
+Validasi diagnostik WP-06 membuktikan bahwa lapisan sadar konteks (*Citation & Context Awareness*) dan dekomposisi jenis bukti (*Evidence-Type Source Grouping*) memberikan bantuan yang substansial, transparan, dan objektif bagi penelaah akademik dalam membedakan penjiplakan sejati dari kutipan sah, boilerplate metodologis, atau kesamaan medan makna.
 
 ---
 

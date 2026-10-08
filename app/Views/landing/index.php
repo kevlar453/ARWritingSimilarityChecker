@@ -2556,8 +2556,8 @@
                     <div class="stat-lbl">Pengunjung Unik</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-val">100%</div>
-                    <div class="stat-lbl">Reviewer Agreement</div>
+                    <div class="stat-val">Hybrid</div>
+                    <div class="stat-lbl">Exact &amp; IDF Engine</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-val">&lt; 150ms</div>

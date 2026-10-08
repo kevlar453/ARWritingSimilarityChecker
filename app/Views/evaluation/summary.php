@@ -86,7 +86,7 @@
                     </div>
                     <h1 class="text-2xl font-bold text-slate-900">Ringkasan Evaluasi & Telaah Manusia</h1>
                     <p class="text-sm text-slate-500 mt-1 max-w-3xl">
-                        Konsolidasi hasil pertimbangan pakar manusia (*expert academic judgment*) terhadap bukti tekstual engine v1.0.0.
+                        Konsolidasi hasil telaah evaluasi (*academic judgment review*) terhadap bukti tekstual engine v1.0.0.
                         Evaluasi ini memverifikasi keadilan akademik, mengonfirmasi perlakuan sitasi, dan memberikan landasan empiris bagi backlog v1.1.
                     </p>
                 </div>

@@ -20,7 +20,6 @@ def save_page(connection, document_id: int, page_number: int, text: str) -> int:
         ON DUPLICATE KEY UPDATE text = VALUES(text)
     """, (document_id, page_number, text))
     page_id = cursor.lastrowid
-    connection.commit()
     cursor.close()
     return page_id
 
@@ -47,7 +46,6 @@ def save_chunk(
         word_count, start_word_pos, end_word_pos
     ))
     chunk_id = cursor.lastrowid
-    connection.commit()
     cursor.close()
     return chunk_id
 
@@ -70,11 +68,53 @@ def save_fingerprints(
             shingle["fingerprint"],
             abs_pos
         ))
-    cursor.executemany("""
-        INSERT INTO fingerprints (document_id, chunk_id, fingerprint, position, created_at)
-        VALUES (%s, %s, %s, %s, NOW())
-    """, values)
-    connection.commit()
+        if len(values) >= 1000:
+            cursor.executemany("""
+                INSERT INTO fingerprints (document_id, chunk_id, fingerprint, position, created_at)
+                VALUES (%s, %s, %s, %s, NOW())
+            """, values)
+            values = []
+    if values:
+        cursor.executemany("""
+            INSERT INTO fingerprints (document_id, chunk_id, fingerprint, position, created_at)
+            VALUES (%s, %s, %s, %s, NOW())
+        """, values)
+    cursor.close()
+
+def save_document_fingerprints(
+    connection,
+    document_id: int,
+    shingles: list[dict],
+    word_chunk_ids: list[int]
+):
+    """
+    Menyimpan seluruh fingerprint dokumen secara berkesinambungan (cross-page).
+    Setiap shingle diasosiasikan dengan chunk_id dari kata awal shingle tersebut.
+    """
+    if not shingles:
+        return
+    cursor = connection.cursor()
+    values = []
+    for shingle in shingles:
+        pos = shingle["position"]
+        chunk_id = word_chunk_ids[pos]
+        values.append((
+            document_id,
+            chunk_id,
+            shingle["fingerprint"],
+            pos
+        ))
+        if len(values) >= 1000:
+            cursor.executemany("""
+                INSERT INTO fingerprints (document_id, chunk_id, fingerprint, position, created_at)
+                VALUES (%s, %s, %s, %s, NOW())
+            """, values)
+            values = []
+    if values:
+        cursor.executemany("""
+            INSERT INTO fingerprints (document_id, chunk_id, fingerprint, position, created_at)
+            VALUES (%s, %s, %s, %s, NOW())
+        """, values)
     cursor.close()
 
 def save_fingerprint_documents(
@@ -87,11 +127,12 @@ def save_fingerprint_documents(
     unique_fps = {item["fingerprint"] for item in shingles}
     cursor = connection.cursor()
     values = [(fp, document_id) for fp in unique_fps]
-    cursor.executemany("""
-        INSERT IGNORE INTO fingerprint_documents (fingerprint, document_id, created_at)
-        VALUES (%s, %s, NOW())
-    """, values)
-    connection.commit()
+    for start in range(0, len(values), 1000):
+        batch = values[start:start + 1000]
+        cursor.executemany("""
+            INSERT IGNORE INTO fingerprint_documents (fingerprint, document_id, created_at)
+            VALUES (%s, %s, NOW())
+        """, batch)
     cursor.close()
 
 def rebuild_fingerprint_stats(connection, benchmark_run_id: int | None = None):
@@ -142,64 +183,100 @@ def index_document(
     mime_type: str | None = None,
     is_corpus: bool = False
 ):
-    clear_document_index(connection, document_id)
-    pages = extract_document(storage_path, mime_type)
-    
-    absolute_word_position = 0
-    total_pages = len(pages)
-    
-    for page in pages:
-        raw_text = page["text"]
-        # Netralkan manipulasi karakter campuran (homoglif) sebelum tokenisasi
-        deobf_text = deobfuscate_for_indexing(raw_text)
-        norm_text = normalize_text(deobf_text)
-        words = tokenize(norm_text)
-        word_count = len(words)
+    try:
+        clear_document_index(connection, document_id)
+        pages = extract_document(storage_path, mime_type)
         
-        if word_count == 0:
-            continue
+        total_pages = len(pages)
+        all_words = []
+        word_chunk_ids = []
+        
+        for page_idx, page in enumerate(pages):
+            raw_text = page["text"]
+            # Netralkan manipulasi karakter campuran (homoglif) sebelum tokenisasi
+            deobf_text = deobfuscate_for_indexing(raw_text)
+            norm_text = normalize_text(deobf_text)
+            words = tokenize(norm_text)
+            word_count = len(words)
             
-        page_id = save_page(connection, document_id, page["page_number"], raw_text)
-        start_pos = absolute_word_position
-        end_pos = absolute_word_position + word_count - 1
+            if word_count == 0:
+                continue
+                
+            page_id = save_page(connection, document_id, page["page_number"], raw_text)
+            start_pos = len(all_words)
+            end_pos = start_pos + word_count - 1
+            
+            chunk_id = save_chunk(
+                connection=connection,
+                document_id=document_id,
+                page_id=page_id,
+                chunk_index=page_idx,
+                text=raw_text,
+                normalized_text=" ".join(words),
+                word_count=word_count,
+                start_word_pos=start_pos,
+                end_word_pos=end_pos
+            )
+            
+            all_words.extend(words)
+            word_chunk_ids.extend([chunk_id] * word_count)
+            
+        if not all_words:
+            cursor = connection.cursor()
+            cursor.execute("""
+                UPDATE documents
+                SET page_count = %s,
+                    status = 'failed',
+                    indexing_status = 'failed',
+                    updated_at = NOW()
+                WHERE id = %s
+            """, (total_pages, document_id))
+            connection.commit()
+            cursor.close()
+            return
+
+        # Buat shingle berkesinambungan lintas halaman dari seluruh kata dokumen
+        shingles = generate_shingles(all_words, size=5)
         
-        chunk_id = save_chunk(
+        # Simpan fingerprints dan dokumen referensi secara atomik
+        save_document_fingerprints(
             connection=connection,
             document_id=document_id,
-            page_id=page_id,
-            chunk_index=0,
-            text=raw_text,
-            normalized_text=" ".join(words),
-            word_count=word_count,
-            start_word_pos=start_pos,
-            end_word_pos=end_pos
-        )
-        
-        shingles = generate_shingles(words, size=5)
-        save_fingerprints(
-            connection=connection,
-            document_id=document_id,
-            chunk_id=chunk_id,
             shingles=shingles,
-            absolute_offset=absolute_word_position
+            word_chunk_ids=word_chunk_ids
         )
         
         if is_corpus:
             save_fingerprint_documents(connection, document_id, shingles)
             
-        absolute_word_position += word_count
+        cursor = connection.cursor()
+        cursor.execute("""
+            UPDATE documents
+            SET page_count = %s,
+                status = 'completed',
+                indexing_status = 'completed',
+                updated_at = NOW()
+            WHERE id = %s
+        """, (total_pages, document_id))
+        connection.commit()
+        cursor.close()
         
-    cursor = connection.cursor()
-    cursor.execute("""
-        UPDATE documents
-        SET page_count = %s,
-            status = 'completed',
-            indexing_status = 'completed',
-            updated_at = NOW()
-        WHERE id = %s
-    """, (total_pages, document_id))
-    connection.commit()
-    cursor.close()
-    
-    if is_corpus:
-        rebuild_fingerprint_stats(connection)
+        if is_corpus:
+            rebuild_fingerprint_stats(connection)
+            
+    except Exception as err:
+        connection.rollback()
+        try:
+            cursor = connection.cursor()
+            cursor.execute("""
+                UPDATE documents
+                SET status = 'failed',
+                    indexing_status = 'failed',
+                    updated_at = NOW()
+                WHERE id = %s
+            """, (document_id,))
+            connection.commit()
+            cursor.close()
+        except Exception:
+            pass
+        raise err
