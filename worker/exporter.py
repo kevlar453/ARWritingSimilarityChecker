@@ -15,8 +15,13 @@ import base64
 import io
 import secrets
 
-# Ensure root directory is on PYTHONPATH
-sys.path.append(str(Path(__file__).resolve().parents[1]))
+# Ensure root directory is on PYTHONPATH and prevent script dir from shadowing worker package
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+script_dir = str(Path(__file__).resolve().parent)
+if script_dir in sys.path:
+    sys.path.remove(script_dir)
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 from worker.database import get_connection
 
