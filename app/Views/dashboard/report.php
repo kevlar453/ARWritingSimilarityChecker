@@ -2198,52 +2198,174 @@
             let inTable = false;
             let tableRows = [];
 
-            function flushTable() {
-                if (tableRows.length === 0) return;
+            function buildSmartHtmlTable(rows) {
+                if (!rows || rows.length === 0) return '';
 
-                let hasHeaderSep = false;
                 let sepIdx = -1;
-                for (let i = 0; i < tableRows.length; i++) {
-                    const rawCells = tableRows[i];
+                for (let i = 0; i < rows.length; i++) {
+                    const rawCells = rows[i];
                     if (rawCells.length > 0 && rawCells.every(c => /^[-:\s]+$/.test(c.replace(/<[^>]+>/g, '').trim()))) {
-                        hasHeaderSep = true;
                         sepIdx = i;
                         break;
                     }
                 }
 
-                let theadHtml = '';
-                let tbodyHtml = '';
-
-                if (hasHeaderSep && sepIdx > 0) {
-                    const headerRow = tableRows[0];
-                    theadHtml = '<thead class="bg-slate-100 text-slate-800 font-bold uppercase tracking-wider text-[11px] border-b border-slate-300"><tr>' +
-                        headerRow.map(c => `<th class="py-2.5 px-3 border-r border-slate-200 last:border-r-0 text-left font-semibold">${c.trim()}</th>`).join('') +
-                        '</tr></thead>';
-
-                    const bodyRows = tableRows.slice(sepIdx + 1);
-                    tbodyHtml = '<tbody class="divide-y divide-slate-100 bg-white font-sans text-xs">' +
-                        bodyRows.map((r, rIdx) => `<tr class="${rIdx % 2 === 0 ? 'bg-white' : 'bg-slate-50/60'} hover:bg-indigo-50/40 transition-colors">` +
-                            r.map(c => `<td class="py-2 px-3 border-r border-slate-200 last:border-r-0 align-top">${c.trim()}</td>`).join('') +
-                        '</tr>').join('') + '</tbody>';
-                } else if (tableRows.length >= 2) {
-                    const headerRow = tableRows[0];
-                    theadHtml = '<thead class="bg-slate-100 text-slate-800 font-bold uppercase tracking-wider text-[11px] border-b border-slate-300"><tr>' +
-                        headerRow.map(c => `<th class="py-2.5 px-3 border-r border-slate-200 last:border-r-0 text-left font-semibold">${c.trim()}</th>`).join('') +
-                        '</tr></thead>';
-
-                    const bodyRows = tableRows.slice(1);
-                    tbodyHtml = '<tbody class="divide-y divide-slate-100 bg-white font-sans text-xs">' +
-                        bodyRows.map((r, rIdx) => `<tr class="${rIdx % 2 === 0 ? 'bg-white' : 'bg-slate-50/60'} hover:bg-indigo-50/40 transition-colors">` +
-                            r.map(c => `<td class="py-2 px-3 border-r border-slate-200 last:border-r-0 align-top">${c.trim()}</td>`).join('') +
-                        '</tr>').join('') + '</tbody>';
+                let headerRow = [];
+                let bodyRows = [];
+                if (sepIdx > 0) {
+                    headerRow = rows[0];
+                    bodyRows = rows.slice(sepIdx + 1);
+                } else if (rows.length >= 2) {
+                    headerRow = rows[0];
+                    bodyRows = rows.slice(1);
                 } else {
-                    tbodyHtml = '<tbody class="divide-y divide-slate-100 bg-white font-sans text-xs"><tr>' +
-                        tableRows[0].map(c => `<td class="py-2 px-3 border-r border-slate-200 last:border-r-0 align-top">${c.trim()}</td>`).join('') +
-                        '</tr></tbody>';
+                    bodyRows = rows;
                 }
 
-                out.push(`</div><div class="overflow-x-auto my-3 rounded-xl border border-slate-300 shadow-2xs bg-white"><table class="min-w-full divide-y divide-slate-200 border-collapse">${theadHtml}${tbodyHtml}</table></div><div class="leading-relaxed whitespace-pre-wrap">`);
+                const numCols = Math.max(headerRow.length, ...bodyRows.map(r => r.length));
+                if (numCols === 0) return '';
+
+                const padRow = (r) => {
+                    const res = [...r];
+                    while (res.length < numCols) res.push('');
+                    return res;
+                };
+
+                const normHeader = padRow(headerRow);
+                const normBody = bodyRows.map(padRow);
+                const numRows = normBody.length;
+                const stripCell = (cell) => (cell || '').replace(/<[^>]+>/g, '').trim();
+
+                let theadHtml = '';
+                if (normHeader.length > 0 && normHeader.some(c => stripCell(c) !== '')) {
+                    theadHtml = '<thead class="bg-slate-100 text-slate-800 font-bold uppercase tracking-wider text-[11px] border-b border-slate-300"><tr>' +
+                        normHeader.map(c => `<th class="py-2.5 px-3 border-r border-slate-300 last:border-r-0 text-center font-bold text-slate-800">${c.trim()}</th>`).join('') +
+                        '</tr></thead>';
+                }
+
+                if (numRows === 0) {
+                    return `<div class="overflow-x-auto my-3 rounded-xl border border-slate-300 shadow-2xs bg-white"><table class="min-w-full divide-y divide-slate-300 border-collapse border border-slate-300">${theadHtml}</table></div>`;
+                }
+
+                // 1. Hitung rowspan untuk kolom hierarki awal (kolom 0, 1, 2: seperti No, Aspek, Kategori)
+                const rowspans = Array.from({ length: numRows }, () => Array(numCols).fill(1));
+                for (let c = 0; c < Math.min(numCols, 3); c++) {
+                    let r = 0;
+                    while (r < numRows) {
+                        const val = stripCell(normBody[r][c]);
+                        if (val !== '') {
+                            let span = 1;
+                            for (let nextR = r + 1; nextR < numRows; nextR++) {
+                                const nextVal = stripCell(normBody[nextR][c]);
+                                if (nextVal === '') {
+                                    const hasOther = normBody[nextR].some((cell, k) => k !== c && stripCell(cell) !== '');
+                                    if (hasOther) {
+                                        const isSummary = normBody[nextR].some(cell => {
+                                            const t = stripCell(cell).toLowerCase();
+                                            return /rata-rata|kriteria|jumlah|total|kesimpulan|mean|average/i.test(t);
+                                        });
+                                        if (isSummary && c > 0) {
+                                            break;
+                                        }
+                                        span++;
+                                    } else {
+                                        break;
+                                    }
+                                } else {
+                                    break;
+                                }
+                            }
+                            rowspans[r][c] = span;
+                            r += span;
+                        } else {
+                            r++;
+                        }
+                    }
+                }
+
+                // 2. Render baris tabel dengan tracking covered cell (mencegah tumpang tindih rowspan/colspan)
+                const covered = Array.from({ length: numRows }, () => Array(numCols).fill(false));
+                const trHtmls = [];
+
+                for (let r = 0; r < numRows; r++) {
+                    const cellsHtml = [];
+                    let c = 0;
+                    const isSummaryRow = normBody[r].some(cell => {
+                        const t = stripCell(cell).toLowerCase();
+                        return /rata-rata|kriteria|jumlah|total|kesimpulan|mean|average|kategori|skor/i.test(t);
+                    });
+
+                    while (c < numCols) {
+                        if (covered[r][c]) {
+                            c++;
+                            continue;
+                        }
+
+                        const raw = normBody[r][c] || '';
+                        const stripped = stripCell(raw);
+                        let colspan = 1;
+
+                        if (stripped !== '') {
+                            const allRestEmpty = normBody[r].slice(c + 1).every((cell, offset) => {
+                                const k = c + 1 + offset;
+                                return !covered[r][k] && stripCell(cell) === '';
+                            });
+
+                            if (allRestEmpty && c > 0) {
+                                colspan = numCols - c;
+                            } else if (isSummaryRow) {
+                                for (let nextC = c + 1; nextC < numCols; nextC++) {
+                                    if (!covered[r][nextC] && stripCell(normBody[r][nextC]) === '') {
+                                        const hasLaterVal = normBody[r].slice(nextC + 1).some((cell, offset) => {
+                                            const k = nextC + 1 + offset;
+                                            return !covered[r][k] && stripCell(cell) !== '';
+                                        });
+                                        if (hasLaterVal) {
+                                            colspan++;
+                                        } else {
+                                            colspan = numCols - c;
+                                            break;
+                                        }
+                                    } else {
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        const rspan = (c < 3 && colspan === 1 && stripped !== '') ? rowspans[r][c] : 1;
+
+                        for (let dr = 0; dr < rspan; dr++) {
+                            for (let dc = 0; dc < colspan; dc++) {
+                                if (r + dr < numRows && c + dc < numCols) {
+                                    covered[r + dr][c + dc] = true;
+                                }
+                            }
+                        }
+
+                        const attrs = [];
+                        if (rspan > 1) attrs.push(`rowspan="${rspan}"`);
+                        if (colspan > 1) attrs.push(`colspan="${colspan}"`);
+
+                        const isCenter = colspan > 1 || c === 0 || (c >= 2 && /^[\d\s,.\-%/+=]+$/.test(stripped));
+                        const alignClass = isCenter ? 'text-center' : 'text-left';
+                        const bgClass = (isSummaryRow && stripped !== '')
+                            ? 'bg-slate-100/85 font-semibold text-slate-900'
+                            : (r % 2 === 0 ? 'bg-white' : 'bg-slate-50/50');
+
+                        const attrStr = attrs.length > 0 ? (' ' + attrs.join(' ')) : '';
+                        cellsHtml.push(`<td${attrStr} class="py-2 px-3 border-r border-b border-slate-300 last:border-r-0 align-middle ${alignClass} ${bgClass}">${raw.trim()}</td>`);
+                        c += colspan;
+                    }
+                    trHtmls.push(`<tr class="hover:bg-indigo-50/40 transition-colors">${cellsHtml.join('')}</tr>`);
+                }
+
+                return `<div class="overflow-x-auto my-3 rounded-xl border border-slate-300 shadow-2xs bg-white"><table class="min-w-full divide-y divide-slate-300 border-collapse border border-slate-300">${theadHtml}<tbody class="divide-y divide-slate-200 bg-white font-sans text-xs">${trHtmls.join('')}</tbody></table></div>`;
+            }
+
+            function flushTable() {
+                if (tableRows.length === 0) return;
+                out.push(`</div>${buildSmartHtmlTable(tableRows)}<div class="leading-relaxed whitespace-pre-wrap">`);
                 tableRows = [];
                 inTable = false;
             }
