@@ -550,7 +550,7 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
         size: A4;
         margin: 15mm 15mm 18mm 15mm;
         @top-right {{
-            content: "AR Tilik v1.0.0 • Sertifikasi #{cert_hash}";
+            content: "AR Tilik v1.3.0 • Sertifikasi #{cert_hash}";
             font-size: 7pt;
             font-family: 'Liberation Sans', 'Helvetica Neue', Arial, sans-serif;
             color: #94a3b8;
@@ -895,7 +895,7 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
         </tr>
         <tr>
             <td class="meta-label">Arsitektur Mesin</td>
-            <td class="meta-val">AR Tilik Dual-Lens Hybrid v1.2</td>
+            <td class="meta-val">AR Tilik Dual-Lens Hybrid v1.3</td>
             <td class="meta-label">Cakupan Korpus</td>
             <td class="meta-val">{f"{corpus_docs_count:,} dokumen pembanding" if corpus_docs_count > 0 else f"{exec_time:.2f} detik (Lengkap)"}</td>
         </tr>

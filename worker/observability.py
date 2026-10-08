@@ -725,7 +725,7 @@ def get_operational_quality_report(db_conn=None) -> Dict[str, Any]:
         cursor.close()
 
         return {
-            "system_version": "v1.1.0 (GA)",
+            "system_version": "v1.3.0 (GA)",
             "baseline_engine": "v1.0.0 (FROZEN)",
             "generated_at": datetime.now(timezone.utc).isoformat(),
             "evidence_metrics": evidence_metrics,

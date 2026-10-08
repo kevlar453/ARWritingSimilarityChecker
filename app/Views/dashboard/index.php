@@ -77,7 +77,7 @@
                                 AR Tilik
                             </a>
                             <span class="text-[10px] sm:text-xs px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 font-semibold border border-indigo-100 flex-shrink-0">
-                                v1.2.0 Production
+                                v1.3.0 Production
                             </span>
                         </div>
                         <p class="hidden sm:block text-[11px] text-slate-400 font-medium truncate">

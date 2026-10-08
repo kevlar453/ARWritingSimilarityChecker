@@ -75,14 +75,14 @@
                     </div>
                     <h1 class="text-2xl font-bold text-slate-900">Dasbor Kualitas Operasional (Operational Quality Dashboard)</h1>
                     <p class="text-sm text-slate-500 mt-1 max-w-3xl">
-                        Memantau metrik kualitas sistem multi-dimensi pasca-rilis v1.1.0 secara objektif:
+                        Memantau metrik kualitas sistem multi-dimensi secara objektif:
                         distribusi bukti tekstual, kepatuhan lapisan konteks sitasi, reliabilitas telaah ahli manusia, serta SLA operasional sistem.
                     </p>
                 </div>
                 <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs space-y-1.5 min-w-[260px]">
                     <div class="flex justify-between">
                         <span class="text-slate-500">Versi Rilis:</span>
-                        <span class="font-bold font-mono-code text-indigo-700"><?= esc($report['system_version'] ?? 'v1.1.0') ?></span>
+                        <span class="font-bold font-mono-code text-indigo-700"><?= esc($report['system_version'] ?? 'v1.3.0') ?></span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-slate-500">Engine Baseline:</span>

@@ -117,7 +117,7 @@ def notify_similarity_check_completed(
 
 def notify_deployment_success(
     server_url: str = DEFAULT_BASE_URL,
-    version: str = "v1.2.0 (Dual-Lens + Section Parser + Term Inspector)"
+    version: str = "v1.3.0 (Dual-Lens + Section Parser + Audit Forensik Cerdas)"
 ) -> bool:
     """
     Notifikasi resmi penyelesaian instalasi/deployment ke production server.
@@ -127,11 +127,11 @@ def notify_deployment_success(
         f"🌐 <b>URL:</b> <a href=\"{server_url}\">{server_url}</a>\n"
         f"📦 <b>Versi:</b> <code>{version}</code>\n"
         f"🗄️ <b>Database:</b> <code>db_artilik</code> (MariaDB Production)\n"
-        "⚡ <b>Engine & Invariant:</b> Dual-Lens (5-Gram + TF-IDF) Frozen v1.0.0 Baseline\n"
-        "✨ <b>Modul Tambahan v1.2:</b>\n"
-        "  • <i>Smart Section Parser</i> (Isolasi Front/Back Matter & Metodologi)\n"
-        "  • <i>Term-Level IDF Drill-Down</i> (Dekonstruksi Bobot Topik & Divergensi)\n"
-        "  • <i>Telegram Bot Notifier</i> (Integrasi Notifikasi Real-time)\n\n"
+        "⚡ <b>Engine & Invariant:</b> Dual-Lens (5-Gram + TF-IDF) Frozen Baseline\n"
+        "✨ <b>Modul Tambahan v1.3:</b>\n"
+        "  • <i>Smart Section Parser & Boilerplate Detector</i>\n"
+        "  • <i>Audit Forensik Cerdas & Sintesis Risiko Akademik</i>\n"
+        "  • <i>Dynamic Multi-Key API Failover Engine</i>\n\n"
         f"<i>Layanan AR Tilik siap melayani pemeriksaan karya ilmiah civitas akademika.</i>"
     )
     return send_telegram_message(msg)

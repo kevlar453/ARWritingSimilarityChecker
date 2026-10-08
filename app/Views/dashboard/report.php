@@ -323,7 +323,7 @@
                 </div>
                 <div class="flex items-center gap-2">
                     <span class="text-xs font-mono-code px-2.5 py-1 rounded bg-slate-800 text-slate-300 border border-slate-700">
-                        v1.0 Frozen
+                        Dual-Lens Hybrid v1.3
                     </span>
                 </div>
             </div>
