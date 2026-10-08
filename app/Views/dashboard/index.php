@@ -398,13 +398,14 @@
 
                 <!-- Table Container with Horizontal Scroll -->
                 <div id="submissionsTableContainer" class="overflow-x-auto">
-                    <table class="min-w-[760px] sm:min-w-full w-full text-left border-collapse text-sm">
+                    <table class="min-w-[850px] sm:min-w-full w-full text-left border-collapse text-sm">
                         <thead class="bg-slate-50 text-slate-500 uppercase text-[11px] font-bold border-b border-slate-200">
                             <tr>
                                 <th class="p-3.5 sm:p-4 min-w-[200px]">Dokumen</th>
                                 <th class="p-3.5 sm:p-4 text-center w-20">Format</th>
                                 <th class="p-3.5 sm:p-4 min-w-[170px]">Engine & Keputusan</th>
-                                <th class="p-3.5 sm:p-4 min-w-[130px]">Similarity</th>
+                                <th class="p-3.5 sm:p-4 min-w-[120px]">Similarity</th>
+                                <th class="p-3.5 sm:p-4 min-w-[135px]">Indikasi AI</th>
                                 <th class="p-3.5 sm:p-4 min-w-[130px] whitespace-nowrap">Tanggal Unggah</th>
                                 <th class="p-3.5 sm:p-4 text-right min-w-[190px] whitespace-nowrap">Aksi</th>
                             </tr>
@@ -412,7 +413,7 @@
                         <tbody class="divide-y divide-slate-100">
                             <?php if (empty($submissions)): ?>
                                 <tr>
-                                    <td colspan="6" class="p-8 text-center text-slate-400 text-xs sm:text-sm">Belum ada karya ilmiah yang diunggah.</td>
+                                    <td colspan="7" class="p-8 text-center text-slate-400 text-xs sm:text-sm">Belum ada karya ilmiah yang diunggah.</td>
                                 </tr>
                             <?php else: ?>
                                 <?php foreach ($submissions as $sub): 
@@ -488,6 +489,43 @@
                                                 <span class="text-xs text-slate-400">-</span>
                                             <?php endif; ?>
                                         </td>
+                                        <td class="p-3.5 sm:p-4">
+                                            <?php if ($rep && $rep['status'] === 'completed'): ?>
+                                                <?php 
+                                                    $aiData = $sub['latest_report']['ai_assessment'] ?? \App\Controllers\DashboardController::extractAiMetrics($rep);
+                                                ?>
+                                                <?php if ($aiData !== null): 
+                                                    $aiScore = $aiData['score'];
+                                                    $gfLevel = $aiData['forensic_level'] ?? null;
+                                                    $isHigh = ($aiScore >= 65 || $gfLevel === 'TINGGI');
+                                                    $isMod  = (!$isHigh && ($aiScore >= 35 || $gfLevel === 'SEDANG'));
+                                                    $aiColor = $isHigh ? 'text-rose-600' : ($isMod ? 'text-amber-600' : 'text-emerald-600');
+                                                    $badgeBg = $isHigh ? 'bg-rose-50 text-rose-700 border-rose-200' : ($isMod ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200');
+                                                    $badgeLabel = $isHigh ? 'Indikasi Tinggi' : ($isMod ? 'Indikasi Sedang' : 'Alami (Rendah)');
+                                                    $tooltipText = 'Probabilitas AI: ' . number_format($aiScore, 1) . '%' 
+                                                        . (!empty($aiData['label']) ? ' • ' . $aiData['label'] : '')
+                                                        . (!empty($gfLevel) ? ' • Audit Forensik Cerdas: ' . $gfLevel : '');
+                                                ?>
+                                                    <div class="flex flex-col items-start gap-1" title="<?= esc($tooltipText) ?>">
+                                                        <div class="font-extrabold text-sm <?= $aiColor ?>">
+                                                            <?= number_format($aiScore, 1) ?>%
+                                                        </div>
+                                                        <span class="inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded border <?= $badgeBg ?> whitespace-nowrap">
+                                                            <?= $badgeLabel ?>
+                                                        </span>
+                                                    </div>
+                                                <?php else: ?>
+                                                    <span class="text-xs text-slate-400" title="Data penilaian AI belum tersedia">-</span>
+                                                <?php endif; ?>
+                                            <?php elseif ($isProcessing): ?>
+                                                <span class="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 animate-pulse whitespace-nowrap">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-blue-600 animate-ping"></span>
+                                                    Menganalisis...
+                                                </span>
+                                            <?php else: ?>
+                                                <span class="text-xs text-slate-400">-</span>
+                                            <?php endif; ?>
+                                        </td>
                                         <td class="p-3.5 sm:p-4 text-slate-500 text-xs whitespace-nowrap">
                                             <?= date('d M Y, H:i', strtotime($sub['created_at'])) ?>
                                         </td>
@@ -552,7 +590,7 @@
                 </div>
 
                 <div class="overflow-x-auto">
-                    <table class="min-w-[760px] sm:min-w-full w-full text-left border-collapse text-sm">
+                    <table class="min-w-[850px] sm:min-w-full w-full text-left border-collapse text-sm">
                         <thead class="bg-slate-50 text-slate-500 uppercase text-[11px] font-bold border-b border-slate-200">
                             <tr>
                                 <th class="p-3.5 sm:p-4 min-w-[200px]">Dokumen</th>
@@ -560,6 +598,7 @@
                                 <th class="p-3.5 sm:p-4 text-center w-20">Format</th>
                                 <th class="p-3.5 sm:p-4 min-w-[120px]">Status / Keputusan</th>
                                 <th class="p-3.5 sm:p-4 text-center min-w-[110px]">Similarity</th>
+                                <th class="p-3.5 sm:p-4 text-center min-w-[125px]">Indikasi AI</th>
                                 <th class="p-3.5 sm:p-4 min-w-[130px] whitespace-nowrap">Tanggal Dibagikan</th>
                                 <th class="p-3.5 sm:p-4 text-right min-w-[190px] whitespace-nowrap">Aksi</th>
                             </tr>
@@ -567,7 +606,7 @@
                         <tbody class="divide-y divide-slate-100">
                             <?php if (empty($sharedDocuments)): ?>
                                 <tr>
-                                    <td colspan="7" class="p-10 text-center">
+                                    <td colspan="8" class="p-10 text-center">
                                         <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center text-xl">👥</div>
                                         <div class="text-sm font-semibold text-slate-700">Belum ada karya ilmiah yang dibagikan</div>
                                         <p class="text-xs text-slate-400 mt-1 max-w-md mx-auto">Ketika rekan peneliti atau mahasiswa membagikan naskahnya ke alamat email Anda (<?= esc($currentUser['email'] ?? '') ?>), naskah tersebut akan otomatis muncul di sini.</p>
@@ -629,6 +668,42 @@
                                                 <div class="font-extrabold text-sm <?= $rep['overall_similarity'] >= 70 ? 'text-rose-600' : ($rep['overall_similarity'] >= 10 ? 'text-amber-600' : 'text-slate-700') ?>">
                                                     <?= number_format($rep['overall_similarity'], 2) ?>%
                                                 </div>
+                                            <?php else: ?>
+                                                <span class="text-xs text-slate-400">-</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td class="p-3.5 sm:p-4 text-center">
+                                            <?php if ($rep && $rep['status'] === 'completed'): ?>
+                                                <?php 
+                                                    $aiData = $item['latest_report']['ai_assessment'] ?? \App\Controllers\DashboardController::extractAiMetrics($rep);
+                                                ?>
+                                                <?php if ($aiData !== null): 
+                                                    $aiScore = $aiData['score'];
+                                                    $gfLevel = $aiData['forensic_level'] ?? null;
+                                                    $isHigh = ($aiScore >= 65 || $gfLevel === 'TINGGI');
+                                                    $isMod  = (!$isHigh && ($aiScore >= 35 || $gfLevel === 'SEDANG'));
+                                                    $aiColor = $isHigh ? 'text-rose-600' : ($isMod ? 'text-amber-600' : 'text-emerald-600');
+                                                    $badgeBg = $isHigh ? 'bg-rose-50 text-rose-700 border-rose-200' : ($isMod ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200');
+                                                    $badgeLabel = $isHigh ? 'Indikasi Tinggi' : ($isMod ? 'Indikasi Sedang' : 'Alami (Rendah)');
+                                                    $tooltipText = 'Probabilitas AI: ' . number_format($aiScore, 1) . '%' 
+                                                        . (!empty($aiData['label']) ? ' • ' . $aiData['label'] : '')
+                                                        . (!empty($gfLevel) ? ' • Audit Forensik Cerdas: ' . $gfLevel : '');
+                                                ?>
+                                                    <div class="flex flex-col items-center gap-1" title="<?= esc($tooltipText) ?>">
+                                                        <div class="font-extrabold text-sm <?= $aiColor ?>">
+                                                            <?= number_format($aiScore, 1) ?>%
+                                                        </div>
+                                                        <span class="inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded border <?= $badgeBg ?> whitespace-nowrap">
+                                                            <?= $badgeLabel ?>
+                                                        </span>
+                                                    </div>
+                                                <?php else: ?>
+                                                    <span class="text-xs text-slate-400" title="Data penilaian AI belum tersedia">-</span>
+                                                <?php endif; ?>
+                                            <?php elseif (!empty($rep) && in_array($rep['status'] ?? '', ['processing', 'pending'], true)): ?>
+                                                <span class="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 animate-pulse whitespace-nowrap">
+                                                    Menganalisis...
+                                                </span>
                                             <?php else: ?>
                                                 <span class="text-xs text-slate-400">-</span>
                                             <?php endif; ?>

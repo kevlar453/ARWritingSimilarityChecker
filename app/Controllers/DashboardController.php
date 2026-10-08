@@ -42,6 +42,9 @@ class DashboardController extends BaseController
             $latestReport = $reportModel->where('document_id', $sub['id'])
                                         ->orderBy('id', 'DESC')
                                         ->first();
+            if ($latestReport) {
+                $latestReport['ai_assessment'] = self::extractAiMetrics($latestReport);
+            }
             $sub['latest_report'] = $latestReport;
         }
         unset($sub);
@@ -92,6 +95,12 @@ class DashboardController extends BaseController
         $shareModel = new \App\Models\DocumentShareModel();
         $shareModel->claimPendingSharesForUser((int) $userId, (string) ($currentUser['email'] ?? ''));
         $sharedDocuments = $shareModel->getDocumentsSharedWithUser((int) $userId);
+        foreach ($sharedDocuments as &$item) {
+            if (!empty($item['latest_report'])) {
+                $item['latest_report']['ai_assessment'] = self::extractAiMetrics($item['latest_report']);
+            }
+        }
+        unset($item);
 
         return view('dashboard/index', [
             'submissions'         => $submissions,
@@ -109,6 +118,71 @@ class DashboardController extends BaseController
             'currentUser'         => $currentUser,
             'quotaInfo'           => $quotaInfo,
         ]);
+    }
+
+    /**
+     * Mengekstrak metriks dan penilaian indikasi AI dari evidence_data laporan
+     */
+    public static function extractAiMetrics(?array $report): ?array
+    {
+        if (!$report || ($report['status'] ?? '') !== 'completed') {
+            return null;
+        }
+
+        $evRaw = $report['evidence_data'] ?? null;
+        if (empty($evRaw)) {
+            return null;
+        }
+
+        $ev = is_string($evRaw) ? json_decode($evRaw, true) : $evRaw;
+        if (!is_array($ev)) {
+            return null;
+        }
+
+        $aiSty = $ev['ai_stylometrics'] ?? $ev['v1_1_presentation']['v1_2_evolution']['ai_stylometrics'] ?? null;
+        $gemini = $ev['gemini_forensic'] ?? $ev['v1_1_presentation']['v1_2_evolution']['gemini_forensic'] ?? null;
+
+        $score = null;
+        $label = null;
+        $level = null;
+
+        if (is_array($aiSty) && isset($aiSty['ai_probability_score']) && is_numeric($aiSty['ai_probability_score'])) {
+            $score = (float) $aiSty['ai_probability_score'];
+            $label = $aiSty['verdict_label'] ?? null;
+            $level = $aiSty['ai_confidence_level'] ?? null;
+        }
+
+        $forensicLevel = null;
+        if (is_array($gemini) && ($gemini['status'] ?? '') === 'completed') {
+            $gAudit = $gemini['audit'] ?? [];
+            if (empty($gAudit) && !empty($gemini['raw_output'])) {
+                if (preg_match('/"tingkat_indikasi_ai"\s*:\s*"([^"]+)"/i', $gemini['raw_output'], $m)) {
+                    $gAudit['tingkat_indikasi_ai'] = $m[1];
+                }
+            }
+            if (!empty($gAudit['tingkat_indikasi_ai'])) {
+                $forensicLevel = strtoupper(trim((string) $gAudit['tingkat_indikasi_ai']));
+            }
+        }
+
+        if ($score === null && $forensicLevel !== null) {
+            $score = match ($forensicLevel) {
+                'TINGGI' => 85.0,
+                'SEDANG' => 50.0,
+                default => 10.0,
+            };
+        }
+
+        if ($score === null) {
+            return null;
+        }
+
+        return [
+            'score'          => $score,
+            'label'          => $label,
+            'level'          => $level,
+            'forensic_level' => $forensicLevel,
+        ];
     }
 
     public function report($id)
