@@ -37,6 +37,24 @@ class ReportController extends BaseController
             return true;
         }
 
+        // Cek apakah naskah dibagikan kepada akun yang sedang login
+        if ($userId) {
+            $shareModel = new \App\Models\DocumentShareModel();
+            if ($shareModel->userHasAccess((int)$doc['id'], (int)$userId, 'view_report')) {
+                return true;
+            }
+        }
+
+        // Cek token share jika disertakan di URL (?share_token=...)
+        $shareToken = $this->request->getGet('share_token');
+        if (!empty($shareToken) && !empty($doc['share_token']) && $shareToken === $doc['share_token'] && !empty($doc['is_shared'])) {
+            if ($userId) {
+                $shareModel = new \App\Models\DocumentShareModel();
+                $shareModel->shareWithEmail((int)$doc['id'], (int)$doc['user_id'], (string)$session->get('user_email'));
+            }
+            return true;
+        }
+
         // Jika disertakan token verifikasi resmi pada URL (?token= atau ?code=)
         $token = $this->request->getGet('token') ?: $this->request->getGet('code');
         if (!empty($token) && $token === ($report['verification_code'] ?? null)) {

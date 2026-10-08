@@ -71,6 +71,18 @@
                                 <span>Daftarkan ke Korpus</span>
                             </button>
                         <?php endif; ?>
+                        <?php if (!empty($isSharedAccess)): ?>
+                            <span class="text-xs font-semibold text-sky-700 bg-sky-50 border border-sky-200 flex items-center gap-1.5 px-3 py-1.5 rounded-lg shadow-xs" title="Naskah karya ilmiah ini dibagikan kepada Anda">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+                                <span>Dibagikan</span>
+                            </span>
+                        <?php endif; ?>
+                        <?php if (!empty($isOwner) || (session()->get('user_role') === 'admin')): ?>
+                            <button onclick="openShareModal(<?= $document['id'] ?>, <?= htmlspecialchars(json_encode($document['title']), ENT_QUOTES, 'UTF-8') ?>)" class="text-xs font-semibold text-sky-700 bg-sky-50 hover:bg-sky-100 active:bg-sky-200 border border-sky-200 flex items-center gap-1.5 px-3 py-1.5 rounded-lg shadow-xs transition cursor-pointer" title="Bagikan karya ilmiah ini ke pengguna lain">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+                                <span>Bagikan</span>
+                            </button>
+                        <?php endif; ?>
                         <button onclick="openDualReaderModal()" class="text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-lg shadow-xs transition cursor-pointer">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/>
@@ -3501,5 +3513,272 @@
             </div>
         </div>
     </div>
+
+    <!-- MODAL SHARING KARYA ILMIAH (MODEL A + B) -->
+    <div id="shareModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs hidden transition-opacity">
+        <div class="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-slate-100 relative space-y-5 animate-in fade-in zoom-in-95 duration-150">
+            <!-- Modal Header -->
+            <div class="flex items-start justify-between border-b border-slate-100 pb-4">
+                <div>
+                    <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-100 mb-1">
+                        <span>🤝 Bagikan Karya Ilmiah</span>
+                    </div>
+                    <h3 id="shareModalDocTitle" class="text-base sm:text-lg font-bold text-slate-800 line-clamp-1">Judul Dokumen</h3>
+                    <p class="text-xs text-slate-400">Bagikan naskah ini kepada rekan peneliti, dosen, atau pengguna AR Tilik lainnya.</p>
+                </div>
+                <button type="button" onclick="closeShareModal()" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition cursor-pointer">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <!-- Bagian 1: Berbagi Langsung via Email (Model A) -->
+            <form id="shareEmailForm" onsubmit="submitAddShare(event)" class="space-y-3">
+                <label class="block text-xs font-bold text-slate-700">Kirim Akses ke Alamat Email</label>
+                <div class="flex flex-col sm:flex-row gap-2">
+                    <div class="relative flex-1">
+                        <input type="email" id="shareEmailInput" placeholder="dosen@kampus.ac.id atau rekan@gmail.com" required
+                               class="w-full text-xs px-3.5 py-2.5 rounded-lg border border-slate-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <select id="sharePermissionSelect" class="text-xs px-3 py-2.5 rounded-lg border border-slate-200 bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none">
+                        <option value="view_all">Laporan & Naskah Asli</option>
+                        <option value="view_report">Hanya Laporan</option>
+                    </select>
+                    <button type="submit" id="btnSubmitShare" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg text-xs transition shadow-xs flex items-center justify-center gap-1.5 flex-shrink-0 cursor-pointer">
+                        <span>Bagikan</span>
+                    </button>
+                </div>
+                <div class="text-[11px] text-slate-500 flex items-start gap-1.5 bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                    <span class="text-indigo-600 font-bold">ℹ️</span>
+                    <span>Jika penerima belum memiliki akun AR Tilik, mereka harus mendaftar akun terlebih dahulu untuk membukanya. Naskah akan langsung tersambung otomatis saat mereka mendaftar dengan email tersebut.</span>
+                </div>
+            </form>
+
+            <!-- Bagian 2: Tautan Berbagi Cepat (Model B) -->
+            <div class="space-y-2 pt-2 border-t border-slate-100">
+                <div class="flex items-center justify-between">
+                    <label class="text-xs font-bold text-slate-700">Tautan Berbagi (Shareable Link)</label>
+                    <label class="inline-flex items-center gap-2 cursor-pointer">
+                        <span class="text-[11px] text-slate-500">Aktifkan Tautan</span>
+                        <input type="checkbox" id="toggleShareLinkCheckbox" onchange="toggleShareLink()" class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer">
+                    </label>
+                </div>
+                <div class="flex gap-2">
+                    <input type="text" id="shareUrlInput" readonly placeholder="Tautan belum diaktifkan"
+                           class="w-full text-xs px-3.5 py-2.5 rounded-lg border border-slate-200 bg-slate-50 font-mono text-slate-600 select-all outline-none">
+                    <button type="button" id="btnCopyShareLink" onclick="copyShareLink()" class="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg text-xs transition shadow-xs flex items-center gap-1 flex-shrink-0 cursor-pointer">
+                        <span>Salin</span>
+                    </button>
+                </div>
+                <p class="text-[11px] text-slate-400">Penerima yang membuka tautan wajib masuk atau mendaftar akun AR Tilik terlebih dahulu.</p>
+            </div>
+
+            <!-- Bagian 3: Daftar Akun yang Memiliki Akses -->
+            <div class="space-y-2 pt-2 border-t border-slate-100">
+                <label class="text-xs font-bold text-slate-700">Daftar Pengguna yang Memiliki Akses</label>
+                <div id="shareListContainer" class="max-h-48 overflow-y-auto space-y-2 pr-1 divide-y divide-slate-100">
+                    <div class="text-center py-4 text-xs text-slate-400">Memuat data akses...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Logika Sharing -->
+    <script>
+        let currentShareDocId = null;
+
+        function openShareModal(docId, docTitle) {
+            currentShareDocId = docId;
+            document.getElementById('shareModalDocTitle').innerText = docTitle;
+            document.getElementById('shareEmailInput').value = '';
+            document.getElementById('shareModal').classList.remove('hidden');
+            loadShareData(docId);
+        }
+
+        function closeShareModal() {
+            document.getElementById('shareModal').classList.add('hidden');
+            currentShareDocId = null;
+        }
+
+        async function loadShareData(docId) {
+            const listContainer = document.getElementById('shareListContainer');
+            listContainer.innerHTML = '<div class="text-center py-4 text-xs text-slate-400">Memuat data akses...</div>';
+            
+            try {
+                const res = await fetch(`<?= base_url('api/documents') ?>/${docId}/shares`);
+                const data = await res.json();
+                
+                if (data.status === 'success') {
+                    const toggle = document.getElementById('toggleShareLinkCheckbox');
+                    const urlInput = document.getElementById('shareUrlInput');
+                    toggle.checked = Boolean(data.is_shared);
+                    urlInput.value = data.share_url || '';
+
+                    renderShareList(data.shares || []);
+                } else {
+                    listContainer.innerHTML = `<div class="text-center py-3 text-xs text-rose-500">${data.message || 'Gagal memuat daftar akses.'}</div>`;
+                }
+            } catch (err) {
+                listContainer.innerHTML = '<div class="text-center py-3 text-xs text-rose-500">Terjadi kendala jaringan saat memuat daftar akses.</div>';
+            }
+        }
+
+        function renderShareList(shares) {
+            const listContainer = document.getElementById('shareListContainer');
+            if (!shares || shares.length === 0) {
+                listContainer.innerHTML = '<div class="text-center py-4 text-xs text-slate-400">Belum ada pengguna lain yang dibagikan dokumen ini.</div>';
+                return;
+            }
+
+            let html = '';
+            shares.forEach(s => {
+                const isPending = (s.status === 'pending_registration');
+                const displayName = s.recipient_name || s.recipient_email;
+                const statusBadge = isPending 
+                    ? '<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">⏳ Menunggu Pendaftaran</span>'
+                    : '<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">✅ Terdaftar & Aktif</span>';
+                
+                const permBadge = (s.permission === 'view_all') 
+                    ? '<span class="text-[10px] text-slate-500">Laporan & Naskah</span>'
+                    : '<span class="text-[10px] text-slate-500">Hanya Laporan</span>';
+
+                html += `
+                    <div class="flex items-center justify-between py-2.5">
+                        <div class="min-w-0 pr-3">
+                            <div class="text-xs font-semibold text-slate-800 truncate">${escapeShareHtml(displayName)}</div>
+                            <div class="text-[11px] text-slate-400 font-mono truncate">${escapeShareHtml(s.recipient_email)}</div>
+                            <div class="flex items-center gap-2 mt-1">
+                                ${statusBadge}
+                                ${permBadge}
+                            </div>
+                        </div>
+                        <button type="button" onclick="deleteShareItem(${s.id})" class="text-slate-400 hover:text-rose-600 p-1.5 rounded-lg hover:bg-rose-50 transition flex-shrink-0 cursor-pointer" title="Cabut Akses">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                        </button>
+                    </div>
+                `;
+            });
+            listContainer.innerHTML = html;
+        }
+
+        async function submitAddShare(e) {
+            e.preventDefault();
+            if (!currentShareDocId) return;
+
+            const emailInput = document.getElementById('shareEmailInput');
+            const permSelect = document.getElementById('sharePermissionSelect');
+            const btn = document.getElementById('btnSubmitShare');
+            const originalBtn = btn.innerHTML;
+
+            const email = emailInput.value.trim();
+            const permission = permSelect.value;
+            if (!email) return;
+
+            btn.disabled = true;
+            btn.innerHTML = '<span>Menyimpan...</span>';
+
+            const formData = new FormData();
+            formData.append('email', email);
+            formData.append('permission', permission);
+
+            try {
+                const res = await fetch(`<?= base_url('api/documents') ?>/${currentShareDocId}/shares`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+
+                if (data.status === 'success') {
+                    emailInput.value = '';
+                    alert(data.message);
+                    renderShareList(data.shares || []);
+                    if (data.share_url) {
+                        document.getElementById('shareUrlInput').value = data.share_url;
+                        document.getElementById('toggleShareLinkCheckbox').checked = true;
+                    }
+                } else {
+                    alert(data.message || 'Gagal membagikan karya ilmiah.');
+                }
+            } catch (err) {
+                alert('Terjadi kesalahan koneksi.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalBtn;
+            }
+        }
+
+        async function deleteShareItem(shareId) {
+            if (!currentShareDocId) return;
+            if (!confirm('Apakah Anda yakin ingin mencabut akses pengguna ini?')) return;
+
+            try {
+                const res = await fetch(`<?= base_url('api/documents') ?>/${currentShareDocId}/shares/${shareId}`, {
+                    method: 'DELETE'
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    renderShareList(data.shares || []);
+                } else {
+                    alert(data.message || 'Gagal mencabut akses.');
+                }
+            } catch (err) {
+                alert('Terjadi kesalahan koneksi.');
+            }
+        }
+
+        async function toggleShareLink() {
+            if (!currentShareDocId) return;
+            const toggle = document.getElementById('toggleShareLinkCheckbox');
+            const urlInput = document.getElementById('shareUrlInput');
+
+            const formData = new FormData();
+            formData.append('is_shared', toggle.checked ? '1' : '0');
+
+            try {
+                const res = await fetch(`<?= base_url('api/documents') ?>/${currentShareDocId}/share-link`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    urlInput.value = data.share_url || '';
+                    toggle.checked = Boolean(data.is_shared);
+                } else {
+                    toggle.checked = !toggle.checked;
+                    alert(data.message || 'Gagal mengubah status tautan.');
+                }
+            } catch (err) {
+                toggle.checked = !toggle.checked;
+                alert('Terjadi kesalahan koneksi.');
+            }
+        }
+
+        function copyShareLink() {
+            const urlInput = document.getElementById('shareUrlInput');
+            if (!urlInput.value) {
+                alert('Aktifkan tautan berbagi terlebih dahulu.');
+                return;
+            }
+            navigator.clipboard.writeText(urlInput.value).then(() => {
+                const btn = document.getElementById('btnCopyShareLink');
+                const orig = btn.innerHTML;
+                btn.innerHTML = '<span>Tersalin!</span>';
+                btn.classList.add('bg-emerald-100', 'text-emerald-700');
+                setTimeout(() => {
+                    btn.innerHTML = orig;
+                    btn.classList.remove('bg-emerald-100', 'text-emerald-700');
+                }, 2000);
+            }).catch(() => {
+                urlInput.select();
+                document.execCommand('copy');
+                alert('Tautan disalin ke clipboard.');
+            });
+        }
+
+        function escapeShareHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text || '';
+            return div.innerHTML;
+        }
+    </script>
 </body>
 </html>

@@ -88,8 +88,14 @@ class DashboardController extends BaseController
         $totalCorpus = $docModel->where('document_type', 'corpus')->where('benchmark_run_id IS NULL', null, false)->countAllResults();
         $totalReports = $reportModel->countAllResults();
 
+        // Dokumen yang dibagikan oleh pengguna lain kepada akun ini (Model A+B)
+        $shareModel = new \App\Models\DocumentShareModel();
+        $shareModel->claimPendingSharesForUser((int) $userId, (string) ($currentUser['email'] ?? ''));
+        $sharedDocuments = $shareModel->getDocumentsSharedWithUser((int) $userId);
+
         return view('dashboard/index', [
             'submissions'         => $submissions,
+            'sharedDocuments'     => $sharedDocuments,
             'corpusDocs'          => $corpusDocs,
             'corpusSearch'        => $corpusSearch,
             'corpusPage'          => $corpusPage,
@@ -128,21 +134,44 @@ class DashboardController extends BaseController
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Dokumen #{$report['document_id']} tidak ditemukan.");
         }
 
-        // Cek izin akses: pemilik, admin, atau memiliki token otorisasi resmi
+        // Cek izin akses: pemilik, admin, dibagikan ke akun ini, atau memiliki token otorisasi resmi
         $session = session();
         $userId  = $session->get('user_id');
         $isAdmin = ($session->get('user_role') === 'admin');
         $isOwner = $userId && ((int) $document['user_id'] === (int) $userId);
 
-        if (! $isOwner && ! $isAdmin) {
-            $token = $this->request->getGet('token') ?: $this->request->getGet('code');
-            if (empty($token) || $token !== ($report['verification_code'] ?? null)) {
-                if (! $userId) {
-                    return redirect()->to(base_url('/?auth=login&redirect=' . urlencode(current_url())))
-                        ->with('auth_notice', 'Silakan masuk ke akun pemilik naskah atau sertakan token otorisasi resmi untuk melihat laporan ini.');
-                }
-                return $this->response->setStatusCode(403)->setBody('Akses ditolak: Anda tidak memiliki izin untuk melihat laporan naskah ini.');
+        $shareModel = new \App\Models\DocumentShareModel();
+        $isSharedToUser = false;
+        if ($userId) {
+            $isSharedToUser = $shareModel->userHasAccess((int) $document['id'], (int) $userId, 'view_report');
+        }
+
+        // Cek share token via query param (?share_token=...)
+        $shareToken = $this->request->getGet('share_token');
+        $hasValidShareToken = false;
+        if (!empty($shareToken) && !empty($document['share_token']) && $shareToken === $document['share_token'] && !empty($document['is_shared'])) {
+            $hasValidShareToken = true;
+            if ($userId && ! $isOwner) {
+                $shareModel->shareWithEmail((int) $document['id'], (int) $document['user_id'], (string) $session->get('user_email'));
+                $isSharedToUser = true;
             }
+        }
+
+        $token = $this->request->getGet('token') ?: $this->request->getGet('code');
+        $hasVerificationCode = (!empty($token) && $token === ($report['verification_code'] ?? null));
+
+        if (! $isOwner && ! $isAdmin && ! $isSharedToUser && ! $hasVerificationCode) {
+            if ($hasValidShareToken && ! $userId) {
+                // Tautan dibagikan namun pengguna belum masuk / belum mendaftar
+                return redirect()->to(base_url('/?auth=register&share_token=' . $shareToken . '&redirect=' . urlencode(current_url())))
+                    ->with('auth_notice', 'Karya ilmiah "' . esc($document['title']) . '" telah dibagikan kepada Anda. Silakan mendaftar akun AR Tilik terlebih dahulu (atau masuk jika sudah memiliki akun) untuk membukanya.');
+            }
+
+            if (! $userId) {
+                return redirect()->to(base_url('/?auth=login&redirect=' . urlencode(current_url())))
+                    ->with('auth_notice', 'Silakan masuk ke akun pemilik naskah atau daftar akun untuk melihat karya ilmiah yang dibagikan.');
+            }
+            return $this->response->setStatusCode(403)->setBody('Akses ditolak: Anda tidak memiliki izin untuk melihat laporan naskah ini.');
         }
 
         // Parse evidence_data JSON jika tersedia
@@ -312,6 +341,8 @@ class DashboardController extends BaseController
             'jitDiscoveredIds'    => $jitDiscoveredIds,
             'citationAudit'       => $citationAudit,
             'evasionDetection'    => $evasionDetection,
+            'isOwner'             => $isOwner,
+            'isSharedAccess'      => $isSharedToUser,
         ]);
     }
 
@@ -972,8 +1003,13 @@ class DashboardController extends BaseController
         $userId  = $session->get('user_id');
         $isAdmin = ($session->get('user_role') === 'admin');
         $isOwner = $userId && ((int) $document['user_id'] === (int) $userId);
+        $isShared = false;
+        if ($userId) {
+            $shareModel = new \App\Models\DocumentShareModel();
+            $isShared = $shareModel->userHasAccess((int) $document['id'], (int) $userId, 'view_report');
+        }
 
-        if (! $isOwner && ! $isAdmin) {
+        if (! $isOwner && ! $isAdmin && ! $isShared) {
             $token = $this->request->getGet('token') ?: $this->request->getGet('code');
             if (empty($token) || $token !== ($report['verification_code'] ?? null)) {
                 return $this->response->setStatusCode(403)->setBody('Akses ditolak: Anda tidak memiliki izin untuk mengunduh laporan PDF ini.');
@@ -1050,12 +1086,17 @@ class DashboardController extends BaseController
             }
         }
 
-        // Cek izin akses ketat: pemilik dokumen, admin, atau korpus rujukan publik
+        // Cek izin akses ketat: pemilik dokumen, admin, korpus rujukan publik, atau dibagikan ke akun ini
         $isOwner  = $userId && ((int) $doc['user_id'] === (int) $userId);
         $isAdmin  = $session->get('user_role') === 'admin';
         $isCorpus = ($doc['document_type'] === 'corpus' || ($doc['corpus_visibility'] ?? '') === 'public');
+        $isShared = false;
+        if ($userId) {
+            $shareModel = new \App\Models\DocumentShareModel();
+            $isShared = $shareModel->userHasAccess((int) $documentId, (int) $userId, 'view_all');
+        }
 
-        if (! $isOwner && ! $isAdmin && ! $isCorpus) {
+        if (! $isOwner && ! $isAdmin && ! $isCorpus && ! $isShared) {
             return $this->response->setStatusCode(403)->setBody('Akses ke dokumen ditolak. Naskah bersifat privat bagi pemilik.');
         }
 
@@ -1074,6 +1115,61 @@ class DashboardController extends BaseController
             ->setHeader('X-Frame-Options', 'SAMEORIGIN')
             ->setHeader('Cache-Control', 'private, no-cache, no-store, must-revalidate')
             ->setBody(file_get_contents($filePath));
+    }
+
+    /**
+     * Endpoint pembuka tautan berbagi naskah karya ilmiah (Model A+B)
+     * Mengarahkan penerima yang belum terdaftar untuk mendaftar akun terlebih dahulu
+     */
+    public function sharedAccess(string $token)
+    {
+        $token = trim($token);
+        if (empty($token)) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Tautan berbagi tidak valid.');
+        }
+
+        $docModel = new DocumentModel();
+        $document = $docModel->where('share_token', $token)
+                             ->where('is_shared', 1)
+                             ->first();
+
+        if (! $document) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Tautan berbagi karya ilmiah tidak ditemukan atau telah dinonaktifkan oleh pemilik.');
+        }
+
+        $session = session();
+        $userId  = $session->get('user_id');
+
+        // Jika penerima belum login / belum mendaftar, arahkan ke registrasi terlebih dahulu
+        if (! $userId) {
+            $docTitle = esc($document['title']);
+            $currentUrl = current_url();
+            return redirect()->to(base_url('/?auth=register&share_token=' . $token . '&redirect=' . urlencode($currentUrl)))
+                ->with('auth_notice', "Karya ilmiah \"{$docTitle}\" telah dibagikan kepada Anda. Silakan mendaftar akun AR Tilik terlebih dahulu (atau masuk jika sudah memiliki akun) untuk membukanya.");
+        }
+
+        // Pengguna sudah login di AR Tilik
+        $userEmail = (string) $session->get('user_email');
+        $shareModel = new \App\Models\DocumentShareModel();
+
+        // Jika bukan pemilik naskah itu sendiri, sambungkan dokumen ke akun penerima
+        if ((int) $document['user_id'] !== (int) $userId) {
+            $shareModel->shareWithEmail((int) $document['id'], (int) $document['user_id'], $userEmail, 'view_all');
+        }
+
+        // Ambil laporan terbaru
+        $reportModel = new ReportModel();
+        $latestReport = $reportModel->where('document_id', $document['id'])
+                                    ->orderBy('id', 'DESC')
+                                    ->first();
+
+        if ($latestReport) {
+            return redirect()->to(base_url('dashboard/report/' . $latestReport['id']))
+                ->with('message', "Karya ilmiah \"{$document['title']}\" berhasil dibuka dan kini tersimpan di tab \"Dibagikan dengan Saya\" di dashboard Anda.");
+        }
+
+        return redirect()->to(base_url('dashboard'))
+            ->with('message', "Karya ilmiah \"{$document['title']}\" berhasil ditambahkan ke tab \"Dibagikan dengan Saya\".");
     }
 
     public function previewPdf($id)
@@ -1103,8 +1199,13 @@ class DashboardController extends BaseController
         $userId  = $session->get('user_id');
         $isAdmin = ($session->get('user_role') === 'admin');
         $isOwner = $userId && ((int) $document['user_id'] === (int) $userId);
+        $isShared = false;
+        if ($userId) {
+            $shareModel = new \App\Models\DocumentShareModel();
+            $isShared = $shareModel->userHasAccess((int) $document['id'], (int) $userId, 'view_report');
+        }
 
-        if (! $isOwner && ! $isAdmin) {
+        if (! $isOwner && ! $isAdmin && ! $isShared) {
             $token = $this->request->getGet('token') ?: $this->request->getGet('code');
             if (empty($token) || $token !== ($report['verification_code'] ?? null)) {
                 return $this->response->setStatusCode(403)->setBody('Akses ditolak: Anda tidak memiliki izin untuk melihat pratinjau laporan ini.');

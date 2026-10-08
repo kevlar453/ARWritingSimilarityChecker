@@ -252,6 +252,13 @@
             <button onclick="switchTab('tab-submission')" id="btn-tab-submission" class="tab-btn pb-3 font-semibold text-xs sm:text-sm border-b-2 border-indigo-600 text-indigo-600 flex items-center gap-1.5 sm:gap-2 flex-shrink-0 whitespace-nowrap transition-colors">
                 📄 Submisi & Pemeriksaan
             </button>
+            <button onclick="switchTab('tab-shared')" id="btn-tab-shared" class="tab-btn pb-3 font-medium text-xs sm:text-sm text-slate-500 hover:text-slate-800 border-b-2 border-transparent flex items-center gap-1.5 sm:gap-2 flex-shrink-0 whitespace-nowrap transition-colors">
+                👥 Dibagikan dengan Saya
+                <?php $sharedCount = count($sharedDocuments ?? []); ?>
+                <?php if ($sharedCount > 0): ?>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 text-indigo-700 ml-1"><?= $sharedCount ?></span>
+                <?php endif; ?>
+            </button>
             <button onclick="switchTab('tab-corpus')" id="btn-tab-corpus" class="tab-btn pb-3 font-medium text-xs sm:text-sm text-slate-500 hover:text-slate-800 border-b-2 border-transparent flex items-center gap-1.5 sm:gap-2 flex-shrink-0 whitespace-nowrap transition-colors">
                 📚 Manajemen Korpus Rujukan
             </button>
@@ -490,6 +497,10 @@
                                                     <a href="<?= base_url('dashboard/report/' . $rep['id']) ?>" class="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg text-xs shadow-xs transition flex items-center gap-1">
                                                         Buka Laporan
                                                     </a>
+                                                    <button onclick="openShareModal(<?= $sub['id'] ?>, <?= htmlspecialchars(json_encode($sub['title']), ENT_QUOTES, 'UTF-8') ?>)" class="px-2.5 py-1 bg-sky-50 hover:bg-sky-100 text-sky-700 font-medium rounded-lg text-xs transition flex items-center gap-1 cursor-pointer" title="Bagikan naskah ini ke pengguna lain">
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+                                                        <span>Bagikan</span>
+                                                    </button>
                                                     <button onclick="triggerCheck(<?= $sub['id'] ?>)" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-lg text-xs transition" title="Ulangi pemeriksaan">
                                                         ↻ Ulangi
                                                     </button>
@@ -497,10 +508,146 @@
                                                     <button onclick="triggerCheck(<?= $sub['id'] ?>)" class="px-3 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold rounded-lg text-xs transition">
                                                         Cek Similarity
                                                     </button>
+                                                    <button onclick="openShareModal(<?= $sub['id'] ?>, <?= htmlspecialchars(json_encode($sub['title']), ENT_QUOTES, 'UTF-8') ?>)" class="px-2 py-1 bg-sky-50 hover:bg-sky-100 text-sky-700 font-medium rounded-lg text-xs transition flex items-center gap-1 cursor-pointer" title="Bagikan naskah ini ke pengguna lain">
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+                                                        <span>Bagikan</span>
+                                                    </button>
                                                 <?php endif; ?>
                                                 <a href="<?= base_url('api/documents/' . $sub['id']) ?>" target="_blank" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-mono rounded-lg text-xs transition" title="Lihat JSON">
                                                     JSON
                                                 </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: Dibagikan dengan Saya -->
+        <div id="tab-shared" class="tab-content space-y-6 hidden">
+            <!-- Header Banner -->
+            <div class="bg-gradient-to-r from-sky-900 via-indigo-900 to-slate-900 rounded-xl p-5 text-white shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border border-sky-800/60">
+                <div class="space-y-1">
+                    <div class="flex items-center gap-2">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-sky-500/20 text-sky-300 border border-sky-500/30">Kolaborasi & Telaah</span>
+                        <h3 class="text-sm sm:text-base font-bold text-white">Karya Ilmiah yang Dibagikan kepada Anda</h3>
+                    </div>
+                    <p class="text-xs text-slate-300 max-w-2xl leading-relaxed">
+                        Daftar dokumen, skripsi, tesis, dan naskah jurnal yang dibagikan oleh peneliti, dosen pembimbing, atau rekan sesama pengguna AR Tilik untuk Anda telaah laporannya.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Table Container -->
+            <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-xs">
+                <div class="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-base font-bold text-slate-800">Daftar Naskah Kolaborasi</h2>
+                        <p class="text-xs text-slate-400">Total <?= count($sharedDocuments ?? []) ?> karya ilmiah telah dibagikan ke akun Anda</p>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="min-w-[760px] sm:min-w-full w-full text-left border-collapse text-sm">
+                        <thead class="bg-slate-50 text-slate-500 uppercase text-[11px] font-bold border-b border-slate-200">
+                            <tr>
+                                <th class="p-3.5 sm:p-4 min-w-[200px]">Dokumen</th>
+                                <th class="p-3.5 sm:p-4 min-w-[160px]">Pemilik Asli</th>
+                                <th class="p-3.5 sm:p-4 text-center w-20">Format</th>
+                                <th class="p-3.5 sm:p-4 min-w-[120px]">Status / Keputusan</th>
+                                <th class="p-3.5 sm:p-4 text-center min-w-[110px]">Similarity</th>
+                                <th class="p-3.5 sm:p-4 min-w-[130px] whitespace-nowrap">Tanggal Dibagikan</th>
+                                <th class="p-3.5 sm:p-4 text-right min-w-[190px] whitespace-nowrap">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            <?php if (empty($sharedDocuments)): ?>
+                                <tr>
+                                    <td colspan="7" class="p-10 text-center">
+                                        <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center text-xl">👥</div>
+                                        <div class="text-sm font-semibold text-slate-700">Belum ada karya ilmiah yang dibagikan</div>
+                                        <p class="text-xs text-slate-400 mt-1 max-w-md mx-auto">Ketika rekan peneliti atau mahasiswa membagikan naskahnya ke alamat email Anda (<?= esc($currentUser['email'] ?? '') ?>), naskah tersebut akan otomatis muncul di sini.</p>
+                                    </td>
+                                </tr>
+                            <?php else: ?>
+                                <?php foreach ($sharedDocuments as $item): 
+                                    $rep = $item['latest_report'] ?? null;
+                                ?>
+                                    <tr class="hover:bg-slate-50/70 transition-colors">
+                                        <td class="p-3.5 sm:p-4 font-medium text-slate-800">
+                                            <div class="font-semibold text-slate-900 line-clamp-1" title="<?= esc($item['title']) ?>"><?= esc($item['title']) ?></div>
+                                            <div class="text-[11px] text-slate-400 truncate max-w-[220px]" title="<?= esc($item['original_filename']) ?>"><?= esc($item['original_filename']) ?></div>
+                                            <?php if (!empty($item['faculty']) || !empty($item['department'])): ?>
+                                                <div class="mt-1 flex items-center gap-1.5 flex-wrap">
+                                                    <?php if (!empty($item['faculty'])): ?>
+                                                        <span class="inline-flex items-center text-[10px] font-medium px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200">🏛️ <?= esc($item['faculty']) ?></span>
+                                                    <?php endif; ?>
+                                                    <?php if (!empty($item['department'])): ?>
+                                                        <span class="inline-flex items-center text-[10px] font-medium px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-100">🎓 <?= esc($item['department']) ?></span>
+                                                    <?php endif; ?>
+                                                </div>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td class="p-3.5 sm:p-4">
+                                            <div class="text-xs font-semibold text-slate-800"><?= esc($item['owner_name']) ?></div>
+                                            <div class="text-[11px] text-slate-500 font-mono truncate max-w-[170px]"><?= esc($item['owner_email']) ?></div>
+                                            <?php if (!empty($item['owner_institution'])): ?>
+                                                <div class="text-[10px] text-slate-400 mt-0.5 truncate max-w-[170px]">🏫 <?= esc($item['owner_institution']) ?></div>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td class="p-3.5 sm:p-4 text-center">
+                                            <span class="px-2 py-0.5 rounded text-[10px] bg-slate-100 text-slate-600 font-mono font-semibold"><?= strtoupper(pathinfo($item['original_filename'], PATHINFO_EXTENSION)) ?></span>
+                                        </td>
+                                        <td class="p-3.5 sm:p-4">
+                                            <?php if ($rep): 
+                                                $dec = $rep['predicted_decision'] ?? 'no_match';
+                                                $status = $rep['status'] ?? 'pending';
+                                            ?>
+                                                <?php if ($status === 'completed'): ?>
+                                                    <?php if ($dec === 'match'): ?>
+                                                        <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 whitespace-nowrap">MATCH (Kemiripan Kuat)</span>
+                                                    <?php elseif ($dec === 'review'): ?>
+                                                        <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 whitespace-nowrap">REVIEW (Perlu Ditelaah)</span>
+                                                    <?php else: ?>
+                                                        <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 whitespace-nowrap">NO MATCH (Aman)</span>
+                                                    <?php endif; ?>
+                                                <?php elseif ($status === 'processing'): ?>
+                                                    <span class="inline-flex items-center gap-1 text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 animate-pulse whitespace-nowrap">Memproses...</span>
+                                                <?php else: ?>
+                                                    <span class="inline-flex items-center text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 whitespace-nowrap">Antrean</span>
+                                                <?php endif; ?>
+                                            <?php else: ?>
+                                                <span class="text-xs text-slate-400">Belum diperiksa</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td class="p-3.5 sm:p-4 text-center">
+                                            <?php if ($rep && $rep['status'] === 'completed'): ?>
+                                                <div class="font-extrabold text-sm <?= $rep['overall_similarity'] >= 70 ? 'text-rose-600' : ($rep['overall_similarity'] >= 10 ? 'text-amber-600' : 'text-slate-700') ?>">
+                                                    <?= number_format($rep['overall_similarity'], 2) ?>%
+                                                </div>
+                                            <?php else: ?>
+                                                <span class="text-xs text-slate-400">-</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td class="p-3.5 sm:p-4 text-slate-500 text-xs whitespace-nowrap">
+                                            <?= date('d M Y, H:i', strtotime($item['shared_at'])) ?>
+                                        </td>
+                                        <td class="p-3.5 sm:p-4 text-right">
+                                            <div class="inline-flex items-center justify-end gap-1.5 whitespace-nowrap">
+                                                <?php if ($rep && $rep['status'] === 'completed'): ?>
+                                                    <a href="<?= base_url('dashboard/report/' . $rep['id']) ?>" class="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg text-xs shadow-xs transition flex items-center gap-1">
+                                                        Buka Laporan
+                                                    </a>
+                                                <?php endif; ?>
+                                                <?php if ($item['permission'] === 'view_all'): ?>
+                                                    <a href="<?= base_url('documents/' . $item['document_id'] . '/preview') ?>" target="_blank" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-lg text-xs transition" title="Lihat Pratinjau Naskah Asli">
+                                                        Lihat Naskah
+                                                    </a>
+                                                <?php endif; ?>
                                             </div>
                                         </td>
                                     </tr>
@@ -1893,6 +2040,273 @@
                 btnElement.disabled = false;
                 btnElement.innerHTML = originalText;
             }
+        }
+    </script>
+
+    <!-- MODAL SHARING KARYA ILMIAH (MODEL A + B) -->
+    <div id="shareModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs hidden transition-opacity">
+        <div class="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-slate-100 relative space-y-5 animate-in fade-in zoom-in-95 duration-150">
+            <!-- Modal Header -->
+            <div class="flex items-start justify-between border-b border-slate-100 pb-4">
+                <div>
+                    <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-100 mb-1">
+                        <span>🤝 Bagikan Karya Ilmiah</span>
+                    </div>
+                    <h3 id="shareModalDocTitle" class="text-base sm:text-lg font-bold text-slate-800 line-clamp-1">Judul Dokumen</h3>
+                    <p class="text-xs text-slate-400">Bagikan naskah ini kepada rekan peneliti, dosen, atau pengguna AR Tilik lainnya.</p>
+                </div>
+                <button type="button" onclick="closeShareModal()" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition cursor-pointer">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <!-- Bagian 1: Berbagi Langsung via Email (Model A) -->
+            <form id="shareEmailForm" onsubmit="submitAddShare(event)" class="space-y-3">
+                <label class="block text-xs font-bold text-slate-700">Kirim Akses ke Alamat Email</label>
+                <div class="flex flex-col sm:flex-row gap-2">
+                    <div class="relative flex-1">
+                        <input type="email" id="shareEmailInput" placeholder="dosen@kampus.ac.id atau rekan@gmail.com" required
+                               class="w-full text-xs px-3.5 py-2.5 rounded-lg border border-slate-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <select id="sharePermissionSelect" class="text-xs px-3 py-2.5 rounded-lg border border-slate-200 bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none">
+                        <option value="view_all">Laporan & Naskah Asli</option>
+                        <option value="view_report">Hanya Laporan</option>
+                    </select>
+                    <button type="submit" id="btnSubmitShare" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg text-xs transition shadow-xs flex items-center justify-center gap-1.5 flex-shrink-0 cursor-pointer">
+                        <span>Bagikan</span>
+                    </button>
+                </div>
+                <div class="text-[11px] text-slate-500 flex items-start gap-1.5 bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                    <span class="text-indigo-600 font-bold">ℹ️</span>
+                    <span>Jika penerima belum memiliki akun AR Tilik, mereka harus mendaftar akun terlebih dahulu untuk membukanya. Naskah akan langsung tersambung otomatis saat mereka mendaftar dengan email tersebut.</span>
+                </div>
+            </form>
+
+            <!-- Bagian 2: Tautan Berbagi Cepat (Model B) -->
+            <div class="space-y-2 pt-2 border-t border-slate-100">
+                <div class="flex items-center justify-between">
+                    <label class="text-xs font-bold text-slate-700">Tautan Berbagi (Shareable Link)</label>
+                    <label class="inline-flex items-center gap-2 cursor-pointer">
+                        <span class="text-[11px] text-slate-500">Aktifkan Tautan</span>
+                        <input type="checkbox" id="toggleShareLinkCheckbox" onchange="toggleShareLink()" class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer">
+                    </label>
+                </div>
+                <div class="flex gap-2">
+                    <input type="text" id="shareUrlInput" readonly placeholder="Tautan belum diaktifkan"
+                           class="w-full text-xs px-3.5 py-2.5 rounded-lg border border-slate-200 bg-slate-50 font-mono text-slate-600 select-all outline-none">
+                    <button type="button" id="btnCopyShareLink" onclick="copyShareLink()" class="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg text-xs transition shadow-xs flex items-center gap-1 flex-shrink-0 cursor-pointer">
+                        <span>Salin</span>
+                    </button>
+                </div>
+                <p class="text-[11px] text-slate-400">Penerima yang membuka tautan wajib masuk atau mendaftar akun AR Tilik terlebih dahulu.</p>
+            </div>
+
+            <!-- Bagian 3: Daftar Akun yang Memiliki Akses -->
+            <div class="space-y-2 pt-2 border-t border-slate-100">
+                <label class="text-xs font-bold text-slate-700">Daftar Pengguna yang Memiliki Akses</label>
+                <div id="shareListContainer" class="max-h-48 overflow-y-auto space-y-2 pr-1 divide-y divide-slate-100">
+                    <div class="text-center py-4 text-xs text-slate-400">Memuat data akses...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Logika Sharing -->
+    <script>
+        let currentShareDocId = null;
+
+        function openShareModal(docId, docTitle) {
+            currentShareDocId = docId;
+            document.getElementById('shareModalDocTitle').innerText = docTitle;
+            document.getElementById('shareEmailInput').value = '';
+            document.getElementById('shareModal').classList.remove('hidden');
+            loadShareData(docId);
+        }
+
+        function closeShareModal() {
+            document.getElementById('shareModal').classList.add('hidden');
+            currentShareDocId = null;
+        }
+
+        async function loadShareData(docId) {
+            const listContainer = document.getElementById('shareListContainer');
+            listContainer.innerHTML = '<div class="text-center py-4 text-xs text-slate-400">Memuat data akses...</div>';
+            
+            try {
+                const res = await fetch(`<?= base_url('api/documents') ?>/${docId}/shares`);
+                const data = await res.json();
+                
+                if (data.status === 'success') {
+                    const toggle = document.getElementById('toggleShareLinkCheckbox');
+                    const urlInput = document.getElementById('shareUrlInput');
+                    toggle.checked = Boolean(data.is_shared);
+                    urlInput.value = data.share_url || '';
+
+                    renderShareList(data.shares || []);
+                } else {
+                    listContainer.innerHTML = `<div class="text-center py-3 text-xs text-rose-500">${data.message || 'Gagal memuat daftar akses.'}</div>`;
+                }
+            } catch (err) {
+                listContainer.innerHTML = '<div class="text-center py-3 text-xs text-rose-500">Terjadi kendala jaringan saat memuat daftar akses.</div>';
+            }
+        }
+
+        function renderShareList(shares) {
+            const listContainer = document.getElementById('shareListContainer');
+            if (!shares || shares.length === 0) {
+                listContainer.innerHTML = '<div class="text-center py-4 text-xs text-slate-400">Belum ada pengguna lain yang dibagikan dokumen ini.</div>';
+                return;
+            }
+
+            let html = '';
+            shares.forEach(s => {
+                const isPending = (s.status === 'pending_registration');
+                const displayName = s.recipient_name || s.recipient_email;
+                const statusBadge = isPending 
+                    ? '<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">⏳ Menunggu Pendaftaran</span>'
+                    : '<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">✅ Terdaftar & Aktif</span>';
+                
+                const permBadge = (s.permission === 'view_all') 
+                    ? '<span class="text-[10px] text-slate-500">Laporan & Naskah</span>'
+                    : '<span class="text-[10px] text-slate-500">Hanya Laporan</span>';
+
+                html += `
+                    <div class="flex items-center justify-between py-2.5">
+                        <div class="min-w-0 pr-3">
+                            <div class="text-xs font-semibold text-slate-800 truncate">${escapeShareHtml(displayName)}</div>
+                            <div class="text-[11px] text-slate-400 font-mono truncate">${escapeShareHtml(s.recipient_email)}</div>
+                            <div class="flex items-center gap-2 mt-1">
+                                ${statusBadge}
+                                ${permBadge}
+                            </div>
+                        </div>
+                        <button type="button" onclick="deleteShareItem(${s.id})" class="text-slate-400 hover:text-rose-600 p-1.5 rounded-lg hover:bg-rose-50 transition flex-shrink-0 cursor-pointer" title="Cabut Akses">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                        </button>
+                    </div>
+                `;
+            });
+            listContainer.innerHTML = html;
+        }
+
+        async function submitAddShare(e) {
+            e.preventDefault();
+            if (!currentShareDocId) return;
+
+            const emailInput = document.getElementById('shareEmailInput');
+            const permSelect = document.getElementById('sharePermissionSelect');
+            const btn = document.getElementById('btnSubmitShare');
+            const originalBtn = btn.innerHTML;
+
+            const email = emailInput.value.trim();
+            const permission = permSelect.value;
+            if (!email) return;
+
+            btn.disabled = true;
+            btn.innerHTML = '<span>Menyimpan...</span>';
+
+            const formData = new FormData();
+            formData.append('email', email);
+            formData.append('permission', permission);
+
+            try {
+                const res = await fetch(`<?= base_url('api/documents') ?>/${currentShareDocId}/shares`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+
+                if (data.status === 'success') {
+                    emailInput.value = '';
+                    alert(data.message);
+                    renderShareList(data.shares || []);
+                    if (data.share_url) {
+                        document.getElementById('shareUrlInput').value = data.share_url;
+                        document.getElementById('toggleShareLinkCheckbox').checked = true;
+                    }
+                } else {
+                    alert(data.message || 'Gagal membagikan karya ilmiah.');
+                }
+            } catch (err) {
+                alert('Terjadi kesalahan koneksi.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalBtn;
+            }
+        }
+
+        async function deleteShareItem(shareId) {
+            if (!currentShareDocId) return;
+            if (!confirm('Apakah Anda yakin ingin mencabut akses pengguna ini?')) return;
+
+            try {
+                const res = await fetch(`<?= base_url('api/documents') ?>/${currentShareDocId}/shares/${shareId}`, {
+                    method: 'DELETE'
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    renderShareList(data.shares || []);
+                } else {
+                    alert(data.message || 'Gagal mencabut akses.');
+                }
+            } catch (err) {
+                alert('Terjadi kesalahan koneksi.');
+            }
+        }
+
+        async function toggleShareLink() {
+            if (!currentShareDocId) return;
+            const toggle = document.getElementById('toggleShareLinkCheckbox');
+            const urlInput = document.getElementById('shareUrlInput');
+
+            const formData = new FormData();
+            formData.append('is_shared', toggle.checked ? '1' : '0');
+
+            try {
+                const res = await fetch(`<?= base_url('api/documents') ?>/${currentShareDocId}/share-link`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    urlInput.value = data.share_url || '';
+                    toggle.checked = Boolean(data.is_shared);
+                } else {
+                    toggle.checked = !toggle.checked;
+                    alert(data.message || 'Gagal mengubah status tautan.');
+                }
+            } catch (err) {
+                toggle.checked = !toggle.checked;
+                alert('Terjadi kesalahan koneksi.');
+            }
+        }
+
+        function copyShareLink() {
+            const urlInput = document.getElementById('shareUrlInput');
+            if (!urlInput.value) {
+                alert('Aktifkan tautan berbagi terlebih dahulu.');
+                return;
+            }
+            navigator.clipboard.writeText(urlInput.value).then(() => {
+                const btn = document.getElementById('btnCopyShareLink');
+                const orig = btn.innerHTML;
+                btn.innerHTML = '<span>Tersalin!</span>';
+                btn.classList.add('bg-emerald-100', 'text-emerald-700');
+                setTimeout(() => {
+                    btn.innerHTML = orig;
+                    btn.classList.remove('bg-emerald-100', 'text-emerald-700');
+                }, 2000);
+            }).catch(() => {
+                urlInput.select();
+                document.execCommand('copy');
+                alert('Tautan disalin ke clipboard.');
+            });
+        }
+
+        function escapeShareHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text || '';
+            return div.innerHTML;
         }
     </script>
 </body>

@@ -3801,7 +3801,9 @@
                 } else {
                     showAlert(data.message || 'Berhasil masuk! Mengarahkan...', false);
                     setTimeout(() => {
-                        window.location.href = data.redirect || '<?= base_url('dashboard') ?>';
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const redirectUrl = urlParams.get('redirect') || data.redirect || '<?= base_url('dashboard') ?>';
+                        window.location.href = redirectUrl;
                     }, 600);
                 }
             } catch (err) {
@@ -4319,6 +4321,13 @@
                 <?php elseif (!empty($flashSuccess)) : ?>
                     showAlert(<?= json_encode($flashSuccess) ?>, false);
                 <?php endif; ?>
+                const paramEmail = urlParams.get('email');
+                if (paramEmail) {
+                    const regEmailInput = document.querySelector('#registerForm input[name="email"]');
+                    const logEmailInput = document.querySelector('#loginForm input[name="email"]');
+                    if (regEmailInput) regEmailInput.value = paramEmail;
+                    if (logEmailInput) logEmailInput.value = paramEmail;
+                }
             }
 
             // Directional scroll tracker for bidirectional AOS (fade-up when scrolling down, fade-down when scrolling up)

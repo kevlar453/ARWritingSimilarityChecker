@@ -62,6 +62,8 @@ CREATE TABLE IF NOT EXISTS documents (
     benchmark_case_id BIGINT UNSIGNED NULL,
     benchmark_run_id BIGINT UNSIGNED NULL,
     page_count INT UNSIGNED NULL,
+    share_token VARCHAR(64) NULL,
+    is_shared TINYINT(1) NOT NULL DEFAULT 0,
     created_at DATETIME NOT NULL,
     updated_at DATETIME NOT NULL,
     INDEX idx_documents_status (status),
@@ -69,7 +71,27 @@ CREATE TABLE IF NOT EXISTS documents (
     INDEX idx_documents_type (document_type),
     INDEX idx_documents_faculty (faculty),
     INDEX idx_documents_department (department),
-    INDEX idx_documents_benchmark_run (benchmark_run_id)
+    INDEX idx_documents_benchmark_run (benchmark_run_id),
+    INDEX idx_documents_share_token (share_token)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS document_shares (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    document_id BIGINT UNSIGNED NOT NULL,
+    shared_by_user_id BIGINT UNSIGNED NOT NULL,
+    shared_with_user_id BIGINT UNSIGNED NULL,
+    recipient_email VARCHAR(191) NOT NULL,
+    permission ENUM('view_all', 'view_report') NOT NULL DEFAULT 'view_all',
+    status ENUM('active', 'pending_registration', 'revoked') NOT NULL DEFAULT 'active',
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
+    INDEX idx_doc_shares_doc (document_id),
+    INDEX idx_doc_shares_user (shared_with_user_id),
+    INDEX idx_doc_shares_email (recipient_email),
+    INDEX idx_doc_shares_status (status),
+    CONSTRAINT fk_doc_shares_doc FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE,
+    CONSTRAINT fk_doc_shares_by FOREIGN KEY (shared_by_user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_doc_shares_with FOREIGN KEY (shared_with_user_id) REFERENCES users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS document_pages (

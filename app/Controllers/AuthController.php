@@ -598,6 +598,14 @@ class AuthController extends BaseController
             'user_role'        => $user['role'],
             'is_logged_in'     => true,
         ]);
+
+        // Klaim secara otomatis karya ilmiah yang dibagikan ke email ini sebelum akun mendaftar/aktif
+        try {
+            $shareModel = new \App\Models\DocumentShareModel();
+            $shareModel->claimPendingSharesForUser((int) $user['id'], (string) $user['email']);
+        } catch (\Throwable $e) {
+            log_message('error', 'Gagal mengklaim share pending: ' . $e->getMessage());
+        }
     }
 
     private function getRequestData(): array

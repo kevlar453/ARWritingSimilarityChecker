@@ -19,6 +19,8 @@ $routes->get('dashboard/report/(:num)/preview', 'DashboardController::previewPdf
 $routes->get('dashboard/reports/(:num)/preview', 'DashboardController::previewPdf/$1');
 $routes->match(['get', 'head'], 'documents/(:num)/preview', 'DashboardController::previewDocument/$1');
 $routes->match(['get', 'head'], 'dashboard/documents/(:num)/preview', 'DashboardController::previewDocument/$1');
+$routes->match(['get', 'head'], 'documents/shared/(:segment)', 'DashboardController::sharedAccess/$1');
+$routes->match(['get', 'head'], 'dashboard/documents/shared/(:segment)', 'DashboardController::sharedAccess/$1');
 $routes->match(['get', 'head'], 'verify/(:segment)', 'DashboardController::verify/$1');
 $routes->match(['get', 'head'], 'verify', 'DashboardController::verify');
 $routes->match(['get', 'head'], 'integrations/ojs/pdf', 'DashboardController::downloadOjsPdf');
@@ -68,6 +70,12 @@ $routes->group('api', function ($routes) {
     $routes->post('documents/(:num)/enroll', 'Api\DocumentController::enroll/$1');
     $routes->post('integration/check', 'Api\DocumentController::checkSubmission');
     $routes->post('corpus/contribute', 'Api\DocumentController::contributeCorpus');
+
+    // Document Sharing (Model A+B)
+    $routes->get('documents/(:num)/shares', 'Api\DocumentController::listShares/$1');
+    $routes->post('documents/(:num)/shares', 'Api\DocumentController::addShare/$1');
+    $routes->delete('documents/(:num)/shares/(:num)', 'Api\DocumentController::deleteShare/$1/$2');
+    $routes->post('documents/(:num)/share-link', 'Api\DocumentController::toggleShareLink/$1');
 
     // Public REST API v1 & OJS Integration Endpoints
     $routes->group('v1', function ($routes) {

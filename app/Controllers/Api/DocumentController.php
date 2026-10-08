@@ -286,9 +286,12 @@ class DocumentController extends BaseController
             ]);
         }
 
-        // Cek kepemilikan dokumen (kecuali admin atau korpus publik)
+        // Cek kepemilikan dokumen (kecuali admin, korpus publik, atau dibagikan ke pengguna)
         $isOwner = $userId && ((int) $document['user_id'] === (int) $userId);
-        if (! $isOwner && ! $isAdmin && $document['document_type'] !== 'corpus') {
+        $shareModel = new \App\Models\DocumentShareModel();
+        $isShared = $userId && $shareModel->userHasAccess((int) $id, (int) $userId, 'view_report');
+
+        if (! $isOwner && ! $isAdmin && ! $isShared && $document['document_type'] !== 'corpus') {
             return $this->response->setStatusCode(404)->setJSON([
                 'status'  => 'error',
                 'message' => 'Dokumen tidak ditemukan.'
@@ -658,6 +661,199 @@ class DocumentController extends BaseController
             'pdf_export_url'    => "{$publicUrl}/report/{$reportId}/export?token={$certHash}",
             'status_api_url'    => "{$publicUrl}/api/reports/{$reportId}",
             'message'           => 'Pemeriksaan similarity berhasil dijadwalkan ke antrean AR Tilik.'
+        ]);
+    }
+
+    /**
+     * Memeriksa hak pemilik atau admin atas dokumen
+     */
+    private function checkDocumentOwnerOrAdmin(int $documentId, &$document = null): ?\CodeIgniter\HTTP\ResponseInterface
+    {
+        $userId = session()->get('user_id');
+        if (! $userId) {
+            return $this->response->setStatusCode(401)->setJSON([
+                'status'  => 'error',
+                'message' => 'Silakan masuk terlebih dahulu.',
+            ]);
+        }
+
+        $docModel = new DocumentModel();
+        $document = $docModel->find($documentId);
+        if (! $document) {
+            return $this->response->setStatusCode(404)->setJSON([
+                'status'  => 'error',
+                'message' => 'Dokumen tidak ditemukan.',
+            ]);
+        }
+
+        $isAdmin = (session()->get('user_role') === 'admin');
+        if (! $isAdmin && (int) $document['user_id'] !== (int) $userId) {
+            return $this->response->setStatusCode(403)->setJSON([
+                'status'  => 'error',
+                'message' => 'Hanya pemilik naskah yang berhak mengelola pembagian karya ilmiah.',
+            ]);
+        }
+
+        return null;
+    }
+
+    /**
+     * Mengambil daftar pengguna yang memiliki akses ke dokumen ini
+     */
+    public function listShares(int $documentId)
+    {
+        $doc = null;
+        $authError = $this->checkDocumentOwnerOrAdmin($documentId, $doc);
+        if ($authError) {
+            return $authError;
+        }
+
+        $shareModel = new \App\Models\DocumentShareModel();
+        $shares = $shareModel->getSharesForDocument($documentId);
+
+        $shareUrl = null;
+        if (!empty($doc['share_token'])) {
+            $shareUrl = base_url('documents/shared/' . $doc['share_token']);
+        }
+
+        return $this->response->setJSON([
+            'status'       => 'success',
+            'document_id'  => $documentId,
+            'title'        => $doc['title'],
+            'is_shared'    => (bool) ($doc['is_shared'] ?? false),
+            'share_token'  => $doc['share_token'] ?? null,
+            'share_url'    => $shareUrl,
+            'shares'       => $shares,
+        ]);
+    }
+
+    /**
+     * Menambahkan pengguna untuk berbagi karya ilmiah via email
+     */
+    public function addShare(int $documentId)
+    {
+        $doc = null;
+        $authError = $this->checkDocumentOwnerOrAdmin($documentId, $doc);
+        if ($authError) {
+            return $authError;
+        }
+
+        $userId = (int) session()->get('user_id');
+        $rawEmail = (string) ($this->request->getPost('email') ?? '');
+        $email = strtolower(trim($rawEmail));
+        $permission = (string) ($this->request->getPost('permission') ?? 'view_all');
+        if (! in_array($permission, ['view_all', 'view_report'], true)) {
+            $permission = 'view_all';
+        }
+
+        if (empty($email)) {
+            return $this->response->setStatusCode(400)->setJSON([
+                'status'  => 'error',
+                'message' => 'Alamat email penerima wajib diisi.',
+            ]);
+        }
+
+        // Pastikan dokumen memiliki share_token agar link undangan siap
+        $docModel = new DocumentModel();
+        if (empty($doc['share_token'])) {
+            $token = bin2hex(random_bytes(16));
+            $docModel->update($documentId, [
+                'share_token' => $token,
+                'is_shared'   => 1,
+            ]);
+            $doc['share_token'] = $token;
+            $doc['is_shared'] = 1;
+        }
+
+        $shareModel = new \App\Models\DocumentShareModel();
+        $result = $shareModel->shareWithEmail($documentId, $userId, $email, $permission);
+
+        if (! $result['success']) {
+            return $this->response->setStatusCode(400)->setJSON([
+                'status'  => 'error',
+                'message' => $result['message'],
+            ]);
+        }
+
+        $shares = $shareModel->getSharesForDocument($documentId);
+        $shareUrl = base_url('documents/shared/' . $doc['share_token']);
+
+        return $this->response->setJSON([
+            'status'        => 'success',
+            'message'       => $result['message'],
+            'is_registered' => $result['is_registered'],
+            'share_url'     => $shareUrl,
+            'shares'        => $shares,
+        ]);
+    }
+
+    /**
+     * Menghapus / mencabut hak akses sharing seorang pengguna
+     */
+    public function deleteShare(int $documentId, int $shareId)
+    {
+        $doc = null;
+        $authError = $this->checkDocumentOwnerOrAdmin($documentId, $doc);
+        if ($authError) {
+            return $authError;
+        }
+
+        $shareModel = new \App\Models\DocumentShareModel();
+        $share = $shareModel->where('id', $shareId)->where('document_id', $documentId)->first();
+        if (! $share) {
+            return $this->response->setStatusCode(404)->setJSON([
+                'status'  => 'error',
+                'message' => 'Catatan akses sharing tidak ditemukan.',
+            ]);
+        }
+
+        $shareModel->delete($shareId);
+
+        $shares = $shareModel->getSharesForDocument($documentId);
+
+        return $this->response->setJSON([
+            'status'  => 'success',
+            'message' => 'Akses berbagi berhasil dicabut.',
+            'shares'  => $shares,
+        ]);
+    }
+
+    /**
+     * Mengatur status tautan berbagi publik / regenerasi token tautan
+     */
+    public function toggleShareLink(int $documentId)
+    {
+        $doc = null;
+        $authError = $this->checkDocumentOwnerOrAdmin($documentId, $doc);
+        if ($authError) {
+            return $authError;
+        }
+
+        $docModel = new DocumentModel();
+        $isSharedParam = $this->request->getPost('is_shared');
+        $regenerate = (bool) $this->request->getPost('regenerate');
+
+        $isShared = ($isSharedParam !== null) ? ((int) $isSharedParam === 1 ? 1 : 0) : ($doc['is_shared'] ? 0 : 1);
+        $token = $doc['share_token'];
+
+        if (empty($token) || $regenerate) {
+            $token = bin2hex(random_bytes(16));
+        }
+
+        $docModel->update($documentId, [
+            'is_shared'   => $isShared,
+            'share_token' => $token,
+            'updated_at'  => date('Y-m-d H:i:s'),
+        ]);
+
+        $shareUrl = base_url('documents/shared/' . $token);
+
+        return $this->response->setJSON([
+            'status'      => 'success',
+            'message'     => $isShared ? 'Tautan berbagi berhasil diaktifkan.' : 'Tautan berbagi dinonaktifkan.',
+            'is_shared'   => (bool) $isShared,
+            'share_token' => $token,
+            'share_url'   => $shareUrl,
         ]);
     }
 }

@@ -25,6 +25,8 @@ class DocumentModel extends Model
         'benchmark_case_id',
         'benchmark_run_id',
         'page_count',
+        'share_token',
+        'is_shared',
         'created_at',
         'updated_at',
     ];
