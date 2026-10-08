@@ -350,6 +350,67 @@ class DashboardController extends BaseController
         ]);
     }
 
+    /**
+     * Memicu audit forensik cerdas (semantik naskah & panduan sidang lisan) secara on-demand.
+     */
+    public function runAudit($reportId)
+    {
+        $session = session();
+        $userId  = $session->get('user_id');
+        $isAdmin = ($session->get('user_role') === 'admin');
+
+        $reportModel = new \App\Models\ReportModel();
+        $docModel    = new \App\Models\DocumentModel();
+
+        $report = $reportModel->find($reportId);
+        if (!$report) {
+            return $this->response->setStatusCode(404)->setJSON(['success' => false, 'message' => 'Laporan tidak ditemukan.']);
+        }
+
+        $document = $docModel->find($report['document_id']);
+        if (!$document) {
+            return $this->response->setStatusCode(404)->setJSON(['success' => false, 'message' => 'Dokumen tidak ditemukan.']);
+        }
+
+        // Cek otorisasi: pemilik, admin, atau memiliki akses share
+        $isOwner   = $userId && ((int) $document['user_id'] === (int) $userId);
+        $shareModel = new \App\Models\DocumentShareModel();
+        $isShared  = $userId ? $shareModel->userHasAccess((int) $document['id'], (int) $userId, 'view_report') : false;
+
+        if (!$isOwner && !$isAdmin && !$isShared) {
+            return $this->response->setStatusCode(403)->setJSON(['success' => false, 'message' => 'Akses tidak diizinkan.']);
+        }
+
+        $repId = (int) $report['id'];
+        $pythonPath = ROOTPATH . '.venv/bin/python';
+        if (!file_exists($pythonPath)) {
+            $pythonPath = 'python3';
+        }
+
+        $scriptPath = ROOTPATH . 'worker/run_forensic_cli.py';
+        $cmd = escapeshellcmd($pythonPath) . ' ' . escapeshellarg($scriptPath) . ' ' . escapeshellarg((string) $repId) . ' 2>&1';
+        $output = shell_exec($cmd);
+
+        $freshReport = $reportModel->find($repId);
+        $freshEv = json_decode($freshReport['evidence_data'] ?? '{}', true) ?: [];
+        $geminiData = $freshEv['gemini_forensic'] ?? null;
+
+        if ($geminiData && ($geminiData['status'] ?? '') === 'completed') {
+            return $this->response->setJSON([
+                'success' => true,
+                'message' => 'Audit forensik cerdas berhasil diselesaikan!',
+                'data'    => $geminiData,
+            ]);
+        }
+
+        $parsedOut = json_decode($output ?? '', true);
+        $errMsg = $parsedOut['error'] ?? ($geminiData['message'] ?? 'Gagal menjalankan audit forensik semantik. Silakan coba sesaat lagi.');
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => $errMsg,
+        ]);
+    }
+
     private function computeFallbackStylometrics(string $text): array
     {
         $rawSentences = preg_split('/[.!?]+(?:\s+|\n+|$)/u', $text, -1, PREG_SPLIT_NO_EMPTY);

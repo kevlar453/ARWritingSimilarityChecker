@@ -103,11 +103,11 @@ def mark_key_rate_limited(key_id: int, error_msg: str = "", cooldown_seconds: in
             conn.close()
 
 
-def call_gemini_api(api_key: str, model_name: str, prompt: str, timeout: int = 45) -> Dict[str, Any]:
+def call_gemini_api(api_key: str, model_name: str, prompt: str, timeout: int = 45, can_fallback: bool = True) -> Dict[str, Any]:
     """
     Mengirimkan request ke Google Generative Language API via HTTP POST.
     """
-    model = model_name or "gemini-3.6-flash"
+    model = model_name or "gemini-3.5-flash"
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
 
     payload = {
@@ -158,13 +158,14 @@ def call_gemini_api(api_key: str, model_name: str, prompt: str, timeout: int = 4
             }
     except urllib.error.HTTPError as e:
         err_content = e.read().decode("utf-8", errors="ignore")
-        # Jika model generasi terbaru (3.6/3.0) belum tersedia di region API Google ini (404),
-        # lakukan fallback cerdas ke model legacy stabil (gemini-1.5-flash) agar proses tidak gagal
-        if e.code == 404 and model != "gemini-1.5-flash":
-            logger.info(f"[GEMINI] Model '{model}' menghasilkan 404 Not Found. Mencoba fallback ke 'gemini-1.5-flash'...")
-            fallback_res = call_gemini_api(api_key, "gemini-1.5-flash", prompt, timeout=timeout)
+        # Jika model mengalami kendala 503 (high demand/overload) atau 404, lakukan fallback otomatis ke gemini-3.5-flash
+        is_503 = (e.code == 503) or ("high demand" in err_content.lower()) or ("unavailable" in err_content.lower())
+        is_404 = (e.code == 404)
+        if can_fallback and (is_503 or is_404) and model != "gemini-3.5-flash":
+            logger.info(f"[GEMINI] Model '{model}' menghasilkan HTTP {e.code}. Mencoba fallback ke 'gemini-3.5-flash'...")
+            fallback_res = call_gemini_api(api_key, "gemini-3.5-flash", prompt, timeout=timeout, can_fallback=False)
             if fallback_res.get("success"):
-                fallback_res["model_executed"] = model
+                fallback_res["model_executed"] = "gemini-3.5-flash"
                 return fallback_res
 
         return {
@@ -175,10 +176,17 @@ def call_gemini_api(api_key: str, model_name: str, prompt: str, timeout: int = 4
             "model_executed": model,
         }
     except Exception as e:
+        err_str = str(e)
+        if can_fallback and model != "gemini-3.5-flash" and ("timed out" in err_str.lower() or "timeout" in err_str.lower()):
+            logger.info(f"[GEMINI] Model '{model}' mengalami timeout. Mencoba fallback ke 'gemini-3.5-flash'...")
+            fallback_res = call_gemini_api(api_key, "gemini-3.5-flash", prompt, timeout=timeout, can_fallback=False)
+            if fallback_res.get("success"):
+                fallback_res["model_executed"] = "gemini-3.5-flash"
+                return fallback_res
         return {
             "success": False,
             "status_code": 0,
-            "error": str(e),
+            "error": err_str,
             "is_quota": False
         }
 
@@ -257,7 +265,7 @@ Lakukan audit kritis dan kembalikan HANYA format JSON valid dengan struktur pers
                 return {
                     "status": "completed",
                     "is_available": True,
-                    "model_used": model_name,
+                    "model_used": res.get("model_executed") or model_name,
                     "key_used": key_name,
                     "audit": parsed_audit
                 }
@@ -276,7 +284,7 @@ Lakukan audit kritis dan kembalikan HANYA format JSON valid dengan struktur pers
                 return {
                     "status": "completed",
                     "is_available": True,
-                    "model_used": model_name,
+                    "model_used": res.get("model_executed") or model_name,
                     "key_used": key_name,
                     "audit": fallback_audit,
                     "raw_output": raw_text

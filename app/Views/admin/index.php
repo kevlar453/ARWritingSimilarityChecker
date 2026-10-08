@@ -1664,9 +1664,10 @@
                         <div>
                             <label class="block text-[11px] font-medium text-slate-400 mb-1">Pilihan Model AI Default</label>
                             <select id="google-model-name" class="w-full bg-slate-900 border border-indigo-500/50 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-400 font-medium">
-                                <option value="gemini-3.6-flash" selected>Gemini 3.6 Flash (Generasi Terbaru 2026 - Rekomendasi Utama &amp; Terverifikasi)</option>
+                                <option value="gemini-3.5-flash" selected>Gemini 3.5 Flash (Sangat Cepat &amp; Responsif - Rekomendasi Utama)</option>
+                                <option value="gemini-3.6-flash">Gemini 3.6 Flash (Generasi Mutakhir 2026)</option>
                                 <option value="gemini-3.0-flash">Gemini 3.0 Flash (Cepat &amp; Efisien)</option>
-                                <option value="gemini-1.5-flash">Gemini 1.5 Flash (Legacy Stabil)</option>
+                                <option value="gemini-1.5-flash">Gemini 1.5 Flash (Legacy)</option>
                                 <option value="gemini-1.5-pro">Gemini 1.5 Pro (Legacy Pro)</option>
                             </select>
                         </div>
@@ -1718,6 +1719,7 @@
                                 <?php else: ?>
                                     <?php 
                                         $modelDisplayNames = [
+                                            'gemini-3.5-flash' => 'Gemini 3.5 Flash (Rekomendasi Utama)',
                                             'gemini-3.6-flash' => 'Gemini 3.6 Flash (Terbaru 2026)',
                                             'gemini-3.0-flash' => 'Gemini 3.0 Flash (Cepat & Efisien)',
                                             'gemini-1.5-flash' => 'Gemini 1.5 Flash (Legacy Stabil)',

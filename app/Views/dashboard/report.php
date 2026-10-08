@@ -1438,6 +1438,39 @@
                 <span><strong>Integritas Dialogis:</strong> Audit forensik cerdas dirancang untuk melengkapi penilaian manusia, bukan menggantikannya. Pertanyaan ujian di atas bertujuan memfasilitasi klarifikasi langsung antara dosen penguji dan mahasiswa demi menjaga martabat kejujuran akademik.</span>
             </div>
         </div>
+        <?php else: ?>
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-2xl">✨</span>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="font-bold text-base text-slate-900">Audit Forensik Cerdas</h3>
+                            <span class="text-[10px] font-bold font-mono-code uppercase px-2 py-0.5 rounded bg-sky-50 text-sky-700 border border-sky-100">Deep Semantic</span>
+                        </div>
+                        <p class="text-xs text-slate-400">Verifikasi konsistensi logika antar-bab, kontradiksi metodologi, integritas sitasi, &amp; panduan pertanyaan ujian lisan sidang skripsi</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 self-start sm:self-auto">
+                    <span class="text-xs font-mono-code font-bold px-3 py-1 rounded-full border shadow-2xs bg-amber-50 text-amber-700 border-amber-200">
+                        Status: Siaga Evaluasi
+                    </span>
+                </div>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="space-y-1">
+                    <div class="font-bold text-slate-800 flex items-center gap-1.5">
+                        <span>🔍</span> Evaluasi Forensik Semantik &amp; Panduan Sidang
+                    </div>
+                    <p class="text-slate-500 text-[11px] leading-relaxed">
+                        Modul ini memverifikasi potensi perakitan teks otomatis, integritas rujukan sitasi, serta menyusun panduan pertanyaan kritis bagi dosen pembimbing dan dewan penguji sidang.
+                    </p>
+                </div>
+                <button onclick="runAuditForensik(<?= (int)$report['id'] ?>)" id="btnRunAuditForensik" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs shadow-xs transition flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer">
+                    <span>⚡ Jalankan Audit Forensik Cerdas</span>
+                </button>
+            </div>
+        </div>
         <?php endif; ?>
 
         <!-- ═════════════════════════════════════════════════════════════════════ -->
@@ -3964,6 +3997,39 @@
             const div = document.createElement('div');
             div.textContent = text || '';
             return div.innerHTML;
+        }
+
+        async function runAuditForensik(reportId) {
+            const btn = document.getElementById('btnRunAuditForensik');
+            if (!btn) return;
+            const originalHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="animate-pulse">⏳ Menjalankan Audit Forensik Cerdas...</span>';
+
+            try {
+                const res = await fetch('<?= base_url('dashboard/audit/run') ?>/' + reportId, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Content-Type': 'application/json'
+                    }
+                });
+                const data = await res.json();
+                if (data.success) {
+                    btn.innerHTML = '<span>✅ Selesai! Memuat analisis...</span>';
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 600);
+                } else {
+                    alert('Catatan Audit: ' + (data.message || 'Gagal mengeksekusi inferensi semantik.'));
+                    btn.disabled = false;
+                    btn.innerHTML = originalHtml;
+                }
+            } catch (err) {
+                alert('Terjadi kendala jaringan saat menghubungi modul forensik.');
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
         }
     </script>
 </body>
