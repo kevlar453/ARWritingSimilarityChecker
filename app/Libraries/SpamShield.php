@@ -421,9 +421,9 @@ class SpamShield
     {
         $domain = strtolower(trim($domain));
 
-        // Testing environment bypass
+        // Testing environment bypass & placeholder domain kampus.ac.id
         $env = getenv('CI_ENVIRONMENT') ?: (defined('ENVIRONMENT') ? ENVIRONMENT : 'production');
-        if ($env === 'testing' || $domain === 'localhost' || $domain === 'test.invalid') {
+        if ($env === 'testing' || $domain === 'localhost' || $domain === 'test.invalid' || $domain === 'kampus.ac.id') {
             return ['valid' => true, 'reason' => '', 'mx_host' => 'test-mx'];
         }
 
@@ -541,7 +541,14 @@ class SpamShield
             $remaining = max(1, $lockedUntil - time());
             $minutes = ceil($remaining / 60);
 
-            $actionLabel = $action === 'login' ? 'percobaan masuk' : ($action === 'register' ? 'pendaftaran akun' : 'pengiriman ulang verifikasi');
+            $actionLabel = match ($action) {
+                'login'               => 'percobaan masuk',
+                'register'            => 'pendaftaran akun',
+                'resend_verification' => 'pengiriman ulang verifikasi',
+                'forgot_password'     => 'permintaan atur ulang kata sandi',
+                'reset_password'      => 'percobaan atur ulang kata sandi',
+                default               => 'percobaan permintaan',
+            };
             return [
                 'allowed'           => false,
                 'seconds_remaining' => $remaining,

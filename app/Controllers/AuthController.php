@@ -241,6 +241,202 @@ class AuthController extends BaseController
     }
 
     /**
+     * Mengajukan permohonan atur ulang kata sandi (Forgot Password)
+     */
+    public function forgotPassword()
+    {
+        $data = $this->getRequestData();
+        $spamShield = new SpamShield();
+        $ip = $this->request->getIPAddress();
+
+        // 1. Pemeriksaan Honeypot anti-bot
+        if ($spamShield->isHoneypotTriggered($data)) {
+            return $this->respondError('Permintaan tidak sah.', 400);
+        }
+
+        // 2. Proteksi Rate Limit Global IP (Maksimal 5 per IP per 15 menit)
+        $ipRate = $spamShield->checkRateLimit('forgot_password', $ip, $ip, 5, 900);
+        if (! $ipRate['allowed']) {
+            return $this->respondError($ipRate['message'], 429);
+        }
+
+        $email = strtolower(trim((string) ($data['email'] ?? '')));
+
+        if (empty($email) || ! filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return $this->respondError('Harap cantumkan alamat email yang valid.', 400);
+        }
+
+        // 3. Proteksi Rate Limit per Alamat Email (Maksimal 3 per 15 menit)
+        $emailRate = $spamShield->checkRateLimit('forgot_password', $email, $ip, 3, 900);
+        if (! $emailRate['allowed']) {
+            return $this->respondError($emailRate['message'], 429);
+        }
+
+        $userModel = new UserModel();
+        $user = $userModel->where('email', $email)->first();
+
+        // Catat percobaan untuk mencegah serangan brute force / email bombing
+        $spamShield->recordFailedAttempt('forgot_password', $email, $ip, 3, 900, 900);
+
+        if (! $user) {
+            // Standar keamanan: jangan bocorkan apakah email terdaftar atau tidak
+            return $this->response->setJSON([
+                'status'  => 'success',
+                'message' => "Jika alamat {$email} terdaftar di AR Tilik, tautan atur ulang kata sandi telah dikirimkan ke kotak masuk Anda.",
+            ]);
+        }
+
+        if ($user['status'] === 'inactive') {
+            return $this->respondError('Akun ini telah dinonaktifkan. Silakan hubungi pengelola sistem.', 403);
+        }
+
+        // Buat token atur ulang sandi kriptografis berlaku 1 jam
+        $token = bin2hex(random_bytes(32));
+        $tokenExpiresAt = date('Y-m-d H:i:s', strtotime('+1 hour'));
+
+        $userModel->update($user['id'], [
+            'reset_password_token'      => $token,
+            'reset_password_expires_at' => $tokenExpiresAt,
+            'updated_at'                => date('Y-m-d H:i:s'),
+        ]);
+
+        $user['reset_password_token'] = $token;
+        $emailService = new EmailService();
+        $sent = $emailService->sendPasswordResetEmail($user, $token);
+
+        return $this->response->setJSON([
+            'status'     => 'success',
+            'email_sent' => $sent,
+            'message'    => "Tautan atur ulang kata sandi berhasil dikirimkan ke {$email}. Silakan periksa kotak masuk atau spam email Anda (berlaku 1 jam).",
+        ]);
+    }
+
+    /**
+     * Menampilkan halaman atur ulang kata sandi bagi pengguna yang mengklik tautan email
+     */
+    public function resetPasswordView()
+    {
+        $token = trim((string) ($this->request->getGet('token') ?? ''));
+
+        if (empty($token)) {
+            return redirect()->to(base_url('/?auth=login&reset=error&reason=empty_token'))
+                ->with('error', 'Token atur ulang kata sandi tidak ditemukan.');
+        }
+
+        $userModel = new UserModel();
+        $user = $userModel->where('reset_password_token', $token)->first();
+
+        if (! $user) {
+            return redirect()->to(base_url('/?auth=login&reset=error&reason=invalid_token'))
+                ->with('error', 'Tautan atur ulang kata sandi tidak valid atau telah kedaluwarsa.');
+        }
+
+        $now = time();
+        $expires = strtotime($user['reset_password_expires_at'] ?? '1970-01-01');
+        if ($now > $expires) {
+            return redirect()->to(base_url('/?auth=login&reset=error&reason=expired&email=' . urlencode($user['email'])))
+                ->with('error', 'Tautan atur ulang kata sandi telah kedaluwarsa. Silakan ajukan permohonan baru.');
+        }
+
+        $spamShield = new SpamShield();
+        $securityToken = $spamShield->generateTimeToken();
+
+        // Samarkan email untuk privasi: m***@domain.com
+        $parts = explode('@', $user['email']);
+        $local = $parts[0];
+        $maskedLocal = substr($local, 0, 1) . str_repeat('*', max(3, strlen($local) - 2)) . (strlen($local) > 1 ? substr($local, -1) : '');
+        $maskedEmail = $maskedLocal . '@' . ($parts[1] ?? '');
+
+        return view('auth/reset_password', [
+            'token'         => $token,
+            'userName'      => $user['name'],
+            'userEmail'     => $maskedEmail,
+            'securityToken' => $securityToken,
+        ]);
+    }
+
+    /**
+     * Memproses penggantian kata sandi baru (Reset Password Submit)
+     */
+    public function resetPassword()
+    {
+        $data = $this->getRequestData();
+        $spamShield = new SpamShield();
+        $ip = $this->request->getIPAddress();
+
+        // 1. Pemeriksaan Honeypot anti-bot
+        if ($spamShield->isHoneypotTriggered($data)) {
+            return $this->respondError('Permintaan tidak sah.', 400);
+        }
+
+        $token = trim((string) ($data['token'] ?? ''));
+        $password = (string) ($data['password'] ?? '');
+        $passwordConfirm = (string) ($data['password_confirm'] ?? '');
+
+        if (empty($token)) {
+            return $this->respondError('Token atur ulang kata sandi tidak valid atau kosong.', 400);
+        }
+
+        if (empty($password) || empty($passwordConfirm)) {
+            return $this->respondError('Kata sandi baru dan konfirmasi kata sandi wajib diisi.', 400);
+        }
+
+        if (strlen($password) < 6) {
+            return $this->respondError('Kata sandi baru minimal 6 karakter demi keamanan akun Anda.', 400);
+        }
+
+        if ($password !== $passwordConfirm) {
+            return $this->respondError('Konfirmasi kata sandi tidak cocok. Harap periksa kembali.', 400);
+        }
+
+        // 2. Proteksi Rate Limit Reset Password (Anti-Brute Force pada token)
+        $rateCheck = $spamShield->checkRateLimit('reset_password', $token, $ip, 5, 900);
+        if (! $rateCheck['allowed']) {
+            return $this->respondError($rateCheck['message'], 429);
+        }
+
+        $userModel = new UserModel();
+        $user = $userModel->where('reset_password_token', $token)->first();
+
+        if (! $user) {
+            $spamShield->recordFailedAttempt('reset_password', $token, $ip, 5, 900, 900);
+            return $this->respondError('Tautan atur ulang kata sandi tidak valid atau sudah kedaluwarsa.', 400);
+        }
+
+        $now = time();
+        $expires = strtotime($user['reset_password_expires_at'] ?? '1970-01-01');
+        if ($now > $expires) {
+            return $this->respondError('Tautan atur ulang kata sandi telah kedaluwarsa. Silakan ajukan permintaan baru.', 400);
+        }
+
+        // Perbarui kata sandi baru & bersihkan token
+        $currentDate = date('Y-m-d H:i:s');
+        $userModel->update($user['id'], [
+            'password_hash'             => password_hash($password, PASSWORD_DEFAULT),
+            'reset_password_token'      => null,
+            'reset_password_expires_at' => null,
+            'status'                    => 'active', // Otomatis aktifkan jika sebelumnya pending_verification
+            'email_verified_at'         => $user['email_verified_at'] ?: $currentDate,
+            'updated_at'                => $currentDate,
+        ]);
+
+        // Bersihkan seluruh catatan pembatasan login untuk akun ini
+        $spamShield->clearRateLimit('login', $user['email'], $ip);
+        $spamShield->clearRateLimit('reset_password', $token, $ip);
+
+        if ($this->request->isAJAX() || $this->request->getHeaderLine('Accept') === 'application/json' || stripos($this->request->getHeaderLine('Content-Type'), 'application/json') !== false) {
+            return $this->response->setJSON([
+                'status'   => 'success',
+                'message'  => 'Kata sandi Anda berhasil diperbarui! Silakan masuk dengan kata sandi baru.',
+                'redirect' => base_url('/?auth=login&reset=success'),
+            ]);
+        }
+
+        return redirect()->to(base_url('/?auth=login&reset=success'))
+            ->with('message', 'Kata sandi Anda berhasil diperbarui! Silakan masuk menggunakan kata sandi baru.');
+    }
+
+    /**
      * Masuk ke akun pengguna dengan proteksi Anti-Brute-Force
      */
     public function login()

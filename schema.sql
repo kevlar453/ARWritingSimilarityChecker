@@ -15,6 +15,8 @@ CREATE TABLE IF NOT EXISTS users (
     verification_token VARCHAR(128) NULL,
     verification_token_expires_at DATETIME NULL,
     email_verified_at DATETIME NULL,
+    reset_password_token VARCHAR(128) NULL,
+    reset_password_expires_at DATETIME NULL,
     free_submissions_used_this_week INT UNSIGNED NOT NULL DEFAULT 0,
     week_reset_at DATETIME NOT NULL,
     bonus_submissions INT UNSIGNED NOT NULL DEFAULT 0,
@@ -24,13 +26,14 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at DATETIME NOT NULL,
     INDEX idx_users_email (email),
     INDEX idx_users_status (status),
-    INDEX idx_users_token (verification_token)
+    INDEX idx_users_token (verification_token),
+    INDEX idx_users_reset_token (reset_password_token)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS auth_rate_limits (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     ip_address VARCHAR(45) NOT NULL,
-    action_type ENUM('login', 'register', 'resend_verification') NOT NULL,
+    action_type ENUM('login', 'register', 'resend_verification', 'forgot_password', 'reset_password') NOT NULL,
     identifier VARCHAR(191) NOT NULL,
     attempts INT UNSIGNED NOT NULL DEFAULT 1,
     first_attempt_at DATETIME NOT NULL,
@@ -53,6 +56,8 @@ CREATE TABLE IF NOT EXISTS documents (
     document_type ENUM('submission', 'corpus') NOT NULL DEFAULT 'submission',
     corpus_visibility ENUM('private', 'institution', 'corpus') NOT NULL DEFAULT 'private',
     source_type ENUM('student', 'journal', 'thesis', 'book', 'website', 'repository', 'other') NULL DEFAULT 'other',
+    faculty VARCHAR(150) NULL DEFAULT NULL,
+    department VARCHAR(150) NULL DEFAULT NULL,
     indexing_status ENUM('not_required', 'pending', 'processing', 'completed', 'failed') NOT NULL DEFAULT 'not_required',
     benchmark_case_id BIGINT UNSIGNED NULL,
     benchmark_run_id BIGINT UNSIGNED NULL,
@@ -62,6 +67,8 @@ CREATE TABLE IF NOT EXISTS documents (
     INDEX idx_documents_status (status),
     INDEX idx_documents_user (user_id),
     INDEX idx_documents_type (document_type),
+    INDEX idx_documents_faculty (faculty),
+    INDEX idx_documents_department (department),
     INDEX idx_documents_benchmark_run (benchmark_run_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

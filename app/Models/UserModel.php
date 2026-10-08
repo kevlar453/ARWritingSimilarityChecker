@@ -20,6 +20,8 @@ class UserModel extends Model
         'verification_token',
         'verification_token_expires_at',
         'email_verified_at',
+        'reset_password_token',
+        'reset_password_expires_at',
         'free_submissions_used_this_week',
         'week_reset_at',
         'bonus_submissions',
