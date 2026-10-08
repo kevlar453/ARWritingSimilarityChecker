@@ -2205,7 +2205,7 @@
                 let sepIdx = -1;
                 for (let i = 0; i < tableRows.length; i++) {
                     const rawCells = tableRows[i];
-                    if (rawCells.every(c => /^[-:\s]+$/.test(c.trim()))) {
+                    if (rawCells.length > 0 && rawCells.every(c => /^[-:\s]+$/.test(c.replace(/<[^>]+>/g, '').trim()))) {
                         hasHeaderSep = true;
                         sepIdx = i;
                         break;
@@ -2250,10 +2250,13 @@
 
             for (let i = 0; i < lines.length; i++) {
                 const line = lines[i];
-                const trimmed = line.trim();
-                if (trimmed.startsWith('|') && trimmed.endsWith('|') && trimmed.length > 2) {
+                const stripped = line.replace(/<[^>]+>/g, '').trim();
+                const firstPipe = line.indexOf('|');
+                const lastPipe = line.lastIndexOf('|');
+                if (stripped.startsWith('|') && stripped.endsWith('|') && stripped.length > 2 && firstPipe !== -1 && lastPipe > firstPipe) {
                     inTable = true;
-                    const cells = trimmed.slice(1, -1).split('|');
+                    const inner = line.substring(firstPipe + 1, lastPipe);
+                    const cells = inner.split('|');
                     tableRows.push(cells);
                 } else {
                     if (inTable) {

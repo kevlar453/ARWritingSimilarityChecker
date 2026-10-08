@@ -184,8 +184,9 @@ class DashboardController extends BaseController
                         ->select('text')
                         ->where('document_id', $report['document_id'])
                         ->orderBy('chunk_index', 'ASC')
+                        ->orderBy('id', 'ASC')
                         ->get()->getResultArray();
-        $submissionText = implode(' ', array_column($subChunks, 'text'));
+        $submissionText = implode("\n\n", array_column($subChunks, 'text'));
 
         $sourceTexts = [];
         foreach ($sources as $s) {
@@ -194,8 +195,9 @@ class DashboardController extends BaseController
                             ->select('text')
                             ->where('document_id', $sDocId)
                             ->orderBy('chunk_index', 'ASC')
+                            ->orderBy('id', 'ASC')
                             ->get()->getResultArray();
-            $sourceTexts[$sDocId] = implode(' ', array_column($srcChunks, 'text'));
+            $sourceTexts[$sDocId] = implode("\n\n", array_column($srcChunks, 'text'));
         }
 
         // Resolusi Stylometrik & AI Indicator
