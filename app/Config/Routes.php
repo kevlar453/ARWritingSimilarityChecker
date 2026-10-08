@@ -17,6 +17,8 @@ $routes->get('report/(:num)/preview', 'DashboardController::previewPdf/$1');
 $routes->get('reports/(:num)/preview', 'DashboardController::previewPdf/$1');
 $routes->get('dashboard/report/(:num)/preview', 'DashboardController::previewPdf/$1');
 $routes->get('dashboard/reports/(:num)/preview', 'DashboardController::previewPdf/$1');
+$routes->match(['get', 'head'], 'documents/(:num)/preview', 'DashboardController::previewDocument/$1');
+$routes->match(['get', 'head'], 'dashboard/documents/(:num)/preview', 'DashboardController::previewDocument/$1');
 $routes->match(['get', 'head'], 'verify/(:segment)', 'DashboardController::verify/$1');
 $routes->match(['get', 'head'], 'verify', 'DashboardController::verify');
 $routes->match(['get', 'head'], 'integrations/ojs/pdf', 'DashboardController::downloadOjsPdf');
@@ -40,8 +42,11 @@ $routes->group('auth', function ($routes) {
     $routes->get('logout', 'AuthController::logout');
     $routes->post('logout', 'AuthController::logout');
     $routes->get('status', 'AuthController::status');
-    $routes->get('verify-email', 'AuthController::verifyEmail');
+    $routes->match(['get', 'head'], 'verify-email', 'AuthController::verifyEmail');
     $routes->post('resend-verification', 'AuthController::resendVerification');
+    $routes->post('forgot-password', 'AuthController::forgotPassword');
+    $routes->match(['get', 'head'], 'reset-password', 'AuthController::resetPasswordView');
+    $routes->post('reset-password', 'AuthController::resetPassword');
     $routes->get('security-token', 'AuthController::securityToken');
 });
 

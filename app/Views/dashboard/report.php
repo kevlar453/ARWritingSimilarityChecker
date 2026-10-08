@@ -116,6 +116,10 @@
                         <span>•</span>
                         <span>Total: <strong class="text-slate-700"><?= number_format($evidenceData['total_words']) ?> kata</strong></span>
                     <?php endif; ?>
+                    <?php if (!empty($document['faculty']) || !empty($document['department'])): ?>
+                        <span>•</span>
+                        <span>Bidang: <strong class="text-slate-700"><?= esc(implode(' / ', array_filter([$document['faculty'] ?? '', $document['department'] ?? '']))) ?></strong></span>
+                    <?php endif; ?>
                 </p>
             </div>
 
@@ -2186,6 +2190,85 @@
             return String(text).replace(/[&<>"']/g, m => map[m]);
         }
 
+        function formatTablesInHtml(html) {
+            if (!html || !html.includes('|')) return html;
+
+            const lines = html.split('\n');
+            const out = [];
+            let inTable = false;
+            let tableRows = [];
+
+            function flushTable() {
+                if (tableRows.length === 0) return;
+
+                let hasHeaderSep = false;
+                let sepIdx = -1;
+                for (let i = 0; i < tableRows.length; i++) {
+                    const rawCells = tableRows[i];
+                    if (rawCells.every(c => /^[-:\s]+$/.test(c.trim()))) {
+                        hasHeaderSep = true;
+                        sepIdx = i;
+                        break;
+                    }
+                }
+
+                let theadHtml = '';
+                let tbodyHtml = '';
+
+                if (hasHeaderSep && sepIdx > 0) {
+                    const headerRow = tableRows[0];
+                    theadHtml = '<thead class="bg-slate-100 text-slate-800 font-bold uppercase tracking-wider text-[11px] border-b border-slate-300"><tr>' +
+                        headerRow.map(c => `<th class="py-2.5 px-3 border-r border-slate-200 last:border-r-0 text-left font-semibold">${c.trim()}</th>`).join('') +
+                        '</tr></thead>';
+
+                    const bodyRows = tableRows.slice(sepIdx + 1);
+                    tbodyHtml = '<tbody class="divide-y divide-slate-100 bg-white font-sans text-xs">' +
+                        bodyRows.map((r, rIdx) => `<tr class="${rIdx % 2 === 0 ? 'bg-white' : 'bg-slate-50/60'} hover:bg-indigo-50/40 transition-colors">` +
+                            r.map(c => `<td class="py-2 px-3 border-r border-slate-200 last:border-r-0 align-top">${c.trim()}</td>`).join('') +
+                        '</tr>').join('') + '</tbody>';
+                } else if (tableRows.length >= 2) {
+                    const headerRow = tableRows[0];
+                    theadHtml = '<thead class="bg-slate-100 text-slate-800 font-bold uppercase tracking-wider text-[11px] border-b border-slate-300"><tr>' +
+                        headerRow.map(c => `<th class="py-2.5 px-3 border-r border-slate-200 last:border-r-0 text-left font-semibold">${c.trim()}</th>`).join('') +
+                        '</tr></thead>';
+
+                    const bodyRows = tableRows.slice(1);
+                    tbodyHtml = '<tbody class="divide-y divide-slate-100 bg-white font-sans text-xs">' +
+                        bodyRows.map((r, rIdx) => `<tr class="${rIdx % 2 === 0 ? 'bg-white' : 'bg-slate-50/60'} hover:bg-indigo-50/40 transition-colors">` +
+                            r.map(c => `<td class="py-2 px-3 border-r border-slate-200 last:border-r-0 align-top">${c.trim()}</td>`).join('') +
+                        '</tr>').join('') + '</tbody>';
+                } else {
+                    tbodyHtml = '<tbody class="divide-y divide-slate-100 bg-white font-sans text-xs"><tr>' +
+                        tableRows[0].map(c => `<td class="py-2 px-3 border-r border-slate-200 last:border-r-0 align-top">${c.trim()}</td>`).join('') +
+                        '</tr></tbody>';
+                }
+
+                out.push(`</div><div class="overflow-x-auto my-3 rounded-xl border border-slate-300 shadow-2xs bg-white"><table class="min-w-full divide-y divide-slate-200 border-collapse">${theadHtml}${tbodyHtml}</table></div><div class="leading-relaxed whitespace-pre-wrap">`);
+                tableRows = [];
+                inTable = false;
+            }
+
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+                const trimmed = line.trim();
+                if (trimmed.startsWith('|') && trimmed.endsWith('|') && trimmed.length > 2) {
+                    inTable = true;
+                    const cells = trimmed.slice(1, -1).split('|');
+                    tableRows.push(cells);
+                } else {
+                    if (inTable) {
+                        flushTable();
+                    }
+                    out.push(line);
+                }
+            }
+            if (inTable) {
+                flushTable();
+            }
+
+            return out.join('\n');
+        }
+
         function buildHighlightedSequentialHtml(rawText, matchRanges, markClass, idPrefix) {
             if (!rawText) return '<p class="text-slate-400 italic py-8 text-center">Teks tidak tersedia.</p>';
             const tokenRegex = /\b[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*\b/gu;
@@ -2200,7 +2283,7 @@
             }
 
             if (tokens.length === 0 || matchRanges.length === 0) {
-                return `<div class="leading-relaxed whitespace-pre-wrap">${escapeHtml(rawText)}</div>`;
+                return `<div class="leading-relaxed whitespace-pre-wrap">${formatTablesInHtml(escapeHtml(rawText))}</div>`;
             }
 
             const charIntervals = [];
@@ -2244,13 +2327,13 @@
                 lastIdx = interval.endChar;
             });
             resultHtml += escapeHtml(rawText.substring(lastIdx));
-            return `<div class="leading-relaxed whitespace-pre-wrap">${resultHtml}</div>`;
+            return `<div class="leading-relaxed whitespace-pre-wrap">${formatTablesInHtml(resultHtml)}</div>`;
         }
 
         function buildHighlightedLexicalHtml(rawText, sharedTermsSet, markClass, idPrefix) {
             if (!rawText) return { html: '<p class="text-slate-400 italic py-8 text-center">Teks tidak tersedia.</p>', count: 0 };
             if (!sharedTermsSet || sharedTermsSet.size === 0) {
-                return { html: `<div class="leading-relaxed whitespace-pre-wrap">${escapeHtml(rawText)}</div>`, count: 0 };
+                return { html: `<div class="leading-relaxed whitespace-pre-wrap">${formatTablesInHtml(escapeHtml(rawText))}</div>`, count: 0 };
             }
 
             const tokenRegex = /\b[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*\b/gu;
@@ -2270,7 +2353,7 @@
             }
             resultHtml += escapeHtml(rawText.substring(lastIdx));
             return {
-                html: `<div class="leading-relaxed whitespace-pre-wrap">${resultHtml}</div>`,
+                html: `<div class="leading-relaxed whitespace-pre-wrap">${formatTablesInHtml(resultHtml)}</div>`,
                 count: termOccurrenceIdx
             };
         }
@@ -2321,14 +2404,95 @@
             }
         }
 
+        let currentDualViewMode = 'text';
+
+        function switchDualViewMode(mode) {
+            currentDualViewMode = mode;
+            const textContainer = document.getElementById('dualTextContainer');
+            const pdfContainer = document.getElementById('dualPdfContainer');
+            const textBtn = document.getElementById('dualViewTextBtn');
+            const pdfBtn = document.getElementById('dualViewPdfBtn');
+            const syncToggleLabel = document.getElementById('dualSyncToggle')?.closest('label');
+            const matchNavBox = document.getElementById('dualMatchNavCounter')?.closest('div');
+
+            if (mode === 'pdf') {
+                if (textContainer) textContainer.classList.add('hidden');
+                if (pdfContainer) pdfContainer.classList.remove('hidden');
+
+                if (textBtn) {
+                    textBtn.className = 'px-2.5 py-1 rounded text-xs font-medium text-slate-300 hover:text-white transition cursor-pointer flex items-center gap-1.5';
+                }
+                if (pdfBtn) {
+                    pdfBtn.className = 'px-2.5 py-1 rounded text-xs font-semibold bg-indigo-600 text-white transition shadow-xs cursor-pointer flex items-center gap-1.5';
+                }
+                if (syncToggleLabel) syncToggleLabel.classList.add('opacity-40', 'pointer-events-none');
+                if (matchNavBox) matchNavBox.classList.add('opacity-40', 'pointer-events-none');
+
+                loadDualPdfFrames();
+            } else {
+                if (textContainer) textContainer.classList.remove('hidden');
+                if (pdfContainer) pdfContainer.classList.add('hidden');
+
+                if (textBtn) {
+                    textBtn.className = 'px-2.5 py-1 rounded text-xs font-semibold bg-indigo-600 text-white transition shadow-xs cursor-pointer flex items-center gap-1.5';
+                }
+                if (pdfBtn) {
+                    pdfBtn.className = 'px-2.5 py-1 rounded text-xs font-medium text-slate-300 hover:text-white transition cursor-pointer flex items-center gap-1.5';
+                }
+                if (syncToggleLabel) syncToggleLabel.classList.remove('opacity-40', 'pointer-events-none');
+                if (matchNavBox) matchNavBox.classList.remove('opacity-40', 'pointer-events-none');
+            }
+        }
+
+        function loadDualPdfFrames() {
+            const subFrame = document.getElementById('dualSubPdfFrame');
+            const subNewTab = document.getElementById('dualSubPdfNewTab');
+            const subPdfUrl = '<?= base_url('dashboard/documents/' . $report['document_id'] . '/preview') ?>';
+
+            if (subFrame && (!subFrame.src || subFrame.src === 'about:blank' || subFrame.src.endsWith('about:blank'))) {
+                subFrame.src = subPdfUrl;
+            }
+            if (subNewTab) {
+                subNewTab.href = subPdfUrl;
+            }
+
+            const select = document.getElementById('dualSourceSelect');
+            if (!select) return;
+            const selectedSrcId = parseInt(select.value);
+            const selectedSourceObj = reportSources.find(s => parseInt(s.source_document_id) === selectedSrcId) || reportSources[0];
+
+            const srcFrame = document.getElementById('dualSrcPdfFrame');
+            const srcNewTab = document.getElementById('dualSrcPdfNewTab');
+            const srcFallback = document.getElementById('dualSrcPdfFallback');
+            const srcTitle = document.getElementById('dualSrcPdfTitle');
+
+            if (selectedSourceObj) {
+                if (srcTitle) srcTitle.innerText = `${selectedSourceObj.source_title || 'Naskah Asli Rujukan'} (PDF)`;
+                const srcPdfUrl = '<?= base_url('dashboard/documents') ?>/' + selectedSrcId + '/preview';
+
+                if (srcNewTab) srcNewTab.href = srcPdfUrl;
+                if (srcFrame) {
+                    srcFrame.src = srcPdfUrl;
+                    if (srcFallback) srcFallback.classList.add('hidden');
+                }
+            }
+        }
+
         function closeDualReaderModal() {
             const modal = document.getElementById('dualReaderModal');
             modal.classList.add('hidden');
             document.body.classList.remove('overflow-hidden');
+            const subFrame = document.getElementById('dualSubPdfFrame');
+            const srcFrame = document.getElementById('dualSrcPdfFrame');
+            if (subFrame) subFrame.src = 'about:blank';
+            if (srcFrame) srcFrame.src = 'about:blank';
         }
 
         function switchDualReaderSource(sourceId) {
             renderDualReaderContent();
+            if (currentDualViewMode === 'pdf') {
+                loadDualPdfFrames();
+            }
         }
 
         function renderDualReaderContent() {
@@ -2771,6 +2935,16 @@
 
                 <!-- Controls in Header -->
                 <div class="flex flex-wrap items-center gap-3 text-xs">
+                    <!-- View Mode Toggle (Text vs Original PDF Document) -->
+                    <div class="flex items-center bg-slate-800 p-0.5 rounded-lg border border-slate-700 font-sans">
+                        <button type="button" id="dualViewTextBtn" onclick="switchDualViewMode('text')" class="px-2.5 py-1 rounded text-xs font-semibold bg-indigo-600 text-white transition shadow-xs cursor-pointer flex items-center gap-1.5" title="Tampilkan teks dengan sorotan pasase mirip">
+                            <span>📝</span> Teks & Sorotan
+                        </button>
+                        <button type="button" id="dualViewPdfBtn" onclick="switchDualViewMode('pdf')" class="px-2.5 py-1 rounded text-xs font-medium text-slate-300 hover:text-white transition cursor-pointer flex items-center gap-1.5" title="Tampilkan naskah asli PDF dengan tata letak visual & tabel">
+                            <span>📄</span> Dokumen Asli (PDF)
+                        </button>
+                    </div>
+
                     <!-- Source Selector -->
                     <div class="flex items-center gap-1.5 bg-slate-800 px-2.5 py-1.5 rounded-lg border border-slate-700">
                         <label for="dualSourceSelect" class="text-slate-400 font-medium text-[11px]">Rujukan:</label>
@@ -2802,8 +2976,8 @@
             <!-- Mode Banner (Sequential Overlap vs Topical Lexical Overlap) -->
             <div id="dualReaderModeBanner" class="hidden"></div>
 
-            <!-- Modal Body: 2 Columns Split Screen -->
-            <div class="flex-1 grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-200 min-h-0 bg-slate-100">
+            <!-- Modal Body 1: 2 Columns Split Screen Teks & Sorotan -->
+            <div id="dualTextContainer" class="flex-1 grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-200 min-h-0 bg-slate-100">
                 <!-- Left Column: Naskah Mahasiswa (Submisi) -->
                 <div class="flex flex-col min-h-0 bg-white">
                     <div class="px-5 py-2.5 bg-indigo-50/70 border-b border-indigo-100 flex items-center justify-between text-xs">
@@ -2829,6 +3003,53 @@
                     </div>
                     <div id="dualSrcPane" class="flex-1 overflow-y-auto p-6 text-sm text-slate-800 leading-relaxed font-serif select-text scroll-smooth space-y-3">
                         <!-- Full text with highlight marks -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Body 2: PDF Pratinjau Dokumen Asli -->
+            <div id="dualPdfContainer" class="flex-1 grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-800 min-h-0 bg-slate-950 hidden">
+                <!-- Left Column: PDF Naskah Mahasiswa (Submisi) -->
+                <div class="flex flex-col min-h-0 bg-slate-900 border-r border-slate-800">
+                    <div class="px-5 py-2.5 bg-slate-950 border-b border-slate-800 flex items-center justify-between text-xs">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                            <span class="font-bold text-slate-200 uppercase tracking-wider font-mono-code">Naskah Asli Submisi (PDF)</span>
+                        </div>
+                        <a id="dualSubPdfNewTab" href="<?= base_url('dashboard/documents/' . $report['document_id'] . '/preview') ?>" target="_blank" class="text-[11px] text-indigo-400 hover:text-indigo-300 font-medium flex items-center gap-1">
+                            Buka di Tab Baru <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                        </a>
+                    </div>
+                    <div class="flex-1 min-h-0 relative bg-slate-900">
+                        <iframe id="dualSubPdfFrame" src="about:blank" class="w-full h-full border-0"></iframe>
+                    </div>
+                </div>
+
+                <!-- Right Column: PDF Dokumen Rujukan (Sumber) -->
+                <div class="flex flex-col min-h-0 bg-slate-900">
+                    <div class="px-5 py-2.5 bg-slate-950 border-b border-slate-800 flex items-center justify-between text-xs">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+                            <span class="font-bold text-slate-200 uppercase tracking-wider font-mono-code" id="dualSrcPdfTitle">Naskah Asli Rujukan (PDF)</span>
+                        </div>
+                        <a id="dualSrcPdfNewTab" href="#" target="_blank" class="text-[11px] text-indigo-400 hover:text-indigo-300 font-medium flex items-center gap-1">
+                            Buka di Tab Baru <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                        </a>
+                    </div>
+                    <div class="flex-1 min-h-0 relative bg-slate-900">
+                        <iframe id="dualSrcPdfFrame" src="about:blank" class="w-full h-full border-0"></iframe>
+                        <div id="dualSrcPdfFallback" class="hidden absolute inset-0 flex flex-col items-center justify-center p-6 text-center text-slate-300 bg-slate-950/95">
+                            <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center text-2xl mb-3 border border-indigo-500/20">
+                                📑
+                            </div>
+                            <h4 class="font-bold text-sm text-white mb-1">Pratinjau PDF Sumber Tidak Tersedia</h4>
+                            <p class="text-xs text-slate-400 max-w-sm mb-4 leading-relaxed">
+                                Dokumen pembanding ini tercatat di repositori korpus dalam format teks murni / hasil crawling repositori akademik tanpa file PDF fisik.
+                            </p>
+                            <button type="button" onclick="switchDualViewMode('text')" class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold transition cursor-pointer">
+                                📝 Lihat di Mode Teks & Sorotan
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

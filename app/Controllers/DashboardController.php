@@ -951,6 +951,56 @@ class DashboardController extends BaseController
             ->setBody($pdfContent);
     }
 
+    /**
+     * Menyajikan file asli dokumen submisi / korpus untuk pratinjau (inline PDF viewer)
+     */
+    public function previewDocument($documentId)
+    {
+        $session = session();
+        $userId  = $session->get('user_id');
+
+        $documentModel = new DocumentModel();
+        $doc = $documentModel->find($documentId);
+
+        $filePath = $doc['storage_path'] ?? '';
+        if (! file_exists($filePath)) {
+            $altPath = ROOTPATH . 'writable/' . preg_replace('#^.*?writable/#', '', $filePath);
+            if (file_exists($altPath)) {
+                $filePath = $altPath;
+            } else {
+                throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('File fisik dokumen tidak ditemukan.');
+            }
+        }
+
+        // Cek izin akses: pemilik dokumen, admin, korpus rujukan, atau laporan terkait
+        $isOwner  = $userId && ((int) $doc['user_id'] === (int) $userId);
+        $isAdmin  = $session->get('user_role') === 'admin';
+        $isCorpus = ($doc['document_type'] === 'corpus' || ($doc['corpus_visibility'] ?? '') === 'public');
+
+        if (! $isOwner && ! $isAdmin && ! $isCorpus) {
+            $reportModel = new ReportModel();
+            $hasReport = $reportModel->where('document_id', $documentId)->first();
+            if (! $hasReport) {
+                return $this->response->setStatusCode(403)->setBody('Akses ke dokumen ditolak.');
+            }
+        }
+
+        $mime = $doc['mime_type'] ?: mime_content_type($filePath);
+        if (empty($mime)) {
+            $mime = 'application/pdf';
+        }
+
+        $filename = $doc['original_filename'] ?: basename($filePath);
+
+        return $this->response
+            ->setHeader('Content-Type', $mime)
+            ->setHeader('Content-Disposition', 'inline; filename="' . addslashes($filename) . '"')
+            ->setHeader('Content-Length', (string) filesize($filePath))
+            ->setHeader('X-Frame-Options', 'SAMEORIGIN')
+            ->setHeader('Cache-Control', 'private, max-age=3600')
+            ->setBody(file_get_contents($filePath));
+    }
+
     public function previewPdf($id)
     {
         $reportModel = new ReportModel();
