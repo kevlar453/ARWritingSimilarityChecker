@@ -9,9 +9,10 @@ DEFAULT_TFIDF_MATCH_SIMILARITY = 85.0
 DEFAULT_TFIDF_REVIEW_SIMILARITY = 10.0
 DEFAULT_EXACT_MATCH_LONGEST = 50
 DEFAULT_EXACT_REVIEW_LONGEST = 10
+DEFAULT_SUBSTANTIAL_LONGEST = 25
 DEFAULT_SIGNIFICANT_MIN_IDF = 0.5
 
-class EvidenceContract(TypedDict):
+class EvidenceContract(TypedDict, total=False):
     """
     Kontrak data bukti seragam untuk setiap engine pemeriksa kemiripan.
     """
@@ -24,6 +25,10 @@ class EvidenceContract(TypedDict):
     avg_idf: Optional[float]     # rata-rata IDF term bukti
     max_idf: Optional[float]     # IDF maksimum term bukti
     top_sources: list[dict]      # daftar sumber teratas yang relevan
+    substantive_longest: Optional[int]      # pasase terpanjang di luar boilerplate & administratif
+    substantive_similarity: Optional[float] # kemiripan sekuensial pada substansi pokok
+    substantive_words: Optional[int]
+    corpus_docs_count: Optional[int]
 
 def extract_exact_evidence(exact_result: dict) -> EvidenceContract:
     """
@@ -45,7 +50,10 @@ def extract_exact_evidence(exact_result: dict) -> EvidenceContract:
         "match_count": int(exact_result.get("match_count", 0)),
         "avg_idf": round(avg_idf, 4),
         "max_idf": round(max_idf, 4),
-        "top_sources": exact_result.get("sources", [])[:5]
+        "top_sources": exact_result.get("sources", [])[:5],
+        "substantive_longest": exact_result.get("substantive_longest"),
+        "substantive_similarity": exact_result.get("substantive_similarity"),
+        "substantive_words": exact_result.get("substantive_words"),
     }
 
 def extract_tfidf_evidence(tfidf_result: dict) -> EvidenceContract:
@@ -104,25 +112,53 @@ def aggregate_evidence(
     tfidf_review_sim: float = DEFAULT_TFIDF_REVIEW_SIMILARITY,
     exact_match_longest: int = DEFAULT_EXACT_MATCH_LONGEST,
     exact_review_longest: int = DEFAULT_EXACT_REVIEW_LONGEST,
-    min_significant_idf: float = DEFAULT_SIGNIFICANT_MIN_IDF
+    min_significant_idf: float = DEFAULT_SIGNIFICANT_MIN_IDF,
+    substantial_longest: int = DEFAULT_SUBSTANTIAL_LONGEST,
+    corpus_docs_count: Optional[int] = None,
 ) -> dict:
     """
     Fase 2.3 & 2.4: Menggabungkan bukti Exact dan TF-IDF berdasarkan aturan eksplisit
     dan menghasilkan pola bukti (*evidence pattern*), keputusan (*decision*),
     serta penjelasan transparan (*explainability rationale*).
+    Mendukung metrik substantif (non-boilerplate & non-administratif) untuk evaluasi yang adil.
     """
     exact_sim = exact_evidence["similarity"]
     longest = exact_evidence["longest_match"] or 0
     exact_max_idf = exact_evidence["max_idf"] or 0.0
-    
+
+    sub_longest = exact_evidence.get("substantive_longest")
+    if sub_longest is None:
+        sub_longest = longest
+
+    sub_sim = exact_evidence.get("substantive_similarity")
+    if sub_sim is None:
+        sub_sim = exact_sim
+
     tfidf_sim = tfidf_evidence["similarity"]
     tfidf_avg_idf = tfidf_evidence["avg_idf"] or 0.0
-    
+
     # Periksa kesepakatan sumber teratas (Source Agreement)
     exact_top_src = exact_evidence["top_sources"][0]["source_document_id"] if exact_evidence["top_sources"] else None
     tfidf_top_src = tfidf_evidence["top_sources"][0]["source_document_id"] if tfidf_evidence["top_sources"] else None
     sources_agree = (exact_top_src is not None and exact_top_src == tfidf_top_src)
-    
+
+    # 0. Kasus Korpus Kosong / Tidak Memadai (INSUFFICIENT_CORPUS)
+    if corpus_docs_count is not None and corpus_docs_count == 0:
+        pattern = "INSUFFICIENT_CORPUS"
+        decision = "review"
+        agreement = "INSUFFICIENT_CORPUS"
+        rationale = (
+            "Korpus pembanding belum memiliki dokumen rujukan pada bidang ini (0 dokumen). "
+            "Hasil pemeriksaan belum dapat dikonfirmasi sebagai naskah bersih."
+        )
+        return {
+            "decision": decision,
+            "pattern": pattern,
+            "agreement": agreement,
+            "sources_agree": sources_agree,
+            "rationale": rationale
+        }
+
     # 1. Kasus Identik / Verbatim (VERBATIM_MATCH)
     # Bukti exact sangat tinggi DAN bukti leksikal kosinus sangat tinggi
     if (exact_sim >= exact_match_sim or longest >= exact_match_longest) and tfidf_sim >= tfidf_match_sim:
@@ -143,7 +179,7 @@ def aggregate_evidence(
         }
 
     # 2. Kasus Frasa Umum Akademis (COMMON_ACADEMIC_PHRASE)
-    # Kemiripan muncul tetapi signifikansi IDF rendah (frasa pasaran DF >= 10, IDF <= 1.0)
+    # A. Kemiripan muncul tetapi signifikansi IDF rendah (frasa pasaran DF >= 10, IDF <= 1.0)
     if exact_sim >= exact_review_sim and exact_max_idf <= 1.0:
         pattern = "COMMON_ACADEMIC_PHRASE"
         decision = "review"
@@ -160,6 +196,25 @@ def aggregate_evidence(
             "sources_agree": sources_agree,
             "rationale": rationale
         }
+
+    # B. Kemiripan sekuensial berada pada bagian administratif atau daftar rujukan (bukan substansi naskah)
+    if longest >= exact_review_longest and sub_longest < substantial_longest and sub_sim < exact_review_sim and tfidf_sim < tfidf_match_sim:
+        pattern = "COMMON_ACADEMIC_PHRASE"
+        decision = "review" if exact_sim >= exact_review_sim else "no_match"
+        agreement = "ADMINISTRATIVE_CONVENTION"
+        rationale = (
+            f"Kemiripan sekuensial yang terdeteksi ({exact_sim:.2f}%, pasase terpanjang {longest} kata) "
+            f"berada pada bagian administratif atau daftar rujukan, tanpa bukti duplikasi substantif "
+            f"(Cosine: {tfidf_sim:.2f}%)."
+        )
+        return {
+            "decision": decision,
+            "pattern": pattern,
+            "agreement": agreement,
+            "sources_agree": sources_agree,
+            "rationale": rationale
+        }
+
     if exact_sim < exact_review_sim and tfidf_sim >= tfidf_review_sim and tfidf_avg_idf < min_significant_idf:
         pattern = "COMMON_ACADEMIC_PHRASE"
         decision = "review"
@@ -177,15 +232,14 @@ def aggregate_evidence(
         }
 
     # 3. Kasus Copy-Edit (COPY_EDIT)
-    # Ada pasase sekuensial panjang yang dipertahankan, namun kosinus menunjukkan modifikasi kata
-    if (exact_sim >= exact_match_sim or longest >= exact_review_longest) and (tfidf_sim < tfidf_match_sim and tfidf_sim >= tfidf_review_sim):
+    # Ada pasase sekuensial substantif yang dipertahankan, namun kosinus global menunjukkan variasi kosakata
+    if (sub_sim >= exact_match_sim or sub_longest >= substantial_longest) and (tfidf_sim < tfidf_match_sim and tfidf_sim >= tfidf_review_sim):
         pattern = "COPY_EDIT"
         decision = "review"
         agreement = "PARTIAL_AGREEMENT"
         rationale = (
-            f"Ditemukan pasase berurutan yang substansial ({longest} kata identik), "
-            f"namun orientasi kosakata global menunjukkan adanya intervensi/modifikasi teks "
-            f"(Cosine: {tfidf_sim:.2f}%)."
+            f"Ditemukan pasase berurutan yang substansial ({sub_longest} kata identik) "
+            f"dengan variasi orientasi kosakata global (Cosine: {tfidf_sim:.2f}%)."
         )
         return {
             "decision": decision,
@@ -196,12 +250,12 @@ def aggregate_evidence(
         }
 
     # 4. Kasus Kemiripan Sekuensial Parsial / Dilusi Teks (PARTIAL_DIRECT_MATCH)
-    if (exact_sim >= exact_review_sim or longest >= exact_review_longest) and exact_max_idf > 1.0:
+    if (sub_sim >= exact_review_sim or sub_longest >= substantial_longest) and exact_max_idf > 1.0:
         pattern = "PARTIAL_DIRECT_MATCH"
         decision = "review"
         agreement = "LOCALIZED_EXACT_EVIDENCE"
         rationale = (
-            f"Ditemukan pasase kata berurutan signifikan (Longest: {longest} kata, Exact: {exact_sim:.2f}%) "
+            f"Ditemukan pasase kata berurutan signifikan (Longest: {sub_longest} kata, Exact: {exact_sim:.2f}%) "
             f"dengan rujukan terminologi spesifik (Max IDF: {exact_max_idf:.4f})."
         )
         return {
@@ -213,13 +267,13 @@ def aggregate_evidence(
         }
 
     # 5. Kasus Parafrase Topikal (SEMANTIC_PARAPHRASE)
-    # Tidak ada pasase sekuensial (Exact rendah), namun kemiripan leksikal substantif tinggi dengan IDF berbobot
-    if exact_sim < exact_review_sim and tfidf_sim >= tfidf_review_sim and tfidf_avg_idf >= min_significant_idf:
+    # Tidak ada pasase sekuensial substantif (Exact substantif rendah), namun kemiripan leksikal substantif tinggi dengan IDF berbobot
+    if sub_sim < exact_review_sim and sub_longest < substantial_longest and tfidf_sim >= tfidf_review_sim and tfidf_avg_idf >= min_significant_idf:
         pattern = "SEMANTIC_PARAPHRASE"
         decision = "review"
         agreement = "COMPLEMENTARY_EVIDENCE"
         rationale = (
-            f"Tidak ditemukan pasase kata berurutan (Exact: {exact_sim:.2f}%), "
+            f"Tidak ditemukan pasase kata berurutan substantif (Exact: {exact_sim:.2f}%), "
             f"namun terdeteksi kemiripan leksikal topikal yang kuat (Cosine: {tfidf_sim:.2f}%) "
             f"dengan terminologi spesifik rujukan (Avg IDF: {tfidf_avg_idf:.4f})."
         )
@@ -235,10 +289,17 @@ def aggregate_evidence(
     pattern = "NO_EVIDENCE"
     decision = "no_match"
     agreement = "MUTUAL_NEGATIVE"
-    rationale = (
-        f"Tidak ditemukan bukti kesamaan pasase sekuensial maupun irisan kosakata "
-        f"yang melewati ambang batas telaah (Exact: {exact_sim:.2f}%, Cosine: {tfidf_sim:.2f}%)."
-    )
+    if corpus_docs_count is not None and corpus_docs_count > 0:
+        rationale = (
+            f"Tidak ditemukan bukti kesamaan pasase sekuensial maupun irisan kosakata "
+            f"yang melewati ambang batas telaah pada korpus pembanding ({corpus_docs_count} dokumen) "
+            f"(Exact: {exact_sim:.2f}%, Cosine: {tfidf_sim:.2f}%)."
+        )
+    else:
+        rationale = (
+            f"Tidak ditemukan bukti kesamaan pasase sekuensial maupun irisan kosakata "
+            f"yang melewati ambang batas telaah (Exact: {exact_sim:.2f}%, Cosine: {tfidf_sim:.2f}%)."
+        )
     return {
         "decision": decision,
         "pattern": pattern,
@@ -280,26 +341,32 @@ def run_hybrid_similarity_check(
             "exact_similarity": s.get("similarity", 0.0),
             "cosine_similarity": 0.0,
             "similarity": s.get("similarity", 0.0),
+            "is_topical_only": False,
         }
     for s in tfidf_raw.get("sources", []):
         s_id = s["source_document_id"]
         if s_id in merged_sources_map:
             merged_sources_map[s_id]["cosine_similarity"] = s.get("cosine_similarity", 0.0)
-            merged_sources_map[s_id]["similarity"] = max(merged_sources_map[s_id]["similarity"], s.get("cosine_similarity", 0.0))
             if "source_title" in s and not merged_sources_map[s_id].get("source_title"):
                 merged_sources_map[s_id]["source_title"] = s["source_title"]
         else:
             merged_sources_map[s_id] = {
                 "source_document_id": s_id,
                 "source_title": s.get("source_title", f"Dokumen #{s_id}"),
-                "matched_words": s.get("shared_terms_count", 0),
+                "matched_words": 0,
                 "matched_shingles": 0,
                 "exact_similarity": 0.0,
                 "cosine_similarity": s.get("cosine_similarity", 0.0),
-                "similarity": s.get("cosine_similarity", 0.0),
+                "similarity": 0.0,
+                "is_topical_only": True,
             }
 
-    merged_sources = sorted(merged_sources_map.values(), key=lambda x: x["similarity"], reverse=True)
+    # Urutkan berdasarkan matched_words (cakupan exact) lebih dulu, baru kemiripan kosinus
+    merged_sources = sorted(
+        merged_sources_map.values(),
+        key=lambda x: (x.get("matched_words", 0), x.get("exact_similarity", 0.0), x.get("cosine_similarity", 0.0)),
+        reverse=True
+    )
     for rank, s in enumerate(merged_sources, start=1):
         s["source_rank"] = rank
 

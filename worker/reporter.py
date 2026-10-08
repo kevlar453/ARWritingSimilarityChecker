@@ -82,7 +82,7 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
                 submission_document_id=document_id,
                 corpus_scope="production"
             )
-            overall_sim = max(result["exact_similarity"], result["cosine_similarity"])
+            overall_sim = result["exact_similarity"]
             exact_sim = result["exact_similarity"]
             cosine_sim = result["cosine_similarity"]
             predicted_decision = result["predicted_decision"]
@@ -261,27 +261,102 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
             )
             result["evasion_detection"] = evasion_res.to_dict()
 
-            # Anotasi pasase individu dengan teks pasase & status boilerplate
+            # Pemetaan rentang karakter token untuk menentukan zonasi setiap pasase
+            import re
+            token_spans = [m.span() for m in re.finditer(r"[^\W_]+(?:[-\'][^\W_]+)*", submission_text.lower(), re.UNICODE)]
+
+            def _find_zone(token_idx: int) -> tuple[str, str]:
+                if 0 <= token_idx < len(token_spans):
+                    char_pos = token_spans[token_idx][0]
+                    for s in segmentation_res.sections:
+                        if s.start_char <= char_pos < s.end_char:
+                            return s.section_zone.value, s.title
+                return "UNKNOWN", "UNKNOWN"
+
+            # Anotasi pasase individu dengan teks pasase, zonasi struktural & status boilerplate
             for match in result.get("matches", []):
                 s_start = match.get("submission_start", 0)
                 s_end = match.get("submission_end", s_start)
+                zone_val, sec_title = _find_zone(s_start)
+                match["zone"] = zone_val
+                match["section_name"] = sec_title
+
                 p_text = ""
                 if 0 <= s_start < len(sub_tokens):
                     passage_slice = sub_tokens[s_start : s_end + 1]
                     p_text = " ".join(passage_slice)
                     match["passage_text"] = p_text
 
-                bp_pass = detect_academic_boilerplate(p_text) if p_text else None
+                bp_pass = detect_academic_boilerplate(p_text, zone=zone_val) if p_text else None
                 if bp_pass and not bp_pass.is_boilerplate and 0 <= s_start < len(sub_tokens):
                     ctx_slice = sub_tokens[max(0, s_start - 2) : min(len(sub_tokens), s_end + 4)]
                     ctx_text = " ".join(ctx_slice)
-                    bp_pass = detect_academic_boilerplate(ctx_text)
+                    bp_pass = detect_academic_boilerplate(ctx_text, zone=zone_val)
 
                 if bp_pass:
                     match["is_boilerplate"] = bp_pass.is_boilerplate
                     match["boilerplate_category"] = bp_pass.category.value
                     match["boilerplate_phrase"] = bp_pass.matched_phrase
                     match["boilerplate_rationale"] = bp_pass.rationale
+                    match["coverage_ratio"] = getattr(bp_pass, "coverage_ratio", 0.0)
+                else:
+                    match["is_boilerplate"] = False
+                    match["boilerplate_category"] = "NONE"
+
+                match["is_substantive"] = (
+                    not match.get("is_boilerplate") and
+                    zone_val not in ("FRONT_MATTER", "BACK_MATTER")
+                )
+
+            # Hitung metrik kemiripan substantif (di luar boilerplate dan zona administratif/pustaka)
+            from worker.similarity import merge_ranges
+            sub_matches = [m for m in result.get("matches", []) if m.get("is_substantive")]
+            sub_longest = max((m.get("word_count", 0) for m in sub_matches), default=0)
+            sub_ranges = [(m["submission_start"], m["submission_end"]) for m in sub_matches if "submission_start" in m]
+            merged_sub = merge_ranges(sub_ranges)
+            sub_covered_words = sum(end - start + 1 for start, end in merged_sub)
+            sub_sim = round((sub_covered_words / max(1, doc_word_count)) * 100.0, 2)
+
+            cursor.execute("SELECT COUNT(*) AS total_docs FROM documents WHERE document_type = 'corpus'")
+            c_row = cursor.fetchone()
+            total_corpus_docs = int(c_row["total_docs"] or 0) if c_row else 0
+
+            # Re-evaluasi keputusan Hybrid dengan metrik substantif dan cakupan korpus
+            if engine == "hybrid":
+                from worker.hybrid import aggregate_evidence
+                exact_ev = result["exact_evidence"]
+                exact_ev["substantive_longest"] = sub_longest
+                exact_ev["substantive_similarity"] = sub_sim
+                exact_ev["substantive_words"] = sub_covered_words
+                exact_ev["corpus_docs_count"] = total_corpus_docs
+
+                re_analysis = aggregate_evidence(
+                    exact_evidence=exact_ev,
+                    tfidf_evidence=result["tfidf_evidence"],
+                    corpus_docs_count=total_corpus_docs
+                )
+
+                predicted_decision = re_analysis["decision"]
+                evidence_pattern = re_analysis["pattern"]
+                evidence_agreement = re_analysis["agreement"]
+                rationale = re_analysis["rationale"]
+
+                result["predicted_decision"] = predicted_decision
+                result["evidence_pattern"] = evidence_pattern
+                result["evidence_agreement"] = evidence_agreement
+                result["rationale"] = rationale
+                result["substantive_longest_match_words"] = sub_longest
+                result["substantive_similarity"] = sub_sim
+                result["substantive_matched_words"] = sub_covered_words
+                result["corpus_docs_count"] = total_corpus_docs
+
+            result["substantive_summary"] = {
+                "substantive_similarity": sub_sim,
+                "substantive_longest_words": sub_longest,
+                "substantive_matched_words": sub_covered_words,
+                "total_words": doc_word_count,
+                "corpus_docs_count": total_corpus_docs,
+            }
 
             # 6. XGBoost Academic Risk Synthesizer (Penyintesis Risiko Akademik Berbobot ML)
             from worker.risk_classifier import predict_academic_risk_xgboost

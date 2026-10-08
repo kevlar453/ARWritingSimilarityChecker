@@ -200,3 +200,71 @@ def test_frozen_baseline_contract():
     assert data["thresholds"]["tfidf_match_similarity"] == 85.0
     assert data["thresholds"]["exact_match_similarity"] == 70.0
 
+def test_aggregate_administrative_matches_only():
+    """
+    Simulasi naskah Helena: pasase 11 kata di daftar pustaka (Back Matter)
+    dan exact 1.35%, tetapi substansi pokok bersih (sub_longest=0, sub_sim=0.0%).
+    Harus TIDAK menghasilkan COPY_EDIT melainkan COMMON_ACADEMIC_PHRASE / no_match.
+    """
+    exact_ev: EvidenceContract = {
+        "engine": "exact",
+        "similarity": 1.35,
+        "matched_terms": 170,
+        "longest_match": 11,
+        "source_count": 8,
+        "match_count": 8,
+        "avg_idf": 1.5,
+        "max_idf": 2.2,
+        "top_sources": [{"source_document_id": 2620}],
+        "substantive_longest": 0,
+        "substantive_similarity": 0.0,
+        "substantive_words": 0,
+    }
+    tfidf_ev: EvidenceContract = {
+        "engine": "tfidf",
+        "similarity": 4.20,
+        "matched_terms": 15,
+        "longest_match": None,
+        "source_count": 5,
+        "match_count": 5,
+        "avg_idf": 2.1,
+        "max_idf": None,
+        "top_sources": [{"source_document_id": 2620}]
+    }
+    analysis = aggregate_evidence(exact_ev, tfidf_ev, corpus_docs_count=2450)
+    assert analysis["decision"] == "no_match"
+    assert analysis["pattern"] == "COMMON_ACADEMIC_PHRASE"
+    assert "administratif" in analysis["rationale"]
+    assert "COPY_EDIT" not in analysis["pattern"]
+
+def test_aggregate_insufficient_corpus():
+    """
+    Jika corpus_docs_count == 0, sistem harus memberikan sinyal INSUFFICIENT_CORPUS.
+    """
+    exact_ev: EvidenceContract = {
+        "engine": "exact",
+        "similarity": 0.0,
+        "matched_terms": 0,
+        "longest_match": 0,
+        "source_count": 0,
+        "match_count": 0,
+        "avg_idf": 0.0,
+        "max_idf": 0.0,
+        "top_sources": []
+    }
+    tfidf_ev: EvidenceContract = {
+        "engine": "tfidf",
+        "similarity": 0.0,
+        "matched_terms": 0,
+        "longest_match": None,
+        "source_count": 0,
+        "match_count": 0,
+        "avg_idf": 0.0,
+        "max_idf": None,
+        "top_sources": []
+    }
+    analysis = aggregate_evidence(exact_ev, tfidf_ev, corpus_docs_count=0)
+    assert analysis["decision"] == "review"
+    assert analysis["pattern"] == "INSUFFICIENT_CORPUS"
+
+

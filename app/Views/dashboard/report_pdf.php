@@ -411,9 +411,9 @@ if ($dec === 'match') {
         </tr>
         <tr>
             <td class="meta-label">Arsitektur Mesin</td>
-            <td class="meta-val">AR Tilik Dual-Lens Hybrid v1.0.0 (Frozen)</td>
-            <td class="meta-label">Durasi Eksekusi</td>
-            <td class="meta-val"><?= number_format($exec_time, 2) ?> detik</td>
+            <td class="meta-val">AR Tilik Dual-Lens Hybrid v1.2</td>
+            <td class="meta-label">Cakupan Korpus</td>
+            <td class="meta-val"><?= !empty($evidenceData['corpus_docs_count']) ? number_format((int)$evidenceData['corpus_docs_count']) . ' dokumen pembanding' : number_format($exec_time, 2) . ' detik' ?></td>
         </tr>
         <?php if (!empty($document['faculty']) || !empty($document['department'])): ?>
         <tr>

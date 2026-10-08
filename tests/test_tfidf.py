@@ -32,3 +32,25 @@ def test_compute_tf_and_vector():
     assert "informasi" in vec
     assert vec["sistem"] > 0
     assert vec["informasi"] > 0
+
+def test_content_tokens_filtering():
+    from worker.tfidf import content_tokens
+    raw_tokens = ["yang", "dan", "dalam", "dengan", "penelitian", "liturgi", "12", "a", "pastoral"]
+    filtered = content_tokens(raw_tokens)
+    assert "yang" not in filtered
+    assert "dan" not in filtered
+    assert "dalam" not in filtered
+    assert "dengan" not in filtered
+    assert "12" not in filtered  # digit
+    assert "a" not in filtered   # short token
+    assert "penelitian" in filtered
+    assert "liturgi" in filtered
+    assert "pastoral" in filtered
+
+def test_compute_sublinear_tf():
+    from worker.tfidf import compute_tf
+    tokens = ["liturgi", "liturgi", "liturgi", "pastoral"]
+    tf_sub = compute_tf(tokens, sublinear=True)
+    assert tf_sub["liturgi"] > tf_sub["pastoral"]
+    assert math.isclose(tf_sub["liturgi"], 1.0 + math.log(3), rel_tol=1e-5)
+    assert math.isclose(tf_sub["pastoral"], 1.0 + math.log(1), rel_tol=1e-5)

@@ -305,3 +305,103 @@ def test_real_world_emiliana_vivi_structure():
     assert SectionType.BAB_5_KESIMPULAN_SARAN in core_types
     assert SectionType.BAB_3_METODE_PENELITIAN not in core_types
 
+
+def test_bab_typo_tolerance_and_helena_thesis_pattern():
+    """
+    Test regresi khusus typo 'BAB 1V' (angka satu + huruf V) seperti pada naskah tesis Helena Nina.
+    Memastikan Bab IV terdeteksi dengan benar dan Bab III (Methodology) tidak membengkak menyerap Bab IV.
+    """
+    mock_thesis = """
+    KATA PENGANTAR
+    Puji syukur penulis panjatkan kepada Tuhan yang Maha Kuasa.
+    
+    DAFTAR ISI
+    BAB 1 PENDAHULUAN ...... 1
+    BAB II LANDASAN TEORI ...... 13
+    BAB III METODE PENELITIAN ...... 35
+    BAB IV HASIL DAN PEMBAHASAN ...... 48
+    BAB V KESIMPULAN DAN SARAN ...... 93
+    
+    ABSTRAK
+    Penelitian ini mengkaji pendampingan liturgi inklusif bagi anak berkebutuhan khusus.
+    
+    BAB 1
+    PENDAHULUAN
+    Gereja Katolik mengajarkan bahwa setiap manusia diciptakan menurut citra Allah imago Dei.
+    Setiap pribadi memiliki martabat luhur yang tidak dapat dikurangi oleh kondisi apapun.
+    """ + " ".join(["kata_pendahuluan"] * 120) + """
+    
+    BAB II
+    LANDASAN TEORI
+    Pendampingan pastoral berakar pada pemahaman tugas penggembalaan liturgis.
+    """ + " ".join(["kata_teori"] * 150) + """
+    
+    BAB III
+    METODE PENELITIAN
+    Penelitian ini menggunakan pendekatan kualitatif dengan studi kasus di Kapel Tirta Ria.
+    Data diperoleh melalui observasi, wawancara, dan dokumentasi mendalam.
+    """ + " ".join(["kata_metode"] * 100) + """
+    
+    BAB 1V
+    HASIL PENELITIAN
+    Berdasarkan observasi dan wawancara, pelaksanaan pendampingan lebih mengedepankan pendekatan personal.
+    Pendamping memahami kondisi emosional anak dan mengatur durasi fokus secara adaptif.
+    """ + " ".join(["kata_hasil_pembahasan"] * 400) + """
+    
+    BAB V
+    KESIMPULAN DAN SARAN
+    Perencanaan dan pelaksanaan pendampingan telah mencerminkan semangat inklusif.
+    """ + " ".join(["kata_kesimpulan"] * 80) + """
+    
+    DAFTAR PUSTAKA
+    Engel, J. D. (2020). Pendampingan Pastoral Keindonesiaan. Kurios, 6(1), 47.
+    """
+
+    res = parse_document_sections(mock_thesis)
+
+    # Verifikasi bahwa Bab IV (BAB 1V) terdeteksi sebagai BAB_4_HASIL_PEMBAHASAN
+    types = [s.section_type for s in res.sections]
+    assert SectionType.BAB_4_HASIL_PEMBAHASAN in types
+    assert SectionType.BAB_3_METODE_PENELITIAN in types
+
+    # Methodology harus proporsional (tidak menyerap Bab IV)
+    meth_pct = res.zone_percentage_distribution.get(SectionZone.METHODOLOGY.value, 0.0)
+    assert meth_pct < 25.0, f"Methodology percentage ({meth_pct}%) too high, BAB 1V likely not separated"
+
+    # Verifikasi Bab IV berzona BODY_TEXT
+    bab4_sec = [s for s in res.sections if s.section_type == SectionType.BAB_4_HASIL_PEMBAHASAN][0]
+    assert bab4_sec.section_zone == SectionZone.BODY_TEXT
+    assert bab4_sec.word_count >= 400
+
+    # Verifikasi Daftar Isi tidak menghasilkan seksi palsu Bab 1..5 sebelum Abstrak
+    bab_sections_before_abstrak = []
+    abstrak_found = False
+    for s in res.sections:
+        if s.section_type == SectionType.ABSTRAK:
+            abstrak_found = True
+            break
+        if "BAB" in s.section_type.value:
+            bab_sections_before_abstrak.append(s)
+    assert len(bab_sections_before_abstrak) == 0, f"Found false BAB sections in TOC: {bab_sections_before_abstrak}"
+
+
+def test_roman_normalization_variations():
+    """
+    Test toleransi variasi penulisan nomor bab: BAB lV (L kecil), BAB |V (pipa), BAB 4 (angka Arab), BAB II (standar).
+    """
+    from worker.section_parser import _bab_number
+    assert _bab_number("BAB I") == 1
+    assert _bab_number("BAB 1") == 1
+    assert _bab_number("BAB II") == 2
+    assert _bab_number("BAB 2") == 2
+    assert _bab_number("BAB III") == 3
+    assert _bab_number("BAB 3") == 3
+    assert _bab_number("BAB IV") == 4
+    assert _bab_number("BAB 4") == 4
+    assert _bab_number("BAB 1V") == 4
+    assert _bab_number("BAB lV") == 4
+    assert _bab_number("BAB |V") == 4
+    assert _bab_number("BAB V") == 5
+    assert _bab_number("BAB 5") == 5
+
+

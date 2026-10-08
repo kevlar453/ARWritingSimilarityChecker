@@ -126,6 +126,8 @@ class DocumentSegmentationResult:
     core_substance_percentage: float = 0.0
     administrative_word_count: int = 0
     administrative_percentage: float = 0.0
+    low_confidence: bool = False
+    confidence_note: Optional[str] = None
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -138,6 +140,8 @@ class DocumentSegmentationResult:
             "core_substance_percentage": round(self.core_substance_percentage, 2),
             "administrative_word_count": self.administrative_word_count,
             "administrative_percentage": round(self.administrative_percentage, 2),
+            "low_confidence": self.low_confidence,
+            "confidence_note": self.confidence_note,
             "sections": [s.to_dict() for s in self.sections],
         }
 
@@ -146,11 +150,24 @@ class DocumentSegmentationResult:
 # Pattern Rules untuk Deteksi Heading Akademik Bahasa Indonesia
 # =========================================================================
 
-# Pola Bab Utama: BAB I s.d. BAB V / BAB 1 s.d. BAB 5 (pencocokan baris tunggal)
+# Pola Bab Utama: menerima token apapun setelah BAB (mis. BAB I, BAB 1, BAB 1V, BAB IV, BAB lV, BAB |V)
 BAB_LINE_PATTERN = re.compile(
-    r"(?m)^[^\S\r\n]*(BAB\s+(?:I{1,3}|IV|V|VI|VII|\d+))\b(?:[^\S\r\n]*[:.\-–—]?[^\S\r\n]*(.*))?$",
+    r"(?m)^[^\S\r\n]*(BAB\s+[A-Za-z0-9|]{1,5})\b(?:[^\S\r\n]*[:.\-–—]?[^\S\r\n]*(.*))?$",
     re.IGNORECASE
 )
+
+_ROMAN_MAP = {
+    "I": 1, "II": 2, "III": 3, "IV": 4, "V": 5,
+    "VI": 6, "VII": 7, "VIII": 8, "IX": 9, "X": 10
+}
+
+def _bab_number(label: str) -> Optional[int]:
+    token = label.strip().split()[-1].upper()
+    if token.isdigit():
+        return int(token)
+    # Toleransi typo umum penulisan naskah: angka 1, huruf L, atau garis pipa | sebagai I
+    token = token.replace("1", "I").replace("L", "I").replace("|", "I")
+    return _ROMAN_MAP.get(token)
 
 KNOWN_BAB_SUBTITLES = {
     "PENDAHULUAN", "LANDASAN TEORI", "KAJIAN TEORI", "KAJIAN PUSTAKA", "TINJAUAN PUSTAKA",
@@ -202,30 +219,41 @@ BACK_MATTER_PATTERNS = [
 ]
 
 
-def _classify_bab_title(bab_label: str, subtitle: str) -> tuple[SectionZone, SectionType]:
+def _classify_bab_title(bab_label: str, subtitle: str) -> tuple[Optional[SectionZone], Optional[SectionType]]:
     """
-    Menentukan Zona dan Tipe Seksi dari nomor BAB dan judulnya.
+    Menentukan Zona dan Tipe Seksi dari nomor BAB hasil normalisasi dan judulnya.
+    Mengembalikan (None, None) bila bukan nomor bab valid agar kandidat semu dilewati.
     """
-    clean_label = bab_label.strip().upper()
+    num = _bab_number(bab_label)
     sub = subtitle.strip().upper() if subtitle else ""
 
-    # Normalisasi nomor romawi / angka
-    if re.search(r"\b(I|1)\b", clean_label):
-        return SectionZone.BODY_TEXT, SectionType.BAB_1_PENDAHULUAN
-    elif re.search(r"\b(II|2)\b", clean_label):
-        return SectionZone.BODY_TEXT, SectionType.BAB_2_LANDASAN_TEORI
-    elif re.search(r"\b(III|3)\b", clean_label):
-        # Bab III adalah METODOLOGI (zona khusus yang sering mengandung boilerplate)
+    # Jika judul menyebut METODE/METODOLOGI, prioritaskan METHODOLOGY
+    if "METODE" in sub or "METODOLOGI" in sub:
         return SectionZone.METHODOLOGY, SectionType.BAB_3_METODE_PENELITIAN
-    elif re.search(r"\b(IV|4)\b", clean_label):
+
+    if num == 1:
+        return SectionZone.BODY_TEXT, SectionType.BAB_1_PENDAHULUAN
+    elif num == 2:
+        return SectionZone.BODY_TEXT, SectionType.BAB_2_LANDASAN_TEORI
+    elif num == 3:
+        return SectionZone.METHODOLOGY, SectionType.BAB_3_METODE_PENELITIAN
+    elif num == 4:
         return SectionZone.BODY_TEXT, SectionType.BAB_4_HASIL_PEMBAHASAN
-    elif re.search(r"\b(V|5)\b", clean_label):
+    elif num == 5:
         return SectionZone.BODY_TEXT, SectionType.BAB_5_KESIMPULAN_SARAN
-    else:
-        # Bab VI dst atau judul deskriptif
-        if "METODE" in sub or "METODOLOGI" in sub:
-            return SectionZone.METHODOLOGY, SectionType.BAB_3_METODE_PENELITIAN
+    elif num is not None and num > 5:
         return SectionZone.BODY_TEXT, SectionType.BAB_UMUM
+    elif num is None:
+        if any(kw in sub for kw in ["HASIL", "PEMBAHASAN"]):
+            return SectionZone.BODY_TEXT, SectionType.BAB_4_HASIL_PEMBAHASAN
+        elif any(kw in sub for kw in ["KESIMPULAN", "PENUTUP"]):
+            return SectionZone.BODY_TEXT, SectionType.BAB_5_KESIMPULAN_SARAN
+        elif any(kw in sub for kw in ["PENDAHULUAN", "LATAR BELAKANG"]):
+            return SectionZone.BODY_TEXT, SectionType.BAB_1_PENDAHULUAN
+        elif any(kw in sub for kw in ["TEORI", "PUSTAKA"]):
+            return SectionZone.BODY_TEXT, SectionType.BAB_2_LANDASAN_TEORI
+        return None, None
+    return None, None
 
 
 def _count_words(text: str) -> int:
@@ -266,6 +294,8 @@ def parse_document_sections(
         if not raw_sub:
             raw_sub = _detect_subsequent_subtitle(text, m.end())
         zone, stype = _classify_bab_title(bab_label, raw_sub)
+        if zone is None or stype is None:
+            continue
         full_title = f"{bab_label} {raw_sub}".strip()
         heading_candidates.append({
             "pos": m.start(),
@@ -273,6 +303,17 @@ def parse_document_sections(
             "zone": zone,
             "type": stype
         })
+
+    # Fallback Bab IV: jika Bab IV belum tertangkap, periksa baris standalone 'HASIL DAN PEMBAHASAN' / 'HASIL PENELITIAN'
+    has_bab4 = any(c["type"] == SectionType.BAB_4_HASIL_PEMBAHASAN for c in heading_candidates)
+    if not has_bab4:
+        for m in re.finditer(r"(?im)^[^\S\r\n]*(?:HASIL\s+DAN\s+PEMBAHASAN|HASIL\s+PENELITIAN(?:\s+DAN\s+PEMBAHASAN)?)\s*$", text):
+            heading_candidates.append({
+                "pos": m.start(),
+                "title": m.group(0).strip(),
+                "zone": SectionZone.BODY_TEXT,
+                "type": SectionType.BAB_4_HASIL_PEMBAHASAN
+            })
 
     # B. Cek Pola Front Matter
     for pattern, stype in FRONT_MATTER_PATTERNS:
@@ -298,6 +339,28 @@ def parse_document_sections(
 
     # Urutkan pembatas berdasarkan posisi kemunculan dalam teks
     heading_candidates.sort(key=lambda x: x["pos"])
+
+    # Filter seksi semu dari Daftar Isi:
+    # Identifikasi titik dimulainya Bab I yang sesungguhnya (berisi teks substantif >= 100 kata)
+    bab1_candidates = [h for h in heading_candidates if h["type"] == SectionType.BAB_1_PENDAHULUAN]
+    real_bab1_pos = None
+    for b1 in bab1_candidates:
+        next_pos = len(text)
+        for h in heading_candidates:
+            if h["pos"] > b1["pos"]:
+                next_pos = h["pos"]
+                break
+        if _count_words(text[b1["pos"]:next_pos]) >= 100:
+            real_bab1_pos = b1["pos"]
+            break
+
+    # Setiap kandidat BAB yang posisinya berada sebelum real_bab1_pos adalah entri daftar isi
+    filtered_cand = []
+    for h in heading_candidates:
+        if real_bab1_pos and h["pos"] < real_bab1_pos and ("BAB" in h["type"].value or h["zone"] in (SectionZone.BODY_TEXT, SectionZone.METHODOLOGY)):
+            continue
+        filtered_cand.append(h)
+    heading_candidates = filtered_cand
 
     # 2. Eliminasi Duplikasi Posisi / Overlap Ketat
     filtered_headings: List[Dict[str, Any]] = []
@@ -411,6 +474,14 @@ def parse_document_sections(
         core_pct = 0.0
         admin_pct = 0.0
 
+    # Sanity check kewajaran distribusi zona naskah
+    meth_pct = zone_pct_dist.get(SectionZone.METHODOLOGY.value, 0.0)
+    low_confidence = False
+    confidence_note = None
+    if meth_pct > 25.0:
+        low_confidence = True
+        confidence_note = f"Proporsi Metodologi terdeteksi tidak lazim ({meth_pct:.1f}% > 25%), kemungkinan ada bab hasil/pembahasan yang tidak terdeteksi."
+
     return DocumentSegmentationResult(
         total_words=total_words,
         total_characters=total_chars,
@@ -421,7 +492,9 @@ def parse_document_sections(
         core_substance_word_count=core_substance_words,
         core_substance_percentage=round(core_pct, 2),
         administrative_word_count=administrative_words,
-        administrative_percentage=round(admin_pct, 2)
+        administrative_percentage=round(admin_pct, 2),
+        low_confidence=low_confidence,
+        confidence_note=confidence_note
     )
 
 

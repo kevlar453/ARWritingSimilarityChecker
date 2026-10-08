@@ -2,14 +2,51 @@ import math
 from collections import Counter
 from worker.normalizer import normalize_text, tokenize
 
-def compute_tf(tokens: list[str]) -> dict[str, float]:
+INDONESIAN_STOPWORDS: set[str] = {
+    "yang", "di", "dan", "dari", "ke", "dalam", "untuk", "pada", "adalah", "ini", "itu",
+    "dengan", "oleh", "secara", "sebagai", "dapat", "akan", "juga", "karena", "tersebut",
+    "bahwa", "serta", "atau", "antara", "terhadap", "bagi", "atas", "bila", "jika",
+    "tidak", "bukan", "telah", "kami", "kita", "mereka", "anda", "saya", "dia", "hal",
+    "suatu", "ada", "sudah", "lebih", "bisa", "hanya", "namun", "tetapi", "saja",
+    "kemudian", "lalu", "sehingga", "maka", "agar", "supaya", "ketika", "saat", "sedangkan",
+    "sementara", "tentang", "maupun", "seperti", "yaitu", "yakni", "selain", "masih", "sangat",
+    "pun", "pula", "pernah", "belum", "para", "setiap", "tiap", "beberapa", "semua", "seluruh",
+    "banyak", "sedikit", "lain", "lainnya", "sendiri", "paling", "begitu", "bagaimana",
+    "mengapa", "apakah", "siapa", "apa", "mana", "ia", "olehnya", "adanya", "dst", "dsb", "dll",
+    "adapun", "walaupun", "meskipun", "kendati", "sebab", "lagi", "hampir", "selalu", "sering",
+    "terkadang", "kadang", "makin", "semakin", "tentu", "pasti", "bahkan", "tanpa", "sambil",
+    "the", "of", "and", "in", "to", "a", "is", "that", "for", "it", "as", "was", "with",
+    "by", "on", "are", "this", "be", "from", "at", "which", "an", "have", "has", "were"
+}
+
+def content_tokens(
+    tokens: list[str],
+    df: dict[str, int] | None = None,
+    total_docs: int = 0,
+    max_df_ratio: float = 0.5
+) -> list[str]:
     """
-    Term Frequency (relatif terhadap total kata dokumen):
-    TF(t) = count(t) / len(tokens)
+    Menyaring token untuk Lensa 2 (TF-IDF):
+    - Mengeliminasi kata fungsi/stopword bahasa Indonesia dan Inggris
+    - Mengabaikan token pendek (panjang <= 2 karakter) dan digit murni
+    - Mengabaikan kata umum berfrekuensi dokumen sangat tinggi (DF > 50% dokumen korpus)
+    """
+    out = [t for t in tokens if t not in INDONESIAN_STOPWORDS and len(t) > 2 and not t.isdigit()]
+    if df and total_docs >= 20:
+        out = [t for t in out if (df.get(t, 0) / total_docs) < max_df_ratio]
+    return out
+
+def compute_tf(tokens: list[str], sublinear: bool = False) -> dict[str, float]:
+    """
+    Term Frequency:
+    - Default (sublinear=False): TF(t) = count(t) / len(tokens)
+    - Sublinear (sublinear=True): TF(t) = 1.0 + ln(count(t))
     """
     if not tokens:
         return {}
     counts = Counter(tokens)
+    if sublinear:
+        return {term: 1.0 + math.log(count) for term, count in counts.items()}
     total = len(tokens)
     return {term: count / total for term, count in counts.items()}
 
@@ -157,27 +194,37 @@ def run_tfidf_similarity_check(
         
     total_docs = len(corpus_docs)
     
-    # 1. Hitung Document Frequency (DF) nyata di seluruh korpus
+    # 1. Saring token konten korpus (mengeliminasi kata fungsi/stopword)
+    df_raw = Counter()
+    for doc in corpus_docs:
+        doc["content_tokens"] = content_tokens(doc["tokens"])
+        for term in set(doc["content_tokens"]):
+            df_raw[term] += 1
+
+    # Jika korpus cukup besar (>= 20 dokumen), saring kata dengan rasio kemunculan > 50%
+    sub_filtered = content_tokens(submission_tokens, df_raw, total_docs, max_df_ratio=0.5)
+    if total_docs >= 20:
+        for doc in corpus_docs:
+            doc["content_tokens"] = [t for t in doc["content_tokens"] if (df_raw.get(t, 0) / total_docs < 0.5)]
+
+    # 2. Hitung Document Frequency (DF) nyata dan tabel IDF pada kosakata konten
     df = Counter()
     for doc in corpus_docs:
-        unique_terms = set(doc["tokens"])
-        for term in unique_terms:
+        for term in set(doc["content_tokens"]):
             df[term] += 1
             
-    # 2. Hitung tabel IDF baku
     idf_table = compute_idf_table(df, total_docs)
-    
     default_idf = math.log(1 + total_docs) + 1.0
     
-    # 3. Hitung Term Frequency (TF) dan Vektor TF-IDF untuk korpus
-    corpus_tfs = {doc["id"]: compute_tf(doc["tokens"]) for doc in corpus_docs}
+    # 3. Hitung Term Frequency (TF) dan Vektor TF-IDF untuk korpus (sublinear TF)
+    corpus_tfs = {doc["id"]: compute_tf(doc["content_tokens"], sublinear=True) for doc in corpus_docs}
     corpus_vectors = {
         doc["id"]: compute_document_vector(corpus_tfs[doc["id"]], idf_table, default_idf)
         for doc in corpus_docs
     }
     
-    # 4. Hitung TF dan Vektor TF-IDF untuk submission
-    sub_tf = compute_tf(submission_tokens)
+    # 4. Hitung TF dan Vektor TF-IDF untuk submission (sublinear TF)
+    sub_tf = compute_tf(sub_filtered, sublinear=True)
     sub_vector = compute_document_vector(sub_tf, idf_table, default_idf)
     
     # 5. Hitung Cosine Similarity terhadap setiap korpus
@@ -260,7 +307,7 @@ def run_tfidf_similarity_check(
         "cosine_similarity": top_cosine_percent,
         "raw_cosine": top_raw_cosine,
         "overall_similarity": top_cosine_percent,  # Kompatibilitas metrik utama
-        "shared_terms_count": len(all_shared_terms_global),
+        "shared_terms_count": sources[0]["shared_terms_count"] if sources else 0,
         "average_shared_term_idf": top_avg_idf,
         "weighted_shared_term_idf": top_weighted_idf,
         "top_shared_terms": top_shared_terms,

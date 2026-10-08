@@ -28,6 +28,8 @@ class BoilerplateCategory(str, Enum):
     STATISTICAL_ANALYSIS = "STATISTICAL_ANALYSIS"        # Prosedur uji statistik terstandarisasi (SPSS, Likert, dll)
     ADMINISTRATIVE_FORMULA = "ADMINISTRATIVE_FORMULA"    # Kalimat template pengesahan/keaslian/kata pengantar
     LEGAL_CITATION = "LEGAL_CITATION"                    # Rujukan regulasi perundang-undangan dan instrumen hukum baku
+    BIBLIOGRAPHIC_ENTRY = "BIBLIOGRAPHIC_ENTRY"          # Entri daftar pustaka / rujukan literatur
+    TABLE_OF_CONTENTS = "TABLE_OF_CONTENTS"              # Baris judul dan nomor halaman daftar isi
     NONE = "NONE"
     UNKNOWN = "UNKNOWN"
 
@@ -52,6 +54,7 @@ class BoilerplateDetectionResult:
     start_pos: Optional[int]
     end_pos: Optional[int]
     rationale: str
+    coverage_ratio: float = 0.0
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -61,6 +64,7 @@ class BoilerplateDetectionResult:
             "start_pos": self.start_pos,
             "end_pos": self.end_pos,
             "rationale": self.rationale,
+            "coverage_ratio": round(self.coverage_ratio, 2),
         }
 
 
@@ -177,9 +181,24 @@ BOILERPLATE_RULES = [
         "Klausul sanksi administratif standar pada lembar formalitas perguruan tinggi."
     ),
     (
-        re.compile(r"(?i)\bpuji\s+dan\s+syukur\s+penulis\s+panjatkan\s+ke\s+hadirat\s+tuhan\s+yang\s+maha\s+esa\b"),
+        re.compile(r"(?i)\bpuji\s+(?:dan\s+)?syukur\s+(?:penulis\s+panjatkan\s+)?(?:ke\s*hadirat|kepada)\s+(?:tuhan|allah)(?:\s+yang\s+(?:maha\s+esa|maha\s+kuasa|maha\s+pengasih))?\b"),
         BoilerplateCategory.ADMINISTRATIVE_FORMULA,
-        "Formula pembuka baku kata pengantar karya ilmiah di Indonesia."
+        "Formula pembuka baku doa/kata pengantar karya ilmiah di Indonesia."
+    ),
+    (
+        re.compile(r"(?i)\b(?:syukur\s+penulis\s+panjatkan\s+kehadirat\s+tuhan|puji\s+syukur\s+kehadirat)\b"),
+        BoilerplateCategory.ADMINISTRATIVE_FORMULA,
+        "Formula pembuka baku kata pengantar karya ilmiah."
+    ),
+    (
+        re.compile(r"(?i)\b(?:pihak(?:-pihak)?\s+yang\s+telah\s+membantu\s+penulis|penulis\s+mengucapkan\s+terima\s+kasih\s+kepada)\b"),
+        BoilerplateCategory.ADMINISTRATIVE_FORMULA,
+        "Formulasi baku ucapan apresiasi/terima kasih pada kata pengantar."
+    ),
+    (
+        re.compile(r"(?i)\b(?:saran\s+yang\s+dapat\s+diberikan\s+(?:adalah\s+)?sebagai\s+berikut|adapun\s+saran\s+yang\s+dapat\s+diberikan)\b"),
+        BoilerplateCategory.ACADEMIC_TRANSITION,
+        "Formulasi baku pengantar saran penutup karya ilmiah."
     ),
     (
         re.compile(r"(?i)\bsebagai\s+salah\s+satu\s+syarat\s+untuk\s+memperoleh\s+gelar\b"),
@@ -208,12 +227,27 @@ BOILERPLATE_RULES = [
         BoilerplateCategory.LEGAL_CITATION,
         "Rujukan formal peraturan perundang-undangan atau produk hukum akademik baku."
     ),
+
+    # 6. Entri Bibliografi / Daftar Pustaka Formal
+    (
+        re.compile(r"(?i)\b[A-Z][a-z]+,\s+[A-Z]\.\s*(?:[A-Z]\.)?\s*\(\d{4}\)"),
+        BoilerplateCategory.BIBLIOGRAPHIC_ENTRY,
+        "Format standar entri referensi/daftar pustaka akademik."
+    ),
+
+    # 7. Format Indeks / Penomoran Daftar Isi
+    (
+        re.compile(r"(?i)\b(?:halaman\s+judul|lembar\s+persetujuan|daftar\s+isi|bab\s+[ivx\d]+)\b.*(?:\.{2,}|…|\b(?:i{1,3}|iv|v|\d+)\s*$)"),
+        BoilerplateCategory.TABLE_OF_CONTENTS,
+        "Format penomoran halaman/tata letak indeks daftar isi."
+    ),
 ]
 
 
-def detect_academic_boilerplate(text: str) -> BoilerplateDetectionResult:
+def detect_academic_boilerplate(text: str, zone: Optional[str] = None) -> BoilerplateDetectionResult:
     """
     Memeriksa apakah potongan pasase teks mengandung formulasi ilmiah baku.
+    Mendukung penentuan berbasis zona naskah (FRONT_MATTER, BACK_MATTER, METHODOLOGY, BODY_TEXT).
     Mengembalikan hasil kategorisasi deterministik dan penjelasan objektif.
     """
     if not text or not text.strip():
@@ -223,21 +257,56 @@ def detect_academic_boilerplate(text: str) -> BoilerplateDetectionResult:
             matched_phrase=None,
             start_pos=None,
             end_pos=None,
-            rationale="Teks kosong atau tidak mengandung pasase."
+            rationale="Teks kosong atau tidak mengandung pasase.",
+            coverage_ratio=0.0
         )
 
+    words = text.split()
+    total_words = len(words)
+
+    # 1. Zona BACK_MATTER otomatis adalah daftar pustaka / lampiran
+    if zone == "BACK_MATTER":
+        return BoilerplateDetectionResult(
+            is_boilerplate=True,
+            category=BoilerplateCategory.BIBLIOGRAPHIC_ENTRY,
+            matched_phrase=text[:80] + ("..." if len(text) > 80 else ""),
+            start_pos=0,
+            end_pos=len(text),
+            rationale="Pasase berada pada zona Daftar Pustaka/Lampiran (Back Matter) yang bersifat non-substantif.",
+            coverage_ratio=1.0
+        )
+
+    # 2. Cek kecocokan katalog pola regex
     for pattern, category, rationale in BOILERPLATE_RULES:
         m = pattern.search(text)
         if m:
             matched_str = m.group(0).strip()
-            return BoilerplateDetectionResult(
-                is_boilerplate=True,
-                category=category,
-                matched_phrase=matched_str,
-                start_pos=m.start(),
-                end_pos=m.end(),
-                rationale=rationale
-            )
+            matched_words = len(matched_str.split())
+            coverage = matched_words / total_words if total_words > 0 else 1.0
+
+            # Kriteria: pasase pendek (<= 20 kata), berada di FRONT_MATTER, atau cakupan frasa memadai (>= 0.25)
+            if total_words <= 20 or zone == "FRONT_MATTER" or coverage >= 0.25:
+                return BoilerplateDetectionResult(
+                    is_boilerplate=True,
+                    category=category,
+                    matched_phrase=matched_str,
+                    start_pos=m.start(),
+                    end_pos=m.end(),
+                    rationale=rationale,
+                    coverage_ratio=coverage
+                )
+
+    # 3. Zona FRONT_MATTER untuk pasase pendek otomatis administratif
+    if zone == "FRONT_MATTER" and total_words <= 25:
+        return BoilerplateDetectionResult(
+            is_boilerplate=True,
+            category=BoilerplateCategory.ADMINISTRATIVE_FORMULA,
+            matched_phrase=text[:60] + ("..." if len(text) > 60 else ""),
+            start_pos=0,
+            end_pos=len(text),
+            rationale="Pasase berada pada zona Formalitas Depan (Front Matter) administratif.",
+            coverage_ratio=1.0
+        )
 
     return BoilerplateDetectionResult(
         is_boilerplate=False,
@@ -245,5 +314,6 @@ def detect_academic_boilerplate(text: str) -> BoilerplateDetectionResult:
         matched_phrase=None,
         start_pos=None,
         end_pos=None,
-        rationale="Teks merupakan kalimat spesifik penulis, bukan formulasi baku terdaftar."
+        rationale="Teks merupakan kalimat spesifik penulis, bukan formulasi baku terdaftar.",
+        coverage_ratio=0.0
     )

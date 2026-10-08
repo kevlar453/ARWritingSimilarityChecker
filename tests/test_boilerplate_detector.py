@@ -125,3 +125,38 @@ def test_author_original_substantive_text():
     assert res.category == BoilerplateCategory.NONE
     assert res.matched_phrase is None
 
+
+def test_kata_pengantar_variations_and_saran():
+    # Variasi kata pengantar tanpa kata 'esa' (mis. Tuhan yang Maha Kuasa)
+    t1 = "syukur penulis panjatkan kehadirat Tuhan yang Maha Kuasa"
+    res1 = detect_academic_boilerplate(t1)
+    assert res1.is_boilerplate is True
+    assert res1.category == BoilerplateCategory.ADMINISTRATIVE_FORMULA
+
+    # Frasa ucapan terima kasih
+    t2 = "pihak yang telah membantu penulis dalam menyelesaikan tesis ini"
+    res2 = detect_academic_boilerplate(t2)
+    assert res2.is_boilerplate is True
+    assert res2.category == BoilerplateCategory.ADMINISTRATIVE_FORMULA
+
+    # Frasa saran penutup
+    t3 = "saran yang dapat diberikan adalah sebagai berikut"
+    res3 = detect_academic_boilerplate(t3)
+    assert res3.is_boilerplate is True
+    assert res3.category == BoilerplateCategory.ACADEMIC_TRANSITION
+
+
+def test_zone_and_bibliographic_support():
+    # Zona BACK_MATTER otomatis terdeteksi sebagai rujukan/bibliografi
+    t_bib = "Engel, J. D. (2020). Pendampingan Pastoral Keindonesiaan. Kurios, 6(1), 47"
+    res_bib = detect_academic_boilerplate(t_bib, zone="BACK_MATTER")
+    assert res_bib.is_boilerplate is True
+    assert res_bib.category == BoilerplateCategory.BIBLIOGRAPHIC_ENTRY
+
+    # Baris Daftar Isi
+    t_toc = "i HALAMAN JUDUL ii LEMBAR PERSETUJUAN iii"
+    res_toc = detect_academic_boilerplate(t_toc)
+    assert res_toc.is_boilerplate is True
+    assert res_toc.category == BoilerplateCategory.TABLE_OF_CONTENTS
+
+

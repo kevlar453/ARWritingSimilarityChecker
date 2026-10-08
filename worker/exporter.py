@@ -108,6 +108,10 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
 
     total_words = evidence_data.get("total_words", 0)
     exec_time = evidence_data.get("execution_time_seconds", 0)
+    corpus_docs_count = int(evidence_data.get("corpus_docs_count") or evidence_data.get("substantive_summary", {}).get("corpus_docs_count") or 0)
+    sub_summary = evidence_data.get("substantive_summary") or {}
+    sub_sim_val = sub_summary.get("substantive_similarity")
+    sub_longest_val = sub_summary.get("substantive_longest_words")
 
     # Ekstraksi modul evolusi v1.2
     v11_pres = evidence_data.get("v1_1_presentation", {})
@@ -785,9 +789,9 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
         </tr>
         <tr>
             <td class="meta-label">Arsitektur Mesin</td>
-            <td class="meta-val">AR Tilik Dual-Lens Hybrid v1.0.0 (Frozen)</td>
-            <td class="meta-label">Durasi Eksekusi</td>
-            <td class="meta-val">{exec_time:.2f} detik</td>
+            <td class="meta-val">AR Tilik Dual-Lens Hybrid v1.2</td>
+            <td class="meta-label">Cakupan Korpus</td>
+            <td class="meta-val">{f"{corpus_docs_count:,} dokumen pembanding" if corpus_docs_count > 0 else f"{exec_time:.2f} detik (Lengkap)"}</td>
         </tr>
         {fac_dept_row}
     </table>
@@ -819,6 +823,10 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
                 <span class="metric-lbl">Kesamaan Sekuensial (Exact Sim)</span>
                 <span class="metric-val">{exact_sim:.2f}%</span>
             </div>
+            {f'''<div class="metric-row">
+                <span class="metric-lbl">Substansi Pokok (Non-Boilerplate)</span>
+                <span class="metric-val" style="color: #047857;">{float(sub_sim_val):.2f}% (max {sub_longest_val} kata)</span>
+            </div>''' if sub_sim_val is not None else ''}
             <div class="metric-row">
                 <span class="metric-lbl">Pasase Cocok Terpanjang</span>
                 <span class="metric-val">{longest_match} kata</span>
