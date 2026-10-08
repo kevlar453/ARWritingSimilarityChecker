@@ -91,9 +91,11 @@
                     <a href="<?= base_url('/') ?>" class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 hover:text-indigo-600 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 transition shadow-2xs">
                         🏠 <span class="hidden sm:inline">Beranda &amp; Teori</span>
                     </a>
-                    <a href="<?= base_url('evaluation/quality') ?>" class="hidden md:inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-indigo-600 px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-white transition">
+                    <?php if (($currentUser['role'] ?? '') === 'admin'): ?>
+                    <a href="<?= base_url('evaluation/quality') ?>" class="hidden md:inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-indigo-600 px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-white transition" title="Observabilitas & Kualitas Engine (Khusus Admin)">
                         📊 Observabilitas
                     </a>
+                    <?php endif; ?>
                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 sm:px-3 sm:py-1 rounded-full text-[11px] sm:text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-xs">
                         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                         <span class="hidden sm:inline">Worker Ready</span>
