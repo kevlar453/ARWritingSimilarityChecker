@@ -87,6 +87,25 @@ def clean_extracted_text(text: str) -> str:
     # Runtuhkan duplikasi marker naskah kaligrafi berturut-turut
     result = re.sub(r'(\[📜 Naskah Kaligrafi / Teks Arab \(Font Khusus HQPB\)\]\s*)+', r'[📜 Naskah Kaligrafi / Teks Arab (Font Khusus HQPB)]\n\n', result)
 
+    # Deteksi dan rapikan urutan sumbu grafik/diagram (misal: 0%\n10%\n20%... Tahap 1 Tahap 2)
+    chart_axis_pattern = re.compile(
+        r'(?:^|\n)[ \t]*(?:\d{1,3}%\s*\n){3,}'
+        r'(?:[ \t]*(?:Tahap|Tahun|Kelas|Kategori|Nilai|\d+)[ \t]*\n*)*'
+        r'(?:[ \t]*(?:Perbedaan|Grafik|Hasil|Diagram)[^\n]+\n*)?',
+        re.MULTILINE
+    )
+
+    def _replace_chart_axis(m):
+        raw = m.group(0)
+        pcts = re.findall(r'\d{1,3}%', raw)
+        min_p = pcts[0] if pcts else '0%'
+        max_p = pcts[-1] if pcts else '100%'
+        title_m = re.search(r'(?:Perbedaan|Grafik|Hasil|Diagram)[^\n]+', raw)
+        title = title_m.group(0).strip() if title_m else 'Grafik / Diagram Batang'
+        return f'\n\n[📊 Elemen Grafik: {title} (Skala {min_p} – {max_p})]\n\n'
+
+    result = chart_axis_pattern.sub(_replace_chart_axis, result)
+
     # Rapikan spasi vertikal berlebih dari pecahan/notasi rumus matematika
     result = re.sub(r'[ \t]*\n[ \t]*\n(?:[ \t]*\n)+', '\n\n', result)
 

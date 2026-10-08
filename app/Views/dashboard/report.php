@@ -2298,9 +2298,37 @@
 <div class="leading-relaxed whitespace-pre-wrap">`;
 
             processed = processed.replace(/\[📜 Naskah Kaligrafi[^\n\]]*\]/gu, quranCard);
-            processed = processed.replace(/(?:[^\S\r\n]*[\uE000-\uF8FF\s]{2,}[^\S\r\n]*(?:\n|\r\n)?){2,}/gu, quranCard);
+            // Hanya cocokkan jika benar-benar berisi karakter PUA berturut-turut (bukan spasi kosong)
+            processed = processed.replace(/(?:[^\S\r\n]*[\uE000-\uF8FF]{2,}[^\S\r\n]*(?:\n|\r\n)?){2,}/gu, quranCard);
 
-            // 3. Map isolated Symbol/Wingdings PUA characters to standard Unicode symbols
+            // 3. Transform Elemen Grafik / Diagram Sumbu Visual menjadi kartu interaktif
+            const chartCard = (title) => `</div>
+<div class="my-4 p-4 rounded-2xl bg-sky-50/85 border border-sky-200/90 text-sky-950 shadow-2xs font-sans not-italic">
+    <div class="flex items-center justify-between gap-3 mb-1.5 flex-wrap">
+        <div class="flex items-center gap-2">
+            <span class="text-xl">📊</span>
+            <span class="font-bold text-xs text-sky-900 tracking-wide uppercase">Elemen Grafik / Diagram Visual</span>
+        </div>
+        <button type="button" onclick="switchDualViewMode('pdf')" class="px-3 py-1.5 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white rounded-xl text-xs font-semibold transition cursor-pointer shadow-xs flex items-center gap-1.5">
+            <span>📄 Buka Grafik Asli di PDF</span>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+        </button>
+    </div>
+    <p class="text-xs text-sky-900 font-semibold mb-1">
+        ${title}
+    </p>
+    <p class="text-[11px] text-sky-800/90 leading-relaxed italic">
+        Visualisasi diagram batang 3D, warna grafik, dan perbandingan lengkap dapat dilihat langsung pada posisi naskah aslinya di mode Dokumen Asli (PDF).
+    </p>
+</div>
+<div class="leading-relaxed whitespace-pre-wrap">`;
+
+            processed = processed.replace(/\[📊 Elemen Grafik: ([^\]]+)\]/gu, (m, p1) => chartCard(p1));
+            // Tangani urutan sumbu persentase vertikal pada naskah lama (0%\n10%\n20%...)
+            const rawAxisPattern = /(?:(?:^|\n)[ \t]*(?:\d{1,3}%\s*\n){3,}(?:[ \t]*(?:Tahap|Tahun|Kelas|Kategori|Nilai|\d+)[ \t]*\n*)*(?:[ \t]*(?:Perbedaan|Grafik|Hasil|Diagram)[^\n]+\n*)?)/g;
+            processed = processed.replace(rawAxisPattern, () => chartCard('Grafik Batang: Sumbu Nilai (0% s.d. 90%)'));
+
+            // 4. Map isolated Symbol/Wingdings PUA characters to standard Unicode symbols
             const PUA_MAP = {
                 0xF0B7: "•", 0xF0A7: "▪", 0xF0A8: "▫", 0xF0D8: "➢", 0xF0FC: "✔", 0xF0FB: "✗",
                 0xF0E0: "→", 0xF0DF: "⇔", 0xF0DE: "⇒", 0xF0B1: "±", 0xF0B4: "×", 0xF0F7: "÷",
