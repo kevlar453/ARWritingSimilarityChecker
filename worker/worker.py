@@ -1,20 +1,36 @@
 import json
 import time
 import sys
+import signal
 from pathlib import Path
 
-# Ensure root directory is on PYTHONPATH
-sys.path.append(str(Path(__file__).resolve().parents[1]))
+# Ensure project root is prioritized on sys.path and avoid script directory shadowing
+_parent_dir = str(Path(__file__).resolve().parents[1])
+_script_dir = str(Path(__file__).resolve().parent)
+if _script_dir in sys.path:
+    sys.path.remove(_script_dir)
+if _parent_dir not in sys.path:
+    sys.path.insert(0, _parent_dir)
 
 from worker.database import (
     get_connection,
     get_next_job,
     mark_job_processing,
     mark_job_completed,
-    mark_job_failed
+    mark_job_failed,
+    recover_stuck_jobs
 )
 from worker.indexer import index_document
 from worker.reporter import process_similarity_check
+
+# Flag untuk graceful shutdown
+_shutdown_requested = False
+
+def _handle_signal(signum, frame):
+    global _shutdown_requested
+    sig_name = "SIGTERM" if signum == signal.SIGTERM else "SIGINT"
+    print(f"\n[!] Sinyal {sig_name} diterima. Menyiapkan penghentian worker secara graceful...")
+    _shutdown_requested = True
 
 def process_job(job: dict):
     payload = json.loads(job["payload"]) if isinstance(job["payload"], str) else job["payload"]
@@ -50,12 +66,39 @@ def process_job(job: dict):
         raise ValueError(f"Unknown job type: {job_type}")
 
 def run_worker(daemon: bool = True):
+    global _shutdown_requested
     print("==================================================")
     print("      AR Tilik Similarity Checker Worker         ")
     print("==================================================")
     print(f"Worker aktif (mode: {'daemon' if daemon else 'drain/once'})...")
     
-    while True:
+    signal.signal(signal.SIGINT, _handle_signal)
+    signal.signal(signal.SIGTERM, _handle_signal)
+
+    # Jalankan recovery job yang macet saat startup
+    try:
+        startup_conn = get_connection()
+        recovered = recover_stuck_jobs(startup_conn, timeout_minutes=15)
+        if recovered > 0:
+            print(f"[*] Startup: Berhasil memulihkan {recovered} job yang macet.")
+        startup_conn.close()
+    except Exception as rec_err:
+        print(f"[!] Gagal menjalankan pemulihan job macet startup: {rec_err}")
+
+    last_recovery_time = time.time()
+    
+    while not _shutdown_requested:
+        # Jalankan recovery secara berkala setiap 5 menit (300 detik)
+        now = time.time()
+        if now - last_recovery_time > 300:
+            try:
+                rec_conn = get_connection()
+                recover_stuck_jobs(rec_conn, timeout_minutes=15)
+                rec_conn.close()
+            except Exception as rec_err:
+                print(f"[!] Gagal menjalankan pemulihan job macet periodik: {rec_err}")
+            last_recovery_time = now
+
         try:
             conn = get_connection()
             job = get_next_job(conn)
@@ -64,7 +107,11 @@ def run_worker(daemon: bool = True):
                 if not daemon:
                     print("[✓] Semua antrean jobs selesai diproses.")
                     break
-                time.sleep(2)
+                # Tunggu 2 detik dengan interval pendek agar peka sinyal shutdown
+                for _ in range(20):
+                    if _shutdown_requested:
+                        break
+                    time.sleep(0.1)
                 continue
                 
             job_id = job["id"]
@@ -92,6 +139,8 @@ def run_worker(daemon: bool = True):
             if not daemon:
                 break
             time.sleep(3)
+
+    print("[✓] Worker AR Tilik telah dihentikan secara aman.")
 
 if __name__ == "__main__":
     import argparse

@@ -143,6 +143,28 @@ def deobfuscate_text(text: str) -> str:
     return "".join(result)
 
 
+def deobfuscate_for_indexing(text: str) -> str:
+    """
+    Menormalkan kata-kata yang memadukan skrip Latin dan Homoglif Cyrillic/Yunani
+    menjadi alfabet Latin murni sebelum pembuatan shingle dan fingerprint.
+    Karakter tak kasat mata (zero-width characters & soft hyphen) juga disingkirkan.
+    Kata yang murni Cyrillic (misal rujukan berbahasa Rusia) atau murni Yunani (simbol statistik)
+    tetap dipertahankan tanpa diubah.
+    """
+    if not text:
+        return ""
+
+    text = "".join(ch for ch in text if ch not in INVISIBLE_CHARACTERS)
+
+    def _fix_mixed_word(match):
+        w = match.group(0)
+        if any(is_latin_char(c) for c in w) and any(c in ALL_HOMOGLYPHS for c in w):
+            return "".join(ALL_HOMOGLYPHS[c][0] if c in ALL_HOMOGLYPHS else c for c in w)
+        return w
+
+    return re.sub(r"\S+", _fix_mixed_word, text)
+
+
 def is_latin_char(ch: str) -> bool:
     """Memeriksa apakah karakter adalah alfabet Latin standar."""
     code = ord(ch)
@@ -208,7 +230,9 @@ def detect_document_evasion(
         has_latin = any(is_latin_char(c) for c in clean_word)
         has_homo = any(c in ALL_HOMOGLYPHS for c in clean_word)
 
-        if has_homo:
+        # HANYA hitung anomali jika kata tersebut mencampur huruf Latin dan Homoglif
+        # Mencegah salah tuduh pada simbol statistik Yunani (Cronbach α, ρ, κ) atau rujukan bahasa Rusia murni
+        if has_homo and has_latin:
             for ch in clean_word:
                 if ch in ALL_HOMOGLYPHS:
                     target_lat, desc = ALL_HOMOGLYPHS[ch]
@@ -227,14 +251,12 @@ def detect_document_evasion(
                     if clean_word not in homoglyph_findings[key]["samples"] and len(homoglyph_findings[key]["samples"]) < 5:
                         homoglyph_findings[key]["samples"].append(clean_word)
 
-            # Jika kata mengandung percampuran huruf Latin dan Homoglif:
-            if has_latin:
-                deobf_word = "".join(ALL_HOMOGLYPHS[c][0] if c in ALL_HOMOGLYPHS else c for c in clean_word)
-                if len(mixed_script_words) < 15:
-                    mixed_script_words.append({
-                        "original": clean_word,
-                        "deobfuscated": deobf_word
-                    })
+            deobf_word = "".join(ALL_HOMOGLYPHS[c][0] if c in ALL_HOMOGLYPHS else c for c in clean_word)
+            if len(mixed_script_words) < 15:
+                mixed_script_words.append({
+                    "original": clean_word,
+                    "deobfuscated": deobf_word
+                })
 
     total_homoglyphs = sum(v["count"] for v in homoglyph_findings.values())
 
@@ -378,30 +400,39 @@ def detect_document_evasion(
 
             risk_score = min(100.0, max(15.0, base_score))
 
-    # Tentukan Status Integritas & Rationale
-    if risk_score >= 35.0 or (has_mixed and total_homoglyphs >= 3) or (white_text_count > 0):
+    # Tentukan Status Integritas & Rationale (bahasa berbasis bukti objektif)
+    if (has_mixed and total_homoglyphs >= 3) or (has_mixed and total_anomalies >= 5):
         integrity_status = "MANIPULATED"
-        verdict_label = "Manipulasi Naskah Terencana Terdeteksi"
+        verdict_label = "Percampuran Skrip Karakter Terdeteksi"
+        sample_words = ", ".join(f"'{m['original']}'" for m in mixed_script_words[:3])
         summary_rationale = (
-            f"Ditemukan indikasi kuat rekayasa teks ({total_anomalies} anomali) berupa "
-            f"{f'{total_homoglyphs} substitusi aksara homoglif, ' if total_homoglyphs else ''}"
-            f"{f'{total_zero_width} karakter tak kasat mata (zero-width), ' if total_zero_width else ''}"
-            f"{f'{white_text_count} kata teks putih tersembunyi, ' if white_text_count else ''}"
-            f"yang bertujuan memecah deteksi n-gram atau mengaburkan kemiripan leksikal."
+            f"Ditemukan {total_anomalies} anomali karakter, termasuk {total_homoglyphs} huruf non-Latin (Cyrillic/Yunani) "
+            f"yang disisipkan di dalam kata berhuruf Latin (contoh: {sample_words}). "
+            f"Disarankan penelaahan manual oleh penelaah/editor."
         )
-    elif risk_score >= 10.0:
+    elif risk_score >= 10.0 or total_anomalies > 0:
         integrity_status = "SUSPICIOUS"
         verdict_label = "Indikasi Anomali Karakter Perlu Tinjauan"
+        details = []
+        if total_homoglyphs:
+            details.append(f"{total_homoglyphs} karakter substitusi aksara")
+        if total_zero_width:
+            details.append(f"{total_zero_width} karakter tak kasat mata (zero-width)")
+        if white_text_count:
+            details.append(f"{white_text_count} kata teks berformat warna putih")
+        if micro_font_count:
+            details.append(f"{micro_font_count} kata mikro-font")
+        detail_str = ", ".join(details) if details else f"{total_anomalies} anomali"
         summary_rationale = (
-            f"Terdeteksi {total_anomalies} anomali karakter khusus yang tidak lazim dalam penulisan ilmiah standar. "
-            f"Perlu verifikasi apakah hal ini akibat kesalahan salin-tempel pustaka atau upaya modifikasi token."
+            f"Terdeteksi {detail_str} dalam naskah. "
+            f"Perlu verifikasi apakah hal ini akibat format dokumen/salin-tempel atau modifikasi token n-gram."
         )
     else:
         integrity_status = "CLEAN"
         verdict_label = "Integritas Naskah Otentik & Bersih"
         summary_rationale = (
             "Tidak ditemukan penyisipan karakter tak kasat mata, substitusi aksara homoglif, maupun teks tersembunyi. "
-            "Struktur karakter naskah memenuhi kaidah penulisan akademik yang murni."
+            "Struktur karakter naskah memenuhi kaidah penulisan akademik yang wajar."
         )
 
     deobfuscated_sample = deobfuscate_text(text[:300]) if total_anomalies > 0 else ""

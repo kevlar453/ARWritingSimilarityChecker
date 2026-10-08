@@ -37,6 +37,20 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
                 is_corpus=(document.get("document_type") == "corpus")
             )
 
+        # Validasi kecukupan teks dokumen (Guard against scanned PDFs / empty documents)
+        cursor.execute("""
+            SELECT COALESCE(SUM(word_count), 0) AS total_words
+            FROM document_chunks
+            WHERE document_id = %s
+        """, (document_id,))
+        doc_word_count = int(cursor.fetchone()["total_words"] or 0)
+        if doc_word_count < 15:
+            raise ValueError(
+                "Naskah tidak memuat teks yang memadai untuk dianalisis (kurang dari 15 kata). "
+                "Kemungkinan naskah merupakan hasil pemindaian (scan) berupa gambar tanpa lapisan teks OCR "
+                "atau dokumen dalam keadaan kosong."
+            )
+
         # 3b. Just-In-Time (JIT) Topic Harvesting (Pencarian Korpus Sebidang Otomatis)
         jit_harvest_res = None
         if document.get("document_type") != "corpus":

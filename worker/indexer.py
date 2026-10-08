@@ -1,6 +1,7 @@
 from worker.extractor import extract_document
 from worker.normalizer import normalize_text, tokenize
 from worker.shingler import generate_shingles
+from worker.evasion_detector import deobfuscate_for_indexing
 
 def clear_document_index(connection, document_id: int):
     cursor = connection.cursor()
@@ -149,7 +150,9 @@ def index_document(
     
     for page in pages:
         raw_text = page["text"]
-        norm_text = normalize_text(raw_text)
+        # Netralkan manipulasi karakter campuran (homoglif) sebelum tokenisasi
+        deobf_text = deobfuscate_for_indexing(raw_text)
+        norm_text = normalize_text(deobf_text)
         words = tokenize(norm_text)
         word_count = len(words)
         

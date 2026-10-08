@@ -86,6 +86,8 @@ def find_matching_fingerprints(
                 AND d.indexing_status = 'completed'
                 AND d.corpus_visibility IN ('institution', 'corpus')
             """
+        else:
+            raise ValueError(f"corpus_scope tidak valid: '{corpus_scope}'")
             
         cursor = connection.cursor(dictionary=True)
         cursor.execute(sql, params)
@@ -130,37 +132,80 @@ def group_matches_by_source(matches: list[dict]) -> dict[int, list[dict]]:
 
 def group_match_segments(matches: list[dict]) -> list[list[dict]]:
     """
-    Mengelompokkan fingerprint yang berurutan secara kontigu:
-    submission_delta == 1 AND source_delta == 1 AND same source.
+    Mengelompokkan fingerprint yang berurutan secara kontigu menggunakan diagonal grouping:
+    diagonal = source_position - submission_position.
+    Hal ini mencegah fragmentasi segmen ketika suatu frasa muncul berulang kali di dokumen sumber.
     """
     if not matches:
         return []
     
-    sorted_matches = sorted(
-        matches,
-        key=lambda item: (
-            item["submission_position"],
-            item["source_position"]
-        )
-    )
-    
+    # Kelompokkan per (source_document_id, diagonal)
+    diagonal_groups = defaultdict(list)
+    for m in matches:
+        diag = m["source_position"] - m["submission_position"]
+        diagonal_groups[(m["source_document_id"], diag)].append(m)
+
     segments = []
-    current = [sorted_matches[0]]
-    
-    for match in sorted_matches[1:]:
-        previous = current[-1]
-        submission_delta = match["submission_position"] - previous["submission_position"]
-        source_delta = match["source_position"] - previous["source_position"]
-        same_source = match["source_document_id"] == previous["source_document_id"]
-        
-        if same_source and submission_delta == 1 and source_delta == 1:
-            current.append(match)
-        else:
+    for (source_id, diag), group in diagonal_groups.items():
+        # Urutkan berdasarkan submission_position
+        sorted_group = sorted(group, key=lambda item: item["submission_position"])
+        current = [sorted_group[0]]
+        for match in sorted_group[1:]:
+            prev = current[-1]
+            sub_delta = match["submission_position"] - prev["submission_position"]
+            if sub_delta == 1:
+                current.append(match)
+            elif sub_delta > 1:
+                segments.append(current)
+                current = [match]
+            # jika sub_delta == 0 (duplikasi posisi), abaikan
+        if current:
             segments.append(current)
-            current = [match]
-            
-    segments.append(current)
+
+    # Urutkan seluruh segmen berdasarkan submission_position agar deterministik dan berurutan
+    segments.sort(key=lambda seg: (seg[0]["submission_position"], seg[0]["source_document_id"]))
     return segments
+
+def load_document_page_map(connection, document_ids: list[int]) -> dict[int, list[dict]]:
+    """
+    Memuat mapping chunk-ke-halaman untuk daftar document_id dalam 1 query batch (mencegah N+1).
+    Hasilnya berupa dict {document_id: [{'start': ..., 'end': ..., 'page_number': ...}, ...]}
+    diurutkan berdasarkan start_word_position.
+    """
+    if not document_ids:
+        return {}
+    
+    unique_ids = list(set(document_ids))
+    placeholders = ",".join(["%s"] * len(unique_ids))
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute(f"""
+        SELECT dc.document_id, dc.start_word_position, dc.end_word_position, dp.page_number
+        FROM document_chunks dc
+        INNER JOIN document_pages dp ON dp.id = dc.page_id
+        WHERE dc.document_id IN ({placeholders})
+        ORDER BY dc.document_id, dc.start_word_position ASC
+    """, unique_ids)
+    rows = cursor.fetchall()
+    cursor.close()
+    
+    page_map = defaultdict(list)
+    for row in rows:
+        page_map[row["document_id"]].append({
+            "start": row["start_word_position"],
+            "end": row["end_word_position"],
+            "page_number": row["page_number"]
+        })
+    return page_map
+
+def find_page_in_map(page_map: dict[int, list[dict]], document_id: int, position: int) -> int | None:
+    """
+    Mencari nomor halaman dari in-memory page map. Mengembalikan None jika tidak ditemukan.
+    """
+    chunks = page_map.get(document_id, [])
+    for chunk in chunks:
+        if chunk["start"] <= position <= chunk["end"]:
+            return chunk["page_number"]
+    return None
 
 def get_page_for_position(connection, document_id: int, position: int) -> int | None:
     cursor = connection.cursor(dictionary=True)
@@ -174,7 +219,7 @@ def get_page_for_position(connection, document_id: int, position: int) -> int | 
     """, (document_id, position))
     row = cursor.fetchone()
     cursor.close()
-    return row["page_number"] if row else 1
+    return row["page_number"] if row else None
 
 def get_corpus_document_count(
     connection,
@@ -195,6 +240,8 @@ def get_corpus_document_count(
             AND indexing_status = 'completed'
             AND corpus_visibility IN ('institution', 'corpus')
         """
+    else:
+        raise ValueError(f"corpus_scope tidak valid: '{corpus_scope}'")
         
     cursor.execute(sql, params)
     row = cursor.fetchone()
@@ -252,7 +299,8 @@ def build_match_record(
     connection,
     submission_document_id: int,
     segment: list[dict],
-    shingle_size: int = SHINGLE_SIZE
+    shingle_size: int = SHINGLE_SIZE,
+    page_map: dict[int, list[dict]] | None = None
 ) -> dict | None:
     if not segment:
         return None
@@ -270,8 +318,12 @@ def build_match_record(
     eval_info = evaluate_segment(segment, shingle_size)
     commonness = calculate_segment_commonness(segment)
     
-    submission_page = get_page_for_position(connection, submission_document_id, submission_start)
-    source_page = get_page_for_position(connection, source_document_id, source_start)
+    if page_map is not None:
+        submission_page = find_page_in_map(page_map, submission_document_id, submission_start)
+        source_page = find_page_in_map(page_map, source_document_id, source_start)
+    else:
+        submission_page = get_page_for_position(connection, submission_document_id, submission_start)
+        source_page = get_page_for_position(connection, source_document_id, source_start)
     
     return {
         "source_document_id": source_document_id,
@@ -386,9 +438,15 @@ def run_similarity_check(
     similarity_result = calculate_overall_similarity(enriched_pairs, total_words, SHINGLE_SIZE)
     longest_match_words = calculate_longest_match(all_segments, SHINGLE_SIZE)
     
+    needed_doc_ids = {submission_document_id}
+    for seg in all_segments:
+        if seg:
+            needed_doc_ids.add(seg[0]["source_document_id"])
+    page_map = load_document_page_map(connection, list(needed_doc_ids))
+    
     match_records = []
     for segment in all_segments:
-        record = build_match_record(connection, submission_document_id, segment, SHINGLE_SIZE)
+        record = build_match_record(connection, submission_document_id, segment, SHINGLE_SIZE, page_map=page_map)
         if record:
             match_records.append(record)
             

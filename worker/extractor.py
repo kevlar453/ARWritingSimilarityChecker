@@ -345,11 +345,23 @@ def extract_docx(path: str) -> list[dict]:
     }]
 
 def extract_text_file(path: str) -> list[dict]:
-    with open(path, "r", encoding="utf-8", errors="replace") as f:
-        text = f.read()
+    with open(path, "rb") as f:
+        raw_bytes = f.read()
+
+    encodings = ["utf-8-sig", "utf-8", "utf-16", "cp1252"]
+    text = ""
+    for enc in encodings:
+        try:
+            text = raw_bytes.decode(enc)
+            break
+        except (UnicodeDecodeError, LookupError):
+            continue
+    else:
+        text = raw_bytes.decode("utf-8", errors="replace")
+
     return [{
         "page_number": 1,
-        "text": text
+        "text": clean_extracted_text(text)
     }]
 
 def extract_document(path: str, mime_type: str | None = None) -> list[dict]:
