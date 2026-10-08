@@ -72,7 +72,20 @@ class ApiKeyController extends BaseController
             $systemType = 'ojs';
         }
 
-        $quotaLimit = max(10, min((int) ($this->request->getPost('quota_limit') ?: 1000), 10000));
+        // Batasi maksimal 5 kunci aktif per pengguna
+        $activeKeys = $this->apiKeyModel->where('user_id', $userId)->where('is_active', 1)->countAllResults();
+        if ($activeKeys >= 5) {
+            return $this->response->setStatusCode(400)->setJSON([
+                'status'  => 'error',
+                'message' => 'Anda telah mencapai batas maksimal 5 API Key aktif. Silakan cabut kunci yang tidak terpakai terlebih dahulu.'
+            ]);
+        }
+
+        $userRole = session()->get('user_role');
+        $isAdmin = ($userRole === 'admin');
+        $defaultQuota = 100;
+        $requestedQuota = (int) ($this->request->getPost('quota_limit') ?: $defaultQuota);
+        $quotaLimit = $isAdmin ? min(10000, max(10, $requestedQuota)) : min(500, max(10, $requestedQuota));
 
         $res = $this->apiKeyModel->generateKey($userId, $keyName, $systemType, $quotaLimit, 60);
 
@@ -97,7 +110,7 @@ class ApiKeyController extends BaseController
             ]);
         }
 
-        $role = session()->get('role');
+        $role = session()->get('user_role');
         $isAdmin = ($role === 'admin');
 
         $success = $this->apiKeyModel->revokeKey((int) $id, $isAdmin ? null : $userId);

@@ -17,6 +17,9 @@ class EvaluationController extends BaseController
 
     public function __construct()
     {
+        if (session()->get('user_role') !== 'admin') {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Modul evaluasi hanya dapat diakses oleh administrator.');
+        }
         $this->reviewSetPath = ROOTPATH . 'evaluation_dataset_v1/human_review_set.json';
         $this->reviewsJsonPath = ROOTPATH . 'evaluation_dataset_v1/human_reviews.json';
     }
@@ -51,21 +54,12 @@ class EvaluationController extends BaseController
         if ($suite === 'pilot_r2') {
             $this->reviewSetPath = ROOTPATH . 'evaluation_dataset_v1_1_targeted_80/pilot_r2_set.json';
             $this->reviewsJsonPath = ROOTPATH . 'evaluation_dataset_v1_1_targeted_80/pilot_r2_reviews.json';
-            if (!file_exists($this->reviewSetPath)) {
-                @exec(ROOTPATH . '.venv/bin/python evaluation/pilot_sampler_r2.py');
-            }
         } elseif ($suite === 'v1_1') {
             $this->reviewSetPath = ROOTPATH . 'evaluation_dataset_v1_1_targeted_80/human_review_set_v1_1.json';
             $this->reviewsJsonPath = ROOTPATH . 'evaluation_dataset_v1_1_targeted_80/human_reviews_v1_1.json';
-            if (!file_exists($this->reviewSetPath)) {
-                @exec(ROOTPATH . '.venv/bin/python -c "from evaluation.reviewer_v1_1 import get_human_review_v11_set; get_human_review_v11_set()"');
-            }
         } else {
             $this->reviewSetPath = ROOTPATH . 'evaluation_dataset_v1/human_review_set.json';
             $this->reviewsJsonPath = ROOTPATH . 'evaluation_dataset_v1/human_reviews.json';
-            if (!file_exists($this->reviewSetPath)) {
-                @exec(ROOTPATH . '.venv/bin/python -c "from evaluation.reviewer import get_human_review_30_set; get_human_review_30_set()"');
-            }
         }
 
         if (file_exists($this->reviewSetPath)) {
@@ -275,27 +269,44 @@ class EvaluationController extends BaseController
      */
     public function save($caseId)
     {
+        if (! preg_match('/^[A-Za-z0-9_-]{1,60}$/', (string) $caseId)) {
+            return redirect()->to('/evaluation')->with('error', 'Format Case ID tidak valid.');
+        }
+
         $set = $this->getReviewSet();
         $caseIds = array_column($set, 'case_id');
         $currentIndex = array_search($caseId, $caseIds);
 
-        $reviewerCode = trim($this->request->getPost('reviewer_code') ?: 'RV-001');
-        $interpretation = $this->request->getPost('human_interpretation');
-        $citationContext = $this->request->getPost('citation_context');
-        $citationStatus = $this->request->getPost('citation_status');
-        $assessment = $this->request->getPost('system_assessment');
-        $confidence = $this->request->getPost('reviewer_confidence');
-        $utility = $this->request->getPost('decomposition_utility') ?: 'YES';
-        $notes = trim($this->request->getPost('notes') ?: '');
-
-        // Validasi ketat: seluruh 5 field pertimbangan manusia wajib diisi
-        if (empty($interpretation) || empty($citationContext) || empty($citationStatus) || empty($assessment) || empty($confidence)) {
-            return redirect()->to("/evaluation/$caseId")->with('error', "Gagal menyimpan: Seluruh 5 field pertimbangan manusia (Human Interpretation, Citation Context, Citation Status, System Assessment, Confidence) wajib dipilih sebelum menyimpan.");
+        $reviewerCode = trim((string) ($this->request->getPost('reviewer_code') ?: 'RV-001'));
+        if (! preg_match('/^[A-Za-z0-9_.-]{1,50}$/', $reviewerCode)) {
+            $reviewerCode = 'RV-001';
         }
 
-        $isRelevant = in_array($interpretation, ['DIRECT_OVERLAP_RELEVANT', 'DIRECT_OVERLAP_PROPERLY_CITED']) ? 1 : 0;
+        $interpretation = (string) $this->request->getPost('human_interpretation');
+        $citationContext = (string) $this->request->getPost('citation_context');
+        $citationStatus = (string) $this->request->getPost('citation_status');
+        $assessment = (string) $this->request->getPost('system_assessment');
+        $confidence = (string) $this->request->getPost('reviewer_confidence');
+        $utility = (string) ($this->request->getPost('decomposition_utility') ?: 'YES');
+        $notes = trim((string) ($this->request->getPost('notes') ?: ''));
+
+        $allowedInterp = ['DIRECT_OVERLAP_RELEVANT', 'DIRECT_OVERLAP_PROPERLY_CITED', 'METHODOLOGY_BOILERPLATE', 'COMMON_ACADEMIC_LANGUAGE', 'NEEDS_INVESTIGATION', 'FALSE_POSITIVE'];
+        $allowedContext = ['ISOLATED_SENTENCE', 'WITHIN_PARAGRAPH', 'SECTION_HEADING', 'TABLE_FIGURE_CAPTION'];
+        $allowedStatus = ['CITED', 'UNCITED', 'PARAPHRASED_WITH_CITATION', 'PARAPHRASED_WITHOUT_CITATION'];
+        $allowedAssessment = ['EXACT_MATCH', 'PARAPHRASE_MATCH', 'NO_MATCH'];
+        $allowedConfidence = ['HIGH', 'MEDIUM', 'LOW'];
+
+        if (! in_array($interpretation, $allowedInterp, true) ||
+            ! in_array($citationContext, $allowedContext, true) ||
+            ! in_array($citationStatus, $allowedStatus, true) ||
+            ! in_array($assessment, $allowedAssessment, true) ||
+            ! in_array($confidence, $allowedConfidence, true)) {
+            return redirect()->to("/evaluation/$caseId")->with('error', "Gagal menyimpan: Pilihan evaluasi tidak valid atau belum lengkap.");
+        }
+
+        $isRelevant = in_array($interpretation, ['DIRECT_OVERLAP_RELEVANT', 'DIRECT_OVERLAP_PROPERLY_CITED'], true) ? 1 : 0;
         $isCommon = ($interpretation === 'COMMON_ACADEMIC_LANGUAGE') ? 1 : 0;
-        $isCited = ($interpretation === 'DIRECT_OVERLAP_PROPERLY_CITED' || in_array($citationStatus, ['CITED', 'PARAPHRASED_WITH_CITATION'])) ? 1 : 0;
+        $isCited = ($interpretation === 'DIRECT_OVERLAP_PROPERLY_CITED' || in_array($citationStatus, ['CITED', 'PARAPHRASED_WITH_CITATION'], true)) ? 1 : 0;
         $isInvestigate = ($interpretation === 'NEEDS_INVESTIGATION') ? 1 : 0;
         $isFalsePositive = ($interpretation === 'FALSE_POSITIVE') ? 1 : 0;
 
@@ -319,18 +330,6 @@ class EvaluationController extends BaseController
             'notes'                => $notes ?: null,
             'reviewed_at'          => date('Y-m-d H:i:s'),
         ]);
-
-        // Sinkronisasi via python backend
-        $cleanNotes = $notes ? addslashes($notes) : '';
-        $pyNotesArg = $notes ? "'$cleanNotes'" : "None";
-        if (str_starts_with($caseId, 'PILOT-')) {
-            $pyCmd = ROOTPATH . ".venv/bin/python -c \"from evaluation.pilot_sampler_r2 import tag_pilot_case; tag_pilot_case('$caseId', '$reviewerCode', 'review', '$citationContext', '$citationStatus', '$interpretation', '$assessment', '$confidence', 'REVIEWED', $pyNotesArg, '$utility')\"";
-        } elseif (str_starts_with($caseId, 'EV11-')) {
-            $pyCmd = ROOTPATH . ".venv/bin/python -c \"from evaluation.reviewer_v1_1 import tag_case_v11; tag_case_v11('$caseId', '$reviewerCode', 'review', '$citationContext', '$citationStatus', '$interpretation', '$assessment', '$confidence', 'REVIEWED', $pyNotesArg)\"";
-        } else {
-            $pyCmd = ROOTPATH . ".venv/bin/python -c \"from evaluation.reviewer import tag_case_full; tag_case_full('$caseId', '$reviewerCode', 'review', '$citationContext', '$citationStatus', '$interpretation', '$assessment', '$confidence', 'REVIEWED', $pyNotesArg)\"";
-        }
-        @exec($pyCmd);
 
         // Redirect ke kasus berikutnya atau ke ringkasan jika selesai
         if ($currentIndex !== false && $currentIndex + 1 < count($caseIds)) {

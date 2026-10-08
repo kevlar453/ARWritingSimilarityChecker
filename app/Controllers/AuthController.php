@@ -381,8 +381,8 @@ class AuthController extends BaseController
             return $this->respondError('Kata sandi baru dan konfirmasi kata sandi wajib diisi.', 400);
         }
 
-        if (strlen($password) < 6) {
-            return $this->respondError('Kata sandi baru minimal 6 karakter demi keamanan akun Anda.', 400);
+        if (strlen($password) < 8) {
+            return $this->respondError('Kata sandi baru minimal 8 karakter demi keamanan akun Anda.', 400);
         }
 
         if ($password !== $passwordConfirm) {
@@ -403,11 +403,18 @@ class AuthController extends BaseController
             return $this->respondError('Tautan atur ulang kata sandi tidak valid atau sudah kedaluwarsa.', 400);
         }
 
+        if (in_array($user['status'], ['banned', 'suspended', 'inactive'], true)) {
+            return $this->respondError('Akun Anda dinonaktifkan atau ditangguhkan. Silakan hubungi administrator.', 403);
+        }
+
         $now = time();
         $expires = strtotime($user['reset_password_expires_at'] ?? '1970-01-01');
         if ($now > $expires) {
             return $this->respondError('Tautan atur ulang kata sandi telah kedaluwarsa. Silakan ajukan permintaan baru.', 400);
         }
+
+        // Status baru: aktifkan hanya jika sebelumnya pending_verification, jangan ubah jika sudah active
+        $newStatus = ($user['status'] === 'pending_verification') ? 'active' : $user['status'];
 
         // Perbarui kata sandi baru & bersihkan token
         $currentDate = date('Y-m-d H:i:s');
@@ -415,7 +422,7 @@ class AuthController extends BaseController
             'password_hash'             => password_hash($password, PASSWORD_DEFAULT),
             'reset_password_token'      => null,
             'reset_password_expires_at' => null,
-            'status'                    => 'active', // Otomatis aktifkan jika sebelumnya pending_verification
+            'status'                    => $newStatus,
             'email_verified_at'         => $user['email_verified_at'] ?: $currentDate,
             'updated_at'                => $currentDate,
         ]);
@@ -582,6 +589,7 @@ class AuthController extends BaseController
 
     private function setUserSession(array $user): void
     {
+        session()->regenerate();
         session()->set([
             'user_id'          => (int) $user['id'],
             'user_name'        => $user['name'],

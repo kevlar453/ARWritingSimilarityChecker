@@ -17,10 +17,15 @@ class MidtransService
 
     public function __construct()
     {
-        $this->serverKey = (string) (env('midtrans.serverKey') ?: 'Mid-server-cqqRTSt9Ecy9qMGYQ8lDJh2U');
-        $this->clientKey = (string) (env('midtrans.clientKey') ?: 'Mid-client-YcdL-k_f7VC97khK');
+        $serverKey = env('midtrans.serverKey');
+        $clientKey = env('midtrans.clientKey');
+        if (empty($serverKey) || empty($clientKey)) {
+            log_message('critical', 'Midtrans API keys are not configured in environment (.env).');
+        }
+        $this->serverKey = (string) ($serverKey ?? '');
+        $this->clientKey = (string) ($clientKey ?? '');
         $isProd = env('midtrans.isProduction');
-        $this->isProduction = ($isProd === null || $isProd === true || $isProd === 'true' || $isProd === 1 || $isProd === '1');
+        $this->isProduction = ($isProd === true || $isProd === 'true' || $isProd === 1 || $isProd === '1');
 
         if ($this->isProduction) {
             $this->snapApiUrl = 'https://app.midtrans.com/snap/v1/transactions';

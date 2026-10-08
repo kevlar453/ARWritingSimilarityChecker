@@ -11,10 +11,8 @@ class DocumentController extends BaseController
     public function create()
     {
         $userId = session()->get('user_id');
-        $systemTestKey = $this->request->getHeaderLine('X-System-Test-Key');
-        $isSystemTest = ($systemTestKey !== '' && $systemTestKey === (env('SYSTEM_TEST_KEY') ?: 'artilik-internal-test-2026'));
 
-        if (! $userId && ! $isSystemTest) {
+        if (! $userId) {
             return $this->response->setStatusCode(401)->setJSON([
                 'status'  => 'unauthorized',
                 'message' => 'Silakan masuk atau daftar akun gratis terlebih dahulu untuk mengunggah naskah karya ilmiah.'
@@ -29,14 +27,16 @@ class DocumentController extends BaseController
             ]);
         }
 
-        $allowed = [
-            'application/pdf',
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'text/plain'
+        $ext = strtolower($file->getClientExtension());
+        $mime = $file->getMimeType();
+        $allowedExts = ['pdf', 'docx', 'txt'];
+        $allowedMimes = [
+            'pdf'  => ['application/pdf', 'application/x-pdf'],
+            'docx' => ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/zip', 'application/octet-stream'],
+            'txt'  => ['text/plain']
         ];
 
-        $mime = $file->getMimeType();
-        if (! in_array($mime, $allowed, true) && ! in_array($file->getClientExtension(), ['pdf', 'docx', 'txt'], true)) {
+        if (! in_array($ext, $allowedExts, true) || ! isset($allowedMimes[$ext]) || ! in_array($mime, $allowedMimes[$ext], true)) {
             return $this->response->setStatusCode(415)->setJSON([
                 'status'  => 'error',
                 'message' => 'Hanya format PDF, DOCX, dan TXT yang didukung.'
@@ -50,6 +50,18 @@ class DocumentController extends BaseController
             ]);
         }
 
+        // Periksa & potong kuota submisi SEBELUM memindahkan berkas fisik ke disk
+        $userModel = new \App\Models\UserModel();
+        $quotaDeducted = $userModel->deductSubmissionQuota($userId);
+        if (! $quotaDeducted) {
+            $quotaInfo = $userModel->getQuotaInfo($userId);
+            return $this->response->setStatusCode(403)->setJSON([
+                'status'     => 'quota_exceeded',
+                'message'    => 'Batas kuota gratis 3 submisi minggu ini telah habis. Anda dapat menambah kuota dengan menyumbangkan 3 korpus karya ilmiah valid (tanpa duplikat).',
+                'quota_info' => $quotaInfo,
+            ]);
+        }
+
         $storagePath = WRITEPATH . 'documents/';
         if (! is_dir($storagePath)) {
             mkdir($storagePath, 0775, true);
@@ -58,27 +70,15 @@ class DocumentController extends BaseController
         $filename = $file->getRandomName();
         $file->move($storagePath, $filename);
 
-        $userModel = new \App\Models\UserModel();
-
-        // Jika pengguna login, periksa dan kurangi kuota mingguan / bonus
-        if ($userId) {
-            $quotaDeducted = $userModel->deductSubmissionQuota($userId);
-            if (! $quotaDeducted) {
-                $quotaInfo = $userModel->getQuotaInfo($userId);
-                return $this->response->setStatusCode(403)->setJSON([
-                    'status'     => 'quota_exceeded',
-                    'message'    => 'Batas kuota gratis 3 submisi minggu ini telah habis. Anda dapat menambah kuota dengan menyumbangkan 3 korpus karya ilmiah valid (tanpa duplikat).',
-                    'quota_info' => $quotaInfo,
-                ]);
-            }
-        }
-
         $faculty = trim((string) ($this->request->getPost('faculty') ?? ''));
         $department = trim((string) ($this->request->getPost('department') ?? ''));
 
+        $rawVisibility = (string) $this->request->getPost('corpus_visibility');
+        $visibility = in_array($rawVisibility, ['private', 'institution', 'corpus'], true) ? $rawVisibility : 'private';
+
         $documentModel = new DocumentModel();
         $documentId = $documentModel->insert([
-            'user_id'           => $userId ?: null,
+            'user_id'           => $userId,
             'title'             => pathinfo($file->getClientName(), PATHINFO_FILENAME),
             'original_filename' => $file->getClientName(),
             'mime_type'         => $mime,
@@ -86,7 +86,7 @@ class DocumentController extends BaseController
             'storage_path'      => $storagePath . $filename,
             'status'            => 'uploaded',
             'document_type'     => 'submission',
-            'corpus_visibility' => $this->request->getPost('corpus_visibility') ?? 'private',
+            'corpus_visibility' => $visibility,
             'faculty'           => !empty($faculty) ? $faculty : null,
             'department'        => !empty($department) ? $department : null,
             'indexing_status'   => 'not_required',
@@ -94,7 +94,7 @@ class DocumentController extends BaseController
             'updated_at'        => date('Y-m-d H:i:s'),
         ]);
 
-        $quotaInfo = $userId ? $userModel->getQuotaInfo($userId) : null;
+        $quotaInfo = $userModel->getQuotaInfo($userId);
 
         return $this->response->setStatusCode(201)->setJSON([
             'status'      => 'success',
@@ -223,6 +223,10 @@ class DocumentController extends BaseController
 
     public function show($id)
     {
+        $session = session();
+        $userId  = $session->get('user_id');
+        $isAdmin = ($session->get('user_role') === 'admin');
+
         $documentModel = new DocumentModel();
         $document = $documentModel->find($id);
 
@@ -233,9 +237,21 @@ class DocumentController extends BaseController
             ]);
         }
 
+        // Cek kepemilikan dokumen (kecuali admin atau korpus publik)
+        $isOwner = $userId && ((int) $document['user_id'] === (int) $userId);
+        if (! $isOwner && ! $isAdmin && $document['document_type'] !== 'corpus') {
+            return $this->response->setStatusCode(404)->setJSON([
+                'status'  => 'error',
+                'message' => 'Dokumen tidak ditemukan.'
+            ]);
+        }
+
         // Ambil laporan terbaru jika ada
         $reportModel = new ReportModel();
         $report = $reportModel->where('document_id', $id)->orderBy('id', 'DESC')->first();
+
+        // Jangan ekspos path fisik server
+        unset($document['storage_path']);
 
         return $this->response->setJSON([
             'status'   => 'success',
@@ -246,6 +262,10 @@ class DocumentController extends BaseController
 
     public function check($id)
     {
+        $session = session();
+        $userId  = $session->get('user_id');
+        $isAdmin = ($session->get('user_role') === 'admin');
+
         $documentModel = new DocumentModel();
         $document = $documentModel->find($id);
 
@@ -254,6 +274,27 @@ class DocumentController extends BaseController
                 'status'  => 'error',
                 'message' => 'Dokumen tidak ditemukan.'
             ]);
+        }
+
+        // Cek hak akses pemilik
+        $isOwner = $userId && ((int) $document['user_id'] === (int) $userId);
+        if (! $isOwner && ! $isAdmin) {
+            return $this->response->setStatusCode(403)->setJSON([
+                'status'  => 'error',
+                'message' => 'Akses ditolak: Anda tidak memiliki izin untuk memeriksa dokumen ini.'
+            ]);
+        }
+
+        // Potong kuota pengguna jika bukan admin
+        if (! $isAdmin && $userId) {
+            $userModel = new \App\Models\UserModel();
+            $quotaDeducted = $userModel->deductSubmissionQuota($userId);
+            if (! $quotaDeducted) {
+                return $this->response->setStatusCode(403)->setJSON([
+                    'status'  => 'quota_exceeded',
+                    'message' => 'Batas kuota gratis minggu ini telah habis. Sumbang korpus atau lakukan top-up untuk melanjutkan.'
+                ]);
+            }
         }
 
         $engine = $this->request->getPost('engine') ?: 'hybrid';
@@ -294,6 +335,10 @@ class DocumentController extends BaseController
 
     public function enroll($id)
     {
+        $session = session();
+        $userId  = $session->get('user_id');
+        $isAdmin = ($session->get('user_role') === 'admin');
+
         $documentModel = new DocumentModel();
         $document = $documentModel->find($id);
 
@@ -301,6 +346,15 @@ class DocumentController extends BaseController
             return $this->response->setStatusCode(404)->setJSON([
                 'status'  => 'error',
                 'message' => 'Dokumen tidak ditemukan.'
+            ]);
+        }
+
+        // Hanya pemilik atau admin yang berhak mendaftarkan naskah menjadi korpus
+        $isOwner = $userId && ((int) $document['user_id'] === (int) $userId);
+        if (! $isOwner && ! $isAdmin) {
+            return $this->response->setStatusCode(403)->setJSON([
+                'status'  => 'error',
+                'message' => 'Akses ditolak: Hanya pemilik naskah yang berhak mendaftarkan dokumen ke korpus.'
             ]);
         }
 
@@ -379,6 +433,34 @@ class DocumentController extends BaseController
      */
     public function checkSubmission()
     {
+        $userId = session()->get('user_id');
+        $apiKeyId = null;
+
+        if (! $userId) {
+            $apiKeyModel = new \App\Models\ApiKeyModel();
+            $authHeader = $this->request->getHeaderLine('X-API-Key');
+            if (empty($authHeader)) {
+                $bearer = $this->request->getHeaderLine('Authorization');
+                if (preg_match('/Bearer\s+(\S+)/i', $bearer, $matches)) {
+                    $authHeader = $matches[1];
+                }
+            }
+            if (!empty($authHeader)) {
+                $keyData = $apiKeyModel->validateKey($authHeader);
+                if ($keyData) {
+                    $userId = (int) $keyData['user_id'];
+                    $apiKeyId = (int) $keyData['id'];
+                }
+            }
+        }
+
+        if (! $userId) {
+            return $this->response->setStatusCode(401)->setJSON([
+                'status'  => 'error',
+                'message' => 'Autentikasi gagal. Masuk atau sertakan API Key yang valid pada header X-API-Key.'
+            ]);
+        }
+
         $file = $this->request->getFile('document');
         if (! $file || ! $file->isValid()) {
             return $this->response->setStatusCode(400)->setJSON([
@@ -387,14 +469,16 @@ class DocumentController extends BaseController
             ]);
         }
 
-        $allowed = [
-            'application/pdf',
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'text/plain'
+        $ext = strtolower($file->getClientExtension());
+        $mime = $file->getMimeType();
+        $allowedExts = ['pdf', 'docx', 'txt'];
+        $allowedMimes = [
+            'pdf'  => ['application/pdf', 'application/x-pdf'],
+            'docx' => ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/zip', 'application/octet-stream'],
+            'txt'  => ['text/plain']
         ];
 
-        $mime = $file->getMimeType();
-        if (! in_array($mime, $allowed, true) && ! in_array($file->getClientExtension(), ['pdf', 'docx', 'txt'], true)) {
+        if (! in_array($ext, $allowedExts, true) || ! isset($allowedMimes[$ext]) || ! in_array($mime, $allowedMimes[$ext], true)) {
             return $this->response->setStatusCode(415)->setJSON([
                 'status'  => 'error',
                 'message' => 'Hanya format PDF, DOCX, dan TXT yang didukung.'
@@ -404,8 +488,22 @@ class DocumentController extends BaseController
         if ($file->getSize() > 25 * 1024 * 1024) {
             return $this->response->setStatusCode(413)->setJSON([
                 'status'  => 'error',
-                'message' => 'Ukuran berkas maksimal 25 MB.'
+                'message' => 'Ukuran berkas maksimal adalah 25 MB.'
             ]);
+        }
+
+        // Potong kuota submisi pengguna
+        $userModel = new \App\Models\UserModel();
+        $quotaDeducted = $userModel->deductSubmissionQuota($userId);
+        if (! $quotaDeducted) {
+            return $this->response->setStatusCode(403)->setJSON([
+                'status'  => 'error',
+                'message' => 'Batas kuota submisi akun Anda tidak mencukupi.'
+            ]);
+        }
+
+        if ($apiKeyId) {
+            (new \App\Models\ApiKeyModel())->recordUsage($apiKeyId);
         }
 
         $storagePath = WRITEPATH . 'documents/';
@@ -426,7 +524,7 @@ class DocumentController extends BaseController
 
         $documentModel = new DocumentModel();
         $documentId = $documentModel->insert([
-            'user_id'           => null,
+            'user_id'           => $userId,
             'title'             => $title,
             'original_filename' => $file->getClientName(),
             'mime_type'         => $mime,
@@ -442,6 +540,10 @@ class DocumentController extends BaseController
             'updated_at'        => $now,
         ]);
 
+        // Buat kode verifikasi acak aman
+        $rnd = strtoupper(bin2hex(random_bytes(6)));
+        $certHash = "ART-" . substr($rnd, 0, 4) . "-" . substr($rnd, 4, 4) . "-" . substr($rnd, 8, 4);
+
         $reportModel = new ReportModel();
         $reportId = $reportModel->insert([
             'document_id'        => $documentId,
@@ -450,19 +552,13 @@ class DocumentController extends BaseController
             'overall_similarity' => 0,
             'source_count'       => 0,
             'match_count'        => 0,
+            'verification_code'  => $certHash,
             'status'             => 'pending',
             'created_at'         => $now,
         ]);
 
-        // Hitung kode sertifikat deterministik awal
-        $seed = "ARTILIK:{$reportId}:{$documentId}:{$now}:0.00:OFFICIAL_CERTIFICATE";
-        $h = strtoupper(substr(hash('sha256', $seed), 0, 12));
-        $certHash = "ART-" . substr($h, 0, 4) . "-" . substr($h, 4, 4) . "-" . substr($h, 8, 4);
-
-        $db = db_connect();
-        $db->table('reports')->where('id', $reportId)->update(['verification_code' => $certHash]);
-
         // Masukkan ke antrean worker
+        $db = db_connect();
         $db->table('jobs')->insert([
             'type'         => 'similarity_check',
             'payload'      => json_encode([
@@ -476,16 +572,16 @@ class DocumentController extends BaseController
             'updated_at'   => $now,
         ]);
 
-        $publicUrl = "https://tilik.arsetontong.top";
+        $publicUrl = rtrim(base_url(), '/');
 
         return $this->response->setStatusCode(202)->setJSON([
             'status'            => 'queued',
             'document_id'       => (int) $documentId,
             'report_id'         => (int) $reportId,
             'verification_code' => $certHash,
-            'report_url'        => "{$publicUrl}/report/{$reportId}",
+            'report_url'        => "{$publicUrl}/report/{$reportId}?token={$certHash}",
             'verification_url'  => "{$publicUrl}/verify/{$certHash}",
-            'pdf_export_url'    => "{$publicUrl}/report/{$reportId}/export",
+            'pdf_export_url'    => "{$publicUrl}/report/{$reportId}/export?token={$certHash}",
             'status_api_url'    => "{$publicUrl}/api/reports/{$reportId}",
             'message'           => 'Pemeriksaan similarity berhasil dijadwalkan ke antrean AR Tilik.'
         ]);

@@ -32,9 +32,6 @@ class PublicApiController extends BaseController
                 $authHeader = $matches[1];
             }
         }
-        if (empty($authHeader)) {
-            $authHeader = $this->request->getGet('api_key');
-        }
 
         if (empty($authHeader)) {
             return null;
@@ -85,11 +82,45 @@ class PublicApiController extends BaseController
         // 1. Dukungan Unggah Berkas File (PDF, DOCX, TXT)
         $file = $this->request->getFile('document') ?: $this->request->getFile('file');
         if ($file && $file->isValid()) {
+            $ext = strtolower($file->getClientExtension());
+            $rawMime = $file->getMimeType();
+            $allowedExts = ['pdf', 'docx', 'txt'];
+            $allowedMimes = [
+                'pdf'  => ['application/pdf', 'application/x-pdf'],
+                'docx' => ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/zip', 'application/octet-stream'],
+                'txt'  => ['text/plain']
+            ];
+            if (! in_array($ext, $allowedExts, true) || ! isset($allowedMimes[$ext]) || ! in_array($rawMime, $allowedMimes[$ext], true)) {
+                return $this->response->setStatusCode(415)->setJSON([
+                    'status'  => 'error',
+                    'code'    => 415,
+                    'message' => 'Format berkas tidak didukung. Hanya file PDF, DOCX, dan TXT yang diperbolehkan.'
+                ]);
+            }
+            if ($file->getSize() > 25 * 1024 * 1024) {
+                return $this->response->setStatusCode(413)->setJSON([
+                    'status'  => 'error',
+                    'code'    => 413,
+                    'message' => 'Ukuran berkas melebihi batas maksimal 25 MB.'
+                ]);
+            }
+
+            // Periksa & potong kuota submisi akun pengguna pemilik kunci
+            $userModel = new \App\Models\UserModel();
+            $quotaDeducted = $userModel->deductSubmissionQuota($userId);
+            if (! $quotaDeducted) {
+                return $this->response->setStatusCode(403)->setJSON([
+                    'status'  => 'error',
+                    'code'    => 403,
+                    'message' => 'Kuota submisi akun Anda tidak mencukupi untuk memproses naskah ini.'
+                ]);
+            }
+
             $clientFilename = $file->getClientName();
             if (empty($title)) {
                 $title = pathinfo($clientFilename, PATHINFO_FILENAME);
             }
-            $mimeType = $file->getMimeType() ?: 'application/octet-stream';
+            $mimeType = $rawMime ?: 'application/octet-stream';
             $fileSize = $file->getSize();
             $randomName = $file->getRandomName();
             $file->move($storagePath, $randomName);
@@ -98,6 +129,17 @@ class PublicApiController extends BaseController
             // 2. Dukungan Pengiriman Teks Langsung
             $rawText = $this->request->getPost('text') ?: $this->request->getPost('content');
             if (! empty($rawText)) {
+                // Periksa & potong kuota submisi akun pengguna pemilik kunci
+                $userModel = new \App\Models\UserModel();
+                $quotaDeducted = $userModel->deductSubmissionQuota($userId);
+                if (! $quotaDeducted) {
+                    return $this->response->setStatusCode(403)->setJSON([
+                        'status'  => 'error',
+                        'code'    => 403,
+                        'message' => 'Kuota submisi akun Anda tidak mencukupi untuk memproses naskah ini.'
+                    ]);
+                }
+
                 if (empty($title)) {
                     $title = 'Naskah Integrasi API ' . date('Y-m-d H:i');
                 }
@@ -139,11 +181,16 @@ class PublicApiController extends BaseController
             'updated_at'        => date('Y-m-d H:i:s'),
         ]);
 
+        // Buat kode verifikasi sertifikat acak aman (12 karakter hex acak kriptografis)
+        $rnd = strtoupper(bin2hex(random_bytes(6)));
+        $verificationCode = "ART-" . substr($rnd, 0, 4) . "-" . substr($rnd, 4, 4) . "-" . substr($rnd, 8, 4);
+
         // Buat Report awal berstatus pending
         $reportId = $this->reportModel->insert([
             'document_id'        => $docId,
             'engine'             => 'hybrid',
             'predicted_decision' => 'no_match',
+            'verification_code'  => $verificationCode,
             'status'             => 'pending',
             'created_at'         => date('Y-m-d H:i:s'),
             'updated_at'         => date('Y-m-d H:i:s'),
@@ -204,7 +251,7 @@ class PublicApiController extends BaseController
         }
 
         $doc = $this->documentModel->find($documentId);
-        if (! $doc) {
+        if (! $doc || ((int) $doc['user_id'] !== (int) $keyData['user_id'])) {
             return $this->response->setStatusCode(404)->setJSON([
                 'status'  => 'error',
                 'message' => "Dokumen #{$documentId} tidak ditemukan."
@@ -213,6 +260,7 @@ class PublicApiController extends BaseController
 
         $report = $this->reportModel->where('document_id', $documentId)->orderBy('id', 'DESC')->first();
         $baseUrl = rtrim(base_url(), '/');
+        $certCode = $report['verification_code'] ?? '';
 
         return $this->response->setJSON([
             'status' => 'success',
@@ -224,9 +272,9 @@ class PublicApiController extends BaseController
                 'report_status'      => $report['status'] ?? 'pending',
                 'overall_similarity' => $report ? (float) $report['overall_similarity'] : 0.0,
                 'predicted_decision' => $report['predicted_decision'] ?? null,
-                'verification_code'  => $report['verification_code'] ?? null,
+                'verification_code'  => $certCode ?: null,
                 'report_url'         => $report ? "{$baseUrl}/api/v1/report/{$report['id']}" : null,
-                'web_report_url'     => $report ? "{$baseUrl}/report/{$report['id']}" : null,
+                'web_report_url'     => $report ? "{$baseUrl}/report/{$report['id']}" . ($certCode ? "?token={$certCode}" : "") : null,
                 'pdf_export_url'     => $report ? "{$baseUrl}/report/{$report['id']}/export" : null,
             ]
         ]);
@@ -255,6 +303,13 @@ class PublicApiController extends BaseController
         }
 
         $doc = $this->documentModel->find($report['document_id']);
+        if (! $doc || ((int) $doc['user_id'] !== (int) $keyData['user_id'])) {
+            return $this->response->setStatusCode(404)->setJSON([
+                'status'  => 'error',
+                'message' => "Laporan #{$reportId} tidak ditemukan."
+            ]);
+        }
+
         $db = db_connect();
 
         $sources = $db->table('report_sources rs')
@@ -267,7 +322,12 @@ class PublicApiController extends BaseController
                       ->getResultArray();
 
         $baseUrl = rtrim(base_url(), '/');
-        $certCode = $report['verification_code'] ?: ('ART-' . strtoupper(substr(md5($report['id'] . $report['created_at']), 0, 12)));
+        $certCode = $report['verification_code'] ?? '';
+        if (empty($certCode)) {
+            $rnd = strtoupper(bin2hex(random_bytes(6)));
+            $certCode = "ART-" . substr($rnd, 0, 4) . "-" . substr($rnd, 4, 4) . "-" . substr($rnd, 8, 4);
+            $this->reportModel->update($reportId, ['verification_code' => $certCode]);
+        }
 
         return $this->response->setJSON([
             'status' => 'success',
@@ -281,8 +341,8 @@ class PublicApiController extends BaseController
                 'verification'       => [
                     'code'            => $certCode,
                     'certificate_url' => "{$baseUrl}/verify/{$certCode}",
-                    'pdf_report_url'  => "{$baseUrl}/report/{$reportId}/export",
-                    'web_report_url'  => "{$baseUrl}/report/{$reportId}",
+                    'pdf_report_url'  => "{$baseUrl}/report/{$reportId}/export?token={$certCode}",
+                    'web_report_url'  => "{$baseUrl}/report/{$reportId}?token={$certCode}",
                 ],
                 'dual_lens'          => [
                     'exact_matcher' => [

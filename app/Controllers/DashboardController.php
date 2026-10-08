@@ -91,6 +91,27 @@ class DashboardController extends BaseController
         $reportId = (int) $report['id'];
         $document = $docModel->find($report['document_id']);
 
+        if (! $document) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Dokumen #{$report['document_id']} tidak ditemukan.");
+        }
+
+        // Cek izin akses: pemilik, admin, atau memiliki token otorisasi resmi
+        $session = session();
+        $userId  = $session->get('user_id');
+        $isAdmin = ($session->get('user_role') === 'admin');
+        $isOwner = $userId && ((int) $document['user_id'] === (int) $userId);
+
+        if (! $isOwner && ! $isAdmin) {
+            $token = $this->request->getGet('token') ?: $this->request->getGet('code');
+            if (empty($token) || $token !== ($report['verification_code'] ?? null)) {
+                if (! $userId) {
+                    return redirect()->to(base_url('/?auth=login&redirect=' . urlencode(current_url())))
+                        ->with('auth_notice', 'Silakan masuk ke akun pemilik naskah atau sertakan token otorisasi resmi untuk melihat laporan ini.');
+                }
+                return $this->response->setStatusCode(403)->setBody('Akses ditolak: Anda tidak memiliki izin untuk melihat laporan naskah ini.');
+            }
+        }
+
         // Parse evidence_data JSON jika tersedia
         $evidenceData = [];
         if (!empty($report['evidence_data'])) {
@@ -908,6 +929,24 @@ class DashboardController extends BaseController
 
         $reportId = (int) $report['id'];
         $document = $docModel->find($report['document_id']);
+
+        if (! $document) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Dokumen #{$report['document_id']} tidak ditemukan.");
+        }
+
+        // Cek izin akses: pemilik, admin, atau memiliki token otorisasi resmi
+        $session = session();
+        $userId  = $session->get('user_id');
+        $isAdmin = ($session->get('user_role') === 'admin');
+        $isOwner = $userId && ((int) $document['user_id'] === (int) $userId);
+
+        if (! $isOwner && ! $isAdmin) {
+            $token = $this->request->getGet('token') ?: $this->request->getGet('code');
+            if (empty($token) || $token !== ($report['verification_code'] ?? null)) {
+                return $this->response->setStatusCode(403)->setBody('Akses ditolak: Anda tidak memiliki izin untuk mengunduh laporan PDF ini.');
+            }
+        }
+
         $rawTitle = $document['title'] ?? 'Dokumen';
         $safeTitle = preg_replace('/[^a-zA-Z0-9_\-]/', '_', $rawTitle);
         $filename = "Laporan_AR_Tilik_#{$reportId}_{$safeTitle}.pdf";
@@ -964,6 +1003,10 @@ class DashboardController extends BaseController
         $documentModel = new DocumentModel();
         $doc = $documentModel->find($documentId);
 
+        if (! $doc) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Dokumen tidak ditemukan.');
+        }
+
         $filePath = $doc['storage_path'] ?? '';
         if (! file_exists($filePath)) {
             $altPath = ROOTPATH . 'writable/' . preg_replace('#^.*?writable/#', '', $filePath);
@@ -974,32 +1017,29 @@ class DashboardController extends BaseController
             }
         }
 
-        // Cek izin akses: pemilik dokumen, admin, korpus rujukan, atau laporan terkait
+        // Cek izin akses ketat: pemilik dokumen, admin, atau korpus rujukan publik
         $isOwner  = $userId && ((int) $doc['user_id'] === (int) $userId);
         $isAdmin  = $session->get('user_role') === 'admin';
         $isCorpus = ($doc['document_type'] === 'corpus' || ($doc['corpus_visibility'] ?? '') === 'public');
 
         if (! $isOwner && ! $isAdmin && ! $isCorpus) {
-            $reportModel = new ReportModel();
-            $hasReport = $reportModel->where('document_id', $documentId)->first();
-            if (! $hasReport) {
-                return $this->response->setStatusCode(403)->setBody('Akses ke dokumen ditolak.');
-            }
+            return $this->response->setStatusCode(403)->setBody('Akses ke dokumen ditolak. Naskah bersifat privat bagi pemilik.');
         }
 
-        $mime = $doc['mime_type'] ?: mime_content_type($filePath);
-        if (empty($mime)) {
-            $mime = 'application/pdf';
-        }
+        $rawMime = $doc['mime_type'] ?: mime_content_type($filePath);
+        $isPdf = ($rawMime === 'application/pdf');
+        $safeMime = $isPdf ? 'application/pdf' : 'application/octet-stream';
+        $disposition = $isPdf ? 'inline' : 'attachment';
 
         $filename = $doc['original_filename'] ?: basename($filePath);
 
         return $this->response
-            ->setHeader('Content-Type', $mime)
-            ->setHeader('Content-Disposition', 'inline; filename="' . addslashes($filename) . '"')
+            ->setHeader('Content-Type', $safeMime)
+            ->setHeader('Content-Disposition', $disposition . '; filename="' . addslashes($filename) . '"')
             ->setHeader('Content-Length', (string) filesize($filePath))
+            ->setHeader('X-Content-Type-Options', 'nosniff')
             ->setHeader('X-Frame-Options', 'SAMEORIGIN')
-            ->setHeader('Cache-Control', 'private, max-age=3600')
+            ->setHeader('Cache-Control', 'private, no-cache, no-store, must-revalidate')
             ->setBody(file_get_contents($filePath));
     }
 
@@ -1020,6 +1060,24 @@ class DashboardController extends BaseController
 
         $reportId = (int) $report['id'];
         $document = $docModel->find($report['document_id']);
+
+        if (! $document) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Dokumen #{$report['document_id']} tidak ditemukan.");
+        }
+
+        // Cek izin akses: pemilik, admin, atau memiliki token otorisasi resmi
+        $session = session();
+        $userId  = $session->get('user_id');
+        $isAdmin = ($session->get('user_role') === 'admin');
+        $isOwner = $userId && ((int) $document['user_id'] === (int) $userId);
+
+        if (! $isOwner && ! $isAdmin) {
+            $token = $this->request->getGet('token') ?: $this->request->getGet('code');
+            if (empty($token) || $token !== ($report['verification_code'] ?? null)) {
+                return $this->response->setStatusCode(403)->setBody('Akses ditolak: Anda tidak memiliki izin untuk melihat pratinjau laporan ini.');
+            }
+        }
+
         $evidenceData = !empty($report['evidence_data']) ? (is_string($report['evidence_data']) ? json_decode($report['evidence_data'], true) : $report['evidence_data']) : [];
 
         $sources = $db->table('report_sources rs')
@@ -1253,31 +1311,6 @@ class DashboardController extends BaseController
         $builder->join('documents', 'documents.id = reports.document_id', 'left');
         $builder->where('reports.verification_code', $code);
         $report = $builder->get()->getRowArray();
-
-        // 2. Fallback deterministik jika kode belum terindeks di database
-        if (!$report) {
-            $candidates = $db->table('reports')
-                             ->select('reports.*, documents.title AS document_title, documents.original_filename, documents.created_at AS document_created_at')
-                             ->join('documents', 'documents.id = reports.document_id', 'left')
-                             ->where('reports.status', 'completed')
-                             ->orderBy('reports.id', 'DESC')
-                             ->get(300)->getResultArray();
-
-            foreach ($candidates as $cand) {
-                $rawCreated = (string) $cand['created_at'];
-                $sim = (float) ($cand['overall_similarity'] ?? 0);
-                $seed = "ARTILIK:{$cand['id']}:{$cand['document_id']}:{$rawCreated}:" . sprintf("%.2f", $sim) . ":OFFICIAL_CERTIFICATE";
-                $h = strtoupper(substr(hash('sha256', $seed), 0, 12));
-                $computedHash = "ART-" . substr($h, 0, 4) . "-" . substr($h, 4, 4) . "-" . substr($h, 8, 4);
-
-                if ($computedHash === $code) {
-                    $report = $cand;
-                    // Cache ke database untuk query berikutnya
-                    $db->table('reports')->where('id', $cand['id'])->update(['verification_code' => $code]);
-                    break;
-                }
-            }
-        }
 
         if (!$report) {
             return view('dashboard/verify', [

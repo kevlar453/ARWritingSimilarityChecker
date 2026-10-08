@@ -78,17 +78,22 @@ class ApiKeyModel extends Model
             return null;
         }
 
-        // Cek kecocokan hash SHA-256 atau string langsung (backward compatible)
+        // Cek kecocokan hash SHA-256 murni (tanpa fallback plaintext)
         $hashed = hash('sha256', $rawKey);
-        $key = $this->where('api_key', $hashed)
-                    ->orWhere('api_key', $rawKey)
-                    ->first();
+        $key = $this->where('api_key', $hashed)->first();
 
         if (! $key) {
             return null;
         }
 
         if (! (int) $key['is_active']) {
+            return null;
+        }
+
+        // Verifikasi akun pemilik kunci harus aktif
+        $userModel = new \App\Models\UserModel();
+        $user = $userModel->find($key['user_id']);
+        if (! $user || $user['status'] !== 'active') {
             return null;
         }
 
@@ -127,17 +132,18 @@ class ApiKeyModel extends Model
     }
 
     /**
-     * Mencabut / menonaktifkan API Key
+     * Mencabut / menonaktifkan API Key secara aman
      */
     public function revokeKey(int $keyId, ?int $userId = null): bool
     {
-        $builder = $this->where('id', $keyId);
+        $builder = $this->builder()->where('id', $keyId);
         if ($userId !== null) {
             $builder->where('user_id', $userId);
         }
-        return $this->update($keyId, [
+        $builder->update([
             'is_active'  => 0,
             'updated_at' => date('Y-m-d H:i:s'),
         ]);
+        return $this->db->affectedRows() > 0;
     }
 }

@@ -84,7 +84,7 @@ $routes->group('api', function ($routes) {
 });
 
 // API Key Management Routes (Protected by Auth/Session)
-$routes->group('api-keys', function ($routes) {
+$routes->group('api-keys', ['filter' => 'auth'], function ($routes) {
     $routes->get('list', 'Api\ApiKeyController::listKeys');
     $routes->post('generate', 'Api\ApiKeyController::generate');
     $routes->post('revoke/(:num)', 'Api\ApiKeyController::revoke/$1');
@@ -117,8 +117,8 @@ $routes->group('admin', ['filter' => 'admin'], function ($routes) {
     $routes->post('corpus/(:num)/reindex', 'Admin\CorpusController::reindex/$1');
 });
 
-// Human Review & Evaluation Subsystem (Phase HR-1 Isolated Module)
-$routes->group('evaluation', function ($routes) {
+// Human Review & Evaluation Subsystem (Phase HR-1 Isolated Module - Protected by AdminFilter)
+$routes->group('evaluation', ['filter' => 'admin'], function ($routes) {
     $routes->get('/', 'EvaluationController::index');
     $routes->get('summary', 'EvaluationController::summary');
     $routes->get('quality', 'EvaluationController::quality');
