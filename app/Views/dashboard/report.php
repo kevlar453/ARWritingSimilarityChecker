@@ -2650,14 +2650,18 @@
 
             renderDualReaderContent();
 
-            if (focusMatchIdx !== null) {
-                setTimeout(() => {
+            setTimeout(() => {
+                if (focusMatchIdx !== null) {
                     const matchItemIdx = currentDualMatches.findIndex(m => parseInt(m.match_original_idx) === parseInt(focusMatchIdx));
                     if (matchItemIdx !== -1) {
                         jumpToDualMatch(matchItemIdx);
+                    } else if (currentDualMatches.length > 0) {
+                        jumpToDualMatch(0);
                     }
-                }, 150);
-            }
+                } else if (currentDualMatches.length > 0) {
+                    jumpToDualMatch(0);
+                }
+            }, 120);
         }
 
         let currentDualViewMode = 'text';
@@ -2954,6 +2958,12 @@
             currentDualMatchIndex = matchIndex;
             updateDualMatchNavCounter();
 
+            isProgrammaticScroll = true;
+            clearTimeout(programmaticScrollTimeout);
+            programmaticScrollTimeout = setTimeout(() => {
+                isProgrammaticScroll = false;
+            }, 600);
+
             // Lepas highlight aktif sebelumnya
             document.querySelectorAll('.dual-active-focus').forEach(el => {
                 el.classList.remove('dual-active-focus', 'ring-4', 'ring-indigo-500', 'ring-teal-500', 'ring-offset-2', 'z-20');
@@ -2979,22 +2989,190 @@
 
         function jumpToSpecificTerm(termWord) {
             const termLower = termWord.toLowerCase();
+            isProgrammaticScroll = true;
+            clearTimeout(programmaticScrollTimeout);
+            programmaticScrollTimeout = setTimeout(() => {
+                isProgrammaticScroll = false;
+            }, 600);
+
             document.querySelectorAll('.dual-active-focus').forEach(el => {
                 el.classList.remove('dual-active-focus', 'ring-4', 'ring-indigo-500', 'ring-teal-500', 'ring-offset-2', 'z-20');
             });
 
+            const ringColor = 'ring-teal-500';
             const subTarget = document.querySelector(`#dualSubPane mark[data-term="${termLower}"]`);
             const srcTarget = document.querySelector(`#dualSrcPane mark[data-term="${termLower}"]`);
 
             if (subTarget) {
-                subTarget.classList.add('dual-active-focus', 'ring-4', 'ring-teal-500', 'ring-offset-2', 'z-20');
+                subTarget.classList.add('dual-active-focus', 'ring-4', ringColor, 'ring-offset-2', 'z-20');
                 subTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
 
             if (srcTarget) {
-                srcTarget.classList.add('dual-active-focus', 'ring-4', 'ring-teal-500', 'ring-offset-2', 'z-20');
+                srcTarget.classList.add('dual-active-focus', 'ring-4', ringColor, 'ring-offset-2', 'z-20');
                 srcTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
+        }
+
+        // ═════════════════════════════════════════════════════════════════════
+        // SINKRONISASI GULIR GANDA (INTERACTIVE DUAL READER SYNC-SCROLL)
+        // ═════════════════════════════════════════════════════════════════════
+        let isSyncScrollActive = true;
+        let isProgrammaticScroll = false;
+        let programmaticScrollTimeout = null;
+        let scrollSyncRAF = null;
+
+        function updateSyncScrollBadgeUI(isActive) {
+            const badge = document.getElementById('dualSyncStatusBadge');
+            if (!badge) return;
+            if (isActive) {
+                badge.innerText = 'Sync-Scroll Active';
+                badge.className = 'text-[10px] uppercase font-bold font-mono-code px-2 py-0.5 rounded bg-indigo-500/30 text-indigo-200 border border-indigo-400/30 transition-all shadow-2xs';
+            } else {
+                badge.innerText = 'Sync-Scroll Nonaktif';
+                badge.className = 'text-[10px] uppercase font-bold font-mono-code px-2 py-0.5 rounded bg-slate-700/60 text-slate-400 border border-slate-600/50 transition-all';
+            }
+        }
+
+        function computeAnchorInterpolatedScroll(currentScroll, fromMax, toMax, direction) {
+            const rawAnchors = [];
+            rawAnchors.push({ from: 0, to: 0 });
+
+            if (currentDualMatches && currentDualMatches.length > 0) {
+                for (let i = 0; i < currentDualMatches.length; i++) {
+                    const fromEl = document.getElementById(direction === 'sub' ? `dual-sub-m-${i}` : `dual-src-m-${i}`);
+                    const toEl = document.getElementById(direction === 'sub' ? `dual-src-m-${i}` : `dual-sub-m-${i}`);
+                    if (fromEl && toEl) {
+                        rawAnchors.push({
+                            from: Math.max(0, fromEl.offsetTop - 80),
+                            to: Math.max(0, toEl.offsetTop - 80),
+                            idx: i
+                        });
+                    }
+                }
+            }
+            rawAnchors.push({ from: fromMax, to: toMax });
+
+            // Saring agar strictly monotonic
+            const monotonicAnchors = [rawAnchors[0]];
+            for (let i = 1; i < rawAnchors.length - 1; i++) {
+                const prev = monotonicAnchors[monotonicAnchors.length - 1];
+                const curr = rawAnchors[i];
+                if (curr.from > prev.from && curr.to >= prev.to) {
+                    monotonicAnchors.push(curr);
+                }
+            }
+            const last = monotonicAnchors[monotonicAnchors.length - 1];
+            const endAnchor = rawAnchors[rawAnchors.length - 1];
+            if (endAnchor.from > last.from && endAnchor.to >= last.to) {
+                monotonicAnchors.push(endAnchor);
+            } else {
+                monotonicAnchors.push({ from: Math.max(last.from + 1, fromMax), to: Math.max(last.to + 1, toMax) });
+            }
+
+            if (monotonicAnchors.length < 2) {
+                return (currentScroll / fromMax) * toMax;
+            }
+
+            const clamped = Math.max(0, Math.min(fromMax, currentScroll));
+
+            for (let k = 0; k < monotonicAnchors.length - 1; k++) {
+                const a1 = monotonicAnchors[k];
+                const a2 = monotonicAnchors[k + 1];
+                if (clamped >= a1.from && clamped <= a2.from) {
+                    const span = a2.from - a1.from;
+                    const t = span > 0 ? (clamped - a1.from) / span : 0;
+                    return Math.max(0, Math.min(toMax, a1.to + t * (a2.to - a1.to)));
+                }
+            }
+
+            return (clamped / fromMax) * toMax;
+        }
+
+        function updateCounterOnScroll(currentScroll, direction) {
+            if (currentDualMode !== 'exact' || !currentDualMatches || currentDualMatches.length === 0) return;
+            let closestIdx = currentDualMatchIndex;
+            let minDistance = Infinity;
+
+            for (let i = 0; i < currentDualMatches.length; i++) {
+                const el = document.getElementById(direction === 'sub' ? `dual-sub-m-${i}` : `dual-src-m-${i}`);
+                if (el) {
+                    const dist = Math.abs(el.offsetTop - currentScroll - 120);
+                    if (dist < minDistance) {
+                        minDistance = dist;
+                        closestIdx = i;
+                    }
+                }
+            }
+
+            if (minDistance < 250 && closestIdx !== currentDualMatchIndex) {
+                currentDualMatchIndex = closestIdx;
+                updateDualMatchNavCounter();
+            }
+        }
+
+        function syncScrollFromTo(fromPane, toPane, direction) {
+            if (scrollSyncRAF) {
+                cancelAnimationFrame(scrollSyncRAF);
+            }
+
+            scrollSyncRAF = requestAnimationFrame(() => {
+                const fromMax = fromPane.scrollHeight - fromPane.clientHeight;
+                const toMax = toPane.scrollHeight - toPane.clientHeight;
+                if (fromMax <= 0 || toMax <= 0) return;
+
+                let targetScrollTop;
+                if (currentDualMode === 'exact' && currentDualMatches && currentDualMatches.length > 0) {
+                    targetScrollTop = computeAnchorInterpolatedScroll(fromPane.scrollTop, fromMax, toMax, direction);
+                } else {
+                    const ratio = Math.max(0, Math.min(1, fromPane.scrollTop / fromMax));
+                    targetScrollTop = ratio * toMax;
+                }
+
+                isProgrammaticScroll = true;
+                toPane.scrollTop = targetScrollTop;
+
+                updateCounterOnScroll(fromPane.scrollTop, direction);
+
+                requestAnimationFrame(() => {
+                    isProgrammaticScroll = false;
+                });
+            });
+        }
+
+        function setupDualSyncScroll() {
+            const subPane = document.getElementById('dualSubPane');
+            const srcPane = document.getElementById('dualSrcPane');
+            const toggle = document.getElementById('dualSyncToggle');
+
+            if (!subPane || !srcPane) return;
+
+            // Pastikan scroll-smooth dilepas dari pane agar gulir manual & sinkronisasi instan tanpa lag
+            subPane.classList.remove('scroll-smooth');
+            srcPane.classList.remove('scroll-smooth');
+
+            if (toggle) {
+                toggle.checked = isSyncScrollActive;
+                updateSyncScrollBadgeUI(isSyncScrollActive);
+
+                toggle.onchange = function() {
+                    isSyncScrollActive = this.checked;
+                    updateSyncScrollBadgeUI(isSyncScrollActive);
+                    if (isSyncScrollActive) {
+                        syncScrollFromTo(subPane, srcPane, 'sub');
+                    }
+                };
+            }
+
+            subPane.onscroll = function() {
+                if (!isSyncScrollActive || isProgrammaticScroll) return;
+                syncScrollFromTo(subPane, srcPane, 'sub');
+            };
+
+            srcPane.onscroll = function() {
+                if (!isSyncScrollActive || isProgrammaticScroll) return;
+                syncScrollFromTo(srcPane, subPane, 'src');
+            };
         }
 
         // ═════════════════════════════════════════════════════════════════════
@@ -3181,7 +3359,7 @@
                             <h3 class="font-bold text-sm sm:text-base text-white tracking-wide">
                                 Interactive Side-by-Side Dual Reader
                             </h3>
-                            <span class="text-[10px] uppercase font-bold font-mono-code px-2 py-0.5 rounded bg-indigo-500/30 text-indigo-200 border border-indigo-400/30">
+                            <span id="dualSyncStatusBadge" class="text-[10px] uppercase font-bold font-mono-code px-2 py-0.5 rounded bg-indigo-500/30 text-indigo-200 border border-indigo-400/30 transition-all shadow-2xs">
                                 Sync-Scroll Active
                             </span>
                         </div>
@@ -3210,9 +3388,9 @@
                     </div>
 
                     <!-- Sync-Scroll Switch -->
-                    <label class="flex items-center gap-1.5 bg-slate-800 px-2.5 py-1.5 rounded-lg border border-slate-700 cursor-pointer select-none">
+                    <label class="flex items-center gap-1.5 bg-slate-800 px-2.5 py-1.5 rounded-lg border border-slate-700 cursor-pointer select-none hover:bg-slate-700/80 transition" title="Aktifkan atau nonaktifkan sinkronisasi gulir kedua naskah">
                         <input type="checkbox" id="dualSyncToggle" checked class="w-3.5 h-3.5 rounded text-indigo-500 focus:ring-indigo-400 bg-slate-900 border-slate-700 cursor-pointer">
-                        <span class="text-slate-300 text-[11px]">Sync-Scroll</span>
+                        <span class="text-slate-300 text-[11px] font-medium">Sync-Scroll</span>
                     </label>
 
                     <!-- Match Navigator -->
@@ -3243,7 +3421,7 @@
                         </div>
                         <span class="text-[11px] text-slate-500 font-mono-code" id="dualSubInfoText"></span>
                     </div>
-                    <div id="dualSubPane" style="font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Amiri', 'Traditional Arabic', 'Noto Naskh Arabic', 'Times New Roman', serif;" class="flex-1 overflow-y-auto p-6 text-sm text-slate-800 leading-relaxed select-text scroll-smooth space-y-3">
+                    <div id="dualSubPane" style="font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Amiri', 'Traditional Arabic', 'Noto Naskh Arabic', 'Times New Roman', serif;" class="flex-1 overflow-y-auto p-6 text-sm text-slate-800 leading-relaxed select-text space-y-3">
                         <!-- Full text with highlight marks -->
                     </div>
                 </div>
@@ -3257,7 +3435,7 @@
                         </div>
                         <span class="text-[11px] text-slate-500 font-mono-code" id="dualSrcInfoText"></span>
                     </div>
-                    <div id="dualSrcPane" style="font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Amiri', 'Traditional Arabic', 'Noto Naskh Arabic', 'Times New Roman', serif;" class="flex-1 overflow-y-auto p-6 text-sm text-slate-800 leading-relaxed select-text scroll-smooth space-y-3">
+                    <div id="dualSrcPane" style="font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Amiri', 'Traditional Arabic', 'Noto Naskh Arabic', 'Times New Roman', serif;" class="flex-1 overflow-y-auto p-6 text-sm text-slate-800 leading-relaxed select-text space-y-3">
                         <!-- Full text with highlight marks -->
                     </div>
                 </div>
