@@ -103,7 +103,7 @@ def mark_key_rate_limited(key_id: int, error_msg: str = "", cooldown_seconds: in
             conn.close()
 
 
-def call_gemini_api(api_key: str, model_name: str, prompt: str, timeout: int = 30) -> Dict[str, Any]:
+def call_gemini_api(api_key: str, model_name: str, prompt: str, timeout: int = 45) -> Dict[str, Any]:
     """
     Mengirimkan request ke Google Generative Language API via HTTP POST.
     """
@@ -276,6 +276,8 @@ Lakukan audit kritis dan kembalikan HANYA format JSON valid dengan struktur pers
             if is_quota:
                 mark_key_rate_limited(key_id, err_msg, cooldown_seconds=60, conn=connection)
                 logger.warning(f"[GEMINI] Kuota kunci '{key_name}' habis (429/ResourceExhausted). Beralih ke kunci berikutnya...")
+            elif res.get("status_code") == 503 or "high demand" in err_msg.lower():
+                logger.warning(f"[GEMINI] Google sedang padat antrean / high demand (503) untuk kunci '{key_name}'. Beralih ke kunci berikutnya...")
             elif res.get("status_code") in (400, 403) or "denied access" in err_msg.lower():
                 try:
                     cursor = connection.cursor() if connection else get_connection().cursor()
