@@ -2272,6 +2272,59 @@
             return out.join('\n');
         }
 
+        function formatRichDocumentHtml(html) {
+            if (!html) return "";
+
+            // 1. Format Markdown tables first
+            let processed = formatTablesInHtml(html);
+
+            // 2. Transform Calligraphy / Non-Latin Arabic Quran blocks into elegant interactive cards
+            const quranCard = `</div>
+<div class="my-4 p-4 rounded-2xl bg-amber-50/90 border border-amber-200/90 text-amber-950 shadow-2xs font-sans not-italic">
+    <div class="flex items-center justify-between gap-3 mb-2 flex-wrap">
+        <div class="flex items-center gap-2">
+            <span class="text-xl">📜</span>
+            <span class="font-bold text-xs text-amber-900 tracking-wide uppercase">Naskah Non-Latin / Kaligrafi Al-Qur'an (Font Khusus)</span>
+        </div>
+        <button type="button" onclick="switchDualViewMode('pdf')" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 active:bg-amber-800 text-white rounded-xl text-xs font-semibold transition cursor-pointer shadow-xs flex items-center gap-1.5">
+            <span>📄 Buka Naskah Asli di PDF</span>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+        </button>
+    </div>
+    <p class="text-xs text-amber-800/95 leading-relaxed italic">
+        Bagian ini disematkan menggunakan font simbolik non-Latin (seperti Quran in Word / HQPB). Untuk membaca kaligrafi Arab, harakat, dan tanda waqaf secara sempurna dan autentik, silakan gunakan mode Dokumen Asli (PDF) berdampingan.
+    </p>
+</div>
+<div class="leading-relaxed whitespace-pre-wrap">`;
+
+            processed = processed.replace(/\[📜 Naskah Kaligrafi[^\n\]]*\]/gu, quranCard);
+            processed = processed.replace(/(?:[^\S\r\n]*[\uE000-\uF8FF\s]{2,}[^\S\r\n]*(?:\n|\r\n)?){2,}/gu, quranCard);
+
+            // 3. Map isolated Symbol/Wingdings PUA characters to standard Unicode symbols
+            const PUA_MAP = {
+                0xF0B7: "•", 0xF0A7: "▪", 0xF0A8: "▫", 0xF0D8: "➢", 0xF0FC: "✔", 0xF0FB: "✗",
+                0xF0E0: "→", 0xF0DF: "⇔", 0xF0DE: "⇒", 0xF0B1: "±", 0xF0B4: "×", 0xF0F7: "÷",
+                0xF0A3: "≤", 0xF0B3: "≥", 0xF0B9: "≠", 0xF0BB: "≈", 0xF0A5: "∞", 0xF0E5: "∑",
+                0xF0F2: "∫", 0xF0D6: "√", 0xF061: "α", 0xF062: "β", 0xF067: "γ", 0xF064: "δ",
+                0xF065: "ε", 0xF06C: "λ", 0xF06D: "μ", 0xF070: "π", 0xF073: "σ", 0xF071: "θ",
+                0xF077: "ω", 0xF044: "Δ", 0xF053: "Σ", 0xF050: "Π", 0xF057: "Ω"
+            };
+
+            let outChars = [];
+            for (let i = 0; i < processed.length; i++) {
+                const code = processed.charCodeAt(i);
+                if (PUA_MAP[code]) {
+                    outChars.push(PUA_MAP[code]);
+                } else if (code >= 0xE000 && code <= 0xF8FF) {
+                    continue; // Skip leftover unmapped PUA to guarantee zero tofu
+                } else {
+                    outChars.push(processed[i]);
+                }
+            }
+
+            return outChars.join('');
+        }
+
         function buildHighlightedSequentialHtml(rawText, matchRanges, markClass, idPrefix) {
             if (!rawText) return '<p class="text-slate-400 italic py-8 text-center">Teks tidak tersedia.</p>';
             const tokenRegex = /\b[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*\b/gu;
@@ -2286,7 +2339,7 @@
             }
 
             if (tokens.length === 0 || matchRanges.length === 0) {
-                return `<div class="leading-relaxed whitespace-pre-wrap">${formatTablesInHtml(escapeHtml(rawText))}</div>`;
+                return `<div class="leading-relaxed whitespace-pre-wrap">${formatRichDocumentHtml(escapeHtml(rawText))}</div>`;
             }
 
             const charIntervals = [];
@@ -2330,13 +2383,13 @@
                 lastIdx = interval.endChar;
             });
             resultHtml += escapeHtml(rawText.substring(lastIdx));
-            return `<div class="leading-relaxed whitespace-pre-wrap">${formatTablesInHtml(resultHtml)}</div>`;
+            return `<div class="leading-relaxed whitespace-pre-wrap">${formatRichDocumentHtml(resultHtml)}</div>`;
         }
 
         function buildHighlightedLexicalHtml(rawText, sharedTermsSet, markClass, idPrefix) {
             if (!rawText) return { html: '<p class="text-slate-400 italic py-8 text-center">Teks tidak tersedia.</p>', count: 0 };
             if (!sharedTermsSet || sharedTermsSet.size === 0) {
-                return { html: `<div class="leading-relaxed whitespace-pre-wrap">${formatTablesInHtml(escapeHtml(rawText))}</div>`, count: 0 };
+                return { html: `<div class="leading-relaxed whitespace-pre-wrap">${formatRichDocumentHtml(escapeHtml(rawText))}</div>`, count: 0 };
             }
 
             const tokenRegex = /\b[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*\b/gu;
@@ -2356,7 +2409,7 @@
             }
             resultHtml += escapeHtml(rawText.substring(lastIdx));
             return {
-                html: `<div class="leading-relaxed whitespace-pre-wrap">${formatTablesInHtml(resultHtml)}</div>`,
+                html: `<div class="leading-relaxed whitespace-pre-wrap">${formatRichDocumentHtml(resultHtml)}</div>`,
                 count: termOccurrenceIdx
             };
         }
@@ -2990,7 +3043,7 @@
                         </div>
                         <span class="text-[11px] text-slate-500 font-mono-code" id="dualSubInfoText"></span>
                     </div>
-                    <div id="dualSubPane" class="flex-1 overflow-y-auto p-6 text-sm text-slate-800 leading-relaxed font-serif select-text scroll-smooth space-y-3">
+                    <div id="dualSubPane" style="font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Amiri', 'Traditional Arabic', 'Noto Naskh Arabic', 'Times New Roman', serif;" class="flex-1 overflow-y-auto p-6 text-sm text-slate-800 leading-relaxed select-text scroll-smooth space-y-3">
                         <!-- Full text with highlight marks -->
                     </div>
                 </div>
@@ -3004,7 +3057,7 @@
                         </div>
                         <span class="text-[11px] text-slate-500 font-mono-code" id="dualSrcInfoText"></span>
                     </div>
-                    <div id="dualSrcPane" class="flex-1 overflow-y-auto p-6 text-sm text-slate-800 leading-relaxed font-serif select-text scroll-smooth space-y-3">
+                    <div id="dualSrcPane" style="font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Amiri', 'Traditional Arabic', 'Noto Naskh Arabic', 'Times New Roman', serif;" class="flex-1 overflow-y-auto p-6 text-sm text-slate-800 leading-relaxed select-text scroll-smooth space-y-3">
                         <!-- Full text with highlight marks -->
                     </div>
                 </div>

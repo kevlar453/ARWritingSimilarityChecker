@@ -1,5 +1,96 @@
 import os
+import re
 from pathlib import Path
+
+# Pemetaan karakter Private Use Area (PUA) dari font Symbol / Wingdings ke Unicode standar
+PUA_SYMBOL_MAP = {
+    0xF0B7: '•',   # Bullet
+    0xF0A7: '▪',   # Black small square
+    0xF0A8: '▫',   # White small square
+    0xF0D8: '➢',   # Arrow pointer
+    0xF0FC: '✔',   # Checkmark
+    0xF0FB: '✗',   # Cross
+    0xF0E0: '→',   # Right arrow
+    0xF0DF: '⇔',   # Left-right double arrow
+    0xF0DE: '⇒',   # Right double arrow
+    0xF0B1: '±',   # Plus-minus
+    0xF0B4: '×',   # Multiplication
+    0xF0F7: '÷',   # Division
+    0xF0A3: '≤',   # Less than or equal
+    0xF0B3: '≥',   # Greater than or equal
+    0xF0B9: '≠',   # Not equal
+    0xF0BB: '≈',   # Almost equal
+    0xF0A5: '∞',   # Infinity
+    0xF0E5: '∑',   # Summation
+    0xF0F2: '∫',   # Integral
+    0xF0D6: '√',   # Square root
+    0xF061: 'α',   # alpha
+    0xF062: 'β',   # beta
+    0xF067: 'γ',   # gamma
+    0xF064: 'δ',   # delta
+    0xF065: 'ε',   # epsilon
+    0xF06C: 'λ',   # lambda
+    0xF06D: 'μ',   # mu
+    0xF070: 'π',   # pi
+    0xF073: 'σ',   # sigma
+    0xF071: 'θ',   # theta
+    0xF077: 'ω',   # omega
+    0xF044: 'Δ',   # Delta
+    0xF053: 'Σ',   # Sigma
+    0xF050: 'Π',   # Pi
+    0xF057: 'Ω',   # Omega
+}
+
+def clean_extracted_text(text: str) -> str:
+    """
+    Membersihkan teks hasil ekstraksi dari karakter PUA (Private Use Area),
+    mengonversi simbol/bullet Word ke Unicode resmi, dan mendeteksi blok
+    kaligrafi non-Latin (seperti font HQPB Quran in Word) serta merapikan baris rumus.
+    """
+    if not text:
+        return ''
+
+    lines = text.split('\n')
+    cleaned_lines = []
+    in_pua_block = False
+
+    for line in lines:
+        stripped = line.strip()
+        pua_chars = [c for c in stripped if 0xE000 <= ord(c) <= 0xF8FF]
+        latin_chars = [c for c in stripped if c.isascii() and c.isalnum()]
+
+        # Baris merupakan blok naskah non-Latin / kaligrafi khusus (seperti font HQPB Quran in Word)
+        # jika terdiri dari karakter PUA tanpa teks Latin/angka alfanumerik biasa
+        if len(pua_chars) >= 3 and len(latin_chars) == 0:
+            if not in_pua_block:
+                cleaned_lines.append('\n[📜 Naskah Kaligrafi / Teks Arab (Font Khusus HQPB)]\n')
+                in_pua_block = True
+            continue
+        else:
+            in_pua_block = False
+
+        # Konversi karakter simbol PUA yang tersisa (bullet, panah, operator rumus)
+        row_chars = []
+        for c in line:
+            code = ord(c)
+            if code in PUA_SYMBOL_MAP:
+                row_chars.append(PUA_SYMBOL_MAP[code])
+            elif 0xE000 <= code <= 0xF8FF:
+                # Abaikan karakter PUA liar agar tidak menjadi kotak tofu
+                continue
+            else:
+                row_chars.append(c)
+        cleaned_lines.append(''.join(row_chars))
+
+    result = '\n'.join(cleaned_lines)
+
+    # Runtuhkan duplikasi marker naskah kaligrafi berturut-turut
+    result = re.sub(r'(\[📜 Naskah Kaligrafi / Teks Arab \(Font Khusus HQPB\)\]\s*)+', r'[📜 Naskah Kaligrafi / Teks Arab (Font Khusus HQPB)]\n\n', result)
+
+    # Rapikan spasi vertikal berlebih dari pecahan/notasi rumus matematika
+    result = re.sub(r'[ \t]*\n[ \t]*\n(?:[ \t]*\n)+', '\n\n', result)
+
+    return result.strip()
 
 def extract_pdf(path: str) -> list[dict]:
     import fitz  # PyMuPDF
@@ -82,7 +173,7 @@ def extract_pdf(path: str) -> list[dict]:
 
         pages.append({
             "page_number": index + 1,
-            "text": text
+            "text": clean_extracted_text(text)
         })
     doc.close()
     return pages
@@ -122,7 +213,7 @@ def extract_docx(path: str) -> list[dict]:
 
     return [{
         "page_number": 1,
-        "text": "\n\n".join(text_blocks)
+        "text": clean_extracted_text("\n\n".join(text_blocks))
     }]
 
 def extract_text_file(path: str) -> list[dict]:
