@@ -213,9 +213,15 @@ def audit_proposal_with_gemini(
     content_sample = substantive_text if (substantive_text and len(substantive_text.strip()) >= 500) else document_text
     truncated_content = content_sample[:25000]
 
+    current_year = time.strftime("%Y")
+    current_date_str = time.strftime("%d %B %Y")
+
     system_prompt = f"""Anda adalah Auditor Forensik Integritas Akademik Independen untuk sistem AR Tilik.
 Tugas Anda adalah menganalisis draf karya ilmiah/proposal berikut untuk mendeteksi inkonsistensi logika, 
 kontradiksi metodologi, distorsi sitasi (halusinasi AI), dan memberikan panduan pertanyaan ujian lisan bagi dosen.
+
+Konteks Waktu Saat Ini: Tahun {current_year} (per tanggal {current_date_str}).
+Catatan Penting Garis Waktu: Pemeriksaan dilakukan pada tahun {current_year}. Publikasi dan data bertahun <= {current_year} (termasuk tahun {int(current_year)-1} dan {current_year}) adalah referensi yang realistis dan sah dalam garis waktu naskah saat ini, jangan anggap tahun {current_year} atau sebelumnya sebagai "sitasi masa depan". Hanya tandai anomali masa depan jika terdapat rujukan dengan tahun > {current_year} atau fabrikasi sitasi fiktif.
 
 Judul Dokumen: {title or 'Karya Ilmiah'}
 
