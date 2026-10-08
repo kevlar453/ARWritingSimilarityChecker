@@ -13,8 +13,8 @@ def normalize_text(text: str) -> str:
         return ""
     
     text = unicodedata.normalize("NFKC", text)
-    # Singkirkan penanda naskah kaligrafi dan grafik agar tidak memicu kecocokan kemiripan semu
-    text = re.sub(r'\[[📜📊][^\]]+\]', ' ', text)
+    # Singkirkan penanda naskah kaligrafi, grafik, dan rumus matematika agar tidak memicu kecocokan kemiripan semu
+    text = re.sub(r'\[[📜📊📐][^\]]+\]', ' ', text)
     # Satukan kata yang terpenggal di ujung baris (contoh: peneli-\n tian -> penelitian)
     text = re.sub(r'(\w+)-\s*\n\s*(\w+)', r'\1\2', text)
     text = text.lower()

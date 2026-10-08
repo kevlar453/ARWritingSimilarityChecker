@@ -106,15 +106,120 @@ def clean_extracted_text(text: str) -> str:
 
     result = chart_axis_pattern.sub(_replace_chart_axis, result)
 
+    # Deteksi dan format blok rumus matematika (misal: P =\n∑x\nSMI × 100%)
+    math_pattern = re.compile(
+        r'(?:^|\n)[ \t]*(?:P\s*=\s*\n+)?'
+        r'[ \t]*∑\s*x\s*\n+'
+        r'[ \t]*(?:SMI|∑\s*x\s*i?)\s*'
+        r'(?:[×x*]\s*100%)?',
+        re.MULTILINE | re.IGNORECASE
+    )
+
+    def _replace_math_formula(m):
+        raw = m.group(0).strip()
+        if 'smi' in raw.lower():
+            return '\n\n[📐 Rumus: P = (∑x / SMI) × 100%]\n\n'
+        elif 'xi' in raw.lower() or 'x i' in raw.lower():
+            return '\n\n[📐 Rumus: P = (∑x / ∑xi) × 100%]\n\n'
+        return '\n\n[📐 Rumus: ' + raw.replace('\n', ' ') + ']\n\n'
+
+    result = math_pattern.sub(_replace_math_formula, result)
+
     # Rapikan spasi vertikal berlebih dari pecahan/notasi rumus matematika
     result = re.sub(r'[ \t]*\n[ \t]*\n(?:[ \t]*\n)+', '\n\n', result)
 
     return result.strip()
 
+def repair_pdf_math_cmaps(doc):
+    """
+    Memperbaiki ToUnicode CMap font matematika Identity-H (seperti Cambria Math)
+    yang rusak akibat bug ekspor Word ke PDF (huruf/angka dipetakan ke spasi).
+    Memetakan ulang GID ke karakter alfanumerik matematika dan simbol sesuai glyph name TrueType.
+    """
+    try:
+        import io
+        from fontTools.ttLib import TTFont
+        from fontTools.agl import toUnicode
+    except ImportError:
+        return
+
+    MATH_TO_ASCII = {
+        0x1D443: 'P', 0x1D465: 'x', 0x1D446: 'S', 0x1D440: 'M', 0x1D43C: 'I',
+        0x1D44E: 'a', 0x1D44F: 'b', 0x1D450: 'c', 0x1D451: 'd', 0x1D452: 'e',
+        0x1D453: 'f', 0x1D454: 'g', 0x1D456: 'i', 0x1D457: 'j', 0x1D458: 'k',
+        0x1D459: 'l', 0x1D45A: 'm', 0x1D45B: 'n', 0x1D45C: 'o', 0x1D45D: 'p',
+        0x1D45E: 'q', 0x1D45F: 'r', 0x1D460: 's', 0x1D461: 't', 0x1D462: 'u',
+        0x1D463: 'v', 0x1D464: 'w', 0x1D466: 'y', 0x1D467: 'z',
+        0x1D434: 'A', 0x1D435: 'B', 0x1D436: 'C', 0x1D437: 'D', 0x1D438: 'E',
+        0x1D439: 'F', 0x1D43A: 'G', 0x1D43B: 'H', 0x1D43D: 'J', 0x1D43E: 'K',
+        0x1D43F: 'L', 0x1D441: 'N', 0x1D442: 'O', 0x1D444: 'Q', 0x1D445: 'R',
+        0x1D447: 'T', 0x1D448: 'U', 0x1D449: 'V', 0x1D44A: 'W', 0x1D44B: 'X',
+        0x1D44C: 'Y', 0x1D44D: 'Z'
+    }
+
+    for xref in range(1, doc.xref_length()):
+        obj = doc.xref_object(xref)
+        if '/Type /Font' in obj and '/Subtype /Type0' in obj and '/ToUnicode' in obj:
+            tu_m = re.search(r'/ToUnicode\s+(\d+)\s+0\s+R', obj)
+            desc_m = re.search(r'/DescendantFonts\s*\[\s*(\d+)\s+0\s+R\s*\]', obj)
+            if tu_m and desc_m:
+                tu_xref = int(tu_m.group(1))
+                desc_xref = int(desc_m.group(1))
+                desc_obj = doc.xref_object(desc_xref)
+                fd_m = re.search(r'/FontDescriptor\s+(\d+)\s+0\s+R', desc_obj)
+                if fd_m:
+                    fd_obj = doc.xref_object(int(fd_m.group(1)))
+                    ff_m = re.search(r'/FontFile2\s+(\d+)\s+0\s+R', fd_obj)
+                    if ff_m:
+                        ff_xref = int(ff_m.group(1))
+                        try:
+                            font_bytes = doc.xref_stream(ff_xref)
+                            tt = TTFont(io.BytesIO(font_bytes))
+                            order = tt.getGlyphOrder()
+                            cmap_entries = []
+                            for cid, name in enumerate(order):
+                                uni_char = None
+                                m = re.match(r'^u([0-9a-fA-F]{4,6})$', name)
+                                if m:
+                                    cp = int(m.group(1), 16)
+                                    uni_char = MATH_TO_ASCII.get(cp, chr(cp))
+                                elif name.startswith('uni') and len(name) == 7:
+                                    try:
+                                        uni_char = chr(int(name[3:], 16))
+                                    except Exception:
+                                        pass
+                                else:
+                                    uni_char = toUnicode(name)
+
+                                if uni_char:
+                                    hex_str = ''.join(f'{ord(c):04X}' for c in uni_char)
+                                    cmap_entries.append(f'<{cid:04X}> <{hex_str}>')
+
+                            if cmap_entries:
+                                chunks = [f'{len(cmap_entries[i:i+100])} beginbfchar\n' + '\n'.join(cmap_entries[i:i+100]) + '\nendbfchar' for i in range(0, len(cmap_entries), 100)]
+                                new_cmap = f'''/CIDInit /ProcSet findresource begin
+12 dict begin
+begincmap
+/CIDSystemInfo << /Registry (Adobe) /Ordering (UCS) /Supplement 0 >> def
+/CMapName /Adobe-Identity-UCS def
+/CMapType 2 def
+1 begincodespacerange
+<0000> <FFFF>
+endcodespacerange
+{'\\n'.join(chunks)}
+endcmap
+CMapName currentdict /CMap defineresource pop
+end
+end'''
+                                doc.update_stream(tu_xref, new_cmap.encode('latin1'))
+                        except Exception:
+                            pass
+
 def extract_pdf(path: str) -> list[dict]:
     import fitz  # PyMuPDF
     pages = []
     doc = fitz.open(path)
+    repair_pdf_math_cmaps(doc)
     for index, page in enumerate(doc):
         # Bersihkan area margin header (40pt) dan footer (40pt) jika tinggi halaman mencukupi
         rect = page.rect

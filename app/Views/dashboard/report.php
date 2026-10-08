@@ -2450,7 +2450,57 @@
             const rawAxisPattern = /(?:(?:^|\n)[ \t]*(?:\d{1,3}%\s*\n){3,}(?:[ \t]*(?:Tahap|Tahun|Kelas|Kategori|Nilai|\d+)[ \t]*\n*)*(?:[ \t]*(?:Perbedaan|Grafik|Hasil|Diagram)[^\n]+\n*)?)/g;
             processed = processed.replace(rawAxisPattern, () => chartCard('Grafik Batang: Sumbu Nilai (0% s.d. 90%)'));
 
-            // 4. Map isolated Symbol/Wingdings PUA characters to standard Unicode symbols
+            // 4. Transform Formula / Rumus Matematika menjadi kartu interaktif
+            const mathCard = (formulaHtml) => `</div>
+<div class="my-4 p-4 rounded-2xl bg-indigo-50/85 border border-indigo-200/90 text-indigo-950 shadow-2xs font-sans not-italic">
+    <div class="flex items-center justify-between gap-3 mb-2 flex-wrap">
+        <div class="flex items-center gap-2">
+            <span class="text-xl">📐</span>
+            <span class="font-bold text-xs text-indigo-900 tracking-wide uppercase">Formula / Rumus Matematika</span>
+        </div>
+        <button type="button" onclick="switchDualViewMode('pdf')" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white rounded-xl text-xs font-semibold transition cursor-pointer shadow-xs flex items-center gap-1.5">
+            <span>📄 Buka Rumus Asli di PDF</span>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+        </button>
+    </div>
+    <div class="p-3.5 my-1.5 rounded-xl bg-white/95 border border-indigo-100 flex items-center justify-center text-sm md:text-base font-serif tracking-wider text-slate-900 shadow-2xs overflow-x-auto">
+        ${formulaHtml}
+    </div>
+    <p class="text-[11px] text-indigo-800/90 leading-relaxed italic mt-1 text-center">
+        Visualisasi pecahan bertingkat, notasi sigma (∑), dan variabel rumus matematika dapat dilihat secara lengkap pada dokumen aslinya di mode Dokumen Asli (PDF).
+    </p>
+</div>
+<div class="leading-relaxed whitespace-pre-wrap">`;
+
+            // Marker rumus matematika hasil ekstraksi baru
+            processed = processed.replace(/\[📐 Rumus: ([^\]]+)\]/gu, (m, p1) => {
+                let formatted = p1;
+                if (p1.includes('P = (∑x / SMI) × 100%') || p1.includes('∑x / SMI')) {
+                    formatted = `P = <span class="inline-flex flex-col items-center mx-2 text-sm"><span class="border-b border-slate-700 px-2 pb-0.5 font-medium">∑x</span><span class="pt-0.5 font-medium">SMI</span></span> × 100%`;
+                } else if (p1.includes('∑x / ∑xi') || p1.includes('∑xi')) {
+                    formatted = `P = <span class="inline-flex flex-col items-center mx-2 text-sm"><span class="border-b border-slate-700 px-2 pb-0.5 font-medium">∑x</span><span class="pt-0.5 font-medium">∑x<sub>i</sub></span></span> × 100%`;
+                }
+                return mathCard(formatted);
+            });
+
+            // Tangani rumus naskah lama di mana huruf rumus terpotong akibat bug ToUnicode Word sehingga hanya menyisakan karakter ∑ sebelum Keterangan
+            processed = processed.replace(/((?:rumus|berikut:)[^\n]*\n+)[ \t\r\n]*(?:∑[ \t\r\n]*)+(?=\n+\s*Keterangan:[\s\S]{0,250}SMI)/gi, (m, p1) => {
+                const fraction = `P = <span class="inline-flex flex-col items-center mx-2 text-sm"><span class="border-b border-slate-700 px-2 pb-0.5 font-medium">∑x</span><span class="pt-0.5 font-medium">SMI</span></span> × 100%`;
+                return p1 + mathCard(fraction) + '\n';
+            });
+
+            processed = processed.replace(/((?:rumus|berikut:)[^\n]*\n+)[ \t\r\n]*(?:∑[ \t\r\n]*)+(?=\n+\s*Keterangan:[\s\S]{0,250}∑x\s*i)/gi, (m, p1) => {
+                const fraction = `P = <span class="inline-flex flex-col items-center mx-2 text-sm"><span class="border-b border-slate-700 px-2 pb-0.5 font-medium">∑x</span><span class="pt-0.5 font-medium">∑x<sub>i</sub></span></span> × 100%`;
+                return p1 + mathCard(fraction) + '\n';
+            });
+
+            // Generic fallback untuk rumus dengan simbol ∑ sebelum Keterangan
+            processed = processed.replace(/((?:rumus|berikut:)[^\n]*\n+)[ \t\r\n]*(?:∑[ \t\r\n]*)+(?=\n+\s*Keterangan:)/gi, (m, p1) => {
+                const fraction = `Formula: <span class="inline-flex flex-col items-center mx-2 text-sm"><span class="border-b border-slate-700 px-2 pb-0.5 font-medium">∑x</span><span class="pt-0.5 font-medium">N</span></span>`;
+                return p1 + mathCard(fraction) + '\n';
+            });
+
+            // 5. Map isolated Symbol/Wingdings PUA characters to standard Unicode symbols
             const PUA_MAP = {
                 0xF0B7: "•", 0xF0A7: "▪", 0xF0A8: "▫", 0xF0D8: "➢", 0xF0FC: "✔", 0xF0FB: "✗",
                 0xF0E0: "→", 0xF0DF: "⇔", 0xF0DE: "⇒", 0xF0B1: "±", 0xF0B4: "×", 0xF0F7: "÷",
