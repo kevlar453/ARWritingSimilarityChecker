@@ -627,6 +627,14 @@ if ($dec === 'match') {
                 $geminiAuditPdf = $evidenceData['gemini_forensic'] ?? $evidenceData['v1_1_presentation']['v1_2_evolution']['gemini_forensic'] ?? [];
                 $geminiCompleted = !empty($geminiAuditPdf) && ($geminiAuditPdf['status'] ?? '') === 'completed';
                 $gAuditData = $geminiAuditPdf['audit'] ?? [];
+                if (empty($gAuditData) && !empty($geminiAuditPdf['raw_output'])) {
+                    if (preg_match('/"tingkat_indikasi_ai"\s*:\s*"([^"]+)"/i', $geminiAuditPdf['raw_output'], $mLevel)) {
+                        $gAuditData['tingkat_indikasi_ai'] = $mLevel[1];
+                    }
+                    if (preg_match('/"alasan_indikasi_ai"\s*:\s*"([^"]+)"/s', $geminiAuditPdf['raw_output'], $mReason)) {
+                        $gAuditData['alasan_indikasi_ai'] = $mReason[1];
+                    }
+                }
                 $gLevelPdf = strtoupper($gAuditData['tingkat_indikasi_ai'] ?? 'RENDAH');
             ?>
             <?php if ($geminiCompleted): ?>

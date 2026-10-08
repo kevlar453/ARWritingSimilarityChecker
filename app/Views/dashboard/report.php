@@ -1263,6 +1263,14 @@
         <?php if (!empty($geminiForensic) && ($geminiForensic['status'] ?? '') === 'completed'): ?>
         <?php
             $gAudit = $geminiForensic['audit'] ?? [];
+            if (empty($gAudit) && !empty($geminiForensic['raw_output'])) {
+                if (preg_match('/"tingkat_indikasi_ai"\s*:\s*"([^"]+)"/i', $geminiForensic['raw_output'], $mLevel)) {
+                    $gAudit['tingkat_indikasi_ai'] = $mLevel[1];
+                }
+                if (preg_match('/"alasan_indikasi_ai"\s*:\s*"([^"]+)"/s', $geminiForensic['raw_output'], $mReason)) {
+                    $gAudit['alasan_indikasi_ai'] = $mReason[1];
+                }
+            }
             $gAiLevel = strtoupper($gAudit['tingkat_indikasi_ai'] ?? 'RENDAH');
             $gAiReason = $gAudit['alasan_indikasi_ai'] ?? '';
             $gContradictions = $gAudit['inkonsistensi_metodologi_dan_logika'] ?? [];

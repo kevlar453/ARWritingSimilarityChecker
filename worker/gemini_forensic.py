@@ -120,7 +120,7 @@ def call_gemini_api(api_key: str, model_name: str, prompt: str, timeout: int = 4
         ],
         "generationConfig": {
             "temperature": 0.2,
-            "maxOutputTokens": 2048,
+            "maxOutputTokens": 8192,
             "responseMimeType": "application/json"
         }
     }
@@ -136,17 +136,20 @@ def call_gemini_api(api_key: str, model_name: str, prompt: str, timeout: int = 4
         with urllib.request.urlopen(req, timeout=timeout) as response:
             res_body = response.read().decode("utf-8")
             data = json.loads(res_body)
-            # Ambil teks jawaban
+            # Ambil seluruh teks jawaban dari seluruh parts
             candidates = data.get("candidates", [])
             if candidates:
                 parts = candidates[0].get("content", {}).get("parts", [])
                 if parts:
-                    return {
-                        "success": True,
-                        "raw_text": parts[0].get("text", ""),
-                        "status_code": 200,
-                        "model_executed": model,
-                    }
+                    text_parts = [p.get("text", "") for p in parts if isinstance(p, dict) and "text" in p]
+                    full_text = "".join(text_parts).strip()
+                    if full_text:
+                        return {
+                            "success": True,
+                            "raw_text": full_text,
+                            "status_code": 200,
+                            "model_executed": model,
+                        }
             return {
                 "success": False,
                 "error": "Respon kosong dari Gemini",
@@ -259,12 +262,23 @@ Lakukan audit kritis dan kembalikan HANYA format JSON valid dengan struktur pers
                     "audit": parsed_audit
                 }
             except Exception as json_err:
-                logger.warning(f"[GEMINI] Gagal mengurai JSON respon dari Gemini: {json_err}. Raw: {raw_text[:200]}")
+                logger.warning(f"[GEMINI] Gagal mengurai JSON respon dari Gemini: {json_err}. Mencoba pemulihan regex...")
+                ai_level_match = re.search(r'"tingkat_indikasi_ai"\s*:\s*"([^"]+)"', raw_text, re.IGNORECASE)
+                ai_reason_match = re.search(r'"alasan_indikasi_ai"\s*:\s*"([^"]+)"', raw_text)
+                
+                fallback_audit = {
+                    "tingkat_indikasi_ai": ai_level_match.group(1).upper() if ai_level_match else "SEDANG",
+                    "alasan_indikasi_ai": ai_reason_match.group(1).strip() if ai_reason_match else raw_text[:500],
+                    "inkonsistensi_metodologi_dan_logika": [],
+                    "integritas_sitasi": [],
+                    "pertanyaan_kritis_dosen": []
+                }
                 return {
                     "status": "completed",
                     "is_available": True,
                     "model_used": model_name,
                     "key_used": key_name,
+                    "audit": fallback_audit,
                     "raw_output": raw_text
                 }
         else:
