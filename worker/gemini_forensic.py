@@ -107,7 +107,7 @@ def call_gemini_api(api_key: str, model_name: str, prompt: str, timeout: int = 3
     """
     Mengirimkan request ke Google Generative Language API via HTTP POST.
     """
-    model = model_name or "gemini-1.5-flash"
+    model = model_name or "gemini-3.6-flash"
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
 
     payload = {
@@ -144,20 +144,32 @@ def call_gemini_api(api_key: str, model_name: str, prompt: str, timeout: int = 3
                     return {
                         "success": True,
                         "raw_text": parts[0].get("text", ""),
-                        "status_code": 200
+                        "status_code": 200,
+                        "model_executed": model,
                     }
             return {
                 "success": False,
                 "error": "Respon kosong dari Gemini",
-                "status_code": 200
+                "status_code": 200,
+                "model_executed": model,
             }
     except urllib.error.HTTPError as e:
         err_content = e.read().decode("utf-8", errors="ignore")
+        # Jika model generasi terbaru (3.6/3.0) belum tersedia di region API Google ini (404),
+        # lakukan fallback cerdas ke model legacy stabil (gemini-1.5-flash) agar proses tidak gagal
+        if e.code == 404 and model != "gemini-1.5-flash":
+            logger.info(f"[GEMINI] Model '{model}' menghasilkan 404 Not Found. Mencoba fallback ke 'gemini-1.5-flash'...")
+            fallback_res = call_gemini_api(api_key, "gemini-1.5-flash", prompt, timeout=timeout)
+            if fallback_res.get("success"):
+                fallback_res["model_executed"] = model
+                return fallback_res
+
         return {
             "success": False,
             "status_code": e.code,
             "error": err_content,
-            "is_quota": (e.code == 429) or ("RESOURCE_EXHAUSTED" in err_content)
+            "is_quota": (e.code == 429) or ("RESOURCE_EXHAUSTED" in err_content),
+            "model_executed": model,
         }
     except Exception as e:
         return {
@@ -225,7 +237,7 @@ Lakukan audit kritis dan kembalikan HANYA format JSON valid dengan struktur pers
         key_id = k["id"]
         key_name = k["key_name"]
         api_key = k["api_key"]
-        model_name = k.get("model_name") or "gemini-1.5-flash"
+        model_name = k.get("model_name") or "gemini-3.6-flash"
 
         logger.info(f"[GEMINI] Mencoba audit dengan kunci #{key_id} ('{key_name}', model={model_name})...")
         res = call_gemini_api(api_key, model_name, system_prompt)

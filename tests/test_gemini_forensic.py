@@ -60,7 +60,7 @@ def test_call_gemini_api_success():
     mock_response.__enter__.return_value = mock_response
 
     with patch("urllib.request.urlopen", return_value=mock_response):
-        res = call_gemini_api("AIzaSyFakeKey", "gemini-1.5-flash", "test prompt")
+        res = call_gemini_api("AIzaSyFakeKey", "gemini-3.6-flash", "test prompt")
         assert res["success"] is True
         assert res["status_code"] == 200
         parsed = json.loads(res["raw_text"])
@@ -78,7 +78,7 @@ def test_call_gemini_api_quota_exhausted():
     )
 
     with patch("urllib.request.urlopen", side_effect=error):
-        res = call_gemini_api("AIzaSyFakeKey", "gemini-1.5-flash", "test prompt")
+        res = call_gemini_api("AIzaSyFakeKey", "gemini-3.6-flash", "test prompt")
         assert res["success"] is False
         assert res["is_quota"] is True
         assert res["status_code"] == 429
@@ -90,8 +90,8 @@ def test_audit_proposal_round_robin_failover():
     melanjutkan ke Kunci #2 dan menghasilkan audit sukses.
     """
     mock_keys = [
-        {"id": 1, "key_name": "Key Akun A", "api_key": "KEY_A", "model_name": "gemini-1.5-flash"},
-        {"id": 2, "key_name": "Key Akun B", "api_key": "KEY_B", "model_name": "gemini-1.5-flash"},
+        {"id": 1, "key_name": "Key Akun A", "api_key": "KEY_A", "model_name": "gemini-3.6-flash"},
+        {"id": 2, "key_name": "Key Akun B", "api_key": "KEY_B", "model_name": "gemini-3.6-flash"},
     ]
 
     def mock_call_api(api_key, model_name, prompt, timeout=30):

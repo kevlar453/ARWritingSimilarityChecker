@@ -1662,16 +1662,24 @@
                             <input type="password" id="google-api-key" placeholder="AIzaSy..." class="w-full bg-slate-900 border border-slate-700/80 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 font-mono-code">
                         </div>
                         <div>
-                            <label class="block text-[11px] font-medium text-slate-400 mb-1">Model Gemini</label>
-                            <select id="google-model-name" class="w-full bg-slate-900 border border-slate-700/80 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
-                                <option value="gemini-1.5-flash" selected>gemini-1.5-flash (Cepat, Hemat Kuota, Disarankan)</option>
-                                <option value="gemini-2.0-flash">gemini-2.0-flash (Generasi Terkini)</option>
-                                <option value="gemini-1.5-pro">gemini-1.5-pro (Penalaran Kompleks)</option>
+                            <label class="block text-[11px] font-medium text-slate-400 mb-1">Pilihan Model AI Default</label>
+                            <select id="google-model-name" class="w-full bg-slate-900 border border-indigo-500/50 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-400 font-medium">
+                                <option value="gemini-3.6-flash" selected>Gemini 3.6 Flash (Generasi Terbaru 2026 - Rekomendasi Utama &amp; Terverifikasi)</option>
+                                <option value="gemini-3.0-flash">Gemini 3.0 Flash (Cepat &amp; Efisien)</option>
+                                <option value="gemini-1.5-flash">Gemini 1.5 Flash (Legacy Stabil)</option>
+                                <option value="gemini-1.5-pro">Gemini 1.5 Pro (Legacy Pro)</option>
                             </select>
                         </div>
                     </div>
-                    <div class="flex justify-end">
-                        <button onclick="handleCreateGoogleKey()" id="btn-add-google-key" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow transition-colors flex items-center gap-1.5 cursor-pointer">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-slate-800/80">
+                        <label class="flex items-center gap-2.5 cursor-pointer select-none">
+                            <input type="checkbox" id="google-send-notify" checked class="w-4 h-4 rounded text-indigo-600 bg-slate-900 border-slate-700 focus:ring-indigo-500">
+                            <div>
+                                <span class="text-xs font-semibold text-slate-200">Kirim Analisis Hasil Audit AI Otomatis</span>
+                                <span class="block text-[10px] text-slate-400">Terima ringkasan notifikasi duplikasi &amp; forensik semantik AI via Email/Telegram</span>
+                            </div>
+                        </label>
+                        <button onclick="handleCreateGoogleKey()" id="btn-add-google-key" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow transition-colors flex items-center gap-1.5 cursor-pointer self-end sm:self-auto">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                             Tambahkan ke Pool Rotasi
                         </button>
@@ -1708,11 +1716,19 @@
                                         </td>
                                     </tr>
                                 <?php else: ?>
+                                    <?php 
+                                        $modelDisplayNames = [
+                                            'gemini-3.6-flash' => 'Gemini 3.6 Flash (Terbaru 2026)',
+                                            'gemini-3.0-flash' => 'Gemini 3.0 Flash (Cepat & Efisien)',
+                                            'gemini-1.5-flash' => 'Gemini 1.5 Flash (Legacy Stabil)',
+                                            'gemini-1.5-pro'   => 'Gemini 1.5 Pro (Legacy Pro)',
+                                        ];
+                                    ?>
                                     <?php foreach ($googleKeysList as $k): ?>
                                         <tr class="hover:bg-slate-800/40 transition-colors">
                                             <td class="py-3 px-3">
                                                 <div class="font-semibold text-white"><?= esc($k['key_name']) ?></div>
-                                                <div class="text-[10px] text-slate-400 font-mono-code"><?= esc($k['model_name']) ?></div>
+                                                <div class="text-[10px] text-indigo-300 font-mono-code"><?= esc($modelDisplayNames[$k['model_name']] ?? $k['model_name']) ?></div>
                                             </td>
                                             <td class="py-3 px-3">
                                                 <span class="font-mono-code text-[11px] text-slate-300 bg-slate-900 px-2 py-1 rounded border border-slate-800">

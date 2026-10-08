@@ -1268,8 +1268,16 @@
             $gContradictions = $gAudit['inkonsistensi_metodologi_dan_logika'] ?? [];
             $gCitationIssues = $gAudit['integritas_sitasi'] ?? [];
             $gQuestions = $gAudit['pertanyaan_kritis_dosen'] ?? [];
-            $gModelUsed = $geminiForensic['model_used'] ?? 'gemini-1.5-flash';
+            $gModelUsed = $geminiForensic['model_used'] ?? 'gemini-3.6-flash';
             $gKeyUsed = $geminiForensic['key_used'] ?? 'Google Pool';
+
+            $modelDisplayLabels = [
+                'gemini-3.6-flash' => 'Gemini 3.6 Flash (Terbaru 2026)',
+                'gemini-3.0-flash' => 'Gemini 3.0 Flash (Cepat & Efisien)',
+                'gemini-1.5-flash' => 'Gemini 1.5 Flash (Legacy Stabil)',
+                'gemini-1.5-pro'   => 'Gemini 1.5 Pro (Legacy Pro)',
+            ];
+            $gModelDisplay = $modelDisplayLabels[$gModelUsed] ?? $gModelUsed;
 
             $gLevelBadge = match($gAiLevel) {
                 'TINGGI' => 'bg-rose-50 text-rose-700 border-rose-200',
@@ -1297,7 +1305,7 @@
                 </div>
                 <div class="flex items-center gap-2 self-start sm:self-auto flex-wrap">
                     <span class="text-[11px] font-mono-code px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
-                        Model: <strong class="text-slate-800"><?= esc($gModelUsed) ?></strong>
+                        Model: <strong class="text-slate-800"><?= esc($gModelDisplay) ?></strong>
                     </span>
                     <span class="text-xs font-mono-code font-bold px-3 py-1 rounded-full border shadow-2xs <?= $gLevelBadge ?>">
                         Indikasi AI: <strong class="<?= $gLevelColor ?>"><?= esc($gAiLevel) ?></strong>

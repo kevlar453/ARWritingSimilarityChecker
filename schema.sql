@@ -368,7 +368,7 @@ CREATE TABLE IF NOT EXISTS google_api_keys (
     key_name VARCHAR(150) NOT NULL,
     api_key VARCHAR(255) NOT NULL UNIQUE,
     provider VARCHAR(50) NOT NULL DEFAULT 'gemini',
-    model_name VARCHAR(100) NOT NULL DEFAULT 'gemini-1.5-flash',
+    model_name VARCHAR(100) NOT NULL DEFAULT 'gemini-3.6-flash',
     status ENUM('active', 'rate_limited', 'exhausted', 'inactive') NOT NULL DEFAULT 'active',
     rate_limited_until DATETIME NULL,
     usage_count INT UNSIGNED NOT NULL DEFAULT 0,

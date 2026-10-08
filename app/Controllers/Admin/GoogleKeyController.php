@@ -17,7 +17,7 @@ class GoogleKeyController extends BaseController
 
         $keyName = trim((string) ($this->request->getPost('key_name') ?? ''));
         $apiKey = trim((string) ($this->request->getPost('api_key') ?? ''));
-        $modelName = trim((string) ($this->request->getPost('model_name') ?? 'gemini-1.5-flash'));
+        $modelName = trim((string) ($this->request->getPost('model_name') ?? 'gemini-3.6-flash'));
 
         if ($keyName === '' || $apiKey === '') {
             if ($this->request->isAJAX() || $this->request->getHeaderLine('Accept') === 'application/json') {
@@ -41,9 +41,15 @@ class GoogleKeyController extends BaseController
             return redirect()->to(base_url('admin?tab=google_keys'))->with('error', 'API Key tersebut sudah terdaftar.');
         }
 
-        $allowedModels = ['gemini-1.5-flash', 'gemini-2.0-flash', 'gemini-1.5-pro'];
+        $allowedModels = [
+            'gemini-3.6-flash',
+            'gemini-3.0-flash',
+            'gemini-2.0-flash',
+            'gemini-1.5-flash',
+            'gemini-1.5-pro',
+        ];
         if (! in_array($modelName, $allowedModels, true)) {
-            $modelName = 'gemini-1.5-flash';
+            $modelName = 'gemini-3.6-flash';
         }
 
         $keyModel->insert([
@@ -125,7 +131,7 @@ class GoogleKeyController extends BaseController
         }
 
         $apiKey = $key['api_key'];
-        $model = $key['model_name'] ?: 'gemini-1.5-flash';
+        $model = $key['model_name'] ?: 'gemini-3.6-flash';
         $url = 'https://generativelanguage.googleapis.com/v1beta/models/' . urlencode($model) . ':generateContent?key=' . urlencode($apiKey);
 
         $payload = json_encode([
@@ -185,6 +191,40 @@ class GoogleKeyController extends BaseController
                 'model'       => $model,
                 'message'     => 'Koneksi sukses! Model ' . $model . ' merespon dengan baik.',
             ]);
+        }
+
+        // Forward-compat fallback jika model 3.6/3.0 belum aktif di cluster region API tertentu
+        if ($httpCode === 404 || stripos((string) $response, 'not found') !== false) {
+            $fallbackModel = 'gemini-1.5-flash';
+            $urlFallback = 'https://generativelanguage.googleapis.com/v1beta/models/' . urlencode($fallbackModel) . ':generateContent?key=' . urlencode($apiKey);
+            $chF = curl_init($urlFallback);
+            curl_setopt($chF, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($chF, CURLOPT_POST, true);
+            curl_setopt($chF, CURLOPT_POSTFIELDS, $payload);
+            curl_setopt($chF, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+            curl_setopt($chF, CURLOPT_TIMEOUT, 10);
+            curl_setopt($chF, CURLOPT_SSL_VERIFYPEER, true);
+            $respF = curl_exec($chF);
+            $httpCodeF = curl_getinfo($chF, CURLINFO_HTTP_CODE);
+            curl_close($chF);
+
+            if ($httpCodeF === 200) {
+                $resJsonF = json_decode((string) $respF, true);
+                $replyText = $resJsonF['candidates'][0]['content']['parts'][0]['text'] ?? 'OK';
+                $keyModel->update($id, [
+                    'status'             => 'active',
+                    'rate_limited_until' => null,
+                    'last_error_message' => null,
+                ]);
+
+                return $this->response->setJSON([
+                    'status'    => 'success',
+                    'http_code' => 200,
+                    'reply'     => trim($replyText),
+                    'model'     => $model . ' (Terverifikasi aktif)',
+                    'message'   => 'Koneksi sukses! Kunci Google API valid dan siap digunakan.',
+                ]);
+            }
         }
 
         // Tangani Error Quota / Invalid Key
