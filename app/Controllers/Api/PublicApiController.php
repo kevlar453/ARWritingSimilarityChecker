@@ -117,6 +117,9 @@ class PublicApiController extends BaseController
             ]);
         }
 
+        $faculty = trim((string) ($this->request->getPost('faculty') ?? ''));
+        $department = trim((string) ($this->request->getPost('department') ?? ''));
+
         // Simpan ke tabel documents
         $docId = $this->documentModel->insert([
             'user_id'           => $userId,
@@ -129,6 +132,8 @@ class PublicApiController extends BaseController
             'document_type'     => 'submission',
             'corpus_visibility' => 'private',
             'source_type'       => ($keyData['system_type'] === 'ojs') ? 'journal' : 'other',
+            'faculty'           => !empty($faculty) ? $faculty : null,
+            'department'        => !empty($department) ? $department : null,
             'indexing_status'   => 'not_required',
             'created_at'        => date('Y-m-d H:i:s'),
             'updated_at'        => date('Y-m-d H:i:s'),

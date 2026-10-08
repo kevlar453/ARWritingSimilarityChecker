@@ -3470,13 +3470,49 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label" for="loginPassword">Kata Sandi</label>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <label class="form-label" for="loginPassword" style="margin-bottom: 0;">Kata Sandi</label>
+                            <a href="javascript:void(0)" onclick="switchTab('forgot')" style="font-size: 11px; font-weight: 700; color: var(--primary); text-decoration: none;">
+                                Lupa Kata Sandi?
+                            </a>
+                        </div>
                         <input type="password" id="loginPassword" name="password" class="form-control" placeholder="••••••••" required>
                     </div>
 
                     <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 8px;">
                         Masuk ke Akun
                     </button>
+                </form>
+
+                <!-- Forgot Password Form -->
+                <form id="formForgot" onsubmit="handleForgotPassword(event)" style="display: none;">
+                    <!-- Anti-Spam Time Token & Honeypot Trap -->
+                    <input type="hidden" name="security_token" id="forgotSecurityToken" value="<?= esc($authSecurityToken ?? '') ?>">
+                    <div style="display:none; visibility:hidden; opacity:0; position:absolute; left:-9999px;" aria-hidden="true">
+                        <input type="text" name="website_hp" tabindex="-1" autocomplete="off">
+                        <input type="text" name="fax_number" tabindex="-1" autocomplete="off">
+                    </div>
+
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 14px; margin-bottom: 16px;">
+                        <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5; margin: 0;">
+                            🔐 Masukkan alamat email akun Anda. Kami akan mengirimkan tautan aman untuk mengatur ulang kata sandi.
+                        </p>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="forgotEmail">Alamat Email Terdaftar</label>
+                        <input type="email" id="forgotEmail" name="email" class="form-control" placeholder="nama@kampus.ac.id" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 8px;">
+                        Kirim Tautan Atur Ulang
+                    </button>
+
+                    <div style="text-align: center; margin-top: 14px;">
+                        <a href="javascript:void(0)" onclick="switchTab('login')" style="font-size: 12px; font-weight: 700; color: var(--primary); text-decoration: underline;">
+                            ← Kembali ke Halaman Masuk
+                        </a>
+                    </div>
                 </form>
 
                 <!-- Register Form -->
@@ -3639,16 +3675,20 @@
             modal.style.display = 'flex';
             switchTab(mode);
 
-            const tokenInput = document.getElementById('regSecurityToken');
-            if (tokenInput && (!tokenInput.value || tokenInput.value === '')) {
-                try {
-                    const res = await fetch('<?= base_url('auth/security-token') ?>');
-                    const data = await res.json();
-                    if (data.token) {
-                        tokenInput.value = data.token;
+            const tokenInputs = [document.getElementById('regSecurityToken'), document.getElementById('forgotSecurityToken')];
+            try {
+                let tokenVal = null;
+                for (const input of tokenInputs) {
+                    if (input && (!input.value || input.value === '')) {
+                        if (!tokenVal) {
+                            const res = await fetch('<?= base_url('auth/security-token') ?>');
+                            const data = await res.json();
+                            tokenVal = data.token;
+                        }
+                        if (tokenVal) input.value = tokenVal;
                     }
-                } catch (e) {}
-            }
+                }
+            } catch (e) {}
         }
 
         function closeAuthModal() {
@@ -3676,25 +3716,44 @@
         });
 
         function switchTab(mode) {
+            const tabSwitch = document.querySelector('.tab-switch');
             const tabLogin = document.getElementById('tabLogin');
             const tabRegister = document.getElementById('tabRegister');
             const formLogin = document.getElementById('formLogin');
             const formRegister = document.getElementById('formRegister');
+            const formForgot = document.getElementById('formForgot');
             const modalTitle = document.getElementById('modalTitle');
 
             hideAlert();
 
             if (mode === 'register') {
+                if (tabSwitch) tabSwitch.style.display = 'flex';
                 tabRegister.classList.add('active');
                 tabLogin.classList.remove('active');
                 formRegister.style.display = 'block';
                 formLogin.style.display = 'none';
+                if (formForgot) formForgot.style.display = 'none';
                 modalTitle.textContent = 'Daftar Akun AR Tilik Gratis';
+            } else if (mode === 'forgot') {
+                if (tabSwitch) tabSwitch.style.display = 'none';
+                formLogin.style.display = 'none';
+                formRegister.style.display = 'none';
+                if (formForgot) {
+                    formForgot.style.display = 'block';
+                    const loginEmailVal = document.getElementById('loginEmail')?.value;
+                    const forgotEmailInput = document.getElementById('forgotEmail');
+                    if (loginEmailVal && forgotEmailInput && !forgotEmailInput.value) {
+                        forgotEmailInput.value = loginEmailVal;
+                    }
+                }
+                modalTitle.textContent = 'Atur Ulang Kata Sandi';
             } else {
+                if (tabSwitch) tabSwitch.style.display = 'flex';
                 tabLogin.classList.add('active');
                 tabRegister.classList.remove('active');
                 formLogin.style.display = 'block';
                 formRegister.style.display = 'none';
+                if (formForgot) formForgot.style.display = 'none';
                 modalTitle.textContent = 'Masuk ke AR Tilik';
             }
         }
@@ -3820,6 +3879,43 @@
                 }
             } catch (err) {
                 showAlert('Kendala koneksi peladen. Silakan coba kembali.', true);
+            }
+        }
+
+        async function handleForgotPassword(e) {
+            e.preventDefault();
+            hideAlert();
+
+            const form = e.target;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span>Mengirim Tautan...</span>';
+
+            const formData = new FormData(form);
+            const userEmail = formData.get('email');
+
+            try {
+                const res = await fetch('<?= base_url('auth/forgot-password') ?>', {
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json' },
+                    body: formData
+                });
+                const data = await res.json();
+
+                if (!res.ok || data.status === 'error') {
+                    showAlert(data.message || 'Gagal mengajukan atur ulang kata sandi.', true);
+                } else {
+                    form.reset();
+                    showAlert('✉️ <strong>Permintaan Terkirim!</strong><br>' + 
+                        (data.message || 'Tautan atur ulang kata sandi telah dikirimkan ke email Anda.') + 
+                        '<div style="margin-top:10px;"><a href="javascript:void(0)" onclick="switchTab(\'login\')" style="font-size:12px; color:var(--primary); font-weight:700; text-decoration:underline;">← Kembali ke Halaman Masuk</a></div>', false);
+                }
+            } catch (err) {
+                showAlert('Kendala koneksi peladen. Silakan coba kembali.', true);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
             }
         }
 
@@ -4188,6 +4284,7 @@
             const urlParams = new URLSearchParams(window.location.search);
             const authParam = urlParams.get('auth');
             const verifiedParam = urlParams.get('verified');
+            const resetParam = urlParams.get('reset');
             const reasonParam = urlParams.get('reason');
 
             if (verifiedParam === 'error') {
@@ -4202,11 +4299,25 @@
             } else if (verifiedParam === 'success') {
                 openAuthModal('login');
                 showAlert('🎉 Alamat email Anda telah berhasil diverifikasi! Silakan masuk ke akun Anda.', false);
-            } else if (authParam === 'login' || authParam === 'register') {
+            } else if (resetParam === 'success') {
+                openAuthModal('login');
+                showAlert('🎉 Kata sandi Anda berhasil diperbarui! Silakan masuk menggunakan kata sandi baru Anda.', false);
+            } else if (resetParam === 'error') {
+                openAuthModal('login');
+                let errText = 'Tautan atur ulang kata sandi tidak valid atau telah kedaluwarsa.';
+                if (reasonParam === 'expired') {
+                    errText = '⏱️ Tautan atur ulang kata sandi telah kedaluwarsa (berlaku 1 jam).<br>' +
+                        '<a href="javascript:void(0)" onclick="switchTab(\'forgot\')" style="color:var(--primary); font-weight:700; text-decoration:underline; display:inline-block; margin-top:6px;">Klik di sini untuk mengajukan permintaan baru.</a>';
+                }
+                showAlert(errText, true);
+            } else if (authParam === 'login' || authParam === 'register' || authParam === 'forgot') {
                 openAuthModal(authParam);
                 <?php $flashNotice = session()->getFlashdata('auth_notice') ?: session()->getFlashdata('error'); ?>
+                <?php $flashSuccess = session()->getFlashdata('message'); ?>
                 <?php if (!empty($flashNotice)) : ?>
                     showAlert(<?= json_encode($flashNotice) ?>, true);
+                <?php elseif (!empty($flashSuccess)) : ?>
+                    showAlert(<?= json_encode($flashSuccess) ?>, false);
                 <?php endif; ?>
             }
 

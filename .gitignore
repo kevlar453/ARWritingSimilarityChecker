@@ -47,3 +47,7 @@ storage/*
 *.swo
 *~
 Thumbs.db
+
+# Temporary scratchpad & dumps
+tmp/
+*.tmp

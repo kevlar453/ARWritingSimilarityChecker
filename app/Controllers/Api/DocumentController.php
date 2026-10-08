@@ -73,6 +73,9 @@ class DocumentController extends BaseController
             }
         }
 
+        $faculty = trim((string) ($this->request->getPost('faculty') ?? ''));
+        $department = trim((string) ($this->request->getPost('department') ?? ''));
+
         $documentModel = new DocumentModel();
         $documentId = $documentModel->insert([
             'user_id'           => $userId ?: null,
@@ -84,6 +87,8 @@ class DocumentController extends BaseController
             'status'            => 'uploaded',
             'document_type'     => 'submission',
             'corpus_visibility' => $this->request->getPost('corpus_visibility') ?? 'private',
+            'faculty'           => !empty($faculty) ? $faculty : null,
+            'department'        => !empty($department) ? $department : null,
             'indexing_status'   => 'not_required',
             'created_at'        => date('Y-m-d H:i:s'),
             'updated_at'        => date('Y-m-d H:i:s'),
@@ -172,6 +177,8 @@ class DocumentController extends BaseController
         $customTitle = trim((string) $this->request->getPost('title'));
         $title = !empty($customTitle) ? $customTitle : $targetTitle;
         $sourceType = $this->request->getPost('source_type') ?: 'journal';
+        $faculty = trim((string) ($this->request->getPost('faculty') ?? ''));
+        $department = trim((string) ($this->request->getPost('department') ?? ''));
 
         $now = date('Y-m-d H:i:s');
         $documentModel = new DocumentModel();
@@ -186,6 +193,8 @@ class DocumentController extends BaseController
             'document_type'     => 'corpus',
             'corpus_visibility' => 'institution',
             'source_type'       => $sourceType,
+            'faculty'           => !empty($faculty) ? $faculty : null,
+            'department'        => !empty($department) ? $department : null,
             'indexing_status'   => 'completed',
             'created_at'        => $now,
             'updated_at'        => $now,
@@ -412,6 +421,9 @@ class DocumentController extends BaseController
         $engine = $this->request->getPost('engine') ?: 'hybrid';
         $now = date('Y-m-d H:i:s');
 
+        $faculty = trim((string) ($this->request->getPost('faculty') ?? ''));
+        $department = trim((string) ($this->request->getPost('department') ?? ''));
+
         $documentModel = new DocumentModel();
         $documentId = $documentModel->insert([
             'user_id'           => null,
@@ -423,6 +435,8 @@ class DocumentController extends BaseController
             'status'            => 'uploaded',
             'document_type'     => 'submission',
             'corpus_visibility' => 'private',
+            'faculty'           => !empty($faculty) ? $faculty : null,
+            'department'        => !empty($department) ? $department : null,
             'indexing_status'   => 'not_required',
             'created_at'        => $now,
             'updated_at'        => $now,

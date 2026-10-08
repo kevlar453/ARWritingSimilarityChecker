@@ -42,6 +42,9 @@ class CorpusController extends BaseController
         $filename = $file->getRandomName();
         $file->move($storagePath, $filename);
 
+        $faculty = trim((string) ($this->request->getPost('faculty') ?? ''));
+        $department = trim((string) ($this->request->getPost('department') ?? ''));
+
         $userId = session()->get('user_id');
         $documentModel = new DocumentModel();
         $docId = $documentModel->insert([
@@ -55,6 +58,8 @@ class CorpusController extends BaseController
             'document_type'     => 'corpus',
             'corpus_visibility' => $this->request->getPost('corpus_visibility') ?? 'institution',
             'source_type'       => $this->request->getPost('source_type') ?? 'other',
+            'faculty'           => !empty($faculty) ? $faculty : null,
+            'department'        => !empty($department) ? $department : null,
             'indexing_status'   => 'pending',
             'created_at'        => date('Y-m-d H:i:s'),
             'updated_at'        => date('Y-m-d H:i:s'),

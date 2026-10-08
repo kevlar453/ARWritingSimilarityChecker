@@ -415,6 +415,12 @@ if ($dec === 'match') {
             <td class="meta-label">Durasi Eksekusi</td>
             <td class="meta-val"><?= number_format($exec_time, 2) ?> detik</td>
         </tr>
+        <?php if (!empty($document['faculty']) || !empty($document['department'])): ?>
+        <tr>
+            <td class="meta-label">Fakultas / Prodi</td>
+            <td class="meta-val" colspan="3"><?= esc(implode(' / ', array_filter([$document['faculty'] ?? '', $document['department'] ?? '']))) ?></td>
+        </tr>
+        <?php endif; ?>
     </table>
 
     <!-- Decision Banner -->

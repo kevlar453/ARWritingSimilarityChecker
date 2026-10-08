@@ -77,6 +77,8 @@ class DashboardController extends BaseController
             $docBuilder->groupStart()
                        ->like('documents.title', $searchQuery)
                        ->orLike('documents.original_filename', $searchQuery)
+                       ->orLike('documents.faculty', $searchQuery)
+                       ->orLike('documents.department', $searchQuery)
                        ->orLike('users.name', $searchQuery)
                        ->orLike('users.email', $searchQuery)
                        ->groupEnd();
@@ -536,7 +538,7 @@ class DashboardController extends BaseController
     {
         $db = db_connect();
         $reports = $db->table('reports r')
-                      ->select('r.id, r.document_id, d.title, u.name as author_name, u.institution, r.overall_similarity, r.exact_similarity, r.cosine_similarity, r.predicted_decision, r.verification_code, r.created_at, r.completed_at')
+                      ->select('r.id, r.document_id, d.title, d.faculty, d.department, u.name as author_name, u.institution, r.overall_similarity, r.exact_similarity, r.cosine_similarity, r.predicted_decision, r.verification_code, r.created_at, r.completed_at')
                       ->join('documents d', 'd.id = r.document_id', 'left')
                       ->join('users u', 'u.id = d.user_id', 'left')
                       ->where('r.status', 'completed')
@@ -561,7 +563,9 @@ class DashboardController extends BaseController
             'ID Dokumen',
             'Judul Naskah',
             'Penulis / Mahasiswa',
-            'Institusi / Fakultas',
+            'Institusi',
+            'Fakultas',
+            'Program Studi',
             'Skor Kemiripan (%)',
             'Lensa 1 Exact (%)',
             'Lensa 2 Kosinus (%)',
@@ -578,6 +582,8 @@ class DashboardController extends BaseController
                 $r['title'] ?? 'Naskah Tidak Berjudul',
                 $r['author_name'] ?? 'Penulis Tamu / Eksternal',
                 $r['institution'] ?? 'Institusi / Mandiri',
+                $r['faculty'] ?? '-',
+                $r['department'] ?? '-',
                 number_format((float) ($r['overall_similarity'] ?? 0), 2),
                 number_format((float) ($r['exact_similarity'] ?? 0), 2),
                 number_format((float) ($r['cosine_similarity'] ?? 0), 2),

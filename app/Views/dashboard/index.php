@@ -341,6 +341,25 @@
                             </label>
                         </div>
                     </div>
+                    <!-- Metadata Taksonomi Akademik (Opsional) -->
+                    <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-2">
+                        <div class="font-bold text-slate-700 flex items-center justify-between">
+                            <div class="flex items-center gap-1.5">
+                                <span>🏛️</span> <span>Rumpun / Taksonomi Akademik (Opsional)</span>
+                            </div>
+                            <span class="text-[11px] font-normal text-slate-400">Untuk metadata penelusuran &amp; pelaporan</span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[11px] font-medium text-slate-500 mb-1">Fakultas:</label>
+                                <input type="text" id="subFaculty" name="faculty" placeholder="Contoh: Fakultas Teknik" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-medium text-slate-500 mb-1">Program Studi / Jurusan:</label>
+                                <input type="text" id="subDepartment" name="department" placeholder="Contoh: Teknik Kimia" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="flex justify-end pt-2">
                         <button type="submit" id="btnUploadSubmit" class="w-full sm:w-auto px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-semibold rounded-xl text-xs sm:text-sm shadow-sm transition flex items-center justify-center gap-2 cursor-pointer">
@@ -395,6 +414,16 @@
                                         <td class="p-3.5 sm:p-4 font-medium text-slate-800">
                                             <div class="font-semibold text-slate-900 line-clamp-1" title="<?= esc($sub['title']) ?>"><?= esc($sub['title']) ?></div>
                                             <div class="text-[11px] text-slate-400 truncate max-w-[220px]" title="<?= esc($sub['original_filename']) ?>"><?= esc($sub['original_filename']) ?></div>
+                                            <?php if (!empty($sub['faculty']) || !empty($sub['department'])): ?>
+                                                <div class="mt-1 flex items-center gap-1.5 flex-wrap">
+                                                    <?php if (!empty($sub['faculty'])): ?>
+                                                        <span class="inline-flex items-center text-[10px] font-medium px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200" title="Fakultas">🏛️ <?= esc($sub['faculty']) ?></span>
+                                                    <?php endif; ?>
+                                                    <?php if (!empty($sub['department'])): ?>
+                                                        <span class="inline-flex items-center text-[10px] font-medium px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-100" title="Program Studi">🎓 <?= esc($sub['department']) ?></span>
+                                                    <?php endif; ?>
+                                                </div>
+                                            <?php endif; ?>
                                         </td>
                                         <td class="p-3.5 sm:p-4 text-center">
                                             <span class="px-2 py-0.5 rounded text-[10px] bg-slate-100 text-slate-600 font-mono font-semibold"><?= strtoupper(pathinfo($sub['original_filename'], PATHINFO_EXTENSION)) ?></span>
@@ -570,7 +599,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Judul Dokumen (Opsional):</label>
-                            <input type="text" name="title" placeholder="Contoh: Jurnal Teologi Pastoral 2026" class="w-full text-xs sm:text-sm px-3.5 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            <input type="text" name="title" placeholder="Contoh: Jurnal Teknik Kimia 2026" class="w-full text-xs sm:text-sm px-3.5 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500">
                         </div>
                         <div>
                             <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Kategori Sumber:</label>
@@ -582,6 +611,14 @@
                                 <option value="repository">Repositori Terbuka</option>
                                 <option value="other" selected>Lainnya</option>
                             </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Fakultas (Opsional):</label>
+                            <input type="text" name="faculty" placeholder="Contoh: Fakultas Teknik" class="w-full text-xs sm:text-sm px-3.5 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Program Studi / Jurusan (Opsional):</label>
+                            <input type="text" name="department" placeholder="Contoh: Teknik Kimia" class="w-full text-xs sm:text-sm px-3.5 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
                         </div>
                     </div>
 
@@ -628,6 +665,16 @@
                                         <td class="p-3.5 sm:p-4 font-medium text-slate-800">
                                             <div class="font-semibold text-slate-900 line-clamp-1" title="<?= esc($doc['title']) ?>"><?= esc($doc['title']) ?></div>
                                             <div class="text-[11px] text-slate-400 truncate max-w-[220px]" title="<?= esc($doc['original_filename']) ?>"><?= esc($doc['original_filename']) ?></div>
+                                            <?php if (!empty($doc['faculty']) || !empty($doc['department'])): ?>
+                                                <div class="mt-1 flex items-center gap-1.5 flex-wrap">
+                                                    <?php if (!empty($doc['faculty'])): ?>
+                                                        <span class="inline-flex items-center text-[10px] font-medium px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200" title="Fakultas">🏛️ <?= esc($doc['faculty']) ?></span>
+                                                    <?php endif; ?>
+                                                    <?php if (!empty($doc['department'])): ?>
+                                                        <span class="inline-flex items-center text-[10px] font-medium px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-100" title="Program Studi">🎓 <?= esc($doc['department']) ?></span>
+                                                    <?php endif; ?>
+                                                </div>
+                                            <?php endif; ?>
                                         </td>
                                         <td class="p-3.5 sm:p-4">
                                             <span class="px-2 py-0.5 rounded text-[11px] bg-indigo-50 text-indigo-700 capitalize font-medium"><?= esc($doc['source_type'] ?? 'other') ?></span>
@@ -1007,6 +1054,14 @@
                 const optJIT = document.getElementById('optJITHarvest');
                 if (optJIT && optJIT.checked) {
                     formData.append('jit_harvest', '1');
+                }
+                const subFaculty = document.getElementById('subFaculty')?.value?.trim();
+                if (subFaculty) {
+                    formData.append('faculty', subFaculty);
+                }
+                const subDepartment = document.getElementById('subDepartment')?.value?.trim();
+                if (subDepartment) {
+                    formData.append('department', subDepartment);
                 }
 
                 try {

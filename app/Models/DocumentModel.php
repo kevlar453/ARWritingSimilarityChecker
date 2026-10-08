@@ -19,6 +19,8 @@ class DocumentModel extends Model
         'document_type',
         'corpus_visibility',
         'source_type',
+        'faculty',
+        'department',
         'indexing_status',
         'benchmark_case_id',
         'benchmark_run_id',
