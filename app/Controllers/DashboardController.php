@@ -142,12 +142,12 @@ class DashboardController extends BaseController
         $aiSty = $ev['ai_stylometrics'] ?? $ev['v1_1_presentation']['v1_2_evolution']['ai_stylometrics'] ?? null;
         $gemini = $ev['gemini_forensic'] ?? $ev['v1_1_presentation']['v1_2_evolution']['gemini_forensic'] ?? null;
 
-        $score = null;
+        $stylometricsScore = null;
         $label = null;
         $level = null;
 
         if (is_array($aiSty) && isset($aiSty['ai_probability_score']) && is_numeric($aiSty['ai_probability_score'])) {
-            $score = (float) $aiSty['ai_probability_score'];
+            $stylometricsScore = (float) $aiSty['ai_probability_score'];
             $label = $aiSty['verdict_label'] ?? null;
             $level = $aiSty['ai_confidence_level'] ?? null;
         }
@@ -165,24 +165,139 @@ class DashboardController extends BaseController
             }
         }
 
-        if ($score === null && $forensicLevel !== null) {
-            $score = match ($forensicLevel) {
-                'TINGGI' => 85.0,
-                'SEDANG' => 50.0,
-                default => 10.0,
-            };
+        // Hitung skor komposit secara dinamis dan berjenjang berdasarkan derajat bukti forensik
+        if ($forensicLevel !== null && is_array($gemini) && ($gemini['status'] ?? '') === 'completed') {
+            $compositeScore = self::calculateDynamicAiScore($gemini, $stylometricsScore);
+        } else {
+            $compositeScore = $stylometricsScore;
         }
 
-        if ($score === null) {
+        if ($compositeScore === null) {
             return null;
         }
 
+        // Menandai apakah skor komposit dinaikkan oleh temuan mendalam Audit Forensik Cerdas
+        $isForensicElevated = ($forensicLevel === 'TINGGI' && ($stylometricsScore === null || $stylometricsScore < 65.0))
+                           || ($forensicLevel === 'SEDANG' && ($stylometricsScore === null || $stylometricsScore < 35.0));
+
+        // Deteksi apakah terdapat bukti kebocoran instruksi/percakapan prompt AI mentah
+        $isMetaPromptLeak = false;
+        if (is_array($gemini)) {
+            $combinedEv = strtolower(json_encode($gemini));
+            $isMetaPromptLeak = (bool) preg_match(
+                '/(kebocoran instruksi|meta-prompt|prompt leak|disalin-tempel secara langsung|copy-paste mentah|bisa\. saya akan buat)/i', 
+                $combinedEv
+            );
+        }
+
         return [
-            'score'          => $score,
-            'label'          => $label,
-            'level'          => $level,
-            'forensic_level' => $forensicLevel,
+            'score'                => $compositeScore,
+            'stylometrics_score'   => $stylometricsScore,
+            'label'                => $label,
+            'level'                => $level,
+            'forensic_level'       => $forensicLevel,
+            'is_forensic_elevated' => $isForensicElevated,
+            'is_meta_prompt_leak'  => $isMetaPromptLeak,
         ];
+    }
+
+    /**
+     * Menghitung skor indikasi AI terpadu secara dinamis berdasarkan derajat keparahan temuan forensik
+     * dan perpaduannya dengan stylometri, mencegah skor dipukul rata (flat 85%).
+     */
+    public static function calculateDynamicAiScore(array $gemini, ?float $stylometricsScore = null): float
+    {
+        $audit = $gemini['audit'] ?? [];
+        if (empty($audit) && !empty($gemini['raw_output'])) {
+            if (preg_match('/"tingkat_indikasi_ai"\s*:\s*"([^"]+)"/i', $gemini['raw_output'], $m)) {
+                $audit['tingkat_indikasi_ai'] = $m[1];
+            }
+            if (preg_match('/"alasan_indikasi_ai"\s*:\s*"([^"]+)"/s', $gemini['raw_output'], $m2)) {
+                $audit['alasan_indikasi_ai'] = $m2[1];
+            }
+            if (preg_match('/"skor_indikasi_persen"\s*:\s*(\d+(?:\.\d+)?)/i', $gemini['raw_output'], $m3)) {
+                $audit['skor_indikasi_persen'] = (float) $m3[1];
+            }
+        }
+
+        // 1. Dukungan eksplisit jika model AI sudah memberikan skor persentase
+        if (isset($audit['skor_indikasi_persen']) && is_numeric($audit['skor_indikasi_persen'])) {
+            $explicit = (float) $audit['skor_indikasi_persen'];
+            if ($explicit >= 0.0 && $explicit <= 100.0) {
+                return $stylometricsScore !== null ? max($explicit, $stylometricsScore) : $explicit;
+            }
+        }
+
+        $level = strtoupper(trim((string) ($audit['tingkat_indikasi_ai'] ?? 'RENDAH')));
+        $reason = (string) ($audit['alasan_indikasi_ai'] ?? '');
+        $contra = (array) ($audit['inkonsistensi_metodologi_dan_logika'] ?? []);
+        $citations = (array) ($audit['integritas_sitasi'] ?? []);
+
+        $evidenceText = strtolower($reason . ' ' . implode(' ', $contra) . ' ' . implode(' ', $citations));
+
+        if ($level === 'RENDAH') {
+            return $stylometricsScore !== null ? $stylometricsScore : 0.0;
+        }
+
+        if ($level === 'SEDANG') {
+            $score = 50.0;
+            if (count($contra) > 1 || count($citations) > 1) {
+                $score += 5.0;
+            }
+            if ($stylometricsScore !== null && $stylometricsScore > $score) {
+                $score = $stylometricsScore;
+            }
+            return round($score, 1);
+        }
+
+        // --- LEVEL TINGGI: Evaluasi Berjenjang Berbasis Bukti Nyata ---
+
+        // Tingkat Ekstrem (95% - 98%): Kebocoran Instruksi / Percakapan Chatbot (Meta-Prompt Leak)
+        // Penulis menyalin langsung teks obrolan AI (misal: "Bisa. Saya akan buat Bab IV...", "Tentu, ini draf...")
+        $isMetaPromptLeak = (bool) preg_match(
+            '/(kebocoran instruksi|meta-prompt|prompt leak|disalin-tempel secara langsung|copy-paste mentah|percakapan ai|chat ai|instruksi percakapan|bisa\. saya akan buat|tentu, berikut|sebagai model bahasa ai)/i',
+            $evidenceText
+        );
+
+        if ($isMetaPromptLeak) {
+            return 98.0;
+        }
+
+        // Tingkat Berat (80% - 88%): Halusinasi Sitasi & Tokoh/Jurnal Fiktif
+        $hasCitationFabrication = (bool) preg_match(
+            '/(halusinasi|tokoh fiktif|nama jurnal .* diperlakukan sebagai|nama paroki .* diperlakukan sebagai|sitasi palsu|penulis fiktif|fabrikasi)/i',
+            $evidenceText
+        );
+
+        if ($hasCitationFabrication) {
+            $baseScore = 80.0;
+        } else {
+            // Tingkat Sedang-Tinggi (74% - 79%): Kompilasi / perakitan AI dengan sitasi rusak atau distorsi logika
+            $baseScore = 74.0;
+        }
+
+        // Pembeda granularitas berdasarkan akumulasi bukti temuan
+        $contraWeight = min(count($contra) * 1.5, 4.5);
+        $citationWeight = min(count($citations) * 1.5, 4.5);
+        $forensicRaw = $baseScore + $contraWeight + $citationWeight;
+
+        // Perpaduan dengan Stylometrics Score
+        if ($stylometricsScore !== null && $stylometricsScore > 0) {
+            if ($stylometricsScore >= 70.0) {
+                // Keduanya (Forensik & Stylometri) sama-sama mendeteksi indikasi kuat
+                $finalScore = max($forensicRaw, $stylometricsScore + 6.0);
+            } elseif ($stylometricsScore >= 35.0) {
+                // Stylometri moderat (35-69%), berikan bobot proporsional
+                $finalScore = ($forensicRaw * 0.8) + ($stylometricsScore * 0.2);
+            } else {
+                // Stylometri rendah (gaya bahasa diacak/halus), forensik menjadi determinan utama
+                $finalScore = $forensicRaw;
+            }
+        } else {
+            $finalScore = $forensicRaw;
+        }
+
+        return round(min(max($finalScore, 70.0), 99.0), 1);
     }
 
     public function report($id)
@@ -1676,6 +1791,64 @@ class DashboardController extends BaseController
             ->setHeader('Content-Length', (string) strlen($content))
             ->setHeader('Cache-Control', 'public, max-age=86400')
             ->setBody($content);
+    }
+
+    /**
+     * Mengunduh Berkas Contoh Runner Integrasi PHP OJS 3.x (artilik_ojs_runner.php)
+     */
+    public function downloadOjsRunner()
+    {
+        $filePath = FCPATH . 'integrations/ojs/artilik_ojs_runner.php';
+        if (! file_exists($filePath)) {
+            $filePath = ROOTPATH . 'public/integrations/ojs/artilik_ojs_runner.php';
+        }
+
+        if (! file_exists($filePath)) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Berkas runner OJS 3.x belum tersedia.");
+        }
+
+        $content  = file_get_contents($filePath);
+        $filename = 'artilik_ojs_runner.php';
+
+        return $this->response
+            ->setHeader('Content-Type', 'text/x-php; charset=utf-8')
+            ->setHeader('Content-Disposition', 'attachment; filename="' . $filename . '"')
+            ->setHeader('Content-Length', (string) strlen($content))
+            ->setHeader('Cache-Control', 'public, max-age=86400')
+            ->setBody($content);
+    }
+
+    /**
+     * Mengunduh Berkas PDF Brosur & Prospektus Eksekutif Institusi AR Tilik
+     */
+    public function downloadPromoBrochure()
+    {
+        $pdfPath = FCPATH . 'docs/Brosur_Eksekutif_ARTilik.pdf';
+        if (! file_exists($pdfPath)) {
+            $pdfPath = ROOTPATH . 'public/docs/Brosur_Eksekutif_ARTilik.pdf';
+        }
+
+        if (! file_exists($pdfPath)) {
+            $pythonBin = ROOTPATH . '.venv/bin/python';
+            if (! file_exists($pythonBin)) {
+                $pythonBin = 'python3';
+            }
+            exec(escapeshellcmd($pythonBin) . ' ' . escapeshellarg(ROOTPATH . 'worker/generate_promo_pdf.py'));
+        }
+
+        if (! file_exists($pdfPath)) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Brosur eksekutif institusi belum tersedia.");
+        }
+
+        $pdfContent = file_get_contents($pdfPath);
+        $filename   = 'Brosur_Eksekutif_ARTilik.pdf';
+
+        return $this->response
+            ->setHeader('Content-Type', 'application/pdf')
+            ->setHeader('Content-Disposition', 'inline; filename="' . $filename . '"')
+            ->setHeader('Content-Length', (string) strlen($pdfContent))
+            ->setHeader('Cache-Control', 'public, max-age=86400')
+            ->setBody($pdfContent);
     }
 }
 
