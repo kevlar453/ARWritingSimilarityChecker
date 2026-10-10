@@ -77,24 +77,54 @@ AI_TRANSITIONAL_MARKERS = {
 }
 
 
+ACADEMIC_ABBREVIATIONS = [
+    r"dkk\.", r"hlm\.", r"hal\.", r"thn\.", r"dsb\.", r"dll\.", r"dst\.",
+    r"no\.", r"vol\.", r"art\.", r"bab\.", r"pasal\.", r"ttg\.", r"tsb\.",
+    r"an\.", r"ub\.", r"sd\.", r"s\.d\.",
+    r"prof\.", r"dr\.", r"drs\.", r"dra\.", r"ir\.", r"ph\.d\.", r"m\.sc\.",
+    r"m\.kom\.", r"s\.pd\.", r"s\.kom\.", r"m\.pd\.", r"m\.hum\.", r"m\.si\.",
+    r"s\.t\.", r"m\.t\.", r"et al\.", r"i\.e\.", r"e\.g\.", r"vs\.", r"etc\.",
+    r"fig\.", r"ref\.", r"dept\.", r"univ\.", r"approx\.", r"cf\.", r"ibid\.",
+    r"op\. cit\.", r"loc\. cit\."
+]
+
+
 def tokenize_sentences(text: str) -> List[str]:
-    """Memecah teks menjadi daftar kalimat yang bersih."""
-    # Split berdasarkan tanda titik, tanda tanya, atau tanda seru
-    raw_sentences = re.split(r"[.!?]+(?:\s+|\n+|$)", text)
+    """
+    Memecah teks menjadi daftar kalimat yang bersih dan utuh.
+    Aman terhadap singkatan akademik (dkk., hlm., Prof., Ph.D.), angka desimal (0.05),
+    dan inisial nama tanpa memecah kalimat menjadi fragmen semu.
+    """
+    if not text:
+        return []
+
+    # 1. Lindungi angka desimal (misal: 0.05, 1.5, 3.14)
+    t = re.sub(r"(\d+)\.(\d+)", r"\1<DOT>\2", text)
+
+    # 2. Lindungi inisial huruf tunggal (misal: A. Yani, W.J.S. Poerwadarminta)
+    t = re.sub(r"\b([A-Za-z])\.", r"\1<DOT>", t)
+
+    # 3. Lindungi singkatan umum dan gelar akademik
+    for abbr in ACADEMIC_ABBREVIATIONS:
+        pattern = re.compile(r"\b" + abbr, re.IGNORECASE)
+        t = pattern.sub(lambda m: m.group(0).replace(".", "<DOT>"), t)
+
+    # 4. Split berdasarkan tanda akhir kalimat yang diikuti spasi & awal kalimat baru atau baris baru
+    raw_sentences = re.split(r"[.!?]+(?:\s+(?=[A-Z0-9\"\'\(])|\n+|$)", t)
     sentences = []
     for s in raw_sentences:
-        s_clean = s.strip()
+        s_restored = s.replace("<DOT>", ".").strip()
         # Ambil kalimat yang memiliki setidaknya 3 kata
-        if len(s_clean.split()) >= 3:
-            sentences.append(s_clean)
+        if len(s_restored.split()) >= 3:
+            sentences.append(s_restored)
     return sentences
 
 
 def calculate_burstiness(sentence_lengths: List[int]) -> float:
     """
     Menghitung Sentence Burstiness (variabilitas panjang kalimat).
-    Manusia: Burstiness tinggi (variasi panjang kalimat beragam, CV > 0.45).
-    AI: Burstiness rendah (panjang kalimat sangat seragam, CV < 0.28).
+    Manusia: Burstiness tinggi (variasi panjang kalimat beragam, CV > 0.40).
+    AI: Burstiness rendah (panjang kalimat sangat seragam, CV < 0.25).
     Formula: Koefisien Variasi (Standard Deviation / Mean).
     """
     if len(sentence_lengths) < 3:
@@ -210,10 +240,12 @@ def analyze_ai_stylometrics(text: str, substantive_text: Optional[str] = None) -
     if not text or len(text.strip()) < 50:
         return {
             "status": "insufficient_data",
+            "is_experimental": True,
             "ai_probability_score": 0.0,
             "ai_confidence_level": "LOW",
-            "verdict_label": "Data Teks Tidak Mencukupi",
+            "verdict_label": "[Eksperimental] Data Teks Tidak Mencukupi",
             "summary_rationale": "Panjang naskah terlalu pendek untuk dianalisis profil stylometrinya.",
+            "disclaimer": "Indikator ini bersifat EKSPERIMENTAL dan HANYA menunjukkan variasi statistik pola kalimat, BUKAN bukti atau vonis penggunaan AI.",
             "metrics": {
                 "burstiness": 0.5,
                 "lexical_diversity": 0.0,
@@ -242,90 +274,95 @@ def analyze_ai_stylometrics(text: str, substantive_text: Optional[str] = None) -
     seg_monotony = calculate_segmental_monotony(analysis_text)
     seg_ratio = seg_monotony["monotony_ratio"]
 
-    # Bobot Penilaian AI Probability (0.0 s/d 100.0)
+    # Bobot Penilaian Indikator Stylometri Eksperimental (0.0 s/d 100.0)
+    # Dikalibrasi berdasarkan uji empiris 50 skripsi manusia (P95 skor manusia = 25.5)
     ai_score = 0.0
 
-    # 1. Global Burstiness (< 0.40)
-    if burstiness < 0.25:
-        ai_score += 35.0
+    # 1. Global Burstiness (Variabilitas Panjang Kalimat)
+    if burstiness < 0.22:
+        ai_score += 30.0
+    elif burstiness < 0.28:
+        ai_score += 20.0
     elif burstiness < 0.32:
-        ai_score += 25.0
-    elif burstiness < 0.40:
-        ai_score += 15.0
-
-    # 2. Segmental Monotony Ratio (% paragraf seragam khas AI)
-    if seg_monotony["evaluated_paragraphs"] >= 5:
-        if seg_ratio >= 40.0:
-            ai_score += 35.0
-        elif seg_ratio >= 28.0:
-            ai_score += 25.0
-        elif seg_ratio >= 18.0:
-            ai_score += 15.0
-
-    # 3. Kepadatan Frasa Klise / Formulaik Akademik AI
-    if transition_density >= 3.0:
-        ai_score += 35.0
-    elif transition_density >= 2.0:
-        ai_score += 25.0
-    elif transition_density >= 1.0:
-        ai_score += 15.0
-    elif transition_density >= 0.5:
-        ai_score += 8.0
-
-    # 4. Panjang kalimat rata-rata teratur khas LLM (18-32 kata)
-    if 18 <= avg_sentence_len <= 32 and (burstiness < 0.42 or seg_ratio >= 25.0):
         ai_score += 10.0
 
-    # 5. Deteksi parafrase canggung / spinner
+    # Sinyal pendukung (co-signals): segmental monotony hanya menambah skor jika ada sinyal lain yang aktif
+    has_co_signals = (burstiness < 0.30 or transition_density >= 1.2 or len(anomalies) > 0)
+
+    # 2. Segmental Monotony Ratio (% paragraf seragam) - HANYA jika didukung sinyal lain
+    if has_co_signals and seg_monotony["evaluated_paragraphs"] >= 5:
+        if seg_ratio >= 45.0:
+            ai_score += 25.0
+        elif seg_ratio >= 30.0:
+            ai_score += 15.0
+        elif seg_ratio >= 20.0:
+            ai_score += 8.0
+
+    # 3. Kepadatan Frasa Formulaik / Transisi Klise
+    if transition_density >= 3.5:
+        ai_score += 30.0
+    elif transition_density >= 2.2:
+        ai_score += 20.0
+    elif transition_density >= 1.2:
+        ai_score += 10.0
+
+    # 4. Panjang kalimat rata-rata teratur (18-32 kata) jika didukung sinyal lain
+    if 18 <= avg_sentence_len <= 32 and burstiness < 0.28 and has_co_signals:
+        ai_score += 10.0
+
+    # 5. Deteksi anomali parafrase / spinner
     if anomalies:
         ai_score += min(len(anomalies) * 5.0, 15.0)
 
     # Normalisasi batas 0 - 100
     ai_score = round(min(max(ai_score, 0.0), 100.0), 2)
 
-    # Klasifikasi Tingkat Indikasi
-    if ai_score >= 60.0:
+    disclaimer_text = (
+        "Indikator ini bersifat EKSPERIMENTAL dan HANYA menunjukkan variasi statistik pola kalimat "
+        "(burstiness, keteraturan segmen, frasa transisi), BUKAN bukti atau vonis penggunaan AI. "
+        "Gaya penulisan teratur dapat mencerminkan kepenulisan manusia yang disiplin. "
+        "Jangan gunakan indikator ini untuk menuduh atau mendiskualifikasi penulis tanpa telaah kualitatif komprehensif."
+    )
+
+    # Klasifikasi Tingkat Indikasi Berbasis Ambang Empiris (MODERATE: 50.0, HIGH: 75.0)
+    if ai_score >= 75.0:
         confidence = "HIGH"
-        label = "Pola Susunan Terstruktur Khas AI (Tinggi)"
-        if seg_ratio >= 25.0 and transition_density >= 1.0:
+        label = "[Eksperimental] Pola Kalimat Sangat Seragam & Klise Tinggi"
+        if seg_ratio >= 30.0 and transition_density >= 1.5:
             rationale = (
-                f"Naskah menunjukkan keteraturan ritme sintaksis segmental yang tinggi ({seg_ratio:.1f}% paragraf berpola seragam khas mesin) "
-                f"disertai kepadatan formulaik akademik AI ({transition_density:.1f}/1000 kata). "
-                f"Disarankan penguji melakukan klarifikasi pemahaman konseptual dan sumber rujukan secara lisan."
+                f"Secara statistik naskah menunjukkan keteraturan ritme sintaksis segmental ({seg_ratio:.1f}% paragraf berpola seragam) "
+                f"disertai kepadatan frasa transisi tertentu ({transition_density:.1f}/1000 kata). "
+                f"Catatan: Ini adalah indikator gaya bahasa eksperimental untuk panduan telaah mandiri penguji, bukan bukti atau vonis AI."
             )
         else:
             rationale = (
-                f"Naskah menunjukkan variasi panjang kalimat yang sangat seragam (Burstiness: {burstiness:.2f}) "
-                f"disertai kepadatan frasa transisi generik ({transition_density:.1f}/1000 kata). "
-                f"Disarankan penguji mengonfirmasi pemahaman konseptual mahasiswa secara lisan."
+                f"Secara statistik naskah memiliki variasi panjang kalimat yang sangat seragam (Burstiness: {burstiness:.2f}) "
+                f"disertai kepadatan frasa transisi ({transition_density:.1f}/1000 kata). "
+                f"Catatan: Ini adalah indikator gaya bahasa eksperimental untuk panduan telaah mandiri penguji, bukan bukti atau vonis AI."
             )
-    elif ai_score >= 35.0:
+    elif ai_score >= 50.0:
         confidence = "MODERATE"
-        label = "Indikasi Parafrase AI Ringan / Berbantuan Mesin"
-        if seg_ratio >= 20.0:
-            rationale = (
-                f"Ditemukan beberapa segmen dengan keteraturan sintaksis khas mesin ({seg_ratio:.1f}% paragraf seragam). "
-                f"Naskah kemungkinan menggunakan alat bantu parafrase atau asistensi draf digital."
-            )
-        else:
-            rationale = (
-                f"Ditemukan beberapa segmen dengan keteraturan sintaksis khas mesin (Burstiness: {burstiness:.2f}). "
-                f"Naskah kemungkinan menggunakan alat bantu parafrase atau penyempurnaan kalimat digital."
-            )
+        label = "[Eksperimental] Variasi Ritme Kalimat Terbatas"
+        rationale = (
+            f"Ditemukan tingkat keseragaman ritme kalimat tertentu (Burstiness: {burstiness:.2f}). "
+            f"Catatan: angka ini bersifat eksperimental dan tidak dapat dijadikan vonis integritas akademik."
+        )
     else:
         confidence = "LOW"
-        label = "Gaya Bahasa Alami Manusia (Organik)"
+        label = "[Eksperimental] Pola Kalimat Dinamis (Organik)"
         rationale = (
-            f"Struktur kalimat memiliki variasi ritme yang dinamis dan organik (Burstiness: {burstiness:.2f}) "
-            f"dengan sebaran leksikal alami khas penulisan manusia mandiri."
+            f"Struktur kalimat memiliki variasi ritme yang dinamis dan alami (Burstiness: {burstiness:.2f}) "
+            f"dalam batas sebaran wajar naskah akademik."
         )
 
     return {
         "status": "completed",
+        "is_experimental": True,
         "ai_probability_score": ai_score,
         "ai_confidence_level": confidence,
         "verdict_label": label,
         "summary_rationale": rationale,
+        "disclaimer": disclaimer_text,
         "metrics": {
             "burstiness": burstiness,
             "lexical_diversity": lex_diversity,

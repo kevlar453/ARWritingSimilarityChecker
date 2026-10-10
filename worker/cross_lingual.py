@@ -22,7 +22,7 @@ from dataclasses import dataclass, field, asdict
 # 1. KAMUS PEMETAAN KONSEP AKADEMIK DWIBAHASA (EXPANDED BILINGUAL ACADEMIC LEXICON)
 # ═══════════════════════════════════════════════════════════════════════════════
 
-BILINGUAL_ACADEMIC_LEXICON: Dict[str, str] = {
+BILINGUAL_ACADEMIC_LEXICON: Dict[str, Any] = {
     # --- Metodologi, Statistik & Desain Penelitian ---
     "penelitian": "research",
     "meneliti": "research",
@@ -90,7 +90,7 @@ BILINGUAL_ACADEMIC_LEXICON: Dict[str, str] = {
     "konseptual": "conceptual",
     "paradigma": "paradigm",
     "literatur": "literature",
-    "pustaka": "literature",
+    "pustaka": ("literature", "reference"),
     "tinjauan": "review",
     "meninjau": "review",
     "sumber": "source",
@@ -125,7 +125,6 @@ BILINGUAL_ACADEMIC_LEXICON: Dict[str, str] = {
     "jurnal": "journal",
     "sitasi": "citation",
     "rujukan": "reference",
-    "pustaka": "references",
 
     # --- Medis, Kesehatan & Hayati ---
     "kanker": "cancer",
@@ -175,7 +174,7 @@ BILINGUAL_ACADEMIC_LEXICON: Dict[str, str] = {
     "infeksi": "infection",
     "respons": "response",
     "sel": "cell",
-    "jaringan": "tissue",
+    "jaringan": ("tissue", "network"),
     "darah": "blood",
     "depresi": "depression",
     "kecemasan": "anxiety",
@@ -197,7 +196,6 @@ BILINGUAL_ACADEMIC_LEXICON: Dict[str, str] = {
     "model": "model",
     "pemodelan": "modeling",
     "sistem": "system",
-    "jaringan": "network",
     "kecerdasan": "intelligence",
     "buatan": "artificial",
     "pembelajaran mesin": "machine learning",
@@ -447,26 +445,44 @@ def lemmatize_english_token(word: str) -> str:
     return w
 
 
-def project_token_to_concept(word: str) -> Optional[str]:
+def project_token_to_concepts(word: str) -> List[str]:
     """
-    Memetakan sebuah token ke konsep kanonikal bersama:
-    1. Cek kamus dwibahasa eksplisit
+    Memetakan sebuah token ke daftar konsep kanonikal bersama:
+    1. Cek kamus dwibahasa eksplisit (string tunggal atau tuple sinonim)
     2. Cek aturan morfologis kognat serapan
     3. Lemmatisasi kata bahasa Inggris
     """
     w = word.lower()
     if w in CROSS_LINGUAL_STOPWORDS or len(w) < 3:
-        return None
+        return []
 
     if w in BILINGUAL_ACADEMIC_LEXICON:
-        return lemmatize_english_token(BILINGUAL_ACADEMIC_LEXICON[w])
+        val = BILINGUAL_ACADEMIC_LEXICON[w]
+        if isinstance(val, (tuple, list)):
+            res = []
+            for item in val:
+                lem = lemmatize_english_token(item)
+                if lem and lem not in CROSS_LINGUAL_STOPWORDS and len(lem) > 2:
+                    res.append(lem)
+            return res
+        else:
+            lem = lemmatize_english_token(val)
+            return [lem] if (lem and lem not in CROSS_LINGUAL_STOPWORDS and len(lem) > 2) else []
 
     # Transformasi kognat serapan
     morph_w = apply_morphological_cognates(w)
     if morph_w != w:
-        return lemmatize_english_token(morph_w)
+        lem = lemmatize_english_token(morph_w)
+        return [lem] if (lem and lem not in CROSS_LINGUAL_STOPWORDS and len(lem) > 2) else []
 
-    return lemmatize_english_token(w)
+    lem = lemmatize_english_token(w)
+    return [lem] if (lem and lem not in CROSS_LINGUAL_STOPWORDS and len(lem) > 2) else []
+
+
+def project_token_to_concept(word: str) -> Optional[str]:
+    """Wrapper kompatibilitas untuk memetakan token tunggal ke konsep utama."""
+    concepts = project_token_to_concepts(word)
+    return concepts[0] if concepts else None
 
 
 def project_text_to_canonical_concepts(text: str) -> List[str]:
@@ -474,9 +490,9 @@ def project_text_to_canonical_concepts(text: str) -> List[str]:
     words = re.findall(r"\b[a-zA-Z]{3,}\b", text.lower())
     concepts = []
     for w in words:
-        c = project_token_to_concept(w)
-        if c and c not in CROSS_LINGUAL_STOPWORDS and len(c) > 2:
-            concepts.append(c)
+        for c in project_token_to_concepts(w):
+            if c and c not in CROSS_LINGUAL_STOPWORDS and len(c) > 2:
+                concepts.append(c)
     return concepts
 
 
@@ -618,6 +634,28 @@ def calculate_cross_lingual_similarity(
 
     is_cross_lingual_pair = (lang_sub == "ID" and lang_src == "EN") or (lang_sub == "EN" and lang_src == "ID")
 
+    # Verifikasi Pasangan Bahasa: HANYA berikan skor jika benar-benar pasangan lintas bahasa (ID <-> EN)
+    # Dokumen dengan bahasa yang sama (ID <-> ID atau EN <-> EN) harus menghasilkan skor 0.0
+    if not is_cross_lingual_pair:
+        return CrossLingualResult(
+            is_cross_lingual_match=False,
+            cross_lingual_score=0.0,
+            confidence="NONE",
+            detected_pair=f"{lang_src} -> {lang_sub}",
+            source_document_id=source_doc_id,
+            source_title=source_title,
+            concept_overlap_percent=0.0,
+            shared_concept_count=0,
+            shared_pairs_count=0,
+            matched_concepts=[],
+            aligned_passages=[],
+            rationale=(
+                f"Pasangan dokumen memiliki bahasa yang sama ({lang_sub} dan {lang_src}). "
+                f"Analisis alih bahasa dilewati karena pemeriksaan kemiripan dilakukan oleh mesin monolingual."
+            ),
+            verdict_label="Bukan Pasangan Lintas Bahasa"
+        )
+
     sub_concepts = project_text_to_canonical_concepts(submission_text)
     src_concepts = project_text_to_canonical_concepts(source_text)
 
@@ -633,65 +671,62 @@ def calculate_cross_lingual_similarity(
             verdict_label="Otentik / Bebas Terjemahan"
         )
 
-    # 1. Bag-of-Concepts Overlap
+    # 1. Bag-of-Concepts Overlap (Sørensen-Dice Coefficient ternormalisasi)
     set_sub = set(sub_concepts)
     set_src = set(src_concepts)
     common_concepts = set_sub.intersection(set_src)
-    min_vocab_len = min(len(set_sub), len(set_src))
-    concept_overlap = (len(common_concepts) / min_vocab_len) * 100.0 if min_vocab_len > 0 else 0.0
+    total_vocab_len = len(set_sub) + len(set_src)
+    concept_overlap = (2.0 * len(common_concepts) / total_vocab_len) * 100.0 if total_vocab_len > 0 else 0.0
 
-    # 2. Unordered Concept Pairs (Co-occurrence)
+    # 2. Unordered Concept Pairs (Co-occurrence Dice)
     sub_pairs = generate_unordered_concept_pairs(sub_concepts, window_size=4)
     src_pairs = generate_unordered_concept_pairs(src_concepts, window_size=4)
     common_pairs = sub_pairs.intersection(src_pairs)
-    min_pairs_len = min(len(sub_pairs), len(src_pairs))
-    pair_overlap = (len(common_pairs) / min_pairs_len) * 100.0 if min_pairs_len > 0 else 0.0
+    total_pairs_len = len(sub_pairs) + len(src_pairs)
+    pair_overlap = (2.0 * len(common_pairs) / total_pairs_len) * 100.0 if total_pairs_len > 0 else 0.0
 
-    # 3. Sequential Concept Shingles
-    sub_shingles = generate_concept_shingles(sub_concepts, size=2)
-    src_shingles = generate_concept_shingles(src_concepts, size=2)
-    common_shingles = sub_shingles.intersection(src_shingles)
-
-    # Composite Score
-    composite_score = round(
-        (concept_overlap * 0.40) + (pair_overlap * 0.45) + (min(len(common_shingles) * 3.0, 15.0)),
-        1
-    )
-    composite_score = min(max(composite_score, 0.0), 100.0)
-
-    # Ekstraksi pasangan pasase dwibahasa
+    # 3. Ekstraksi pasangan pasase dwibahasa terpadan
     aligned_passages = []
     if len(common_concepts) >= 4:
         aligned_passages = extract_aligned_passage_pairs(submission_text, source_text, max_pairs=3)
 
-    # Evaluasi status kecurigaan terjemahan
+    # Bonus pasase terpadan: mensyaratkan adanya korespondensi kalimat nyata
+    aligned_bonus = min(len(aligned_passages) * 5.0, 15.0)
+
+    # Composite Score
+    composite_score = round(
+        (concept_overlap * 0.45) + (pair_overlap * 0.45) + aligned_bonus,
+        1
+    )
+    composite_score = min(max(composite_score, 0.0), 100.0)
+
+    # Evaluasi status kecurigaan terjemahan (mensyaratkan bukti pasase nyata untuk MODERATE/HIGH)
     is_translation_match = False
     confidence = "NONE"
     verdict_label = "Otentik / Bebas Terjemahan"
     rationale = "Tidak terdeteksi indikasi penerjemahan langsung antar bahasa."
 
-    if is_cross_lingual_pair:
-        if composite_score >= 32.0 or (len(common_pairs) >= 8 and len(common_concepts) >= 10):
-            is_translation_match = True
-            if composite_score >= 48.0 or len(aligned_passages) >= 2:
-                confidence = "HIGH"
-                verdict_label = "Terindikasi Plagiarisme Terjemahan (High Confidence)"
-            else:
-                confidence = "MODERATE"
-                verdict_label = "Terindikasi Parafrasa Lintas Bahasa"
+    if composite_score >= 40.0 and len(aligned_passages) >= 1 and len(common_concepts) >= 8:
+        is_translation_match = True
+        if composite_score >= 55.0 and len(aligned_passages) >= 2 and len(common_concepts) >= 12:
+            confidence = "HIGH"
+            verdict_label = "Terindikasi Plagiarisme Terjemahan (High Confidence)"
+        else:
+            confidence = "MODERATE"
+            verdict_label = "Terindikasi Parafrasa Lintas Bahasa"
 
-            rationale = (
-                f"Terdeteksi indikasi terjemahan langsung lintas bahasa ({lang_src} ke {lang_sub}). "
-                f"Terdapat {len(common_concepts)} kesesuaian konsep inti, {len(common_pairs)} pasangan relasi gagasan, "
-                f"dan {len(aligned_passages)} pasase kalimat terpadan dengan tingkat keselarasan semantik {composite_score:.1f}%."
-            )
-        elif composite_score >= 15.0:
-            confidence = "LOW"
-            verdict_label = "Irisan Terminologi Umum (Wajar)"
-            rationale = (
-                f"Ditemukan irisan kosakata akademis umum ({composite_score:.1f}%), "
-                f"namun tidak cukup kuat untuk diindikasikan sebagai naskah terjemahan langsung."
-            )
+        rationale = (
+            f"Terdeteksi indikasi terjemahan langsung lintas bahasa ({lang_src} ke {lang_sub}). "
+            f"Terdapat {len(common_concepts)} kesesuaian konsep inti, {len(common_pairs)} pasangan relasi gagasan, "
+            f"dan {len(aligned_passages)} pasase kalimat terpadan dengan tingkat keselarasan semantik {composite_score:.1f}%."
+        )
+    elif composite_score >= 15.0:
+        confidence = "LOW"
+        verdict_label = "Irisan Terminologi Umum (Wajar)"
+        rationale = (
+            f"Ditemukan irisan kosakata akademis umum ({composite_score:.1f}%), "
+            f"namun tidak cukup kuat untuk diindikasikan sebagai naskah terjemahan langsung."
+        )
 
     return CrossLingualResult(
         is_cross_lingual_match=is_translation_match,
@@ -765,19 +800,28 @@ def scan_cross_lingual_corpus(
     if sub_lang == "ID" and connection:
         try:
             with connection.cursor(dictionary=True) as cursor:
-                # Query dokumen korpus yang berpotensi berbahasa Inggris
+                # Identifikasi dokumen korpus berbahasa Inggris melalui deteksi bahasa teks nyata (bukan tebakan judul LIKE)
                 cursor.execute("""
-                    SELECT id, title, storage_path, mime_type
-                    FROM documents
-                    WHERE document_type = 'corpus'
-                      AND (
-                        title LIKE '% the %' OR title LIKE '% of %' OR title LIKE 'The %'
-                        OR title LIKE '% in %' OR title LIKE '% and %' OR title LIKE '% for %'
-                      )
-                    ORDER BY id DESC
-                    LIMIT 20
+                    SELECT dc.document_id, dc.text, d.title, d.storage_path, d.mime_type
+                    FROM document_chunks dc
+                    JOIN documents d ON d.id = dc.document_id
+                    WHERE d.document_type = 'corpus' AND dc.chunk_index = 0
+                    ORDER BY d.id DESC
+                    LIMIT 200
                 """)
-                en_docs = cursor.fetchall()
+                candidate_chunks = cursor.fetchall()
+                en_docs = []
+                for cc in candidate_chunks:
+                    c_text = cc.get("text") or ""
+                    if len(c_text) >= 40 and detect_language(c_text) == "EN":
+                        en_docs.append({
+                            "id": cc["document_id"],
+                            "title": cc["title"],
+                            "storage_path": cc.get("storage_path"),
+                            "mime_type": cc.get("mime_type")
+                        })
+                        if len(en_docs) >= 20:
+                            break
 
                 for ed in en_docs:
                     e_id = ed["id"]

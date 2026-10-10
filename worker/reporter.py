@@ -287,6 +287,31 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
                     "message": f"Audit semantik Google Gemini dilewati: {gem_err}"
                 }
 
+            # 9. Self-Collision & Revision Protection Telemetry
+            doc_user_id = document.get("user_id")
+            excluded_user_corpus_count = 0
+            if doc_user_id:
+                try:
+                    cursor.execute("""
+                        SELECT COUNT(*) AS total
+                        FROM documents
+                        WHERE user_id = %s
+                          AND document_type = 'corpus'
+                          AND id != %s
+                    """, (doc_user_id, document_id))
+                    row_excluded = cursor.fetchone()
+                    if row_excluded:
+                        excluded_user_corpus_count = row_excluded.get("total", 0)
+                except Exception:
+                    pass
+
+            result["self_collision_protection"] = {
+                "active": True,
+                "user_id": doc_user_id,
+                "excluded_own_corpus_count": excluded_user_corpus_count,
+                "note": "Naskah korpus milik sendiri dikecualikan dari pemindaian plagiarisme untuk mencegah false positive pada naskah revisi."
+            }
+
             # Pemetaan rentang karakter token untuk menentukan zonasi setiap pasase
             import re
             token_spans = [m.span() for m in re.finditer(r"[^\W_]+(?:[-\'][^\W_]+)*", submission_text.lower(), re.UNICODE)]
@@ -395,11 +420,10 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
             cited_count = sum(1 for m in matches_list if detect_citation_context(m.get("passage_text", "")).citation_status in ("CITED", "ATTRIBUTED"))
             q_ratio = (cited_count / total_matches_cnt) if total_matches_cnt > 0 else (0.8 if context_res.citation_status in ("CITED", "ATTRIBUTED") else 0.0)
 
+            # Keadilan Akademik: Stylometri bersifat eksperimental dan belum divalidasi.
+            # Jangan masukkan ke risk_classifier agar mahasiswa tidak terkena risiko vonis risiko AI.
             burstiness_val = 0.5
             trans_density_val = 0.0
-            if isinstance(ai_stylometrics_res, dict) and "metrics" in ai_stylometrics_res:
-                burstiness_val = float(ai_stylometrics_res["metrics"].get("burstiness", 0.5))
-                trans_density_val = float(ai_stylometrics_res["metrics"].get("transition_density", 0.0))
 
             cl_score = 0.0
             if cross_lingual_res:

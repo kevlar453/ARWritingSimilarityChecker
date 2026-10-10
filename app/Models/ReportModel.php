@@ -25,6 +25,7 @@ class ReportModel extends Model
         'source_count',
         'match_count',
         'longest_match_words',
+        'verification_code',
         'status',
         'error_message',
         'created_at',

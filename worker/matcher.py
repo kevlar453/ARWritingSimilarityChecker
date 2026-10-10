@@ -1,4 +1,8 @@
+import json
+import logging
 from collections import defaultdict
+from typing import Dict, List, Tuple, Optional, Any
+from worker.queue_manager import get_redis_client
 from worker.similarity import (
     merge_ranges,
     calculate_overall_similarity,
@@ -13,8 +17,84 @@ from worker.idf import (
     calculate_segment_commonness
 )
 
+logger = logging.getLogger("artilik.matcher")
+
 SHINGLE_SIZE = 5
 BATCH_SIZE = 500
+SHINGLE_CACHE_TTL = 3600  # 1 jam
+
+
+def fetch_shingles_from_cache(
+    unique_fingerprints: list[bytes],
+    corpus_scope: str,
+    exclude_user_id: Optional[int] = None
+) -> Tuple[Dict[bytes, List[dict]], List[bytes]]:
+    """
+    Mengambil shingle hits dari Redis cache menggunakan pipeline multi-get (Inisiatif 1.3).
+    Mengembalikan:
+      - cached_matches: dict mapping fingerprint -> list of match rows
+      - misses: list of fingerprints yang belum di-cache
+    """
+    client = get_redis_client()
+    if not client:
+        return {}, unique_fingerprints
+
+    user_scope = exclude_user_id if exclude_user_id is not None else 0
+    key_prefix = f"artilik:shingle:{corpus_scope}:{user_scope}:"
+
+    fp_list = list(unique_fingerprints)
+    keys = [key_prefix + (fp.hex() if isinstance(fp, bytes) else str(fp)) for fp in fp_list]
+
+    try:
+        pipe = client.pipeline(transaction=False)
+        for k in keys:
+            pipe.get(k)
+        cached_values = pipe.execute()
+
+        cached_matches = {}
+        misses = []
+
+        for fp, val in zip(fp_list, cached_values):
+            if val is not None:
+                try:
+                    rows = json.loads(val)
+                    cached_matches[fp] = rows
+                except Exception:
+                    misses.append(fp)
+            else:
+                misses.append(fp)
+
+        return cached_matches, misses
+    except Exception as e:
+        logger.warning(f"[CACHE] Gagal membaca shingle cache dari Redis: {e}")
+        return {}, unique_fingerprints
+
+
+def store_shingles_to_cache(
+    fingerprint_map: Dict[bytes, List[dict]],
+    corpus_scope: str,
+    exclude_user_id: Optional[int] = None,
+    ttl: int = SHINGLE_CACHE_TTL
+) -> None:
+    """
+    Menyimpan hasil pencarian shingle ke Redis cache secara batch dengan pipelining (Inisiatif 1.3).
+    """
+    client = get_redis_client()
+    if not client or not fingerprint_map:
+        return
+
+    user_scope = exclude_user_id if exclude_user_id is not None else 0
+    key_prefix = f"artilik:shingle:{corpus_scope}:{user_scope}:"
+
+    try:
+        pipe = client.pipeline(transaction=False)
+        for fp, matches in fingerprint_map.items():
+            k = key_prefix + (fp.hex() if isinstance(fp, bytes) else str(fp))
+            pipe.set(k, json.dumps(matches), ex=ttl)
+        pipe.execute()
+    except Exception as e:
+        logger.warning(f"[CACHE] Gagal menulis shingle cache ke Redis: {e}")
+
 
 def get_document_word_count(connection, document_id: int) -> int:
     cursor = connection.cursor(dictionary=True)
@@ -52,17 +132,43 @@ def find_matching_fingerprints(
     submission_document_id: int,
     corpus_scope: str = "production",
     benchmark_run_id: int | None = None,
-    batch_size: int = BATCH_SIZE
+    batch_size: int = BATCH_SIZE,
+    exclude_user_id: int | None = None,
+    use_cache: bool = True
 ) -> list[dict]:
     if not unique_fingerprints:
         return []
-    
+
+    # 1. Coba ambil dari Redis Inverted Shingle Cache terlebih dahulu (Inisiatif 1.3)
+    if use_cache:
+        cached_map, misses = fetch_shingles_from_cache(unique_fingerprints, corpus_scope, exclude_user_id)
+    else:
+        cached_map, misses = {}, unique_fingerprints
+
     results = []
-    for start in range(0, len(unique_fingerprints), batch_size):
-        batch = unique_fingerprints[start:start + batch_size]
+    # Rekonstruksi baris dari cache untuk non-self documents
+    for fp, cached_rows in cached_map.items():
+        for r in cached_rows:
+            if r["s_doc"] != submission_document_id:
+                results.append({
+                    "fingerprint": fp,
+                    "source_document_id": r["s_doc"],
+                    "source_chunk_id": r["s_chunk"],
+                    "source_position": r["s_pos"]
+                })
+
+    # 2. Jika seluruh shingle ter-cache, kembalikan langsung tanpa kueri database
+    if not misses:
+        return results
+
+    # 3. Kueri MariaDB untuk shingle yang belum ada di cache (cache misses)
+    new_cache_entries = {fp: [] for fp in misses}
+
+    for start in range(0, len(misses), batch_size):
+        batch = misses[start:start + batch_size]
         placeholders = ",".join(["%s"] * len(batch))
         params = [submission_document_id] + batch
-        
+
         sql = f"""
             SELECT
                 f.fingerprint,
@@ -75,7 +181,7 @@ def find_matching_fingerprints(
               AND f.fingerprint IN ({placeholders})
               AND d.document_type = 'corpus'
         """
-        
+
         if corpus_scope == "benchmark":
             if benchmark_run_id is not None:
                 sql += " AND d.benchmark_run_id = %s"
@@ -86,15 +192,31 @@ def find_matching_fingerprints(
                 AND d.indexing_status = 'completed'
                 AND d.corpus_visibility IN ('institution', 'corpus')
             """
+            if exclude_user_id is not None:
+                sql += " AND (d.user_id != %s OR d.user_id IS NULL)"
+                params.append(exclude_user_id)
         else:
             raise ValueError(f"corpus_scope tidak valid: '{corpus_scope}'")
-            
+
         cursor = connection.cursor(dictionary=True)
         cursor.execute(sql, params)
         rows = cursor.fetchall()
         cursor.close()
-        results.extend(rows)
-        
+
+        for row in rows:
+            results.append(row)
+            fp = row["fingerprint"]
+            if fp in new_cache_entries:
+                new_cache_entries[fp].append({
+                    "s_doc": row["source_document_id"],
+                    "s_chunk": row["source_chunk_id"],
+                    "s_pos": row["source_position"]
+                })
+
+    # 4. Simpan hasil kueri ke Redis cache untuk mempercepat pemindaian selanjutnya
+    if use_cache:
+        store_shingles_to_cache(new_cache_entries, corpus_scope, exclude_user_id)
+
     return results
 
 def build_match_pairs(submission_map: dict, raw_matches: list[dict]) -> list[dict]:
@@ -381,11 +503,13 @@ def run_similarity_check(
     submission_document_id: int,
     engine: str = "exact",
     corpus_scope: str = "production",
-    benchmark_run_id: int | None = None
+    benchmark_run_id: int | None = None,
+    exclude_same_user: bool = True
 ) -> dict:
     """
     Fungsi eksekusi inti similarity checker AR Tilik.
     Mendukung engine 'exact' (baseline v1.0) dan 'idf' (significance v1.1).
+    Secara default mengecualikan naskah korpus milik user yang sama untuk mencegah false positive self-plagiarism.
     """
     total_words = get_document_word_count(connection, submission_document_id)
     submission_fingerprints = get_submission_fingerprints(connection, submission_document_id)
@@ -407,13 +531,27 @@ def run_similarity_check(
     
     submission_map = build_submission_fingerprint_map(submission_fingerprints)
     unique_fingerprints = list(submission_map.keys())
+
+    # Ambil user_id naskah agar korpus terdahulu milik pengguna yang sama dikecualikan (cegah self-collision)
+    submission_user_id = None
+    if exclude_same_user and corpus_scope == "production":
+        try:
+            cursor = connection.cursor(dictionary=True)
+            cursor.execute("SELECT user_id FROM documents WHERE id = %s", (submission_document_id,))
+            doc_row = cursor.fetchone()
+            cursor.close()
+            if doc_row and doc_row.get("user_id"):
+                submission_user_id = doc_row["user_id"]
+        except Exception:
+            pass
     
     raw_matches = find_matching_fingerprints(
         connection=connection,
         unique_fingerprints=unique_fingerprints,
         submission_document_id=submission_document_id,
         corpus_scope=corpus_scope,
-        benchmark_run_id=benchmark_run_id
+        benchmark_run_id=benchmark_run_id,
+        exclude_user_id=submission_user_id
     )
     
     if not raw_matches:

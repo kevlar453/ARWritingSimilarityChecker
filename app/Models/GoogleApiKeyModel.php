@@ -40,6 +40,12 @@ class GoogleApiKeyModel extends Model
     {
         $keys = $this->orderBy('id', 'DESC')->findAll();
         $now = date('Y-m-d H:i:s');
+        $ptDateToday = '';
+        try {
+            $ptDateToday = (new \DateTime('now', new \DateTimeZone('America/Los_Angeles')))->format('Y-m-d');
+        } catch (\Throwable $e) {
+            $ptDateToday = date('Y-m-d');
+        }
 
         foreach ($keys as &$k) {
             // Auto-recovery jika rate_limited_until sudah lewat
@@ -50,6 +56,25 @@ class GoogleApiKeyModel extends Model
                 ]);
                 $k['status'] = 'active';
                 $k['rate_limited_until'] = null;
+            }
+
+            // Auto-recovery jika kunci exhausted sudah melewati Midnight Pacific Time (reset kuota Google)
+            if ($k['status'] === 'exhausted' && !empty($k['updated_at'])) {
+                try {
+                    $keyPtDate = (new \DateTime($k['updated_at']))->setTimezone(new \DateTimeZone('America/Los_Angeles'))->format('Y-m-d');
+                    if ($keyPtDate < $ptDateToday) {
+                        $this->update($k['id'], [
+                            'status'             => 'active',
+                            'rate_limited_until' => null,
+                            'error_count'        => 0,
+                        ]);
+                        $k['status'] = 'active';
+                        $k['rate_limited_until'] = null;
+                        $k['error_count'] = 0;
+                    }
+                } catch (\Throwable $e) {
+                    // Abaikan kesalahan parsing tanggal
+                }
             }
 
             // Masking API Key: AIzaSy...4xK9
@@ -66,7 +91,7 @@ class GoogleApiKeyModel extends Model
     }
 
     /**
-     * Mengambil satu API Key yang siap digunakan dengan strategi Round-Robin
+     * Mengambil satu API Key yang siap digunakan dengan strategi Pool Cerdas (kesehatan & beban terendah)
      */
     public function getNextRoundRobinKey(): ?array
     {
@@ -81,12 +106,14 @@ class GoogleApiKeyModel extends Model
                  'rate_limited_until' => null,
              ]);
 
-        // Pilih kunci aktif yang paling lama tidak digunakan (Round-Robin alami)
+        // Pilih kunci aktif: error terendah -> pemakaian terendah -> waktu pakai terlama
         return $this->where('status', 'active')
                     ->groupStart()
                         ->where('rate_limited_until IS NULL', null, false)
                         ->orWhere('rate_limited_until <=', $now)
                     ->groupEnd()
+                    ->orderBy('error_count', 'ASC')
+                    ->orderBy('usage_count', 'ASC')
                     ->orderBy('last_used_at', 'ASC')
                     ->orderBy('id', 'ASC')
                     ->first();

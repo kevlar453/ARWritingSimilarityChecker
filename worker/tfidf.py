@@ -105,7 +105,9 @@ def get_submission_tokens(connection, document_id: int) -> list[str]:
 def get_corpus_documents(
     connection,
     corpus_scope: str = "production",
-    benchmark_run_id: int | None = None
+    benchmark_run_id: int | None = None,
+    exclude_document_id: int | None = None,
+    exclude_user_id: int | None = None
 ) -> list[dict]:
     cursor = connection.cursor(dictionary=True)
     sql = """
@@ -126,6 +128,12 @@ def get_corpus_documents(
             AND d.indexing_status = 'completed'
             AND d.corpus_visibility IN ('institution', 'corpus')
         """
+        if exclude_document_id is not None:
+            sql += " AND d.id != %s"
+            params.append(exclude_document_id)
+        if exclude_user_id is not None:
+            sql += " AND (d.user_id != %s OR d.user_id IS NULL)"
+            params.append(exclude_user_id)
         
     cursor.execute(sql, params)
     rows = cursor.fetchall()
@@ -159,11 +167,13 @@ def run_tfidf_similarity_check(
     submission_document_id: int,
     corpus_scope: str = "production",
     benchmark_run_id: int | None = None,
-    threshold: float = 0.05
+    threshold: float = 0.05,
+    exclude_same_user: bool = True
 ) -> dict:
     """
     Menghitung kemiripan leksikal dan topikal (TF-IDF + Cosine Similarity)
     secara transparan tanpa memalsukan metrik exact.
+    Mengecualikan korpus milik user yang sama untuk mencegah self-collision.
     """
     submission_tokens = get_submission_tokens(connection, submission_document_id)
     total_words = len(submission_tokens)
@@ -187,8 +197,26 @@ def run_tfidf_similarity_check(
     
     if total_words == 0:
         return empty_result
-        
-    corpus_docs = get_corpus_documents(connection, corpus_scope, benchmark_run_id)
+
+    submission_user_id = None
+    if exclude_same_user and corpus_scope == "production":
+        try:
+            cursor = connection.cursor(dictionary=True)
+            cursor.execute("SELECT user_id FROM documents WHERE id = %s", (submission_document_id,))
+            doc_row = cursor.fetchone()
+            cursor.close()
+            if doc_row and doc_row.get("user_id"):
+                submission_user_id = doc_row["user_id"]
+        except Exception:
+            pass
+
+    corpus_docs = get_corpus_documents(
+        connection=connection,
+        corpus_scope=corpus_scope,
+        benchmark_run_id=benchmark_run_id,
+        exclude_document_id=submission_document_id,
+        exclude_user_id=submission_user_id
+    )
     if not corpus_docs:
         return empty_result
         

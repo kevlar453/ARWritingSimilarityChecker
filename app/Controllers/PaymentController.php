@@ -83,6 +83,18 @@ class PaymentController extends BaseController
             'updated_at'         => date('Y-m-d H:i:s'),
         ]);
 
+        $userName        = trim((string) ($user['name'] ?? 'Pelanggan AR Tilik'));
+        $userEmail       = trim((string) ($user['email'] ?? ''));
+        $userInstitution = trim((string) ($user['institution'] ?? ''));
+        $packageName     = (string) ($package['name'] ?? 'Paket Kuota AR Tilik');
+
+        // Format Order Detail lengkap: {nama pengguna} dari {nama_institusi} order paket {nama_paket}
+        if (!empty($userInstitution)) {
+            $orderDetail = "{$userName} dari {$userInstitution} order paket {$packageName}";
+        } else {
+            $orderDetail = "{$userName} order paket {$packageName}";
+        }
+
         $params = [
             'transaction_details' => [
                 'order_id'     => $orderId,
@@ -90,16 +102,31 @@ class PaymentController extends BaseController
             ],
             'item_details' => [
                 [
-                    'id'       => $package['id'],
-                    'price'    => (int) $package['amount'],
-                    'quantity' => 1,
-                    'name'     => substr($package['name'], 0, 50),
+                    'id'            => $package['id'],
+                    'price'         => (int) $package['amount'],
+                    'quantity'      => 1,
+                    'name'          => substr($package['name'], 0, 50),
+                    'category'      => 'Kuota Submisi AR Tilik',
+                    'merchant_name' => 'AR Tilik',
                 ]
             ],
             'customer_details' => [
-                'first_name' => $user['name'],
-                'email'      => $user['email'],
+                'first_name'       => $userName,
+                'email'            => $userEmail,
+                'billing_address'  => [
+                    'first_name'   => $userName,
+                    'email'        => $userEmail,
+                    'address'      => substr($orderDetail, 0, 255),
+                    'country_code' => 'IDN',
+                ],
+                'shipping_address' => [
+                    'first_name'   => $userName,
+                    'email'        => $userEmail,
+                    'address'      => substr($orderDetail, 0, 255),
+                    'country_code' => 'IDN',
+                ],
             ],
+            'custom_field1' => substr($orderDetail, 0, 255),
         ];
 
         try {
@@ -119,6 +146,7 @@ class PaymentController extends BaseController
                 'snap_token'   => $snapToken,
                 'redirect_url' => $redirectUrl,
                 'package'      => $package,
+                'order_detail' => $orderDetail,
             ]);
         } catch (\Throwable $e) {
             log_message('error', 'Gagal membuat Snap Token Midtrans: ' . $e->getMessage());

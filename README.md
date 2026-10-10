@@ -1,16 +1,16 @@
 # AR Tilik — Academic Writing Similarity & Evidence Checker
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-v1.1.0--GA-indigo.svg" alt="Version">
+  <img src="https://img.shields.io/badge/version-v1.3.0--Production-indigo.svg" alt="Version">
   <img src="https://img.shields.io/badge/status-production--ready-emerald.svg" alt="Status">
-  <img src="https://img.shields.io/badge/automated%20tests-116%2F116%20passed-brightgreen.svg" alt="Tests">
-  <img src="https://img.shields.io/badge/human%20validation-100%25%20agreement-blue.svg" alt="Human Validation">
-  <img src="https://img.shields.io/badge/latency%20overhead-%3C%20150ms%20(0.23ms%20avg)-teal.svg" alt="SLA">
+  <img src="https://img.shields.io/badge/automated%20tests-120%2B%20passed-brightgreen.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/forensic%20engine-Google%20Gemini%20AI-blue.svg" alt="AI Engine">
+  <img src="https://img.shields.io/badge/integrations-PKP%20OJS%203.x-emerald.svg" alt="OJS 3.x">
   <img src="https://img.shields.io/badge/PHP-8.1%2B-777BB4.svg" alt="PHP">
   <img src="https://img.shields.io/badge/Python-3.12%2B-3776AB.svg" alt="Python">
 </p>
 
-**AR Tilik** adalah sistem penelaah kemiripan karya ilmiah berbasis bukti tekstual (*textual evidence*), orientasi leksikal (*lexical similarity*), dan kesadaran konteks akademik (*citation context awareness*) yang menjunjung tinggi keadilan akademik (*academic fairness*).
+**AR Tilik** adalah sistem penelaah kemiripan karya ilmiah berbasis bukti tekstual (*textual evidence*), orientasi leksikal (*lexical similarity*), kesadaran konteks akademik (*citation context awareness*), dan penalaran semantik **Audit Forensik Cerdas AI** yang menjunjung tinggi keadilan akademik (*academic fairness*).
 
 Sistem dirancang secara khusus untuk membedakan antara **penyalinan pasase sekuensial verbatim mutlak**, **modifikasi kata (*copy-edit*)**, **parafrasa leksikal topikal**, **kutipan berizin (*proper citations/quotes*)**, dan **penggunaan frasa baku metodologi ilmiah** tanpa melontarkan tuduhan sepihak.
 
@@ -29,11 +29,12 @@ Sistem dirancang secara khusus untuk membedakan antara **penyalinan pasase sekue
 
 ---
 
-## 🔬 Arsitektur Sistem 4-Lapisan (v1.1.0)
+## 🔬 Arsitektur Sistem Multi-Lapisan (v1.3.0 Production)
 
 ```text
                            ┌───────────────────────────┐
                            │   Submisi Karya Ilmiah    │
+                           │  (Web UI / PKP OJS 3 API) │
                            └─────────────┬─────────────┘
                                          │
  ┌───────────────────────────────────────┴───────────────────────────────────────┐
@@ -52,25 +53,24 @@ Sistem dirancang secara khusus untuk membedakan antara **penyalinan pasase sekue
  └─────────────────────────────────┼─────────────────────────────────────────────┘
                                    │
  ┌─────────────────────────────────▼─────────────────────────────────────────────┐
- │ 2. CITATION & CONTEXT DETECTOR LAYER (v1.1)                                   │
- │    - Deteksi deterministik: Inline, Parenthetical, Direct Quote, Block Quote   │
- │    - Ekstraksi Context Span (posisi karakter) & Auditable Rationale           │
- │    - Penanganan status ambigu deterministik -> UNKNOWN                        │
+ │ 2. CITATION & STYLOMETRIC ANALYSIS LAYER (v1.1 & v1.2)                        │
+ │    - Deteksi deterministik sitasi & isolasi teks substantif (section-aware)    │
+ │    - AI Stylometrics: Monotoni paragraf, frasa formulaik akademik             │
+ │    - Cross-lingual similarity & deteksi parafrase lintas-bahasa               │
  └─────────────────────────────────┬─────────────────────────────────────────────┘
                                    │
  ┌─────────────────────────────────▼─────────────────────────────────────────────┐
- │ 3. DECOMPOSED EVIDENCE PRESENTATION LAYER (v1.1)                              │
- │    - Source Group 1: Direct Textual Overlap (Exact > 0 atau Matched Words > 0)│
- │    - Source Group 2: Lexical / Topic Similarity (Cosine > 0)                  │
- │    - Divergence Alert Generator: Deteksi Exact ≈ 0% dengan Cosine > 0%        │
+ │ 3. AUDIT FORENSIK CERDAS AI & ORAL DEFENSE GUIDE (v1.3.0)                     │
+ │    - Google Gemini AI multi-key pool (round-robin + rate-limit failover)      │
+ │    - Verifikasi fabrikasi sitasi (mendeteksi referensi semu / halusinasi AI)  │
+ │    - 3 Set pertanyaan kritis telaah untuk Mitra Bestari & Meja Ujian Sidang   │
  └─────────────────────────────────┬─────────────────────────────────────────────┘
                                    │
  ┌─────────────────────────────────▼─────────────────────────────────────────────┐
- │ 4. HUMAN VALIDATION & OPERATIONAL OBSERVABILITY LAYER (v1.1)                  │
- │    - Expert Review Panel: 30 Kasus Terprioritas (100% Reviewer Agreement)     │
- │    - Real-Time SLA Tracking: Overhead < 150ms (p95: 0.186 ms)                 │
- │    - Structured JSON Lines Telemetry: writable/logs/v1_1_observability.log    │
- │    - Dashboard CLI & Web Report Interface (Interactive Passage Inspection)    │
+ │ 4. SERTIFIKASI DIGITAL, KOLABORASI & OJS INTEGRATION (v1.3.0)                 │
+ │    - Sertifikat Keabsahan Digital ber-hash SHA-256 & QR Code verifikasi publik│
+ │    - Kolaborasi berbagi dokumen ilmiah (Secure Share Token & User Permissions)│
+ │    - Integrasi native PKP OJS 3.x (REST API v1 + ARTilikOJSConnector.php)     │
  └───────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -180,6 +180,9 @@ AR Tilik memegang teguh batasan kejujuran ilmiah:
 
 ## 📄 Dokumentasi Terkait
 
+- **Brosur &amp; Prospektus Eksekutif Institusi (PDF)**: [`public/docs/Brosur_Eksekutif_ARTilik.pdf`](public/docs/Brosur_Eksekutif_ARTilik.pdf)
+- **Buku Panduan Integrasi OJS 3.x (PDF)**: [`public/integrations/ojs/Panduan_Integrasi_OJS_ARTilik.pdf`](public/integrations/ojs/Panduan_Integrasi_OJS_ARTilik.pdf)
+- **Dokumentasi REST API & Konektor OJS**: [`public/integrations/ojs/README.md`](public/integrations/ojs/README.md)
 - **Release Notes v1.1.0**: [`docs/V1_1_RELEASE_NOTES.md`](docs/V1_1_RELEASE_NOTES.md)
 - **Laporan Observabilitas & Kepatuhan SLA**: [`docs/V1_1_OBSERVABILITY.md`](docs/V1_1_OBSERVABILITY.md)
 - **Laporan Validasi Panel Pakar Manusia**: [`docs/V1_1_HUMAN_VALIDATION_RESULTS.md`](docs/V1_1_HUMAN_VALIDATION_RESULTS.md)

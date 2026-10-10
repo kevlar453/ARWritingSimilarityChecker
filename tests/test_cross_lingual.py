@@ -86,3 +86,52 @@ def test_calculate_cross_lingual_similarity_unrelated():
     assert res["is_cross_lingual_match"] is False
     assert res["confidence"] == "NONE"
     assert res["cross_lingual_score"] < 10.0
+
+
+def test_calculate_cross_lingual_similarity_same_language_id_id():
+    id_doc1 = (
+        "Penelitian ini menggunakan metode kuantitatif untuk menguji hipotesis hubungan antara motivasi belajar dan hasil belajar siswa."
+    )
+    id_doc2 = (
+        "Kajian ini meneliti pengaruh faktor kepemimpinan terhadap kinerja pegawai dengan analisis regresi dan pengujian hipotesis."
+    )
+
+    res = calculate_cross_lingual_similarity(id_doc1, id_doc2)
+
+    # Dokumen dengan bahasa sama (ID <-> ID) tidak boleh menghasilkan skor cross-lingual semu
+    assert res["is_cross_lingual_match"] is False
+    assert res["confidence"] == "NONE"
+    assert res["cross_lingual_score"] == 0.0
+    assert "Bukan Pasangan Lintas Bahasa" in res["verdict_label"]
+
+
+def test_calculate_cross_lingual_similarity_unrelated_academic_id_en():
+    id_generic = (
+        "Penelitian ini bertujuan untuk menganalisis data menggunakan metode kuantitatif. "
+        "Hasil penelitian menunjukkan adanya pengaruh yang signifikan antara variabel independen dan dependen. "
+        "Kesimpulan kajian ini memberikan implikasi teoritis dan praktis bagi pengembangan kurikulum sekolah dasar."
+    )
+    en_unrelated = (
+        "The research aims to analyze data using quantitative methods. "
+        "The study investigates leadership factors on employee performance with statistical hypothesis testing."
+    )
+
+    res = calculate_cross_lingual_similarity(id_generic, en_unrelated)
+
+    # Kecocokan konsep metodologi generik secara kebetulan tidak boleh dilabeli MODERATE atau terjemahan langsung
+    assert res["is_cross_lingual_match"] is False
+    assert res["confidence"] in ["LOW", "NONE"]
+    assert res["cross_lingual_score"] < 40.0
+
+
+def test_lexicon_multi_mapping_pustaka_and_jaringan():
+    from worker.cross_lingual import project_token_to_concepts
+
+    pustaka_concepts = project_token_to_concepts("pustaka")
+    assert "literature" in pustaka_concepts
+    assert "reference" in pustaka_concepts
+
+    jaringan_concepts = project_token_to_concepts("jaringan")
+    assert "tissue" in jaringan_concepts
+    assert "network" in jaringan_concepts
+

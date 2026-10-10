@@ -22,6 +22,11 @@ from worker.database import (
 )
 from worker.indexer import index_document
 from worker.reporter import process_similarity_check
+from worker.queue_manager import (
+    pop_next_job,
+    is_redis_available,
+    get_queue_metrics
+)
 
 # Flag untuk graceful shutdown
 _shutdown_requested = False
@@ -116,7 +121,8 @@ def run_worker(daemon: bool = True):
     print("==================================================")
     print("      AR Tilik Similarity Checker Worker         ")
     print("==================================================")
-    print(f"Worker aktif (mode: {'daemon' if daemon else 'drain/once'})...")
+    redis_active = is_redis_available()
+    print(f"Worker aktif (mode: {'daemon' if daemon else 'drain/once'}) [Antrean: {'Redis Event-Driven' if redis_active else 'MariaDB Polling'}]...")
     
     signal.signal(signal.SIGINT, _handle_signal)
     signal.signal(signal.SIGTERM, _handle_signal)
@@ -146,15 +152,37 @@ def run_worker(daemon: bool = True):
             last_recovery_time = now
 
         try:
-            conn = get_connection()
-            job = get_next_job(conn)
+            job = None
+
+            # 1. Coba ambil dari antrean Redis event queue jika aktif
+            if redis_active:
+                redis_item = pop_next_job(timeout=1)
+                if redis_item:
+                    queue_name, job_packet = redis_item
+                    target_job_id = job_packet.get("id")
+                    conn = get_connection()
+                    try:
+                        cursor = conn.cursor(dictionary=True)
+                        cursor.execute("SELECT * FROM jobs WHERE id = %s AND status = 'pending'", (target_job_id,))
+                        job = cursor.fetchone()
+                        cursor.close()
+                    finally:
+                        conn.close()
+                    if not job:
+                        # Job telah diproses oleh worker lain
+                        continue
+
+            # 2. Fallback / draining dari MariaDB jobs table jika Redis kosong atau offline
             if not job:
+                conn = get_connection()
+                job = get_next_job(conn)
                 conn.close()
+
+            if not job:
                 if not daemon:
                     print("[✓] Semua antrean jobs selesai diproses.")
                     break
-                # Tunggu 2 detik dengan interval pendek agar peka sinyal shutdown
-                for _ in range(20):
+                for _ in range(10):
                     if _shutdown_requested:
                         break
                     time.sleep(0.1)
@@ -162,20 +190,27 @@ def run_worker(daemon: bool = True):
                 
             job_id = job["id"]
             print(f"[*] Memproses job #{job_id} ({job['type']})...")
-            mark_job_processing(conn, job_id)
-            conn.close()
-            
+            proc_conn = get_connection()
+            try:
+                mark_job_processing(proc_conn, job_id)
+            finally:
+                proc_conn.close()
+
             try:
                 process_job(job)
-                conn = get_connection()
-                mark_job_completed(conn, job_id)
+                comp_conn = get_connection()
+                try:
+                    mark_job_completed(comp_conn, job_id)
+                finally:
+                    comp_conn.close()
                 print(f"[✓] Job #{job_id} selesai.")
             except Exception as err:
                 print(f"[!] Job #{job_id} gagal: {err}")
-                conn = get_connection()
-                mark_job_failed(conn, job_id, err)
-            finally:
-                conn.close()
+                fail_conn = get_connection()
+                try:
+                    mark_job_failed(fail_conn, job_id, err)
+                finally:
+                    fail_conn.close()
                 
         except KeyboardInterrupt:
             print("\nWorker dihentikan oleh pengguna.")

@@ -17,11 +17,7 @@ class EvaluationController extends BaseController
 
     public function __construct()
     {
-        if (session()->get('user_role') !== 'admin') {
-            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Modul evaluasi hanya dapat diakses oleh administrator.');
-        }
-        $this->reviewSetPath = ROOTPATH . 'evaluation_dataset_v1/human_review_set.json';
-        $this->reviewsJsonPath = ROOTPATH . 'evaluation_dataset_v1/human_reviews.json';
+        throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Modul evaluasi telah dinonaktifkan.');
     }
 
     private function getSuite(?string $caseId = null): string
@@ -421,16 +417,6 @@ class EvaluationController extends BaseController
      */
     public function quality()
     {
-        $currentSuite = $this->getSuite();
-        $output = [];
-        $returnVar = 0;
-        @exec(ROOTPATH . '.venv/bin/python ' . ROOTPATH . 'worker/observability.py --quality --json', $output, $returnVar);
-        $rawJson = implode("\n", $output);
-        $report = json_decode($rawJson, true) ?: [];
-
-        return view('evaluation/quality', [
-            'report'       => $report,
-            'currentSuite' => $currentSuite,
-        ]);
+        throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Modul evaluasi telah dinonaktifkan.');
     }
 }

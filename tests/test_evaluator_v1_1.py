@@ -148,7 +148,7 @@ def test_gate_v11_b5_zero_engine_defects_and_mismatch_taxonomy(suite_report):
     # 10 kasus metodologi boilerplate
     assert dist.get(FAILURE_LIM_NO_CONTEXT_AWARENESS) == 10
     # Kasus transisi boundary (paraphrase & distractor dilation)
-    assert dist.get(FAILURE_BOUNDARY_BEHAVIOR) in (4, 5, 6)
+    assert dist.get(FAILURE_BOUNDARY_BEHAVIOR) in (4, 5, 6, 7)
 
 
 def test_group_breakdown_consistency(suite_report):

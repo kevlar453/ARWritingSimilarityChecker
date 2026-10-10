@@ -51,3 +51,5 @@ Thumbs.db
 # Temporary scratchpad & dumps
 tmp/
 *.tmp
+*.rdb
+dump.rdb

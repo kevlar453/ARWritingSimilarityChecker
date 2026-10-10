@@ -35,9 +35,21 @@ def test_export_report_pdf_direct():
     assert len(pdf_bytes) > 5000
     assert pdf_bytes.startswith(b"%PDF-")
 
+def get_latest_completed_report() -> dict:
+    conn = get_connection()
+    try:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT id, verification_code FROM reports WHERE status = 'completed' ORDER BY id DESC LIMIT 1")
+        row = cursor.fetchone()
+        return row or {"id": 1, "verification_code": ""}
+    finally:
+        conn.close()
+
 def test_export_report_pdf_http_endpoint():
-    report_id = get_latest_completed_report_id()
-    url = f"{BASE_URL}/report/{report_id}/export"
+    rep = get_latest_completed_report()
+    report_id = rep["id"]
+    token = rep.get("verification_code") or ""
+    url = f"{BASE_URL}/report/{report_id}/export?token={token}"
     
     req = urllib.request.Request(url, method="GET")
     with urllib.request.urlopen(req, timeout=15) as resp:
@@ -49,8 +61,10 @@ def test_export_report_pdf_http_endpoint():
         assert body.startswith(b"%PDF-")
 
 def test_preview_report_pdf_http_endpoint():
-    report_id = get_latest_completed_report_id()
-    url = f"{BASE_URL}/report/{report_id}/preview"
+    rep = get_latest_completed_report()
+    report_id = rep["id"]
+    token = rep.get("verification_code") or ""
+    url = f"{BASE_URL}/report/{report_id}/preview?token={token}"
     
     req = urllib.request.Request(url, method="GET")
     with urllib.request.urlopen(req, timeout=15) as resp:

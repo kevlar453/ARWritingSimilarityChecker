@@ -30,6 +30,17 @@ $routes->match(['get', 'head'], 'docs/ojs/pdf', 'DashboardController::downloadOj
 $routes->match(['get', 'head'], 'integrations/ojs/connector', 'DashboardController::downloadOjsConnector');
 $routes->match(['get', 'head'], 'docs/ojs/connector', 'DashboardController::downloadOjsConnector');
 $routes->match(['get', 'head'], 'integrations/ojs/ARTilikOJSConnector.php', 'DashboardController::downloadOjsConnector');
+$routes->match(['get', 'head'], 'integrations/ojs/runner', 'DashboardController::downloadOjsRunner');
+$routes->match(['get', 'head'], 'docs/ojs/runner', 'DashboardController::downloadOjsRunner');
+$routes->match(['get', 'head'], 'integrations/ojs/artilik_ojs_runner.php', 'DashboardController::downloadOjsRunner');
+
+// Media Promosi & Prospektus Eksekutif Institusi (PDF)
+$routes->match(['get', 'head'], 'docs/brosur', 'DashboardController::downloadPromoBrochure');
+$routes->match(['get', 'head'], 'promosi/brosur', 'DashboardController::downloadPromoBrochure');
+$routes->match(['get', 'head'], 'brosur', 'DashboardController::downloadPromoBrochure');
+$routes->match(['get', 'head'], 'docs/Brosur_Eksekutif_ARTilik.pdf', 'DashboardController::downloadPromoBrochure');
+$routes->match(['get', 'head'], 'promosi/Brosur_Eksekutif_ARTilik.pdf', 'DashboardController::downloadPromoBrochure');
+
 $routes->match(['get', 'head'], 'sitemap.xml', 'SitemapController::index');
 
 // Legal & Contact Routes
@@ -135,11 +146,12 @@ $routes->group('admin', ['filter' => 'admin'], function ($routes) {
     $routes->post('google-keys/test/(:num)', 'Admin\GoogleKeyController::testConnection/$1');
 });
 
-// Human Review & Evaluation Subsystem (Phase HR-1 Isolated Module - Protected by AdminFilter)
-$routes->group('evaluation', ['filter' => 'admin'], function ($routes) {
-    $routes->get('/', 'EvaluationController::index');
-    $routes->get('summary', 'EvaluationController::summary');
-    $routes->get('quality', 'EvaluationController::quality');
-    $routes->get('(:segment)', 'EvaluationController::detail/$1');
-    $routes->post('(:segment)/save', 'EvaluationController::save/$1');
-});
+// Human Review & Evaluation Subsystem (DINONAKTIFKAN - mitigasi risiko RCE lewat exec)
+// $routes->group('evaluation', ['filter' => 'admin'], function ($routes) {
+//     $routes->get('/', 'EvaluationController::index');
+//     $routes->get('summary', 'EvaluationController::summary');
+//     $routes->get('quality', 'EvaluationController::quality');
+//     $routes->get('(:segment)', 'EvaluationController::detail/$1');
+//     $routes->post('(:segment)/save', 'EvaluationController::save/$1');
+// });
+

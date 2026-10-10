@@ -76,7 +76,8 @@ def collect_evidence(
     connection,
     submission_document_id: int,
     corpus_scope: str = "production",
-    benchmark_run_id: Optional[int] = None
+    benchmark_run_id: Optional[int] = None,
+    exclude_same_user: bool = True
 ) -> tuple[dict, dict, EvidenceContract, EvidenceContract]:
     """
     Fase 2.2: Mengumpulkan bukti mentah dari Exact Engine dan TF-IDF Engine
@@ -88,7 +89,8 @@ def collect_evidence(
         submission_document_id=submission_document_id,
         engine="exact",
         corpus_scope=corpus_scope,
-        benchmark_run_id=benchmark_run_id
+        benchmark_run_id=benchmark_run_id,
+        exclude_same_user=exclude_same_user
     )
     exact_evidence = extract_exact_evidence(exact_raw)
     
@@ -97,7 +99,8 @@ def collect_evidence(
         connection=connection,
         submission_document_id=submission_document_id,
         corpus_scope=corpus_scope,
-        benchmark_run_id=benchmark_run_id
+        benchmark_run_id=benchmark_run_id,
+        exclude_same_user=exclude_same_user
     )
     tfidf_evidence = extract_tfidf_evidence(tfidf_raw)
     
@@ -312,17 +315,20 @@ def run_hybrid_similarity_check(
     connection,
     submission_document_id: int,
     corpus_scope: str = "production",
-    benchmark_run_id: Optional[int] = None
+    benchmark_run_id: Optional[int] = None,
+    exclude_same_user: bool = True
 ) -> dict:
     """
     Fungsi eksekusi terpadu Hybrid Evidence Layer untuk AR Tilik.
     Mengumpulkan bukti Exact & TF-IDF, menganalisis pola, dan memberikan keputusan terintegrasi.
+    Mengecualikan korpus milik user yang sama untuk mencegah false positive self-plagiarism.
     """
     exact_raw, tfidf_raw, exact_ev, tfidf_ev = collect_evidence(
         connection=connection,
         submission_document_id=submission_document_id,
         corpus_scope=corpus_scope,
-        benchmark_run_id=benchmark_run_id
+        benchmark_run_id=benchmark_run_id,
+        exclude_same_user=exclude_same_user
     )
     
     analysis = aggregate_evidence(exact_ev, tfidf_ev)

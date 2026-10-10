@@ -8,6 +8,7 @@ use App\Models\PaymentTransactionModel;
 use App\Models\ReportModel;
 use App\Models\UserModel;
 use App\Models\VisitorModel;
+use App\Libraries\QueueService;
 use CodeIgniter\HTTP\ResponseInterface;
 
 class DashboardController extends BaseController
@@ -437,14 +438,7 @@ class DashboardController extends BaseController
             'updated_at'      => $now,
         ]);
 
-        $db = db_connect();
-        $db->table('jobs')->insert([
-            'type'         => 'process_document',
-            'payload'      => json_encode(['document_id' => $documentId]),
-            'status'       => 'pending',
-            'available_at' => $now,
-            'created_at'   => $now,
-        ]);
+        QueueService::dispatch('process_document', ['document_id' => (int) $documentId]);
 
         return $this->response->setJSON([
             'status'  => 'success',

@@ -219,6 +219,86 @@ end'''
                         except Exception:
                             pass
 
+def reorder_blocks_two_column(blocks: list, page_width: float, page_height: float) -> list:
+    """
+    Mendeteksi layout halaman akademik (1 kolom vs 2 kolom - Inisiatif 1.2).
+    Jika terdeteksi 2 kolom, mengurutkan blok teks:
+    1. Header / Judul / Abstrak (blok full-width di bagian atas)
+    2. Kolom Kiri (dari atas ke bawah berdasarkan y0)
+    3. Kolom Kanan (dari atas ke bawah berdasarkan y0)
+    4. Catatan Kaki / Footnotes (blok di bagian bawah)
+    Jika 1 kolom standar, mengurutkan secara vertikal alami (y0 lalu x0).
+    """
+    text_blocks = [b for b in blocks if len(b) > 6 and b[6] == 0 and b[4].strip()]
+    if len(text_blocks) < 2:
+        return text_blocks
+
+    mid_x = page_width / 2.0
+    gutter_margin = 0.05 * page_width
+    full_width_threshold = 0.60 * page_width
+
+    left_candidates = []
+    right_candidates = []
+    full_candidates = []
+
+    for b in text_blocks:
+        bx0, by0, bx1, by1 = b[0], b[1], b[2], b[3]
+        bw = bx1 - bx0
+        cx = (bx0 + bx1) / 2.0
+
+        if bw >= full_width_threshold:
+            full_candidates.append(b)
+        elif cx < mid_x and bx1 <= (mid_x + gutter_margin):
+            left_candidates.append(b)
+        elif cx >= mid_x and bx0 >= (mid_x - gutter_margin):
+            right_candidates.append(b)
+        else:
+            if cx < mid_x:
+                left_candidates.append(b)
+            else:
+                right_candidates.append(b)
+
+    # Deteksi 2 kolom: minimal ada blok di kiri dan kanan, dan ada tumpang tindih vertikal (Y-overlap)
+    is_two_column = False
+    if len(left_candidates) >= 1 and len(right_candidates) >= 1:
+        y_overlap_count = 0
+        for lb in left_candidates:
+            for rb in right_candidates:
+                if not (lb[3] <= rb[1] or lb[1] >= rb[3]):
+                    y_overlap_count += 1
+                    break
+        if y_overlap_count >= 1 and (len(left_candidates) + len(right_candidates)) >= 2:
+            is_two_column = True
+
+    if not is_two_column:
+        return sorted(text_blocks, key=lambda b: (b[1], b[0]))
+
+    col_blocks = left_candidates + right_candidates
+    min_col_y0 = min(b[1] for b in col_blocks)
+    max_col_y1 = max(b[3] for b in col_blocks)
+
+    top_blocks = []
+    bottom_blocks = []
+
+    for b in full_candidates:
+        if b[3] <= min_col_y0 + 15:
+            top_blocks.append(b)
+        elif b[1] >= max_col_y1 - 15:
+            bottom_blocks.append(b)
+        else:
+            if b[1] < (min_col_y0 + max_col_y1) / 2.0:
+                top_blocks.append(b)
+            else:
+                bottom_blocks.append(b)
+
+    top_blocks.sort(key=lambda b: b[1])
+    left_candidates.sort(key=lambda b: b[1])
+    right_candidates.sort(key=lambda b: b[1])
+    bottom_blocks.sort(key=lambda b: b[1])
+
+    return top_blocks + left_candidates + right_candidates + bottom_blocks
+
+
 def extract_pdf(path: str) -> list[dict]:
     import fitz  # PyMuPDF
     pages = []
@@ -235,13 +315,15 @@ def extract_pdf(path: str) -> list[dict]:
         except Exception:
             tabs = None
 
+        raw_blocks = page.get_text("blocks", clip=clip_box) if clip_box else page.get_text("blocks")
+
         if not tabs or not tabs.tables:
-            text = page.get_text("text", clip=clip_box) if clip_box else page.get_text("text")
+            ordered = reorder_blocks_two_column(raw_blocks, rect.width, rect.height)
+            text = '\n\n'.join(b[4].strip() for b in ordered if b[4].strip())
         else:
-            # Terdapat tabel: rekonstruksi teks halaman agar tabel tersusun rapi dalam baris dan kolom
+            # Halaman memiliki tabel: rekonstruksi layout dua kolom dan isolasi tabel
             tables_list = sorted(tabs.tables, key=lambda t: t.bbox[1])
-            blocks = page.get_text("blocks", clip=clip_box) if clip_box else page.get_text("blocks")
-            text_blocks = [b for b in blocks if b[6] == 0]
+            text_blocks = [b for b in raw_blocks if b[6] == 0]
 
             def is_inside_table(b, tab_bbox):
                 bx0, by0, bx1, by1 = b[:4]
@@ -252,25 +334,11 @@ def extract_pdf(path: str) -> list[dict]:
                 area_b = (bx1 - bx0) * (by1 - by0)
                 return area_b > 0 and (area_overlap / area_b) > 0.35
 
-            out_parts = []
-            used_blocks = set()
+            outside_blocks = [b for b in text_blocks if not any(is_inside_table(b, t.bbox) for t in tables_list)]
+            ordered_outside = reorder_blocks_two_column(outside_blocks, rect.width, rect.height)
 
+            table_markdowns = []
             for t in tables_list:
-                ty0 = t.bbox[1]
-                # Ambil teks paragraf sebelum tabel
-                for idx, b in enumerate(text_blocks):
-                    if idx not in used_blocks and b[3] <= ty0 + 4 and not any(is_inside_table(b, ot.bbox) for ot in tables_list):
-                        b_text = b[4].strip()
-                        if b_text:
-                            out_parts.append(b_text)
-                        used_blocks.add(idx)
-
-                # Tandai blok teks di dalam tabel agar tidak diekstrak dobel
-                for idx, b in enumerate(text_blocks):
-                    if idx not in used_blocks and is_inside_table(b, t.bbox):
-                        used_blocks.add(idx)
-
-                # Ekstrak tabel dan format ke struktur Markdown Table
                 try:
                     extracted = t.extract()
                     if extracted:
@@ -285,17 +353,27 @@ def extract_pdf(path: str) -> list[dict]:
                                 lines.append('| ' + ' | '.join(['---'] * len(clean_cells)) + ' |')
                                 header_done = True
                         if lines:
-                            out_parts.append('\n' + '\n'.join(lines) + '\n')
+                            table_markdowns.append((t.bbox, '\n' + '\n'.join(lines) + '\n'))
                 except Exception:
                     pass
 
-            # Ambil sisa teks paragraf setelah semua tabel
-            for idx, b in enumerate(text_blocks):
-                if idx not in used_blocks and not any(is_inside_table(b, ot.bbox) for ot in tables_list):
-                    b_text = b[4].strip()
-                    if b_text:
-                        out_parts.append(b_text)
-                    used_blocks.add(idx)
+            out_parts = []
+            used_tables = set()
+
+            for b in ordered_outside:
+                by0 = b[1]
+                for tidx, (tbbox, tmd) in enumerate(table_markdowns):
+                    if tidx not in used_tables and tbbox[1] <= by0:
+                        out_parts.append(tmd)
+                        used_tables.add(tidx)
+                b_text = b[4].strip()
+                if b_text:
+                    out_parts.append(b_text)
+
+            for tidx, (tbbox, tmd) in enumerate(table_markdowns):
+                if tidx not in used_tables:
+                    out_parts.append(tmd)
+                    used_tables.add(tidx)
 
             text = '\n\n'.join(out_parts)
 

@@ -154,7 +154,8 @@ def test_full_reset_password_lifecycle(db_conn):
             "password_confirm": "123"
         }, headers={"Accept": "application/json"})
         assert res_short.status_code == 400
-        assert "minimal 6 karakter" in res_short.json()["message"].lower()
+        msg_lower = res_short.json()["message"].lower()
+        assert "minimal 8 karakter" in msg_lower or "minimal 6 karakter" in msg_lower
 
         # Step 7: Submit Password Baru yang Valid
         res_reset_success = session.post(f"{BASE_URL}/auth/reset-password", json={

@@ -83,13 +83,13 @@ def build_html() -> str:
         letter-spacing: 0.5px;
     }
     @top-right {
-        content: "Dual-Lens Academic Writing Similarity Checker";
+        content: "Academic Writing Similarity & Evidence Checker";
         font-family: 'Liberation Sans', 'DejaVu Sans', Arial, sans-serif;
         font-size: 7.5pt;
         color: #64748b;
     }
     @bottom-left {
-        content: "https://tilik.arsetontong.top • Dokumentasi Resmi v1.2 (Edisi Pengelola Jurnal)";
+        content: "https://tilik.arsetontong.top • Dokumentasi Resmi v1.3.0 Production (Edisi Pengelola Jurnal)";
         font-family: 'Liberation Sans', 'DejaVu Sans', Arial, sans-serif;
         font-size: 7.5pt;
         color: #94a3b8;
@@ -465,21 +465,21 @@ p.body-text {
 table.data-table {
     width: 100%;
     border-collapse: collapse;
-    margin: 7px 0;
-    font-size: 7.2pt;
+    margin: 5px 0;
+    font-size: 7.05pt;
 }
 
 table.data-table th {
     background: #0f294a;
     color: #ffffff;
     font-weight: 700;
-    padding: 5px 7px;
+    padding: 4px 6px;
     text-align: left;
     border: 1px solid #1e3a8a;
 }
 
 table.data-table td {
-    padding: 4.5px 7px;
+    padding: 3.5px 6px;
     border: 1px solid #e2e8f0;
     color: #334155;
     vertical-align: middle;
@@ -670,11 +670,11 @@ table.data-table tr.highlight-row {
         <div class="cover-logo-box">
             <img class="cover-logo-img" src="__LOGO_B64__" alt="AR Tilik Logo" />
             <div>
-                <div class="cover-brand-title">AR TILIK</div>
-                <div class="cover-brand-sub">Academic Writing Similarity Checker</div>
+                <div class="cover-brand-title">AR Tilik</div>
+                <div class="cover-brand-sub">Academic Writing Similarity &amp; Evidence Checker</div>
             </div>
         </div>
-        <div class="cover-badge-top">Dokumentasi Resmi v1.2 • OJS 3.x Ready</div>
+        <div class="cover-badge-top">Dokumentasi Resmi v1.3.0 Production • OJS 3.x Ready</div>
     </div>
 
     <div class="cover-title-group">
@@ -683,7 +683,7 @@ table.data-table tr.highlight-row {
             Otomasi Penelaahan Naskah Jurnal Ilmiah dengan <span>PKP OJS 3.x</span>
         </h1>
         <p class="cover-subtitle">
-            Integrasi REST API Publik, Konektor PHP Cerdas, Evaluasi Mesin Dual-Lens, dan Penerbitan Sertifikat Keabsahan Digital Berbasis QR Code untuk Pengelola Jurnal Kampus.
+            Integrasi REST API Publik, Konektor PHP Cerdas, Evaluasi Mesin Dual-Lens, Audit Forensik Cerdas AI, Panduan Telaah Redaksi, dan Penerbitan Sertifikat Keabsahan Digital Berbasis QR Code untuk Pengelola Jurnal Kampus.
         </p>
     </div>
 
@@ -704,19 +704,19 @@ table.data-table tr.highlight-row {
         <div class="cover-highlight-card">
             <div class="cover-highlight-title">
                 <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                Mesin Evaluasi Dual-Lens Akurat
+                Mesin Dual-Lens &amp; Forensik AI
             </div>
             <div class="cover-highlight-desc">
-                Kombinasi Lensa 1 (5-Gram Shingling exact match) dan Lensa 2 (TF-IDF Cosine vector) mendeteksi salin-tempel dan parafrase cerdas.
+                Kombinasi Lensa 1 (5-Gram exact match), Lensa 2 (TF-IDF Cosine), dan penalaran semantik AI untuk deteksi fabrikasi rujukan sitasi.
             </div>
         </div>
         <div class="cover-highlight-card">
             <div class="cover-highlight-title">
                 <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                Sertifikat Digital Berkode QR
+                Sertifikat QR &amp; Panduan Telaah
             </div>
             <div class="cover-highlight-desc">
-                Bukti keabsahan naskah digital ber-hash SHA-256 yang dapat diverifikasi publik secara instan oleh Asesor SINTA & ARJUNA.
+                Bukti keabsahan naskah digital ber-hash SHA-256 berkode QR serta 3 set pertanyaan telaah kritis otomatis siap pakai bagi Mitra Bestari.
             </div>
         </div>
         <div class="cover-highlight-card">
@@ -762,7 +762,7 @@ table.data-table tr.highlight-row {
     </div>
 
     <p class="body-text">
-        Pengelolaan jurnal ilmiah di era digital menuntut kecepatan peninjauan (<em>editorial turnaround time</em>) sekaligus ketelitian tinggi dalam menyaring plagiarisme. Selama bertahun-tahun, pengelola jurnal di perguruan tinggi Indonesia menghadapi dilema: <strong>biaya langganan platform asing (Turnitin/iThenticate) yang sangat mahal berbasis valas (USD)</strong>, minimnya dukungan repositori karya ilmiah lokal Indonesia, serta risiko kerahasiaan naskah submisi penulis yang belum dipublikasikan (<em>pre-published manuscripts</em>).
+        Pengelolaan jurnal ilmiah di era digital menuntut kecepatan peninjauan (<em>editorial turnaround time</em>) sekaligus ketelitian tinggi dalam memverifikasi orisinalitas naskah dan mencegah pelanggaran integritas akademik. Selama bertahun-tahun, pengelola jurnal di perguruan tinggi Indonesia menghadapi dilema: <strong>biaya langganan platform asing yang sangat mahal berbasis valas (USD)</strong>, minimnya dukungan repositori karya ilmiah lokal Indonesia, serta risiko kerahasiaan naskah submisi penulis yang belum dipublikasikan (<em>pre-published manuscripts</em>).
     </p>
 
     <div class="promo-grid">
@@ -777,20 +777,20 @@ table.data-table tr.highlight-row {
         </div>
         <div class="promo-card">
             <div class="promo-card-title">
-                <span class="tag-badge tag-green">Akurasi Tinggi</span>
-                Dua Sudut Pandang (Dual-Lens Engine)
+                <span class="tag-badge tag-green">Akurasi &amp; Forensik</span>
+                Dual-Lens &amp; Forensik AI
             </div>
             <div class="promo-card-desc">
-                Tidak lagi terkecoh oleh sekadar persentase total. AR Tilik memisahkan bukti salin-tempel literal (Lensa 1) dengan parafrase semantik (Lensa 2) sehingga sitasi ilmiah wajar tidak divonis plagiat.
+                Tidak lagi terkecoh sekadar skor tunggal. Memisahkan salin-tempel literal (Lensa 1) dengan parafrase (Lensa 2), ditambah penalaran AI untuk mendeteksi fabrikasi sitasi fiktif.
             </div>
         </div>
         <div class="promo-card">
             <div class="promo-card-title">
                 <span class="tag-badge tag-amber">Akreditasi SINTA</span>
-                Sertifikat Digital Anti-Pemalsuan
+                Sertifikat &amp; Pertanyaan Telaah
             </div>
             <div class="promo-card-desc">
-                Setiap naskah yang dicek memperoleh lembar sertifikasi resmi lengkap dengan QR code verifikasi dan stempel digital SHA-256. Sangat memudahkan bukti dukung akreditasi ARJUNA / SINTA.
+                Setiap naskah memperoleh lembar sertifikasi ber-QR code dan SHA-256 untuk akreditasi ARJUNA/SINTA, serta 3 pertanyaan telaah terarah untuk reviewer OJS.
             </div>
         </div>
         <div class="promo-card">
@@ -799,7 +799,7 @@ table.data-table tr.highlight-row {
                 Penghematan Hingga 70% Anggaran
             </div>
             <div class="promo-card-desc">
-                Didesain khusus untuk ekosistem akademis Indonesia dengan biaya transparan berbasis kuota wajar, tanpa sistem lisensi per kepala mahasiswa yang membebani kas fakultas dan prodi.
+                Didesain khusus untuk ekosistem akademis Indonesia dengan biaya transparan berbasis kuota wajar, tanpa sistem lisensi per kepala mahasiswa yang memberatkan kas fakultas.
             </div>
         </div>
     </div>
@@ -809,14 +809,14 @@ table.data-table tr.highlight-row {
         <thead>
             <tr>
                 <th style="width: 28%;">Parameter Komparasi</th>
-                <th style="width: 24%; background: #0284c7;">AR Tilik (Dual-Lens)</th>
+                <th style="width: 24%; background: #0284c7;">AR Tilik (Dual-Lens v1.3)</th>
                 <th style="width: 24%;">Vendor Asing Komersial</th>
                 <th style="width: 24%;">Detektor Daring Gratisan</th>
             </tr>
         </thead>
         <tbody>
             <tr class="highlight-row">
-                <td><strong>Kedaulatan Data & Privasi</strong></td>
+                <td><strong>Kedaulatan Data &amp; Privasi</strong></td>
                 <td><span class="tag-badge tag-green">Sangat Terjamin (Private)</span></td>
                 <td><span class="tag-badge tag-amber">Tersimpan di Cloud Asing</span></td>
                 <td><span class="tag-badge tag-red">Risiko Naskah Dijual / Bocor</span></td>
@@ -828,6 +828,18 @@ table.data-table tr.highlight-row {
                 <td><span class="tag-badge tag-red">Tidak (Hanya String Match)</span></td>
             </tr>
             <tr>
+                <td><strong>Audit Forensik Cerdas AI &amp; Sitasi</strong></td>
+                <td><span class="tag-badge tag-green">Ya (Verifikasi Fabrikasi Sitasi)</span></td>
+                <td><span class="tag-badge tag-amber">Terbatas / Fitur Add-on USD</span></td>
+                <td><span class="tag-badge tag-red">Tidak Ada</span></td>
+            </tr>
+            <tr>
+                <td><strong>Panduan Pertanyaan Telaah Redaksi</strong></td>
+                <td><span class="tag-badge tag-green">Ya (3 Set Pertanyaan Otomatis)</span></td>
+                <td><span class="tag-badge tag-red">Tidak Ada</span></td>
+                <td><span class="tag-badge tag-red">Tidak Ada</span></td>
+            </tr>
+            <tr>
                 <td><strong>Sertifikat Digital Ber-QR Code</strong></td>
                 <td><span class="tag-badge tag-green">Ya, Verifikasi Publik Instan</span></td>
                 <td><span class="tag-badge tag-amber">Hanya Teks PDF Standar</span></td>
@@ -835,7 +847,7 @@ table.data-table tr.highlight-row {
             </tr>
             <tr>
                 <td><strong>Konektivitas OJS 3.x</strong></td>
-                <td><span class="tag-badge tag-green">Native REST API & PHP Connector</span></td>
+                <td><span class="tag-badge tag-green">Native REST API &amp; PHP Connector</span></td>
                 <td><span class="tag-badge tag-amber">Biaya Lisensi API Tambahan</span></td>
                 <td><span class="tag-badge tag-red">Manual Unggah Satu-Satu</span></td>
             </tr>
@@ -846,7 +858,7 @@ table.data-table tr.highlight-row {
                 <td><span class="tag-badge tag-red">Sangat Terbatas</span></td>
             </tr>
             <tr>
-                <td><strong>Skema Biaya & Lisensi</strong></td>
+                <td><strong>Skema Biaya &amp; Lisensi</strong></td>
                 <td><span class="tag-badge tag-green">Hemat, Rupiah, Kuota Fleksibel</span></td>
                 <td><span class="tag-badge tag-red">Mahal (Mata Uang USD)</span></td>
                 <td><span class="tag-badge tag-amber">Gratis Terbatas / Iklan</span></td>
@@ -936,61 +948,62 @@ table.data-table tr.highlight-row {
             <polygon points="535,146 543,150 535,154" fill="#059669" />
             <text x="470" y="142" fill="#059669" font-size="7.2" font-weight="bold" text-anchor="middle">Dual-Lens Engine</text>
 
-            <!-- Step 5: Dual-Lens & Certificate -->
-            <rect x="535" y="48" width="120" height="55" rx="6" fill="#ffffff" stroke="#10b981" stroke-width="1.2" />
-            <text x="595" y="65" fill="#047857" font-size="7.8" font-weight="bold" text-anchor="middle">5. Komputasi Bukti</text>
-            <text x="595" y="78" fill="#15803d" font-size="6.8" text-anchor="middle">• Lensa 1: 5-Gram Exact</text>
-            <text x="595" y="90" fill="#15803d" font-size="6.8" text-anchor="middle">• Lensa 2: TF-IDF Cosine</text>
+            <!-- Step 5: Dual-Lens & Forensik Cerdas -->
+            <rect x="535" y="44" width="120" height="66" rx="6" fill="#ffffff" stroke="#10b981" stroke-width="1.2" />
+            <text x="595" y="59" fill="#047857" font-size="7.8" font-weight="bold" text-anchor="middle">5. Komputasi Bukti</text>
+            <text x="595" y="72" fill="#15803d" font-size="6.5" text-anchor="middle">• Dual-Lens (Exact &amp; Cosine)</text>
+            <text x="595" y="83" fill="#0284c7" font-size="6.5" text-anchor="middle">• Audit Forensik Cerdas AI</text>
+            <text x="595" y="94" fill="#7c3aed" font-size="6.5" text-anchor="middle">• Panduan Telaah Redaksi</text>
 
-            <rect x="535" y="120" width="120" height="50" rx="6" fill="#ffffff" stroke="#10b981" stroke-width="1.2" />
-            <text x="595" y="137" fill="#047857" font-size="7.8" font-weight="bold" text-anchor="middle">Sertifikat Digital</text>
-            <text x="595" y="150" fill="#64748b" font-size="6.8" text-anchor="middle">Hash SHA-256 & QR Code</text>
-            <text x="595" y="162" fill="#64748b" font-size="6.3" text-anchor="middle">Laporan PDF Resmi</text>
+            <rect x="535" y="118" width="120" height="52" rx="6" fill="#ffffff" stroke="#10b981" stroke-width="1.2" />
+            <text x="595" y="134" fill="#047857" font-size="7.8" font-weight="bold" text-anchor="middle">Sertifikat Digital</text>
+            <text x="595" y="147" fill="#64748b" font-size="6.8" text-anchor="middle">Hash SHA-256 &amp; QR Code</text>
+            <text x="595" y="159" fill="#64748b" font-size="6.3" text-anchor="middle">Laporan PDF Bersertifikasi</text>
 
             <!-- Arrow back to OJS (Completed Result) -->
             <path d="M 535 160 L 480 195 L 145 180" fill="none" stroke="#10b981" stroke-width="1.5" stroke-dasharray="4" />
             <polygon points="145,176 137,180 145,184" fill="#10b981" />
-            <text x="340" y="202" fill="#047857" font-size="6.8" font-weight="bold" text-anchor="middle">Laporan & Tautan Unduh PDF Terkirim ke OJS</text>
+            <text x="340" y="202" fill="#047857" font-size="6.8" font-weight="bold" text-anchor="middle">Laporan, Hasil Forensik &amp; Tautan PDF Terkirim ke OJS</text>
         </svg>
         <div class="diagram-caption">Gambar 1: Alur Kerja End-to-End Integrasi PKP OJS 3.x dengan AR Tilik</div>
     </div>
 
-    <h3 class="sub-heading">Tiga Titik Pemicu Integrasi (Trigger Points) dalam Redaksi OJS</h3>
+    <h3 class="sub-heading">Titik Pemicu Integrasi (Trigger Points) dalam Redaksi OJS</h3>
     <div class="promo-grid">
         <div class="promo-card">
             <div class="promo-card-title">
                 <span class="tag-badge tag-blue">Titik 1</span>
-                Pemeriksaan Awal (Desk Evaluation)
+                Desk Evaluation &amp; Cek Sitasi
             </div>
             <div class="promo-card-desc">
-                Saat naskah baru masuk dari penulis, konektor memicu pemeriksaan awal. Editor in Chief langsung mengetahui apakah naskah layak dikirim ke reviewer atau harus segera ditolak jika skor kemiripan melebihi ambang batas.
+                Saat naskah masuk, konektor memicu komputasi Dual-Lens dan verifikasi referensi AI. Editor langsung mengetahui skor kemiripan dan deteksi dini keabsahan rujukan.
             </div>
         </div>
         <div class="promo-card">
             <div class="promo-card-title">
                 <span class="tag-badge tag-green">Titik 2</span>
-                Diskusi Mitra Bestari (Review Discussions)
+                Diskusi Reviewer &amp; Soal Telaah
             </div>
             <div class="promo-card-desc">
-                Tautan laporan interaktif AR Tilik otomatis dilampirkan pada catatan penugasan reviewer. Reviewer dapat melihat pasase teks mana yang terindikasi salin-tempel tanpa harus menebak-nebak.
+                Tautan laporan interaktif dilampirkan otomatis beserta 3 set pertanyaan telaah kritis. Mitra Bestari dapat langsung menyalinnya ke catatan ulasan naskah di OJS.
             </div>
         </div>
         <div class="promo-card">
             <div class="promo-card-title">
                 <span class="tag-badge tag-amber">Titik 3</span>
-                Penerbitan Galley (Camera-Ready Copy)
+                Penerbitan Galley &amp; Sertifikat
             </div>
             <div class="promo-card-desc">
-                Sebelum artikel diterbitkan secara resmi (Issue Publication), nomor kode verifikasi digital (<code>ART-XXXX-XXXX-XXXX</code>) dan tautan sertifikat dapat dicantumkan pada footer PDF artikel terbit.
+                Sebelum artikel terbit, kode verifikasi digital (<code>ART-XXXX-XXXX-XXXX</code>) dan QR verifikasi resmi disematkan pada artikel sebagai bukti standar mutu publikasi SINTA.
             </div>
         </div>
         <div class="promo-card">
             <div class="promo-card-title">
                 <span class="tag-badge tag-red">Keamanan</span>
-                Rate Limiting & Anti DoS
+                Kolaborasi Aman &amp; Rate Limit
             </div>
             <div class="promo-card-desc">
-                Setiap panggilan API Key dilindungi oleh pembatas laju request (<em>rate limiter</em> 60 request/menit) dan enkripsi payload berkas untuk memastikan stabilitas server kampus.
+                Didukung tautan ulasan aman (Secure Share Link) tanpa mewajibkan reviewer eksternal mendaftar akun lokal, serta perlindungan rate limit 60 req/menit.
             </div>
         </div>
     </div>
@@ -1009,7 +1022,7 @@ table.data-table tr.highlight-row {
     </div>
 
     <p class="body-text">
-        Kelemahan terbesar alat pendeteksi plagiarisme konvensional adalah memberikan satu skor tunggal tanpa membedakan <strong>frasa metodologi umum yang wajar</strong> dengan <strong>salin-tempel literal curang</strong> atau <strong>parafrase otomatis berstruktur sinonim</strong>. AR Tilik memecahkan tantangan ini dengan membedah teks melalui dua lensa komputasi independen:
+        Kelemahan terbesar alat penelaah kemiripan konvensional adalah memberikan satu skor tunggal tanpa membedakan <strong>frasa metodologi umum yang wajar</strong> dengan <strong>salin-tempel literal sekuensial</strong> atau <strong>parafrase otomatis berstruktur sinonim</strong>. AR Tilik memecahkan tantangan ini dengan membedah teks melalui dua lensa komputasi independen dan lapisan audit semantik:
     </p>
 
     <div class="promo-grid">
@@ -1073,10 +1086,10 @@ table.data-table tr.highlight-row {
                 <td><strong>Revisi Minor / Sitasi.</strong> Minta penulis menyisipkan tanda petik / parafrase ulang.</td>
             </tr>
             <tr style="background: #fef2f2;">
-                <td><strong>4. Indikasi Plagiarisme Berat</strong></td>
+                <td><strong>4. Replikasi Pasase Masif</strong></td>
                 <td><span class="tag-badge tag-red">&gt; 20%</span></td>
                 <td><span class="tag-badge tag-red">&gt; 35%</span></td>
-                <td><strong>Desk Reject (Tolak Naskah).</strong> Kembalikan naskah ke penulis dengan bukti PDF resmi.</td>
+                <td><strong>Desk Reject / Klarifikasi.</strong> Kembalikan ke penulis dengan bukti PDF resmi.</td>
             </tr>
         </tbody>
     </table>
@@ -1084,17 +1097,17 @@ table.data-table tr.highlight-row {
     <h3 class="sub-heading" style="margin-top: 8px;">Standar Ambang Batas (Threshold) Rekomendasi Akreditasi SINTA</h3>
     <div class="promo-grid avoid-break">
         <div class="promo-card">
-            <div class="promo-card-title">Jurnal SINTA 1 & 2 / Scopus</div>
+            <div class="promo-card-title">Jurnal SINTA 1 &amp; 2 / Scopus</div>
             <div class="promo-card-desc">
                 • Maksimal Overall Similarity: <strong>&le; 15% - 20%</strong> | Per Sumber: <strong>&le; 3%</strong><br>
-                • Wajib melampirkan sertifikat keabsahan digital pada berkas akreditasi.
+                • Didukung validasi bebas fabrikasi sitasi semantik AI &amp; sertifikat ber-QR resmi.
             </div>
         </div>
         <div class="promo-card">
-            <div class="promo-card-title">Jurnal SINTA 3 & 4</div>
+            <div class="promo-card-title">Jurnal SINTA 3 &amp; 4</div>
             <div class="promo-card-desc">
                 • Maksimal Overall Similarity: <strong>&le; 20% - 25%</strong> | Per Sumber: <strong>&le; 5%</strong><br>
-                • Disarankan memeriksa bab metodologi dan tinjauan pustaka secara terpisah.
+                • Isolasi teks substantif (section-aware) mengecualikan cover dan daftar pustaka.
             </div>
         </div>
     </div>
@@ -1137,15 +1150,15 @@ table.data-table tr.highlight-row {
     <div class="step-container">
         <div class="step-badge">2</div>
         <div class="step-content">
-            <div class="step-title">Langkah 2: Mengunduh dan Menempatkan Library Konektor PHP</div>
+            <div class="step-title">Langkah 2: Mengunduh Konektor PHP &amp; Skrip Runner</div>
             <div class="step-desc">
-                Unduh berkas <code style="color: #0284c7;">ARTilikOJSConnector.php</code> langsung dari tombol <strong>Unduh Konektor OJS (PHP)</strong> di portal AR Tilik. Salin berkas tersebut ke direktori server OJS Anda (contoh: di dalam folder plugin atau folder kustom integrasi).
+                Unduh berkas <code style="color: #0284c7;">ARTilikOJSConnector.php</code> dan skrip runner mandiri <code style="color: #0284c7;">artilik_ojs_runner.php</code> dari portal AR Tilik. Salin berkas tersebut ke direktori server OJS Anda (contoh: di dalam folder plugin atau folder kustom integrasi).
             </div>
             <div class="code-block" style="margin-top: 4px;">
 <div class="code-header">Terminal / SSH Server OJS</div>
-<span class="code-comment"># Salin konektor ke folder library OJS Anda</span>
-<span class="code-keyword">cp</span> ARTilikOJSConnector.php /var/www/ojs/plugins/generic/artilik/
-<span class="code-keyword">chmod</span> 644 /var/www/ojs/plugins/generic/artilik/ARTilikOJSConnector.php</div>
+<span class="code-comment"># Salin konektor dan skrip runner ke folder library OJS Anda</span>
+<span class="code-keyword">cp</span> ARTilikOJSConnector.php artilik_ojs_runner.php /var/www/ojs/plugins/generic/artilik/
+<span class="code-keyword">chmod</span> 644 /var/www/ojs/plugins/generic/artilik/*.php</div>
         </div>
     </div>
 
@@ -1179,8 +1192,8 @@ table.data-table tr.highlight-row {
         Berikut adalah contoh skrip PHP mandiri yang dapat langsung dijalankan atau diadaptasikan ke dalam modul OJS 3. Skrip menangani pengiriman naskah, polling otomatis hingga selesai, pembacaan skor Dual-Lens, dan pengunduhan sertifikat PDF resmi.
     </p>
 
-    <div class="code-block avoid-break" style="font-size: 6.2pt; line-height: 1.3;">
-<div class="code-header">artilik_ojs_runner.php (Contoh Implementasi Lengkap)</div>
+    <div class="code-block avoid-break" style="font-size: 6.0pt; line-height: 1.25;">
+<div class="code-header">artilik_ojs_runner.php (Contoh Implementasi Lengkap v1.3.0)</div>
 <span class="code-keyword">&lt;?php</span>
 <span class="code-keyword">require_once</span> <span class="code-str">__DIR__ . '/ARTilikOJSConnector.php'</span>;
 
@@ -1191,19 +1204,27 @@ table.data-table tr.highlight-row {
     <span class="code-comment">// 1. Kirim naskah artikel yang diunggah oleh Penulis di OJS</span>
     <span class="code-var">$filePath</span> = <span class="code-str">'/var/www/ojs/files/journals/1/articles/124/submission/124-article.pdf'</span>;
     <span class="code-var">$res</span> = <span class="code-var">$connector</span>-&gt;<span class="code-func">submitManuscript</span>(<span class="code-var">$filePath</span>, <span class="code-str">'Analisis Algoritma Dual-Lens'</span>, <span class="code-str">'Dr. Budi Santoso'</span>, <span class="code-str">'ojs_124'</span>);
-    <span class="code-var">$docId</span> = <span class="code-var">$res</span>[<span class="code-str">'data'</span>][<span class="code-str">'document_id'</span>];
-    <span class="code-func">echo</span> <span class="code-str">"[✓] Naskah diterima! Doc ID: #{$docId}\n"</span>;
+    <span class="code-var">$docId</span>    = <span class="code-var">$res</span>[<span class="code-str">'data'</span>][<span class="code-str">'document_id'</span>];
+    <span class="code-var">$reportId</span> = <span class="code-var">$res</span>[<span class="code-str">'data'</span>][<span class="code-str">'report_id'</span>];
+    <span class="code-func">echo</span> <span class="code-str">"[✓] Naskah diterima! Doc ID: #{$docId} | Report ID: #{$reportId}\n"</span>;
 
     <span class="code-comment">// 2. Menunggu komputasi selesai (Polling otomatis setiap 3 detik)</span>
-    <span class="code-var">$result</span> = <span class="code-var">$connector</span>-&gt;<span class="code-func">waitForCompletion</span>(<span class="code-var">$docId</span>, 60, 3);
+    <span class="code-var">$result</span>    = <span class="code-var">$connector</span>-&gt;<span class="code-func">waitForCompletion</span>(<span class="code-var">$docId</span>, 60, 3);
     <span class="code-var">$sim</span>       = <span class="code-var">$result</span>[<span class="code-str">'data'</span>][<span class="code-str">'overall_similarity'</span>];
     <span class="code-var">$decision</span>  = <span class="code-var">$result</span>[<span class="code-str">'data'</span>][<span class="code-str">'predicted_decision'</span>];
     <span class="code-var">$webReport</span> = <span class="code-var">$result</span>[<span class="code-str">'data'</span>][<span class="code-str">'web_report_url'</span>];
     <span class="code-var">$pdfExport</span> = <span class="code-var">$result</span>[<span class="code-str">'data'</span>][<span class="code-str">'pdf_export_url'</span>];
+    <span class="code-func">echo</span> <span class="code-str">"Hasil: Kemiripan {$sim}% | Putusan: {$decision}\nLaporan Web: {$webReport}\n"</span>;
 
-    <span class="code-func">echo</span> <span class="code-str">"Hasil: Kemiripan {$sim}% | Keputusan: {$decision}\nLaporan Web: {$webReport}\n"</span>;
+    <span class="code-comment">// 3. Ambil Audit Forensik Cerdas AI &amp; Pertanyaan Telaah Reviewer (v1.3.0)</span>
+    <span class="code-var">$audit</span> = <span class="code-var">$connector</span>-&gt;<span class="code-func">getForensicAudit</span>(<span class="code-var">$reportId</span>);
+    <span class="code-keyword">if</span> (<span class="code-var">$audit</span>) {
+        <span class="code-func">echo</span> <span class="code-str">"Audit AI: "</span> . <span class="code-var">$audit</span>[<span class="code-str">'verdict'</span>] . <span class="code-str">" | Model: "</span> . <span class="code-var">$audit</span>[<span class="code-str">'model'</span>] . <span class="code-str">"\n"</span>;
+        <span class="code-var">$questions</span> = <span class="code-var">$connector</span>-&gt;<span class="code-func">getEditorialQuestions</span>(<span class="code-var">$reportId</span>);
+        <span class="code-comment">// Sisipkan $questions ke formulir Review Discussions OJS untuk Mitra Bestari</span>
+    }
 
-    <span class="code-comment">// 3. Unduh Sertifikat PDF Resmi untuk Disimpan di Arsip Editorial OJS</span>
+    <span class="code-comment">// 4. Unduh Sertifikat PDF Resmi untuk Disimpan di Arsip Editorial OJS</span>
     <span class="code-var">$pdfBytes</span> = <span class="code-func">file_get_contents</span>(<span class="code-var">$pdfExport</span>);
     <span class="code-keyword">if</span> (<span class="code-var">$pdfBytes</span>) {
         <span class="code-func">file_put_contents</span>(<span class="code-str">"/var/www/ojs/files/journals/1/articles/124/review/sertifikat_{$docId}.pdf"</span>, <span class="code-var">$pdfBytes</span>);
@@ -1217,9 +1238,9 @@ table.data-table tr.highlight-row {
     <table class="data-table avoid-break">
         <thead>
             <tr>
-                <th style="width: 32%;">Metode PHP</th>
-                <th style="width: 23%;">Parameter Utama</th>
-                <th style="width: 45%;">Keterangan & Fungsi</th>
+                <th style="width: 30%;">Metode PHP</th>
+                <th style="width: 22%;">Parameter Utama</th>
+                <th style="width: 48%;">Keterangan &amp; Fungsi</th>
             </tr>
         </thead>
         <tbody>
@@ -1236,12 +1257,22 @@ table.data-table tr.highlight-row {
             <tr>
                 <td><code style="color: #0284c7;">getDetailedReport()</code></td>
                 <td><code>$reportId</code></td>
-                <td>Mengambil struktur JSON rincian sumber rujukan teratas dan metrik dekomposisi Dual-Lens.</td>
+                <td>Mengambil struktur JSON rincian sumber rujukan teratas, dekomposisi Dual-Lens, dan audit forensik.</td>
+            </tr>
+            <tr>
+                <td><code style="color: #0284c7;">getForensicAudit()</code></td>
+                <td><code>$reportId</code></td>
+                <td>Mengambil hasil evaluasi semantik Google Gemini AI, verifikasi fabrikasi sitasi, dan rekomendasi audit.</td>
+            </tr>
+            <tr>
+                <td><code style="color: #0284c7;">getEditorialQuestions()</code></td>
+                <td><code>$reportId</code></td>
+                <td>Mengambil 3 set pertanyaan telaah kritis terarah untuk form ulasan Mitra Bestari / Reviewer OJS.</td>
             </tr>
             <tr>
                 <td><code style="color: #0284c7;">waitForCompletion()</code></td>
                 <td><code>$docId, $maxWait, $pollInterval</code></td>
-                <td>Fungsi polling otomatis praktis yang menunggu komputasi selesai hingga batas timeout tanpa memblokir server.</td>
+                <td>Fungsi polling otomatis praktis yang menunggu komputasi selesai tanpa memblokir server OJS.</td>
             </tr>
         </tbody>
     </table>
@@ -1416,7 +1447,7 @@ curl -X POST https://tilik.arsetontong.top/api/v1/check \\
                     </tr>
                     <tr>
                         <td style="color: #64748b; padding: 2px 0;">Status Audit:</td>
-                        <td style="color: #059669; font-weight: 700; padding: 2px 0;">Direkomendasikan untuk Terbit (Low Plagiarism Risk)</td>
+                        <td style="color: #059669; font-weight: 700; padding: 2px 0;">Direkomendasikan untuk Terbit (Risiko Integritas Sangat Rendah - Sesuai Standar SINTA)</td>
                     </tr>
                 </table>
             </div>

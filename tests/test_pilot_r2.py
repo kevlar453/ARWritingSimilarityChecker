@@ -218,7 +218,7 @@ def test_pilot_r2_provenance_separation_in_observability():
     from worker.observability import get_operational_quality_report
 
     report = get_operational_quality_report()
-    assert report["system_version"] == "v1.1.0 (GA)"
+    assert report["system_version"] in ("v1.3.0 (GA)", "v1.1.0 (GA)")
     assert report["baseline_engine"] == "v1.0.0 (FROZEN)"
 
     human = report["human_validation_metrics"]

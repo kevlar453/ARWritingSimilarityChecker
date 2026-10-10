@@ -21,6 +21,22 @@ def test_tokenize_sentences():
     assert "Ini adalah kalimat pertama" in sentences[0]
 
 
+def test_tokenize_sentences_with_academic_abbreviations():
+    academic_text = (
+        "Menurut Sugiyono dkk. (2020, hlm. 45), metode penelitian kualitatif berfokus pada makna. "
+        "Penelitian oleh Prof. Dr. Ir. H. Bambang, M.Sc., Ph.D. menunjukkan nilai p-value 0.05. "
+        "Instrumen terbukti reliabel (r = 0.85, p < 0.01) dalam publikasi no. 12 vol. 4 thn. 2021. "
+        "Hal ini sesuai temuan Smith et al. dalam kajian teoretis sebelumnya."
+    )
+    sentences = tokenize_sentences(academic_text)
+    assert len(sentences) == 4
+    assert "Sugiyono dkk. (2020, hlm. 45)" in sentences[0]
+    assert "Prof. Dr. Ir. H. Bambang, M.Sc., Ph.D." in sentences[1]
+    assert "0.05" in sentences[1]
+    assert "no. 12 vol. 4 thn. 2021" in sentences[2]
+    assert "Smith et al." in sentences[3]
+
+
 def test_calculate_burstiness_human_vs_ai():
     # Pola AI: Kalimat seragam (panjang mirip)
     ai_lengths = [20, 21, 20, 22, 19, 21, 20]
@@ -72,17 +88,33 @@ def test_analyze_ai_stylometrics_comprehensive():
     )
     result = analyze_ai_stylometrics(ai_text)
     assert result["status"] == "completed"
-    assert result["ai_probability_score"] >= 40.0
-    assert result["verdict_label"] in [
-        "Pola Susunan Terstruktur Khas AI (Tinggi)",
-        "Indikasi Parafrase AI Ringan / Berbantuan Mesin"
-    ]
+    assert result["is_experimental"] is True
+    assert result["ai_probability_score"] >= 50.0
+    assert "[Eksperimental]" in result["verdict_label"]
+    assert "disclaimer" in result
     assert "burstiness" in result["metrics"]
     assert "transition_density" in result["metrics"]
+
+
+def test_analyze_ai_stylometrics_human_thesis_text():
+    human_text = (
+        "Penelitian ini berangkat dari kegelisahan akademis terhadap rendahnya literasi digital di perdesaan. "
+        "Masyarakat sering kali kesulitan mengakses informasi yang akurat. "
+        "Berdasarkan hasil wawancara mendalam dengan kepala desa Sukamaju pada tanggal 12 Mei 2023, ditemukan bahwa keterbatasan infrastruktur jaringan internet menjadi kendala paling dominan yang menghambat efektivitas program digitalisasi desa tersebut. "
+        "Oleh sebab itu, kami mengajukan model pendampingan berbasis komunitas lokal. "
+        "Data empiris menunjukkan perubahan sikap yang positif setelah intervensi dilaksanakan selama tiga bulan berturut-turut."
+    )
+    result = analyze_ai_stylometrics(human_text)
+    assert result["status"] == "completed"
+    assert result["is_experimental"] is True
+    assert result["ai_probability_score"] < 50.0
+    assert result["ai_confidence_level"] == "LOW"
+    assert "Organik" in result["verdict_label"]
 
 
 def test_analyze_ai_stylometrics_insufficient_text():
     short_text = "Teks terlalu pendek."
     result = analyze_ai_stylometrics(short_text)
     assert result["status"] == "insufficient_data"
+    assert result["is_experimental"] is True
     assert result["ai_probability_score"] == 0.0

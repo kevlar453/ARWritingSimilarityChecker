@@ -57,7 +57,7 @@ class PaymentTransactionModel extends Model
      */
     public function getAllTransactions(int $limit = 50, int $offset = 0): array
     {
-        return $this->select('payment_transactions.*, users.name as user_name, users.email as user_email')
+        return $this->select('payment_transactions.*, users.name as user_name, users.email as user_email, users.institution as user_institution')
             ->join('users', 'users.id = payment_transactions.user_id', 'left')
             ->orderBy('payment_transactions.id', 'DESC')
             ->findAll($limit, $offset);

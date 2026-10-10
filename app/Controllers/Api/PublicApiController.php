@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use App\Models\ApiKeyModel;
 use App\Models\DocumentModel;
 use App\Models\ReportModel;
+use App\Libraries\QueueService;
 
 class PublicApiController extends BaseController
 {
@@ -198,22 +199,14 @@ class PublicApiController extends BaseController
                 'updated_at'         => date('Y-m-d H:i:s'),
             ]);
 
-            // Masukkan job antrean worker
-            $db = db_connect();
-            $db->table('jobs')->insert([
-                'type'         => 'similarity_check',
-                'payload'      => json_encode([
-                    'document_id'  => (int) $docId,
-                    'report_id'    => (int) $reportId,
-                    'engine'       => 'hybrid',
-                    'callback_url' => $callbackUrl,
-                    'external_id'  => $extRef,
-                    'api_key_id'   => (int) $keyData['id'],
-                ]),
-                'status'       => 'pending',
-                'available_at' => date('Y-m-d H:i:s'),
-                'created_at'   => date('Y-m-d H:i:s'),
-                'updated_at'   => date('Y-m-d H:i:s'),
+            // Masukkan job antrean worker via QueueService (Redis event-driven + MariaDB fallback)
+            QueueService::dispatch('similarity_check', [
+                'document_id'  => (int) $docId,
+                'report_id'    => (int) $reportId,
+                'engine'       => 'hybrid',
+                'callback_url' => $callbackUrl,
+                'external_id'  => $extRef,
+                'api_key_id'   => (int) $keyData['id'],
             ]);
         } catch (\Throwable $e) {
             $userModel->refundSubmissionQuota($userId);
@@ -340,6 +333,24 @@ class PublicApiController extends BaseController
             $this->reportModel->update($reportId, ['verification_code' => $certCode]);
         }
 
+        $evidenceData = [];
+        if (! empty($report['evidence_data'])) {
+            $evidenceData = is_string($report['evidence_data']) ? json_decode($report['evidence_data'], true) : $report['evidence_data'];
+        }
+        $gemini = $evidenceData['gemini_forensic'] ?? $evidenceData['v1_1_presentation']['v1_2_evolution']['gemini_forensic'] ?? null;
+        $forensicPayload = null;
+        if (! empty($gemini) && is_array($gemini)) {
+            $forensicPayload = [
+                'status'                 => $gemini['status'] ?? 'completed',
+                'model'                  => $gemini['model'] ?? 'gemini-3.6-flash',
+                'verdict'                => $gemini['verdict'] ?? null,
+                'summary'                => $gemini['summary'] ?? null,
+                'confidence_score'       => $gemini['confidence_score'] ?? null,
+                'recommendations'        => $gemini['recommendations'] ?? [],
+                'oral_defense_questions' => $gemini['oral_defense_questions'] ?? [],
+            ];
+        }
+
         return $this->response->setJSON([
             'status' => 'success',
             'data'   => [
@@ -368,6 +379,7 @@ class PublicApiController extends BaseController
                         'method'       => 'Sparse Cosine Vector Space',
                     ],
                 ],
+                'forensic_audit'     => $forensicPayload,
                 'sources_count'      => count($sources),
                 'top_sources'        => array_map(function ($s) {
                     return [

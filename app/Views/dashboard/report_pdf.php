@@ -656,9 +656,9 @@ if ($dec === 'match') {
             ?>
             <?php if (!empty($aiAuditPdf)): ?>
             <tr>
-                <td><strong>Indikator AI &amp; Profil Stylometri</strong><br><span style="font-size: 7.5pt; color: #64748b;">Variabilitas Ritme Sintaksis &amp; Pola LLM</span></td>
-                <td style="text-align: center; font-weight: bold; color: <?= $aiProbPdf >= 70 ? '#b91c1c' : ($aiProbPdf >= 35 ? '#b45309' : '#047857') ?>; font-size: 10pt;">
-                    <?= number_format($aiProbPdf, 1) ?>% Probabilitas
+                <td><strong>[Eksperimental] Indikator Gaya Bahasa &amp; Stylometri</strong><br><span style="font-size: 7.5pt; color: #64748b;">Eksperimental — Bukan Vonis AI</span></td>
+                <td style="text-align: center; font-weight: bold; color: <?= $aiProbPdf >= 75 ? '#b91c1c' : ($aiProbPdf >= 50 ? '#b45309' : '#047857') ?>; font-size: 10pt;">
+                    <?= number_format($aiProbPdf, 1) ?>% Indikator
                 </td>
                 <td>
                     <strong><?= esc($aiLabelPdf) ?></strong>

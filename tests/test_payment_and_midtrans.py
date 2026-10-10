@@ -49,8 +49,8 @@ def test_full_payment_lifecycle():
         test_email = "test_payer_midtrans@arsetontong.top"
         cur.execute("DELETE FROM users WHERE email = %s", (test_email,))
         cur.execute("""
-            INSERT INTO users (name, email, password_hash, role, status, week_reset_at, bonus_submissions, created_at, updated_at)
-            VALUES (%s, %s, %s, 'user', 'active', NOW() + INTERVAL 7 DAY, 0, NOW(), NOW())
+            INSERT INTO users (name, email, password_hash, institution, role, status, week_reset_at, bonus_submissions, created_at, updated_at)
+            VALUES (%s, %s, %s, 'Institut Teknologi Bandung', 'user', 'active', NOW() + INTERVAL 7 DAY, 0, NOW(), NOW())
         """, ("Test Payer", test_email, "$2y$10$wN9a8N4o0gG8O1u2v3w4x.9gH7k8L9m0n1p2q3r4s5t6u7v8w9x0y"))
         user_id = cur.lastrowid
         conn.commit()
@@ -69,9 +69,6 @@ def test_full_payment_lifecycle():
 
     # Since we can set session or directly test snap creation with simulated authenticated user:
     # Let's verify by testing snap token directly or setting a valid password
-    # Let's set password hash for 'Secret123!'
-    from werkzeug.security import generate_password_hash
-    # We can use php password_hash via shell or direct login
     import subprocess
     hashed = subprocess.check_output(["php", "-r", "echo password_hash('Pass1234!', PASSWORD_BCRYPT);"]).decode().strip()
     with conn.cursor() as cur:
@@ -97,6 +94,7 @@ def test_full_payment_lifecycle():
     snap_token = snap_data.get("snap_token")
     assert order_id.startswith("TILIK-")
     assert snap_token is not None and len(snap_token) > 10
+    assert snap_data.get("order_detail") == "Test Payer dari Institut Teknologi Bandung order paket Top-Up 3 Dokumen"
 
     # 4. Verifikasi record di payment_transactions berstatus pending
     with conn.cursor() as cur:

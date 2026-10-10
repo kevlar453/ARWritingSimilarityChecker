@@ -4,6 +4,7 @@ namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
 use App\Models\DocumentModel;
+use App\Libraries\QueueService;
 
 class CorpusController extends BaseController
 {
@@ -345,14 +346,6 @@ class CorpusController extends BaseController
 
     private function queueIndexJob($documentId)
     {
-        $db = db_connect();
-        $db->table('jobs')->insert([
-            'type'         => 'index_corpus',
-            'payload'      => json_encode(['document_id' => (int) $documentId]),
-            'status'       => 'pending',
-            'available_at' => date('Y-m-d H:i:s'),
-            'created_at'   => date('Y-m-d H:i:s'),
-            'updated_at'   => date('Y-m-d H:i:s'),
-        ]);
+        QueueService::dispatch('index_corpus', ['document_id' => (int) $documentId]);
     }
 }

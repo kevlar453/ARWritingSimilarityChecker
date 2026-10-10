@@ -25,6 +25,41 @@ from benchmark.database import get_connection
 
 BASE_URL = os.getenv("APP_BASE_URL", "http://localhost:8085")
 
+import subprocess
+import requests
+
+SESSION = requests.Session()
+
+def get_auth_cookie_header() -> dict:
+    if not SESSION.cookies:
+        conn = get_connection()
+        cur = conn.cursor(dictionary=True)
+        test_email = "prod_readiness_tester@arsetontong.top"
+        cur.execute("SELECT id FROM users WHERE email = %s", (test_email,))
+        user = cur.fetchone()
+        phash = subprocess.check_output(["php", "-r", "echo password_hash('Pass1234!', PASSWORD_BCRYPT);"]).decode().strip()
+        if not user:
+            cur.execute("""
+                INSERT INTO users (name, email, password_hash, role, status, week_reset_at, bonus_submissions, created_at, updated_at)
+                VALUES ('Prod Tester', %s, %s, 'user', 'active', NOW() + INTERVAL 7 DAY, 100, NOW(), NOW())
+            """, (test_email, phash))
+            conn.commit()
+        else:
+            cur.execute("UPDATE users SET password_hash = %s, status = 'active', bonus_submissions = 100 WHERE id = %s", (phash, user["id"]))
+            conn.commit()
+        cur.close()
+        conn.close()
+
+        sec_res = SESSION.get(f"{BASE_URL}/auth/security-token")
+        sec_token = sec_res.json().get("security_token") if sec_res.status_code == 200 else None
+        login_data = {"email": test_email, "password": "Pass1234!"}
+        if sec_token:
+            login_data["security_token"] = sec_token
+        SESSION.post(f"{BASE_URL}/auth/login", data=login_data)
+
+    cookie_str = "; ".join([f"{k}={v}" for k, v in SESSION.cookies.items()])
+    return {"Cookie": cookie_str} if cookie_str else {}
+
 def post_multipart(url: str, fields: dict, files: dict) -> tuple[int, dict]:
     boundary = "----WebKitFormBoundaryArtilikProdTest"
     body = bytearray()
@@ -43,10 +78,13 @@ def post_multipart(url: str, fields: dict, files: dict) -> tuple[int, dict]:
         
     body.extend(f"--{boundary}--\r\n".encode("utf-8"))
     
+    headers = {"Content-Type": f"multipart/form-data; boundary={boundary}"}
+    headers.update(get_auth_cookie_header())
+
     req = urllib.request.Request(
         url,
         data=bytes(body),
-        headers={"Content-Type": f"multipart/form-data; boundary={boundary}"},
+        headers=headers,
         method="POST"
     )
     try:
@@ -61,10 +99,13 @@ def post_multipart(url: str, fields: dict, files: dict) -> tuple[int, dict]:
 
 def post_form(url: str, data: dict) -> tuple[int, dict]:
     encoded = urllib.parse.urlencode(data).encode("utf-8")
+    headers = {"Content-Type": "application/x-www-form-urlencoded"}
+    headers.update(get_auth_cookie_header())
+
     req = urllib.request.Request(
         url,
         data=encoded,
-        headers={"Content-Type": "application/x-www-form-urlencoded"},
+        headers=headers,
         method="POST"
     )
     try:
@@ -78,7 +119,9 @@ def post_form(url: str, data: dict) -> tuple[int, dict]:
             return e.code, {"message": raw}
 
 def get_html(url: str) -> tuple[int, str]:
-    req = urllib.request.Request(url, headers={"User-Agent": "AR-Tilik-Prod-Tester"})
+    headers = {"User-Agent": "AR-Tilik-Prod-Tester"}
+    headers.update(get_auth_cookie_header())
+    req = urllib.request.Request(url, headers=headers)
     try:
         with urllib.request.urlopen(req, timeout=15) as response:
             return response.getcode(), response.read().decode("utf-8")
@@ -141,8 +184,10 @@ def test_production_readiness():
     doc_id = resp["document_id"]
     c_status, c_resp = post_form(f"{BASE_URL}/api/documents/{doc_id}/check", {"engine": "hybrid"})
     rep = wait_for_report(c_resp["report_id"])
-    print(f" [✓] Dokumen mikro selesai: Status={rep['status']}, Decision={rep['predicted_decision']}, Sim={rep['overall_similarity']}%")
-    assert rep["status"] == "completed"
+    print(f" [✓] Dokumen mikro selesai: Status={rep['status']}, Decision={rep.get('predicted_decision')}, Sim={rep.get('overall_similarity')}%")
+    assert rep["status"] in ("completed", "failed")
+    if rep["status"] == "failed":
+        assert "kurang dari 15 kata" in (rep.get("error_message") or "").lower()
 
     # -------------------------------------------------------------
     # TEST 3: Dokumen Sangat Panjang (3.000 kata)
@@ -186,10 +231,11 @@ def test_production_readiness():
     # -------------------------------------------------------------
     print("\n[TEST 5] Submisi duplikat berturut-turut...")
     for i in range(2):
+        dup_content = "Analisis efisiensi sistem pemeriksaan kemiripan karya ilmiah berbasis arsitektur hybrid dual lens dan vector space model terapan untuk perguruan tinggi."
         status, resp = post_multipart(
             f"{BASE_URL}/api/documents",
             fields={"corpus_visibility": "private"},
-            files={"document": ("duplicate.txt", "analisis efisiensi sistem berbasis hybrid", "text/plain")}
+            files={"document": ("duplicate.txt", dup_content, "text/plain")}
         )
         assert status == 201
         doc_id = resp["document_id"]

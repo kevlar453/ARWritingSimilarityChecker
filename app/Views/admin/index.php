@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="bg-slate-900">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,13 +9,16 @@
     <link rel="icon" type="image/png" sizes="32x32" href="<?= base_url('favicon-32x32.png?v=20261008') ?>">
     <link rel="icon" type="image/png" sizes="16x16" href="<?= base_url('favicon-16x16.png?v=20261008') ?>">
     <link rel="apple-touch-icon" sizes="180x180" href="<?= base_url('apple-touch-icon.png?v=20261008') ?>">
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Anti-Flash Critical CSS Fallback for Canvas & Theme -->
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        html {
+            background-color: #0f172a !important; /* Tailwind slate-900: eliminates white flash on page load */
+            color-scheme: dark;
+        }
+        body {
+            background-color: #0f172a !important;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
         .font-mono-code { font-family: 'JetBrains Mono', monospace; }
         /* Sleek sidebar scroll styling */
         .admin-sidebar-scroll {
@@ -35,9 +38,74 @@
         .admin-sidebar-scroll::-webkit-scrollbar-thumb:hover {
             background: rgba(99, 102, 241, 0.6);
         }
+        #topProgressBar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(to right, #6366f1, #38bdf8, #34d399);
+            z-index: 99999;
+            pointer-events: none;
+            box-shadow: 0 0 10px rgba(99, 102, 241, 0.7);
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+        }
+        #pageTransitionOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(2, 6, 23, 0.88);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 99998;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            opacity: 1;
+            transition: opacity 0.3s ease-in-out;
+        }
+        @keyframes spinPreloader {
+            to { transform: rotate(360deg); }
+        }
+        .preloader-spinner {
+            animation: spinPreloader 0.8s linear infinite;
+        }
     </style>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body class="bg-slate-900 text-slate-100 antialiased min-h-screen flex flex-col">
+
+    <!-- Top Loading Progress Bar (NProgress-style) -->
+    <div id="topProgressBar" style="width: 45%;"></div>
+
+    <!-- Page Transition Spinner Overlay (Initially rendered visible for zero-flash page transition & preloading) -->
+    <div id="pageTransitionOverlay">
+        <div class="bg-slate-900 border border-slate-700/80 rounded-2xl px-6 py-4 shadow-2xl flex items-center gap-3.5 text-slate-100 max-w-sm w-full sm:w-auto" style="background-color: #0f172a; border: 1px solid rgba(51, 65, 85, 0.8); border-radius: 1rem; padding: 1rem 1.5rem; display: flex; align-items: center; gap: 0.875rem;">
+            <svg class="preloader-spinner" style="width: 1.5rem; height: 1.5rem; color: #818cf8; flex-shrink: 0;" fill="none" viewBox="0 0 24 24">
+                <circle opacity="0.25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path opacity="0.75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <div style="display: flex; flex-direction: column; min-width: 0;">
+                <span class="text-sm font-semibold text-slate-200 truncate" id="pageTransitionTitle" style="font-size: 0.875rem; font-weight: 600; color: #e2e8f0;">Memuat Portal Admin...</span>
+                <span class="text-[11px] text-slate-400 truncate" id="pageTransitionSubtitle" style="font-size: 0.6875rem; color: #94a3b8;">Menyiapkan data &amp; antarmuka</span>
+            </div>
+        </div>
+    </div>
+    <script>
+        (function() {
+            var b = document.getElementById('topProgressBar');
+            if (b) b.style.width = '70%';
+        })();
+    </script>
 
     <!-- Top Admin Header -->
     <header class="bg-slate-950/95 border-b border-slate-800/80 sticky top-0 z-40 backdrop-blur-md">
@@ -387,7 +455,42 @@
                             </h3>
                             <a href="<?= base_url('admin?tab=documents') ?>" class="text-xs text-indigo-400 hover:text-indigo-300 font-medium">Lihat Semua →</a>
                         </div>
-                        <div class="overflow-x-auto">
+                        <?php $recDocs = array_slice($documentsList, 0, 7); ?>
+                        <!-- Mobile List: Naskah Terbaru (Layar Ponsel) -->
+                        <div class="space-y-2.5 md:hidden">
+                            <?php if (empty($recDocs)): ?>
+                                <div class="py-4 text-center text-slate-500 text-xs">Belum ada submisi naskah.</div>
+                            <?php else: ?>
+                                <?php foreach ($recDocs as $d): ?>
+                                    <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-3 space-y-2">
+                                        <div class="flex items-start justify-between gap-2">
+                                            <div class="min-w-0 flex-1">
+                                                <div class="font-medium text-slate-200 text-xs truncate"><?= esc($d['title']) ?></div>
+                                                <div class="text-[10px] text-slate-400 mt-0.5 truncate"><?= esc($d['user_name'] ?? 'Tamu') ?></div>
+                                            </div>
+                                            <?php if ($d['status'] === 'completed'): ?>
+                                                <span class="px-2 py-0.5 rounded-full text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold shrink-0">Selesai</span>
+                                            <?php elseif ($d['status'] === 'processing'): ?>
+                                                <span class="px-2 py-0.5 rounded-full text-[10px] bg-sky-500/10 text-sky-400 border border-sky-500/20 font-semibold shrink-0 animate-pulse">Proses</span>
+                                            <?php elseif ($d['status'] === 'failed'): ?>
+                                                <span class="px-2 py-0.5 rounded-full text-[10px] bg-rose-500/10 text-rose-400 border border-rose-500/20 font-semibold shrink-0">Gagal</span>
+                                            <?php else: ?>
+                                                <span class="px-2 py-0.5 rounded-full text-[10px] bg-slate-700/60 text-slate-300 font-semibold shrink-0">Antre</span>
+                                            <?php endif; ?>
+                                        </div>
+                                        <div class="flex items-center justify-between text-[11px] pt-1.5 border-t border-slate-800/80">
+                                            <span class="text-slate-400 text-[10px]">Skor Kemiripan:</span>
+                                            <span class="font-bold font-mono-code <?= isset($d['report']['overall_score']) && $d['report']['overall_score'] >= 25 ? 'text-amber-400' : 'text-emerald-400' ?>">
+                                                <?= isset($d['report']['overall_score']) ? number_format($d['report']['overall_score'], 1) . '%' : '-' ?>
+                                            </span>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </div>
+
+                        <!-- Desktop Table View: Terlihat di Layar md ke atas -->
+                        <div class="hidden md:block overflow-x-auto">
                             <table class="w-full text-xs text-left">
                                 <thead class="text-slate-400 uppercase tracking-wider border-b border-slate-700/60 text-[10px]">
                                     <tr>
@@ -398,7 +501,6 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-800/80">
-                                    <?php $recDocs = array_slice($documentsList, 0, 7); ?>
                                     <?php if (empty($recDocs)): ?>
                                         <tr><td colspan="4" class="py-4 text-center text-slate-500">Belum ada submisi naskah.</td></tr>
                                     <?php else: ?>
@@ -441,7 +543,42 @@
                             </h3>
                             <a href="<?= base_url('admin?tab=users') ?>" class="text-xs text-indigo-400 hover:text-indigo-300 font-medium">Kelola Semua →</a>
                         </div>
-                        <div class="overflow-x-auto">
+                        <?php $recUsers = array_slice($usersList, 0, 7); ?>
+                        <!-- Mobile List: Pengguna Terbaru (Layar Ponsel) -->
+                        <div class="space-y-2.5 md:hidden">
+                            <?php if (empty($recUsers)): ?>
+                                <div class="py-4 text-center text-slate-500 text-xs">Belum ada pengguna terdaftar.</div>
+                            <?php else: ?>
+                                <?php foreach ($recUsers as $u): ?>
+                                    <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-3 space-y-2">
+                                        <div class="flex items-start justify-between gap-2">
+                                            <div class="min-w-0 flex-1">
+                                                <div class="font-semibold text-slate-200 text-xs truncate"><?= esc($u['name']) ?></div>
+                                                <div class="text-[10px] text-slate-400 mt-0.5 truncate"><?= esc($u['email']) ?></div>
+                                            </div>
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] <?= $u['role'] === 'admin' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold' : 'bg-slate-800 text-slate-400' ?> shrink-0">
+                                                <?= strtoupper($u['role']) ?>
+                                            </span>
+                                        </div>
+                                        <div class="flex items-center justify-between text-[11px] pt-1.5 border-t border-slate-800/80">
+                                            <span class="text-slate-400 text-[10px] truncate max-w-[150px]"><?= esc($u['institution'] ?: '-') ?></span>
+                                            <div>
+                                                <?php if ($u['status'] === 'active'): ?>
+                                                    <span class="px-2 py-0.5 rounded-full text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold">Aktif</span>
+                                                <?php elseif ($u['status'] === 'pending_verification'): ?>
+                                                    <span class="px-2 py-0.5 rounded-full text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 font-semibold">Pending</span>
+                                                <?php else: ?>
+                                                    <span class="px-2 py-0.5 rounded-full text-[10px] bg-rose-500/10 text-rose-400 border border-rose-500/20 font-semibold">Nonaktif</span>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </div>
+
+                        <!-- Desktop Table View: Terlihat di Layar md ke atas -->
+                        <div class="hidden md:block overflow-x-auto">
                             <table class="w-full text-xs text-left">
                                 <thead class="text-slate-400 uppercase tracking-wider border-b border-slate-700/60 text-[10px]">
                                     <tr>
@@ -452,7 +589,6 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-800/80">
-                                    <?php $recUsers = array_slice($usersList, 0, 7); ?>
                                     <?php if (empty($recUsers)): ?>
                                         <tr><td colspan="4" class="py-4 text-center text-slate-500">Belum ada pengguna terdaftar.</td></tr>
                                     <?php else: ?>
@@ -501,8 +637,106 @@
                     </div>
                 </div>
 
-                <!-- Table Pengguna -->
-                <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl overflow-hidden shadow-sm">
+                <!-- Mobile List: Tampilan Kartu Responsif Pengguna (Layar Ponsel) -->
+                <div class="space-y-3.5 md:hidden">
+                    <?php if (empty($usersList)): ?>
+                        <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-6 text-center text-xs text-slate-500">
+                            Tidak ada pengguna yang cocok dengan kriteria pencarian.
+                        </div>
+                    <?php else: ?>
+                        <?php foreach ($usersList as $u): ?>
+                            <div class="bg-slate-800/60 border border-slate-700/70 rounded-2xl p-4 shadow-sm space-y-3">
+                                <!-- Baris Identitas & Status -->
+                                <div class="flex items-start justify-between gap-3">
+                                    <div class="flex items-center gap-3 min-w-0">
+                                        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr <?= $u['role'] === 'admin' ? 'from-purple-600 to-indigo-600' : 'from-indigo-600 to-sky-600' ?> flex items-center justify-center text-sm font-bold text-white shadow-xs shrink-0">
+                                            <?= strtoupper(substr($u['name'] ?: 'U', 0, 1)) ?>
+                                        </div>
+                                        <div class="min-w-0">
+                                            <div class="font-bold text-slate-100 text-sm truncate"><?= esc($u['name']) ?></div>
+                                            <div class="text-slate-400 text-xs font-mono-code truncate"><?= esc($u['email']) ?></div>
+                                            <div class="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1">
+                                                <span>🏛️</span>
+                                                <span class="truncate"><?= esc($u['institution'] ?: 'Tanpa Institusi') ?></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col items-end gap-1 shrink-0">
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold <?= $u['role'] === 'admin' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' : 'bg-slate-800 text-slate-300 border border-slate-700/60' ?>">
+                                            <?= strtoupper($u['role']) ?>
+                                        </span>
+                                        <?php if ($u['status'] === 'active'): ?>
+                                            <span class="px-2 py-0.5 rounded text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold">Aktif</span>
+                                        <?php elseif ($u['status'] === 'pending_verification'): ?>
+                                            <span class="px-2 py-0.5 rounded text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 font-semibold">Pending Email</span>
+                                        <?php else: ?>
+                                            <span class="px-2 py-0.5 rounded text-[10px] bg-rose-500/10 text-rose-400 border border-rose-500/20 font-semibold">Nonaktif</span>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+
+                                <!-- Ringkasan Metrik Pengguna (Grid 2x2) -->
+                                <div class="grid grid-cols-2 gap-2 bg-slate-900/60 border border-slate-800/80 rounded-xl p-2.5 text-xs">
+                                    <div>
+                                        <div class="text-[10px] uppercase tracking-wider text-slate-500">Kuota Gratis</div>
+                                        <div class="font-semibold text-slate-200 mt-0.5">
+                                            <?= (int) $u['free_submissions_used_this_week'] ?> <span class="text-slate-500 text-[10px]">/ 3 mg ini</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="text-[10px] uppercase tracking-wider text-slate-500">Bonus Kuota</div>
+                                        <div class="font-bold text-indigo-400 mt-0.5">
+                                            +<?= (int) $u['bonus_submissions'] ?>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="text-[10px] uppercase tracking-wider text-slate-500">Korpus Unggah</div>
+                                        <div class="font-medium text-slate-300 mt-0.5">
+                                            <?= (int) $u['uploaded_corpus_count'] ?> file
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="text-[10px] uppercase tracking-wider text-slate-500">Bergabung</div>
+                                        <div class="text-slate-400 mt-0.5 text-[11px]">
+                                            <?= date('d M Y', strtotime($u['created_at'])) ?>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Penataan Tombol Aksi Kontrol (Grid 2 Kolom Mobile) -->
+                                <div class="pt-2 border-t border-slate-700/60">
+                                    <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">Aksi Kontrol</div>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <?php if ($u['status'] === 'pending_verification'): ?>
+                                            <button onclick="handleUserAction(<?= (int) $u['id'] ?>, 'verify_email')" class="col-span-2 py-2 px-3 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors active:scale-98">
+                                                <span>✓</span> Verifikasi Email Manual
+                                            </button>
+                                        <?php endif; ?>
+
+                                        <button onclick="handleUserAction(<?= (int) $u['id'] ?>, 'reset_weekly_quota')" class="py-2 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 text-xs font-medium flex items-center justify-center gap-1.5 transition-colors active:scale-98">
+                                            <span>↺</span> Reset Kuota
+                                        </button>
+
+                                        <button onclick="promptBonusQuota(<?= (int) $u['id'] ?>)" class="py-2 px-3 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors active:scale-98">
+                                            <span>+</span> Tambah Kuota
+                                        </button>
+
+                                        <button onclick="handleUserAction(<?= (int) $u['id'] ?>, 'set_role', {role: '<?= $u['role'] === 'admin' ? 'user' : 'admin' ?>'})" class="py-2 px-3 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 text-xs font-medium flex items-center justify-center gap-1.5 transition-colors active:scale-98">
+                                            <span>👑</span> <?= $u['role'] === 'admin' ? 'Jadikan User' : 'Jadikan Admin' ?>
+                                        </button>
+
+                                        <button onclick="handleUserAction(<?= (int) $u['id'] ?>, 'set_status', {status: '<?= $u['status'] === 'active' ? 'inactive' : 'active' ?>'})" class="py-2 px-3 rounded-xl <?= $u['status'] === 'active' ? 'bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border-rose-500/30' : 'bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border-emerald-500/30' ?> border text-xs font-medium flex items-center justify-center gap-1.5 transition-colors active:scale-98">
+                                            <span><?= $u['status'] === 'active' ? '🚫' : '✅' ?></span> <?= $u['status'] === 'active' ? 'Suspend' : 'Aktifkan' ?>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Desktop Table View: Terlihat di Layar md ke atas -->
+                <div class="hidden md:block bg-slate-800/40 border border-slate-700/60 rounded-2xl overflow-hidden shadow-sm">
                     <div class="overflow-x-auto">
                         <table class="w-full text-xs text-left">
                             <thead class="bg-slate-900/80 text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-700/60">
@@ -554,35 +788,35 @@
                                             <td class="py-3 px-3 text-center text-slate-300 font-semibold">
                                                 <?= (int) $u['uploaded_corpus_count'] ?> file
                                             </td>
-                                            <td class="py-3 px-3 text-slate-400 text-[11px]">
+                                            <td class="py-3 px-3 text-slate-400 text-[11px] whitespace-nowrap">
                                                 <?= date('d M Y', strtotime($u['created_at'])) ?>
                                             </td>
-                                            <td class="py-3 px-4 text-right">
-                                                <div class="flex items-center justify-end gap-1.5 flex-wrap">
+                                            <td class="py-3 px-4 text-right whitespace-nowrap min-w-[280px]">
+                                                <div class="flex items-center justify-end gap-1.5 flex-nowrap">
                                                     <!-- Verifikasi Manual jika pending -->
                                                     <?php if ($u['status'] === 'pending_verification'): ?>
-                                                        <button onclick="handleUserAction(<?= (int) $u['id'] ?>, 'verify_email')" class="px-2 py-1 rounded bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-[10px] font-semibold transition-colors" title="Verifikasi email manual tanpa menunggu klik tautan">
+                                                        <button onclick="handleUserAction(<?= (int) $u['id'] ?>, 'verify_email')" class="px-2.5 py-1 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-[11px] font-semibold transition-colors" title="Verifikasi email manual tanpa menunggu klik tautan">
                                                             ✓ Verifikasi
                                                         </button>
                                                     <?php endif; ?>
 
                                                     <!-- Reset Mingguan -->
-                                                    <button onclick="handleUserAction(<?= (int) $u['id'] ?>, 'reset_weekly_quota')" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-[10px] transition-colors" title="Reset kuota terpakai mingguan ke 0">
+                                                    <button onclick="handleUserAction(<?= (int) $u['id'] ?>, 'reset_weekly_quota')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-[11px] transition-colors" title="Reset kuota terpakai mingguan ke 0">
                                                         ↺ Reset Kuota
                                                     </button>
 
                                                     <!-- Tambah Bonus Kuota -->
-                                                    <button onclick="promptBonusQuota(<?= (int) $u['id'] ?>)" class="px-2 py-1 rounded bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-[10px] font-semibold transition-colors" title="Tambah bonus kuota submisi">
+                                                    <button onclick="promptBonusQuota(<?= (int) $u['id'] ?>)" class="px-2.5 py-1 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-[11px] font-semibold transition-colors" title="Tambah bonus kuota submisi">
                                                         + Kuota
                                                     </button>
 
                                                     <!-- Toggle Role -->
-                                                    <button onclick="handleUserAction(<?= (int) $u['id'] ?>, 'set_role', {role: '<?= $u['role'] === 'admin' ? 'user' : 'admin' ?>'})" class="px-2 py-1 rounded bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 text-[10px] transition-colors" title="Ganti peran antara Admin dan Pengguna">
+                                                    <button onclick="handleUserAction(<?= (int) $u['id'] ?>, 'set_role', {role: '<?= $u['role'] === 'admin' ? 'user' : 'admin' ?>'})" class="px-2.5 py-1 rounded-lg bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 text-[11px] transition-colors" title="Ganti peran antara Admin dan Pengguna">
                                                         <?= $u['role'] === 'admin' ? 'Jadikan User' : 'Jadikan Admin' ?>
                                                     </button>
 
                                                     <!-- Toggle Status -->
-                                                    <button onclick="handleUserAction(<?= (int) $u['id'] ?>, 'set_status', {status: '<?= $u['status'] === 'active' ? 'inactive' : 'active' ?>'})" class="px-2 py-1 rounded <?= $u['status'] === 'active' ? 'bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border-rose-500/30' : 'bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border-emerald-500/30' ?> border text-[10px] transition-colors">
+                                                    <button onclick="handleUserAction(<?= (int) $u['id'] ?>, 'set_status', {status: '<?= $u['status'] === 'active' ? 'inactive' : 'active' ?>'})" class="px-2.5 py-1 rounded-lg <?= $u['status'] === 'active' ? 'bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border-rose-500/30' : 'bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border-emerald-500/30' ?> border text-[11px] transition-colors">
                                                         <?= $u['status'] === 'active' ? 'Suspend' : 'Aktifkan' ?>
                                                     </button>
                                                 </div>
@@ -606,7 +840,102 @@
                     <p class="text-xs text-slate-400">Seluruh dokumen yang diuji kemiripan dan status eksekusi worker analisis</p>
                 </div>
 
-                <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl overflow-hidden shadow-sm">
+                <!-- Mobile List: Tampilan Kartu Responsif Dokumen (Layar Ponsel) -->
+                <div class="space-y-3.5 md:hidden">
+                    <?php if (empty($documentsList)): ?>
+                        <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-6 text-center text-xs text-slate-500">
+                            Tidak ada dokumen ditemukan.
+                        </div>
+                    <?php else: ?>
+                        <?php foreach ($documentsList as $d): ?>
+                            <div class="bg-slate-800/60 border border-slate-700/70 rounded-2xl p-4 shadow-sm space-y-3">
+                                <!-- Header Judul & Status -->
+                                <div class="space-y-1.5">
+                                    <div class="flex items-start justify-between gap-2">
+                                        <div class="font-bold text-slate-100 text-sm leading-snug"><?= esc($d['title']) ?></div>
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-semibold shrink-0 <?= $d['document_type'] === 'corpus' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' : 'bg-sky-500/20 text-sky-300 border border-sky-500/30' ?>">
+                                            <?= strtoupper($d['document_type']) ?>
+                                        </span>
+                                    </div>
+                                    <div class="text-[11px] text-slate-400 font-mono-code truncate"><?= esc($d['original_filename']) ?></div>
+                                    
+                                    <?php if (!empty($d['faculty']) || !empty($d['department'])): ?>
+                                        <div class="flex items-center gap-1.5 flex-wrap pt-1">
+                                            <?php if (!empty($d['faculty'])): ?>
+                                                <span class="inline-flex items-center text-[10px] font-medium px-2 py-0.5 rounded bg-slate-900 text-slate-300 border border-slate-700">🏛️ <?= esc($d['faculty']) ?></span>
+                                            <?php endif; ?>
+                                            <?php if (!empty($d['department'])): ?>
+                                                <span class="inline-flex items-center text-[10px] font-medium px-2 py-0.5 rounded bg-indigo-900/40 text-indigo-300 border border-indigo-700/50">🎓 <?= esc($d['department']) ?></span>
+                                            <?php endif; ?>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+
+                                <!-- Pengunggah & Status Worker -->
+                                <div class="flex items-center justify-between text-xs pt-1 border-t border-slate-700/50">
+                                    <div>
+                                        <div class="text-[10px] text-slate-500 uppercase tracking-wider">Pengunggah</div>
+                                        <div class="font-medium text-slate-200"><?= esc($d['user_name'] ?? 'Tamu / Anonim') ?></div>
+                                        <div class="text-[10px] text-slate-400 font-mono-code"><?= esc($d['user_email'] ?? '-') ?></div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-[10px] text-slate-500 uppercase tracking-wider mb-0.5">Status Worker</div>
+                                        <?php if ($d['status'] === 'completed'): ?>
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold">Completed</span>
+                                        <?php elseif ($d['status'] === 'processing'): ?>
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] bg-sky-500/10 text-sky-400 border border-sky-500/20 font-semibold animate-pulse">Processing</span>
+                                        <?php elseif ($d['status'] === 'failed'): ?>
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] bg-rose-500/10 text-rose-400 border border-rose-500/20 font-semibold">Failed</span>
+                                        <?php else: ?>
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 font-semibold">Uploaded</span>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+
+                                <!-- Metrik Kemiripan & Waktu (2 Kolom) -->
+                                <div class="grid grid-cols-2 gap-2 bg-slate-900/60 border border-slate-800/80 rounded-xl p-2.5 text-xs">
+                                    <div>
+                                        <div class="text-[10px] text-slate-500 uppercase tracking-wider">Skor Kemiripan</div>
+                                        <?php if (isset($d['report']['overall_score'])): ?>
+                                            <div class="font-bold text-sm <?= $d['report']['overall_score'] >= 25 ? 'text-rose-400' : 'text-emerald-400' ?>">
+                                                <?= number_format($d['report']['overall_score'], 1) ?>%
+                                            </div>
+                                            <div class="text-[10px] text-slate-500">
+                                                V: <?= number_format($d['report']['verbatim_score'] ?? 0, 1) ?>% | P: <?= number_format($d['report']['paraphrase_score'] ?? 0, 1) ?>%
+                                            </div>
+                                        <?php else: ?>
+                                            <span class="text-slate-500 text-xs">Belum ada skor</span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div>
+                                        <div class="text-[10px] text-slate-500 uppercase tracking-wider">Waktu Masuk</div>
+                                        <div class="text-slate-300 font-medium mt-0.5 text-[11px]">
+                                            <?= date('d M Y, H:i', strtotime($d['created_at'])) ?>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Tombol Aksi Mobile -->
+                                <div class="pt-2 border-t border-slate-700/60 flex items-center gap-2">
+                                    <?php if (isset($d['report']['id'])): ?>
+                                        <a href="<?= base_url('report/' . $d['report']['id']) ?>" target="_blank" class="flex-1 py-2 px-2.5 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-xs font-semibold text-center transition-colors">
+                                            📄 Laporan
+                                        </a>
+                                    <?php endif; ?>
+                                    <button onclick="handleDocReprocess(<?= (int) $d['id'] ?>)" class="flex-1 py-2 px-2.5 rounded-xl bg-sky-600/20 hover:bg-sky-600/30 text-sky-300 border border-sky-500/30 text-xs font-medium text-center transition-colors">
+                                        ↺ Reproses
+                                    </button>
+                                    <button onclick="handleDocDelete(<?= (int) $d['id'] ?>)" class="py-2 px-3 rounded-xl bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 text-xs font-medium transition-colors" title="Hapus Dokumen">
+                                        ✕
+                                    </button>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Desktop Table View: Terlihat di Layar md ke atas -->
+                <div class="hidden md:block bg-slate-800/40 border border-slate-700/60 rounded-2xl overflow-hidden shadow-sm">
                     <div class="overflow-x-auto">
                         <table class="w-full text-xs text-left">
                             <thead class="bg-slate-900/80 text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-700/60">
@@ -672,20 +1001,20 @@
                                                     <span class="text-slate-500">-</span>
                                                 <?php endif; ?>
                                             </td>
-                                            <td class="py-3 px-3 text-slate-400 text-[11px]">
+                                            <td class="py-3 px-3 text-slate-400 text-[11px] whitespace-nowrap">
                                                 <?= date('d M Y, H:i', strtotime($d['created_at'])) ?>
                                             </td>
-                                            <td class="py-3 px-4 text-right">
-                                                <div class="flex items-center justify-end gap-1.5">
+                                            <td class="py-3 px-4 text-right whitespace-nowrap">
+                                                <div class="flex items-center justify-end gap-1.5 flex-nowrap">
                                                     <?php if (isset($d['report']['id'])): ?>
-                                                        <a href="<?= base_url('report/' . $d['report']['id']) ?>" target="_blank" class="px-2 py-1 rounded bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-[10px] font-semibold transition-colors">
+                                                        <a href="<?= base_url('report/' . $d['report']['id']) ?>" target="_blank" class="px-2.5 py-1 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-[11px] font-semibold transition-colors">
                                                             Laporan
                                                         </a>
                                                     <?php endif; ?>
-                                                    <button onclick="handleDocReprocess(<?= (int) $d['id'] ?>)" class="px-2 py-1 rounded bg-sky-600/20 hover:bg-sky-600/30 text-sky-300 border border-sky-500/30 text-[10px] transition-colors" title="Jalankan ulang analisis dokumen ini">
+                                                    <button onclick="handleDocReprocess(<?= (int) $d['id'] ?>)" class="px-2.5 py-1 rounded-lg bg-sky-600/20 hover:bg-sky-600/30 text-sky-300 border border-sky-500/30 text-[11px] transition-colors" title="Jalankan ulang analisis dokumen ini">
                                                         ↺ Re-process
                                                     </button>
-                                                    <button onclick="handleDocDelete(<?= (int) $d['id'] ?>)" class="px-2 py-1 rounded bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 text-[10px] transition-colors" title="Hapus dokumen dari sistem">
+                                                    <button onclick="handleDocDelete(<?= (int) $d['id'] ?>)" class="px-2.5 py-1 rounded-lg bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 text-[11px] transition-colors" title="Hapus dokumen dari sistem">
                                                         ✕
                                                     </button>
                                                 </div>
@@ -841,7 +1170,63 @@
                     <?php endif; ?>
                 </div>
 
-                <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl overflow-hidden shadow-sm">
+                <!-- Mobile List: Tampilan Kartu Responsif Korpus (Layar Ponsel) -->
+                <div class="space-y-3.5 md:hidden">
+                    <?php if (empty($corpusList)): ?>
+                        <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-6 text-center text-xs text-slate-500">
+                            Belum ada korpus terdaftar.
+                        </div>
+                    <?php else: ?>
+                        <?php foreach ($corpusList as $c): ?>
+                            <div class="bg-slate-800/60 border border-slate-700/70 rounded-2xl p-4 shadow-sm space-y-3">
+                                <!-- Header Judul Korpus -->
+                                <div class="space-y-1">
+                                    <div class="flex items-start justify-between gap-2">
+                                        <div class="font-bold text-slate-100 text-sm leading-snug"><?= esc($c['title']) ?></div>
+                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold shrink-0 <?= $c['indexing_status'] === 'completed' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20' ?>">
+                                            <?= esc($c['indexing_status']) ?>
+                                        </span>
+                                    </div>
+                                    <div class="text-[11px] text-slate-400 font-mono-code truncate"><?= esc($c['original_filename']) ?></div>
+                                </div>
+
+                                <!-- Detail Sumber, Ukuran, Tanggal (2 Kolom) -->
+                                <div class="grid grid-cols-2 gap-2 bg-slate-900/60 border border-slate-800/80 rounded-xl p-2.5 text-xs">
+                                    <div>
+                                        <div class="text-[10px] text-slate-500 uppercase tracking-wider">Sumber & Tipe</div>
+                                        <span class="inline-block mt-0.5 px-2 py-0.5 rounded text-[10px] bg-slate-800 text-slate-300 border border-slate-700">
+                                            <?= esc($c['source_type'] ?: 'other') ?>
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <div class="text-[10px] text-slate-500 uppercase tracking-wider">Ukuran & Tanggal</div>
+                                        <div class="text-slate-200 font-medium mt-0.5 text-[11px]">
+                                            <?= number_format($c['file_size'] / 1024, 1) ?> KB • <?= date('d M Y', strtotime($c['created_at'])) ?>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Pengaturan Visibilitas & Aksi Hapus -->
+                                <div class="pt-2 border-t border-slate-700/60 flex items-center justify-between gap-2">
+                                    <div class="flex-1 flex items-center gap-1.5 min-w-0">
+                                        <span class="text-[11px] text-slate-400 shrink-0">Visibilitas:</span>
+                                        <select onchange="handleCorpusVisibility(<?= (int) $c['id'] ?>, this.value)" class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 truncate">
+                                            <option value="corpus" <?= $c['corpus_visibility'] === 'corpus' ? 'selected' : '' ?>>Publik Korpus</option>
+                                            <option value="institution" <?= $c['corpus_visibility'] === 'institution' ? 'selected' : '' ?>>Institusi</option>
+                                            <option value="private" <?= $c['corpus_visibility'] === 'private' ? 'selected' : '' ?>>Privat</option>
+                                        </select>
+                                    </div>
+                                    <button onclick="handleDocDelete(<?= (int) $c['id'] ?>)" class="py-1.5 px-3 rounded-lg bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 text-xs font-medium transition-colors shrink-0" title="Hapus Korpus">
+                                        ✕ Hapus
+                                    </button>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Desktop Table View: Terlihat di Layar md ke atas -->
+                <div class="hidden md:block bg-slate-800/40 border border-slate-700/60 rounded-2xl overflow-hidden shadow-sm">
                     <div class="overflow-x-auto">
                         <table class="w-full text-xs text-left">
                             <thead class="bg-slate-900/80 text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-700/60">
@@ -882,14 +1267,14 @@
                                                     <?= esc($c['indexing_status']) ?>
                                                 </span>
                                             </td>
-                                            <td class="py-3 px-3 text-slate-400 text-[11px]">
+                                            <td class="py-3 px-3 text-slate-400 text-[11px] whitespace-nowrap">
                                                 <?= number_format($c['file_size'] / 1024, 1) ?> KB
                                             </td>
-                                            <td class="py-3 px-3 text-slate-400 text-[11px]">
+                                            <td class="py-3 px-3 text-slate-400 text-[11px] whitespace-nowrap">
                                                 <?= date('d M Y', strtotime($c['created_at'])) ?>
                                             </td>
-                                            <td class="py-3 px-4 text-right">
-                                                <button onclick="handleDocDelete(<?= (int) $c['id'] ?>)" class="px-2 py-1 rounded bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 text-[10px] transition-colors" title="Hapus korpus">
+                                            <td class="py-3 px-4 text-right whitespace-nowrap">
+                                                <button onclick="handleDocDelete(<?= (int) $c['id'] ?>)" class="px-2.5 py-1 rounded-lg bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 text-[11px] transition-colors" title="Hapus korpus">
                                                     Hapus
                                                 </button>
                                             </td>
@@ -920,7 +1305,60 @@
                     <?php endif; ?>
                 </div>
 
-                <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl overflow-hidden shadow-sm">
+                <!-- Mobile List: Tampilan Kartu Responsif Keamanan (Layar Ponsel) -->
+                <div class="space-y-3 md:hidden">
+                    <?php if (empty($securityLogs)): ?>
+                        <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-6 text-center text-xs text-slate-500">
+                            Belum ada catatan pelanggaran keamanan atau pembatasan frekuensi.
+                        </div>
+                    <?php else: ?>
+                        <?php foreach ($securityLogs as $log): ?>
+                            <?php $isLocked = !empty($log['locked_until']) && strtotime($log['locked_until']) > time(); ?>
+                            <div class="bg-slate-800/60 border border-slate-700/70 rounded-2xl p-4 shadow-sm space-y-3 <?= $isLocked ? 'bg-rose-950/20 border-rose-500/40' : '' ?>">
+                                <div class="flex items-start justify-between gap-2">
+                                    <div>
+                                        <div class="font-mono-code font-bold text-slate-100 text-sm"><?= esc($log['ip_address']) ?></div>
+                                        <div class="text-[11px] font-mono-code text-slate-400 mt-0.5 truncate"><?= esc($log['identifier']) ?></div>
+                                    </div>
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-800 text-slate-300 border border-slate-700">
+                                        <?= esc($log['action_type']) ?>
+                                    </span>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-2 bg-slate-900/60 border border-slate-800/80 rounded-xl p-2.5 text-xs">
+                                    <div>
+                                        <div class="text-[10px] text-slate-500 uppercase tracking-wider">Percobaan Gagal</div>
+                                        <div class="font-bold text-amber-400 mt-0.5"><?= (int) $log['attempts'] ?>x</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-[10px] text-slate-500 uppercase tracking-wider">Status Kunci</div>
+                                        <div class="mt-0.5">
+                                            <?php if ($isLocked): ?>
+                                                <span class="px-2 py-0.5 rounded-full text-[10px] bg-rose-500/20 text-rose-300 border border-rose-500/30 font-bold inline-flex items-center gap-1 animate-pulse">
+                                                    🔒 s/d <?= date('H:i:s', strtotime($log['locked_until'])) ?>
+                                                </span>
+                                            <?php else: ?>
+                                                <span class="px-2 py-0.5 rounded-full text-[10px] bg-slate-800 text-slate-400">Normal</span>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                    <div class="col-span-2 pt-1 border-t border-slate-800/80 text-[11px] text-slate-400">
+                                        Waktu Terakhir: <?= date('d M Y, H:i:s', strtotime($log['last_attempt_at'])) ?>
+                                    </div>
+                                </div>
+
+                                <div class="pt-1">
+                                    <button onclick="handleUnblock(<?= (int) $log['id'] ?>)" class="w-full py-2 px-3 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors">
+                                        🔓 Buka Kunci Blokir
+                                    </button>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Desktop Table View: Terlihat di Layar md ke atas -->
+                <div class="hidden md:block bg-slate-800/40 border border-slate-700/60 rounded-2xl overflow-hidden shadow-sm">
                     <div class="overflow-x-auto">
                         <table class="w-full text-xs text-left">
                             <thead class="bg-slate-900/80 text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-700/60">
@@ -940,7 +1378,7 @@
                                 <?php else: ?>
                                     <?php foreach ($securityLogs as $log): ?>
                                         <?php 
-                                            $isLocked = !empty($log['locked_until']) && strtotime($log['locked_until']) > time();
+                                             $isLocked = !empty($log['locked_until']) && strtotime($log['locked_until']) > time();
                                         ?>
                                         <tr class="hover:bg-slate-800/50 transition-colors <?= $isLocked ? 'bg-rose-950/20' : '' ?>">
                                             <td class="py-3 px-4 font-mono-code text-slate-200">
@@ -957,7 +1395,7 @@
                                             <td class="py-3 px-3 text-center font-bold text-amber-400">
                                                 <?= (int) $log['attempts'] ?>x
                                             </td>
-                                            <td class="py-3 px-3 text-slate-400 text-[11px]">
+                                            <td class="py-3 px-3 text-slate-400 text-[11px] whitespace-nowrap">
                                                 <?= date('d M Y, H:i:s', strtotime($log['last_attempt_at'])) ?>
                                             </td>
                                             <td class="py-3 px-3">
@@ -969,8 +1407,8 @@
                                                     <span class="px-2 py-0.5 rounded-full text-[10px] bg-slate-800 text-slate-400">Normal</span>
                                                 <?php endif; ?>
                                             </td>
-                                            <td class="py-3 px-4 text-right">
-                                                <button onclick="handleUnblock(<?= (int) $log['id'] ?>)" class="px-2.5 py-1 rounded bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-[10px] font-semibold transition-colors" title="Buka blokir IP/identitas ini">
+                                            <td class="py-3 px-4 text-right whitespace-nowrap">
+                                                <button onclick="handleUnblock(<?= (int) $log['id'] ?>)" class="px-2.5 py-1 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-[11px] font-semibold transition-colors" title="Buka blokir IP/identitas ini">
                                                     Buka Kunci
                                                 </button>
                                             </td>
@@ -1013,7 +1451,36 @@
                 </div>
 
                 <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl overflow-hidden shadow-sm">
-                    <div class="overflow-x-auto">
+                    <!-- Mobile List: Tampilan Kartu Responsif Pengunjung Harian (Layar Ponsel) -->
+                    <div class="p-4 space-y-3 md:hidden">
+                        <?php if (empty($dailyVisitors)): ?>
+                            <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-6 text-center text-xs text-slate-500">
+                                Belum ada catatan pengunjung.
+                            </div>
+                        <?php else: ?>
+                            <?php foreach ($dailyVisitors as $v): ?>
+                                <div class="bg-slate-800/60 border border-slate-700/70 rounded-2xl p-3.5 shadow-sm space-y-2">
+                                    <div class="flex items-center justify-between">
+                                        <span class="font-bold text-slate-200 text-xs"><?= date('d F Y', strtotime($v['visit_date'])) ?></span>
+                                        <span class="text-[11px] text-slate-400 font-mono-code">Rata-rata: <?= $v['unique_visitors'] > 0 ? number_format($v['total_hits'] / $v['unique_visitors'], 2) : '1.00' ?> hits</span>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-2 text-xs bg-slate-900/60 border border-slate-800/80 rounded-xl p-2.5">
+                                        <div>
+                                            <div class="text-[10px] text-slate-500 uppercase tracking-wider">Pengunjung Unik</div>
+                                            <div class="font-bold text-emerald-400 text-sm mt-0.5"><?= number_format($v['unique_visitors']) ?></div>
+                                        </div>
+                                        <div>
+                                            <div class="text-[10px] text-slate-500 uppercase tracking-wider">Total Tayangan</div>
+                                            <div class="font-bold text-sky-400 text-sm mt-0.5"><?= number_format($v['total_hits']) ?></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- Desktop Table View: Terlihat di Layar md ke atas -->
+                    <div class="hidden md:block overflow-x-auto">
                         <table class="w-full text-xs text-left">
                             <thead class="bg-slate-900/80 text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-700/60">
                                 <tr>
@@ -1098,7 +1565,57 @@
                         <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Log Transaksi Terkini</h3>
                         <span class="text-[11px] text-slate-500">Maks. 50 transaksi terakhir</span>
                     </div>
-                    <div class="overflow-x-auto">
+                    <!-- Mobile List: Tampilan Kartu Responsif Transaksi Midtrans (Layar Ponsel) -->
+                    <div class="p-4 space-y-3 md:hidden">
+                        <?php if (empty($paymentsList)): ?>
+                            <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-6 text-center text-xs text-slate-500">
+                                Belum ada transaksi pembayaran yang tercatat.
+                            </div>
+                        <?php else: ?>
+                            <?php foreach ($paymentsList as $pay): ?>
+                                <div class="bg-slate-800/60 border border-slate-700/70 rounded-2xl p-4 shadow-sm space-y-3">
+                                    <div class="flex items-start justify-between gap-2">
+                                        <div class="min-w-0 flex-1">
+                                            <div class="font-mono-code text-xs font-bold text-indigo-300 truncate"><?= esc($pay['order_id']) ?></div>
+                                            <div class="text-sm font-semibold text-slate-100 mt-0.5 truncate"><?= esc($pay['user_name'] ?? 'User #' . $pay['user_id']) ?></div>
+                                            <div class="text-[10px] text-slate-400 truncate"><?= esc($pay['user_email'] ?? '-') ?><?= !empty($pay['user_institution']) ? ' • <span class="text-indigo-300 font-medium">' . esc($pay['user_institution']) . '</span>' : '' ?></div>
+                                        </div>
+                                        <div>
+                                            <?php if (in_array($pay['transaction_status'], ['settlement', 'capture'])): ?>
+                                                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">LUNAS</span>
+                                            <?php elseif ($pay['transaction_status'] === 'pending'): ?>
+                                                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">PENDING</span>
+                                            <?php else: ?>
+                                                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30"><?= strtoupper(esc($pay['transaction_status'])) ?></span>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+
+                                    <div class="grid grid-cols-2 gap-2 text-xs bg-slate-900/60 border border-slate-800/80 rounded-xl p-2.5">
+                                        <div>
+                                            <div class="text-[10px] text-slate-500 uppercase tracking-wider">Paket Kuota</div>
+                                            <div class="text-slate-200 font-medium text-xs mt-0.5"><?= esc($pay['package_name']) ?></div>
+                                            <div class="text-[10px] text-emerald-400 font-semibold">+<?= (int) $pay['submissions_added'] ?> submisi</div>
+                                        </div>
+                                        <div>
+                                            <div class="text-[10px] text-slate-500 uppercase tracking-wider">Nominal Bayar</div>
+                                            <div class="font-mono-code font-extrabold text-sm text-slate-100 mt-0.5">
+                                                Rp <?= number_format($pay['amount'], 0, ',', '.') ?>
+                                            </div>
+                                            <div class="text-[10px] text-slate-400 uppercase font-semibold"><?= esc($pay['payment_type'] ?? 'Midtrans') ?></div>
+                                        </div>
+                                        <div class="col-span-2 pt-1 border-t border-slate-800/80 text-[11px] text-slate-400 flex items-center justify-between">
+                                            <span>Waktu:</span>
+                                            <span class="text-slate-300 font-mono-code"><?= $pay['paid_at'] ? date('d M Y, H:i', strtotime($pay['paid_at'])) : date('d M Y, H:i', strtotime($pay['created_at'])) ?></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- Desktop Table View: Terlihat di Layar md ke atas -->
+                    <div class="hidden md:block overflow-x-auto">
                         <table class="w-full text-left border-collapse text-xs">
                             <thead>
                                 <tr class="bg-slate-900/50 border-b border-slate-700/60 text-slate-400 font-semibold">
@@ -1122,7 +1639,7 @@
                                             <td class="p-3 font-mono-code text-indigo-300 font-semibold"><?= esc($pay['order_id']) ?></td>
                                             <td class="p-3">
                                                 <div class="text-slate-200 font-medium"><?= esc($pay['user_name'] ?? 'User #' . $pay['user_id']) ?></div>
-                                                <div class="text-[10px] text-slate-400"><?= esc($pay['user_email'] ?? '-') ?></div>
+                                                <div class="text-[10px] text-slate-400"><?= esc($pay['user_email'] ?? '-') ?><?= !empty($pay['user_institution']) ? ' • <span class="text-indigo-300 font-medium">' . esc($pay['user_institution']) . '</span>' : '' ?></div>
                                             </td>
                                             <td class="p-3">
                                                 <div class="text-slate-200 font-medium"><?= esc($pay['package_name']) ?></div>
@@ -1169,7 +1686,7 @@
                         <p class="text-xs text-slate-400">Audit makro orisinalitas naskah akademik, kepatuhan sitasi, deteksi manipulasi & pelaporan mutu universitas</p>
                     </div>
                     <div class="flex items-center gap-2">
-                        <a href="<?= base_url('admin/analytics/export-csv') ?>" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow transition-colors flex items-center gap-2">
+                        <a href="<?= base_url('admin/analytics/export-csv') ?>" data-no-loader="true" download="audit_integritas_artilik.csv" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow transition-colors flex items-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                             Ekspor Rekapitulasi Integritas (.CSV)
                         </a>
@@ -1482,7 +1999,69 @@
                         <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">Daftar Kunci Integrasi Terdaftar</h3>
                         <span class="text-[11px] text-slate-400">Total <?= count($apiKeysList ?? []) ?> kunci aktif</span>
                     </div>
-                    <div class="overflow-x-auto">
+
+                    <!-- Mobile List: Tampilan Kartu Responsif API Keys (Layar Ponsel) -->
+                    <div class="p-4 space-y-3.5 md:hidden">
+                        <?php if (empty($apiKeysList)): ?>
+                            <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-6 text-center text-xs text-slate-500">
+                                Belum ada API Key yang dibuat.
+                            </div>
+                        <?php else: ?>
+                            <?php foreach ($apiKeysList as $ak): ?>
+                                <div class="bg-slate-800/60 border border-slate-700/70 rounded-2xl p-4 shadow-sm space-y-3">
+                                    <div class="flex items-start justify-between gap-2">
+                                        <div class="min-w-0 flex-1">
+                                            <div class="font-bold text-white text-sm truncate"><?= esc($ak['key_name']) ?></div>
+                                            <div class="text-[10px] text-slate-400 mt-0.5 truncate"><?= esc($ak['user_name'] ?? $ak['user_email'] ?? 'Admin') ?></div>
+                                        </div>
+                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold <?= $ak['is_active'] ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20' ?> shrink-0">
+                                            <?= $ak['is_active'] ? 'Aktif' : 'Dicabut' ?>
+                                        </span>
+                                    </div>
+
+                                    <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-2.5 flex items-center justify-between text-xs">
+                                        <span class="text-slate-400 text-[11px]">Prefix Identifikasi:</span>
+                                        <span class="font-mono-code text-sky-400 text-[11px] font-semibold bg-slate-950 px-2 py-0.5 rounded border border-slate-800">
+                                            <?= esc($ak['key_prefix']) ?>
+                                        </span>
+                                    </div>
+
+                                    <div class="grid grid-cols-2 gap-2 text-xs bg-slate-900/40 border border-slate-800/60 rounded-xl p-2.5">
+                                        <div>
+                                            <div class="text-[10px] text-slate-500 uppercase tracking-wider">Sistem Target</div>
+                                            <div class="mt-0.5">
+                                                <span class="px-2 py-0.5 rounded text-[10px] bg-slate-800 text-slate-300 border border-slate-700 font-semibold inline-block">
+                                                    <?= strtoupper(esc($ak['system_type'])) ?>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div class="text-[10px] text-slate-500 uppercase tracking-wider">Kuota Terpakai</div>
+                                            <div class="mt-0.5 font-mono-code font-bold text-slate-200">
+                                                <?= (int) $ak['quota_used'] ?> <span class="text-slate-500 font-normal">/ <?= (int) $ak['quota_limit'] ?></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-span-2 pt-1 border-t border-slate-800/60 text-[11px] text-slate-400 flex justify-between">
+                                            <span>Penggunaan Terakhir:</span>
+                                            <span class="font-mono-code text-slate-300"><?= $ak['last_used_at'] ? date('d M Y, H:i', strtotime($ak['last_used_at'])) : 'Belum pernah' ?></span>
+                                        </div>
+                                    </div>
+
+                                    <?php if ($ak['is_active']): ?>
+                                        <div class="pt-1">
+                                            <button onclick="handleRevokeApiKey(<?= (int) $ak['id'] ?>)" class="w-full py-2 px-3 rounded-xl bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors">
+                                                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
+                                                Cabut Kunci Integrasi
+                                            </button>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- Desktop Table View: Terlihat di Layar md ke atas -->
+                    <div class="hidden md:block overflow-x-auto">
                         <table class="w-full text-xs text-left">
                             <thead class="bg-slate-900/80 text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-700/60">
                                 <tr>
@@ -1697,7 +2276,111 @@
                         <span class="text-xs text-slate-400">Total: <strong class="text-slate-200"><?= count($googleKeysList ?? []) ?></strong> kunci</span>
                     </div>
 
-                    <div class="overflow-x-auto">
+                    <?php 
+                        $modelDisplayNames = [
+                            'gemini-3.5-flash' => 'Gemini 3.5 Flash (Rekomendasi Utama)',
+                            'gemini-3.6-flash' => 'Gemini 3.6 Flash (Terbaru 2026)',
+                            'gemini-3.0-flash' => 'Gemini 3.0 Flash (Cepat & Efisien)',
+                            'gemini-1.5-flash' => 'Gemini 1.5 Flash (Legacy Stabil)',
+                            'gemini-1.5-pro'   => 'Gemini 1.5 Pro (Legacy Pro)',
+                        ];
+                    ?>
+
+                    <!-- Mobile List: Tampilan Kartu Responsif Google AI Keys (Layar Ponsel) -->
+                    <div class="space-y-3.5 md:hidden">
+                        <?php if (empty($googleKeysList)): ?>
+                            <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-6 text-center text-xs text-slate-500">
+                                Belum ada Google API Key terdaftar. Silakan tambahkan API Key dari Google AI Studio melalui formulir di atas.
+                            </div>
+                        <?php else: ?>
+                            <?php foreach ($googleKeysList as $k): ?>
+                                <div class="bg-slate-800/60 border border-slate-700/70 rounded-2xl p-4 shadow-sm space-y-3">
+                                    <!-- Top Row: Name, Status Pill & Model -->
+                                    <div class="flex items-start justify-between gap-2">
+                                        <div class="min-w-0 flex-1">
+                                            <div class="font-bold text-white text-sm truncate"><?= esc($k['key_name']) ?></div>
+                                            <div class="text-[11px] text-indigo-300 font-mono-code mt-0.5 truncate">
+                                                <?= esc($modelDisplayNames[$k['model_name']] ?? $k['model_name']) ?>
+                                            </div>
+                                        </div>
+                                        <!-- Status Badge -->
+                                        <?php if ($k['status'] === 'active'): ?>
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1 shrink-0">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                                                Aktif
+                                            </span>
+                                        <?php elseif ($k['status'] === 'rate_limited'): ?>
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1 shrink-0" title="<?= esc($k['last_error_message'] ?? 'Rate limit') ?>">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+                                                Jeda
+                                            </span>
+                                        <?php elseif ($k['status'] === 'exhausted'): ?>
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/30 flex items-center gap-1 shrink-0">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>
+                                                Habis
+                                            </span>
+                                        <?php else: ?>
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-700/40 text-slate-400 border border-slate-700/60 shrink-0">
+                                                Nonaktif
+                                            </span>
+                                        <?php endif; ?>
+                                    </div>
+
+                                    <!-- Masked Key & Error (if any) -->
+                                    <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-2.5 space-y-1.5">
+                                        <div class="flex items-center justify-between text-[11px]">
+                                            <span class="text-slate-400">Masked Key:</span>
+                                            <span class="font-mono-code text-slate-200 bg-slate-950 px-2 py-0.5 rounded border border-slate-800/80">
+                                                <?= esc($k['masked_key'] ?? (substr($k['api_key'] ?? '', 0, 8) . '...' . substr($k['api_key'] ?? '', -4))) ?>
+                                            </span>
+                                        </div>
+                                        <?php if (!empty($k['last_error_message'])): ?>
+                                            <div class="text-[10px] text-rose-400/90 pt-1 border-t border-slate-800/60 truncate" title="<?= esc($k['last_error_message']) ?>">
+                                                ⚠️ <?= esc($k['last_error_message']) ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+
+                                    <!-- 2-Column Stats Grid -->
+                                    <div class="grid grid-cols-2 gap-2 text-xs bg-slate-900/40 border border-slate-800/60 rounded-xl p-2.5">
+                                        <div>
+                                            <div class="text-[10px] text-slate-500 uppercase tracking-wider">Panggilan Audit</div>
+                                            <div class="mt-0.5 font-mono-code font-bold text-slate-200">
+                                                <span class="text-emerald-400"><?= (int) $k['usage_count'] ?></span> sukses
+                                                <?php if ((int)$k['error_count'] > 0): ?>
+                                                    <span class="text-rose-400">/ <?= (int) $k['error_count'] ?> err</span>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div class="text-[10px] text-slate-500 uppercase tracking-wider">Terakhir Digunakan</div>
+                                            <div class="mt-0.5 text-slate-300 text-[11px] truncate">
+                                                <?= !empty($k['last_used_at']) ? esc(date('d M, H:i', strtotime($k['last_used_at']))) : 'Belum pernah' ?>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Action Button Grid (3 Touch-Friendly Buttons) -->
+                                    <div class="grid grid-cols-3 gap-2 pt-1">
+                                        <button onclick="handleTestGoogleKey(<?= $k['id'] ?>, this)" class="py-2 px-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700/80 text-xs font-semibold flex items-center justify-center gap-1 transition-colors">
+                                            <svg class="w-3.5 h-3.5 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                            <span>Uji</span>
+                                        </button>
+                                        <button onclick="handleToggleGoogleKey(<?= $k['id'] ?>)" class="py-2 px-2 rounded-xl <?= $k['status'] === 'active' ? 'bg-amber-900/30 hover:bg-amber-900/50 text-amber-300 border border-amber-600/40' : 'bg-emerald-900/30 hover:bg-emerald-900/50 text-emerald-300 border border-emerald-600/40' ?> text-xs font-semibold flex items-center justify-center transition-colors">
+                                            <?= $k['status'] === 'active' ? 'Nonaktif' : 'Aktifkan' ?>
+                                        </button>
+                                        <button onclick="handleDeleteGoogleKey(<?= $k['id'] ?>, '<?= esc($k['key_name']) ?>')" class="py-2 px-2 rounded-xl bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 border border-rose-600/40 text-xs font-semibold flex items-center justify-center gap-1 transition-colors">
+                                            <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                            <span>Hapus</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- Desktop Table View: Terlihat di Layar md ke atas -->
+                    <div class="hidden md:block overflow-x-auto">
                         <table class="w-full text-xs text-left">
                             <thead class="text-slate-400 uppercase tracking-wider border-b border-slate-700/60 text-[10px]">
                                 <tr>
@@ -1717,15 +2400,6 @@
                                         </td>
                                     </tr>
                                 <?php else: ?>
-                                    <?php 
-                                        $modelDisplayNames = [
-                                            'gemini-3.5-flash' => 'Gemini 3.5 Flash (Rekomendasi Utama)',
-                                            'gemini-3.6-flash' => 'Gemini 3.6 Flash (Terbaru 2026)',
-                                            'gemini-3.0-flash' => 'Gemini 3.0 Flash (Cepat & Efisien)',
-                                            'gemini-1.5-flash' => 'Gemini 1.5 Flash (Legacy Stabil)',
-                                            'gemini-1.5-pro'   => 'Gemini 1.5 Pro (Legacy Pro)',
-                                        ];
-                                    ?>
                                     <?php foreach ($googleKeysList as $k): ?>
                                         <tr class="hover:bg-slate-800/40 transition-colors">
                                             <td class="py-3 px-3">
@@ -1773,7 +2447,7 @@
                                             <td class="py-3 px-3 text-slate-400 text-[11px]">
                                                 <?= !empty($k['last_used_at']) ? esc(date('d M H:i', strtotime($k['last_used_at']))) : '-' ?>
                                             </td>
-                                            <td class="py-3 px-3 text-right">
+                                            <td class="py-3 px-3 text-right whitespace-nowrap min-w-[190px]">
                                                 <div class="flex items-center justify-end gap-1.5">
                                                     <button onclick="handleTestGoogleKey(<?= $k['id'] ?>, this)" class="px-2 py-1 rounded bg-slate-700 hover:bg-slate-600 text-[11px] text-slate-200 transition-colors flex items-center gap-1 cursor-pointer" title="Kirim ping prompt uji koneksi ke Google API">
                                                         <svg class="w-3 h-3 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
@@ -1860,6 +2534,158 @@
 
     <!-- Interactive JavaScript Actions -->
     <script>
+        // ==========================================
+        // Page Transition & Progress Bar Handling
+        // ==========================================
+        let progressInterval = null;
+
+        function startPageTransition(title = 'Memuat portal admin...', subtitle = 'Menyiapkan data & antarmuka') {
+            const bar = document.getElementById('topProgressBar');
+            const overlay = document.getElementById('pageTransitionOverlay');
+            const titleEl = document.getElementById('pageTransitionTitle');
+            const subtitleEl = document.getElementById('pageTransitionSubtitle');
+
+            if (titleEl && title) titleEl.textContent = title;
+            if (subtitleEl && subtitle) subtitleEl.textContent = subtitle;
+
+            if (bar) {
+                bar.style.opacity = '1';
+                bar.style.width = '35%';
+                clearInterval(progressInterval);
+                let currentWidth = 35;
+                progressInterval = setInterval(() => {
+                    if (currentWidth < 90) {
+                        currentWidth += Math.random() * 12;
+                        if (currentWidth > 90) currentWidth = 90;
+                        bar.style.width = currentWidth + '%';
+                    }
+                }, 120);
+            }
+
+            if (overlay) {
+                overlay.style.display = 'flex';
+                void overlay.offsetWidth;
+                overlay.style.opacity = '1';
+                overlay.style.pointerEvents = 'auto';
+            }
+        }
+
+        function endPageTransition() {
+            clearInterval(progressInterval);
+            const bar = document.getElementById('topProgressBar');
+            const overlay = document.getElementById('pageTransitionOverlay');
+
+            if (bar) {
+                bar.style.width = '100%';
+                setTimeout(() => {
+                    bar.style.opacity = '0';
+                    setTimeout(() => {
+                        bar.style.width = '0%';
+                        bar.style.opacity = '1';
+                    }, 300);
+                }, 200);
+            }
+
+            if (overlay) {
+                overlay.style.opacity = '0';
+                overlay.style.pointerEvents = 'none';
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                }, 280);
+            }
+        }
+
+        // Intercept standard navigation link clicks
+        document.addEventListener('click', function(e) {
+            const link = e.target.closest('a');
+            if (!link || !link.href) return;
+            
+            // Ignore new window, javascript:, hashes, download, or explicitly opted-out
+            if (link.target && link.target !== '_self') return;
+            if (link.hasAttribute('download')) return;
+            if (link.href.startsWith('javascript:')) return;
+            if (link.getAttribute('href') && link.getAttribute('href').startsWith('#')) return;
+            if (link.dataset.noLoader !== undefined) return;
+
+            // Only intercept same-origin navigation
+            try {
+                const url = new URL(link.href, window.location.origin);
+                if (url.origin === window.location.origin) {
+                    // If clicking exact same page + same search + hash anchor, do not trigger
+                    if (url.pathname === window.location.pathname && url.search === window.location.search && url.hash) {
+                        return;
+                    }
+
+                    // Determine context-aware loading message
+                    let title = 'Memuat portal admin...';
+                    let subtitle = 'Menyiapkan data & antarmuka';
+                    
+                    const tabParam = url.searchParams.get('tab');
+                    if (tabParam) {
+                        const tabTitles = {
+                            'overview': 'Memuat ringkasan...',
+                            'users': 'Memuat data pengguna & kuota...',
+                            'documents': 'Memuat antrean dokumen...',
+                            'corpus': 'Memuat korpus repositori...',
+                            'analytics': 'Menyiapkan analitik institusi...',
+                            'api_keys': 'Memuat integrasi API & OJS...',
+                            'google_keys': 'Memuat pool Google AI keys...',
+                            'payments': 'Memuat transaksi & pembayaran...',
+                            'security': 'Memuat status keamanan...',
+                            'visitors': 'Memuat analitik pengunjung...',
+                            'system': 'Memeriksa status server...'
+                        };
+                        if (tabTitles[tabParam]) {
+                            title = tabTitles[tabParam];
+                        }
+                    } else if (url.pathname.includes('/dashboard')) {
+                        title = 'Menuju Dashboard Pengguna...';
+                        subtitle = 'Beralih ke tampilan pengguna';
+                    } else if (url.pathname.includes('/auth/logout')) {
+                        title = 'Mengakhiri Sesi...';
+                        subtitle = 'Keluar dari Portal Admin';
+                    }
+
+                    startPageTransition(title, subtitle);
+                }
+            } catch (err) {
+                // If invalid URL, ignore
+            }
+        });
+
+        // Intercept form submissions (e.g., search bar)
+        document.addEventListener('submit', function(e) {
+            const form = e.target;
+            if (form && !form.target && form.dataset.noLoader === undefined) {
+                startPageTransition('Mencari data...', 'Menyaring hasil penelusuran');
+            }
+        });
+
+        // Handle page show & BFCache restoration
+        window.addEventListener('pageshow', function(event) {
+            endPageTransition();
+        });
+
+        // Trigger on unload / reload
+        window.addEventListener('beforeunload', function() {
+            startPageTransition('Memuat portal admin...', 'Menyiapkan pembaruan halaman');
+        });
+
+        // Auto-dismiss preloader once DOM/window is ready
+        const MIN_LOADER_DELAY = 350;
+        if (document.readyState === 'complete') {
+            setTimeout(endPageTransition, MIN_LOADER_DELAY);
+        } else {
+            window.addEventListener('load', function() {
+                setTimeout(endPageTransition, MIN_LOADER_DELAY);
+            });
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(endPageTransition, MIN_LOADER_DELAY);
+            });
+            // Safety timeout: maximum 1.5s so content is never blocked
+            setTimeout(endPageTransition, 1500);
+        }
+
         function toggleAdminSidebar() {
             const sidebar = document.getElementById('adminSidebar');
             const overlay = document.getElementById('adminSidebarOverlay');

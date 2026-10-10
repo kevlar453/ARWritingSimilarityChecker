@@ -1145,15 +1145,15 @@
                     <span class="text-2xl">🤖</span>
                     <div>
                         <div class="flex items-center gap-2">
-                            <h3 class="font-bold text-base text-slate-900">Indikator Teks Buatan AI &amp; Profil Stylometri</h3>
-                            <span class="text-[10px] font-bold font-mono-code uppercase px-2 py-0.5 rounded bg-purple-50 text-purple-700 border border-purple-100">Fitur 2</span>
+                            <h3 class="font-bold text-base text-slate-900">[Eksperimental] Indikator Gaya Bahasa &amp; Stylometri</h3>
+                            <span class="text-[10px] font-bold font-mono-code uppercase px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">Eksperimental</span>
                         </div>
-                        <p class="text-xs text-slate-400">Analisis variabilitas ritme sintaksis (Burstiness), kepadatan frasa transisi generik, &amp; anomali pemintal teks (Spinner/QuillBot)</p>
+                        <p class="text-xs text-slate-400">Analisis variabilitas ritme sintaksis (Burstiness), kepadatan frasa transisi, &amp; anomali pemintal teks (Bukan Vonis AI)</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-2 self-start sm:self-auto">
                     <span class="text-xs font-mono-code font-bold px-3 py-1 rounded-full border shadow-2xs <?= $aiScoreBadgeClass ?>">
-                        Probabilitas AI: <strong class="<?= $aiScoreColor ?>"><?= number_format($aiScore, 1) ?>%</strong> (<?= $aiConf ?>)
+                        Indikator Eksperimental: <strong class="<?= $aiScoreColor ?>"><?= number_format($aiScore, 1) ?>%</strong> (<?= $aiConf ?>)
                     </span>
                 </div>
             </div>
@@ -1251,7 +1251,7 @@
                 </p>
                 <div class="flex items-start gap-2 pt-1 text-[11px] text-purple-800/80">
                     <span class="text-sm">⚖️</span>
-                    <span><strong>Prinsip Keadilan Akademik:</strong> Indikator ini merupakan panduan profil probabilitas statistik, bukan vonis mutlak. Penguji dan pembimbing disarankan melakukan klarifikasi dialogis lisan secara arif mengenai pemahaman konsep karya tulis mahasiswa.</span>
+                    <span><strong>Disclaimer Eksperimental &amp; Prinsip Keadilan Akademik:</strong> Indikator ini bersifat <em>eksperimental</em> dan hanya mengukur variasi statistik ritme kalimat, <strong>BUKAN bukti atau vonis</strong> penggunaan AI. Angka ini tidak boleh digunakan untuk menuduh mahasiswa atau menjatuhkan sanksi tanpa telaah kualitatif komprehensif.</span>
                 </div>
             </div>
         </div>

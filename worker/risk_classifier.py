@@ -416,7 +416,7 @@ def predict_academic_risk_xgboost(
 
     labels = {
         0: ("LOW", "Aman (Bebas Indikasi Signifikan)", "Naskah menunjukkan profil kepenulisan orisinal tanpa bukti penyalinan substansial."),
-        1: ("MODERATE", "Perlu Telaah Konseptual Dosen", "Terdapat nuansa teks (frasa baku, parafrasa AI, atau alih bahasa) yang memerlukan konfirmasi lisan."),
+        1: ("MODERATE", "Perlu Telaah Konseptual Dosen", "Terdapat nuansa teks (frasa baku, kemiripan konseptual, atau alih bahasa) yang memerlukan konfirmasi lisan."),
         2: ("HIGH", "Risiko Integritas Tinggi (Verbatim Overlap)", "Terdeteksi pasase sekuensial panjang atau kesamaan tekstual substansial tanpa atribusi memadai.")
     }
 

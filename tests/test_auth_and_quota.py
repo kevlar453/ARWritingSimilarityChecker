@@ -41,11 +41,11 @@ def test_landing_page_rendered_correctly():
     html = res.text
 
     assert "AR Tilik" in html
-    assert "Deteksi Kesepadanan Naskah Akademik" in html
+    assert ("Penelaah Kesepadanan Naskah" in html or "Deteksi Kesepadanan Naskah" in html)
     assert "Three-Layer Separation" in html
     assert "Dual-Lens Architecture" in html
     assert "Civitas Akademika" in html
-    assert "Peneliti Produktif" in html
+    assert ("Dosen & Peneliti Pro" in html or "Peneliti Produktif" in html)
     assert "Kampus" in html
     assert "Daftar Akun AR Tilik Gratis" in html
 
@@ -219,7 +219,7 @@ def test_full_auth_quota_and_corpus_incentive_lifecycle(db_conn):
         assert data_4["quota_info"]["total_available"] == 0
 
         # Step 7: Sumbang Korpus 1 (valid)
-        corpus_content_1 = f"Karya rujukan ilmiah bidang kecerdasan buatan dan pemrosesan bahasa alami {random_suffix}."
+        corpus_content_1 = (f"Karya rujukan ilmiah bidang kecerdasan buatan dan pemrosesan bahasa alami {random_suffix}. " * 30)
         files_c1 = {
             "corpus_document": (f"korpus_nlp_{random_suffix}.txt", io.BytesIO(corpus_content_1.encode("utf-8")), "text/plain")
         }
@@ -241,7 +241,7 @@ def test_full_auth_quota_and_corpus_incentive_lifecycle(db_conn):
         assert res_dup_c.json()["status"] == "duplicate"
 
         # Step 9: Sumbang Korpus 2 (valid)
-        corpus_content_2 = f"Metodologi pengujian komputasi terdistribusi dalam repositori karya ilmiah {random_suffix}."
+        corpus_content_2 = (f"Metodologi pengujian komputasi terdistribusi dalam repositori karya ilmiah {random_suffix}. " * 30)
         files_c2 = {
             "corpus_document": (f"korpus_cloud_{random_suffix}.txt", io.BytesIO(corpus_content_2.encode("utf-8")), "text/plain")
         }
@@ -255,7 +255,7 @@ def test_full_auth_quota_and_corpus_incentive_lifecycle(db_conn):
         assert c2_json["quota_info"]["corpus_to_next_bonus"] == 1
 
         # Step 10: Sumbang Korpus 3 (valid) -> Memicu bonus +1 submisi!
-        corpus_content_3 = f"Implementasi etika sitasi dan reproduktibilitas penelitian ilmiah Indonesia {random_suffix}."
+        corpus_content_3 = (f"Implementasi etika sitasi dan reproduktibilitas penelitian ilmiah Indonesia {random_suffix}. " * 30)
         files_c3 = {
             "corpus_document": (f"korpus_etika_{random_suffix}.txt", io.BytesIO(corpus_content_3.encode("utf-8")), "text/plain")
         }

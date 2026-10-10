@@ -1,6 +1,6 @@
 {
   "evaluation_name": "Targeted 80-Case Academic Context Evaluation (v1.1)",
-  "executed_at": "2026-10-06T15:33:32.386270",
+  "executed_at": "2026-10-11T04:30:48.720215",
   "system_version": "v1.1.0",
   "baseline_version": "v1.0.0 (FROZEN)",
   "all_quality_gates_pass": true,
@@ -13,33 +13,33 @@
   },
   "global_metrics": {
     "total_cases": 80,
-    "decision_agreement_pct": 80.0,
+    "decision_agreement_pct": 78.75,
     "context_detection_accuracy_pct": 100.0,
     "citation_status_accuracy_pct": 100.0,
     "evidence_type_alignment_pct": 87.5,
     "decision_invariance_pct": 100.0,
     "non_suppression_invariance_pct": 100.0,
-    "elapsed_seconds": 0.027
+    "elapsed_seconds": 0.026
   },
   "observability_metrics": {
     "target_sla_overhead_ms": 150.0,
     "is_sla_compliant": true,
     "citation_parsing_latency": {
       "count": 80,
-      "avg_ms": 0.1292,
-      "min_ms": 0.078,
-      "max_ms": 0.3146,
-      "p50_ms": 0.1185,
-      "p90_ms": 0.1794,
-      "p95_ms": 0.2279,
-      "p99_ms": 0.3146,
+      "avg_ms": 0.1222,
+      "min_ms": 0.0829,
+      "max_ms": 0.2345,
+      "p50_ms": 0.1175,
+      "p90_ms": 0.1579,
+      "p95_ms": 0.1695,
+      "p99_ms": 0.2345,
       "statistically_valid_p95": true,
       "sample_note": "Sampel operasional valid (n=80 >= 30)."
     },
     "gate_v11_sla": "PASS"
   },
   "failure_taxonomy_distribution": {
-    "BOUNDARY_BEHAVIOR:THRESHOLD_TRANSITION": 6,
+    "BOUNDARY_BEHAVIOR:THRESHOLD_TRANSITION": 7,
     "ENGINE_LIMITATION:NO_CONTEXT_AWARENESS": 10
   },
   "group_breakdown": [
@@ -95,13 +95,13 @@
       "group_index": 5,
       "group_name": "Paraphrase + citation",
       "total_cases": 10,
-      "decision_accuracy_pct": 90.0,
+      "decision_accuracy_pct": 80.0,
       "context_accuracy_pct": 100.0,
       "citation_status_accuracy_pct": 100.0,
       "evidence_type_accuracy_pct": 100.0,
       "decision_invariant_pct": 100.0,
       "non_suppression_pct": 100.0,
-      "mismatch_count": 1
+      "mismatch_count": 2
     },
     {
       "group_index": 6,
@@ -140,8 +140,28 @@
       "mismatch_count": 5
     }
   ],
-  "mismatches_count": 16,
+  "mismatches_count": 17,
   "mismatches": [
+    {
+      "case_id": "EV11-PRA-007",
+      "group_index": 5,
+      "group_name": "Paraphrase + citation",
+      "expected_class": "review",
+      "predicted_class": "no_match",
+      "expected_context": "PARENTHETICAL_CITATION",
+      "predicted_context": "PARENTHETICAL_CITATION",
+      "expected_status": "CITED",
+      "predicted_status": "CITED",
+      "expected_evidence_type": "LEXICAL_TOPIC_SIMILARITY",
+      "predicted_evidence_type": "LEXICAL_TOPIC_SIMILARITY",
+      "exact_similarity": 0.0,
+      "cosine_similarity": 9.34,
+      "longest_match_words": 0,
+      "failure_classification": "BOUNDARY_BEHAVIOR:THRESHOLD_TRANSITION",
+      "reasons": [
+        "Decision mismatch: expected 'review', got 'no_match' (pattern: NO_EVIDENCE)"
+      ]
+    },
     {
       "case_id": "EV11-PRA-009",
       "group_index": 5,
@@ -155,7 +175,7 @@
       "expected_evidence_type": "LEXICAL_TOPIC_SIMILARITY",
       "predicted_evidence_type": "LEXICAL_TOPIC_SIMILARITY",
       "exact_similarity": 0.0,
-      "cosine_similarity": 4.48,
+      "cosine_similarity": 4.65,
       "longest_match_words": 0,
       "failure_classification": "BOUNDARY_BEHAVIOR:THRESHOLD_TRANSITION",
       "reasons": [
@@ -175,7 +195,7 @@
       "expected_evidence_type": "METHODOLOGY_BOILERPLATE",
       "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
       "exact_similarity": 76.19,
-      "cosine_similarity": 91.98,
+      "cosine_similarity": 92.6,
       "longest_match_words": 16,
       "failure_classification": "ENGINE_LIMITATION:NO_CONTEXT_AWARENESS",
       "reasons": [
@@ -196,7 +216,7 @@
       "expected_evidence_type": "METHODOLOGY_BOILERPLATE",
       "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
       "exact_similarity": 75.0,
-      "cosine_similarity": 93.19,
+      "cosine_similarity": 93.46,
       "longest_match_words": 15,
       "failure_classification": "ENGINE_LIMITATION:NO_CONTEXT_AWARENESS",
       "reasons": [
@@ -217,7 +237,7 @@
       "expected_evidence_type": "METHODOLOGY_BOILERPLATE",
       "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
       "exact_similarity": 76.19,
-      "cosine_similarity": 92.28,
+      "cosine_similarity": 92.55,
       "longest_match_words": 16,
       "failure_classification": "ENGINE_LIMITATION:NO_CONTEXT_AWARENESS",
       "reasons": [
@@ -238,7 +258,7 @@
       "expected_evidence_type": "METHODOLOGY_BOILERPLATE",
       "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
       "exact_similarity": 79.17,
-      "cosine_similarity": 95.53,
+      "cosine_similarity": 95.86,
       "longest_match_words": 19,
       "failure_classification": "ENGINE_LIMITATION:NO_CONTEXT_AWARENESS",
       "reasons": [
@@ -259,7 +279,7 @@
       "expected_evidence_type": "METHODOLOGY_BOILERPLATE",
       "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
       "exact_similarity": 78.26,
-      "cosine_similarity": 92.57,
+      "cosine_similarity": 92.99,
       "longest_match_words": 18,
       "failure_classification": "ENGINE_LIMITATION:NO_CONTEXT_AWARENESS",
       "reasons": [
@@ -280,7 +300,7 @@
       "expected_evidence_type": "METHODOLOGY_BOILERPLATE",
       "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
       "exact_similarity": 75.0,
-      "cosine_similarity": 91.49,
+      "cosine_similarity": 91.23,
       "longest_match_words": 15,
       "failure_classification": "ENGINE_LIMITATION:NO_CONTEXT_AWARENESS",
       "reasons": [
@@ -301,7 +321,7 @@
       "expected_evidence_type": "METHODOLOGY_BOILERPLATE",
       "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
       "exact_similarity": 73.68,
-      "cosine_similarity": 93.89,
+      "cosine_similarity": 93.82,
       "longest_match_words": 14,
       "failure_classification": "ENGINE_LIMITATION:NO_CONTEXT_AWARENESS",
       "reasons": [
@@ -322,7 +342,7 @@
       "expected_evidence_type": "METHODOLOGY_BOILERPLATE",
       "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
       "exact_similarity": 79.17,
-      "cosine_similarity": 95.8,
+      "cosine_similarity": 96.15,
       "longest_match_words": 19,
       "failure_classification": "ENGINE_LIMITATION:NO_CONTEXT_AWARENESS",
       "reasons": [
@@ -343,7 +363,7 @@
       "expected_evidence_type": "METHODOLOGY_BOILERPLATE",
       "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
       "exact_similarity": 78.26,
-      "cosine_similarity": 94.21,
+      "cosine_similarity": 94.45,
       "longest_match_words": 18,
       "failure_classification": "ENGINE_LIMITATION:NO_CONTEXT_AWARENESS",
       "reasons": [
@@ -364,7 +384,7 @@
       "expected_evidence_type": "METHODOLOGY_BOILERPLATE",
       "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
       "exact_similarity": 75.0,
-      "cosine_similarity": 92.21,
+      "cosine_similarity": 92.59,
       "longest_match_words": 15,
       "failure_classification": "ENGINE_LIMITATION:NO_CONTEXT_AWARENESS",
       "reasons": [
@@ -385,7 +405,7 @@
       "expected_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
       "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
       "exact_similarity": 75.0,
-      "cosine_similarity": 84.06,
+      "cosine_similarity": 82.73,
       "longest_match_words": 21,
       "failure_classification": "BOUNDARY_BEHAVIOR:THRESHOLD_TRANSITION",
       "reasons": [
@@ -393,7 +413,7 @@
       ]
     },
     {
-      "case_id": "EV11-DIS-005",
+      "case_id": "EV11-DIS-006",
       "group_index": 8,
       "group_name": "Unrelated citation to overlap",
       "expected_class": "match",
@@ -404,9 +424,9 @@
       "predicted_status": "CITED",
       "expected_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
       "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
-      "exact_similarity": 75.86,
-      "cosine_similarity": 84.78,
-      "longest_match_words": 22,
+      "exact_similarity": 70.0,
+      "cosine_similarity": 84.8,
+      "longest_match_words": 21,
       "failure_classification": "BOUNDARY_BEHAVIOR:THRESHOLD_TRANSITION",
       "reasons": [
         "Decision mismatch: expected 'match', got 'review' (pattern: COPY_EDIT)"
@@ -425,7 +445,7 @@
       "expected_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
       "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
       "exact_similarity": 75.0,
-      "cosine_similarity": 83.2,
+      "cosine_similarity": 82.27,
       "longest_match_words": 21,
       "failure_classification": "BOUNDARY_BEHAVIOR:THRESHOLD_TRANSITION",
       "reasons": [
@@ -445,7 +465,7 @@
       "expected_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
       "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
       "exact_similarity": 70.37,
-      "cosine_similarity": 79.47,
+      "cosine_similarity": 76.76,
       "longest_match_words": 19,
       "failure_classification": "BOUNDARY_BEHAVIOR:THRESHOLD_TRANSITION",
       "reasons": [
@@ -465,7 +485,7 @@
       "expected_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
       "predicted_evidence_type": "DIRECT_TEXTUAL_OVERLAP",
       "exact_similarity": 74.07,
-      "cosine_similarity": 83.42,
+      "cosine_similarity": 82.24,
       "longest_match_words": 20,
       "failure_classification": "BOUNDARY_BEHAVIOR:THRESHOLD_TRANSITION",
       "reasons": [

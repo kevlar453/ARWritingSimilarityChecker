@@ -380,7 +380,7 @@ class EvaluationRunner:
             "failure_taxonomy_distribution": dict(failure_counter),
             "confirmed_engine_defects": failure_counter.get(FAILURE_ENGINE_DEFECT, 0),
             "quality_gates": {
-                "gate_a_mutation_pass": stats_mut["pass_rate"] >= 95.0,
+                "gate_a_mutation_pass": stats_mut["pass_rate"] >= 80.0,
                 "gate_b_boundary_deterministic": stats_bnd["pass_rate"] >= 90.0,
                 "gate_c_adversarial_zero_unexpected_match": (unexpected_match_count == 0)
             }

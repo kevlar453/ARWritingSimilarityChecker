@@ -19,7 +19,7 @@
         <ul>
             <li><strong>Kesepadanan Tekstual (Textual Similarity):</strong> Menghitung derajat tumpang tindih urutan kata (5-gram) dan kesamaan terminologi leksikal (TF-IDF Cosine) antara naskah submisi dengan korpus rujukan secara matematis.</li>
             <li><strong>Plagiarisme (Plagiarism):</strong> Pelanggaran etika berat yang menyangkut niat pengabaian atribusi, penjiplakan ide substansial, atau klaim kepengarangan secara tidak jujur.</li>
-            <li><strong>Kedaulatan Keputusan Manusia:</strong> Angka persentase AR Tilik tidak boleh dijadikan dasar tunggal penolakan naskah atau penjatuhan sanksi akademik. Keputusan final keaslian dan kelayakan karya ilmiah mutlak berada pada wewenang <strong>Dosen Pembimbing, Dewan Penguji Sidang, Mitra Bestari (*Peer Reviewer*), dan Dewan Redaksi Jurnal</strong>.</li>
+            <li><strong>Kedaulatan Keputusan Manusia:</strong> Angka persentase AR Tilik tidak boleh dijadikan dasar tunggal penolakan naskah atau penjatuhan sanksi akademik. Keputusan final keaslian dan kelayakan karya ilmiah mutlak berada pada wewenang <strong>Dosen Pembimbing, Dewan Penguji Sidang, Mitra Bestari, dan Dewan Redaksi Jurnal</strong>.</li>
         </ul>
     </section>
 

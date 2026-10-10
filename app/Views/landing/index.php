@@ -29,7 +29,7 @@
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:image:type" content="image/png">
-    <meta property="og:image:alt" content="AR Tilik Academic Writing Similarity Checker &amp; Evidence Reviewer">
+    <meta property="og:image:alt" content="AR Tilik Academic Writing Similarity Checker">
 
     <!-- Twitter / X Cards -->
     <meta name="twitter:card" content="summary_large_image">
@@ -2301,6 +2301,13 @@
                                 <span class="dropdown-sub">Keadilan akademik &amp; kedaulatan naskah</span>
                             </div>
                         </a>
+                        <a href="<?= base_url('docs/Brosur_Eksekutif_ARTilik.pdf') ?>" target="_blank" download="Brosur_Eksekutif_ARTilik.pdf" class="dropdown-item" onclick="closeAllNavDropdowns()">
+                            <div class="dropdown-icon" style="background: #ecfdf5; color: #059669;">📄</div>
+                            <div class="dropdown-content">
+                                <span class="dropdown-title">Brosur Eksekutif Kampus</span>
+                                <span class="dropdown-sub">Prospektus resmi institusi (PDF 2.7 MB)</span>
+                            </div>
+                        </a>
                     </div>
                 </li>
 
@@ -2450,10 +2457,15 @@
 
             <div class="mobile-nav-group-title" style="margin-top: 20px;">Unduhan &amp; Bantuan</div>
             <nav class="mobile-nav-menu">
+                <a href="<?= base_url('docs/Brosur_Eksekutif_ARTilik.pdf') ?>" target="_blank" download="Brosur_Eksekutif_ARTilik.pdf" class="mobile-nav-link" onclick="closeMobileNav()">
+                    <span class="nav-icon">📄</span>
+                    <span>Brosur Eksekutif Kampus (PDF)</span>
+                    <span class="nav-badge" style="background: rgba(16, 185, 129, 0.2); color: #10b981;">2.7 MB</span>
+                </a>
                 <a href="<?= base_url('integrations/ojs/Panduan_Integrasi_OJS_ARTilik.pdf') ?>" target="_blank" download="Panduan_Integrasi_OJS_ARTilik.pdf" class="mobile-nav-link" onclick="closeMobileNav()">
                     <span class="nav-icon">📕</span>
                     <span>Buku Panduan OJS (PDF)</span>
-                    <span class="nav-badge">1.9 MB</span>
+                    <span class="nav-badge">2.0 MB</span>
                 </a>
                 <a href="<?= base_url('integrations/ojs/connector') ?>" download="ARTilikOJSConnector.php" class="mobile-nav-link" onclick="closeMobileNav()">
                     <span class="nav-icon">💻</span>
@@ -2534,7 +2546,7 @@
                                 <span>🔬</span> Dual-Lens Spectrum Analysis
                             </span>
                             <span class="hero-visual-status">
-                                Engine Active &bull; 96% Precision
+                                Engine Active
                             </span>
                         </div>
                     </div>
@@ -2884,15 +2896,21 @@
                             Buku Panduan Integrasi OJS 3.x (Format PDF Resolusi Tinggi - 8 Halaman)
                         </h3>
                         <p style="font-size: 14px; color: #cbd5e1; line-height: 1.6; margin-bottom: 24px;">
-                            Disusun khusus untuk pengelola jurnal, IT kampus, dan Dewan Redaksi. Dilengkapi diagram alur kerja <em>end-to-end</em> (Penulis &rarr; OJS 3 &rarr; REST API &rarr; Dual-Lens &rarr; Sertifikat Digital), konsep komputasi Dual-Lens, panduan instalasi langkah demi langkah, dan contoh kode PHP konektor.
+                            Disusun khusus untuk pengelola jurnal, IT kampus, dan Dewan Redaksi. Dilengkapi diagram alur kerja <em>end-to-end</em> (Penulis &rarr; OJS 3 &rarr; REST API &rarr; Dual-Lens &rarr; Sertifikat Digital), konsep komputasi Dual-Lens, Audit Forensik Cerdas AI, Panduan Telaah Redaksi, panduan instalasi, dan contoh kode PHP konektor.
                         </p>
 
                         <div style="display: flex; gap: 12px; flex-wrap: wrap;">
                             <a href="<?= base_url('integrations/ojs/Panduan_Integrasi_OJS_ARTilik.pdf') ?>" target="_blank" download="Panduan_Integrasi_OJS_ARTilik.pdf" class="btn" style="background: linear-gradient(135deg, #e11d48 0%, #be123c 100%); color: #ffffff; box-shadow: 0 4px 14px rgba(225, 29, 72, 0.4); border: 1px solid rgba(255,255,255,0.2);">
-                                <span>📥</span> Unduh Panduan PDF (1.9 MB)
+                                <span>📥</span> Unduh Panduan PDF (2.0 MB)
+                            </a>
+                            <a href="<?= base_url('docs/Brosur_Eksekutif_ARTilik.pdf') ?>" target="_blank" download="Brosur_Eksekutif_ARTilik.pdf" class="btn" style="background: rgba(99, 102, 241, 0.2); color: #c7d2fe; border: 1px solid rgba(129, 140, 248, 0.45);">
+                                <span>📄</span> Unduh Brosur Eksekutif (2.7 MB)
                             </a>
                             <a href="<?= base_url('integrations/ojs/connector') ?>" download="ARTilikOJSConnector.php" class="btn" style="background: rgba(255, 255, 255, 0.1); color: #ffffff; border: 1px solid rgba(255,255,255,0.25);">
                                 <span>💻</span> Unduh Konektor PHP
+                            </a>
+                            <a href="<?= base_url('integrations/ojs/runner') ?>" download="artilik_ojs_runner.php" class="btn" style="background: rgba(255, 255, 255, 0.08); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);">
+                                <span>⚡</span> Unduh Runner PHP
                             </a>
                             <a href="<?= base_url('integrations/ojs/README.md') ?>" target="_blank" class="btn" style="background: transparent; color: #94a3b8; border: 1px solid #334155;">
                                 <span>📖</span> Dokumentasi Online
@@ -3059,9 +3077,14 @@
                         </ul>
                     </div>
 
-                    <a href="#pricing" class="btn btn-outline" style="width: 100%; justify-content: center; font-weight: 700;">
-                        Konsultasi Paket Kampus
-                    </a>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <a href="#langganan" class="btn btn-outline" style="width: 100%; justify-content: center; font-weight: 700;">
+                            Konsultasi Paket Kampus
+                        </a>
+                        <a href="<?= base_url('docs/Brosur_Eksekutif_ARTilik.pdf') ?>" target="_blank" download="Brosur_Eksekutif_ARTilik.pdf" class="btn btn-sm" style="width: 100%; justify-content: center; font-weight: 700; background: rgba(16, 185, 129, 0.1); color: #059669; border: 1px solid rgba(16, 185, 129, 0.3);">
+                            <span>📄</span> Unduh Brosur Eksekutif (PDF)
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -3230,7 +3253,7 @@
                             <span class="plan-period">/ bulan</span>
                         </div>
                         <p class="plan-desc">
-                            Hanya <strong>Rp 1.000 / dokumen</strong>. Dirancang untuk dosen pembimbing, reviewer, dan peneliti aktif.
+                            Hanya <strong>Rp 1.000 / dokumen</strong>. Dirancang untuk dosen pembimbing dan peneliti aktif.
                         </p>
 
                         <ul class="plan-features">
@@ -3427,6 +3450,7 @@
                 <div>
                     <strong style="color: #ffffff; display: block; margin-bottom: 14px;">Dokumentasi &amp; Legal</strong>
                     <ul class="footer-links">
+                        <li><a href="<?= base_url('docs/Brosur_Eksekutif_ARTilik.pdf') ?>" target="_blank" download="Brosur_Eksekutif_ARTilik.pdf">Brosur Eksekutif Institusi (PDF)</a></li>
                         <li><a href="<?= base_url('integrations/ojs/Panduan_Integrasi_OJS_ARTilik.pdf') ?>" target="_blank" download="Panduan_Integrasi_OJS_ARTilik.pdf">Buku Panduan OJS (PDF)</a></li>
                         <li><a href="<?= base_url('integrations/ojs/connector') ?>" download="ARTilikOJSConnector.php">Konektor PHP OJS 3.x</a></li>
                         <li><a href="<?= base_url('integrations/ojs/README.md') ?>" target="_blank">Spesifikasi REST API v1</a></li>

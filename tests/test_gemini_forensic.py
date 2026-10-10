@@ -140,3 +140,127 @@ def test_audit_proposal_round_robin_failover():
         assert audit["tingkat_indikasi_ai"] == "SEDANG"
         assert len(audit["inkonsistensi_metodologi_dan_logika"]) == 1
         assert len(audit["pertanyaan_kritis_dosen"]) == 1
+
+
+def test_calculate_exponential_backoff():
+    """Memverifikasi perhitungan backoff eksponensial dan jitter."""
+    from worker.gemini_forensic import calculate_exponential_backoff
+
+    b0 = calculate_exponential_backoff(error_count=0)
+    assert 60 <= b0 <= 72  # 60s + 2-10s jitter
+
+    b1 = calculate_exponential_backoff(error_count=1)
+    assert 120 <= b1 <= 132  # 120s + 2-10s jitter
+
+    b4 = calculate_exponential_backoff(error_count=4)
+    assert 900 <= b4 <= 912  # Capped at 900s + 2-10s jitter
+
+
+def test_audit_proposal_daily_exhausted_failover():
+    """
+    Memverifikasi bahwa jika kunci terkena batas kuota harian (RPD),
+    fungsi mark_key_exhausted dipanggil (bukan mark_key_rate_limited biasa).
+    """
+    from worker.gemini_forensic import mark_key_exhausted
+
+    mock_keys = [
+        {"id": 10, "key_name": "Key Harian Habis", "api_key": "KEY_EXHAUSTED", "model_name": "gemini-3.6-flash", "error_count": 0},
+        {"id": 11, "key_name": "Key Cadangan", "api_key": "KEY_BACKUP", "model_name": "gemini-3.6-flash", "error_count": 0},
+    ]
+
+    def mock_call_api(api_key, model_name, prompt, timeout=30):
+        if api_key == "KEY_EXHAUSTED":
+            return {
+                "success": False,
+                "is_quota": True,
+                "is_daily_quota": True,
+                "error": "RESOURCE_EXHAUSTED: Quota exceeded for quota metric 'Generate Content API requests per day'",
+                "status_code": 429
+            }
+        elif api_key == "KEY_BACKUP":
+            valid_json = json.dumps({
+                "tingkat_indikasi_ai": "RENDAH",
+                "alasan_indikasi_ai": "Tulisan asli manusia.",
+                "inkonsistensi_metodologi_dan_logika": [],
+                "integritas_sitasi": [],
+                "pertanyaan_kritis_dosen": []
+            })
+            return {"success": True, "raw_text": valid_json, "status_code": 200}
+        return {"success": False, "error": "Unknown"}
+
+    with patch("worker.gemini_forensic.get_available_gemini_keys", return_value=mock_keys), \
+         patch("worker.gemini_forensic.call_gemini_api", side_effect=mock_call_api), \
+         patch("worker.gemini_forensic.mark_key_exhausted") as mock_exhausted, \
+         patch("worker.gemini_forensic.mark_key_rate_limited") as mock_rate_limit, \
+         patch("worker.gemini_forensic.mark_key_success") as mock_success:
+
+        res = audit_proposal_with_gemini(
+            document_text="Contoh naskah uji coba...",
+            substantive_text="Metode pengujian...",
+            title="Uji Batas Harian"
+        )
+
+        # Kunci #10 harus ditandai exhausted, BUKAN rate-limited biasa
+        mock_exhausted.assert_called_once()
+        assert mock_exhausted.call_args[0][0] == 10
+        mock_rate_limit.assert_not_called()
+
+        # Kunci #11 berhasil
+        mock_success.assert_called_once()
+        assert mock_success.call_args[0][0] == 11
+        assert res["status"] == "completed"
+
+
+def test_audit_proposal_disabled_on_invalid_key():
+    """Memverifikasi bahwa kunci HTTP 400/403 (invalid/revoked) langsung dinonaktifkan (mark_key_inactive)."""
+    mock_keys = [
+        {"id": 99, "key_name": "Key Rusak", "api_key": "KEY_INVALID", "model_name": "gemini-3.6-flash"},
+        {"id": 100, "key_name": "Key Sehat", "api_key": "KEY_HEALTHY", "model_name": "gemini-3.6-flash"},
+    ]
+
+    def mock_call_api(api_key, model_name, prompt, timeout=30):
+        if api_key == "KEY_INVALID":
+            return {
+                "success": False,
+                "is_quota": False,
+                "error": "API_KEY_INVALID: API key not valid. Please pass a valid API key.",
+                "status_code": 400
+            }
+        return {
+            "success": True,
+            "raw_text": json.dumps({"tingkat_indikasi_ai": "RENDAH", "alasan_indikasi_ai": "", "inkonsistensi_metodologi_dan_logika": [], "integritas_sitasi": [], "pertanyaan_kritis_dosen": []}),
+            "status_code": 200
+        }
+
+    with patch("worker.gemini_forensic.get_available_gemini_keys", return_value=mock_keys), \
+         patch("worker.gemini_forensic.call_gemini_api", side_effect=mock_call_api), \
+         patch("worker.gemini_forensic.mark_key_inactive") as mock_inactive, \
+         patch("worker.gemini_forensic.mark_key_success") as mock_success:
+
+        res = audit_proposal_with_gemini(
+            document_text="Teks uji...",
+            title="Uji Kunci Invalid"
+        )
+
+        mock_inactive.assert_called_once()
+        assert mock_inactive.call_args[0][0] == 99
+        mock_success.assert_called_once()
+        assert mock_success.call_args[0][0] == 100
+        assert res["status"] == "completed"
+
+
+def test_log_gemini_metric_and_summary(tmp_path):
+    """Memverifikasi pencatatan berkas log JSONL metrik dan pembuatan ringkasan harian."""
+    from worker.gemini_forensic import log_gemini_metric, get_gemini_daily_summary
+    metrics_file = str(tmp_path / "test_gemini_metrics.jsonl")
+
+    with patch("worker.gemini_forensic.METRICS_LOG_PATH", metrics_file):
+        log_gemini_metric("success", "Key A", "AIzaSyKeyA12345678", {"latency_s": 1.25})
+        log_gemini_metric("ratelimited_rpm", "Key A", "AIzaSyKeyA12345678", {"cooldown_s": 65})
+        log_gemini_metric("ratelimited_daily", "Key B", "AIzaSyKeyB87654321", {})
+
+        summary = get_gemini_daily_summary(metrics_path=metrics_file)
+        assert summary["total_success"] == 1
+        assert summary["total_429"] == 2
+        assert len(summary["per_key"]) >= 2
+

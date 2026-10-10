@@ -292,15 +292,15 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
         ai_metrics = ai_audit.get("metrics") or {}
         burstiness = float(ai_metrics.get("burstiness") or 0.5)
         ai_conf = ai_audit.get("ai_confidence_level") or "LOW"
-        ai_color = "#b91c1c" if ai_prob >= 70 else ("#b45309" if ai_prob >= 35 else "#047857")
-        burst_lbl = "Ritme Alami Manusia" if burstiness >= 0.4 else "Ritme Seragam (Khas AI)"
+        ai_color = "#b91c1c" if ai_prob >= 75 else ("#b45309" if ai_prob >= 50 else "#047857")
+        burst_lbl = "Ritme Alami Manusia" if burstiness >= 0.35 else "Ritme Seragam"
         seg_ratio = float(ai_metrics.get("segmental_monotony_ratio") or 0.0)
         seg_str = f" • Monotoni Paragraf: {seg_ratio:.1f}%" if seg_ratio > 0 else ""
         ai_row = f"""
             <tr>
-                <td><strong>Indikator AI &amp; Profil Stylometri</strong><br><span style="font-size: 7.5pt; color: #64748b;">Variabilitas Ritme Sintaksis &amp; Pola LLM</span></td>
+                <td><strong>[Eksperimental] Indikator Gaya Bahasa &amp; Stylometri</strong><br><span style="font-size: 7.5pt; color: #64748b;">Eksperimental — Bukan Vonis AI</span></td>
                 <td style="text-align: center; font-weight: bold; color: {ai_color}; font-size: 10pt;">
-                    {ai_prob:.1f}% Probabilitas
+                    {ai_prob:.1f}% Indikator
                 </td>
                 <td>
                     <strong>{ai_lbl}</strong>

@@ -5,6 +5,7 @@ namespace App\Controllers\Api;
 use App\Controllers\BaseController;
 use App\Models\DocumentModel;
 use App\Models\ReportModel;
+use App\Libraries\QueueService;
 
 class DocumentController extends BaseController
 {
@@ -369,18 +370,10 @@ class DocumentController extends BaseController
                 'created_at'         => date('Y-m-d H:i:s'),
             ]);
 
-            $db = db_connect();
-            $db->table('jobs')->insert([
-                'type'         => 'similarity_check',
-                'payload'      => json_encode([
-                    'document_id' => (int) $id,
-                    'report_id'   => (int) $reportId,
-                    'engine'      => $engine,
-                ]),
-                'status'       => 'pending',
-                'available_at' => date('Y-m-d H:i:s'),
-                'created_at'   => date('Y-m-d H:i:s'),
-                'updated_at'   => date('Y-m-d H:i:s'),
+            QueueService::dispatch('similarity_check', [
+                'document_id' => (int) $id,
+                'report_id'   => (int) $reportId,
+                'engine'      => $engine,
             ]);
 
             return $this->response->setStatusCode(202)->setJSON([
@@ -434,7 +427,76 @@ class DocumentController extends BaseController
         }
 
         $db = db_connect();
+
+        // ═════════════════════════════════════════════════════════════════════════
+        // CORPUS QUALITY GATE: Penyaringan Mutu & Integritas Sebelum Masuk Korpus
+        // ═════════════════════════════════════════════════════════════════════════
+        $reportModel = new \App\Models\ReportModel();
+        $latestReport = $reportModel->where('document_id', $id)
+                                    ->orderBy('id', 'DESC')
+                                    ->first();
+
+        // Syarat 1: Dokumen harus sudah selesai diperiksa
+        if (! $latestReport || ($latestReport['status'] ?? '') !== 'completed') {
+            return $this->response->setStatusCode(422)->setJSON([
+                'status'  => 'error',
+                'message' => 'Naskah belum dapat didaftarkan ke korpus: Pemeriksaan kemiripan naskah harus selesai dilakukan terlebih dahulu.'
+            ]);
+        }
+
+        // Syarat 2: Ambang Batas Kemiripan Awal (Maksimal 25% untuk non-admin)
+        $simScore = (float) ($latestReport['overall_similarity'] ?? 0.0);
+        if (! $isAdmin && $simScore > 25.0) {
+            return $this->response->setStatusCode(422)->setJSON([
+                'status'  => 'error',
+                'message' => "Naskah belum memenuhi standar mutu korpus: Tingkat kemiripan saat ini ({$simScore}%) melebihi batas maksimal 25%. Korpus institusi dipersyaratkan untuk naskah berintegritas tinggi."
+            ]);
+        }
+
+        // Syarat 3: Panjang Substantif Minimum (Minimal 1.000 kata untuk non-admin)
+        $wordCountRow = $db->query("SELECT COALESCE(SUM(word_count), 0) AS total_words FROM document_chunks WHERE document_id = ?", [(int)$id])->getRowArray();
+        $totalWords = (int) ($wordCountRow['total_words'] ?? 0);
+        if (! $isAdmin && $totalWords < 1000) {
+            return $this->response->setStatusCode(422)->setJSON([
+                'status'  => 'error',
+                'message' => "Naskah belum memenuhi kelayakan korpus: Panjang naskah ({$totalWords} kata) kurang dari batas minimum karya ilmiah lengkap (1.000 kata)."
+            ]);
+        }
+
+        // Syarat 4: Deteksi Integritas AI (Tingkat Indikasi AI Tidak Boleh Ekstrem Tinggi)
+        $evData = [];
+        if (!empty($latestReport['evidence_data'])) {
+            $evData = is_array($latestReport['evidence_data']) ? $latestReport['evidence_data'] : json_decode((string)$latestReport['evidence_data'], true);
+        }
+        $geminiAudit = $evData['gemini_forensic']['audit'] ?? [];
+        $aiLevel = strtoupper(trim((string)($geminiAudit['tingkat_indikasi_ai'] ?? '')));
+        $aiProbability = (float) ($evData['ai_stylometrics']['ai_probability_score'] ?? 0.0);
+        if (! $isAdmin && ($aiLevel === 'TINGGI' || $aiProbability >= 80.0)) {
+            return $this->response->setStatusCode(422)->setJSON([
+                'status'  => 'error',
+                'message' => "Naskah belum memenuhi syarat korpus: Terdeteksi tingkat indikasi generatif AI yang dominan ({$aiLevel}). Korpus institusi diprioritaskan untuk karya orisinal manusia."
+            ]);
+        }
+
         $db->transStart();
+
+        // Pembaruan Versi: Jika pengguna pernah mendaftarkan naskah korpus terdahulu, ganti versi lama agar tidak redundan
+        $replacedOldCount = 0;
+        if (!empty($document['user_id'])) {
+            $prevCorpusDocs = $documentModel->where('user_id', $document['user_id'])
+                                            ->where('document_type', 'corpus')
+                                            ->where('id !=', $id)
+                                            ->findAll();
+            foreach ($prevCorpusDocs as $oldDoc) {
+                $documentModel->update($oldDoc['id'], [
+                    'document_type'     => 'submission',
+                    'corpus_visibility' => 'private',
+                    'updated_at'        => date('Y-m-d H:i:s'),
+                ]);
+                $db->query("DELETE FROM fingerprint_documents WHERE document_id = ?", [(int)$oldDoc['id']]);
+                $replacedOldCount++;
+            }
+        }
 
         // 1. Daftarkan fingerprints unik naskah ke fingerprint_documents
         $db->query("
@@ -626,19 +688,11 @@ class DocumentController extends BaseController
                 'created_at'         => $now,
             ]);
 
-            // Masukkan ke antrean worker
-            $db = db_connect();
-            $db->table('jobs')->insert([
-                'type'         => 'similarity_check',
-                'payload'      => json_encode([
-                    'document_id' => (int) $documentId,
-                    'report_id'   => (int) $reportId,
-                    'engine'      => $engine,
-                ]),
-                'status'       => 'pending',
-                'available_at' => $now,
-                'created_at'   => $now,
-                'updated_at'   => $now,
+            // Masukkan ke antrean worker via QueueService (Redis event-driven + MariaDB fallback)
+            QueueService::dispatch('similarity_check', [
+                'document_id' => (int) $documentId,
+                'report_id'   => (int) $reportId,
+                'engine'      => $engine,
             ]);
         } catch (\Throwable $e) {
             $userModel->refundSubmissionQuota($userId);

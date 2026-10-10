@@ -3,6 +3,7 @@ AR Tilik - Automated Test Suite for LMS/OJS Integration Endpoint
 Menguji integrasi API: POST /api/integration/check
 """
 
+import hashlib
 import os
 import sys
 import io
@@ -21,6 +22,31 @@ from worker.database import get_connection, load_env
 load_env()
 
 BASE_URL = os.getenv("TEST_BASE_URL", "http://localhost:8085")
+
+
+def get_or_create_test_api_key() -> str:
+    conn = get_connection()
+    try:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT id FROM users WHERE status = 'active' ORDER BY id ASC LIMIT 1")
+        user = cursor.fetchone()
+        user_id = user["id"] if user else 1
+
+        # Pastikan user uji memiliki kuota submisi yang cukup
+        cursor.execute("UPDATE users SET bonus_submissions = 100, free_submissions_used_this_week = 0 WHERE id = %s", (user_id,))
+
+        raw_key = "artilik_ojs_test_mock_key_integration_123"
+        hashed = hashlib.sha256(raw_key.encode()).hexdigest()
+        cursor.execute("SELECT id FROM api_keys WHERE api_key = %s", (hashed,))
+        if not cursor.fetchone():
+            cursor.execute("""
+                INSERT INTO api_keys (user_id, key_name, key_prefix, api_key, system_type, quota_limit, quota_used, is_active, created_at, updated_at)
+                VALUES (%s, 'Test OJS Key', 'artilik_ojs_tes...', %s, 'ojs', 1000, 0, 1, NOW(), NOW())
+            """, (user_id, hashed))
+        conn.commit()
+        return raw_key
+    finally:
+        conn.close()
 
 
 def test_integration_endpoint_contract_and_submission():
@@ -56,12 +82,14 @@ def test_integration_endpoint_contract_and_submission():
     
     payload = body.getvalue()
     
+    api_key = get_or_create_test_api_key()
     req = urllib.request.Request(
         f"{BASE_URL}/api/integration/check",
         data=payload,
         headers={
             "Content-Type": f"multipart/form-data; boundary={boundary}",
-            "User-Agent": "Moodle-LMS-ARTilik-Plugin/1.0"
+            "User-Agent": "Moodle-LMS-ARTilik-Plugin/1.0",
+            "X-API-Key": api_key
         },
         method="POST"
     )
@@ -123,10 +151,14 @@ def test_integration_endpoint_validation_missing_file():
     body.write(f"--{boundary}--\r\n".encode("utf-8"))
     payload = body.getvalue()
     
+    api_key = get_or_create_test_api_key()
     req = urllib.request.Request(
         f"{BASE_URL}/api/integration/check",
         data=payload,
-        headers={"Content-Type": f"multipart/form-data; boundary={boundary}"},
+        headers={
+            "Content-Type": f"multipart/form-data; boundary={boundary}",
+            "X-API-Key": api_key
+        },
         method="POST"
     )
     

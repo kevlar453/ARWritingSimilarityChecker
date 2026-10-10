@@ -139,6 +139,45 @@ class ARTilikOJSConnector
     }
 
     /**
+     * Mengambil ringkasan Audit Forensik Cerdas AI (v1.3.0)
+     * 
+     * @param int $reportId ID Laporan AR Tilik
+     * @return array|null Data hasil audit forensik semantik atau null jika belum/tidak tersedia
+     * @throws Exception
+     */
+    public function getForensicAudit(int $reportId): ?array
+    {
+        $rep = $this->getDetailedReport($reportId);
+        return $rep['data']['forensic_audit'] ?? null;
+    }
+
+    /**
+     * Mengambil 3 set pertanyaan kritis telaah naskah untuk Reviewer/Editor (v1.3.0)
+     * 
+     * @param int $reportId ID Laporan AR Tilik
+     * @return array Daftar pertanyaan telaah
+     * @throws Exception
+     */
+    public function getEditorialQuestions(int $reportId): array
+    {
+        $forensic = $this->getForensicAudit($reportId);
+        return $forensic['oral_defense_questions'] ?? [];
+    }
+
+    /**
+     * Mengambil URL sertifikat digital resmi berkode QR
+     * 
+     * @param int $reportId ID Laporan AR Tilik
+     * @return string|null URL verifikasi publik
+     * @throws Exception
+     */
+    public function getVerificationCertificateUrl(int $reportId): ?string
+    {
+        $rep = $this->getDetailedReport($reportId);
+        return $rep['data']['verification']['certificate_url'] ?? null;
+    }
+
+    /**
      * Eksekutor cURL
      */
     private function executeCurl(string $url, string $method = 'GET', array $data = [], bool $isMultipart = false): array

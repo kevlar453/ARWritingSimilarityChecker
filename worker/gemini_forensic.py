@@ -6,21 +6,109 @@ dan generator pertanyaan ujian skripsi berbasis Google Gemini API (Pool Round-Ro
 
 import json
 import logging
+import os
+import random
 import re
 import time
 import urllib.request
 import urllib.error
+from datetime import datetime
+from zoneinfo import ZoneInfo
 from typing import Dict, List, Any, Optional
 
 from worker.database import get_connection
 
 logger = logging.getLogger("artilik.gemini_forensic")
 
+# Lokasi berkas log metrik JSONL
+METRICS_LOG_PATH = os.environ.get(
+    "GEMINI_METRICS",
+    os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "writable", "logs", "gemini_metrics.jsonl")
+)
+
+
+def get_pacific_date_str() -> str:
+    """Mengembalikan tanggal saat ini di zona waktu US Pacific Time (PT). Google Cloud mereset kuota harian saat Pacific Midnight."""
+    try:
+        return datetime.now(ZoneInfo("America/Los_Angeles")).strftime("%Y-%m-%d")
+    except Exception:
+        return time.strftime("%Y-%m-%d")
+
+
+def calculate_exponential_backoff(error_count: int = 0, base_backoff: float = 60.0, max_backoff: float = 900.0) -> int:
+    """
+    Menghitung durasi jeda cooldown dengan pola backoff eksponensial dan jitter acak.
+    Rumus: min(base * 2^(fails - 1), max) + random(2, 10).
+    60s -> 120s -> 240s -> ... (maks 900s / 15 menit).
+    """
+    fails = max(1, int(error_count) + 1)
+    backoff = min(base_backoff * (2 ** (min(fails, 5) - 1)), max_backoff)
+    jitter = random.uniform(2.0, 10.0)
+    return int(backoff + jitter)
+
+
+def log_gemini_metric(event: str, key_name: str, api_key: str, extra: Optional[Dict[str, Any]] = None):
+    """
+    Mencatat aktivitas pemakaian kunci API ke format JSONL secara non-blocking.
+    """
+    key_fp = (api_key[:6] + "..." + api_key[-4:]) if len(api_key) > 10 else "masked_key"
+    rec = {
+        "ts": time.strftime("%Y-%m-%dT%H:%M:%S"),
+        "event": event,
+        "key_name": key_name,
+        "key_fp": key_fp,
+    }
+    if extra:
+        rec.update(extra)
+    try:
+        os.makedirs(os.path.dirname(METRICS_LOG_PATH), exist_ok=True)
+        with open(METRICS_LOG_PATH, "a", encoding="utf-8") as f:
+            f.write(json.dumps(rec) + "\n")
+    except Exception:
+        pass
+
+
+def get_gemini_daily_summary(metrics_path: Optional[str] = None) -> Dict[str, Any]:
+    """
+    Membaca agregasi metrik harian dari berkas JSONL untuk pemantauan/diagnostik.
+    """
+    path = metrics_path or METRICS_LOG_PATH
+    today = time.strftime("%Y-%m-%d")
+    agg: Dict[str, Dict[str, int]] = {}
+    try:
+        if os.path.exists(path):
+            with open(path, "r", encoding="utf-8") as f:
+                for line in f:
+                    try:
+                        rec = json.loads(line)
+                    except Exception:
+                        continue
+                    if not rec.get("ts", "").startswith(today):
+                        continue
+                    fp = rec.get("key_fp", "unknown")
+                    d = agg.setdefault(fp, {"success": 0, "ratelimited_rpm": 0, "ratelimited_daily": 0, "error": 0})
+                    evt = rec.get("event", "other")
+                    d[evt] = d.get(evt, 0) + 1
+    except Exception:
+        pass
+
+    total_ok = sum(d.get("success", 0) for d in agg.values())
+    total_429 = sum(d.get("ratelimited_rpm", 0) + d.get("ratelimited_daily", 0) for d in agg.values())
+    return {
+        "date": today,
+        "total_success": total_ok,
+        "total_429": total_429,
+        "per_key": agg
+    }
+
 
 def get_available_gemini_keys(conn=None) -> List[Dict[str, Any]]:
     """
-    Mengambil daftar Google API Key aktif dari database dengan rotasi round-robin
-    (diurutkan berdasarkan last_used_at ASC).
+    Mengambil daftar Google API Key aktif dari database dengan rotasi cerdas berbasis kesehatan:
+    - Memulihkan kunci rate_limited yang masa jedanya (cooldown) telah selesai.
+    - Memulihkan kunci exhausted jika hari ini di zona waktu Pacific Time sudah berganti.
+    - Mengurutkan berdasarkan error_count ASC, usage_count ASC, last_used_at ASC (paling sehat & paling sepi).
+    - Fallback ke env GEMINI_API_KEYS jika database tidak memiliki kunci aktif.
     """
     close_after = False
     if conn is None:
@@ -29,23 +117,67 @@ def get_available_gemini_keys(conn=None) -> List[Dict[str, Any]]:
 
     try:
         cursor = conn.cursor(dictionary=True)
-        # Pulihkan kunci rate_limited yang sudah melewati batas waktu jeda (cooldown)
+        # 1. Pulihkan kunci rate_limited yang sudah melewati batas waktu jeda (cooldown)
         cursor.execute("""
             UPDATE google_api_keys 
             SET status = 'active', rate_limited_until = NULL 
             WHERE status = 'rate_limited' AND rate_limited_until <= NOW()
         """)
+
+        # 2. Pulihkan kunci exhausted jika sudah melewati Midnight Pacific Time
+        pt_today = get_pacific_date_str()
+        cursor.execute("SELECT id, updated_at FROM google_api_keys WHERE status = 'exhausted'")
+        exhausted_rows = cursor.fetchall() or []
+        for erow in exhausted_rows:
+            up_at = erow.get("updated_at")
+            should_reset = False
+            if up_at:
+                try:
+                    up_pt = up_at.astimezone(ZoneInfo("America/Los_Angeles")).strftime("%Y-%m-%d") if hasattr(up_at, "astimezone") else str(up_at)[:10]
+                    if up_pt < pt_today:
+                        should_reset = True
+                except Exception:
+                    should_reset = True
+            else:
+                should_reset = True
+
+            if should_reset:
+                cursor.execute("""
+                    UPDATE google_api_keys 
+                    SET status = 'active', rate_limited_until = NULL, error_count = 0 
+                    WHERE id = %s
+                """, (erow["id"],))
+
         conn.commit()
 
-        # Ambil kunci yang aktif dan siap dipakai
+        # 3. Ambil kunci aktif diurutkan: error paling sedikit, penggunaan terendah, waktu pakai terlama
         cursor.execute("""
             SELECT id, key_name, api_key, model_name, usage_count, error_count, rate_limited_until
             FROM google_api_keys
             WHERE status = 'active' AND (rate_limited_until IS NULL OR rate_limited_until <= NOW())
-            ORDER BY COALESCE(last_used_at, '2000-01-01 00:00:00') ASC, id ASC
+            ORDER BY error_count ASC, usage_count ASC, COALESCE(last_used_at, '2000-01-01 00:00:00') ASC, id ASC
         """)
         keys = cursor.fetchall() or []
         cursor.close()
+
+        # 4. Fallback ke environment variable jika tabel database kosong
+        if not keys:
+            env_raw = os.environ.get("GEMINI_API_KEYS", "")
+            if env_raw.strip():
+                raw_keys = [k.strip() for k in env_raw.split(",") if k.strip()]
+                keys = [
+                    {
+                        "id": None,
+                        "key_name": f"ENV_KEY_{i+1}",
+                        "api_key": k,
+                        "model_name": os.environ.get("GEMINI_DEFAULT_MODEL", "gemini-3.6-flash"),
+                        "usage_count": 0,
+                        "error_count": 0,
+                        "rate_limited_until": None,
+                    }
+                    for i, k in enumerate(raw_keys)
+                ]
+
         return keys
     except Exception as e:
         logger.error(f"[GEMINI] Gagal mengambil daftar kunci API dari database: {e}")
@@ -55,8 +187,10 @@ def get_available_gemini_keys(conn=None) -> List[Dict[str, Any]]:
             conn.close()
 
 
-def mark_key_success(key_id: int, conn=None):
-    """Mencatat penggunaan sukses pada API key."""
+def mark_key_success(key_id: Optional[int], conn=None):
+    """Mencatat penggunaan sukses pada API key, mereset counter gagal berturut-turut."""
+    if not key_id:
+        return
     close_after = False
     if conn is None:
         conn = get_connection()
@@ -65,7 +199,11 @@ def mark_key_success(key_id: int, conn=None):
         cursor = conn.cursor()
         cursor.execute("""
             UPDATE google_api_keys 
-            SET usage_count = usage_count + 1, last_used_at = NOW(), rate_limited_until = NULL, last_error_message = NULL
+            SET usage_count = usage_count + 1, 
+                error_count = 0,
+                last_used_at = NOW(), 
+                rate_limited_until = NULL, 
+                last_error_message = NULL
             WHERE id = %s
         """, (key_id,))
         conn.commit()
@@ -77,8 +215,12 @@ def mark_key_success(key_id: int, conn=None):
             conn.close()
 
 
-def mark_key_rate_limited(key_id: int, error_msg: str = "", cooldown_seconds: int = 60, conn=None):
-    """Menandai kunci terkena rate-limit / kuota sesaat dengan masa cooldown."""
+def mark_key_rate_limited(key_id: Optional[int], error_msg: str = "", cooldown_seconds: Optional[int] = None, conn=None):
+    """Menandai kunci terkena rate-limit / kuota sesaat (RPM) dengan masa cooldown eksponensial."""
+    if not key_id:
+        return
+    if cooldown_seconds is None or cooldown_seconds <= 0:
+        cooldown_seconds = calculate_exponential_backoff(0)
     close_after = False
     if conn is None:
         conn = get_connection()
@@ -98,6 +240,60 @@ def mark_key_rate_limited(key_id: int, error_msg: str = "", cooldown_seconds: in
         logger.warning(f"[GEMINI] Kunci #{key_id} terkena limit kuota. Dijeda selama {cooldown_seconds} detik.")
     except Exception as e:
         logger.error(f"[GEMINI] Gagal menandai rate limit key #{key_id}: {e}")
+    finally:
+        if close_after and conn:
+            conn.close()
+
+
+def mark_key_exhausted(key_id: Optional[int], error_msg: str = "", conn=None):
+    """Menandai kunci kuota harian habis (RPD / RESOURCE_EXHAUSTED per day) agar istirahat sampai besok."""
+    if not key_id:
+        return
+    close_after = False
+    if conn is None:
+        conn = get_connection()
+        close_after = True
+    try:
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE google_api_keys 
+            SET status = 'exhausted', 
+                error_count = error_count + 1,
+                last_error_message = %s
+            WHERE id = %s
+        """, (error_msg[:450], key_id))
+        conn.commit()
+        cursor.close()
+        logger.warning(f"[GEMINI] Kunci #{key_id} kuota harian habis (exhausted).")
+    except Exception as e:
+        logger.error(f"[GEMINI] Gagal menandai kunci exhausted #{key_id}: {e}")
+    finally:
+        if close_after and conn:
+            conn.close()
+
+
+def mark_key_inactive(key_id: Optional[int], error_msg: str = "", conn=None):
+    """Menonaktifkan kunci yang ditolak permanen (HTTP 400/401/403 atau invalid key)."""
+    if not key_id:
+        return
+    close_after = False
+    if conn is None:
+        conn = get_connection()
+        close_after = True
+    try:
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE google_api_keys 
+            SET status = 'inactive', 
+                error_count = error_count + 1,
+                last_error_message = %s
+            WHERE id = %s
+        """, (error_msg[:450], key_id))
+        conn.commit()
+        cursor.close()
+        logger.warning(f"[GEMINI] Kunci #{key_id} dinonaktifkan otomatis: {error_msg[:200]}")
+    except Exception as e:
+        logger.error(f"[GEMINI] Gagal menonaktifkan kunci #{key_id}: {e}")
     finally:
         if close_after and conn:
             conn.close()
@@ -168,11 +364,16 @@ def call_gemini_api(api_key: str, model_name: str, prompt: str, timeout: int = 4
                 fallback_res["model_executed"] = "gemini-3.5-flash"
                 return fallback_res
 
+        is_quota = (e.code == 429) or ("RESOURCE_EXHAUSTED" in err_content)
+        err_lower = err_content.lower()
+        is_daily_quota = is_quota and ("per day" in err_lower or "daily" in err_lower or "quota exceeded for quota metric" in err_lower and "day" in err_lower)
+
         return {
             "success": False,
             "status_code": e.code,
             "error": err_content,
-            "is_quota": (e.code == 429) or ("RESOURCE_EXHAUSTED" in err_content),
+            "is_quota": is_quota,
+            "is_daily_quota": is_daily_quota,
             "model_executed": model,
         }
     except Exception as e:
@@ -187,7 +388,8 @@ def call_gemini_api(api_key: str, model_name: str, prompt: str, timeout: int = 4
             "success": False,
             "status_code": 0,
             "error": err_str,
-            "is_quota": False
+            "is_quota": False,
+            "is_daily_quota": False
         }
 
 
@@ -199,7 +401,7 @@ def audit_proposal_with_gemini(
 ) -> Dict[str, Any]:
     """
     Menjalankan audit forensik semantik menggunakan Google Gemini API
-    dengan rotasi Round-Robin dan failover otomatis saat kuota habis.
+    dengan rotasi cerdas berbasis kesehatan, backoff eksponensial, dan failover otomatis.
     """
     keys = get_available_gemini_keys(connection)
     if not keys:
@@ -248,20 +450,26 @@ Lakukan audit kritis dan kembalikan HANYA format JSON valid dengan struktur pers
 }}
 """
 
-    # Eksekusi dengan Round-Robin & Failover antar API Key
+    # Eksekusi dengan Pool Cerdas Berbasis Kesehatan & Failover antar API Key
     last_error = ""
     for k in keys:
-        key_id = k["id"]
-        key_name = k["key_name"]
+        key_id = k.get("id")
+        key_name = k.get("key_name", "Kunci")
         api_key = k["api_key"]
         model_name = k.get("model_name") or "gemini-3.6-flash"
 
+        t0 = time.time()
         logger.info(f"[GEMINI] Mencoba audit dengan kunci #{key_id} ('{key_name}', model={model_name})...")
         res = call_gemini_api(api_key, model_name, system_prompt)
+        latency = round(time.time() - t0, 2)
 
         if res.get("success"):
-            # Sukses
+            # Sukses: update DB dan log metrik
             mark_key_success(key_id, connection)
+            log_gemini_metric("success", key_name, api_key, {
+                "latency_s": latency,
+                "model": res.get("model_executed") or model_name
+            })
             raw_text = res.get("raw_text", "")
             try:
                 # Bersihkan pembungkus markdown ```json ... ``` bila ada
@@ -296,33 +504,36 @@ Lakukan audit kritis dan kembalikan HANYA format JSON valid dengan struktur pers
                     "raw_output": raw_text
                 }
         else:
-            # Gagal: cek apakah karena kuota / rate limit
+            # Gagal: klasifikasi error untuk backoff & update status
             is_quota = res.get("is_quota", False)
+            is_daily_quota = res.get("is_daily_quota", False)
             err_msg = res.get("error", "Unknown error")
+            err_lower = err_msg.lower()
             last_error = err_msg
 
             if is_quota:
-                mark_key_rate_limited(key_id, err_msg, cooldown_seconds=60, conn=connection)
-                logger.warning(f"[GEMINI] Kuota kunci '{key_name}' habis (429/ResourceExhausted). Beralih ke kunci berikutnya...")
-            elif res.get("status_code") == 503 or "high demand" in err_msg.lower():
-                logger.warning(f"[GEMINI] Google sedang padat antrean / high demand (503) untuk kunci '{key_name}'. Beralih ke kunci berikutnya...")
-            elif res.get("status_code") in (400, 403) or "denied access" in err_msg.lower():
-                try:
-                    cursor = connection.cursor() if connection else get_connection().cursor()
-                    cursor.execute("""
-                        UPDATE google_api_keys 
-                        SET status = 'inactive', 
-                            error_count = error_count + 1,
-                            last_error_message = %s 
-                        WHERE id = %s
-                    """, (err_msg[:450], key_id))
-                    if connection:
-                        connection.commit()
-                except Exception as de_err:
-                    logger.error(f"[GEMINI] Gagal menonaktifkan kunci #{key_id}: {de_err}")
-                logger.warning(f"[GEMINI] Kunci '{key_name}' ditolak/tidak valid ({res.get('status_code')}). Dinonaktifkan otomatis: {err_msg}")
+                if is_daily_quota or ("per day" in err_lower) or ("daily" in err_lower):
+                    mark_key_exhausted(key_id, err_msg, conn=connection)
+                    log_gemini_metric("ratelimited_daily", key_name, api_key, {"error": err_msg[:200]})
+                    logger.warning(f"[GEMINI] Kuota harian (RPD) kunci '{key_name}' habis total. Ditandai exhausted.")
+                else:
+                    current_fails = k.get("error_count", 0)
+                    cooldown = calculate_exponential_backoff(current_fails)
+                    mark_key_rate_limited(key_id, err_msg, cooldown_seconds=cooldown, conn=connection)
+                    log_gemini_metric("ratelimited_rpm", key_name, api_key, {"cooldown_s": cooldown, "error": err_msg[:200]})
+                    logger.warning(f"[GEMINI] Kuota per-menit kunci '{key_name}' kena rate-limit (429/RPM). Backoff jeda {cooldown} detik.")
+            elif res.get("status_code") in (400, 401, 403) or "denied access" in err_lower or "api_key_invalid" in err_lower or "permission_denied" in err_lower:
+                mark_key_inactive(key_id, err_msg, conn=connection)
+                log_gemini_metric("disabled", key_name, api_key, {"status_code": res.get("status_code"), "error": err_msg[:200]})
+                logger.warning(f"[GEMINI] Kunci '{key_name}' ditolak/tidak valid ({res.get('status_code')}). Dinonaktifkan otomatis: {err_msg[:200]}")
+            elif res.get("status_code") == 503 or "high demand" in err_lower or "unavailable" in err_lower:
+                cooldown = int(30 + random.uniform(2, 8))
+                mark_key_rate_limited(key_id, err_msg, cooldown_seconds=cooldown, conn=connection)
+                log_gemini_metric("error_503", key_name, api_key, {"cooldown_s": cooldown})
+                logger.warning(f"[GEMINI] Google sedang padat antrean / overload (503) untuk kunci '{key_name}'. Dijeda {cooldown} detik.")
             else:
-                logger.warning(f"[GEMINI] Error pada kunci '{key_name}': {err_msg}")
+                log_gemini_metric("error", key_name, api_key, {"status_code": res.get("status_code"), "error": err_msg[:200]})
+                logger.warning(f"[GEMINI] Error pada kunci '{key_name}': {err_msg[:200]}")
 
     return {
         "status": "failed",
