@@ -1448,7 +1448,7 @@
                     <span class="text-lg">🗳️</span>
                     <div>
                         <div class="text-xs font-bold text-slate-800">Apakah hasil Audit Forensik &amp; Panduan Sidang ini akurat dan membantu?</div>
-                        <div class="text-[11px] text-slate-500">Penilaian Anda membantu evaluasi penalaran AI dan menjadi poin keaktifan kurasi <strong class="text-indigo-600 font-semibold">Duta Kampus AR Tilik</strong>.</div>
+                        <div class="text-[11px] text-slate-500">Penilaian Anda membantu evaluasi penalaran AI<?= empty($isAmbassador) ? ' dan menjadi poin keaktifan kurasi <strong class="text-indigo-600 font-semibold">Duta Kampus AR Tilik</strong>' : ' serta meningkatkan kualitas deteksi naskah' ?>.</div>
                     </div>
                 </div>
                 <div class="flex items-center gap-2 flex-shrink-0" id="voteAuditBtns">
@@ -2306,9 +2306,12 @@
                             🌟
                         </div>
                         <div>
-                            <h3 class="text-lg sm:text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                            <h3 class="text-lg sm:text-xl font-bold tracking-tight text-white flex items-center gap-2 flex-wrap">
                                 <span>Evaluasi Pemeriksaan &amp; Testimoni Akademik</span>
                                 <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/30 text-indigo-200 border border-indigo-400/30 font-mono-code">Verifikasi #<?= esc($report['verification_code'] ?? $report['id']) ?></span>
+                                <?php if (!empty($isAmbassador)): ?>
+                                    <span class="text-[10px] font-bold tracking-wider px-2.5 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30">🎓 Duta Kampus</span>
+                                <?php endif; ?>
                             </h3>
                             <p class="text-xs sm:text-sm text-slate-300 mt-0.5">
                                 Ulasan dan penilaian Anda membantu kami menyempurnakan engine, menguatkan integritas riset, serta menjadi bukti nyata bagi civitas akademika lainnya.
@@ -2331,6 +2334,7 @@
                 </div>
 
                 <!-- Banner Program Spesial: Duta Kampus AR Tilik -->
+                <?php if (empty($isAmbassador)): ?>
                 <div class="bg-gradient-to-r from-amber-500/15 via-indigo-500/20 to-purple-500/15 border border-amber-500/30 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-inner">
                     <div class="flex items-start gap-3.5">
                         <div class="w-10 h-10 rounded-xl bg-amber-400/20 border border-amber-400/30 text-amber-300 flex items-center justify-center text-xl flex-shrink-0">
@@ -2361,6 +2365,7 @@
                         </span>
                     </div>
                 </div>
+                <?php endif; ?>
 
                 <!-- Konten: Sudah Kirim vs Belum Kirim -->
                 <?php if (!empty($userReview)): ?>
@@ -2458,7 +2463,11 @@
                         <div>
                             <label class="block text-[11px] font-bold text-slate-300 mb-1 flex items-center justify-between">
                                 <span>Perguruan Tinggi / Institusi:</span>
-                                <span class="text-[10px] text-amber-300 font-normal">🎓 Verifikasi Duta Kampus</span>
+                                <?php if (!empty($isAmbassador)): ?>
+                                    <span class="text-[10px] text-emerald-300 font-normal">🎓 Duta Kampus Terverifikasi</span>
+                                <?php else: ?>
+                                    <span class="text-[10px] text-amber-300 font-normal">🎓 Verifikasi Duta Kampus</span>
+                                <?php endif; ?>
                             </label>
                             <input type="text" name="institution" id="testiInstitution" value="<?= esc($userReview['institution'] ?? $currentUser['institution'] ?? session('user_institution') ?? '') ?>" placeholder="Misal: Univ. Gadjah Mada / UI / ITB" class="w-full text-xs bg-black/30 border border-white/15 rounded-xl px-3 py-2 text-white focus:outline-none focus:ring-1 focus:ring-indigo-500">
                             <p class="text-[10px] text-slate-400 mt-1 leading-normal">
@@ -2508,12 +2517,14 @@
                 <p class="text-xs text-slate-500 leading-relaxed">
                     Berkas sertifikasi resmi Anda terbuka di tab baru. Sambil menunggu, bolehkah kami meminta 5 detik untuk menilai hasil pemeriksaan naskah ini?
                 </p>
+                <?php if (empty($isAmbassador)): ?>
                 <div class="bg-amber-50 border border-amber-200/80 rounded-xl p-2.5 text-left flex items-start gap-2">
                     <span class="text-base flex-shrink-0">🎓</span>
                     <p class="text-[11px] text-amber-900 leading-snug">
                         <strong>Peluang Duta Kampus:</strong> Berikan penilaian &amp; ulasan untuk berkesempatan terpilih menjadi Duta Kampus resmi AR Tilik (khusus pelanggan yang pernah membeli paket pemeriksaan)!
                     </p>
                 </div>
+                <?php endif; ?>
             </div>
 
             <div class="flex justify-center items-center gap-2 py-2">

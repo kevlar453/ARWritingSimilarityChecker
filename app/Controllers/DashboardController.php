@@ -547,6 +547,17 @@ class DashboardController extends BaseController
             }
         }
 
+        // Cek apakah pengguna sudah menjadi Duta Kampus aktif / masa percobaan
+        $ambProfile = null;
+        $isAmbassador = false;
+        if ($userId) {
+            $ambProfileModel = new \App\Models\AmbassadorProfileModel();
+            $ambProfile = $ambProfileModel->where('user_id', (int) $userId)
+                ->whereIn('status', ['probation', 'active'])
+                ->first();
+            $isAmbassador = !empty($ambProfile);
+        }
+
         return view('dashboard/report', [
             'report'              => $report,
             'document'            => $document,
@@ -571,6 +582,8 @@ class DashboardController extends BaseController
             'userReview'          => $userReview,
             'currentUser'         => $currentUser,
             'hasPurchased'        => $hasPurchased,
+            'isAmbassador'        => $isAmbassador,
+            'ambProfile'          => $ambProfile,
         ]);
     }
 
