@@ -2319,6 +2319,13 @@
                 <li><a href="#langganan">Paket Tarif</a></li>
                 <li><a href="#faq">FAQ</a></li>
                 <li>
+                    <a href="<?= base_url('ambassador') ?>" style="display: inline-flex; align-items: center; gap: 5px; color: #f59e0b; font-weight: 700; background: rgba(245, 158, 11, 0.08); padding: 5px 11px; border-radius: 10px; border: 1px solid rgba(245, 158, 11, 0.25); text-decoration: none; transition: all 0.2s ease;">
+                        <span>🎓</span>
+                        <span>Duta Kampus</span>
+                        <span style="font-size: 9px; background: #f59e0b; color: #000; font-weight: 800; padding: 1px 5px; border-radius: 9999px;">20%</span>
+                    </a>
+                </li>
+                <li>
                     <a href="<?= base_url('verify') ?>" class="nav-link-verify">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
@@ -2462,6 +2469,11 @@
                     <span class="nav-icon">🛡️</span>
                     <span>Portal Verifikasi Sertifikat QR</span>
                     <span class="nav-arrow">›</span>
+                </a>
+                <a href="<?= base_url('ambassador') ?>" class="mobile-nav-link" onclick="closeMobileNav()" style="background: rgba(245, 158, 11, 0.08); border-left: 3px solid #f59e0b;">
+                    <span class="nav-icon">🎓</span>
+                    <span>Program Duta Kampus (Afiliasi)</span>
+                    <span class="nav-badge" style="background: rgba(245, 158, 11, 0.2); color: #d97706; font-weight: 800;">Komisi 20%</span>
                 </a>
             </nav>
 
@@ -3399,6 +3411,17 @@
                     🔒 Terenkripsi SSL 256-bit • Kuota langsung bertambah otomatis dalam hitungan detik
                 </div>
             </div>
+
+            <!-- Callout Duta Kampus di Area Tarif -->
+            <div style="margin-top: 16px; padding: 16px 24px; background: linear-gradient(90deg, rgba(245, 158, 11, 0.08) 0%, rgba(99, 102, 241, 0.08) 100%); border: 1px dashed rgba(245, 158, 11, 0.4); border-radius: 16px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 14px;" data-aos="fade-up">
+                <div style="display: flex; align-items: center; gap: 12px; font-size: 13px; color: #1e293b;">
+                    <span style="font-size: 22px;">🎓</span>
+                    <span><strong>Peluang Mahasiswa &amp; Dosen:</strong> Ingin akses naskah gratis 30 hari &amp; penghasilan bagi hasil 20% di kampus Anda?</span>
+                </div>
+                <a href="<?= base_url('ambassador') ?>" class="btn" style="background: #f59e0b; color: #0f172a; font-weight: 800; font-size: 12.5px; padding: 9px 18px; border-radius: 10px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.25);">
+                    <span>Daftar Duta Kampus</span> &rarr;
+                </a>
+            </div>
         </div>
     </section>
 
@@ -3489,6 +3512,39 @@
                         <p>
                             Setiap laporan hasil telaah AR Tilik dilengkapi kode hash kriptografis unik dan tautan QR Code resmi yang mengarah ke portal verifikasi publik (<code>https://tilik.arsetontong.top/verify/{hash}</code>). Pihak perpustakaan prodi, dewan penguji skripsi, atau editor jurnal dapat memindai QR tersebut kapan saja untuk memvalidasi skor kesepadanan, tanggal terbit, dan keaslian sertifikat tanpa risiko pemalsuan PDF.
                         </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Khusus: Peluang Bergabung Duta Kampus AR Tilik -->
+    <section id="duta-kampus-cta" class="section" style="background: linear-gradient(135deg, #090d16 0%, #1e1b4b 60%, #0f172a 100%); padding: 70px 0; border-top: 1px solid rgba(255,255,255,0.08); border-bottom: 1px solid rgba(255,255,255,0.08); color: #ffffff; position: relative; overflow: hidden;">
+        <div class="container" style="position: relative; z-index: 2;">
+            <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(245, 158, 11, 0.35); border-radius: 28px; padding: 44px 36px; display: flex; flex-direction: column; lg:flex-row; gap: 32px; align-items: center; justify-content: space-between; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); backdrop-filter: blur(12px);" data-aos="fade-up" data-aos-duration="800">
+                <div style="max-width: 650px;">
+                    <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); padding: 5px 14px; border-radius: 9999px; font-size: 11px; font-weight: 800; color: #f59e0b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px;">
+                        <span>🎓</span> <span>Program Afiliasi &amp; Kemitraan Kampus</span>
+                    </div>
+                    <h2 style="font-size: 28px; font-weight: 800; line-height: 1.3; color: #ffffff; margin-bottom: 14px; letter-spacing: -0.5px;">
+                        Jadilah <span style="background: linear-gradient(90deg, #f59e0b, #fbbf24); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Duta Kampus AR Tilik</span> di Universitas Anda
+                    </h2>
+                    <p style="font-size: 14px; color: #cbd5e1; line-height: 1.6; margin-bottom: 20px;">
+                        Bantu rekan mahasiswa, peneliti, dan dosen di kampus Anda mengakses uji kemiripan naskah yang adil dan transparan. Dapatkan <strong>Akun Premium 30 Hari Gratis</strong>, <strong>Bagi Hasil 20%</strong> untuk setiap transaksi dari kode referral Anda, serta <strong>Sertifikat Pengabdian Resmi</strong>.
+                    </p>
+                    <div style="display: flex; flex-wrap: wrap; gap: 16px; font-size: 12px; color: #94a3b8;">
+                        <span style="display: flex; align-items: center; gap: 6px;"><strong style="color: #10b981;">✓</strong> Tanpa Modal &amp; Biaya Pendaftaran</span>
+                        <span style="display: flex; align-items: center; gap: 6px;"><strong style="color: #10b981;">✓</strong> Dilengkapi Welcome Kit &amp; Copywriting Siap Pakai</span>
+                        <span style="display: flex; align-items: center; gap: 6px;"><strong style="color: #10b981;">✓</strong> Pencairan Komisi Tiap Akhir Bulan</span>
+                    </div>
+                </div>
+
+                <div style="flex-shrink: 0; text-align: center; width: 100%; max-width: 280px;">
+                    <a href="<?= base_url('ambassador') ?>" class="btn" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #090d16; font-weight: 800; font-size: 15px; padding: 16px 28px; border-radius: 16px; width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; box-shadow: 0 10px 25px rgba(245, 158, 11, 0.35); transition: transform 0.2s ease;">
+                        <span>🚀</span> <span>Daftar Jadi Duta</span> &rarr;
+                    </a>
+                    <div style="font-size: 11px; color: #64748b; margin-top: 10px;">
+                        Seleksi berkas &amp; aktivasi kode dalam 1×24 jam kerja
                     </div>
                 </div>
             </div>

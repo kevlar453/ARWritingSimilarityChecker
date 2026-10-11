@@ -53,6 +53,35 @@ class AmbassadorController extends BaseController
     }
 
     /**
+     * Panduan 1 Halaman & Welcome Kit Duta Kampus (Materi & Template Promosi Siap Salin)
+     */
+    public function guide()
+    {
+        $session = session();
+        $userId = $session->get('user_id');
+
+        $userModel = new \App\Models\UserModel();
+        $currentUser = $userId ? $userModel->find($userId) : null;
+
+        $profile = null;
+        if ($userId) {
+            $profileModel = new AmbassadorProfileModel();
+            $profile = $profileModel->getProfileWithStats($userId);
+        }
+
+        // Tentukan kode referral & URL default jika belum login atau belum aktif
+        $referralCode = $profile['referral_code'] ?? 'TILIK-KAMPUS-NAMA';
+        $referralUrl  = !empty($profile['referral_url']) ? $profile['referral_url'] : base_url('ref/' . $referralCode);
+
+        return view('ambassador/guide', [
+            'currentUser'  => $currentUser,
+            'profile'      => $profile,
+            'referralCode' => $referralCode,
+            'referralUrl'  => $referralUrl,
+        ]);
+    }
+
+    /**
      * Memproses Pengajuan Pendaftaran Duta Kampus (Tahap 1 POST)
      */
     public function apply(): ResponseInterface

@@ -35,7 +35,10 @@
                     <span class="text-[10px] text-amber-400 font-mono block leading-none">Dashboard Duta Kampus</span>
                 </div>
             </a>
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2.5 flex-wrap">
+                <a href="<?= base_url('ambassador/guide') ?>" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-amber-300 hover:text-white bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/30 transition shadow-xs">
+                    <span>📖</span> <span>Panduan &amp; Template Promosi</span>
+                </a>
                 <a href="<?= base_url('dashboard') ?>" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-200 hover:text-white bg-slate-900 hover:bg-slate-800 border border-white/15 transition shadow-xs">
                     <span>&larr;</span> <span>Kembali ke Dashboard</span>
                 </a>
@@ -111,7 +114,10 @@
                         $waShareUrl = "https://wa.me/?text=" . urlencode($waShareText);
                     ?>
                     <a href="<?= $waShareUrl ?>" target="_blank" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-2 shadow-md shadow-emerald-600/20 transition">
-                        <span>📲</span> <span>Bagikan ke Grup WhatsApp Angkatan</span>
+                        <span>📲</span> <span>Bagikan Cepat ke WhatsApp</span>
+                    </a>
+                    <a href="<?= base_url('ambassador/guide') ?>" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center gap-2 shadow-md shadow-indigo-600/20 transition">
+                        <span>📖</span> <span>Template Copywriting Siap Salin</span> &rarr;
                     </a>
                     <span class="text-[11px] text-slate-400">
                         Teman yang mendaftar melalui link Anda otomatis mendapat <strong>+1 bonus cek naskah gratis</strong>.

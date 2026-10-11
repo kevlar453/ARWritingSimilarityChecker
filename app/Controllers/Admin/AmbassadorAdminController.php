@@ -151,6 +151,7 @@ class AmbassadorAdminController extends BaseController
             . "📋 **Ketentuan Masa Percobaan (Bulan 1):**\n"
             . "• Jalankan minimal 8x posting promosi (Story WA/IG/Grup angkatan) ATAU hasilkan 3 transaksi referral.\n"
             . "• Komisi bagi hasil 20% dicairkan di akhir bulan.\n"
+            . "• Panduan & Template Promosi Siap Salin (Welcome Kit): " . base_url('ambassador/guide') . "\n"
             . "• Pantau statistik & unggah bukti promosi di: " . base_url('ambassador/dashboard') . "\n\n"
             . "Selamat berkontribusi menjaga integritas karya ilmiah kampus Anda!\n\n"
             . "Salam sukses,\nFounder AR Tilik";

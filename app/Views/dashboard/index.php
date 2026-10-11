@@ -235,6 +235,16 @@
                     Buka Dashboard Duta &amp; Rekap &rarr;
                 </a>
             </div>
+            <?php else: ?>
+            <div class="mt-3 pt-3 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase bg-amber-500/20 text-amber-300 border border-amber-500/30">Peluang Mitra</span>
+                    <span class="text-slate-300">Jadilah <strong>Duta Kampus AR Tilik</strong>: Dapatkan akun premium 30 hari gratis &amp; komisi bagi hasil 20%!</span>
+                </div>
+                <a href="<?= base_url('ambassador') ?>" class="text-amber-300 hover:text-white font-bold inline-flex items-center gap-1 transition whitespace-nowrap">
+                    Daftar Duta Kampus &rarr;
+                </a>
+            </div>
             <?php endif; ?>
         </div>
         <?php else: ?>

@@ -57,6 +57,7 @@ $routes->get('feedback/status/(:num)', 'FeedbackController::getStatus/$1');
 
 // Ambassador & Referral Program Routes (Fase 2)
 $routes->get('ambassador', 'AmbassadorController::index');
+$routes->get('ambassador/guide', 'AmbassadorController::guide');
 $routes->post('ambassador/apply', 'AmbassadorController::apply');
 $routes->get('ambassador/verify/(:segment)', 'AmbassadorController::verify/$1');
 $routes->post('ambassador/verify/(:segment)', 'AmbassadorController::submitVerification/$1');
