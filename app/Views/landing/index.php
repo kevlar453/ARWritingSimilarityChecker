@@ -758,6 +758,13 @@
         /* Section Styling */
         .section {
             padding: 90px 0;
+            content-visibility: auto;
+            contain-intrinsic-size: 1px 700px;
+        }
+
+        .faq-section, .footer {
+            content-visibility: auto;
+            contain-intrinsic-size: 1px 600px;
         }
 
         .section-header {
