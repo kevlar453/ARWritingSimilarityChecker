@@ -2047,7 +2047,8 @@
             z-index: 1050;
             box-shadow: -8px 0 32px rgba(15, 23, 42, 0.25);
             transform: translateX(100%);
-            transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+            visibility: hidden;
+            transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.32s ease;
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -2055,6 +2056,7 @@
 
         .mobile-nav-drawer.active {
             transform: translateX(0);
+            visibility: visible;
         }
 
         .mobile-drawer-header {
@@ -2970,7 +2972,7 @@
     <div id="mobileNavOverlay" class="mobile-nav-overlay" onclick="closeMobileNav()"></div>
 
     <!-- Mobile Navigation Drawer -->
-    <div id="mobileNavDrawer" class="mobile-nav-drawer" aria-hidden="true">
+    <div id="mobileNavDrawer" class="mobile-nav-drawer" aria-hidden="true" inert>
         <div class="mobile-drawer-header">
             <a href="<?= base_url() ?>" class="brand" onclick="closeMobileNav()">
                 <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik Logo" width="30" height="30" style="width: 30px; height: 30px; object-fit: contain; border-radius: 8px;">
@@ -3129,17 +3131,17 @@
         <div class="container">
             <div class="hero-grid">
                 <div>
-                    <div class="hero-badge" data-aos="fade-down" data-aos-duration="600">
+                    <div class="hero-badge">
                         <span>🏛️</span> Standar Keadilan Akademik &bull; OJS 3.x Ready &bull; Lintas Bahasa EN⇄ID &bull; Anti-Cheat Shield
                     </div>
-                    <h1 class="hero-title" data-aos="fade-up" data-aos-duration="700">
+                    <h1 class="hero-title">
                         Cek Plagiarisme &amp; Penelaah Kesepadanan Naskah Berbasis <span>Bukti Ilmiah Terbuka</span>
                     </h1>
-                    <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="100" data-aos-duration="700">
+                    <p class="hero-subtitle">
                         AR Tilik hadir bukan untuk memvonis karya, melainkan menyediakan dekomposisi bukti kemiripan transparan, kesadaran konteks sitasi, audit kepatuhan daftar pustaka, integrasi otomatis OJS 3.x, serta sintesis risiko akademik terkalibrasi untuk sivitas perguruan tinggi.
                     </p>
 
-                    <div class="hero-buttons" data-aos="fade-up" data-aos-delay="200" data-aos-duration="700">
+                    <div class="hero-buttons">
                         <?php if ($currentUser) : ?>
                             <a href="<?= base_url('dashboard') ?>" class="btn btn-primary">
                                 <span>🚀</span> Buka Dashboard Pemeriksaan
@@ -5357,6 +5359,7 @@
             drawer.classList.add('active');
             overlay.classList.add('active');
             drawer.setAttribute('aria-hidden', 'false');
+            drawer.removeAttribute('inert');
             if (btn) {
                 btn.classList.add('active');
                 btn.setAttribute('aria-expanded', 'true');
@@ -5373,6 +5376,7 @@
             drawer.classList.remove('active');
             overlay.classList.remove('active');
             drawer.setAttribute('aria-hidden', 'true');
+            drawer.setAttribute('inert', '');
             if (btn) {
                 btn.classList.remove('active');
                 btn.setAttribute('aria-expanded', 'false');
