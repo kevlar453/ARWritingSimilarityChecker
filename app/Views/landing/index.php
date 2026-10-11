@@ -191,15 +191,51 @@
     <link rel="apple-touch-icon" sizes="180x180" href="<?= base_url('apple-touch-icon.png?v=20261012') ?>">
     <link rel="shortcut icon" type="image/x-icon" href="<?= base_url('favicon.ico?v=20261012') ?>">
     <link rel="manifest" href="<?= base_url('site.webmanifest?v=20261012') ?>">
+    <!-- Preload Hero LCP Candidate Image -->
+    <link rel="preload" as="image" href="<?= base_url('images/hero_illustration.webp') ?>" type="image/webp" fetchpriority="high">
+
+    <!-- Fonts & Performance Preconnects -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-    <!-- Animate On Scroll (AOS) -->
-    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript>
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    </noscript>
 
-    <!-- Google AdSense -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9248253613564140"
-         crossorigin="anonymous"></script>
+    <!-- Animate On Scroll (AOS) Non-blocking -->
+    <link rel="preload" as="style" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" media="print" onload="this.media='all'">
+    <noscript>
+        <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
+    </noscript>
+
+    <!-- Google AdSense (Lazy load upon user interaction or idle callback to prevent blocking LCP / TBT) -->
+    <script>
+        (function() {
+            var adsLoaded = false;
+            function initAdSense() {
+                if (adsLoaded) return;
+                adsLoaded = true;
+                ['scroll', 'mousemove', 'touchstart', 'click', 'keydown'].forEach(function(evt) {
+                    window.removeEventListener(evt, initAdSense, { passive: true });
+                });
+                var adScript = document.createElement('script');
+                adScript.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9248253613564140';
+                adScript.async = true;
+                adScript.crossOrigin = 'anonymous';
+                document.head.appendChild(adScript);
+            }
+            ['scroll', 'mousemove', 'touchstart', 'click', 'keydown'].forEach(function(evt) {
+                window.addEventListener(evt, initAdSense, { once: true, passive: true });
+            });
+            if ('requestIdleCallback' in window) {
+                requestIdleCallback(function() { setTimeout(initAdSense, 4500); });
+            } else {
+                setTimeout(initAdSense, 4500);
+            }
+        })();
+    </script>
 
     <style>
         :root {
@@ -3173,7 +3209,7 @@
                     <div class="hero-visual-card">
                         <picture>
                             <source srcset="<?= base_url('images/hero_illustration.webp') ?>" type="image/webp">
-                            <img src="<?= base_url('images/hero_illustration.jpg') ?>" alt="Analisis Naskah Akademik AR Tilik" width="800" height="450" fetchpriority="high">
+                            <img src="<?= base_url('images/hero_illustration.jpg') ?>" alt="Analisis Naskah Akademik AR Tilik" width="800" height="450" fetchpriority="high" decoding="async">
                         </picture>
                         <div class="hero-visual-overlay">
                             <span class="hero-visual-tag">
@@ -5268,7 +5304,7 @@
     </script>
 
     <!-- AOS (Animate On Scroll) Library & Initialization -->
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script defer src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
         function toggleFaq(btn) {
             const card = btn.closest('.faq-card');
@@ -5478,14 +5514,21 @@
                 }
             }, { passive: true });
 
+            function initAOS() {
+                if (typeof AOS !== 'undefined') {
+                    AOS.init({
+                        duration: 750,
+                        easing: 'ease-out-cubic',
+                        once: false,
+                        mirror: true,
+                        offset: 70
+                    });
+                }
+            }
             if (typeof AOS !== 'undefined') {
-                AOS.init({
-                    duration: 750,
-                    easing: 'ease-out-cubic',
-                    once: false,
-                    mirror: true,
-                    offset: 70
-                });
+                initAOS();
+            } else {
+                window.addEventListener('load', initAOS);
             }
         });
     </script>
