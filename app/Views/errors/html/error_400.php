@@ -281,9 +281,9 @@ $homeUrl = function_exists('base_url') ? base_url('/') : '/';
                 </div>
 
                 <div class="actions">
-                    <a href="javascript:history.back()" class="btn btn-primary">
+                    <button type="button" onclick="history.back()" class="btn btn-primary" style="font: inherit; cursor: pointer; border: none;">
                         <span>←</span> Kembali ke Halaman Sebelumnya
-                    </a>
+                    </button>
                     <a href="<?= esc($homeUrl) ?>" class="btn btn-secondary">
                         <span>📊</span> Buka Dashboard
                     </a>

@@ -1343,13 +1343,21 @@
             gap: 10px;
         }
 
-        .footer-links a {
+        .footer-links a,
+        .footer-links button {
             color: #94a3b8;
             text-decoration: none;
             transition: color 0.2s;
+            background: none;
+            border: none;
+            padding: 0;
+            font: inherit;
+            cursor: pointer;
+            text-align: left;
         }
 
-        .footer-links a:hover {
+        .footer-links a:hover,
+        .footer-links button:hover {
             color: #ffffff;
         }
 
@@ -2841,7 +2849,7 @@
     <header class="navbar">
         <div class="container nav-inner">
             <a href="<?= base_url() ?>" class="brand">
-                <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik Logo" class="brand-logo">
+                <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik Logo" class="brand-logo" width="40" height="40">
                 <div class="brand-text">
                     <span class="brand-title">AR Tilik</span>
                     <span class="brand-badge">v1.3.0</span>
@@ -2962,7 +2970,7 @@
     <div id="mobileNavDrawer" class="mobile-nav-drawer" aria-hidden="true">
         <div class="mobile-drawer-header">
             <a href="<?= base_url() ?>" class="brand" onclick="closeMobileNav()">
-                <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik Logo" style="width: 30px; height: 30px; object-fit: contain; border-radius: 8px;">
+                <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik Logo" width="30" height="30" style="width: 30px; height: 30px; object-fit: contain; border-radius: 8px;">
                 <div class="brand-text">
                     <span class="brand-title" style="font-size: 18px;">AR Tilik</span>
                     <span class="brand-badge">v1.3.0</span>
@@ -3087,11 +3095,11 @@
                     <span>Konektor PHP OJS 3.x</span>
                     <span class="nav-badge">PHP</span>
                 </a>
-                <a href="javascript:void(0)" onclick="closeMobileNav(); openContactModal('Pertanyaan Umum');" class="mobile-nav-link">
+                <button type="button" onclick="closeMobileNav(); openContactModal('Pertanyaan Umum');" class="mobile-nav-link" style="width: 100%; border: none; background: transparent; text-align: left; cursor: pointer; font: inherit;">
                     <span class="nav-icon">💬</span>
                     <span>Hubungi Tim Pengembang</span>
                     <span class="nav-arrow">›</span>
-                </a>
+                </button>
             </nav>
         </div>
 
@@ -3109,6 +3117,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Main Content Landmark -->
+    <main id="main-content">
 
     <!-- Hero Section -->
     <section class="hero">
@@ -3135,7 +3146,7 @@
                                 <span>✨</span> Mulai Gratis (3 Submisi/Minggu)
                             </button>
                         <?php endif; ?>
-                        <a href="#integrasi-ojs" class="btn btn-outline" style="border-color: #f43f5e; color: #e11d48; background: #fff1f2;">
+                        <a href="#integrasi-ojs" class="btn btn-outline" style="border-color: #f43f5e; color: #be123c; background: #fff1f2;">
                             <span>📕</span> Panduan OJS 3.x (PDF)
                         </a>
                         <a href="#fitur-unggulan" class="btn btn-outline">
@@ -3574,7 +3585,7 @@
                         </div>
                         <span style="font-size: 11px; color: #f43f5e; font-weight: 700;">● Terhubung REST API v1</span>
                     </div>
-                    <img src="<?= base_url('images/ojs_integration_admin.png') ?>" alt="Integrasi AR Tilik pada Alur Kerja Editor OJS 3.x" style="width: 100%; height: auto; border-radius: 10px; display: block;" loading="lazy">
+                    <img src="<?= base_url('images/ojs_integration_admin.png') ?>" alt="Integrasi AR Tilik pada Alur Kerja Editor OJS 3.x" width="1024" height="479" style="width: 100%; height: auto; border-radius: 10px; display: block;" loading="lazy">
                 </div>
             </div>
 
@@ -4440,6 +4451,7 @@
             </div>
         </div>
     </section>
+    </main>
 
     <!-- Footer -->
     <footer class="footer" data-aos="fade-in" data-aos-duration="800">
@@ -4447,7 +4459,7 @@
             <div class="footer-grid">
                 <div>
                     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
-                        <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik Logo" style="width: 34px; height: 34px; object-fit: contain; border-radius: 8px;">
+                        <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik Logo" width="34" height="34" style="width: 34px; height: 34px; object-fit: contain; border-radius: 8px;">
                         <span style="font-size: 20px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px;">AR Tilik</span>
                     </div>
                     <p style="line-height: 1.6; max-width: 380px;">
@@ -4479,7 +4491,7 @@
                         <?php if ($currentUser) : ?>
                             <li><a href="<?= base_url('dashboard') ?>">Dashboard Pemeriksaan</a></li>
                         <?php else : ?>
-                            <li><a href="javascript:void(0)" onclick="openAuthModal('login')">Masuk Dashboard</a></li>
+                            <li><button type="button" onclick="openAuthModal('login')">Masuk Dashboard</button></li>
                         <?php endif; ?>
                     </ul>
                 </div>
@@ -4495,7 +4507,7 @@
                         <li><a href="<?= base_url('sitemap.xml') ?>" target="_blank">Peta Situs (Sitemap XML)</a></li>
                         <li><a href="<?= base_url('privacy') ?>" onclick="openLegalModal('privacy', event)">Kebijakan Privasi</a></li>
                         <li><a href="<?= base_url('terms') ?>" onclick="openLegalModal('terms', event)">Ketentuan Layanan (ToS)</a></li>
-                        <li><a href="javascript:void(0)" onclick="openContactModal('Pertanyaan Umum')">Kontak Pengembang</a></li>
+                        <li><button type="button" onclick="openContactModal('Pertanyaan Umum')">Kontak Pengembang</button></li>
                     </ul>
                 </div>
             </div>
@@ -4529,7 +4541,7 @@
         <div class="modal-card">
             <div class="modal-header">
                 <div style="display: flex; align-items: center; gap: 10px;">
-                    <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik Logo" style="width: 26px; height: 26px; object-fit: contain; border-radius: 6px;">
+                    <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik Logo" width="26" height="26" style="width: 26px; height: 26px; object-fit: contain; border-radius: 6px;">
                     <div class="modal-title" id="modalTitle">Masuk ke AR Tilik</div>
                 </div>
                 <button type="button" class="modal-close" onclick="closeAuthModal()">&times;</button>
@@ -4558,9 +4570,9 @@
                     <div class="form-group">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                             <label class="form-label" for="loginPassword" style="margin-bottom: 0;">Kata Sandi</label>
-                            <a href="javascript:void(0)" onclick="switchTab('forgot')" style="font-size: 11px; font-weight: 700; color: var(--primary); text-decoration: none;">
+                            <button type="button" onclick="switchTab('forgot')" style="background: none; border: none; padding: 0; font-family: inherit; font-size: 11px; font-weight: 700; color: var(--primary); text-decoration: none; cursor: pointer;">
                                 Lupa Kata Sandi?
-                            </a>
+                            </button>
                         </div>
                         <input type="password" id="loginPassword" name="password" class="form-control" placeholder="••••••••" required>
                     </div>
@@ -4595,9 +4607,9 @@
                     </button>
 
                     <div style="text-align: center; margin-top: 14px;">
-                        <a href="javascript:void(0)" onclick="switchTab('login')" style="font-size: 12px; font-weight: 700; color: var(--primary); text-decoration: underline;">
+                        <button type="button" onclick="switchTab('login')" style="background: none; border: none; padding: 0; font-family: inherit; font-size: 12px; font-weight: 700; color: var(--primary); text-decoration: underline; cursor: pointer;">
                             ← Kembali ke Halaman Masuk
-                        </a>
+                        </button>
                     </div>
                 </form>
 
@@ -4741,11 +4753,11 @@
         <div class="modal-card modal-card-lg">
             <div class="modal-header" style="border-bottom: 1px solid var(--border); padding: 18px 24px;">
                 <div style="display: flex; align-items: center; gap: 10px;">
-                    <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik Logo" style="width: 24px; height: 24px; object-fit: contain;">
+                    <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik Logo" width="24" height="24" style="width: 24px; height: 24px; object-fit: contain;">
                     <div class="modal-title" id="legalModalTitle" style="font-size: 17px; font-weight: 800; color: var(--dark);">Dokumen Legal</div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 12px;">
-                    <a id="legalFullPageLink" href="#" target="_blank" style="font-size: 12px; color: var(--primary); font-weight: 700; text-decoration: underline;">
+                    <a id="legalFullPageLink" href="<?= base_url('privacy') ?>" target="_blank" style="font-size: 12px; color: var(--primary); font-weight: 700; text-decoration: underline;">
                         Buka Halaman Penuh ↗
                     </a>
                     <button type="button" class="modal-close" onclick="closeLegalModal()">&times;</button>
@@ -4886,7 +4898,7 @@
                 if (!res.ok || data.status === 'error') {
                     if (data.needs_verification) {
                         showAlert('⚠️ ' + data.message + 
-                            '<br><a href="javascript:void(0)" onclick="resendVerification(\'' + (data.email || loginEmailVal) + '\')" style="color:var(--primary); font-weight:700; text-decoration:underline; display:inline-block; margin-top:8px;">✉️ Kirim Ulang Tautan Aktivasi Sekarang</a>', true);
+                            '<br><button type="button" onclick="resendVerification(\'' + (data.email || loginEmailVal) + '\')" style="background:none; border:none; padding:0; cursor:pointer; font-family:inherit; color:var(--primary); font-weight:700; text-decoration:underline; display:inline-block; margin-top:8px;">✉️ Kirim Ulang Tautan Aktivasi Sekarang</button>', true);
                     } else {
                         showAlert(data.message || 'Gagal masuk akun. Periksa email & kata sandi.', true);
                     }
@@ -4930,7 +4942,7 @@
                 if (!res.ok || data.status === 'error') {
                     if (data.needs_verification) {
                         showAlert('⚠️ ' + (data.message || 'Email sudah terdaftar namun belum diverifikasi.') + 
-                            '<br><a href="javascript:void(0)" onclick="resendVerification(\'' + userEmail + '\')" style="color:var(--primary); font-weight:700; text-decoration:underline; display:inline-block; margin-top:6px;">Kirim Ulang Email Aktivasi</a>', true);
+                            '<br><button type="button" onclick="resendVerification(\'' + userEmail + '\')" style="background:none; border:none; padding:0; cursor:pointer; font-family:inherit; color:var(--primary); font-weight:700; text-decoration:underline; display:inline-block; margin-top:6px;">Kirim Ulang Email Aktivasi</button>', true);
                     } else {
                         showAlert(data.message || 'Gagal mendaftar. Silakan lengkapi formulir.', true);
                     }
@@ -4939,7 +4951,7 @@
                     showAlert('🎉 <strong>Pendaftaran Berhasil!</strong><br>' + 
                         'Kami telah mengirimkan tautan verifikasi ke <strong>' + userEmail + '</strong>.<br>' +
                         '<span style="font-size:12px; color:#475569; display:block; margin-top:6px;">Silakan buka kotak masuk atau spam email Anda dan klik tautan aktivasi untuk mengaktifkan akun AR Tilik.</span>' +
-                        '<div style="margin-top:10px;"><a href="javascript:void(0)" onclick="resendVerification(\'' + userEmail + '\')" style="font-size:12px; color:var(--primary); font-weight:700; text-decoration:underline;">Belum menerima email? Kirim Ulang</a></div>', false);
+                        '<div style="margin-top:10px;"><button type="button" onclick="resendVerification(\'' + userEmail + '\')" style="background:none; border:none; padding:0; cursor:pointer; font-family:inherit; font-size:12px; color:var(--primary); font-weight:700; text-decoration:underline;">Belum menerima email? Kirim Ulang</button></div>', false);
                 }
             } catch (err) {
                 showAlert('Kendala koneksi peladen. Silakan coba kembali.', true);
@@ -5003,7 +5015,7 @@
                     form.reset();
                     showAlert('✉️ <strong>Permintaan Terkirim!</strong><br>' + 
                         (data.message || 'Tautan atur ulang kata sandi telah dikirimkan ke email Anda.') + 
-                        '<div style="margin-top:10px;"><a href="javascript:void(0)" onclick="switchTab(\'login\')" style="font-size:12px; color:var(--primary); font-weight:700; text-decoration:underline;">← Kembali ke Halaman Masuk</a></div>', false);
+                        '<div style="margin-top:10px;"><button type="button" onclick="switchTab(\'login\')" style="background:none; border:none; padding:0; cursor:pointer; font-family:inherit; font-size:12px; color:var(--primary); font-weight:700; text-decoration:underline;">← Kembali ke Halaman Masuk</button></div>', false);
                 }
             } catch (err) {
                 showAlert('Kendala koneksi peladen. Silakan coba kembali.', true);
@@ -5114,7 +5126,7 @@
                         emailInput.style.borderColor = '#10b981';
                         let html = '<span style="color:#059669; font-weight:600;">✓ Server email aktif & domain valid (' + (data.domain || '') + ')</span>';
                         if (data.suggestion) {
-                            html += '<span style="color:#d97706; margin-top:2px;">💡 Apakah maksud Anda: <a href="javascript:void(0)" onclick="applyEmailSuggestion(\'' + data.suggestion + '\')" style="color:#d97706; font-weight:700; text-decoration:underline;">' + data.suggestion + '</a>?</span>';
+                            html += '<span style="color:#d97706; margin-top:2px;">💡 Apakah maksud Anda: <button type="button" onclick="applyEmailSuggestion(\'' + data.suggestion + '\')" style="background:none; border:none; padding:0; cursor:pointer; font-family:inherit; color:#d97706; font-weight:700; text-decoration:underline;">' + data.suggestion + '</button>?</span>';
                         }
                         feedbackEl.innerHTML = html;
                     } else {
@@ -5122,7 +5134,7 @@
                         emailInput.style.borderColor = '#ef4444';
                         let html = '<span style="color:#dc2626; font-weight:600;">⚠️ ' + (data.reason || 'Email terindikasi tidak aktif atau fiktif.') + '</span>';
                         if (data.suggestion) {
-                            html += '<span style="color:#d97706; margin-top:2px;">💡 Apakah maksud Anda: <a href="javascript:void(0)" onclick="applyEmailSuggestion(\'' + data.suggestion + '\')" style="color:#d97706; font-weight:700; text-decoration:underline;">' + data.suggestion + '</a>?</span>';
+                            html += '<span style="color:#d97706; margin-top:2px;">💡 Apakah maksud Anda: <button type="button" onclick="applyEmailSuggestion(\'' + data.suggestion + '\')" style="background:none; border:none; padding:0; cursor:pointer; font-family:inherit; color:#d97706; font-weight:700; text-decoration:underline;">' + data.suggestion + '</button>?</span>';
                         }
                         feedbackEl.innerHTML = html;
                     }
@@ -5387,7 +5399,7 @@
                 if (reasonParam === 'expired') {
                     const unvEmail = urlParams.get('email') || '';
                     errText = '⏱️ Tautan verifikasi telah kedaluwarsa (berlaku 24 jam).<br>' +
-                        '<a href="javascript:void(0)" onclick="resendVerification(\'' + unvEmail + '\')" style="color:var(--primary); font-weight:700; text-decoration:underline; display:inline-block; margin-top:6px;">Klik di sini untuk mengirimkan tautan aktivasi baru.</a>';
+                        '<button type="button" onclick="resendVerification(\'' + unvEmail + '\')" style="background:none; border:none; padding:0; cursor:pointer; font-family:inherit; color:var(--primary); font-weight:700; text-decoration:underline; display:inline-block; margin-top:6px;">Klik di sini untuk mengirimkan tautan aktivasi baru.</button>';
                 }
                 showAlert(errText, true);
             } else if (verifiedParam === 'success') {
@@ -5401,7 +5413,7 @@
                 let errText = 'Tautan atur ulang kata sandi tidak valid atau telah kedaluwarsa.';
                 if (reasonParam === 'expired') {
                     errText = '⏱️ Tautan atur ulang kata sandi telah kedaluwarsa (berlaku 1 jam).<br>' +
-                        '<a href="javascript:void(0)" onclick="switchTab(\'forgot\')" style="color:var(--primary); font-weight:700; text-decoration:underline; display:inline-block; margin-top:6px;">Klik di sini untuk mengajukan permintaan baru.</a>';
+                        '<button type="button" onclick="switchTab(\'forgot\')" style="background:none; border:none; padding:0; cursor:pointer; font-family:inherit; color:var(--primary); font-weight:700; text-decoration:underline; display:inline-block; margin-top:6px;">Klik di sini untuk mengajukan permintaan baru.</button>';
                 }
                 showAlert(errText, true);
             } else if (authParam === 'login' || authParam === 'register' || authParam === 'forgot') {
