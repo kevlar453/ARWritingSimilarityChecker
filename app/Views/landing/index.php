@@ -254,23 +254,23 @@
             right: 0;
             width: 100%;
             z-index: 990;
-            background: rgba(255, 255, 255, 0.90);
+            background: rgba(255, 255, 255, 0.92);
             backdrop-filter: blur(14px);
             -webkit-backdrop-filter: blur(14px);
             border-bottom: 1px solid var(--border);
-            padding: 14px 0;
+            padding: 9px 0;
             transition: padding 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
         }
 
         .navbar.scrolled {
-            padding: 10px 0;
-            background: rgba(255, 255, 255, 0.96);
-            box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08);
-            border-bottom-color: rgba(226, 232, 240, 0.8);
+            padding: 7px 0;
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 4px 18px -2px rgba(15, 23, 42, 0.07);
+            border-bottom-color: rgba(226, 232, 240, 0.85);
         }
 
         .navbar .container {
-            max-width: 1320px;
+            max-width: 1240px;
         }
 
         /* Floating Go to Top Button */
@@ -339,44 +339,44 @@
         }
 
         .brand-logo {
-            width: 40px;
-            height: 40px;
+            width: 35px;
+            height: 35px;
             object-fit: contain;
-            border-radius: 10px;
-            filter: drop-shadow(0 2px 5px rgba(67, 56, 202, 0.18));
+            border-radius: 9px;
+            filter: drop-shadow(0 2px 4px rgba(67, 56, 202, 0.16));
         }
 
         .brand-text {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 7px;
         }
 
         .brand-title {
-            font-size: 20px;
+            font-size: 18.5px;
             font-weight: 800;
-            letter-spacing: -0.5px;
+            letter-spacing: -0.4px;
             background: linear-gradient(135deg, #4338ca 0%, #6366f1 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
         .brand-badge {
-            font-size: 10px;
+            font-size: 9.5px;
             font-weight: 700;
-            padding: 2px 7px;
-            border-radius: 12px;
+            padding: 1.5px 6px;
+            border-radius: 10px;
             background: #eef2ff;
             color: #4338ca;
             border: 1px solid #c7d2fe;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.2px;
         }
 
         .nav-links {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 3px;
             list-style: none;
             margin: 0;
             padding: 0;
@@ -385,15 +385,15 @@
         .nav-links > li > a {
             text-decoration: none;
             color: var(--text-muted);
-            font-size: 13.5px;
+            font-size: 13px;
             font-weight: 600;
-            padding: 7px 12px;
+            padding: 5.5px 9px;
             border-radius: 8px;
             transition: all 0.2s ease;
             white-space: nowrap;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
         }
 
         .nav-links > li > a:hover {
@@ -409,15 +409,15 @@
         .nav-dropdown-toggle {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
             background: transparent;
             border: none;
             color: var(--text-muted);
-            font-size: 13.5px;
+            font-size: 13px;
             font-weight: 600;
             font-family: inherit;
             cursor: pointer;
-            padding: 7px 12px;
+            padding: 5.5px 9px;
             border-radius: 8px;
             transition: all 0.2s ease;
             white-space: nowrap;
@@ -534,6 +534,8 @@
             background: rgba(67, 56, 202, 0.04) !important;
             color: var(--primary) !important;
             font-weight: 700 !important;
+            padding: 5.5px 9px !important;
+            font-size: 12.5px !important;
         }
 
         .nav-link-verify:hover {
@@ -543,13 +545,15 @@
 
         /* Duta Kampus Nav Pill */
         .nav-link-ambassador {
-            border: 1px solid rgba(245, 158, 11, 0.3) !important;
+            border: 1px solid rgba(245, 158, 11, 0.28) !important;
             background: rgba(245, 158, 11, 0.08) !important;
             color: #b45309 !important;
             font-weight: 700 !important;
             display: inline-flex !important;
             align-items: center !important;
-            gap: 6px !important;
+            gap: 5px !important;
+            padding: 5.5px 9px !important;
+            font-size: 12.5px !important;
         }
 
         .nav-link-ambassador:hover {
@@ -560,15 +564,15 @@
         }
 
         .nav-badge-ambassador {
-            font-size: 10px;
+            font-size: 9.5px;
             font-weight: 800;
             line-height: 1;
-            padding: 2px 5.5px;
+            padding: 1.5px 5px;
             border-radius: 9999px;
             background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
             color: #ffffff;
             letter-spacing: 0.2px;
-            box-shadow: 0 1px 3px rgba(217, 119, 6, 0.3);
+            box-shadow: 0 1px 3px rgba(217, 119, 6, 0.25);
             display: inline-flex;
             align-items: center;
         }
@@ -576,7 +580,7 @@
         .nav-actions {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             flex-shrink: 0;
         }
 
@@ -584,10 +588,10 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            padding: 10px 20px;
+            gap: 6px;
+            padding: 9px 18px;
             border-radius: 12px;
-            font-size: 14px;
+            font-size: 13.5px;
             font-weight: 700;
             text-decoration: none;
             cursor: pointer;
@@ -596,8 +600,9 @@
         }
 
         .btn-sm {
-            padding: 8px 16px;
-            font-size: 13px;
+            padding: 6.5px 13px;
+            font-size: 12.8px;
+            border-radius: 10px;
         }
 
         .btn-primary {
@@ -631,7 +636,7 @@
 
         /* Hero Section */
         .hero {
-            padding: 90px 0 60px;
+            padding: 76px 0 52px;
             position: relative;
             background: radial-gradient(circle at 50% 10%, rgba(99, 102, 241, 0.08) 0%, transparent 60%);
         }
@@ -2334,11 +2339,11 @@
             </a>
 
             <ul class="nav-links">
-                <!-- Dropdown: Fitur & Teknologi -->
+                <!-- Dropdown: Fitur & Solusi -->
                 <li class="nav-item-dropdown">
                     <button type="button" class="nav-dropdown-toggle" onclick="toggleNavDropdown(event)" aria-expanded="false" aria-haspopup="true">
-                        <span>Fitur &amp; Teknologi</span>
-                        <svg class="dropdown-chevron" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                        <span>Fitur &amp; Solusi</span>
+                        <svg class="dropdown-chevron" width="11" height="11" viewBox="0 0 12 12" fill="none">
                             <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                     </button>
@@ -2350,6 +2355,20 @@
                                 <span class="dropdown-sub">Dual-Lens 5-Gram &amp; Anti-Cheat Shield</span>
                             </div>
                         </a>
+                        <a href="#integrasi-ojs" class="dropdown-item" onclick="closeAllNavDropdowns()">
+                            <div class="dropdown-icon" style="background: #f0fdf4; color: #16a34a;">🔌</div>
+                            <div class="dropdown-content">
+                                <span class="dropdown-title">Integrasi OJS 3.x</span>
+                                <span class="dropdown-sub">Konektor otomatisasi naskah jurnal OJS</span>
+                            </div>
+                        </a>
+                        <a href="#solusi" class="dropdown-item" onclick="closeAllNavDropdowns()">
+                            <div class="dropdown-icon" style="background: #eff6ff; color: #2563eb;">🏛️</div>
+                            <div class="dropdown-content">
+                                <span class="dropdown-title">Solusi Institusi</span>
+                                <span class="dropdown-sub">Sivitas akademika, LPPM &amp; dewan penguji</span>
+                            </div>
+                        </a>
                         <a href="#cara-kerja" class="dropdown-item" onclick="closeAllNavDropdowns()">
                             <div class="dropdown-icon" style="background: #e0f2fe; color: #0284c7;">🔄</div>
                             <div class="dropdown-content">
@@ -2358,7 +2377,7 @@
                             </div>
                         </a>
                         <a href="#teori" class="dropdown-item" onclick="closeAllNavDropdowns()">
-                            <div class="dropdown-icon" style="background: #fdf4ff; color: #9333ea;">🏛️</div>
+                            <div class="dropdown-icon" style="background: #fdf4ff; color: #9333ea;">⚖️</div>
                             <div class="dropdown-content">
                                 <span class="dropdown-title">Filosofi &amp; Teori Bukti</span>
                                 <span class="dropdown-sub">Keadilan akademik &amp; kedaulatan naskah</span>
@@ -2374,16 +2393,14 @@
                     </div>
                 </li>
 
-                <li><a href="#integrasi-ojs">Integrasi OJS 3.x</a></li>
-                <li><a href="#solusi">Solusi Institusi</a></li>
                 <?php if (!empty($approvedTestimonials)): ?>
                     <li><a href="#testimoni">Testimoni</a></li>
                 <?php endif; ?>
-                <li><a href="#langganan">Paket Tarif</a></li>
+                <li><a href="#langganan">Tarif</a></li>
                 <li><a href="#faq">FAQ</a></li>
                 <li>
                     <a href="<?= base_url('ambassador') ?>" class="nav-link-ambassador" title="Program Kemitraan &amp; Afiliasi Duta Kampus (Komisi 20%)">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color: #d97706; flex-shrink: 0;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color: #d97706; flex-shrink: 0;">
                             <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
                             <path d="M6 12v5c3 3 9 3 12 0v-5"/>
                         </svg>
@@ -2392,8 +2409,8 @@
                     </a>
                 </li>
                 <li>
-                    <a href="<?= base_url('verify') ?>" class="nav-link-verify">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <a href="<?= base_url('verify') ?>" class="nav-link-verify" title="Verifikasi Keaslian Sertifikat &amp; Laporan">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                         </svg>
                         <span>Verifikasi QR</span>
@@ -2406,7 +2423,7 @@
                     <a href="<?= base_url('dashboard') ?>" class="btn btn-primary btn-sm">
                         <span>📊</span> Dashboard
                     </a>
-                    <a href="<?= base_url('auth/logout') ?>" class="btn btn-secondary btn-sm btn-desktop-only">
+                    <a href="<?= base_url('auth/logout') ?>" class="btn btn-secondary btn-sm btn-desktop-only" title="Keluar">
                         Keluar
                     </a>
                 <?php else : ?>
