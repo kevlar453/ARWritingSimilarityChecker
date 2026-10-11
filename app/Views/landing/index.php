@@ -2323,6 +2323,251 @@
             .nav-actions .btn-outline { display: none !important; }
             .browser-url { max-width: 150px; }
         }
+
+        /* ========================================================== */
+        /* TESTIMONIALS CAROUSEL (RESPONSIVE 3-COL DESKTOP / 1-COL MOBILE) */
+        /* ========================================================== */
+        .testi-carousel-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .testi-carousel-track {
+            display: flex;
+            gap: 24px;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            padding: 16px 4px 20px 4px;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        .testi-carousel-track::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Mode No-Carousel (Saat kartu <= batas kolom, misal <= 3 di desktop) */
+        @media (min-width: 1024px) {
+            .testi-carousel-track.no-carousel {
+                overflow-x: visible;
+                justify-content: center;
+                scroll-snap-type: none;
+            }
+        }
+        @media (min-width: 768px) and (max-width: 1023px) {
+            .testi-carousel-track.no-carousel {
+                overflow-x: visible;
+                justify-content: center;
+                scroll-snap-type: none;
+            }
+        }
+
+        /* Base Card Styling */
+        .testi-card {
+            scroll-snap-align: start;
+            flex: 0 0 100%;
+            width: 100%;
+            min-width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 26px 22px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+            position: relative;
+        }
+
+        .testi-card:hover {
+            box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.08);
+            border-color: #cbd5e1;
+        }
+
+        .testi-featured-badge {
+            position: absolute;
+            top: -10px;
+            right: 20px;
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+            border-radius: 20px;
+            padding: 2px 10px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+        }
+
+        /* Tablet (min-width: 768px and max-width: 1023px): 2 cards per view */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            .testi-card {
+                flex: 0 0 calc((100% - 24px) / 2);
+                width: calc((100% - 24px) / 2);
+                min-width: calc((100% - 24px) / 2);
+                max-width: calc((100% - 24px) / 2);
+            }
+        }
+
+        /* Desktop (min-width: 1024px): 3 cards per view */
+        @media (min-width: 1024px) {
+            .testi-card {
+                flex: 0 0 calc((100% - 48px) / 3);
+                width: calc((100% - 48px) / 3);
+                min-width: calc((100% - 48px) / 3);
+                max-width: calc((100% - 48px) / 3);
+                padding: 28px;
+            }
+        }
+
+        /* Floating Nav Arrows for Desktop/Tablet */
+        .testi-nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+            color: var(--text-dark, #1e293b);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        .testi-nav-arrow:hover:not(:disabled) {
+            background: var(--primary, #4338ca);
+            color: #ffffff;
+            border-color: var(--primary, #4338ca);
+            box-shadow: 0 6px 20px rgba(67, 56, 202, 0.25);
+            transform: translateY(-50%) scale(1.06);
+        }
+
+        .testi-nav-arrow:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .testi-prev-arrow {
+            left: -22px;
+        }
+
+        .testi-next-arrow {
+            right: -22px;
+        }
+
+        /* Controls Bar (Dots & Mobile Nav) */
+        .testi-controls-bar {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .testi-controls-inner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .testi-dots-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .testi-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 9999px;
+            background: #cbd5e1;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            padding: 0;
+        }
+
+        .testi-dot:hover {
+            background: #94a3b8;
+        }
+
+        .testi-dot.active {
+            width: 26px;
+            background: var(--primary, #4338ca);
+            box-shadow: 0 2px 8px rgba(67, 56, 202, 0.35);
+        }
+
+        .testi-mobile-nav-btn {
+            display: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            color: var(--text-dark, #1e293b);
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .testi-mobile-nav-btn:hover:not(:disabled) {
+            background: var(--primary, #4338ca);
+            color: #ffffff;
+            border-color: var(--primary, #4338ca);
+        }
+
+        .testi-mobile-nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .testi-counter-badge {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted, #64748b);
+            background: #f1f5f9;
+            padding: 3px 10px;
+            border-radius: 100px;
+            letter-spacing: 0.04em;
+        }
+
+        /* Responsive Mobile Specific */
+        @media (max-width: 767px) {
+            .testi-nav-arrow {
+                display: none !important;
+            }
+            .testi-mobile-nav-btn {
+                display: flex;
+            }
+            .testi-carousel-track {
+                padding-left: 2px;
+                padding-right: 2px;
+                gap: 16px;
+            }
+            .testi-card {
+                padding: 24px 20px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -3269,74 +3514,104 @@
                 </button>
             </div>
 
-            <!-- Testimonials Grid with Schema.org Microdata -->
-            <div id="testimonialsGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;" data-aos="fade-up" data-aos-delay="200">
-                <?php foreach ($approvedTestimonials as $tItem): 
-                    $roleLower = strtolower($tItem['author_role'] ?? '');
-                    if (str_contains($roleLower, 'dosen') || str_contains($roleLower, 'peneliti') || str_contains($roleLower, 'pengajar')) {
-                        $roleCategory = 'dosen';
-                    } elseif (str_contains($roleLower, 'jurnal') || str_contains($roleLower, 'editor') || str_contains($roleLower, 'reviewer') || str_contains($roleLower, 'ojs')) {
-                        $roleCategory = 'jurnal';
-                    } else {
-                        $roleCategory = 'mahasiswa';
-                    }
-                ?>
-                    <div class="testi-card" data-category="<?= $roleCategory ?>" itemscope itemtype="https://schema.org/Review" style="background: #ffffff; border: 1px solid var(--border); border-radius: 20px; padding: 28px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; justify-content: space-between; transition: all 0.25s ease; position: relative;">
-                        <!-- Hidden Schema Reference to Product -->
-                        <div itemprop="itemReviewed" itemscope itemtype="https://schema.org/WebApplication" style="display: none;">
-                            <meta itemprop="name" content="AR Tilik">
-                            <meta itemprop="url" content="<?= base_url() ?>">
-                        </div>
+            <!-- Testimonials Carousel Container -->
+            <div class="testi-carousel-wrapper" data-aos="fade-up" data-aos-delay="200">
+                <!-- Floating Nav Arrows (Desktop & Tablet) -->
+                <button type="button" id="testiPrevBtnDesktop" class="testi-nav-arrow testi-prev-arrow" onclick="scrollTesti(-1)" aria-label="Testimoni Sebelumnya" title="Sebelumnya">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                </button>
+                <button type="button" id="testiNextBtnDesktop" class="testi-nav-arrow testi-next-arrow" onclick="scrollTesti(1)" aria-label="Testimoni Berikutnya" title="Berikutnya">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                </button>
 
-                        <?php if (!empty($tItem['is_featured'])): ?>
-                            <div style="position: absolute; top: -10px; right: 20px; background: #fef3c7; color: #92400e; border: 1px solid #fde68a; border-radius: 20px; padding: 2px 10px; font-size: 10px; font-weight: 700; text-transform: uppercase;">
-                                ⭐ Unggulan
-                            </div>
-                        <?php endif; ?>
-                        
-                        <div>
-                            <!-- Rating Stars (Schema.org Rating) -->
-                            <div itemprop="reviewRating" itemscope itemtype="https://schema.org/Rating" style="color: #f59e0b; font-size: 15px; margin-bottom: 14px;">
-                                <meta itemprop="ratingValue" content="<?= (int)$tItem['rating'] ?>">
-                                <meta itemprop="bestRating" content="5">
-                                <meta itemprop="worstRating" content="1">
-                                <?php for ($st = 1; $st <= 5; $st++): ?>
-                                    <span><?= $st <= (int)$tItem['rating'] ? '★' : '☆' ?></span>
-                                <?php endfor; ?>
+                <!-- Scrollable Carousel Track -->
+                <div id="testimonialsTrack" class="testi-carousel-track">
+                    <?php foreach ($approvedTestimonials as $tItem): 
+                        $roleLower = strtolower($tItem['author_role'] ?? '');
+                        if (str_contains($roleLower, 'dosen') || str_contains($roleLower, 'peneliti') || str_contains($roleLower, 'pengajar')) {
+                            $roleCategory = 'dosen';
+                        } elseif (str_contains($roleLower, 'jurnal') || str_contains($roleLower, 'editor') || str_contains($roleLower, 'reviewer') || str_contains($roleLower, 'ojs')) {
+                            $roleCategory = 'jurnal';
+                        } else {
+                            $roleCategory = 'mahasiswa';
+                        }
+                    ?>
+                        <div class="testi-card" data-category="<?= $roleCategory ?>" itemscope itemtype="https://schema.org/Review">
+                            <!-- Hidden Schema Reference to Product -->
+                            <div itemprop="itemReviewed" itemscope itemtype="https://schema.org/WebApplication" style="display: none;">
+                                <meta itemprop="name" content="AR Tilik">
+                                <meta itemprop="url" content="<?= base_url() ?>">
                             </div>
 
-                            <!-- Testimonial Quote (Schema.org reviewBody) -->
-                            <p itemprop="reviewBody" style="font-size: 13.5px; line-height: 1.65; color: var(--text-dark); margin-bottom: 20px; font-style: italic;">
-                                "<?= esc($tItem['content']) ?>"
-                            </p>
-                        </div>
-
-                        <!-- Author Meta (Schema.org Person) -->
-                        <div itemprop="author" itemscope itemtype="https://schema.org/Person" style="border-top: 1px solid #f1f5f9; padding-top: 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
-                            <div style="display: flex; align-items: center; gap: 12px;">
-                                <div style="width: 40px; height: 40px; border-radius: 12px; background: #e0e7ff; color: #4338ca; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; flex-shrink: 0;">
-                                    <?= mb_substr($tItem['display_name'] ?? 'A', 0, 1) ?>
+                            <?php if (!empty($tItem['is_featured'])): ?>
+                                <div class="testi-featured-badge">
+                                    ⭐ Unggulan
                                 </div>
-                                <div>
-                                    <div itemprop="name" style="font-weight: 700; font-size: 13px; color: var(--text-dark);">
-                                        <?= esc($tItem['display_name']) ?>
+                            <?php endif; ?>
+                            
+                            <div style="flex-grow: 1;">
+                                <!-- Rating Stars (Schema.org Rating) -->
+                                <div itemprop="reviewRating" itemscope itemtype="https://schema.org/Rating" style="color: #f59e0b; font-size: 15px; margin-bottom: 14px;">
+                                    <meta itemprop="ratingValue" content="<?= (int)$tItem['rating'] ?>">
+                                    <meta itemprop="bestRating" content="5">
+                                    <meta itemprop="worstRating" content="1">
+                                    <?php for ($st = 1; $st <= 5; $st++): ?>
+                                        <span><?= $st <= (int)$tItem['rating'] ? '★' : '☆' ?></span>
+                                    <?php endfor; ?>
+                                </div>
+
+                                <!-- Testimonial Quote (Schema.org reviewBody) -->
+                                <p itemprop="reviewBody" style="font-size: 13.5px; line-height: 1.65; color: var(--text-dark); margin-bottom: 20px; font-style: italic;">
+                                    "<?= esc($tItem['content']) ?>"
+                                </p>
+                            </div>
+
+                            <!-- Author Meta (Schema.org Person) -->
+                            <div itemprop="author" itemscope itemtype="https://schema.org/Person" style="border-top: 1px solid #f1f5f9; padding-top: 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: auto;">
+                                <div style="display: flex; align-items: center; gap: 12px; min-width: 0;">
+                                    <div style="width: 40px; height: 40px; border-radius: 12px; background: #e0e7ff; color: #4338ca; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; flex-shrink: 0;">
+                                        <?= mb_substr($tItem['display_name'] ?? 'A', 0, 1) ?>
                                     </div>
-                                    <div style="font-size: 11.5px; color: var(--primary); font-weight: 600;">
-                                        <?= esc($tItem['author_role'] ?? 'Mahasiswa') ?>
-                                    </div>
-                                    <?php if (!empty($tItem['display_institution'])): ?>
-                                        <div style="font-size: 11px; color: var(--text-muted);">
-                                            <?= esc($tItem['display_institution']) ?>
+                                    <div style="min-width: 0;">
+                                        <div itemprop="name" style="font-weight: 700; font-size: 13px; color: var(--text-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                            <?= esc($tItem['display_name']) ?>
                                         </div>
-                                    <?php endif; ?>
+                                        <div style="font-size: 11.5px; color: var(--primary); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                            <?= esc($tItem['author_role'] ?? 'Mahasiswa') ?>
+                                        </div>
+                                        <?php if (!empty($tItem['display_institution'])): ?>
+                                            <div style="font-size: 11px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                <?= esc($tItem['display_institution']) ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                                <div style="background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; border-radius: 12px; padding: 4px 8px; font-size: 10px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; flex-shrink: 0;">
+                                    <span>✓</span> <span>Terverifikasi</span>
                                 </div>
                             </div>
-                            <div style="background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; border-radius: 12px; padding: 4px 8px; font-size: 10px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;">
-                                <span>✓</span> <span>Terverifikasi</span>
-                            </div>
                         </div>
+                    <?php endforeach; ?>
+                </div>
+
+                <!-- Empty State jika kategori tidak memiliki ulasan -->
+                <div id="testiEmptyState" style="display: none; background: #ffffff; border: 1px dashed var(--border); border-radius: 16px; padding: 36px 20px; text-align: center; color: var(--text-muted); font-size: 13px;">
+                    <span>🔍</span> Belum ada ulasan untuk kategori ini.
+                </div>
+
+                <!-- Controls Bar (Dots & Mobile Buttons) -->
+                <div id="testiControlsBar" class="testi-controls-bar">
+                    <div class="testi-controls-inner">
+                        <button type="button" id="testiPrevBtnMobile" class="testi-mobile-nav-btn" onclick="scrollTesti(-1)" aria-label="Sebelumnya" title="Sebelumnya">
+                            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                        </button>
+                        <div id="testiDots" class="testi-dots-container"></div>
+                        <button type="button" id="testiNextBtnMobile" class="testi-mobile-nav-btn" onclick="scrollTesti(1)" aria-label="Berikutnya" title="Berikutnya">
+                            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                        </button>
                     </div>
-                <?php endforeach; ?>
+                    <div id="testiCounter" class="testi-counter-badge"></div>
+                </div>
             </div>
 
             <!-- Callout CTA Tulis Ulasan -->
@@ -3355,9 +3630,169 @@
         </div>
     </section>
 
-    <!-- JavaScript Filter Testimoni Interaktif -->
+    <!-- JavaScript Filter & Carousel Testimoni Interaktif -->
     <script>
+        let currentTestiFilter = 'all';
+
+        function getCardsPerPage() {
+            const w = window.innerWidth;
+            if (w < 768) return 1;
+            if (w < 1024) return 2;
+            return 3;
+        }
+
+        function getVisibleCards() {
+            return Array.from(document.querySelectorAll('.testi-card')).filter(c => c.style.display !== 'none');
+        }
+
+        function updateTestiCarousel() {
+            const track = document.getElementById('testimonialsTrack');
+            if (!track) return;
+
+            const visibleCards = getVisibleCards();
+            const count = visibleCards.length;
+            const emptyState = document.getElementById('testiEmptyState');
+            const prevDesktop = document.getElementById('testiPrevBtnDesktop');
+            const nextDesktop = document.getElementById('testiNextBtnDesktop');
+            const controlsBar = document.getElementById('testiControlsBar');
+            const dotsContainer = document.getElementById('testiDots');
+            const counterEl = document.getElementById('testiCounter');
+
+            if (count === 0) {
+                if (emptyState) emptyState.style.display = 'block';
+                track.style.display = 'none';
+                if (prevDesktop) prevDesktop.style.display = 'none';
+                if (nextDesktop) nextDesktop.style.display = 'none';
+                if (controlsBar) controlsBar.style.display = 'none';
+                return;
+            }
+
+            if (emptyState) emptyState.style.display = 'none';
+            track.style.display = 'flex';
+
+            const cardsPerPage = getCardsPerPage();
+            const needsCarousel = count > cardsPerPage;
+
+            if (!needsCarousel) {
+                track.classList.add('no-carousel');
+                if (prevDesktop) prevDesktop.style.display = 'none';
+                if (nextDesktop) nextDesktop.style.display = 'none';
+                if (controlsBar) controlsBar.style.display = 'none';
+                track.scrollLeft = 0;
+                return;
+            }
+
+            // Mode carousel aktif
+            track.classList.remove('no-carousel');
+            if (prevDesktop) prevDesktop.style.display = 'flex';
+            if (nextDesktop) nextDesktop.style.display = 'flex';
+            if (controlsBar) controlsBar.style.display = 'flex';
+
+            const maxStep = Math.max(0, count - cardsPerPage);
+
+            // Render Pagination Dots
+            if (dotsContainer) {
+                dotsContainer.innerHTML = '';
+                for (let i = 0; i <= maxStep; i++) {
+                    const dot = document.createElement('button');
+                    dot.type = 'button';
+                    dot.className = 'testi-dot' + (i === 0 ? ' active' : '');
+                    dot.setAttribute('aria-label', `Testimoni slide ${i + 1}`);
+                    dot.onclick = () => scrollTestiToStep(i);
+                    dotsContainer.appendChild(dot);
+                }
+            }
+
+            updateActiveDotAndArrows();
+        }
+
+        function scrollTestiToStep(stepIndex) {
+            const track = document.getElementById('testimonialsTrack');
+            const visibleCards = getVisibleCards();
+            if (!track || !visibleCards[stepIndex]) return;
+
+            const targetOffset = visibleCards[stepIndex].offsetLeft - track.offsetLeft;
+            track.scrollTo({ left: targetOffset, behavior: 'smooth' });
+        }
+
+        function scrollTesti(direction) {
+            const track = document.getElementById('testimonialsTrack');
+            const visibleCards = getVisibleCards();
+            if (!track || visibleCards.length === 0) return;
+
+            const cardsPerPage = getCardsPerPage();
+            const maxStep = Math.max(0, visibleCards.length - cardsPerPage);
+            if (maxStep === 0) return;
+
+            let currentStep = 0;
+            const currentScroll = track.scrollLeft;
+            let minDiff = Infinity;
+
+            visibleCards.slice(0, maxStep + 1).forEach((card, idx) => {
+                const offset = card.offsetLeft - track.offsetLeft;
+                const diff = Math.abs(currentScroll - offset);
+                if (diff < minDiff) {
+                    minDiff = diff;
+                    currentStep = idx;
+                }
+            });
+
+            const nextStep = Math.min(maxStep, Math.max(0, currentStep + direction));
+            scrollTestiToStep(nextStep);
+        }
+
+        function updateActiveDotAndArrows() {
+            const track = document.getElementById('testimonialsTrack');
+            const visibleCards = getVisibleCards();
+            if (!track || visibleCards.length === 0) return;
+
+            const cardsPerPage = getCardsPerPage();
+            const maxStep = Math.max(0, visibleCards.length - cardsPerPage);
+
+            let currentStep = 0;
+            const currentScroll = track.scrollLeft;
+            let minDiff = Infinity;
+
+            visibleCards.slice(0, maxStep + 1).forEach((card, idx) => {
+                const offset = card.offsetLeft - track.offsetLeft;
+                const diff = Math.abs(currentScroll - offset);
+                if (diff < minDiff) {
+                    minDiff = diff;
+                    currentStep = idx;
+                }
+            });
+
+            // Dots highlight
+            const dots = document.querySelectorAll('.testi-dot');
+            dots.forEach((dot, idx) => {
+                if (idx === currentStep) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+
+            // Counter (Mobile)
+            const counterEl = document.getElementById('testiCounter');
+            if (counterEl) {
+                counterEl.textContent = `${currentStep + 1} dari ${maxStep + 1}`;
+            }
+
+            // Desktop Arrows disabled state
+            const prevDesktop = document.getElementById('testiPrevBtnDesktop');
+            const nextDesktop = document.getElementById('testiNextBtnDesktop');
+            if (prevDesktop) prevDesktop.disabled = (currentStep <= 0);
+            if (nextDesktop) nextDesktop.disabled = (currentStep >= maxStep);
+
+            // Mobile Nav Buttons disabled state
+            const prevMobile = document.getElementById('testiPrevBtnMobile');
+            const nextMobile = document.getElementById('testiNextBtnMobile');
+            if (prevMobile) prevMobile.disabled = (currentStep <= 0);
+            if (nextMobile) nextMobile.disabled = (currentStep >= maxStep);
+        }
+
         function filterTestimonials(cat, btn) {
+            currentTestiFilter = cat;
             document.querySelectorAll('.testi-filter-btn').forEach(b => {
                 b.style.background = '#ffffff';
                 b.style.color = 'var(--text-dark)';
@@ -3375,7 +3810,31 @@
                     card.style.display = 'none';
                 }
             });
+
+            const track = document.getElementById('testimonialsTrack');
+            if (track) {
+                track.scrollLeft = 0;
+            }
+
+            updateTestiCarousel();
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const track = document.getElementById('testimonialsTrack');
+            if (track) {
+                let scrollAnim = null;
+                track.addEventListener('scroll', () => {
+                    if (scrollAnim) cancelAnimationFrame(scrollAnim);
+                    scrollAnim = requestAnimationFrame(updateActiveDotAndArrows);
+                }, { passive: true });
+            }
+
+            window.addEventListener('resize', () => {
+                updateTestiCarousel();
+            });
+
+            updateTestiCarousel();
+        });
     </script>
     <?php endif; ?>
 
