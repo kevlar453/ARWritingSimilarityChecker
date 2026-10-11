@@ -99,6 +99,11 @@
 
                     <?php if (!empty($currentUser)): ?>
                     <div class="flex items-center gap-2 pl-2 border-l border-slate-200">
+                        <?php if (!empty($ambProfile)): ?>
+                        <a href="<?= base_url('ambassador/dashboard') ?>" class="inline-flex items-center gap-1.5 text-xs font-bold text-amber-800 hover:text-amber-900 bg-amber-100 hover:bg-amber-200 px-2.5 py-1.5 rounded-lg border border-amber-300 transition shadow-2xs" title="Buka Dashboard Duta Kampus">
+                            🎓 <span class="hidden sm:inline">Duta Kampus</span>
+                        </a>
+                        <?php endif; ?>
                         <?php if (($currentUser['role'] ?? '') === 'admin'): ?>
                         <a href="<?= base_url('admin') ?>" class="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-2.5 py-1.5 rounded-lg border border-emerald-300 transition shadow-2xs" title="Buka Portal Administrator">
                             👑 <span class="hidden sm:inline">Portal Admin</span>
@@ -218,6 +223,19 @@
                     <?php endif; ?>
                 </div>
             </div>
+
+            <?php if (!empty($ambProfile)): ?>
+            <div class="mt-3 pt-3 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase bg-amber-400 text-slate-950">Duta Kampus</span>
+                    <span class="text-slate-300">Kode Referral: <strong class="text-amber-300 font-mono-code"><?= esc($ambProfile['referral_code']) ?></strong></span>
+                    <span class="text-slate-400">&bull; Komisi 20% Bulanan</span>
+                </div>
+                <a href="<?= base_url('ambassador/dashboard') ?>" class="text-amber-300 hover:text-white font-bold inline-flex items-center gap-1 transition">
+                    Buka Dashboard Duta &amp; Rekap &rarr;
+                </a>
+            </div>
+            <?php endif; ?>
         </div>
         <?php else: ?>
         <div class="mb-6 bg-gradient-to-r from-indigo-900 to-indigo-950 rounded-2xl p-4 sm:p-5 text-white shadow-md border border-indigo-700/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -261,6 +279,16 @@
             <button onclick="switchTab('tab-benchmark')" id="btn-tab-benchmark" class="tab-btn pb-3 font-medium text-xs sm:text-sm text-slate-500 hover:text-slate-800 border-b-2 border-transparent flex items-center gap-1.5 sm:gap-2 flex-shrink-0 whitespace-nowrap transition-colors">
                 🧪 Benchmark Lab
             </button>
+            <?php if (!empty($ambProfile)): ?>
+            <a href="<?= base_url('ambassador/dashboard') ?>" class="tab-btn pb-3 font-semibold text-xs sm:text-sm text-amber-600 hover:text-amber-800 border-b-2 border-transparent hover:border-amber-500 flex items-center gap-1.5 sm:gap-2 flex-shrink-0 whitespace-nowrap transition-colors" title="Buka Dashboard Afiliasi Duta Kampus">
+                🎓 Dashboard Duta
+                <span class="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-amber-100 text-amber-800 font-mono-code"><?= esc($ambProfile['referral_code']) ?></span>
+            </a>
+            <?php else: ?>
+            <a href="<?= base_url('ambassador') ?>" class="tab-btn pb-3 font-medium text-xs sm:text-sm text-slate-500 hover:text-indigo-600 border-b-2 border-transparent hover:border-indigo-500 flex items-center gap-1.5 sm:gap-2 flex-shrink-0 whitespace-nowrap transition-colors" title="Program Kemitraan & Afiliasi Mahasiswa">
+                🎓 Duta Kampus
+            </a>
+            <?php endif; ?>
         </div>
 
         <!-- TAB 1: Submisi & Pemeriksaan -->

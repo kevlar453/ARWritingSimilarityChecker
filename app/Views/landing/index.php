@@ -3526,6 +3526,7 @@
                     <ul class="footer-links">
                         <li><a href="#integrasi-ojs">Integrasi OJS 3.x Jurnal</a></li>
                         <li><a href="#solusi">Solusi Sivitas Akademika</a></li>
+                        <li><a href="<?= base_url('ambassador') ?>">Program Duta Kampus (Afiliasi)</a></li>
                         <li><a href="<?= base_url('verify') ?>">Portal Verifikasi QR</a></li>
                         <li><a href="#kuota-korpus">Gotong Royong Korpus</a></li>
                         <li><a href="#langganan">Paket Tarif &amp; Top-Up</a></li>

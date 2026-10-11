@@ -102,6 +102,15 @@ class DashboardController extends BaseController
         }
         unset($item);
 
+        // Ambil profil Duta Kampus jika pengguna terdaftar
+        $ambProfile = null;
+        if ($userId) {
+            $ambProfileModel = new \App\Models\AmbassadorProfileModel();
+            $ambProfile = $ambProfileModel->where('user_id', (int) $userId)
+                                          ->whereIn('status', ['probation', 'active'])
+                                          ->first();
+        }
+
         return view('dashboard/index', [
             'submissions'         => $submissions,
             'sharedDocuments'     => $sharedDocuments,
@@ -117,6 +126,7 @@ class DashboardController extends BaseController
             'totalReports'        => $totalReports,
             'currentUser'         => $currentUser,
             'quotaInfo'           => $quotaInfo,
+            'ambProfile'          => $ambProfile,
         ]);
     }
 
