@@ -257,7 +257,18 @@ class DashboardController extends BaseController
             $tier = $item['subscription_tier'] ?? 'free';
             $item['has_purchased'] = ($uId && (isset($paidUserMap[$uId]) || $tier !== 'free'));
         }
-        unset($item);
+        // 15. Data Program Duta Kampus & Seleksi Asinkron (Tahap 2, 3, 4, 5, 6)
+        $ambAppModel = new \App\Models\AmbassadorApplicationModel();
+        $ambProfileModel = new \App\Models\AmbassadorProfileModel();
+        $ambStats = $ambAppModel->getAdminStats();
+        $ambApplications = $ambAppModel->orderBy('id', 'DESC')->findAll(100);
+        $ambProfiles = $db->table('ambassador_profiles ap')
+                          ->select('ap.*, u.name as user_name, u.email as user_email, u.institution as user_institution')
+                          ->join('users u', 'u.id = ap.user_id', 'left')
+                          ->orderBy('ap.id', 'DESC')
+                          ->limit(50)
+                          ->get()
+                          ->getResultArray();
 
         return view('admin/index', [
             'activeTab'            => $activeTab,
@@ -309,6 +320,9 @@ class DashboardController extends BaseController
             'recentFeedback'       => $recentFeedback,
             'testimonialStats'     => $testimonialStats,
             'testimonialsList'     => $testimonialsList,
+            'ambStats'             => $ambStats,
+            'ambApplications'      => $ambApplications,
+            'ambProfiles'          => $ambProfiles,
             'currentAdmin'         => $userModel->find(session()->get('user_id')),
         ]);
     }

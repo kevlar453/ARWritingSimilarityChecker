@@ -84,6 +84,10 @@ class AuthController extends BaseController
         $token = bin2hex(random_bytes(32));
         $tokenExpiresAt = date('Y-m-d H:i:s', strtotime('+24 hours'));
 
+        $referredByCode = session()->get('referred_by_code') ?? $this->request->getCookie('referred_by_code') ?? ($data['referral_code'] ?? null);
+        $referredByCode = $referredByCode ? strtoupper(trim((string)$referredByCode)) : null;
+        $bonusSubmissions = $referredByCode ? 1 : 0; // Bonus 1x cek naskah gratis bagi pengguna via referral
+
         $userId = $userModel->insert([
             'name'                            => $name,
             'email'                           => $email,
@@ -96,7 +100,8 @@ class AuthController extends BaseController
             'email_verified_at'               => null,
             'free_submissions_used_this_week' => 0,
             'week_reset_at'                   => $resetAt,
-            'bonus_submissions'               => 0,
+            'bonus_submissions'               => $bonusSubmissions,
+            'referred_by_code'                => $referredByCode,
             'uploaded_corpus_count'           => 0,
             'last_login_at'                   => null,
             'created_at'                      => $now,

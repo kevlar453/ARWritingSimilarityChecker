@@ -282,6 +282,21 @@
                             </span>
                         <?php endif; ?>
                     </a>
+                    <a href="<?= base_url('admin?tab=ambassador') ?>" class="group flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 <?= $activeTab === 'ambassador' ? 'bg-indigo-600/15 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent' ?>">
+                        <div class="flex items-center gap-2.5">
+                            <span class="text-sm">🎓</span>
+                            <span>Duta Kampus (Afiliasi)</span>
+                        </div>
+                        <?php if (!empty($ambStats['pending_review'])): ?>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold">
+                                <?= (int) $ambStats['pending_review'] ?> baru
+                            </span>
+                        <?php elseif (!empty($ambStats['active_ambassadors'])): ?>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold">
+                                <?= (int) $ambStats['active_ambassadors'] ?> aktif
+                            </span>
+                        <?php endif; ?>
+                    </a>
                 </div>
 
                 <!-- Group 4: Sistem & Keamanan -->
@@ -2745,6 +2760,245 @@
             </div>
 
         <!-- ========================================== -->
+        <!-- TAB: DUTA KAMPUS & SELEKSI ASINKRON        -->
+        <!-- ========================================== -->
+        <?php elseif ($activeTab === 'ambassador'): ?>
+            <div class="space-y-6">
+                <!-- Header -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-700/60 pb-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                            <span>🎓 Program Duta Kampus &amp; Seleksi Asinkron</span>
+                            <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/30 text-indigo-200 border border-indigo-400/30 font-mono-code">
+                                Fase 2 Kemitraan
+                            </span>
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-0.5">
+                            Kurasi mingguan pendaftar perwakilan kampus, verifikasi identitas anti-fraud, dan pemantauan kinerja afiliasi.
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <a href="<?= base_url('ambassador') ?>" target="_blank" class="px-3 py-1.5 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-xs font-semibold transition flex items-center gap-1.5">
+                            <span>🔗</span> <span>Lihat Formulir Publik</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 5 Metrik Ringkasan Seleksi -->
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                    <div class="bg-slate-800/40 border border-slate-700/60 rounded-xl p-3.5 space-y-1">
+                        <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Total Pendaftar</div>
+                        <div class="text-xl font-bold font-mono-code text-white"><?= (int)($ambStats['total_applications'] ?? 0) ?></div>
+                    </div>
+                    <div class="bg-slate-800/40 border border-amber-500/30 rounded-xl p-3.5 space-y-1">
+                        <div class="text-[10px] uppercase font-bold text-amber-300 tracking-wider">Menunggu Seleksi</div>
+                        <div class="text-xl font-bold font-mono-code text-amber-400"><?= (int)($ambStats['pending_review'] ?? 0) ?></div>
+                    </div>
+                    <div class="bg-slate-800/40 border border-sky-500/30 rounded-xl p-3.5 space-y-1">
+                        <div class="text-[10px] uppercase font-bold text-sky-300 tracking-wider">Menunggu KTM</div>
+                        <div class="text-xl font-bold font-mono-code text-sky-400"><?= (int)($ambStats['accepted_wait_ktm'] ?? 0) ?></div>
+                    </div>
+                    <div class="bg-slate-800/40 border border-purple-500/30 rounded-xl p-3.5 space-y-1">
+                        <div class="text-[10px] uppercase font-bold text-purple-300 tracking-wider">KTM Siap Aktivasi</div>
+                        <div class="text-xl font-bold font-mono-code text-purple-400"><?= (int)($ambStats['verified_ready_act'] ?? 0) ?></div>
+                    </div>
+                    <div class="bg-slate-800/40 border border-emerald-500/30 rounded-xl p-3.5 space-y-1">
+                        <div class="text-[10px] uppercase font-bold text-emerald-300 tracking-wider">Duta Aktif</div>
+                        <div class="text-xl font-bold font-mono-code text-emerald-400"><?= (int)($ambStats['active_ambassadors'] ?? 0) ?></div>
+                    </div>
+                </div>
+
+                <!-- Bagian 1: Berkas Pendaftaran & Seleksi Asinkron (Tahap 1, 2, 3) -->
+                <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-5 space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-700/60 pb-3 flex-wrap gap-2">
+                        <div>
+                            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                                <span>📋 Berkas Pendaftaran &amp; Kurasi Seleksi</span>
+                                <span class="text-[10px] font-mono-code px-2 py-0.5 rounded bg-slate-700 text-slate-300">
+                                    <?= count($ambApplications ?? []) ?> pendaftar
+                                </span>
+                            </h3>
+                            <p class="text-xs text-slate-400 mt-0.5">Tinjau narasi jaringan kampus &amp; kelayakan pembelian paket untuk aktivasi Duta Kampus</p>
+                        </div>
+                    </div>
+
+                    <?php if (empty($ambApplications)): ?>
+                        <div class="p-8 text-center text-xs text-slate-500 bg-slate-900/40 rounded-xl border border-slate-800">
+                            Belum ada pendaftaran Duta Kampus yang masuk.
+                        </div>
+                    <?php else: ?>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead>
+                                    <tr class="text-slate-400 border-b border-slate-700/60 text-[11px] uppercase tracking-wider">
+                                        <th class="py-3 px-3">Pendaftar &amp; Kontak</th>
+                                        <th class="py-3 px-3">Kampus &amp; Semester</th>
+                                        <th class="py-3 px-3">Jaringan Kampus</th>
+                                        <th class="py-3 px-3 text-center">Kelayakan Paket</th>
+                                        <th class="py-3 px-3 text-center">Status</th>
+                                        <th class="py-3 px-3 text-right">Aksi Seleksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-800">
+                                    <?php foreach ($ambApplications as $app): ?>
+                                        <tr class="hover:bg-slate-800/30 transition" id="amb-row-<?= (int)$app['id'] ?>">
+                                            <td class="py-3 px-3 align-top">
+                                                <div class="font-bold text-white"><?= esc($app['full_name']) ?></div>
+                                                <div class="text-[11px] text-indigo-300"><?= esc($app['email']) ?></div>
+                                                <div class="text-[10px] text-slate-400 font-mono-code mt-0.5">WA: <?= esc($app['whatsapp_number']) ?></div>
+                                                <div class="text-[9px] text-slate-500"><?= date('d M Y, H:i', strtotime($app['created_at'])) ?></div>
+                                            </td>
+                                            <td class="py-3 px-3 align-top">
+                                                <div class="font-bold text-slate-200"><?= esc($app['institution']) ?></div>
+                                                <div class="text-[11px] text-slate-400"><?= esc($app['major']) ?></div>
+                                                <div class="text-[10px] text-amber-300/90 mt-0.5"><?= esc($app['semester']) ?></div>
+                                            </td>
+                                            <td class="py-3 px-3 align-top max-w-xs sm:max-w-sm">
+                                                <p class="text-slate-300 leading-relaxed italic bg-slate-950/40 p-2.5 rounded-lg border border-slate-800/80 line-clamp-3 hover:line-clamp-none transition-all">
+                                                    "<?= esc($app['campus_network']) ?>"
+                                                </p>
+                                                <?php if (!empty($app['id_card_path'])): ?>
+                                                    <div class="mt-1.5 flex items-center gap-1.5 text-[10px] text-emerald-400 font-semibold">
+                                                        <span>📎</span>
+                                                        <span>KTM Terunggah</span>
+                                                        <span class="text-slate-500">&bull;</span>
+                                                        <span class="text-slate-400"><?= date('d M Y', strtotime($app['id_card_uploaded_at'] ?? 'now')) ?></span>
+                                                    </div>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td class="py-3 px-3 align-top text-center whitespace-nowrap">
+                                                <?php if (!empty($app['has_purchased'])): ?>
+                                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                                                        <span>✓</span> <span>Pembeli Terverifikasi</span>
+                                                    </span>
+                                                <?php else: ?>
+                                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-800 text-slate-400">
+                                                        <span>Non-Buyer</span>
+                                                    </span>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td class="py-3 px-3 align-top text-center whitespace-nowrap">
+                                                <span id="amb-status-badge-<?= (int)$app['id'] ?>">
+                                                    <?php if ($app['status'] === 'active'): ?>
+                                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                                                            ✓ Aktif
+                                                        </span>
+                                                    <?php elseif ($app['status'] === 'verified'): ?>
+                                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                                                            🛡️ KTM Terverifikasi
+                                                        </span>
+                                                    <?php elseif ($app['status'] === 'accepted'): ?>
+                                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-sky-500/20 text-sky-300 border border-sky-500/30">
+                                                            ⏳ Menunggu KTM
+                                                        </span>
+                                                    <?php elseif ($app['status'] === 'rejected'): ?>
+                                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                                                            ✕ Ditolak
+                                                        </span>
+                                                    <?php else: ?>
+                                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                                                            ⏳ Menunggu Seleksi
+                                                        </span>
+                                                    <?php endif; ?>
+                                                </span>
+                                            </td>
+                                            <td class="py-3 px-3 align-top text-right whitespace-nowrap space-x-1">
+                                                <?php if ($app['status'] === 'pending'): ?>
+                                                    <button type="button" onclick="adminAcceptAmbassador(<?= (int)$app['id'] ?>)" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] transition shadow-xs cursor-pointer" title="Loloskan seleksi & buka pesan WhatsApp untuk minta KTM">
+                                                        ✓ Terima (Kirim WA)
+                                                    </button>
+                                                    <button type="button" onclick="adminRejectAmbassador(<?= (int)$app['id'] ?>)" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-rose-900 text-slate-300 hover:text-white text-[11px] transition cursor-pointer" title="Tolak pendaftaran">
+                                                        ✕ Tolak
+                                                    </button>
+                                                <?php elseif (in_array($app['status'], ['accepted', 'verified'])): ?>
+                                                    <button type="button" onclick="adminActivateAmbassador(<?= (int)$app['id'] ?>, '<?= esc($app['full_name']) ?>', '<?= esc($app['institution']) ?>')" class="px-2.5 py-1 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-bold text-[11px] transition shadow-sm cursor-pointer" title="Terbitkan kode referral & kirim paket sambutan WA">
+                                                        🚀 Aktivasi Kode &amp; WA
+                                                    </button>
+                                                <?php else: ?>
+                                                    <span class="text-[10px] text-slate-500 font-mono-code">Selesai</span>
+                                                <?php endif; ?>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Bagian 2: Daftar Duta Kampus Aktif & Pemantauan Performa (Tahap 4, 5, 6) -->
+                <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-5 space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-700/60 pb-3 flex-wrap gap-2">
+                        <div>
+                            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                                <span>🌟 Duta Kampus Aktif &amp; Pemantauan Afiliasi</span>
+                                <span class="text-[10px] font-mono-code px-2 py-0.5 rounded bg-slate-700 text-slate-300">
+                                    <?= count($ambProfiles ?? []) ?> aktif
+                                </span>
+                            </h3>
+                            <p class="text-xs text-slate-400 mt-0.5">Pantau kode referral, masa percobaan (probation), dan rekap pencairan komisi bulanan</p>
+                        </div>
+                    </div>
+
+                    <?php if (empty($ambProfiles)): ?>
+                        <div class="p-8 text-center text-xs text-slate-500 bg-slate-900/40 rounded-xl border border-slate-800">
+                            Belum ada Duta Kampus yang diaktivasi.
+                        </div>
+                    <?php else: ?>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead>
+                                    <tr class="text-slate-400 border-b border-slate-700/60 text-[11px] uppercase tracking-wider">
+                                        <th class="py-3 px-3">Duta &amp; Kampus</th>
+                                        <th class="py-3 px-3">Kode Referral</th>
+                                        <th class="py-3 px-3">Status &amp; Periode</th>
+                                        <th class="py-3 px-3 text-center">Komisi</th>
+                                        <th class="py-3 px-3 text-right">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-800">
+                                    <?php foreach ($ambProfiles as $prof): ?>
+                                        <tr class="hover:bg-slate-800/30 transition">
+                                            <td class="py-3 px-3 align-top">
+                                                <div class="font-bold text-white"><?= esc($prof['user_name'] ?? 'Akademisi') ?></div>
+                                                <div class="text-[11px] text-slate-400"><?= esc($prof['user_institution'] ?? '-') ?></div>
+                                                <div class="text-[10px] text-indigo-300 font-mono-code"><?= esc($prof['user_email'] ?? '-') ?></div>
+                                            </td>
+                                            <td class="py-3 px-3 align-top whitespace-nowrap">
+                                                <span class="font-mono-code font-bold text-amber-300 bg-amber-500/10 px-2 py-1 rounded-md border border-amber-500/20">
+                                                    <?= esc($prof['referral_code']) ?>
+                                                </span>
+                                            </td>
+                                            <td class="py-3 px-3 align-top whitespace-nowrap">
+                                                <div>
+                                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold <?= $prof['status'] === 'probation' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' ?>">
+                                                        <?= strtoupper(esc($prof['status'])) ?>
+                                                    </span>
+                                                </div>
+                                                <div class="text-[10px] text-slate-400 mt-1">
+                                                    s/d <?= date('d M Y', strtotime($prof['probation_end'] ?? '+30 days')) ?>
+                                                </div>
+                                            </td>
+                                            <td class="py-3 px-3 align-top text-center whitespace-nowrap">
+                                                <span class="font-mono-code font-bold text-emerald-400">
+                                                    <?= number_format((float)$prof['commission_rate_percent'], 0) ?>%
+                                                </span>
+                                            </td>
+                                            <td class="py-3 px-3 align-top text-right whitespace-nowrap">
+                                                <a href="<?= base_url('ref/' . $prof['referral_code']) ?>" target="_blank" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-semibold transition" title="Uji tautan referral">
+                                                    🔗 Tautan
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+        <!-- ========================================== -->
         <!-- TAB 7: SISTEM SERVER                       -->
         <!-- ========================================== -->
         <?php elseif ($activeTab === 'system'): ?>
@@ -3326,6 +3580,68 @@
                     if (row) row.remove();
                 } else {
                     alert('Gagal: ' + res.message);
+                }
+        async function adminAcceptAmbassador(id) {
+            if (!confirm('Loloskan pendaftar ini ke Tahap 2 & kirim tautan verifikasi identitas (KTM)?')) return;
+            try {
+                const res = await postJson('<?= base_url('admin/ambassador/accept') ?>/' + id, {});
+                if (res.success) {
+                    alert('✓ ' + res.message);
+                    const badge = document.getElementById('amb-status-badge-' + id);
+                    if (badge) {
+                        badge.innerHTML = '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-sky-500/20 text-sky-300 border border-sky-500/30">⏳ Menunggu KTM</span>';
+                    }
+                    if (res.wa_link) {
+                        window.open(res.wa_link, '_blank');
+                    }
+                } else {
+                    alert('Gagal: ' + (res.message || 'Terjadi kesalahan.'));
+                }
+            } catch (err) {
+                alert('Terjadi kesalahan koneksi.');
+            }
+        }
+
+        async function adminRejectAmbassador(id) {
+            const reason = prompt('Alasan penolakan (opsional untuk catatan admin):', 'Kuota perwakilan kampus telah terpenuhi');
+            if (reason === null) return;
+            try {
+                const res = await postJson('<?= base_url('admin/ambassador/reject') ?>/' + id, { admin_notes: reason });
+                if (res.success) {
+                    const badge = document.getElementById('amb-status-badge-' + id);
+                    if (badge) {
+                        badge.innerHTML = '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">✕ Ditolak</span>';
+                    }
+                    if (res.wa_link && confirm('Buka WhatsApp untuk mengirim pesan pemberitahuan sopan ke pendaftar?')) {
+                        window.open(res.wa_link, '_blank');
+                    }
+                } else {
+                    alert('Gagal: ' + (res.message || 'Terjadi kesalahan.'));
+                }
+            } catch (err) {
+                alert('Terjadi kesalahan koneksi.');
+            }
+        }
+
+        async function adminActivateAmbassador(id, name, institution) {
+            const defaultCode = 'TILIK-' + institution.replace(/[^a-zA-Z]/g, '').substring(0, 4).toUpperCase() + '-' + name.split(' ')[0].toUpperCase();
+            const code = prompt('Masukkan / Sesuaikan Kode Referral Unik untuk Duta Kampus ini:', defaultCode);
+            if (!code) return;
+
+            try {
+                const res = await postJson('<?= base_url('admin/ambassador/activate') ?>/' + id, { referral_code: code });
+                if (res.success) {
+                    alert('🎉 Duta Kampus berhasil diaktivasi!\nKode Referral: ' + res.referral_code + '\nPaket Premium 30 hari telah aktif.');
+                    const badge = document.getElementById('amb-status-badge-' + id);
+                    if (badge) {
+                        badge.innerHTML = '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">✓ Aktif</span>';
+                    }
+                    if (res.wa_link) {
+                        window.open(res.wa_link, '_blank');
+                    }
+                    setTimeout(() => window.location.reload(), 1500);
+                } else {
+                    alert('Gagal aktivasi: ' + (res.message || 'Periksa kembali data.'));
                 }
             } catch (err) {
                 alert('Terjadi kesalahan koneksi.');

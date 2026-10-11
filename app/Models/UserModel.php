@@ -25,6 +25,7 @@ class UserModel extends Model
         'free_submissions_used_this_week',
         'week_reset_at',
         'bonus_submissions',
+        'referred_by_code',
         'uploaded_corpus_count',
         'last_login_at',
         'created_at',

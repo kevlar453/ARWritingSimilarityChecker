@@ -55,6 +55,15 @@ $routes->post('feedback/vote', 'FeedbackController::vote');
 $routes->post('feedback/testimonial', 'FeedbackController::submitTestimonial');
 $routes->get('feedback/status/(:num)', 'FeedbackController::getStatus/$1');
 
+// Ambassador & Referral Program Routes (Fase 2)
+$routes->get('ambassador', 'AmbassadorController::index');
+$routes->post('ambassador/apply', 'AmbassadorController::apply');
+$routes->get('ambassador/verify/(:segment)', 'AmbassadorController::verify/$1');
+$routes->post('ambassador/verify/(:segment)', 'AmbassadorController::submitVerification/$1');
+$routes->get('ambassador/dashboard', 'AmbassadorController::dashboard');
+$routes->post('ambassador/proof', 'AmbassadorController::submitProof');
+$routes->get('ref/(:segment)', 'AmbassadorController::ref/$1');
+
 // Auth Routes
 $routes->group('auth', function ($routes) {
     $routes->post('register', 'AuthController::register');
@@ -155,6 +164,11 @@ $routes->group('admin', ['filter' => 'admin'], function ($routes) {
     $routes->post('testimonials/reject/(:num)', 'Admin\DashboardController::rejectTestimonial/$1');
     $routes->post('testimonials/feature/(:num)', 'Admin\DashboardController::toggleFeaturedTestimonial/$1');
     $routes->post('testimonials/delete/(:num)', 'Admin\DashboardController::deleteTestimonial/$1');
+
+    // Ambassador Batch Review & Activation (Tahap 2, 4)
+    $routes->post('ambassador/accept/(:num)', 'Admin\AmbassadorAdminController::acceptApplication/$1');
+    $routes->post('ambassador/reject/(:num)', 'Admin\AmbassadorAdminController::rejectApplication/$1');
+    $routes->post('ambassador/activate/(:num)', 'Admin\AmbassadorAdminController::activateAmbassador/$1');
 });
 
 // Human Review & Evaluation Subsystem (DINONAKTIFKAN - mitigasi risiko RCE lewat exec)
