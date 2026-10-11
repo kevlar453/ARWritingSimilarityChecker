@@ -104,6 +104,16 @@
         (function() {
             var b = document.getElementById('topProgressBar');
             if (b) b.style.width = '70%';
+            // Failsafe auto-dismiss overlay to guarantee the admin portal is never stuck behind the loader
+            setTimeout(function() {
+                var o = document.getElementById('pageTransitionOverlay');
+                if (o && o.style.display !== 'none') {
+                    o.style.opacity = '0';
+                    o.style.pointerEvents = 'none';
+                    setTimeout(function() { o.style.display = 'none'; }, 250);
+                }
+                if (b) b.style.opacity = '0';
+            }, 400);
         })();
     </script>
 
@@ -3581,6 +3591,11 @@
                 } else {
                     alert('Gagal: ' + res.message);
                 }
+            } catch (err) {
+                alert('Terjadi kesalahan koneksi.');
+            }
+        }
+
         async function adminAcceptAmbassador(id) {
             if (!confirm('Loloskan pendaftar ini ke Tahap 2 & kirim tautan verifikasi identitas (KTM)?')) return;
             try {
