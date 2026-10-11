@@ -1942,12 +1942,17 @@ class DashboardController extends BaseController
         $db->table('document_chunks')->where('document_id', $documentId)->update([
             'text'            => '',
             'normalized_text' => '',
+            'word_count'      => 0,
         ]);
         $db->table('document_pages')->where('document_id', $documentId)->update([
             'text' => '',
         ]);
 
-        // 3. Update status dokumen
+        // 3. Bersihkan sidik jari biner (fingerprints & shingle) naskah ini dari basis data
+        $db->table('fingerprint_documents')->where('document_id', $documentId)->delete();
+        $db->table('fingerprints')->where('document_id', $documentId)->delete();
+
+        // 4. Update status dokumen
         $now = date('Y-m-d H:i:s');
         $docModel->update($documentId, [
             'storage_path'   => '[PURGED]',

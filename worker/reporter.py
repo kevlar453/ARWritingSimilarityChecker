@@ -24,6 +24,12 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
         document = cursor.fetchone()
         if not document:
             raise ValueError(f"Dokumen ID {document_id} tidak ditemukan.")
+
+        if document.get("file_purged_at") or document.get("storage_path") == "[PURGED]":
+            raise ValueError(
+                "Naskah telah dimusnahkan secara mandiri dari peladen demi kedaulatan privasi (Zero-Leakage Guarantee). "
+                "Pemeriksaan ulang tidak dapat dilakukan tanpa mengunggah kembali naskah baru."
+            )
             
         # 3. Cek apakah dokumen sudah di-index atau belum
         if document.get("indexing_status") != "completed" and document.get("storage_path"):

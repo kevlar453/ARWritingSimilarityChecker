@@ -338,6 +338,14 @@ class DocumentController extends BaseController
             ]);
         }
 
+        // Tolak pemeriksaan jika berkas fisik naskah sudah dimusnahkan secara mandiri (Zero-Leakage Guarantee)
+        if (! empty($document['file_purged_at']) || ($document['storage_path'] ?? '') === '[PURGED]') {
+            return $this->response->setStatusCode(400)->setJSON([
+                'status'  => 'error',
+                'message' => 'Pemeriksaan ulang tidak dapat dilakukan karena berkas fisik naskah asli telah dimusnahkan secara mandiri dari peladen demi kedaulatan privasi (Zero-Leakage Guarantee). Silakan unggah kembali naskah jika ingin melakukan pengujian baru.'
+            ]);
+        }
+
         // Potong kuota pengguna jika bukan admin dan dokumen ini adalah pengujian ulang (re-check)
         // Catatan: Dokumen baru yang belum pernah memiliki report sudah dipotong kuotanya saat upload().
         $reportModel = new ReportModel();
