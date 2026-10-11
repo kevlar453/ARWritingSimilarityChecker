@@ -99,6 +99,22 @@ class AmbassadorController extends BaseController
             return $this->response->setJSON($result)->setStatusCode(400);
         }
 
+        // Kirim notifikasi instan ke Telegram Admin / Grup (-1002426917612)
+        try {
+            \App\Libraries\TelegramNotifier::notifyAmbassadorApplication([
+                'full_name'       => $fullName,
+                'email'           => $email,
+                'whatsapp_number' => $wa,
+                'institution'     => $institution,
+                'major'           => $major,
+                'semester'        => $semester,
+                'campus_network'  => $campusNetwork,
+                'has_purchased'   => $result['has_purchased'] ?? false,
+            ]);
+        } catch (\Throwable $te) {
+            log_message('warning', 'Gagal kirim notifikasi Telegram pendaftaran duta: ' . $te->getMessage());
+        }
+
         return $this->response->setJSON([
             'success'            => true,
             'message'            => 'Pendaftaran Duta Kampus Anda berhasil dikirim! Tim AR Tilik akan meninjau data Anda pada batch seleksi mingguan.',
@@ -175,6 +191,20 @@ class AmbassadorController extends BaseController
         $savedPath = 'uploads/ambassador_ids/' . $newName;
 
         $appModel->saveIdCard((int) $app['id'], $savedPath, $idType);
+
+        // Kirim notifikasi Telegram bahwa berkas identitas / KTM siap diverifikasi admin
+        try {
+            \App\Libraries\TelegramNotifier::notifyAmbassadorKtmUploaded([
+                'id'              => $app['id'],
+                'full_name'       => $app['full_name'],
+                'email'           => $app['email'],
+                'whatsapp_number' => $app['whatsapp_number'],
+                'institution'     => $app['institution'],
+                'id_card_type'    => $idType,
+            ]);
+        } catch (\Throwable $te) {
+            log_message('warning', 'Gagal kirim notifikasi Telegram unggah KTM: ' . $te->getMessage());
+        }
 
         return $this->response->setJSON([
             'success' => true,
@@ -265,7 +295,7 @@ class AmbassadorController extends BaseController
         }
 
         $proofModel = new AmbassadorProofModel();
-        $proofModel->submitProof([
+        $proofId = $proofModel->submitProof([
             'ambassador_id' => $profile['id'],
             'month_period'  => date('Y-m'),
             'proof_type'    => $proofType,
@@ -274,6 +304,25 @@ class AmbassadorController extends BaseController
             'file_path'     => $filePath,
             'url_link'      => $urlLink ?: null,
         ]);
+
+        // Kirim notifikasi Telegram bahwa bukti promosi masuk
+        try {
+            $userModel = new \App\Models\UserModel();
+            $ambUser = $userModel->find($profile['user_id']);
+            \App\Libraries\TelegramNotifier::notifyAmbassadorProofSubmitted([
+                'proof_id'        => $proofId,
+                'ambassador_name' => $ambUser['name'] ?? 'Duta Kampus',
+                'institution'     => $ambUser['institution'] ?? '-',
+                'referral_code'   => $profile['referral_code'],
+                'proof_type'      => $proofType,
+                'title'           => $title,
+                'description'     => $description,
+                'url_link'        => $urlLink,
+                'has_file'        => !empty($filePath),
+            ]);
+        } catch (\Throwable $te) {
+            log_message('warning', 'Gagal kirim notifikasi Telegram bukti promosi: ' . $te->getMessage());
+        }
 
         return $this->response->setJSON([
             'success' => true,

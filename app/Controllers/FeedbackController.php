@@ -46,6 +46,21 @@ class FeedbackController extends BaseController
             ? 'Terima kasih atas apresiasi Anda! Masukan ini sangat berharga bagi peningkatan engine AR Tilik.' 
             : 'Terima kasih atas masukan kritis Anda. Tim kami akan terus menyempurnakan akurasi fitur ini.';
 
+        // Kirim notifikasi Telegram jika pengguna menyertakan masukan teks atau vote kritis (-1)
+        if (!empty($feedbackText) || $voteValue === -1) {
+            try {
+                \App\Libraries\TelegramNotifier::notifyFeatureFeedback([
+                    'report_id'     => $reportId,
+                    'feature_name'  => $featureName,
+                    'vote_value'    => $voteValue,
+                    'feedback_text' => $feedbackText ? (string) $feedbackText : null,
+                    'user_id'       => $userId,
+                ]);
+            } catch (\Throwable $te) {
+                log_message('warning', 'Gagal kirim notifikasi Telegram feedback: ' . $te->getMessage());
+            }
+        }
+
         return $this->response->setJSON([
             'success'    => true,
             'message'    => $msg,
@@ -108,6 +123,32 @@ class FeedbackController extends BaseController
                 ]);
                 session()->set('user_institution', $institution);
             }
+        }
+
+        // Ambil info naskah / kode verifikasi jika tersedia
+        $reportVerificationCode = (string) $reportId;
+        if ($reportId) {
+            $repModel = new \App\Models\ReportModel();
+            $rep = $repModel->find($reportId);
+            if ($rep && !empty($rep['verification_code'])) {
+                $reportVerificationCode = $rep['verification_code'];
+            }
+        }
+
+        // Kirim notifikasi instan ke Telegram agar admin segera merespon & moderasi
+        try {
+            \App\Libraries\TelegramNotifier::notifyTestimonialSubmitted([
+                'rating'               => $rating,
+                'content'              => $content,
+                'author_name'          => $authorName,
+                'author_role'          => $authorRole,
+                'institution'          => $institution,
+                'is_anonymous'         => $isAnonymous,
+                'allow_public_display' => $allowPublic,
+                'report_code'          => $reportVerificationCode,
+            ]);
+        } catch (\Throwable $te) {
+            log_message('warning', 'Gagal kirim notifikasi Telegram testimoni: ' . $te->getMessage());
         }
 
         return $this->response->setJSON([
