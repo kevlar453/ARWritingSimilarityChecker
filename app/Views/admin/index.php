@@ -3006,6 +3006,108 @@
                         </div>
                     <?php endif; ?>
                 </div>
+
+                <!-- Bagian 3: Verifikasi Bukti Aktivitas Promosi Bulanan (Tahap 5 & 6) -->
+                <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-5 space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-700/60 pb-3 flex-wrap gap-2">
+                        <div>
+                            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                                <span>📸 Verifikasi Bukti Promosi &amp; Rekap Mandiri Duta</span>
+                                <span class="text-[10px] font-mono-code px-2 py-0.5 rounded bg-slate-700 text-slate-300">
+                                    <?= count($ambProofs ?? []) ?> total bukti
+                                </span>
+                            </h3>
+                            <p class="text-xs text-slate-400 mt-0.5">Validasi tangkapan layar promosi (Story WA/IG, grup angkatan) untuk syarat kelulusan probation &amp; evaluasi bulanan</p>
+                        </div>
+                    </div>
+
+                    <?php if (empty($ambProofs)): ?>
+                        <div class="p-8 text-center text-xs text-slate-500 bg-slate-900/40 rounded-xl border border-slate-800">
+                            Belum ada bukti promosi yang diunggah oleh Duta Kampus.
+                        </div>
+                    <?php else: ?>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead>
+                                    <tr class="text-slate-400 border-b border-slate-700/60 text-[11px] uppercase tracking-wider">
+                                        <th class="py-3 px-3">Duta &amp; Kampus</th>
+                                        <th class="py-3 px-3">Kegiatan &amp; Saluran</th>
+                                        <th class="py-3 px-3">Waktu Unggah</th>
+                                        <th class="py-3 px-3 text-center">Berkas / Link Bukti</th>
+                                        <th class="py-3 px-3 text-center">Status</th>
+                                        <th class="py-3 px-3 text-right">Aksi Verifikasi</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-800">
+                                    <?php foreach ($ambProofs as $pf): ?>
+                                        <tr class="hover:bg-slate-800/30 transition" id="proof-row-<?= (int)$pf['id'] ?>">
+                                            <td class="py-3 px-3 align-top">
+                                                <div class="font-bold text-white"><?= esc($pf['ambassador_name'] ?? 'Duta') ?></div>
+                                                <div class="text-[11px] text-slate-400"><?= esc($pf['ambassador_institution'] ?? '-') ?></div>
+                                                <div class="text-[10px] text-amber-300 font-mono-code mt-0.5"><?= esc($pf['referral_code'] ?? '-') ?></div>
+                                            </td>
+                                            <td class="py-3 px-3 align-top">
+                                                <div class="font-semibold text-slate-200"><?= esc($pf['title']) ?></div>
+                                                <div class="text-[11px] text-indigo-300 font-medium">
+                                                    <?= strtoupper(str_replace('_', ' ', $pf['proof_type'])) ?>
+                                                </div>
+                                                <?php if (!empty($pf['description'])): ?>
+                                                    <div class="text-[11px] text-slate-400 mt-1 italic"><?= esc($pf['description']) ?></div>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td class="py-3 px-3 align-top whitespace-nowrap text-slate-400">
+                                                <div><?= date('d M Y', strtotime($pf['created_at'])) ?></div>
+                                                <div class="text-[10px] text-slate-500"><?= date('H:i', strtotime($pf['created_at'])) ?> WIB</div>
+                                            </td>
+                                            <td class="py-3 px-3 align-top text-center whitespace-nowrap">
+                                                <?php if (!empty($pf['file_path'])): ?>
+                                                    <a href="<?= base_url('admin/ambassador/proof/file/' . $pf['id']) ?>" target="_blank" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 border border-indigo-500/30 text-[11px] font-bold transition">
+                                                        <span>🖼️</span> <span>Lihat Screenshot</span>
+                                                    </a>
+                                                <?php endif; ?>
+                                                <?php if (!empty($pf['url_link'])): ?>
+                                                    <a href="<?= esc($pf['url_link']) ?>" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-[11px] font-medium transition ml-1">
+                                                        <span>🔗</span> <span>Tautan</span>
+                                                    </a>
+                                                <?php endif; ?>
+                                                <?php if (empty($pf['file_path']) && empty($pf['url_link'])): ?>
+                                                    <span class="text-slate-500 text-[11px]">-</span>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td class="py-3 px-3 align-top text-center whitespace-nowrap" id="proof-status-badge-<?= (int)$pf['id'] ?>">
+                                                <?php if ($pf['status'] === 'approved'): ?>
+                                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                                                        <span>✓</span> <span>Disetujui</span>
+                                                    </span>
+                                                <?php elseif ($pf['status'] === 'rejected'): ?>
+                                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                                                        <span>✕</span> <span>Ditolak</span>
+                                                    </span>
+                                                <?php else: ?>
+                                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                                                        <span>⏳</span> <span>Menunggu Review</span>
+                                                    </span>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td class="py-3 px-3 align-top text-right whitespace-nowrap space-x-1">
+                                                <?php if ($pf['status'] !== 'approved'): ?>
+                                                    <button type="button" onclick="adminApproveProof(<?= (int)$pf['id'] ?>)" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] transition shadow-xs cursor-pointer" title="Verifikasi & setujui bukti promosi ini">
+                                                        ✓ Setujui
+                                                    </button>
+                                                <?php endif; ?>
+                                                <?php if ($pf['status'] !== 'rejected'): ?>
+                                                    <button type="button" onclick="adminRejectProof(<?= (int)$pf['id'] ?>)" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-rose-900 text-slate-300 hover:text-white text-[11px] transition cursor-pointer" title="Tolak bukti promosi">
+                                                        ✕ Tolak
+                                                    </button>
+                                                <?php endif; ?>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    <?php endif; ?>
+                </div>
             </div>
 
         <!-- ========================================== -->
@@ -3657,6 +3759,43 @@
                     setTimeout(() => window.location.reload(), 1500);
                 } else {
                     alert('Gagal aktivasi: ' + (res.message || 'Periksa kembali data.'));
+                }
+            } catch (err) {
+                alert('Terjadi kesalahan koneksi.');
+            }
+        }
+
+        async function adminApproveProof(id) {
+            if (!confirm('Apakah Anda ingin memverifikasi dan menyetujui bukti promosi ini?')) return;
+            try {
+                const res = await postJson('<?= base_url('admin/ambassador/proof/approve') ?>/' + id, {});
+                if (res.success) {
+                    alert('✓ ' + res.message);
+                    const badge = document.getElementById('proof-status-badge-' + id);
+                    if (badge) {
+                        badge.innerHTML = '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"><span>✓</span> <span>Disetujui</span></span>';
+                    }
+                } else {
+                    alert('Gagal: ' + (res.message || 'Terjadi kesalahan.'));
+                }
+            } catch (err) {
+                alert('Terjadi kesalahan koneksi.');
+            }
+        }
+
+        async function adminRejectProof(id) {
+            const reason = prompt('Alasan penolakan bukti (opsional untuk catatan):', 'Tangkapan layar tidak jelas atau bukan materi AR Tilik');
+            if (reason === null) return;
+            try {
+                const res = await postJson('<?= base_url('admin/ambassador/proof/reject') ?>/' + id, { admin_notes: reason });
+                if (res.success) {
+                    alert('✓ ' + res.message);
+                    const badge = document.getElementById('proof-status-badge-' + id);
+                    if (badge) {
+                        badge.innerHTML = '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30"><span>✕</span> <span>Ditolak</span></span>';
+                    }
+                } else {
+                    alert('Gagal: ' + (res.message || 'Terjadi kesalahan.'));
                 }
             } catch (err) {
                 alert('Terjadi kesalahan koneksi.');

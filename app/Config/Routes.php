@@ -165,10 +165,14 @@ $routes->group('admin', ['filter' => 'admin'], function ($routes) {
     $routes->post('testimonials/feature/(:num)', 'Admin\DashboardController::toggleFeaturedTestimonial/$1');
     $routes->post('testimonials/delete/(:num)', 'Admin\DashboardController::deleteTestimonial/$1');
 
-    // Ambassador Batch Review & Activation (Tahap 2, 4)
+    // Ambassador Batch Review & Activation & Proof Verification (Tahap 2, 4, 5, 6)
     $routes->post('ambassador/accept/(:num)', 'Admin\AmbassadorAdminController::acceptApplication/$1');
     $routes->post('ambassador/reject/(:num)', 'Admin\AmbassadorAdminController::rejectApplication/$1');
     $routes->post('ambassador/activate/(:num)', 'Admin\AmbassadorAdminController::activateAmbassador/$1');
+    $routes->post('ambassador/proof/approve/(:num)', 'Admin\AmbassadorAdminController::approveProof/$1');
+    $routes->post('ambassador/proof/reject/(:num)', 'Admin\AmbassadorAdminController::rejectProof/$1');
+    $routes->get('ambassador/proof/file/(:num)', 'Admin\AmbassadorAdminController::viewProofFile/$1');
+    $routes->get('ambassador/ktm/file/(:num)', 'Admin\AmbassadorAdminController::viewKtmFile/$1');
 });
 
 // Human Review & Evaluation Subsystem (DINONAKTIFKAN - mitigasi risiko RCE lewat exec)

@@ -258,9 +258,19 @@
                                                 Tersimpan Aman
                                             </span>
                                         <?php endif; ?>
-                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                                            <?= strtoupper($p['status']) ?>
-                                        </span>
+                                        <?php if ($p['status'] === 'approved'): ?>
+                                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                                                ✓ DISETUJUI
+                                            </span>
+                                        <?php elseif ($p['status'] === 'rejected'): ?>
+                                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                                                ✕ DITOLAK
+                                            </span>
+                                        <?php else: ?>
+                                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                                                ⏳ PENDING
+                                            </span>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             <?php endforeach; ?>

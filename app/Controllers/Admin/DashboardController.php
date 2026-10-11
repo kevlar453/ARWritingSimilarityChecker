@@ -271,6 +271,15 @@ class DashboardController extends BaseController
                           ->get()
                           ->getResultArray();
 
+        $ambProofs = $db->table('ambassador_activity_proofs ap')
+                        ->select('ap.*, prof.referral_code, u.name as ambassador_name, u.email as ambassador_email, u.institution as ambassador_institution')
+                        ->join('ambassador_profiles prof', 'prof.id = ap.ambassador_id', 'left')
+                        ->join('users u', 'u.id = prof.user_id', 'left')
+                        ->orderBy('ap.id', 'DESC')
+                        ->limit(100)
+                        ->get()
+                        ->getResultArray();
+
         return view('admin/index', [
             'activeTab'            => $activeTab,
             'searchQuery'          => $searchQuery,
@@ -324,6 +333,7 @@ class DashboardController extends BaseController
             'ambStats'             => $ambStats,
             'ambApplications'      => $ambApplications,
             'ambProfiles'          => $ambProfiles,
+            'ambProofs'            => $ambProofs,
             'currentAdmin'         => $userModel->find(session()->get('user_id')),
         ]);
     }

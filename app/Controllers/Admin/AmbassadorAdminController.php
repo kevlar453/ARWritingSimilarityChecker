@@ -165,4 +165,107 @@ class AmbassadorAdminController extends BaseController
             'wa_link'       => $waLink,
         ]);
     }
+
+    /**
+     * Menyetujui Bukti Promosi Duta Kampus (Tahap 5 & 6)
+     */
+    public function approveProof(int $id): ResponseInterface
+    {
+        $proofModel = new \App\Models\AmbassadorProofModel();
+        $proof = $proofModel->find($id);
+
+        if (!$proof) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Bukti promosi tidak ditemukan.'])->setStatusCode(404);
+        }
+
+        $proofModel->update($id, [
+            'status'     => 'approved',
+            'updated_at' => date('Y-m-d H:i:s'),
+        ]);
+
+        return $this->response->setJSON([
+            'success' => true,
+            'message' => 'Bukti promosi berhasil diverifikasi & disetujui!',
+        ]);
+    }
+
+    /**
+     * Menolak Bukti Promosi Duta Kampus (Tahap 5 & 6)
+     */
+    public function rejectProof(int $id): ResponseInterface
+    {
+        $proofModel = new \App\Models\AmbassadorProofModel();
+        $proof = $proofModel->find($id);
+
+        if (!$proof) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Bukti promosi tidak ditemukan.'])->setStatusCode(404);
+        }
+
+        $reason = trim((string) $this->request->getPost('admin_notes')) ?: 'Bukti promosi tidak sesuai atau tidak valid';
+
+        $proofModel->update($id, [
+            'status'      => 'rejected',
+            'description' => trim(($proof['description'] ?? '') . ' [Catatan Admin: ' . $reason . ']'),
+            'updated_at'  => date('Y-m-d H:i:s'),
+        ]);
+
+        return $this->response->setJSON([
+            'success' => true,
+            'message' => 'Bukti promosi telah ditandai ditolak.',
+        ]);
+    }
+
+    /**
+     * Mengunduh/Melihat Berkas Bukti Screenshot Promosi secara Aman
+     */
+    public function viewProofFile(int $id): ResponseInterface
+    {
+        $proofModel = new \App\Models\AmbassadorProofModel();
+        $proof = $proofModel->find($id);
+
+        if (!$proof || empty($proof['file_path'])) {
+            return $this->response->setStatusCode(404)->setBody('Berkas bukti tidak ditemukan.');
+        }
+
+        $fullPath = WRITEPATH . $proof['file_path'];
+        if (!file_exists($fullPath)) {
+            return $this->response->setStatusCode(404)->setBody('Berkas fisik bukti promosi tidak ditemukan di penyimpanan server.');
+        }
+
+        $mime = mime_content_type($fullPath) ?: 'application/octet-stream';
+        $content = file_get_contents($fullPath);
+
+        return $this->response->setHeader('Content-Type', $mime)
+                              ->setHeader('Content-Disposition', 'inline; filename="' . basename($fullPath) . '"')
+                              ->setBody($content);
+    }
+
+    /**
+     * Mengunduh/Melihat Berkas KTM Pendaftar secara Aman
+     */
+    public function viewKtmFile(int $id): ResponseInterface
+    {
+        $appModel = new AmbassadorApplicationModel();
+        $app = $appModel->find($id);
+
+        if (!$app || empty($app['id_card_path'])) {
+            return $this->response->setStatusCode(404)->setBody('Berkas KTM tidak ditemukan.');
+        }
+
+        $fullPath = WRITEPATH . 'storage/' . $app['id_card_path'];
+        if (!file_exists($fullPath)) {
+            $fullPath = WRITEPATH . $app['id_card_path'];
+        }
+
+        if (!file_exists($fullPath)) {
+            return $this->response->setStatusCode(404)->setBody('Berkas fisik KTM tidak ditemukan di penyimpanan server.');
+        }
+
+        $mime = mime_content_type($fullPath) ?: 'image/jpeg';
+        $content = file_get_contents($fullPath);
+
+        return $this->response->setHeader('Content-Type', $mime)
+                              ->setHeader('Content-Disposition', 'inline; filename="' . basename($fullPath) . '"')
+                              ->setBody($content);
+    }
 }
