@@ -269,6 +269,10 @@
             border-bottom-color: rgba(226, 232, 240, 0.8);
         }
 
+        .navbar .container {
+            max-width: 1320px;
+        }
+
         /* Floating Go to Top Button */
         .btn-scroll-top {
             position: fixed;
@@ -535,6 +539,38 @@
         .nav-link-verify:hover {
             background: rgba(67, 56, 202, 0.1) !important;
             border-color: rgba(67, 56, 202, 0.35) !important;
+        }
+
+        /* Duta Kampus Nav Pill */
+        .nav-link-ambassador {
+            border: 1px solid rgba(245, 158, 11, 0.3) !important;
+            background: rgba(245, 158, 11, 0.08) !important;
+            color: #b45309 !important;
+            font-weight: 700 !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+        }
+
+        .nav-link-ambassador:hover {
+            background: rgba(245, 158, 11, 0.16) !important;
+            border-color: rgba(245, 158, 11, 0.5) !important;
+            color: #92400e !important;
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15) !important;
+        }
+
+        .nav-badge-ambassador {
+            font-size: 10px;
+            font-weight: 800;
+            line-height: 1;
+            padding: 2px 5.5px;
+            border-radius: 9999px;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: #ffffff;
+            letter-spacing: 0.2px;
+            box-shadow: 0 1px 3px rgba(217, 119, 6, 0.3);
+            display: inline-flex;
+            align-items: center;
         }
 
         .nav-actions {
@@ -2164,9 +2200,9 @@
             font-weight: 600;
         }
 
-        @media (min-width: 993px) and (max-width: 1160px) {
+        @media (min-width: 993px) and (max-width: 1260px) {
             .nav-links { gap: 2px; }
-            .nav-links > li > a, .nav-dropdown-toggle { font-size: 12.8px; padding: 6px 8px; }
+            .nav-links > li > a, .nav-dropdown-toggle { font-size: 12.5px; padding: 6px 7px; }
             .brand-title { font-size: 18px; }
             .brand-badge { display: none; }
         }
@@ -2346,10 +2382,13 @@
                 <li><a href="#langganan">Paket Tarif</a></li>
                 <li><a href="#faq">FAQ</a></li>
                 <li>
-                    <a href="<?= base_url('ambassador') ?>" style="display: inline-flex; align-items: center; gap: 5px; color: #f59e0b; font-weight: 700; background: rgba(245, 158, 11, 0.08); padding: 5px 11px; border-radius: 10px; border: 1px solid rgba(245, 158, 11, 0.25); text-decoration: none; transition: all 0.2s ease;">
-                        <span>🎓</span>
+                    <a href="<?= base_url('ambassador') ?>" class="nav-link-ambassador" title="Program Kemitraan &amp; Afiliasi Duta Kampus (Komisi 20%)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color: #d97706; flex-shrink: 0;">
+                            <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                            <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+                        </svg>
                         <span>Duta Kampus</span>
-                        <span style="font-size: 9px; background: #f59e0b; color: #000; font-weight: 800; padding: 1px 5px; border-radius: 9999px;">20%</span>
+                        <span class="nav-badge-ambassador">20%</span>
                     </a>
                 </li>
                 <li>

@@ -16,8 +16,26 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
+        html, body {
+            overflow-x: clip;
+            max-width: 100vw;
+            width: 100%;
+        }
+        @supports not (overflow: clip) {
+            html, body {
+                overflow-x: hidden;
+            }
+        }
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         .font-mono-code { font-family: 'JetBrains Mono', monospace; }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800 antialiased min-h-screen">
@@ -38,33 +56,41 @@
     <!-- Navbar -->
     <nav class="bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 shadow-xs">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-wrap sm:flex-nowrap justify-between min-h-[4rem] py-2.5 sm:py-3.5 items-center gap-2.5 sm:gap-4">
-                <div class="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
-                    <a href="<?= base_url('dashboard') ?>" class="flex-shrink-0 group">
-                        <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik Logo" class="w-10 h-10 sm:w-11 sm:h-11 object-contain drop-shadow-sm group-hover:scale-105 transition-transform duration-200">
-                    </a>
-                    <div class="min-w-0">
-                        <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-                            <a href="<?= base_url('dashboard') ?>" class="text-lg sm:text-xl font-bold bg-gradient-to-r from-indigo-700 to-indigo-500 bg-clip-text text-transparent hover:opacity-90">AR Tilik</a>
-                            <span class="text-[10px] sm:text-xs px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 font-semibold border border-indigo-100 whitespace-nowrap">Laporan #<?= $report['id'] ?></span>
-                            <span class="text-[9px] sm:text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200 whitespace-nowrap">
-                                Engine: <?= strtoupper(esc($report['engine'] ?? 'hybrid')) ?>
-                            </span>
+            <div class="flex flex-wrap sm:flex-nowrap justify-between min-h-[3.75rem] sm:min-h-[4rem] py-2 sm:py-3.5 items-center gap-2 sm:gap-4">
+                <div class="flex items-center justify-between w-full sm:w-auto min-w-0">
+                    <div class="flex items-center gap-2 sm:gap-3.5 min-w-0">
+                        <a href="<?= base_url('dashboard') ?>" class="flex-shrink-0 group">
+                            <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik Logo" class="w-9 h-9 sm:w-11 sm:h-11 object-contain drop-shadow-sm group-hover:scale-105 transition-transform duration-200">
+                        </a>
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                                <a href="<?= base_url('dashboard') ?>" class="text-base sm:text-xl font-bold bg-gradient-to-r from-indigo-700 to-indigo-500 bg-clip-text text-transparent hover:opacity-90">AR Tilik</a>
+                                <span class="text-[10px] sm:text-xs px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 font-semibold border border-indigo-100 whitespace-nowrap">Laporan #<?= $report['id'] ?></span>
+                                <span class="text-[9px] sm:text-[10px] uppercase font-bold tracking-wider px-1.5 sm:px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200 whitespace-nowrap">
+                                    Engine: <?= strtoupper(esc($report['engine'] ?? 'hybrid')) ?>
+                                </span>
+                            </div>
+                            <p class="hidden sm:block text-[11px] text-slate-400 truncate">Academic Writing Similarity & Evidence Checker</p>
                         </div>
-                        <p class="hidden sm:block text-[11px] text-slate-400 truncate">Academic Writing Similarity & Evidence Checker</p>
                     </div>
+                    <!-- Quick Back to Dashboard on Mobile (Header Top Right) -->
+                    <a href="<?= base_url('dashboard') ?>" class="sm:hidden text-xs font-semibold text-slate-600 hover:text-indigo-600 flex items-center gap-1 px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 hover:bg-white transition shrink-0 ml-2 shadow-2xs" title="Kembali ke Dashboard">
+                        <span>← Dashboard</span>
+                    </a>
                 </div>
-                <div class="flex items-center gap-2 flex-shrink-0">
+
+                <!-- Action Toolbar: horizontally scrollable on mobile, flex on desktop -->
+                <div class="w-full sm:w-auto flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar py-1 sm:py-0 -mx-4 px-4 sm:mx-0 sm:px-0 max-w-full flex-nowrap">
                     <?php if (($report['status'] ?? '') === 'completed'): ?>
                         <?php if (($document['document_type'] ?? '') === 'corpus'): ?>
-                            <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 flex items-center gap-1.5 px-3 py-1.5 rounded-lg shadow-xs">
+                            <span class="shrink-0 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 flex items-center gap-1.5 px-3 py-1.5 rounded-lg shadow-xs whitespace-nowrap">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                 </svg>
                                 <span>Korpus Institusi</span>
                             </span>
                         <?php else: ?>
-                            <button id="btnEnrollCorpus" onclick="enrollDocumentAsCorpus(<?= $document['id'] ?>)" class="text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 active:bg-emerald-200 border border-emerald-300 flex items-center gap-1.5 px-3 py-1.5 rounded-lg shadow-xs transition cursor-pointer">
+                            <button id="btnEnrollCorpus" onclick="enrollDocumentAsCorpus(<?= $document['id'] ?>)" class="shrink-0 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 active:bg-emerald-200 border border-emerald-300 flex items-center gap-1.5 px-3 py-1.5 rounded-lg shadow-xs transition cursor-pointer whitespace-nowrap">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                                 </svg>
@@ -72,31 +98,31 @@
                             </button>
                         <?php endif; ?>
                         <?php if (!empty($isSharedAccess)): ?>
-                            <span class="text-xs font-semibold text-sky-700 bg-sky-50 border border-sky-200 flex items-center gap-1.5 px-3 py-1.5 rounded-lg shadow-xs" title="Naskah karya ilmiah ini dibagikan kepada Anda">
+                            <span class="shrink-0 text-xs font-semibold text-sky-700 bg-sky-50 border border-sky-200 flex items-center gap-1.5 px-3 py-1.5 rounded-lg shadow-xs whitespace-nowrap" title="Naskah karya ilmiah ini dibagikan kepada Anda">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
                                 <span>Dibagikan</span>
                             </span>
                         <?php endif; ?>
                         <?php if (!empty($isOwner) || (session()->get('user_role') === 'admin')): ?>
-                            <button onclick="openShareModal(<?= $document['id'] ?>, <?= htmlspecialchars(json_encode($document['title']), ENT_QUOTES, 'UTF-8') ?>)" class="text-xs font-semibold text-sky-700 bg-sky-50 hover:bg-sky-100 active:bg-sky-200 border border-sky-200 flex items-center gap-1.5 px-3 py-1.5 rounded-lg shadow-xs transition cursor-pointer" title="Bagikan karya ilmiah ini ke pengguna lain">
+                            <button onclick="openShareModal(<?= $document['id'] ?>, <?= htmlspecialchars(json_encode($document['title']), ENT_QUOTES, 'UTF-8') ?>)" class="shrink-0 text-xs font-semibold text-sky-700 bg-sky-50 hover:bg-sky-100 active:bg-sky-200 border border-sky-200 flex items-center gap-1.5 px-3 py-1.5 rounded-lg shadow-xs transition cursor-pointer whitespace-nowrap" title="Bagikan karya ilmiah ini ke pengguna lain">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
                                 <span>Bagikan</span>
                             </button>
                         <?php endif; ?>
-                        <button onclick="openDualReaderModal()" class="text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-lg shadow-xs transition cursor-pointer">
+                        <button onclick="openDualReaderModal()" class="shrink-0 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-lg shadow-xs transition cursor-pointer whitespace-nowrap">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/>
                             </svg>
                             <span>Layar Ganda</span>
                         </button>
-                        <a href="<?= base_url('report/' . $report['id'] . '/export') ?>" target="_blank" onclick="handleDownloadPdfClick(event)" class="text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-lg shadow-xs transition">
+                        <a href="<?= base_url('report/' . $report['id'] . '/export') ?>" target="_blank" onclick="handleDownloadPdfClick(event)" class="shrink-0 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-lg shadow-xs transition whitespace-nowrap">
                             <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                             </svg>
                             <span>Unduh PDF</span>
                         </a>
                     <?php endif; ?>
-                    <a href="<?= base_url('dashboard') ?>" class="text-xs font-semibold text-slate-600 hover:text-indigo-600 flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-white transition">
+                    <a href="<?= base_url('dashboard') ?>" class="hidden sm:flex shrink-0 text-xs font-semibold text-slate-600 hover:text-indigo-600 items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-white transition whitespace-nowrap">
                         <span>← Dashboard</span>
                     </a>
                 </div>
@@ -105,23 +131,23 @@
     </nav>
 
     <!-- Main Container -->
-    <main class="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+    <main class="max-w-5xl w-full min-w-0 mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
 
         <!-- Document Metadata Header -->
-        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-                <div class="flex items-center gap-2 mb-2">
+        <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4 min-w-0">
+            <div class="min-w-0">
+                <div class="flex items-center gap-2 mb-2 flex-wrap">
                     <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded-md border border-indigo-100">
                         Academic Evidence Report
                     </span>
                     <span class="text-xs text-slate-400">•</span>
                     <span class="text-xs text-slate-500">ID Submisi #<?= $document['id'] ?? $report['document_id'] ?></span>
                 </div>
-                <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+                <h1 class="text-xl sm:text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight break-words">
                     <?= esc($document['title'] ?? 'Dokumen Karya Ilmiah') ?>
                 </h1>
                 <p class="text-xs sm:text-sm text-slate-500 mt-1 flex flex-wrap items-center gap-3">
-                    <span>File: <span class="font-mono-code text-slate-700 font-semibold"><?= esc($document['original_filename'] ?? '-') ?></span></span>
+                    <span>File: <span class="font-mono-code text-slate-700 font-semibold break-all"><?= esc($document['original_filename'] ?? '-') ?></span></span>
                     <span>•</span>
                     <span>Diperiksa: <strong class="text-slate-700"><?= date('d M Y, H:i', strtotime($report['created_at'])) ?></strong></span>
                     <?php if (!empty($evidenceData['total_words'])): ?>
