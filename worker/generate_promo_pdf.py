@@ -60,6 +60,7 @@ def build_html() -> str:
     hero_b64 = load_image_base64(PUBLIC_DIR / "images" / "hero_illustration.jpg")
     dual_lens_concept_b64 = load_image_base64(PUBLIC_DIR / "images" / "dual_lens_concept.jpg")
     dual_reader_mockup_b64 = load_image_base64(PUBLIC_DIR / "images" / "dual_reader_mockup.jpg")
+    piagam_mockup_b64 = load_image_base64(PUBLIC_DIR / "images" / "piagam_akreditasi_mockup.png")
     qr_portal_b64 = generate_qr_base64("https://tilik.arsetontong.top/#solusi")
     qr_demo_b64 = generate_qr_base64("https://tilik.arsetontong.top/verify/ART-OJS3-8821-DEMO")
     qr_wa_b64 = generate_qr_base64("https://wa.me/6282353201673?text=Halo%20Pak%20Makarius,%20saya%20ingin%20mengajukan%20Trial%20Gratis%2014%20Hari%20AR%20Tilik")
@@ -92,7 +93,7 @@ def build_html() -> str:
         color: #64748b;
     }
     @bottom-left {
-        content: "https://tilik.arsetontong.top • Prospektus Resmi Institusi v1.3.0 Production";
+        content: "https://tilik.arsetontong.top • Prospektus Resmi Institusi v2.0 Production";
         font-family: 'Liberation Sans', 'DejaVu Sans', Arial, sans-serif;
         font-size: 7.2pt;
         color: #94a3b8;
@@ -730,7 +731,7 @@ body {
             </div>
         </div>
         <div class="cover-badge">
-            Prospektus Resmi Institusi • v1.3.0 Production
+            Prospektus Resmi Institusi • v2.0 Production
         </div>
     </div>
 
@@ -740,7 +741,7 @@ body {
         <span>Efisiensi Anggaran Kampus Hingga 70%</span>
     </h2>
     <p class="cover-hero-subtitle">
-        Platform pemeriksaan kesepadanan naskah ilmiah berbasis Dual-Lens, audit forensik semantik bertenaga Google Gemini AI, dan verifikasi sertifikat digital berstempel SHA-256 yang menjaga 100% kerahasiaan hak cipta karya ilmiah sivitas akademika Indonesia.
+        Platform pemeriksaan integritas karya ilmiah berbasis komputasi Catur Pilar (Sekuensial, Orientasi Kosinus, Pasase, &amp; Sintesis Mesin), Audit Forensik Cerdas bertenaga Google Gemini AI, dan verifikasi sertifikat digital berstempel SHA-256 dengan jaminan Zero-Leakage (Pemusnahan Berkas Fisik Mandiri).
     </p>
 
     <div class="cover-hero-image-box">
@@ -755,35 +756,35 @@ body {
         </div>
         <div class="cover-stat-card">
             <div class="cover-stat-val emerald">100%</div>
-            <div class="cover-stat-lbl">Kedaulatan Data &amp; Anti-Kebocoran Naskah</div>
+            <div class="cover-stat-lbl">Kedaulatan &amp; Zero-Leakage (Fitur Purge Mandiri)</div>
         </div>
         <div class="cover-stat-card">
             <div class="cover-stat-val">&lt; 15 dtk</div>
-            <div class="cover-stat-lbl">Komputasi Dual-Lens Kilat &amp; Akurat</div>
+            <div class="cover-stat-lbl">Komputasi Catur Pilar Kilat &amp; Presisi</div>
         </div>
         <div class="cover-stat-card">
             <div class="cover-stat-val rose">SINTA Ready</div>
-            <div class="cover-stat-lbl">Bukti Dukung Akreditasi ARJUNA &amp; BAN-PT</div>
+            <div class="cover-stat-lbl">Bukti Dukung Akreditasi ARJUNA &amp; SINTA</div>
         </div>
     </div>
 
     <!-- 4 Pilar Strategis -->
     <div class="cover-pillars-grid">
         <div class="cover-pillar-card">
-            <div class="cover-pillar-title">🛡️ 100% Kedaulatan &amp; Kerahasiaan Data</div>
-            <div class="cover-pillar-desc">Naskah submisi tidak diumpankan ke repositori komersial global. Opsi <em>On-Premise / Private Cloud</em> menjamin data riset sivitas tetap di pusat data kampus.</div>
+            <div class="cover-pillar-title"><span style="color: #38bdf8; font-weight: 800; margin-right: 4px;">&bull;</span> Kedaulatan Data &amp; Zero-Leakage Guarantee</div>
+            <div class="cover-pillar-desc">Naskah submisi tidak diumpankan ke repositori komersial global. Fitur <em>Self-Service File Purge</em> memungkinkan pemusnahan berkas fisik mandiri, sementara sertifikat SHA-256 tetap sah 100%.</div>
         </div>
         <div class="cover-pillar-card">
-            <div class="cover-pillar-title">💰 Lisensi Rupiah Transparan Tanpa Monopoli</div>
-            <div class="cover-pillar-desc">Hapus beban tagihan valas asing (USD) dan sistem lisensi per-kepala mahasiswa. Kampus membayar sesuai kuota naskah riil dengan biaya terukur.</div>
+            <div class="cover-pillar-title"><span style="color: #38bdf8; font-weight: 800; margin-right: 4px;">&bull;</span> Lisensi Rupiah Transparan Tanpa Monopoli</div>
+            <div class="cover-pillar-desc">Hapus beban tagihan valas asing (USD) dan sistem lisensi per-kepala mahasiswa. Kampus membayar sesuai kuota naskah riil dengan biaya terukur dan hemat hingga 70%.</div>
         </div>
         <div class="cover-pillar-card">
-            <div class="cover-pillar-title">🔍 Mesin Analisis Dual-Lens &amp; Isolasi Substantif</div>
-            <div class="cover-pillar-desc">Memisahkan salin-tempel literal (Lensa 1) dengan parafrase semantik (Lensa 2). Bagian metodologi baku dan daftar pustaka diisolasi agar sitasi wajar tidak dipenalti.</div>
+            <div class="cover-pillar-title"><span style="color: #38bdf8; font-weight: 800; margin-right: 4px;">&bull;</span> Standar Catur Pilar &amp; Isolasi Substantif</div>
+            <div class="cover-pillar-desc">Mengevaluasi 4 metrik independen (5-Gram, TF-IDF Kosinus, Pasase Panjang, &amp; Sintesis Mesin). Isolasi cerdas melindungi rujukan hukum, formula administratif, dan bibliografi.</div>
         </div>
         <div class="cover-pillar-card">
-            <div class="cover-pillar-title">🤖 Google Gemini AI Forensic Audit &amp; Tanya Uji</div>
-            <div class="cover-pillar-desc">Penalaran semantik cerdas membongkar manipulasi teks &amp; rujukan fiktif, serta otomatis menghasilkan 3 set pertanyaan kritis untuk Dewan Penguji sidang &amp; Reviewer.</div>
+            <div class="cover-pillar-title"><span style="color: #38bdf8; font-weight: 800; margin-right: 4px;">&bull;</span> Audit Forensik Cerdas &amp; Panduan Tanya Uji</div>
+            <div class="cover-pillar-desc">Penalaran semantik Google Gemini AI membongkar rujukan fiktif &amp; fabrikasi data, serta memproduksi 3–4 set pertanyaan kritis untuk Dewan Penguji sidang &amp; Reviewer.</div>
         </div>
     </div>
 
@@ -805,68 +806,80 @@ body {
 
     <div class="grid-3">
         <div class="info-card alert">
-            <div class="card-title">⚠️ Jebakan Skor Tunggal</div>
+            <div class="card-title"><span style="color: #e11d48; font-weight: 800; margin-right: 4px;">&bull;</span> Jebakan Skor Tunggal</div>
             <div class="card-text">
                 Alat pendeteksi lama mencampuradukkan sitasi sah, kutipan doa, nama institusi, dan kalimat metodologi umum menjadi satu angka kumulatif, menimbulkan salah vonis yang merugikan mahasiswa dan peneliti jujur.
             </div>
         </div>
         <div class="info-card alert">
-            <div class="card-title">💵 Beban Lisensi Valas (USD)</div>
+            <div class="card-title"><span style="color: #e11d48; font-weight: 800; margin-right: 4px;">&bull;</span> Beban Lisensi Valas (USD)</div>
             <div class="card-text">
                 Platform komersial asing memberlakukan sistem lisensi per-kepala mahasiswa berbayar USD. Kampus terpaksa mengalokasikan ratusan juta hingga miliaran rupiah setiap tahun hanya untuk langganan alat bantu.
             </div>
         </div>
         <div class="info-card alert">
-            <div class="card-title">🔓 Kebocoran Hak Cipta Naskah</div>
+            <div class="card-title"><span style="color: #e11d48; font-weight: 800; margin-right: 4px;">&bull;</span> Naskah Tersandera Tanpa Opsi Purge</div>
             <div class="card-text">
-                Naskah pra-publikasi yang diunggah otomatis tersimpan di repositori terbuka penyedia asing. Gagasan riset dan draf naskah yang belum resmi terbit berisiko terpublikasi secara prematur.
+                Naskah pra-publikasi yang diunggah otomatis tersimpan di cloud asing tanpa jaminan kedaulatan data. Kampus tidak memiliki kendali untuk memusnahkan draf naskah riset berharga milik sivitas akademika.
             </div>
         </div>
     </div>
 
     <div class="section-tag">Arsitektur Komputasi Unggulan</div>
-    <h2 class="section-title">Solusi AR Tilik: Dekomposisi Dual-Lens &amp; Isolasi Substantif</h2>
+    <h2 class="section-title">Standar Catur Pilar Metrik Integritas Akademik</h2>
     <p class="section-desc">
-        AR Tilik membedah setiap naskah secara objektif melalui dua sudut pandang matematis yang independen, memastikan keadilan akademik tanpa vonis serampangan:
+        AR Tilik membedah setiap naskah secara komprehensif melalui 4 pilar metrik independen berstandar akreditasi SINTA &amp; ARJUNA:
     </p>
 
     <div class="grid-2">
         <div class="info-card primary">
-            <div class="card-title">🔬 Lensa 1: Exact 5-Gram Shingling (Literal)</div>
+            <div class="card-title"><span style="display:inline-block; font-size: 6.8pt; font-weight: 800; background: #4338ca; color: #ffffff; padding: 1px 4.5px; border-radius: 3px; margin-right: 3px;">PILAR I</span> Sekuensial: Kesepadanan Harfiah</div>
             <div class="card-text">
-                Memecah teks menjadi klaster 5-kata sekuensial dan mencocokkan hash blok teks identik. Berfungsi mendeteksi kutipan langsung tanpa tanda petik, salin-tempel kata-demi-kata (*verbatim copying*), dan mengidentifikasi pasase duplikasi terpanjang.
+                Memecah teks menjadi klaster 5-kata sekuensial (5-Gram Shingle). Berfungsi mendeteksi kutipan langsung tanpa tanda petik, salin-tempel kata-demi-kata (*verbatim copying*), dan kesepadanan harfiah secara matematis.
             </div>
         </div>
         <div class="info-card primary">
-            <div class="card-title">🧠 Lensa 2: TF-IDF Cosine Vector (Semantik)</div>
+            <div class="card-title"><span style="display:inline-block; font-size: 6.8pt; font-weight: 800; background: #4338ca; color: #ffffff; padding: 1px 4.5px; border-radius: 3px; margin-right: 3px;">PILAR II</span> Orientasi: Kosinus Leksikal / Topik</div>
             <div class="card-text">
-                Membangun ruang vektor multi-dimensi berdasarkan frekuensi dan bobot kelangkaan istilah ilmiah (IDF). Berfungsi mendeteksi parafrase terstruktur, manipulasi sinonim kata, dan kesepadanan topik gagasan mendalam.
+                Membangun ruang vektor multi-dimensi bobot istilah ilmiah (TF-IDF Cosine). Berfungsi mendeteksi parafrase terstruktur, pergeseran sinonim kata, dan korelasi topik gagasan mendalam.
+            </div>
+        </div>
+        <div class="info-card primary">
+            <div class="card-title"><span style="display:inline-block; font-size: 6.8pt; font-weight: 800; background: #4338ca; color: #ffffff; padding: 1px 4.5px; border-radius: 3px; margin-right: 3px;">PILAR III</span> Pasase: Rangkaian Terpanjang</div>
+            <div class="card-text">
+                Mengukur bentangan pasase terpanjang tanpa putus (*longest consecutive span*). Membedakan apakah kesepadanan tersebar wajar pada frasa umum atau terpusat dalam blok kalimat yang perlu parafrasa ulang.
+            </div>
+        </div>
+        <div class="info-card primary">
+            <div class="card-title"><span style="display:inline-block; font-size: 6.8pt; font-weight: 800; background: #be123c; color: #ffffff; padding: 1px 4.5px; border-radius: 3px; margin-right: 3px;">PILAR IV</span> Sintesis: Forensik Sintesis Mesin</div>
+            <div class="card-text">
+                Mengevaluasi probabilitas sintesis AI melalui kombinasi stylometri teks (*burstiness*, leksikon, variasi kalimat) berpadu dengan penalaran audit semantik forensik mendalam.
             </div>
         </div>
     </div>
 
     <!-- Visual Concept -->
-    <div style="width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; overflow: hidden; margin-bottom: 4mm;">
-        <img src="__DUAL_LENS_CONCEPT_B64__" alt="Konsep Dual-Lens AR Tilik" style="width: 100%; height: 38mm; object-fit: cover; display: block;">
+    <div style="width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; overflow: hidden; margin-bottom: 3.5mm;">
+        <img src="__DUAL_LENS_CONCEPT_B64__" alt="Konsep Dual-Lens &amp; Catur Pilar AR Tilik" style="width: 100%; height: 32mm; object-fit: cover; display: block;">
     </div>
 
     <div class="section-tag emerald">Kecerdasan Artifisial Generatif</div>
-    <h2 class="section-title">Google Gemini AI Forensic Audit &amp; Panduan Tanya Uji Kritis</h2>
+    <h2 class="section-title">Audit Forensik Cerdas (Deep Semantic) &amp; Tanya Uji Kritis</h2>
     <p class="section-desc">
-        AR Tilik melangkah jauh melampaui pencocokan teks biasa dengan menghadirkan penalaran forensik semantik bertenaga AI untuk membantu dewan editor jurnal dan penguji sidang:
+        Melangkah jauh melampaui deteksi probabilitas AI biasa dengan menghadirkan penalaran forensik semantik mendalam bertenaga Google Gemini AI untuk membantu dewan editor jurnal dan penguji sidang:
     </p>
 
     <div class="grid-2">
         <div class="info-card highlight">
-            <div class="card-title">🛡️ Audit Forensik Semantik AI</div>
+            <div class="card-title"><span style="color: #059669; font-weight: 800; margin-right: 4px;">&bull;</span> Deteksi Halusinasi Rujukan &amp; Fabrikasi Data</div>
             <div class="card-text">
-                Mendeteksi anomali gaya selingkung (*stylometry*), indikasi fabrikasi data, serta kutipan sitasi fiktif/halusinatif yang sering lolos dari pengawasan manusia. Memberikan ringkasan audit komprehensif berstatus netral.
+                Mendeteksi rujukan sitasi fiktif yang dikarang generator AI, distorsi metodologi, ketidaksesuaian entitas fakta, serta potensi kebocoran prompt (*meta-prompt leak*).
             </div>
         </div>
         <div class="info-card highlight">
-            <div class="card-title">🎯 3 Set Pertanyaan Tanya Uji (Oral Defense)</div>
+            <div class="card-title"><span style="color: #059669; font-weight: 800; margin-right: 4px;">&bull;</span> 3–4 Set Pertanyaan Tanya Uji (Oral Defense)</div>
             <div class="card-text">
-                Otomatis memproduksi daftar pertanyaan kritis berbasis temuan pasase naskah yang spesifik. Sangat berharga bagi Dosen Penguji Skripsi/Tesis dan Mitra Bestari Jurnal untuk menguji penguasaan substansi penulis secara elegan.
+                Otomatis memproduksi daftar pertanyaan kritis berbasis temuan pasase naskah. Sangat berharga bagi Dosen Penguji Skripsi/Tesis dan Mitra Bestari Jurnal untuk menguji penguasaan substansi penulis secara elegan.
             </div>
         </div>
     </div>
@@ -894,43 +907,43 @@ body {
         <tbody>
             <tr>
                 <td><strong>Kedaulatan &amp; Privasi Data</strong></td>
-                <td><span class="badge-win">100% Privat / Opsi On-Premise</span><br>Naskah draft tidak dibocorkan ke luar.</td>
-                <td><span class="badge-lose">Tersimpan di Cloud Asing</span><br>Naskah tersimpan di basis data vendor.</td>
-                <td><span class="badge-lose">Risiko Naskah Dijual</span><br>Hak cipta rentan disalahgunakan.</td>
+                <td><span class="badge-win">100% Privat + Zero-Leakage</span><br>Opsi Purge berkas fisik mandiri, verifikasi SHA-256 tetap sah 100%.</td>
+                <td><span class="badge-lose">Tersimpan di Cloud Asing</span><br>Naskah tersimpan di basis data vendor tanpa opsi purge mandiri.</td>
+                <td><span class="badge-lose">Risiko Naskah Dijual</span><br>Hak cipta rentan disalahgunakan pihak ketiga.</td>
             </tr>
             <tr>
                 <td><strong>Skema Biaya &amp; Model Lisensi</strong></td>
-                <td><span class="badge-win">Rupiah Transparan, Hemat 70%</span><br>Kuota fleksibel, tanpa biaya per-kepala mhs.</td>
+                <td><span class="badge-win">Rupiah Transparan, Hemat 70%</span><br>Kuota fleksibel, tanpa biaya per-kepala mhs, bebas kurs USD.</td>
                 <td><span class="badge-lose">Valas (USD) Sangat Mahal</span><br>Kontrak multi-tahunan, tarif per-mahasiswa.</td>
                 <td><span class="badge-neutral">Gratis Terbatas / Iklan</span><br>Fitur dipangkas, limit kata sangat kecil.</td>
             </tr>
             <tr>
                 <td><strong>Dekomposisi Bukti Kemiripan</strong></td>
-                <td><span class="badge-win">Dual-Lens (5-Gram &amp; TF-IDF Cosine)</span><br>Memisahkan salin-tempel vs parafrase.</td>
+                <td><span class="badge-win">Standar Catur Pilar Metrik</span><br>Sekuensial 5-Gram, Kosinus TF-IDF, Pasase, Sintesis Mesin.</td>
                 <td><span class="badge-neutral">Hanya Skor Tunggal Kumulatif</span><br>Tidak membedakan jenis kemiripan.</td>
                 <td><span class="badge-lose">Pencocokan String Dasar</span><br>Sangat mudah dikelabui manipulasi kata.</td>
             </tr>
             <tr>
                 <td><strong>Isolasi Substantif (Section-Aware)</strong></td>
-                <td><span class="badge-win">Ya, Pemisahan Bab Otomatis</span><br>Metodologi &amp; referensi diisolasi adil.</td>
+                <td><span class="badge-win">Pengecualian Cerdas Otomatis</span><br>Isolasi sitasi hukum, formula administratif, &amp; daftar pustaka.</td>
                 <td><span class="badge-neutral">Hanya Filter Teks Standar</span><br>Memerlukan penyesuaian manual lambat.</td>
                 <td><span class="badge-lose">Tidak Ada</span><br>Seluruh teks diperlakukan seragam.</td>
             </tr>
             <tr>
                 <td><strong>Forensik Cerdas Google Gemini AI</strong></td>
-                <td><span class="badge-win">Ya, Forensik Semantik + Tanya Uji</span><br>Analisis gaya teks &amp; panduan penguji.</td>
-                <td><span class="badge-lose">Tidak Tersedia</span><br>Hanya fitur detektor AI generik terpisah.</td>
+                <td><span class="badge-win">Deep Semantic + Deteksi Sitasi Palsu</span><br>Deteksi rujukan fiktif halusinasi AI &amp; panduan tanya uji.</td>
+                <td><span class="badge-lose">Detektor AI Terpisah Tanpa Audit Rujukan</span><br>Hanya probabilitas mentah tanpa audit rujukan.</td>
                 <td><span class="badge-lose">Tidak Ada</span></td>
             </tr>
             <tr>
                 <td><strong>Sertifikat Digital Anti-Pemalsuan</strong></td>
-                <td><span class="badge-win">Ya, QR Code Publik + SHA-256</span><br>Diverifikasi instan oleh Asesor SINTA.</td>
+                <td><span class="badge-win">Piagam Akreditasi Standar SINTA/ARJUNA</span><br>Diploma A4, stempel medali emas 3D, QR &amp; SHA-256.</td>
                 <td><span class="badge-neutral">Hanya Lembar PDF Standar</span><br>Rentan dipalsukan / dimanipulasi teksnya.</td>
                 <td><span class="badge-lose">Tidak Ada Sertifikat</span></td>
             </tr>
             <tr>
                 <td><strong>Konektivitas OJS 3.x &amp; Repositori</strong></td>
-                <td><span class="badge-win">Native REST API, PHP, &amp; OAI-PMH</span><br>Plug-and-play ke OJS 3, EPrints, &amp; DSpace.</td>
+                <td><span class="badge-win">Native REST API, CLI, &amp; OAI-PMH</span><br>Plug-and-play ke OJS 3, EPrints, &amp; DSpace.</td>
                 <td><span class="badge-neutral">Integrasi API Kompleks</span><br>Memerlukan biaya lisensi API tambahan.</td>
                 <td><span class="badge-lose">Manual Satu-Satu</span><br>Tidak mendukung otomasi redaksi.</td>
             </tr>
@@ -944,18 +957,29 @@ body {
     </table>
 
     <div class="section-tag emerald">Antarmuka Interaktif &amp; Bukti Keabsahan</div>
-    <h2 class="section-title">Dual-Reader Interaktif &amp; Sertifikat Digital Berkode QR</h2>
+    <h2 class="section-title">Dual-Reader Interaktif &amp; Piagam Akreditasi Standar SINTA</h2>
     <p class="section-desc">
-        Memudahkan sivitas memeriksa bukti secara berdampingan dan membuktikan keabsahan naskah secara transparan kepada pihak ketiga:
+        Memudahkan sivitas memeriksa bukti secara berdampingan serta menerbitkan piagam pengesahan resmi berstandar akreditasi nasional:
     </p>
 
-    <!-- Visual Mockup -->
-    <div style="width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; overflow: hidden; margin-bottom: 3.5mm;">
-        <img src="__DUAL_READER_MOCKUP_B64__" alt="Antarmuka Dual-Reader AR Tilik" style="width: 100%; height: 36mm; object-fit: cover; display: block;">
+    <!-- Visual Mockups: Dual Reader & Piagam Akreditasi -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 3mm;">
+        <div style="border: 1px solid #cbd5e1; border-radius: 6px; overflow: hidden; background: #020617;">
+            <img src="__DUAL_READER_MOCKUP_B64__" alt="Antarmuka Dual-Reader AR Tilik" style="width: 100%; height: 31mm; object-fit: cover; display: block;">
+            <div style="padding: 2.5px 5px; font-size: 6.6pt; font-weight: 700; color: #334155; background: #f8fafc; text-align: center; border-top: 1px solid #e2e8f0;">
+                Dual-Reader Bukti Interaktif Berdampingan
+            </div>
+        </div>
+        <div style="border: 1px solid #cbd5e1; border-radius: 6px; overflow: hidden; background: #020617;">
+            <img src="__PIAGAM_MOCKUP_B64__" alt="Piagam Akreditasi Integritas Resmi AR Tilik" style="width: 100%; height: 31mm; object-fit: cover; display: block;">
+            <div style="padding: 2.5px 5px; font-size: 6.6pt; font-weight: 700; color: #875c16; background: #fffdf8; text-align: center; border-top: 1px solid #fef3c7;">
+                Piagam Akreditasi Standar SINTA / ARJUNA (A4)
+            </div>
+        </div>
     </div>
 
     <div class="callout-box">
-        <strong>Sertifikat Keabsahan Digital Resmi:</strong> Setiap dokumen yang diperiksa memperoleh lembar sertifikasi digital berstempel kriptografis SHA-256 dan kode QR publik. Asesor SINTA, ARJUNA, BAN-PT, maupun panitia yudisium dapat memindai kode QR untuk memvalidasi keaslian laporan secara instan tanpa perlu akun masuk.
+        <strong>Piagam Akreditasi Integritas Resmi &amp; Jaminan Zero-Leakage:</strong> Setiap pemeriksaan menghasilkan Piagam Akreditasi format Diploma A4 berstempel medali emas timbul 3D, validasi kriptografis SHA-256, dan kode QR publik. Asesor SINTA, ARJUNA, BAN-PT, maupun panitia yudisium dapat memvalidasi keaslian secara instan tanpa perlu akun masuk &mdash; bahkan setelah berkas fisik naskah asli dimusnahkan secara mandiri oleh institusi (Zero-Leakage Guarantee).
     </div>
 </div>
 
@@ -980,8 +1004,9 @@ body {
                 <li><span class="check">✓</span> <span class="li-txt">Kuota fleksibel untuk 1–10 Jurnal OJS</span></li>
                 <li><span class="check">✓</span> <span class="li-txt">Pustaka Konektor PHP &amp; Skrip Runner CLI</span></li>
                 <li><span class="check">✓</span> <span class="li-txt">REST API Key Jurnal dengan limit terlindungi</span></li>
-                <li><span class="check">✓</span> <span class="li-txt">Sertifikat Digital Ber-QR Code per artikel</span></li>
+                <li><span class="check">✓</span> <span class="li-txt">Piagam Akreditasi Digital ber-QR Code per artikel</span></li>
                 <li><span class="check">✓</span> <span class="li-txt">Standar Bukti Akreditasi ARJUNA / SINTA</span></li>
+                <li><span class="check">✓</span> <span class="li-txt">Jaminan Zero-Leakage (Privasi Blind Review)</span></li>
             </ul>
             <div style="font-size: 7.2pt; color: #64748b; font-weight: 600; text-align: center; border-top: 1px dashed #e2e8f0; padding-top: 5px;">
                 Mulai Rp 450.000 / Bulan
@@ -997,9 +1022,11 @@ body {
             <ul class="package-list">
                 <li><span class="check">✓</span> <span class="li-txt">Seluruh fitur Paket Redaksi Jurnal</span></li>
                 <li><span class="check">✓</span> <span class="li-txt">Dasbor Verifikasi Skripsi, Tesis &amp; Disertasi</span></li>
-                <li><span class="check">✓</span> <span class="li-txt"><strong>AI Oral Defense Questions</strong> untuk Dosen Penguji</span></li>
-                <li><span class="check">✓</span> <span class="li-txt">Isolasi Substantif Bab Pembahasan Ilmiah</span></li>
-                <li><span class="check">✓</span> <span class="li-txt">Multi-user akun Dosen Pembimbing &amp; Admin Prodi</span></li>
+                <li><span class="check">✓</span> <span class="li-txt">Standar Komputasi Catur Pilar Lengkap</span></li>
+                <li><span class="check">✓</span> <span class="li-txt"><strong>AI Oral Defense Questions</strong> Dosen Penguji</span></li>
+                <li><span class="check">✓</span> <span class="li-txt">Isolasi Substantif Bab Pembahasan &amp; Bibliografi</span></li>
+                <li><span class="check">✓</span> <span class="li-txt">Pemusnahan Berkas Mandiri (Zero-Leakage)</span></li>
+                <li><span class="check">✓</span> <span class="li-txt">Multi-user akun Pembimbing &amp; Admin Prodi</span></li>
             </ul>
             <div style="font-size: 7.2pt; color: #4338ca; font-weight: 700; text-align: center; border-top: 1px dashed #c7d2fe; padding-top: 5px;">
                 Solusi Paling Populer Fakultas
@@ -1017,6 +1044,7 @@ body {
                 <li><span class="check">✓</span> <span class="li-txt">Panen Otomatis Repositori Kampus (OAI-PMH)</span></li>
                 <li><span class="check">✓</span> <span class="li-txt">Integrasi Single Sign-On (SSO / LDAP / Google)</span></li>
                 <li><span class="check">✓</span> <span class="li-txt">Dasbor Analitik Tren Integritas Universitas</span></li>
+                <li><span class="check">✓</span> <span class="li-txt">Kedaulatan Penuh &amp; Zero-Leakage Guarantee</span></li>
                 <li><span class="check">✓</span> <span class="li-txt">Dedicated Technical Support &amp; SLA 99.9%</span></li>
             </ul>
             <div style="font-size: 7.2pt; color: #64748b; font-weight: 600; text-align: center; border-top: 1px dashed #e2e8f0; padding-top: 5px;">
@@ -1033,7 +1061,7 @@ body {
         </div>
         <h3 class="trial-title">Coba Gratis 14 Hari &mdash; Tanpa Komitmen</h3>
         <p class="trial-desc">
-            Uji AR Tilik dengan naskah riil jurnal Anda: <strong>50 naskah</strong>, semua fitur aktif (<strong>Dual-Lens</strong>, <strong>forensik Gemini AI</strong>, <strong>sertifikat QR</strong>, <strong>konektor OJS</strong>). Tanpa kartu kredit, tanpa sales yang menekan. Cukup kirim email &mdash; akun trial aktif dalam <strong>1x24 jam</strong>.
+            Uji AR Tilik dengan naskah riil jurnal Anda: <strong>50 naskah</strong>, semua fitur aktif (<strong>Catur Pilar Integritas</strong>, <strong>forensik Gemini AI</strong>, <strong>Piagam Akreditasi QR</strong>, <strong>fitur Purge Zero-Leakage</strong>, <strong>konektor OJS 3.x</strong>). Tanpa kartu kredit, tanpa sales yang menekan. Akun trial aktif dalam <strong>1x24 jam</strong>.
         </p>
 
         <div class="trial-features-row">
@@ -1043,11 +1071,11 @@ body {
             </div>
             <div class="trial-feat-item">
                 <span class="feat-check">✓</span>
-                <span><strong>Dual-Lens &amp; Gemini AI</strong> Aktif</span>
+                <span><strong>Catur Pilar &amp; Gemini AI</strong> Aktif</span>
             </div>
             <div class="trial-feat-item">
                 <span class="feat-check">✓</span>
-                <span><strong>Konektor OJS 3.x</strong> &amp; Sertifikat QR</span>
+                <span><strong>Konektor OJS 3.x</strong> &amp; Piagam QR SINTA</span>
             </div>
             <div class="trial-feat-item">
                 <span class="feat-check">✓</span>
@@ -1113,6 +1141,7 @@ body {
     html = html.replace("__HERO_B64__", hero_b64)
     html = html.replace("__DUAL_LENS_CONCEPT_B64__", dual_lens_concept_b64)
     html = html.replace("__DUAL_READER_MOCKUP_B64__", dual_reader_mockup_b64)
+    html = html.replace("__PIAGAM_MOCKUP_B64__", piagam_mockup_b64)
     html = html.replace("__QR_PORTAL_B64__", qr_portal_b64)
     html = html.replace("__QR_DEMO_B64__", qr_demo_b64)
     html = html.replace("__QR_WA_B64__", qr_wa_b64)
@@ -1150,6 +1179,12 @@ def main():
         file_size = OUTPUT_PDF_PATH.stat().st_size
         print(f"✅ PDF berhasil dikompilasi ke: {OUTPUT_PDF_PATH}")
         print(f"📦 Ukuran Berkas: {file_size:,} bytes ({file_size / (1024*1024):.2f} MB)")
+
+        # Sinkronkan juga ke direktori public/promosi
+        promosi_pdf = PUBLIC_DIR / "promosi" / "Brosur_Eksekutif_ARTilik.pdf"
+        promosi_pdf.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(OUTPUT_PDF_PATH, promosi_pdf)
+        print(f"🔄 Berkas disinkronkan ke: {promosi_pdf}")
     finally:
         if os.path.exists(temp_html_path):
             os.remove(temp_html_path)
