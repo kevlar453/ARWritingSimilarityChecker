@@ -74,8 +74,15 @@
             <?php endif; ?>
         </div>
 
-        <div class="text-center text-xs text-slate-500">
-            &copy; <?= date('Y') ?> AR Tilik &bull; Verifikasi Identitas Duta Kampus
+        <div class="text-center space-y-2">
+            <div>
+                <a href="<?= base_url('dashboard') ?>" class="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white font-semibold transition">
+                    <span>&larr;</span> <span>Kembali ke Dashboard Pengguna</span>
+                </a>
+            </div>
+            <div class="text-[11px] text-slate-500">
+                &copy; <?= date('Y') ?> AR Tilik &bull; Verifikasi Identitas Duta Kampus
+            </div>
         </div>
     </div>
 

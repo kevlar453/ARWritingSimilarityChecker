@@ -50,8 +50,8 @@
             </a>
             <div class="flex items-center gap-3">
                 <?php if (!empty($currentUser)): ?>
-                    <a href="<?= base_url('dashboard') ?>" class="text-xs text-slate-300 hover:text-white font-semibold transition">
-                        Dashboard
+                    <a href="<?= base_url('dashboard') ?>" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-200 hover:text-white bg-slate-900 hover:bg-slate-800 border border-white/15 transition shadow-xs">
+                        <span>&larr;</span> <span>Kembali ke Dashboard</span>
                     </a>
                     <?php if (!empty($activeProfile)): ?>
                         <a href="<?= base_url('ambassador/dashboard') ?>" class="text-xs px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition flex items-center gap-1.5 shadow-xs">
