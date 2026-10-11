@@ -3528,10 +3528,10 @@
                 <div id="testimonialsTrack" class="testi-carousel-track">
                     <?php foreach ($approvedTestimonials as $tItem): 
                         $roleLower = strtolower($tItem['author_role'] ?? '');
-                        if (str_contains($roleLower, 'dosen') || str_contains($roleLower, 'peneliti') || str_contains($roleLower, 'pengajar')) {
-                            $roleCategory = 'dosen';
-                        } elseif (str_contains($roleLower, 'jurnal') || str_contains($roleLower, 'editor') || str_contains($roleLower, 'reviewer') || str_contains($roleLower, 'ojs')) {
+                        if (str_contains($roleLower, 'jurnal') || str_contains($roleLower, 'editor') || str_contains($roleLower, 'reviewer') || str_contains($roleLower, 'ojs')) {
                             $roleCategory = 'jurnal';
+                        } elseif (str_contains($roleLower, 'dosen') || str_contains($roleLower, 'peneliti') || str_contains($roleLower, 'pengajar')) {
+                            $roleCategory = 'dosen';
                         } else {
                             $roleCategory = 'mahasiswa';
                         }
