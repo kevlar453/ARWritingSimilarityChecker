@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verifikasi Identitas Duta Kampus &bull; AR Tilik</title>
+    <!-- Favicon & Brand Icons -->
+    <link rel="icon" type="image/x-icon" href="<?= base_url('favicon.ico?v=20261008') ?>">
+    <link rel="icon" type="image/png" sizes="32x32" href="<?= base_url('favicon-32x32.png?v=20261008') ?>">
+    <link rel="icon" type="image/png" sizes="16x16" href="<?= base_url('favicon-16x16.png?v=20261008') ?>">
+    <link rel="apple-touch-icon" sizes="180x180" href="<?= base_url('apple-touch-icon.png?v=20261008') ?>">
+    <link rel="shortcut icon" type="image/x-icon" href="<?= base_url('favicon.ico?v=20261008') ?>">
     <!-- Tailwind CSS v3 via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -13,11 +19,9 @@
     <div class="max-w-md w-full space-y-6">
         <!-- Logo -->
         <div class="text-center space-y-2">
-            <a href="<?= base_url() ?>" class="inline-flex items-center gap-2">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-lg">
-                    AR
-                </div>
-                <span class="font-bold text-base tracking-tight text-white">AR Tilik</span>
+            <a href="<?= base_url() ?>" class="inline-flex items-center gap-2 group">
+                <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik Logo" class="w-10 h-10 object-contain drop-shadow-sm group-hover:scale-105 transition-transform duration-200">
+                <span class="font-bold text-base tracking-tight text-white group-hover:text-indigo-400 transition-colors">AR Tilik</span>
             </a>
             <div class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-300 border border-amber-500/30">
                 <span>🛡️</span> <span>Tahap 3: Verifikasi Identitas Anti-Fraud</span>

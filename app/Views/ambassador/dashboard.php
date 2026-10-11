@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal Duta Kampus &bull; AR Tilik</title>
+    <!-- Favicon & Brand Icons -->
+    <link rel="icon" type="image/x-icon" href="<?= base_url('favicon.ico?v=20261008') ?>">
+    <link rel="icon" type="image/png" sizes="32x32" href="<?= base_url('favicon-32x32.png?v=20261008') ?>">
+    <link rel="icon" type="image/png" sizes="16x16" href="<?= base_url('favicon-16x16.png?v=20261008') ?>">
+    <link rel="apple-touch-icon" sizes="180x180" href="<?= base_url('apple-touch-icon.png?v=20261008') ?>">
+    <link rel="shortcut icon" type="image/x-icon" href="<?= base_url('favicon.ico?v=20261008') ?>">
     <!-- Tailwind CSS v3 via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -26,12 +32,10 @@
     <!-- Header / Navbar -->
     <header class="border-b border-white/10 bg-slate-950/80 backdrop-blur-md sticky top-0 z-50">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-            <a href="<?= base_url() ?>" class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-base shadow-lg">
-                    AR
-                </div>
+            <a href="<?= base_url() ?>" class="flex items-center gap-2.5 group">
+                <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik Logo" class="w-9 h-9 object-contain drop-shadow-sm group-hover:scale-105 transition-transform duration-200">
                 <div>
-                    <span class="font-bold text-sm tracking-tight text-white">AR Tilik</span>
+                    <span class="font-bold text-sm tracking-tight text-white group-hover:text-indigo-300 transition">AR Tilik</span>
                     <span class="text-[10px] text-amber-400 font-mono block leading-none">Dashboard Duta Kampus</span>
                 </div>
             </a>
