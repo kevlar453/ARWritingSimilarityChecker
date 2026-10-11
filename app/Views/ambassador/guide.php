@@ -4,6 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panduan &amp; Welcome Kit Duta Kampus &bull; AR Tilik</title>
+    
+    <!-- Primary SEO Meta Tags -->
+    <meta name="description" content="Buku Panduan Resmi &amp; Welcome Kit Duta Kampus AR Tilik: Pedoman edukasi etika integritas karya ilmiah, materi promosi resmi, dan tata cara klaim insentif.">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+    <link rel="canonical" href="<?= base_url('ambassador/guide') ?>">
+    <meta name="theme-color" content="#4338ca">
+
+    <!-- Open Graph / Social Sharing -->
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="id_ID">
+    <meta property="og:site_name" content="AR Tilik">
+    <meta property="og:title" content="Panduan &amp; Welcome Kit Duta Kampus — AR Tilik">
+    <meta property="og:description" content="Pedoman resmi perwakilan kampus AR Tilik untuk sosialisasi kesadaran integritas akademik dan program kemitraan mahasiswa.">
+    <meta property="og:url" content="<?= base_url('ambassador/guide') ?>">
+    <meta property="og:image" content="<?= base_url('images/og-artilik.png') ?>">
+
     <!-- Favicon & Brand Icons -->
     <link rel="icon" type="image/x-icon" href="<?= base_url('favicon.ico?v=20261008') ?>">
     <link rel="icon" type="image/png" sizes="32x32" href="<?= base_url('favicon-32x32.png?v=20261008') ?>">

@@ -6,6 +6,8 @@ Allow: /
 Allow: /privacy
 Allow: /terms
 Allow: /verify
+Allow: /ambassador
+Allow: /docs/
 Allow: /integrations/
 Allow: /images/
 Allow: /sitemap.xml

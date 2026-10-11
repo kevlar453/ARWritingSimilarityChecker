@@ -57,7 +57,7 @@ class LandingController extends BaseController
         return view('landing/index', [
             'currentUser'          => $currentUser,
             'quotaInfo'            => $quotaInfo,
-            'totalCorpus'          => max(475, $totalCorpus),
+            'totalCorpus'          => $totalCorpus,
             'totalSubmissions'     => $totalSubmissions,
             'totalReports'         => $totalReports,
             'visitorStats'         => $visitorStats,

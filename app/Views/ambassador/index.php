@@ -4,6 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Duta Kampus AR Tilik &bull; Program Kemitraan Akademik &amp; Afiliasi</title>
+    
+    <!-- Primary SEO Meta Tags -->
+    <meta name="description" content="Program Duta Kampus AR Tilik: Raih akses naskah gratis 30 hari, piagam kepemimpinan integritas akademik, dan komisi kemitraan 20% di universitas Anda.">
+    <meta name="keywords" content="duta kampus, student ambassador, afiliasi akademik, integritas akademik, program duta mahasiswa, ar tilik">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+    <link rel="canonical" href="<?= base_url('ambassador') ?>">
+    <meta name="theme-color" content="#0f172a">
+
+    <!-- Open Graph / Social Sharing -->
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="id_ID">
+    <meta property="og:site_name" content="AR Tilik">
+    <meta property="og:title" content="Duta Kampus AR Tilik — Kemitraan Akademik &amp; Afiliasi">
+    <meta property="og:description" content="Program Duta Kampus AR Tilik: Akses naskah gratis 30 hari, piagam kepemimpinan resmi, dan komisi kemitraan 20% bagi mahasiswa &amp; dosen.">
+    <meta property="og:url" content="<?= base_url('ambassador') ?>">
+    <meta property="og:image" content="<?= base_url('images/og-artilik.png') ?>">
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Duta Kampus AR Tilik — Kemitraan Akademik &amp; Afiliasi">
+    <meta name="twitter:description" content="Program Duta Kampus AR Tilik: Akses naskah gratis 30 hari, piagam kepemimpinan resmi, dan komisi kemitraan 20%.">
+    <meta name="twitter:image" content="<?= base_url('images/og-artilik.png') ?>">
+
     <!-- Favicon & Brand Icons -->
     <link rel="icon" type="image/x-icon" href="<?= base_url('favicon.ico?v=20261008') ?>">
     <link rel="icon" type="image/png" sizes="32x32" href="<?= base_url('favicon-32x32.png?v=20261008') ?>">
