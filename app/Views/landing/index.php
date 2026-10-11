@@ -2325,8 +2325,80 @@
         }
 
         /* ========================================================== */
-        /* TESTIMONIALS CAROUSEL (RESPONSIVE 3-COL DESKTOP / 1-COL MOBILE) */
+        /* TESTIMONIALS CAROUSEL & CARDS (RESPONSIVE DESKTOP & MOBILE) */
         /* ========================================================== */
+        .testi-trust-bar-wrap {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 26px;
+        }
+
+        .testi-trust-bar {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            padding: 8px 24px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .testi-trust-stars {
+            color: #f59e0b;
+            font-size: 16px;
+            line-height: 1;
+        }
+
+        .testi-trust-score {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-dark);
+            line-height: 1;
+        }
+
+        .testi-trust-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1;
+        }
+
+        /* Filter Kategori Testimoni Interaktif */
+        .testi-filter-wrapper {
+            margin-bottom: 30px;
+            width: 100%;
+        }
+
+        .testi-filter-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .testi-filter-btn {
+            padding: 7px 18px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 700;
+            border: 1px solid var(--border);
+            background: #ffffff;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .testi-filter-btn.active-testi-filter {
+            border-color: var(--primary) !important;
+            background: var(--primary) !important;
+            color: #ffffff !important;
+        }
+
         .testi-carousel-wrapper {
             position: relative;
             width: 100%;
@@ -2404,6 +2476,114 @@
             font-weight: 700;
             text-transform: uppercase;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+            letter-spacing: 0.02em;
+        }
+
+        .testi-card-quote {
+            font-size: 13.5px;
+            line-height: 1.65;
+            color: var(--text-dark);
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        /* Author Meta Row */
+        .testi-author-row {
+            border-top: 1px solid #f1f5f9;
+            padding-top: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: auto;
+        }
+
+        .testi-author-left {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            min-width: 0;
+            width: 100%;
+        }
+
+        .testi-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: #e0e7ff;
+            color: #4338ca;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .testi-author-meta {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .testi-author-name-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 3px;
+        }
+
+        .testi-author-name {
+            font-weight: 700;
+            font-size: 13px;
+            color: var(--text-dark);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .testi-verified-badge {
+            background: #ecfdf5;
+            color: #047857;
+            border: 1px solid #a7f3d0;
+            border-radius: 12px;
+            padding: 2px 7px;
+            font-size: 10px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .testi-author-role {
+            font-size: 11.5px;
+            color: var(--primary);
+            font-weight: 600;
+            line-height: 1.35;
+            word-break: break-word;
+        }
+
+        .testi-author-inst {
+            font-size: 11px;
+            color: var(--text-muted);
+            line-height: 1.35;
+            word-break: break-word;
+        }
+
+        /* Callout CTA Box */
+        .testi-cta-box {
+            margin-top: 36px;
+            background: #ffffff;
+            border: 1px dashed var(--border);
+            border-radius: 20px;
+            padding: 20px 26px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
         }
 
         /* Tablet (min-width: 768px and max-width: 1023px): 2 cards per view */
@@ -2477,7 +2657,8 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
-            margin-top: 10px;
+            margin-top: 14px;
+            margin-bottom: 8px;
         }
 
         .testi-controls-inner {
@@ -2551,21 +2732,105 @@
             letter-spacing: 0.04em;
         }
 
-        /* Responsive Mobile Specific */
+        /* Responsive Mobile Specific (max-width: 767px) */
         @media (max-width: 767px) {
+            #testimoni {
+                padding-top: 48px;
+                padding-bottom: 60px;
+            }
+
+            .testi-trust-bar-wrap {
+                margin-bottom: 16px;
+            }
+
+            .testi-trust-bar {
+                padding: 6px 14px;
+                gap: 8px;
+            }
+
+            .testi-trust-stars {
+                font-size: 13px;
+            }
+
+            .testi-trust-score {
+                font-size: 12px;
+            }
+
+            .testi-trust-desc {
+                font-size: 11px;
+            }
+
+            /* Single horizontal scrollable row for filter buttons on mobile */
+            .testi-filter-wrapper {
+                margin: 0 -18px 16px -18px;
+                padding: 0;
+            }
+
+            .testi-filter-container {
+                justify-content: flex-start;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+                gap: 8px;
+                padding: 4px 18px 8px 18px;
+            }
+
+            .testi-filter-container::-webkit-scrollbar {
+                display: none;
+            }
+
+            .testi-filter-btn {
+                flex-shrink: 0;
+                padding: 6px 14px !important;
+                font-size: 11.5px !important;
+            }
+
             .testi-nav-arrow {
                 display: none !important;
             }
+
             .testi-mobile-nav-btn {
                 display: flex;
+                width: 38px;
+                height: 38px;
             }
+
             .testi-carousel-track {
                 padding-left: 2px;
                 padding-right: 2px;
+                padding-top: 12px;
+                padding-bottom: 12px;
                 gap: 16px;
             }
+
             .testi-card {
-                padding: 24px 20px;
+                padding: 22px 18px 18px;
+            }
+
+            .testi-card-quote {
+                font-size: 13px;
+                line-height: 1.6;
+                margin-bottom: 16px;
+            }
+
+            .testi-controls-bar {
+                margin-top: 14px;
+                margin-bottom: 24px;
+                gap: 8px;
+            }
+
+            .testi-cta-box {
+                margin-top: 24px;
+                padding: 18px 16px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 14px;
+            }
+
+            .testi-cta-box .btn {
+                width: 100%;
+                justify-content: center;
             }
         }
     </style>
@@ -3486,32 +3751,34 @@
             </div>
 
             <!-- Trust Bar / KPI -->
-            <div style="display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-bottom: 30px;" data-aos="fade-up" data-aos-delay="100">
-                <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 100px; padding: 8px 24px; display: inline-flex; align-items: center; gap: 10px; box-shadow: var(--shadow-sm);">
-                    <div style="color: #f59e0b; font-size: 16px;">★★★★★</div>
-                    <div style="font-size: 13px; font-weight: 700; color: var(--text-dark);">
+            <div class="testi-trust-bar-wrap" data-aos="fade-up" data-aos-delay="100">
+                <div class="testi-trust-bar">
+                    <div class="testi-trust-stars">★★★★★</div>
+                    <div class="testi-trust-score">
                         <?= number_format($testimonialStats['avg_rating'] ?? 5.0, 1) ?> / 5.0
                     </div>
-                    <div style="font-size: 12px; color: var(--text-muted);">
+                    <div class="testi-trust-desc">
                         (Skor Kepuasan dari <?= (int)($testimonialStats['total_reviews'] ?? count($approvedTestimonials)) ?>+ Ulasan Terverifikasi)
                     </div>
                 </div>
             </div>
 
             <!-- Filter Kategori Testimoni Interaktif -->
-            <div style="display: flex; justify-content: center; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 35px;" data-aos="fade-up" data-aos-delay="150">
-                <button type="button" onclick="filterTestimonials('all', this)" class="testi-filter-btn active-testi-filter" style="padding: 7px 18px; border-radius: 9999px; font-size: 12px; font-weight: 700; border: 1px solid var(--primary); background: var(--primary); color: #ffffff; cursor: pointer; transition: all 0.2s ease;">
-                    Semua Civitas (<?= count($approvedTestimonials) ?>)
-                </button>
-                <button type="button" onclick="filterTestimonials('mahasiswa', this)" class="testi-filter-btn" style="padding: 7px 18px; border-radius: 9999px; font-size: 12px; font-weight: 700; border: 1px solid var(--border); background: #ffffff; color: var(--text-dark); cursor: pointer; transition: all 0.2s ease;">
-                    🎓 Mahasiswa (Skripsi &amp; Tesis)
-                </button>
-                <button type="button" onclick="filterTestimonials('dosen', this)" class="testi-filter-btn" style="padding: 7px 18px; border-radius: 9999px; font-size: 12px; font-weight: 700; border: 1px solid var(--border); background: #ffffff; color: var(--text-dark); cursor: pointer; transition: all 0.2s ease;">
-                    👨‍🏫 Dosen &amp; Peneliti
-                </button>
-                <button type="button" onclick="filterTestimonials('jurnal', this)" class="testi-filter-btn" style="padding: 7px 18px; border-radius: 9999px; font-size: 12px; font-weight: 700; border: 1px solid var(--border); background: #ffffff; color: var(--text-dark); cursor: pointer; transition: all 0.2s ease;">
-                    📑 Pengelola Jurnal (OJS)
-                </button>
+            <div class="testi-filter-wrapper" data-aos="fade-up" data-aos-delay="150">
+                <div class="testi-filter-container">
+                    <button type="button" onclick="filterTestimonials('all', this)" class="testi-filter-btn active-testi-filter">
+                        Semua Civitas (<?= count($approvedTestimonials) ?>)
+                    </button>
+                    <button type="button" onclick="filterTestimonials('mahasiswa', this)" class="testi-filter-btn">
+                        🎓 Mahasiswa (Skripsi &amp; Tesis)
+                    </button>
+                    <button type="button" onclick="filterTestimonials('dosen', this)" class="testi-filter-btn">
+                        👨‍🏫 Dosen &amp; Peneliti
+                    </button>
+                    <button type="button" onclick="filterTestimonials('jurnal', this)" class="testi-filter-btn">
+                        📑 Pengelola Jurnal (OJS)
+                    </button>
+                </div>
             </div>
 
             <!-- Testimonials Carousel Container -->
@@ -3561,33 +3828,35 @@
                                 </div>
 
                                 <!-- Testimonial Quote (Schema.org reviewBody) -->
-                                <p itemprop="reviewBody" style="font-size: 13.5px; line-height: 1.65; color: var(--text-dark); margin-bottom: 20px; font-style: italic;">
+                                <p itemprop="reviewBody" class="testi-card-quote">
                                     "<?= esc($tItem['content']) ?>"
                                 </p>
                             </div>
 
                             <!-- Author Meta (Schema.org Person) -->
-                            <div itemprop="author" itemscope itemtype="https://schema.org/Person" style="border-top: 1px solid #f1f5f9; padding-top: 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: auto;">
-                                <div style="display: flex; align-items: center; gap: 12px; min-width: 0;">
-                                    <div style="width: 40px; height: 40px; border-radius: 12px; background: #e0e7ff; color: #4338ca; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; flex-shrink: 0;">
+                            <div class="testi-author-row" itemprop="author" itemscope itemtype="https://schema.org/Person">
+                                <div class="testi-author-left">
+                                    <div class="testi-avatar">
                                         <?= mb_substr($tItem['display_name'] ?? 'A', 0, 1) ?>
                                     </div>
-                                    <div style="min-width: 0;">
-                                        <div itemprop="name" style="font-weight: 700; font-size: 13px; color: var(--text-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                            <?= esc($tItem['display_name']) ?>
+                                    <div class="testi-author-meta">
+                                        <div class="testi-author-name-row">
+                                            <span class="testi-author-name" itemprop="name">
+                                                <?= esc($tItem['display_name']) ?>
+                                            </span>
+                                            <span class="testi-verified-badge">
+                                                ✓ Terverifikasi
+                                            </span>
                                         </div>
-                                        <div style="font-size: 11.5px; color: var(--primary); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                        <div class="testi-author-role">
                                             <?= esc($tItem['author_role'] ?? 'Mahasiswa') ?>
                                         </div>
                                         <?php if (!empty($tItem['display_institution'])): ?>
-                                            <div style="font-size: 11px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                            <div class="testi-author-inst">
                                                 <?= esc($tItem['display_institution']) ?>
                                             </div>
                                         <?php endif; ?>
                                     </div>
-                                </div>
-                                <div style="background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; border-radius: 12px; padding: 4px 8px; font-size: 10px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; flex-shrink: 0;">
-                                    <span>✓</span> <span>Terverifikasi</span>
                                 </div>
                             </div>
                         </div>
@@ -3615,7 +3884,7 @@
             </div>
 
             <!-- Callout CTA Tulis Ulasan -->
-            <div style="margin-top: 40px; background: #ffffff; border: 1px dashed var(--border); border-radius: 20px; padding: 22px 28px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 18px;" data-aos="fade-up">
+            <div class="testi-cta-box" data-aos="fade-up">
                 <div style="display: flex; align-items: center; gap: 14px;">
                     <span style="font-size: 26px;">💬</span>
                     <div>
@@ -3794,13 +4063,21 @@
         function filterTestimonials(cat, btn) {
             currentTestiFilter = cat;
             document.querySelectorAll('.testi-filter-btn').forEach(b => {
-                b.style.background = '#ffffff';
-                b.style.color = 'var(--text-dark)';
-                b.style.borderColor = 'var(--border)';
+                b.classList.remove('active-testi-filter');
+                b.style.background = '';
+                b.style.color = '';
+                b.style.borderColor = '';
             });
-            btn.style.background = 'var(--primary)';
-            btn.style.color = '#ffffff';
-            btn.style.borderColor = 'var(--primary)';
+            if (btn) {
+                btn.classList.add('active-testi-filter');
+                btn.style.background = '';
+                btn.style.color = '';
+                btn.style.borderColor = '';
+
+                if (typeof btn.scrollIntoView === 'function') {
+                    btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                }
+            }
 
             const cards = document.querySelectorAll('.testi-card');
             cards.forEach(card => {
