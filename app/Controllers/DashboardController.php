@@ -1794,6 +1794,124 @@ class DashboardController extends BaseController
     }
 
     /**
+     * Mengunduh Berkas PDF Piagam Akreditasi Integritas Akademik Resmi (Format A4 Landscape Vektor)
+     * Dihasilkan langsung dari peladen via Python & WeasyPrint
+     */
+    public function downloadCertificatePdf(?string $code = null)
+    {
+        $code = $code ?? $this->request->getGet('code');
+        if (empty($code)) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Kode sertifikat tidak disediakan.");
+        }
+
+        $code = strtoupper(trim($code));
+        $db = db_connect();
+        $report = $db->table('reports')->where('verification_code', $code)->get()->getRowArray();
+
+        if (! $report) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Sertifikat dengan kode #{$code} tidak ditemukan.");
+        }
+
+        $projectRoot = ROOTPATH;
+        $pythonBin = $projectRoot . '.venv/bin/python';
+        if (! file_exists($pythonBin)) {
+            $pythonBin = 'python3';
+        }
+
+        $cmd = escapeshellcmd($pythonBin) . ' ' . escapeshellarg($projectRoot . 'worker/generate_certificate_pdf.py') . ' --code ' . escapeshellarg($code) . ' --stdout';
+
+        $descriptors = [
+            0 => ['pipe', 'r'],
+            1 => ['pipe', 'w'],
+            2 => ['pipe', 'w'],
+        ];
+
+        $process = proc_open($cmd, $descriptors, $pipes, $projectRoot);
+        if (! is_resource($process)) {
+            return $this->response->setStatusCode(500)->setBody("Gagal menginisialisasi proses generator piagam.");
+        }
+
+        fclose($pipes[0]);
+        $pdfContent = stream_get_contents($pipes[1]);
+        fclose($pipes[1]);
+        $stderr = stream_get_contents($pipes[2]);
+        fclose($pipes[2]);
+
+        $exitCode = proc_close($process);
+
+        if ($exitCode !== 0 || empty($pdfContent)) {
+            log_message('error', "Certificate PDF export failed: {$stderr}");
+            return $this->response->setStatusCode(500)->setBody("Gagal menghasilkan PDF Piagam Akreditasi: " . esc($stderr));
+        }
+
+        $filename = "Piagam_Akreditasi_ARTilik_{$code}.pdf";
+
+        return $this->response
+            ->setHeader('Content-Type', 'application/pdf')
+            ->setHeader('Content-Disposition', 'inline; filename="' . $filename . '"')
+            ->setHeader('Content-Length', (string) strlen($pdfContent))
+            ->setHeader('Cache-Control', 'public, max-age=3600')
+            ->setBody($pdfContent);
+    }
+
+    /**
+     * Mengunduh Berkas PDF Piagam Akreditasi berdasarkan Report ID
+     */
+    public function downloadCertificatePdfByReportId(int $reportId)
+    {
+        $db = db_connect();
+        $report = $db->table('reports')->where('id', $reportId)->get()->getRowArray();
+        if (! $report) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Laporan #{$reportId} tidak ditemukan.");
+        }
+
+        if (! empty($report['verification_code'])) {
+            return $this->downloadCertificatePdf($report['verification_code']);
+        }
+
+        $projectRoot = ROOTPATH;
+        $pythonBin = $projectRoot . '.venv/bin/python';
+        if (! file_exists($pythonBin)) {
+            $pythonBin = 'python3';
+        }
+
+        $cmd = escapeshellcmd($pythonBin) . ' ' . escapeshellarg($projectRoot . 'worker/generate_certificate_pdf.py') . ' --report ' . (int)$reportId . ' --stdout';
+
+        $descriptors = [
+            0 => ['pipe', 'r'],
+            1 => ['pipe', 'w'],
+            2 => ['pipe', 'w'],
+        ];
+
+        $process = proc_open($cmd, $descriptors, $pipes, $projectRoot);
+        if (! is_resource($process)) {
+            return $this->response->setStatusCode(500)->setBody("Gagal menginisialisasi proses generator piagam.");
+        }
+
+        fclose($pipes[0]);
+        $pdfContent = stream_get_contents($pipes[1]);
+        fclose($pipes[1]);
+        $stderr = stream_get_contents($pipes[2]);
+        fclose($pipes[2]);
+
+        $exitCode = proc_close($process);
+
+        if ($exitCode !== 0 || empty($pdfContent)) {
+            log_message('error', "Certificate PDF export failed: {$stderr}");
+            return $this->response->setStatusCode(500)->setBody("Gagal menghasilkan PDF Piagam Akreditasi: " . esc($stderr));
+        }
+
+        $filename = "Piagam_Akreditasi_ARTilik_Report_{$reportId}.pdf";
+
+        return $this->response
+            ->setHeader('Content-Type', 'application/pdf')
+            ->setHeader('Content-Disposition', 'inline; filename="' . $filename . '"')
+            ->setHeader('Content-Length', (string) strlen($pdfContent))
+            ->setHeader('Cache-Control', 'public, max-age=3600')
+            ->setBody($pdfContent);
+    }
+
+    /**
      * Mengunduh Berkas PDF Dokumentasi & Panduan Resmi Integrasi OJS 3.x
      */
     public function downloadOjsPdf()
