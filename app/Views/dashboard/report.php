@@ -1448,7 +1448,7 @@
                     <span class="text-lg">🗳️</span>
                     <div>
                         <div class="text-xs font-bold text-slate-800">Apakah hasil Audit Forensik &amp; Panduan Sidang ini akurat dan membantu?</div>
-                        <div class="text-[11px] text-slate-500">Penilaian Anda membantu kami mengevaluasi kualitas penalaran audit kecerdasan buatan.</div>
+                        <div class="text-[11px] text-slate-500">Penilaian Anda membantu evaluasi penalaran AI dan menjadi poin keaktifan kurasi <strong class="text-indigo-600 font-semibold">Duta Kampus AR Tilik</strong>.</div>
                     </div>
                 </div>
                 <div class="flex items-center gap-2 flex-shrink-0" id="voteAuditBtns">
@@ -2330,6 +2330,29 @@
                     <?php endif; ?>
                 </div>
 
+                <!-- Banner Program Spesial: Duta Kampus AR Tilik -->
+                <div class="bg-gradient-to-r from-amber-500/15 via-indigo-500/20 to-purple-500/15 border border-amber-500/30 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-inner">
+                    <div class="flex items-start gap-3.5">
+                        <div class="w-10 h-10 rounded-xl bg-amber-400/20 border border-amber-400/30 text-amber-300 flex items-center justify-center text-xl flex-shrink-0">
+                            🎓
+                        </div>
+                        <div class="space-y-1">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span class="text-xs font-bold uppercase tracking-wider text-amber-300 bg-amber-400/10 px-2.5 py-0.5 rounded-full border border-amber-400/30">Program Spesial</span>
+                                <h4 class="text-sm font-bold text-white">Peluang Terpilih Menjadi Duta Kampus AR Tilik (Campus Ambassador)</h4>
+                            </div>
+                            <p class="text-xs text-slate-300 leading-relaxed">
+                                Pengguna yang berpartisipasi memberikan rating, voting fitur, dan ulasan/testimoni berkesempatan diprioritaskan menjadi <strong>Duta Kampus resmi AR Tilik</strong>. Dapatkan sertifikat apresiasi, kuota pemeriksaan naskah gratis, akses fitur laboratorium eksklusif, serta komisi afiliasi tertinggi di kampus Anda.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="self-stretch sm:self-auto flex items-center justify-end flex-shrink-0">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-400 text-slate-950 shadow-md shadow-amber-400/20 whitespace-nowrap">
+                            <span>✨</span> <span>Kurasi Aktif</span>
+                        </span>
+                    </div>
+                </div>
+
                 <!-- Konten: Sudah Kirim vs Belum Kirim -->
                 <?php if (!empty($userReview)): ?>
                     <div id="existingReviewDisplay" class="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-3">
@@ -2424,8 +2447,14 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-[11px] font-bold text-slate-300 mb-1">Perguruan Tinggi / Institusi:</label>
-                            <input type="text" name="institution" id="testiInstitution" value="<?= esc($userReview['institution'] ?? '') ?>" placeholder="Misal: Univ. Gadjah Mada / UI / ITB" class="w-full text-xs bg-black/30 border border-white/15 rounded-xl px-3 py-2 text-white focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                            <label class="block text-[11px] font-bold text-slate-300 mb-1 flex items-center justify-between">
+                                <span>Perguruan Tinggi / Institusi:</span>
+                                <span class="text-[10px] text-amber-300 font-normal">🎓 Verifikasi Duta Kampus</span>
+                            </label>
+                            <input type="text" name="institution" id="testiInstitution" value="<?= esc($userReview['institution'] ?? $currentUser['institution'] ?? session('user_institution') ?? '') ?>" placeholder="Misal: Univ. Gadjah Mada / UI / ITB" class="w-full text-xs bg-black/30 border border-white/15 rounded-xl px-3 py-2 text-white focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                            <p class="text-[10px] text-slate-400 mt-1 leading-normal">
+                                Terisi otomatis dari data profil Anda. Silakan ubah secara bebas jika ingin memperbarui atau memperbaiki nama institusi Anda.
+                            </p>
                         </div>
                     </div>
 
@@ -2470,6 +2499,12 @@
                 <p class="text-xs text-slate-500 leading-relaxed">
                     Berkas sertifikasi resmi Anda terbuka di tab baru. Sambil menunggu, bolehkah kami meminta 5 detik untuk menilai hasil pemeriksaan naskah ini?
                 </p>
+                <div class="bg-amber-50 border border-amber-200/80 rounded-xl p-2.5 text-left flex items-start gap-2">
+                    <span class="text-base flex-shrink-0">🎓</span>
+                    <p class="text-[11px] text-amber-900 leading-snug">
+                        <strong>Peluang Duta Kampus:</strong> Berikan penilaian &amp; ulasan untuk berkesempatan terpilih menjadi Duta Kampus resmi AR Tilik dengan kuota gratis &amp; insentif khusus!
+                    </p>
+                </div>
             </div>
 
             <div class="flex justify-center items-center gap-2 py-2">

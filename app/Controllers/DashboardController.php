@@ -523,6 +523,9 @@ class DashboardController extends BaseController
         $userVotes = $voteModel->getReportVotes($reportId, $userId, $userIp);
         $userReview = $testimonialModel->getReviewForReport($reportId, $userId, $userIp);
 
+        $userModel = new \App\Models\UserModel();
+        $currentUser = $userId ? $userModel->find($userId) : null;
+
         return view('dashboard/report', [
             'report'              => $report,
             'document'            => $document,
@@ -545,6 +548,7 @@ class DashboardController extends BaseController
             'isSharedAccess'      => $isSharedToUser,
             'userVotes'           => $userVotes,
             'userReview'          => $userReview,
+            'currentUser'         => $currentUser,
         ]);
     }
 

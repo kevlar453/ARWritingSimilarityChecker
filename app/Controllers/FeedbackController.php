@@ -95,8 +95,20 @@ class FeedbackController extends BaseController
             'institution'          => !empty($institution) ? $institution : null,
             'is_anonymous'         => $isAnonymous,
             'allow_public_display' => $allowPublic,
-            'ip_address'           => $request->getIPAddress(),
         ]);
+
+        // Sinkronkan pembaruan institusi ke profil pengguna jika diperbarui / memperbaiki data lama
+        if ($userId && !empty($institution)) {
+            $userModel = new \App\Models\UserModel();
+            $user = $userModel->find($userId);
+            if ($user && ($user['institution'] ?? '') !== $institution) {
+                $userModel->update($userId, [
+                    'institution' => $institution,
+                    'updated_at'  => date('Y-m-d H:i:s'),
+                ]);
+                session()->set('user_institution', $institution);
+            }
+        }
 
         return $this->response->setJSON([
             'success' => true,
