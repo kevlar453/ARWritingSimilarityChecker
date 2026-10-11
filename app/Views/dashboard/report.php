@@ -89,7 +89,7 @@
                             </svg>
                             <span>Layar Ganda</span>
                         </button>
-                        <a href="<?= base_url('report/' . $report['id'] . '/export') ?>" target="_blank" class="text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-lg shadow-xs transition">
+                        <a href="<?= base_url('report/' . $report['id'] . '/export') ?>" target="_blank" onclick="handleDownloadPdfClick(event)" class="text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-lg shadow-xs transition">
                             <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                             </svg>
@@ -145,7 +145,7 @@
                     <span class="text-[11px] text-slate-400">Skor Terpadu</span>
                 </div>
                 <?php if (($report['status'] ?? '') === 'completed'): ?>
-                    <a href="<?= base_url('report/' . $report['id'] . '/export') ?>" target="_blank" class="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-3 py-1.5 rounded-lg transition shadow-xs mt-1">
+                    <a href="<?= base_url('report/' . $report['id'] . '/export') ?>" target="_blank" onclick="handleDownloadPdfClick(event)" class="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-3 py-1.5 rounded-lg transition shadow-xs mt-1">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                         </svg>
@@ -1437,6 +1437,42 @@
                 <span class="text-sm">⚖️</span>
                 <span><strong>Integritas Dialogis:</strong> Audit forensik cerdas dirancang untuk melengkapi penilaian manusia, bukan menggantikannya. Pertanyaan ujian di atas bertujuan memfasilitasi klarifikasi langsung antara dosen penguji dan mahasiswa demi menjaga martabat kejujuran akademik.</span>
             </div>
+
+            <!-- Evaluasi Akurasi Fitur (Micro-Voting) -->
+            <?php 
+                $auditVote = $userVotes['audit_forensik'] ?? null;
+                $currentAuditVote = (int) ($auditVote['vote_value'] ?? 0);
+            ?>
+            <div class="mt-4 pt-3.5 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/80 p-3.5 rounded-xl border border-slate-200/60" id="voteAuditForensikBox">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-lg">🗳️</span>
+                    <div>
+                        <div class="text-xs font-bold text-slate-800">Apakah hasil Audit Forensik &amp; Panduan Sidang ini akurat dan membantu?</div>
+                        <div class="text-[11px] text-slate-500">Penilaian Anda membantu kami mengevaluasi kualitas penalaran audit kecerdasan buatan.</div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 flex-shrink-0" id="voteAuditBtns">
+                    <button type="button" onclick="submitFeatureVote(<?= (int)$report['id'] ?>, 'audit_forensik', 1)" id="btnVoteAuditUp" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition cursor-pointer <?= ($currentAuditVote === 1) ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs' : 'bg-white text-slate-700 border-slate-300 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-300' ?>" title="Sangat membantu dan akurat">
+                        <span>👍</span> <span>Membantu</span>
+                    </button>
+                    <button type="button" onclick="submitFeatureVote(<?= (int)$report['id'] ?>, 'audit_forensik', -1)" id="btnVoteAuditDown" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition cursor-pointer <?= ($currentAuditVote === -1) ? 'bg-amber-600 text-white border-amber-600 shadow-xs' : 'bg-white text-slate-700 border-slate-300 hover:bg-amber-50 hover:text-amber-700 hover:border-amber-300' ?>" title="Kurang pas atau ada yang perlu diperbaiki">
+                        <span>👎</span> <span>Kurang Pas</span>
+                    </button>
+                </div>
+            </div>
+            <!-- Feedback Text Input (muncul setelah vote atau jika ingin memberi catatan) -->
+            <div id="voteAuditFeedbackForm" class="<?= !empty($auditVote['feedback_text']) ? '' : 'hidden' ?> mt-2 p-3 bg-white border border-slate-200 rounded-xl space-y-2">
+                <div class="text-[11px] font-semibold text-slate-700 flex items-center justify-between">
+                    <span id="voteAuditFeedbackPrompt">💡 Catatan Anda untuk penyempurnaan fitur ini (opsional):</span>
+                    <button type="button" onclick="document.getElementById('voteAuditFeedbackForm').classList.add('hidden')" class="text-slate-400 hover:text-slate-600 text-xs cursor-pointer">&times; Tutup</button>
+                </div>
+                <div class="flex gap-2">
+                    <input type="text" id="voteAuditFeedbackText" value="<?= esc($auditVote['feedback_text'] ?? '') ?>" class="w-full text-xs px-3 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500" placeholder="Misal: Penjelasan sitasi tepat sasaran / Pertanyaan sidang sangat aplikatif...">
+                    <button type="button" onclick="submitFeatureFeedbackText(<?= (int)$report['id'] ?>, 'audit_forensik')" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-lg whitespace-nowrap cursor-pointer">
+                        Simpan Catatan
+                    </button>
+                </div>
+            </div>
         </div>
         <?php else: ?>
         <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4">
@@ -2254,7 +2290,207 @@
         </div>
         <?php endif; ?>
 
+        <!-- ═════════════════════════════════════════════════════════════════════ -->
+        <!-- EVALUASI KEPUASAN & TESTIMONI AKADEMIK (FASE 1)                       -->
+        <!-- ═════════════════════════════════════════════════════════════════════ -->
+        <div class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl border border-indigo-500/20 relative overflow-hidden" id="reportSatisfactionSection">
+            <!-- Background Glow -->
+            <div class="absolute -right-20 -bottom-20 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -left-20 -top-20 w-80 h-80 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="relative z-10 space-y-6">
+                <!-- Header -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-5">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-2xl shadow-lg shadow-amber-500/20 flex-shrink-0">
+                            🌟
+                        </div>
+                        <div>
+                            <h3 class="text-lg sm:text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                                <span>Evaluasi Pemeriksaan &amp; Testimoni Akademik</span>
+                                <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/30 text-indigo-200 border border-indigo-400/30 font-mono-code">Verifikasi #<?= esc($report['verification_code'] ?? $report['id']) ?></span>
+                            </h3>
+                            <p class="text-xs sm:text-sm text-slate-300 mt-0.5">
+                                Ulasan dan penilaian Anda membantu kami menyempurnakan engine, menguatkan integritas riset, serta menjadi bukti nyata bagi civitas akademika lainnya.
+                            </p>
+                        </div>
+                    </div>
+                    <?php if (!empty($userReview)): ?>
+                        <div class="self-start sm:self-auto flex items-center gap-2">
+                            <?php if ((int)$userReview['is_approved'] === 1): ?>
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                                    <span>✓</span> <span>Tayang di Publik</span>
+                                </span>
+                            <?php else: ?>
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                                    <span>⏳</span> <span>Tersimpan &amp; Siap Ditinjau</span>
+                                </span>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Konten: Sudah Kirim vs Belum Kirim -->
+                <?php if (!empty($userReview)): ?>
+                    <div id="existingReviewDisplay" class="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-3">
+                        <div class="flex items-center justify-between flex-wrap gap-2">
+                            <div class="flex items-center gap-2">
+                                <div class="flex text-amber-400 text-lg">
+                                    <?php for ($s = 1; $s <= 5; $s++): ?>
+                                        <span><?= $s <= (int)$userReview['rating'] ? '★' : '☆' ?></span>
+                                    <?php endfor; ?>
+                                </div>
+                                <span class="text-xs font-bold font-mono-code text-amber-300"><?= (int)$userReview['rating'] ?>.0 / 5.0</span>
+                                <span class="text-xs text-slate-400">&bull;</span>
+                                <span class="text-xs font-semibold text-slate-200"><?= esc($userReview['author_role'] ?? 'Mahasiswa') ?></span>
+                                <?php if (!empty($userReview['institution'])): ?>
+                                    <span class="text-xs text-slate-400">&bull; <?= esc($userReview['institution']) ?></span>
+                                <?php endif; ?>
+                            </div>
+                            <button type="button" onclick="toggleEditTestimonialForm()" class="text-xs text-indigo-300 hover:text-white underline cursor-pointer flex items-center gap-1">
+                                <span>✏️</span> <span>Ubah Ulasan</span>
+                            </button>
+                        </div>
+                        <p class="text-sm text-slate-200 leading-relaxed italic bg-black/20 p-4 rounded-xl border border-white/5">
+                            "<?= esc($userReview['content']) ?>"
+                        </p>
+                        <div class="text-[11px] text-slate-400 flex items-center justify-between pt-1">
+                            <span>Ditulis oleh: <strong><?= esc($userReview['author_name']) ?></strong> <?= !empty($userReview['is_anonymous']) ? '<span class="text-amber-300">(Disamarkan di publik)</span>' : '' ?></span>
+                            <span><?= date('d M Y, H:i', strtotime($userReview['created_at'])) ?> WIB</span>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
+                <!-- Form Ulasan / Testimoni (Interaktif) -->
+                <form id="testimonialForm" onsubmit="submitReportTestimonial(event, <?= (int)$report['id'] ?>)" class="<?= !empty($userReview) ? 'hidden' : '' ?> space-y-5 bg-white/5 border border-white/10 rounded-2xl p-5 sm:p-6">
+                    <input type="hidden" name="report_id" value="<?= (int)$report['id'] ?>">
+                    <input type="hidden" name="rating" id="selectedRatingInput" value="<?= esc($userReview['rating'] ?? 5) ?>">
+
+                    <!-- Star Selector Row -->
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-300">
+                            1. Beri Nilai Pengalaman Pemeriksaan Naskah Anda:
+                        </label>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <div class="flex items-center gap-1 bg-black/30 px-3.5 py-2 rounded-xl border border-white/10" id="starButtonRow">
+                                <?php $defRating = (int)($userReview['rating'] ?? 5); ?>
+                                <?php for ($i = 1; $i <= 5; $i++): ?>
+                                    <button type="button" onclick="selectReportStar(<?= $i ?>)" onmouseenter="previewStarHover(<?= $i ?>)" onmouseleave="resetStarHover()" class="star-btn text-2xl transition-transform hover:scale-125 focus:outline-none cursor-pointer <?= $i <= $defRating ? 'text-amber-400' : 'text-slate-600' ?>" data-star="<?= $i ?>" title="<?= $i ?> Bintang">
+                                        ★
+                                    </button>
+                                <?php endfor; ?>
+                            </div>
+                            <div id="starRatingLabel" class="text-xs font-semibold text-amber-300 bg-amber-500/10 border border-amber-500/20 px-3 py-2 rounded-xl">
+                                🌟 Luar Biasa! Sangat membantu dan akurat untuk persiapan sidang/publikasi.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Testimonial Content Textarea -->
+                    <div class="space-y-2">
+                        <label for="testimonialContent" id="testimonialContentLabel" class="block text-xs font-bold uppercase tracking-wider text-slate-300">
+                            2. Ceritakan Pengalaman atau Testimoni Nyata Anda:
+                        </label>
+                        <textarea id="testimonialContent" name="content" rows="3" class="w-full text-xs sm:text-sm bg-black/30 border border-white/15 rounded-xl p-3.5 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition leading-relaxed" placeholder="Ceritakan bagaimana AR Tilik membantu Anda (misal: lolos cek perpustakaan prodi, terbantu persiapan sidang skripsi, membedah sitasi masa depan, dsb)..."><?= esc($userReview['content'] ?? '') ?></textarea>
+                        <p class="text-[11px] text-slate-400">
+                            Testimoni Anda sangat berarti untuk membangun kepercayaan publik terhadap platform kedaulatan akademik ini.
+                        </p>
+                    </div>
+
+                    <!-- Identitas & Peran Akademik -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-300 mb-1">Nama / Inisial Penulis:</label>
+                            <input type="text" name="author_name" id="testiAuthorName" value="<?= esc($userReview['author_name'] ?? session('user_name') ?? 'Akademisi AR Tilik') ?>" class="w-full text-xs bg-black/30 border border-white/15 rounded-xl px-3 py-2 text-white focus:outline-none focus:ring-1 focus:ring-indigo-500" required>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-300 mb-1">Status / Peran Akademik:</label>
+                            <select name="author_role" id="testiAuthorRole" class="w-full text-xs bg-slate-900 border border-white/15 rounded-xl px-3 py-2 text-white focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                                <?php 
+                                    $curRole = $userReview['author_role'] ?? 'Mahasiswa S1 (Skripsi)';
+                                    $roles = [
+                                        'Mahasiswa S1 (Skripsi)'       => 'Mahasiswa S1 (Skripsi)',
+                                        'Mahasiswa Magister / S2'      => 'Mahasiswa Magister / S2 (Tesis)',
+                                        'Mahasiswa Doktoral / S3'      => 'Mahasiswa Doktoral / S3 (Disertasi)',
+                                        'Dosen Pembimbing / Penguji'   => 'Dosen Pembimbing / Penguji',
+                                        'Peneliti & Akademisi'         => 'Peneliti & Akademisi',
+                                        'Pengelola Jurnal Ilmiah (OJS)'=> 'Pengelola Jurnal Ilmiah (OJS)',
+                                        'Umum / Profesional'           => 'Umum / Profesional',
+                                    ];
+                                ?>
+                                <?php foreach ($roles as $rVal => $rLabel): ?>
+                                    <option value="<?= esc($rVal) ?>" <?= $curRole === $rVal ? 'selected' : '' ?>><?= esc($rLabel) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-300 mb-1">Perguruan Tinggi / Institusi:</label>
+                            <input type="text" name="institution" id="testiInstitution" value="<?= esc($userReview['institution'] ?? '') ?>" placeholder="Misal: Univ. Gadjah Mada / UI / ITB" class="w-full text-xs bg-black/30 border border-white/15 rounded-xl px-3 py-2 text-white focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                        </div>
+                    </div>
+
+                    <!-- Opsi Privasi & Publikasi -->
+                    <div class="pt-2 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-slate-300">
+                        <div class="space-y-1.5">
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" name="allow_public_display" value="1" <?= (!isset($userReview) || !empty($userReview['allow_public_display'])) ? 'checked' : '' ?> class="rounded border-slate-700 text-indigo-600 focus:ring-indigo-500">
+                                <span>Izinkan ulasan ini ditampilkan pada Landing Page &amp; Materi Edukasi AR Tilik</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer select-none text-slate-400">
+                                <input type="checkbox" name="is_anonymous" value="1" <?= !empty($userReview['is_anonymous']) ? 'checked' : '' ?> class="rounded border-slate-700 text-indigo-600 focus:ring-indigo-500">
+                                <span>Samarkan identitas saya (Hanya inisial &amp; nama kampus disamarkan demi privasi akademik)</span>
+                            </label>
+                        </div>
+                        <div class="flex items-center gap-2 self-end sm:self-auto flex-shrink-0">
+                            <?php if (!empty($userReview)): ?>
+                                <button type="button" onclick="toggleEditTestimonialForm()" class="px-3 py-2 text-xs font-semibold text-slate-400 hover:text-white transition">
+                                    Batal
+                                </button>
+                            <?php endif; ?>
+                            <button type="submit" id="btnSubmitTestimonial" class="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 active:scale-95 text-slate-950 font-bold text-xs rounded-xl shadow-lg shadow-amber-500/20 transition flex items-center gap-2 cursor-pointer">
+                                <span>🚀</span>
+                                <span id="btnSubmitTestiText"><?= !empty($userReview) ? 'Perbarui Ulasan' : 'Kirim Penilaian &amp; Testimoni' ?></span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
     </main>
+
+    <!-- Modal Ramah Pasca Unduh PDF (Intersepsi Apresiasi & Rating Cepat) -->
+    <div id="postDownloadModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden p-6 sm:p-7 space-y-4 animate-in fade-in zoom-in-95 duration-200">
+            <div class="text-center space-y-2">
+                <div class="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto text-3xl shadow-sm">
+                    📄
+                </div>
+                <h3 class="text-base sm:text-lg font-bold text-slate-900">Laporan PDF Sedang Diunduh</h3>
+                <p class="text-xs text-slate-500 leading-relaxed">
+                    Berkas sertifikasi resmi Anda terbuka di tab baru. Sambil menunggu, bolehkah kami meminta 5 detik untuk menilai hasil pemeriksaan naskah ini?
+                </p>
+            </div>
+
+            <div class="flex justify-center items-center gap-2 py-2">
+                <?php for ($i = 1; $i <= 5; $i++): ?>
+                    <button type="button" onclick="quickRateFromModal(<?= $i ?>, <?= (int)$report['id'] ?>)" class="text-3xl text-amber-400 hover:scale-125 transition-transform cursor-pointer focus:outline-none" title="<?= $i ?> Bintang">
+                        ★
+                    </button>
+                <?php endfor; ?>
+            </div>
+            <p class="text-[11px] text-center text-slate-400 font-medium">Klik bintang untuk memberikan nilai cepat</p>
+
+            <div class="flex gap-2 pt-2 border-t border-slate-100">
+                <button type="button" onclick="closePostDownloadModal()" class="w-full py-2.5 border border-slate-200 hover:bg-slate-50 text-slate-600 text-xs font-semibold rounded-xl transition cursor-pointer">
+                    Nanti Saja
+                </button>
+                <button type="button" onclick="closePostDownloadModal(); scrollToSatisfactionCard();" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl transition cursor-pointer shadow-xs">
+                    Tulis Ulasan Lengkap
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Modal [View Passage] Dialog -->
     <div id="passageModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
@@ -4029,6 +4265,223 @@
                 alert('Terjadi kendala jaringan saat menghubungi modul forensik.');
                 btn.disabled = false;
                 btn.innerHTML = originalHtml;
+            }
+        }
+
+        // ── KELOLA VOTING SKOR FITUR (MICRO-VOTING) ──
+        async function submitFeatureVote(reportId, featureName, voteValue) {
+            const btnUp = document.getElementById('btnVoteAuditUp');
+            const btnDown = document.getElementById('btnVoteAuditDown');
+            const feedbackBox = document.getElementById('voteAuditFeedbackForm');
+
+            try {
+                const formData = new FormData();
+                formData.append('report_id', reportId);
+                formData.append('feature_name', featureName);
+                formData.append('vote_value', voteValue);
+
+                const res = await fetch('<?= base_url('feedback/vote') ?>', {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.success) {
+                    if (voteValue === 1) {
+                        btnUp.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition cursor-pointer bg-emerald-600 text-white border-emerald-600 shadow-xs';
+                        btnDown.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition cursor-pointer bg-white text-slate-700 border-slate-300 hover:bg-amber-50 hover:text-amber-700 hover:border-amber-300';
+                    } else {
+                        btnDown.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition cursor-pointer bg-amber-600 text-white border-amber-600 shadow-xs';
+                        btnUp.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition cursor-pointer bg-white text-slate-700 border-slate-300 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-300';
+                    }
+                    if (feedbackBox) {
+                        feedbackBox.classList.remove('hidden');
+                    }
+                }
+            } catch (err) {
+                console.error('Feature vote error:', err);
+            }
+        }
+
+        async function submitFeatureFeedbackText(reportId, featureName) {
+            const input = document.getElementById('voteAuditFeedbackText');
+            if (!input || !input.value.trim()) return;
+
+            try {
+                const formData = new FormData();
+                formData.append('report_id', reportId);
+                formData.append('feature_name', featureName);
+                formData.append('vote_value', document.getElementById('btnVoteAuditUp')?.classList.contains('bg-emerald-600') ? 1 : -1);
+                formData.append('feedback_text', input.value.trim());
+
+                const res = await fetch('<?= base_url('feedback/vote') ?>', {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert('Catatan Anda berhasil disimpan. Terima kasih atas masukan berharga Anda!');
+                    document.getElementById('voteAuditFeedbackForm').classList.add('hidden');
+                }
+            } catch (err) {
+                console.error('Feature feedback error:', err);
+            }
+        }
+
+        // ── KELOLA EVALUASI & TESTIMONI KESELURUHAN ──
+        const starLabels = {
+            1: '❌ Sangat Kurang Tepat & Membutuhkan Evaluasi Total',
+            2: '⚠️ Kurang Memuaskan, Memerlukan Peningkatan Engine',
+            3: '😐 Cukup Membantu, Ada Sebagian Aspek Perlu Disempurnakan',
+            4: '👍 Bagus & Sangat Bermanfaat untuk Naskah Ilmiah',
+            5: '🌟 Luar Biasa! Sangat membantu dan akurat untuk persiapan sidang/publikasi.'
+        };
+
+        let currentSelectedRating = parseInt(document.getElementById('selectedRatingInput')?.value || '5');
+
+        function selectReportStar(rating) {
+            currentSelectedRating = rating;
+            const input = document.getElementById('selectedRatingInput');
+            if (input) input.value = rating;
+            updateStarDisplay(rating, false);
+        }
+
+        function previewStarHover(rating) {
+            updateStarDisplay(rating, true);
+        }
+
+        function resetStarHover() {
+            updateStarDisplay(currentSelectedRating, false);
+        }
+
+        function updateStarDisplay(rating, isPreview = false) {
+            const btns = document.querySelectorAll('#starButtonRow .star-btn');
+            btns.forEach((btn, idx) => {
+                const starVal = idx + 1;
+                if (starVal <= rating) {
+                    btn.classList.add('text-amber-400');
+                    btn.classList.remove('text-slate-600');
+                } else {
+                    btn.classList.remove('text-amber-400');
+                    btn.classList.add('text-slate-600');
+                }
+            });
+
+            const lbl = document.getElementById('starRatingLabel');
+            if (lbl && starLabels[rating]) {
+                lbl.textContent = starLabels[rating];
+            }
+
+            const contentLbl = document.getElementById('testimonialContentLabel');
+            const contentInput = document.getElementById('testimonialContent');
+            if (contentLbl && contentInput && !isPreview) {
+                if (rating <= 3) {
+                    contentLbl.textContent = '2. Masukan untuk Peningkatan Kualitas Engine AR Tilik:';
+                    contentInput.placeholder = 'Apa kekurangan atau hal yang perlu diperbaiki dari hasil telaah ini? Masukan Anda akan langsung ditinjau oleh tim engineering.';
+                } else {
+                    contentLbl.textContent = '2. Ceritakan Pengalaman atau Testimoni Nyata Anda:';
+                    contentInput.placeholder = 'Ceritakan bagaimana AR Tilik membantu Anda (misal: lolos cek perpustakaan prodi, terbantu persiapan sidang skripsi, membedah sitasi masa depan, dsb)...';
+                }
+            }
+        }
+
+        function toggleEditTestimonialForm() {
+            const form = document.getElementById('testimonialForm');
+            const display = document.getElementById('existingReviewDisplay');
+            if (form) {
+                form.classList.toggle('hidden');
+            }
+            if (display) {
+                display.classList.toggle('hidden');
+            }
+        }
+
+        async function submitReportTestimonial(e, reportId) {
+            e.preventDefault();
+            const form = document.getElementById('testimonialForm');
+            const btn = document.getElementById('btnSubmitTestimonial');
+            const originalHtml = btn.innerHTML;
+
+            btn.disabled = true;
+            btn.innerHTML = '<span>⏳ Menyimpan ulasan...</span>';
+
+            try {
+                const formData = new FormData(form);
+                const res = await fetch('<?= base_url('feedback/testimonial') ?>', {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.success) {
+                    btn.innerHTML = '<span>✅ Berhasil Disimpan!</span>';
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 700);
+                } else {
+                    alert('Gagal: ' + (data.message || 'Terjadi kesalahan.'));
+                    btn.disabled = false;
+                    btn.innerHTML = originalHtml;
+                }
+            } catch (err) {
+                alert('Terjadi kesalahan jaringan.');
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        }
+
+        // ── MODAL POST-DOWNLOAD APRESIASI & QUICK RATE ──
+        let userHasReviewed = <?= !empty($userReview) ? 'true' : 'false' ?>;
+
+        function handleDownloadPdfClick(e) {
+            if (!userHasReviewed) {
+                setTimeout(() => {
+                    const modal = document.getElementById('postDownloadModal');
+                    if (modal) modal.classList.remove('hidden');
+                }, 1200);
+            }
+        }
+
+        function closePostDownloadModal() {
+            const modal = document.getElementById('postDownloadModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function scrollToSatisfactionCard() {
+            const sec = document.getElementById('reportSatisfactionSection');
+            if (sec) {
+                sec.scrollIntoView({ behavior: 'smooth' });
+                const form = document.getElementById('testimonialForm');
+                if (form && form.classList.contains('hidden')) {
+                    toggleEditTestimonialForm();
+                }
+            }
+        }
+
+        async function quickRateFromModal(starRating, reportId) {
+            closePostDownloadModal();
+            selectReportStar(starRating);
+            scrollToSatisfactionCard();
+
+            // Submit quick rating immediately
+            try {
+                const formData = new FormData();
+                formData.append('report_id', reportId);
+                formData.append('rating', starRating);
+                formData.append('author_name', document.getElementById('testiAuthorName')?.value || 'Akademisi AR Tilik');
+                formData.append('author_role', document.getElementById('testiAuthorRole')?.value || 'Mahasiswa');
+                formData.append('institution', document.getElementById('testiInstitution')?.value || '');
+                formData.append('allow_public_display', 1);
+
+                await fetch('<?= base_url('feedback/testimonial') ?>', {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    body: formData
+                });
+                userHasReviewed = true;
+            } catch (err) {
+                console.error(err);
             }
         }
     </script>

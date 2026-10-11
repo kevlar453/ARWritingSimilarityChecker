@@ -516,6 +516,13 @@ class DashboardController extends BaseController
         // Resolusi Audit Forensik Cerdas Google Gemini (Semantik & Pertanyaan Ujian Lisan)
         $geminiForensic = $evidenceData['gemini_forensic'] ?? $evidenceData['v1_1_presentation']['v1_2_evolution']['gemini_forensic'] ?? null;
 
+        // Feedback & Testimoni Akademik (Fase 1)
+        $voteModel = new \App\Models\FeatureVoteModel();
+        $testimonialModel = new \App\Models\TestimonialModel();
+        $userIp = $this->request->getIPAddress();
+        $userVotes = $voteModel->getReportVotes($reportId, $userId, $userIp);
+        $userReview = $testimonialModel->getReviewForReport($reportId, $userId, $userIp);
+
         return view('dashboard/report', [
             'report'              => $report,
             'document'            => $document,
@@ -536,6 +543,8 @@ class DashboardController extends BaseController
             'geminiForensic'      => $geminiForensic,
             'isOwner'             => $isOwner,
             'isSharedAccess'      => $isSharedToUser,
+            'userVotes'           => $userVotes,
+            'userReview'          => $userReview,
         ]);
     }
 

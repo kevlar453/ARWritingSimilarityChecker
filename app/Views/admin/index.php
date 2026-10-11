@@ -271,6 +271,17 @@
                             </span>
                         <?php endif; ?>
                     </a>
+                    <a href="<?= base_url('admin?tab=feedback') ?>" class="group flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 <?= $activeTab === 'feedback' ? 'bg-indigo-600/15 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent' ?>">
+                        <div class="flex items-center gap-2.5">
+                            <svg class="w-4 h-4 <?= $activeTab === 'feedback' ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+                            <span>Feedback &amp; Testimoni</span>
+                        </div>
+                        <?php if (!empty($testimonialStats['total_reviews'])): ?>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold">
+                                <?= (int) $testimonialStats['total_reviews'] ?>
+                            </span>
+                        <?php endif; ?>
+                    </a>
                 </div>
 
                 <!-- Group 4: Sistem & Keamanan -->
@@ -2499,6 +2510,236 @@
             </div>
 
         <!-- ========================================== -->
+        <!-- TAB: FEEDBACK & TESTIMONI (FASE 1)         -->
+        <!-- ========================================== -->
+        <?php elseif ($activeTab === 'feedback'): ?>
+            <div class="space-y-6">
+                <!-- Header -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                            <span>🌟 Evaluasi Kinerja Fitur &amp; Moderasi Testimoni</span>
+                            <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono-code">Fase 1 Growth</span>
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-0.5">
+                            Menganalisis penilaian performa fitur di mata pengguna (Voting Score), mengevaluasi catatan kualitatif, serta memoderasi testimoni publik untuk Landing Page.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 4 KPI Metrics Cards -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+                    <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-4 space-y-1">
+                        <div class="text-[11px] font-semibold text-slate-400">Rata-rata Rating</div>
+                        <div class="text-2xl font-black text-amber-400 font-mono-code flex items-center gap-1">
+                            <span><?= number_format($testimonialStats['avg_rating'] ?? 5.0, 1) ?></span>
+                            <span class="text-base text-amber-400">★</span>
+                        </div>
+                        <div class="text-[10px] text-slate-400">Kepuasan pemeriksaan naskah</div>
+                    </div>
+                    <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-4 space-y-1">
+                        <div class="text-[11px] font-semibold text-slate-400">Total Ulasan Masuk</div>
+                        <div class="text-2xl font-black text-white font-mono-code">
+                            <?= (int) ($testimonialStats['total_reviews'] ?? 0) ?>
+                        </div>
+                        <div class="text-[10px] text-slate-400">Seluruh ulasan terkirim</div>
+                    </div>
+                    <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-4 space-y-1">
+                        <div class="text-[11px] font-semibold text-slate-400">Tayang di Publik</div>
+                        <div class="text-2xl font-black text-emerald-400 font-mono-code">
+                            <?= (int) ($testimonialStats['count_approved'] ?? 0) ?>
+                        </div>
+                        <div class="text-[10px] text-emerald-400/80">Disetujui untuk Landing Page</div>
+                    </div>
+                    <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-4 space-y-1">
+                        <div class="text-[11px] font-semibold text-slate-400">Menunggu Moderasi</div>
+                        <div class="text-2xl font-black <?= ($testimonialStats['count_pending'] ?? 0) > 0 ? 'text-amber-400' : 'text-slate-400' ?> font-mono-code">
+                            <?= (int) ($testimonialStats['count_pending'] ?? 0) ?>
+                        </div>
+                        <div class="text-[10px] text-slate-400">Perlu ditinjau admin</div>
+                    </div>
+                </div>
+
+                <!-- Bagian A: Kinerja Fitur (Feature Voting Score) -->
+                <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-5 space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-700/60 pb-3">
+                        <div>
+                            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                                <span>🗳️ Skor Voting &amp; Kepuasan Fitur (Micro-Feedback)</span>
+                            </h3>
+                            <p class="text-xs text-slate-400 mt-0.5">Respon pengguna per fitur: memantau fitur mana yang paling membantu vs yang perlu ditingkatkan</p>
+                        </div>
+                    </div>
+
+                    <?php if (empty($featureStats)): ?>
+                        <div class="p-6 text-center text-xs text-slate-500 bg-slate-900/40 rounded-xl border border-slate-800">
+                            Belum ada rekaman voting fitur dari pengguna.
+                        </div>
+                    <?php else: ?>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                            <?php foreach ($featureStats as $fs): ?>
+                                <?php 
+                                    $fNameLabel = match($fs['feature_name']) {
+                                        'audit_forensik'     => '✨ Audit Forensik Cerdas',
+                                        'pertanyaan_sidang'  => '🎯 Pertanyaan Sidang Lisan',
+                                        'cross_lingual'      => '🌐 Kemiripan Lintas Bahasa',
+                                        'dual_lens'          => '🧬 Dual-Lens Matcher',
+                                        'pdf_export'         => '📄 Cetak / Ekspor PDF',
+                                        default              => ucwords(str_replace('_', ' ', $fs['feature_name']))
+                                    };
+                                    $satRate = (float)($fs['satisfaction_rate'] ?? 100.0);
+                                ?>
+                                <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-3.5 space-y-2.5">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs font-bold text-slate-200"><?= esc($fNameLabel) ?></span>
+                                        <span class="text-[11px] font-mono-code font-bold px-2 py-0.5 rounded <?= $satRate >= 80 ? 'bg-emerald-500/20 text-emerald-300' : ($satRate >= 60 ? 'bg-amber-500/20 text-amber-300' : 'bg-rose-500/20 text-rose-300') ?>">
+                                            <?= number_format($satRate, 1) ?>% Puas
+                                        </span>
+                                    </div>
+                                    <!-- Progress Bar -->
+                                    <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden flex">
+                                        <div class="bg-emerald-500 h-full" style="width: <?= $satRate ?>%"></div>
+                                        <div class="bg-amber-500 h-full" style="width: <?= 100 - $satRate ?>%"></div>
+                                    </div>
+                                    <div class="flex justify-between items-center text-[10px] text-slate-400">
+                                        <span>Total: <strong><?= (int)$fs['total_votes'] ?> suara</strong></span>
+                                        <span class="space-x-2">
+                                            <span class="text-emerald-400">👍 <?= (int)$fs['upvotes'] ?></span>
+                                            <span class="text-amber-400">👎 <?= (int)$fs['downvotes'] ?></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <!-- Catatan Kualitatif Pengguna Terbaru -->
+                    <?php if (!empty($recentFeedback)): ?>
+                        <div class="mt-4 pt-3 border-t border-slate-700/60 space-y-2">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Catatan &amp; Masukan Kualitatif Pengguna</h4>
+                            <div class="space-y-2 max-h-60 overflow-y-auto pr-1">
+                                <?php foreach ($recentFeedback as $fb): ?>
+                                    <div class="p-3 bg-slate-950/60 border border-slate-800 rounded-xl text-xs space-y-1">
+                                        <div class="flex items-center justify-between text-[11px]">
+                                            <span class="font-bold text-indigo-300">
+                                                <?= (int)$fb['vote_value'] === 1 ? '👍' : '👎' ?> <?= esc($fb['feature_name']) ?>
+                                                <span class="text-slate-400 font-normal">&bull; <?= esc($fb['user_name'] ?? 'Tamu') ?> (<?= esc($fb['institution'] ?? 'Institusi') ?>)</span>
+                                            </span>
+                                            <span class="text-slate-500"><?= date('d M Y, H:i', strtotime($fb['created_at'])) ?></span>
+                                        </div>
+                                        <p class="text-slate-300 italic">"<?= esc($fb['feedback_text']) ?>"</p>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Bagian B: Moderasi Testimoni Akademik -->
+                <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-5 space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-700/60 pb-3 flex-wrap gap-2">
+                        <div>
+                            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                                <span>💬 Moderasi Testimoni &amp; Bukti Nyata Publik</span>
+                                <span class="text-[10px] font-mono-code px-2 py-0.5 rounded bg-slate-700 text-slate-300">
+                                    <?= count($testimonialsList ?? []) ?> total
+                                </span>
+                            </h3>
+                            <p class="text-xs text-slate-400 mt-0.5">Pilih testimoni yang memenuhi etika akademik untuk ditampilkan pada Landing Page</p>
+                        </div>
+                    </div>
+
+                    <?php if (empty($testimonialsList)): ?>
+                        <div class="p-8 text-center text-xs text-slate-500 bg-slate-900/40 rounded-xl border border-slate-800">
+                            Belum ada testimoni yang dikirimkan oleh pengguna.
+                        </div>
+                    <?php else: ?>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs text-slate-300">
+                                <thead class="text-[10px] font-bold uppercase tracking-wider text-slate-400 bg-slate-900/80 border-b border-slate-700/60">
+                                    <tr>
+                                        <th class="py-3 px-3">Penulis &amp; Status</th>
+                                        <th class="py-3 px-3">Rating</th>
+                                        <th class="py-3 px-3">Isi Testimoni / Ulasan</th>
+                                        <th class="py-3 px-3">Status Moderasi</th>
+                                        <th class="py-3 px-3 text-center">Unggulan</th>
+                                        <th class="py-3 px-3 text-right">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-800">
+                                    <?php foreach ($testimonialsList as $t): ?>
+                                        <tr class="hover:bg-slate-800/30 transition" id="testi-row-<?= (int)$t['id'] ?>">
+                                            <td class="py-3 px-3 align-top">
+                                                <div class="font-bold text-white"><?= esc($t['author_name']) ?></div>
+                                                <div class="text-[11px] text-indigo-300"><?= esc($t['author_role'] ?? 'Mahasiswa') ?></div>
+                                                <?php if (!empty($t['institution'])): ?>
+                                                    <div class="text-[10px] text-slate-400"><?= esc($t['institution']) ?></div>
+                                                <?php endif; ?>
+                                                <?php if (!empty($t['is_anonymous'])): ?>
+                                                    <span class="inline-block mt-1 text-[9px] px-1.5 py-0.5 rounded bg-slate-700 text-amber-300 font-mono-code">Anonim Publik</span>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td class="py-3 px-3 align-top whitespace-nowrap">
+                                                <div class="text-amber-400 font-bold">
+                                                    <?php for ($s = 1; $s <= 5; $s++): ?>
+                                                        <span><?= $s <= (int)$t['rating'] ? '★' : '☆' ?></span>
+                                                    <?php endfor; ?>
+                                                </div>
+                                                <div class="text-[10px] text-slate-400 font-mono-code"><?= (int)$t['rating'] ?>.0 / 5.0</div>
+                                            </td>
+                                            <td class="py-3 px-3 align-top max-w-xs sm:max-w-md">
+                                                <p class="text-slate-200 leading-relaxed italic bg-slate-950/40 p-2.5 rounded-lg border border-slate-800/80">
+                                                    "<?= esc($t['content']) ?>"
+                                                </p>
+                                                <div class="text-[10px] text-slate-500 mt-1 flex items-center gap-2">
+                                                    <span>Naskah: <?= esc($t['document_title'] ?? 'Laporan #' . $t['report_id']) ?></span>
+                                                    <span>&bull;</span>
+                                                    <span><?= date('d M Y, H:i', strtotime($t['created_at'])) ?></span>
+                                                </div>
+                                            </td>
+                                            <td class="py-3 px-3 align-top whitespace-nowrap">
+                                                <span id="testi-status-badge-<?= (int)$t['id'] ?>">
+                                                    <?php if ((int)$t['is_approved'] === 1): ?>
+                                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                                                            ✓ Disetujui
+                                                        </span>
+                                                    <?php elseif ((int)$t['is_approved'] === -1): ?>
+                                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                                                            ✕ Ditolak
+                                                        </span>
+                                                    <?php else: ?>
+                                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                                                            ⏳ Menunggu
+                                                        </span>
+                                                    <?php endif; ?>
+                                                </span>
+                                            </td>
+                                            <td class="py-3 px-3 align-top text-center whitespace-nowrap">
+                                                <button type="button" onclick="adminToggleFeatured(<?= (int)$t['id'] ?>)" id="testi-feat-btn-<?= (int)$t['id'] ?>" class="p-1.5 rounded-lg border text-sm transition cursor-pointer <?= !empty($t['is_featured']) ? 'bg-amber-500/20 border-amber-500/40 text-amber-300' : 'bg-slate-800 border-slate-700 text-slate-500 hover:text-slate-300' ?>" title="Jadikan unggulan di Landing Page">
+                                                    ⭐
+                                                </button>
+                                            </td>
+                                            <td class="py-3 px-3 align-top text-right whitespace-nowrap space-x-1">
+                                                <button type="button" onclick="adminApproveTestimonial(<?= (int)$t['id'] ?>)" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-[11px] transition cursor-pointer shadow-xs" title="Setujui dan tayangkan ke publik">
+                                                    Setujui
+                                                </button>
+                                                <button type="button" onclick="adminRejectTestimonial(<?= (int)$t['id'] ?>)" class="px-2 py-1 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-300 text-[11px] transition cursor-pointer" title="Tolak">
+                                                    Tolak
+                                                </button>
+                                                <button type="button" onclick="adminDeleteTestimonial(<?= (int)$t['id'] ?>)" class="px-2 py-1 rounded-lg bg-rose-900/60 hover:bg-rose-800 text-rose-200 text-[11px] transition cursor-pointer" title="Hapus permanen">
+                                                    Hapus
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+        <!-- ========================================== -->
         <!-- TAB 7: SISTEM SERVER                       -->
         <!-- ========================================== -->
         <?php elseif ($activeTab === 'system'): ?>
@@ -3011,6 +3252,78 @@
                     btnElement.disabled = false;
                     btnElement.innerHTML = 'Uji';
                 }
+            }
+        }
+
+        // ── KELOLA MODERASI TESTIMONI AKADEMIK ──
+        async function adminApproveTestimonial(id) {
+            try {
+                const res = await postJson('<?= base_url('admin/testimonials/approve') ?>/' + id, {});
+                if (res.status === 'success') {
+                    const badge = document.getElementById('testi-status-badge-' + id);
+                    if (badge) {
+                        badge.innerHTML = '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">✓ Disetujui</span>';
+                    }
+                } else {
+                    alert('Gagal: ' + res.message);
+                }
+            } catch (err) {
+                alert('Terjadi kesalahan koneksi.');
+            }
+        }
+
+        async function adminRejectTestimonial(id) {
+            try {
+                const res = await postJson('<?= base_url('admin/testimonials/reject') ?>/' + id, {});
+                if (res.status === 'success') {
+                    const badge = document.getElementById('testi-status-badge-' + id);
+                    if (badge) {
+                        badge.innerHTML = '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">✕ Ditolak</span>';
+                    }
+                } else {
+                    alert('Gagal: ' + res.message);
+                }
+            } catch (err) {
+                alert('Terjadi kesalahan koneksi.');
+            }
+        }
+
+        async function adminToggleFeatured(id) {
+            try {
+                const res = await postJson('<?= base_url('admin/testimonials/feature') ?>/' + id, {});
+                if (res.status === 'success') {
+                    const btn = document.getElementById('testi-feat-btn-' + id);
+                    if (btn) {
+                        if (res.is_featured) {
+                            btn.className = 'p-1.5 rounded-lg border text-sm transition cursor-pointer bg-amber-500/20 border-amber-500/40 text-amber-300';
+                            const badge = document.getElementById('testi-status-badge-' + id);
+                            if (badge) {
+                                badge.innerHTML = '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">✓ Disetujui</span>';
+                            }
+                        } else {
+                            btn.className = 'p-1.5 rounded-lg border text-sm transition cursor-pointer bg-slate-800 border-slate-700 text-slate-500 hover:text-slate-300';
+                        }
+                    }
+                } else {
+                    alert('Gagal: ' + res.message);
+                }
+            } catch (err) {
+                alert('Terjadi kesalahan koneksi.');
+            }
+        }
+
+        async function adminDeleteTestimonial(id) {
+            if (!confirm('Apakah Anda yakin ingin menghapus testimoni ini secara permanen?')) return;
+            try {
+                const res = await postJson('<?= base_url('admin/testimonials/delete') ?>/' + id, {});
+                if (res.status === 'success') {
+                    const row = document.getElementById('testi-row-' + id);
+                    if (row) row.remove();
+                } else {
+                    alert('Gagal: ' + res.message);
+                }
+            } catch (err) {
+                alert('Terjadi kesalahan koneksi.');
             }
         }
     </script>

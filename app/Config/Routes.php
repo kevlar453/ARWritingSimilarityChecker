@@ -50,6 +50,11 @@ $routes->get('contact/challenge', 'LegalController::challenge');
 $routes->match(['get', 'post'], 'contact/validate-email', 'LegalController::validateEmail');
 $routes->post('contact/send', 'LegalController::sendMessage');
 
+// Feedback & Testimonials Routes
+$routes->post('feedback/vote', 'FeedbackController::vote');
+$routes->post('feedback/testimonial', 'FeedbackController::submitTestimonial');
+$routes->get('feedback/status/(:num)', 'FeedbackController::getStatus/$1');
+
 // Auth Routes
 $routes->group('auth', function ($routes) {
     $routes->post('register', 'AuthController::register');
@@ -144,6 +149,12 @@ $routes->group('admin', ['filter' => 'admin'], function ($routes) {
     $routes->delete('google-keys/(:num)', 'Admin\GoogleKeyController::delete/$1');
     $routes->post('google-keys/delete/(:num)', 'Admin\GoogleKeyController::delete/$1');
     $routes->post('google-keys/test/(:num)', 'Admin\GoogleKeyController::testConnection/$1');
+
+    // Feedback & Testimonials Moderation (Protected by AdminFilter)
+    $routes->post('testimonials/approve/(:num)', 'Admin\DashboardController::approveTestimonial/$1');
+    $routes->post('testimonials/reject/(:num)', 'Admin\DashboardController::rejectTestimonial/$1');
+    $routes->post('testimonials/feature/(:num)', 'Admin\DashboardController::toggleFeaturedTestimonial/$1');
+    $routes->post('testimonials/delete/(:num)', 'Admin\DashboardController::deleteTestimonial/$1');
 });
 
 // Human Review & Evaluation Subsystem (DINONAKTIFKAN - mitigasi risiko RCE lewat exec)

@@ -227,6 +227,22 @@ class DashboardController extends BaseController
             }
         }
 
+        // 14. Data Evaluasi Fitur & Testimoni Publik (Fase 1)
+        $voteModel = new \App\Models\FeatureVoteModel();
+        $testimonialModel = new \App\Models\TestimonialModel();
+        $featureStats = $voteModel->getFeatureStats();
+        $recentFeedback = $voteModel->getRecentFeedback(25);
+        $testimonialStats = $testimonialModel->getStats();
+        $testimonialsList = $db->table('testimonials t')
+                               ->select('t.*, u.name as user_name, u.email as user_email, d.title as document_title')
+                               ->join('users u', 'u.id = t.user_id', 'left')
+                               ->join('reports r', 'r.id = t.report_id', 'left')
+                               ->join('documents d', 'd.id = r.document_id', 'left')
+                               ->orderBy('t.id', 'DESC')
+                               ->limit(100)
+                               ->get()
+                               ->getResultArray();
+
         return view('admin/index', [
             'activeTab'            => $activeTab,
             'searchQuery'          => $searchQuery,
@@ -273,6 +289,10 @@ class DashboardController extends BaseController
                 'phantom_count'           => $phantomCount,
                 'cross_lingual_count'     => $crossLingualCount,
             ],
+            'featureStats'         => $featureStats,
+            'recentFeedback'       => $recentFeedback,
+            'testimonialStats'     => $testimonialStats,
+            'testimonialsList'     => $testimonialsList,
             'currentAdmin'         => $userModel->find(session()->get('user_id')),
         ]);
     }
@@ -597,4 +617,111 @@ class DashboardController extends BaseController
         fclose($output);
         exit;
     }
+
+    /**
+     * Menyetujui testimoni untuk ditampilkan ke publik
+     */
+    public function approveTestimonial(int $id): ResponseInterface
+    {
+        $testimonialModel = new \App\Models\TestimonialModel();
+        $testi = $testimonialModel->find($id);
+        if (! $testi) {
+            return $this->response->setStatusCode(404)->setJSON([
+                'status'  => 'error',
+                'message' => 'Testimoni tidak ditemukan.',
+            ]);
+        }
+
+        $testimonialModel->update($id, [
+            'is_approved' => 1,
+            'updated_at'  => date('Y-m-d H:i:s'),
+        ]);
+
+        return $this->response->setJSON([
+            'status'  => 'success',
+            'message' => 'Testimoni berhasil disetujui dan siap tayang di publik.',
+        ]);
+    }
+
+    /**
+     * Menolak testimoni
+     */
+    public function rejectTestimonial(int $id): ResponseInterface
+    {
+        $testimonialModel = new \App\Models\TestimonialModel();
+        $testi = $testimonialModel->find($id);
+        if (! $testi) {
+            return $this->response->setStatusCode(404)->setJSON([
+                'status'  => 'error',
+                'message' => 'Testimoni tidak ditemukan.',
+            ]);
+        }
+
+        $testimonialModel->update($id, [
+            'is_approved' => -1,
+            'is_featured' => 0,
+            'updated_at'  => date('Y-m-d H:i:s'),
+        ]);
+
+        return $this->response->setJSON([
+            'status'  => 'success',
+            'message' => 'Testimoni ditandai sebagai ditolak.',
+        ]);
+    }
+
+    /**
+     * Menandai atau mencabut tanda unggulan (Featured) testimoni
+     */
+    public function toggleFeaturedTestimonial(int $id): ResponseInterface
+    {
+        $testimonialModel = new \App\Models\TestimonialModel();
+        $testi = $testimonialModel->find($id);
+        if (! $testi) {
+            return $this->response->setStatusCode(404)->setJSON([
+                'status'  => 'error',
+                'message' => 'Testimoni tidak ditemukan.',
+            ]);
+        }
+
+        $newVal = empty($testi['is_featured']) ? 1 : 0;
+        $updateData = [
+            'is_featured' => $newVal,
+            'updated_at'  => date('Y-m-d H:i:s'),
+        ];
+        // Jika belum disetujui, otomatis setujui saat dijadikan featured
+        if ($newVal === 1 && (int)$testi['is_approved'] !== 1) {
+            $updateData['is_approved'] = 1;
+        }
+
+        $testimonialModel->update($id, $updateData);
+
+        return $this->response->setJSON([
+            'status'      => 'success',
+            'is_featured' => $newVal,
+            'message'     => $newVal ? 'Testimoni dijadikan unggulan di landing page!' : 'Status unggulan testimoni dicabut.',
+        ]);
+    }
+
+    /**
+     * Menghapus testimoni
+     */
+    public function deleteTestimonial(int $id): ResponseInterface
+    {
+        $testimonialModel = new \App\Models\TestimonialModel();
+        $testi = $testimonialModel->find($id);
+        if (! $testi) {
+            return $this->response->setStatusCode(404)->setJSON([
+                'status'  => 'error',
+                'message' => 'Testimoni tidak ditemukan.',
+            ]);
+        }
+
+        $testimonialModel->delete($id);
+
+        return $this->response->setJSON([
+            'status'  => 'success',
+            'message' => 'Testimoni berhasil dihapus.',
+        ]);
+    }
 }
+

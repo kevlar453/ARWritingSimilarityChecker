@@ -49,14 +49,21 @@ class LandingController extends BaseController
         $spamShield = new \App\Libraries\SpamShield();
         $authSecurityToken = $spamShield->generateTimeToken();
 
+        // Testimoni Publik Terverifikasi (Fase 1)
+        $testimonialModel = new \App\Models\TestimonialModel();
+        $approvedTestimonials = $testimonialModel->getApprovedForPublic(6);
+        $testimonialStats = $testimonialModel->getStats();
+
         return view('landing/index', [
-            'currentUser'        => $currentUser,
-            'quotaInfo'          => $quotaInfo,
-            'totalCorpus'        => max(475, $totalCorpus),
-            'totalSubmissions'   => $totalSubmissions,
-            'totalReports'       => $totalReports,
-            'visitorStats'       => $visitorStats,
-            'authSecurityToken'  => $authSecurityToken,
+            'currentUser'          => $currentUser,
+            'quotaInfo'            => $quotaInfo,
+            'totalCorpus'          => max(475, $totalCorpus),
+            'totalSubmissions'     => $totalSubmissions,
+            'totalReports'         => $totalReports,
+            'visitorStats'         => $visitorStats,
+            'authSecurityToken'    => $authSecurityToken,
+            'approvedTestimonials' => $approvedTestimonials,
+            'testimonialStats'     => $testimonialStats,
         ]);
     }
 }
