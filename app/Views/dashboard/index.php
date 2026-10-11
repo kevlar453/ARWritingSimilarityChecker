@@ -415,6 +415,33 @@
                 <div id="uploadAlert" class="mt-4 p-4 rounded-xl text-xs sm:text-sm hidden"></div>
             </div>
 
+            <!-- Zero-Leakage & Data Sovereignty Guarantee Banner -->
+            <div class="bg-gradient-to-r from-emerald-950 via-slate-900 to-indigo-950 rounded-2xl p-4 sm:p-5 text-white shadow-md border border-emerald-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div class="flex items-start gap-3.5">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-xl flex-shrink-0 mt-0.5">
+                        🛡️
+                    </div>
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <h3 class="text-sm sm:text-base font-bold text-white">Kedaulatan Privasi &amp; Jaminan Nol Kebocoran Data</h3>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-400/20 text-emerald-300 border border-emerald-400/30">
+                                Zero-Leakage Guarantee
+                            </span>
+                        </div>
+                        <p class="text-xs text-emerald-100/90 leading-relaxed max-w-3xl">
+                            Naskah Anda adalah hak milik intelektual Anda seutuhnya. AR Tilik <strong class="text-white">tidak pernah</strong> membagikan, mempublikasikan, atau memasukkan karya Anda ke korpus publik tanpa izin. Anda dapat <strong class="text-emerald-300">memusnahkan berkas fisik naskah asli (PDF/DOCX)</strong> dari peladen kapan saja secara mandiri. Meskipun berkas naskah asli dimusnahkan demi kerahasiaan, <strong class="text-white">skor analitik, bukti pasase, dan keabsahan sertifikat verifikasi digital ber-QR Code tetap aktif 100%</strong>.
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 flex-shrink-0 self-end md:self-center">
+                    <div class="text-[11px] text-emerald-200/90 bg-emerald-900/50 px-3.5 py-2 rounded-xl border border-emerald-500/40 font-semibold flex items-center gap-1.5 shadow-2xs">
+                        <span>🔒 Enkripsi Disk</span>
+                        <span>&bull;</span>
+                        <span>Self-Purge Mandiri</span>
+                    </div>
+                </div>
+            </div>
+
             <!-- Submissions Table Card -->
             <div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
                 <div class="p-4 sm:p-5 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4">
@@ -441,7 +468,7 @@
                                 <th class="p-3.5 sm:p-4 min-w-[120px]">Similarity</th>
                                 <th class="p-3.5 sm:p-4 min-w-[135px]">Indikasi AI</th>
                                 <th class="p-3.5 sm:p-4 min-w-[130px] whitespace-nowrap">Tanggal Unggah</th>
-                                <th class="p-3.5 sm:p-4 text-right min-w-[190px] whitespace-nowrap">Aksi</th>
+                                <th class="p-3.5 sm:p-4 text-right min-w-[270px] whitespace-nowrap">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
@@ -587,19 +614,22 @@
                                         </td>
                                         <td class="p-3.5 sm:p-4 text-right">
                                             <div class="inline-flex items-center justify-end gap-1.5 whitespace-nowrap">
+                                                <?php 
+                                                    $isPurged = !empty($sub['file_purged_at']) || ($sub['storage_path'] ?? '') === '[PURGED]';
+                                                ?>
                                                 <?php if ($rep && $rep['status'] === 'completed'): ?>
-                                                    <a href="<?= base_url('dashboard/report/' . $rep['id']) ?>" class="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg text-xs shadow-xs transition flex items-center gap-1">
+                                                    <a href="<?= base_url('dashboard/report/' . $rep['id']) ?>" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg text-xs shadow-xs transition flex items-center gap-1">
                                                         Buka Laporan
                                                     </a>
-                                                    <button onclick="openShareModal(<?= $sub['id'] ?>, <?= htmlspecialchars(json_encode($sub['title']), ENT_QUOTES, 'UTF-8') ?>)" class="px-2.5 py-1 bg-sky-50 hover:bg-sky-100 text-sky-700 font-medium rounded-lg text-xs transition flex items-center gap-1 cursor-pointer" title="Bagikan naskah ini ke pengguna lain">
+                                                    <button onclick="openShareModal(<?= $sub['id'] ?>, <?= htmlspecialchars(json_encode($sub['title']), ENT_QUOTES, 'UTF-8') ?>)" class="px-2 py-1 bg-sky-50 hover:bg-sky-100 text-sky-700 font-medium rounded-lg text-xs transition flex items-center gap-1 cursor-pointer" title="Bagikan naskah ini ke pengguna lain">
                                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
                                                         <span>Bagikan</span>
                                                     </button>
-                                                    <button onclick="triggerCheck(<?= $sub['id'] ?>)" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-lg text-xs transition" title="Ulangi pemeriksaan">
+                                                    <button onclick="triggerCheck(<?= $sub['id'] ?>)" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-lg text-xs transition" title="Ulangi pemeriksaan">
                                                         ↻ Ulangi
                                                     </button>
                                                 <?php else: ?>
-                                                    <button onclick="triggerCheck(<?= $sub['id'] ?>)" class="px-3 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold rounded-lg text-xs transition">
+                                                    <button onclick="triggerCheck(<?= $sub['id'] ?>)" class="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold rounded-lg text-xs transition">
                                                         Cek Similarity
                                                     </button>
                                                     <button onclick="openShareModal(<?= $sub['id'] ?>, <?= htmlspecialchars(json_encode($sub['title']), ENT_QUOTES, 'UTF-8') ?>)" class="px-2 py-1 bg-sky-50 hover:bg-sky-100 text-sky-700 font-medium rounded-lg text-xs transition flex items-center gap-1 cursor-pointer" title="Bagikan naskah ini ke pengguna lain">
@@ -607,9 +637,24 @@
                                                         <span>Bagikan</span>
                                                     </button>
                                                 <?php endif; ?>
+
+                                                <?php if ($isPurged): ?>
+                                                    <span class="px-2 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg text-xs font-semibold inline-flex items-center gap-1 cursor-help" title="Berkas fisik naskah asli telah dimusnahkan secara mandiri dari server pada <?= !empty($sub['file_purged_at']) ? date('d M Y, H:i', strtotime($sub['file_purged_at'])) : '-' ?> WIB demi kerahasiaan & privasi. Skor dan sertifikat tetap utuh.">
+                                                        🛡️ <span class="hidden sm:inline">Dimusnahkan</span>
+                                                    </span>
+                                                <?php else: ?>
+                                                    <button type="button" onclick="openPurgeFileModal(<?= $sub['id'] ?>, <?= htmlspecialchars(json_encode($sub['title']), ENT_QUOTES, 'UTF-8') ?>)" class="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-semibold rounded-lg text-xs transition inline-flex items-center gap-1 cursor-pointer" title="Musnahkan berkas fisik naskah dari disk peladen demi privasi (skor & sertifikat tetap utuh)">
+                                                        🛡️ <span class="hidden sm:inline">Musnahkan</span>
+                                                    </button>
+                                                <?php endif; ?>
+
                                                 <a href="<?= base_url('api/documents/' . $sub['id']) ?>" target="_blank" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-mono rounded-lg text-xs transition" title="Lihat JSON">
                                                     JSON
                                                 </a>
+
+                                                <button type="button" onclick="openDeleteDocModal(<?= $sub['id'] ?>, <?= htmlspecialchars(json_encode($sub['title']), ENT_QUOTES, 'UTF-8') ?>)" class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition cursor-pointer" title="Hapus submisi ini dari riwayat">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>
@@ -2466,7 +2511,184 @@
             div.textContent = text || '';
             return div.innerHTML;
         }
+
+        // ==========================================
+        // FITUR 4: LOGIKA SELF-PURGE & KEDAULATAN DATA
+        // ==========================================
+        let activePurgeDocId = null;
+        let activeDeleteDocId = null;
+
+        function openPurgeFileModal(docId, docTitle) {
+            activePurgeDocId = docId;
+            document.getElementById('purgeModalDocTitle').innerText = docTitle;
+            document.getElementById('purgeFileModal').classList.remove('hidden');
+        }
+
+        function closePurgeFileModal() {
+            document.getElementById('purgeFileModal').classList.add('hidden');
+            activePurgeDocId = null;
+        }
+
+        async function executePurgeFile() {
+            if (!activePurgeDocId) return;
+            const btn = document.getElementById('btnConfirmPurge');
+            const btnText = document.getElementById('btnConfirmPurgeText');
+            btn.disabled = true;
+            btnText.innerText = 'Memusnahkan Berkas...';
+
+            try {
+                const res = await fetch(`<?= base_url('dashboard/documents') ?>/${activePurgeDocId}/purge-file`, {
+                    method: 'POST'
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert(data.message || 'Berkas fisik naskah asli berhasil dimusnahkan dari peladen.');
+                    window.location.reload();
+                } else {
+                    alert(data.message || 'Gagal memusnahkan berkas.');
+                    btn.disabled = false;
+                    btnText.innerText = 'Ya, Musnahkan Berkas Mentah';
+                }
+            } catch (err) {
+                alert('Terjadi kesalahan jaringan saat memusnahkan berkas.');
+                btn.disabled = false;
+                btnText.innerText = 'Ya, Musnahkan Berkas Mentah';
+            }
+        }
+
+        function openDeleteDocModal(docId, docTitle) {
+            activeDeleteDocId = docId;
+            document.getElementById('deleteModalDocTitle').innerText = docTitle;
+            document.getElementById('deleteDocModal').classList.remove('hidden');
+        }
+
+        function closeDeleteDocModal() {
+            document.getElementById('deleteDocModal').classList.add('hidden');
+            activeDeleteDocId = null;
+        }
+
+        async function executeDeleteDoc() {
+            if (!activeDeleteDocId) return;
+            const btn = document.getElementById('btnConfirmDelete');
+            const btnText = document.getElementById('btnConfirmDeleteText');
+            btn.disabled = true;
+            btnText.innerText = 'Menghapus...';
+
+            try {
+                const res = await fetch(`<?= base_url('dashboard/documents') ?>/${activeDeleteDocId}/delete`, {
+                    method: 'POST'
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert(data.message || 'Karya ilmiah berhasil dihapus dari riwayat.');
+                    window.location.reload();
+                } else {
+                    alert(data.message || 'Gagal menghapus submisi.');
+                    btn.disabled = false;
+                    btnText.innerText = 'Ya, Hapus Submisi';
+                }
+            } catch (err) {
+                alert('Terjadi kesalahan jaringan saat menghapus submisi.');
+                btn.disabled = false;
+                btnText.innerText = 'Ya, Hapus Submisi';
+            }
+        }
     </script>
+
+    <!-- MODAL PEMUSNAHAN BERKAS MENTAH (SELF-PURGE PRIVACY) -->
+    <div id="purgeFileModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-xs hidden transition-opacity">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 relative space-y-5 animate-in fade-in zoom-in-95 duration-150">
+            <div class="flex items-start justify-between border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 border border-rose-200 flex items-center justify-center text-xl flex-shrink-0">
+                        🛡️
+                    </div>
+                    <div>
+                        <div class="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-100">
+                            Kedaulatan Privasi Data
+                        </div>
+                        <h3 class="text-base font-bold text-slate-900 mt-0.5">Musnahkan Berkas Fisik Asli</h3>
+                    </div>
+                </div>
+                <button type="button" onclick="closePurgeFileModal()" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition cursor-pointer">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <div class="space-y-3 text-xs text-slate-600 leading-relaxed">
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                    <span class="text-slate-400 font-medium">Judul Naskah:</span>
+                    <div id="purgeModalDocTitle" class="font-bold text-slate-800 text-sm mt-0.5 line-clamp-2">-</div>
+                </div>
+
+                <div class="space-y-2">
+                    <div class="flex items-start gap-2 text-rose-700 bg-rose-50/70 p-3 rounded-xl border border-rose-200">
+                        <span class="font-bold text-sm">⚠️</span>
+                        <div>
+                            <strong>Pemusnahan Berkas Fisik Permanen:</strong>
+                            <p class="text-[11px] text-rose-800/90 mt-0.5">Berkas dokumen asli (<code class="font-mono">PDF/DOCX</code>) dan teks mentah di server akan dimusnahkan secara permanen. Tindakan ini tidak dapat dibatalkan.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-2 text-emerald-800 bg-emerald-50/70 p-3 rounded-xl border border-emerald-200">
+                        <span class="font-bold text-sm">✅</span>
+                        <div>
+                            <strong>Skor &amp; Sertifikat Tetap Utuh:</strong>
+                            <p class="text-[11px] text-emerald-800/90 mt-0.5">Laporan hasil pemeriksaan kemiripan, dekomposisi statistik, bukti pasase, dan keabsahan sertifikat publik ber-QR Code (<code class="font-mono">ART-XXXX</code>) tetap tersimpan dengan aman untuk administrasi akademik Anda.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-2 flex items-center justify-end gap-2.5 border-t border-slate-100">
+                <button type="button" onclick="closePurgeFileModal()" class="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition cursor-pointer">
+                    Batal
+                </button>
+                <button type="button" id="btnConfirmPurge" onclick="executePurgeFile()" class="px-4 py-2.5 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white shadow-sm transition flex items-center gap-1.5 cursor-pointer">
+                    <span id="btnConfirmPurgeText">Ya, Musnahkan Berkas Mentah</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL HAPUS TOTAL KARYA ILMIAH -->
+    <div id="deleteDocModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-xs hidden transition-opacity">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 relative space-y-5 animate-in fade-in zoom-in-95 duration-150">
+            <div class="flex items-start justify-between border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-slate-100 text-rose-600 flex items-center justify-center text-xl flex-shrink-0">
+                        🗑️
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900">Hapus Submisi Naskah</h3>
+                        <p class="text-[11px] text-slate-400">Hapus karya ilmiah ini dari riwayat akun Anda</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeDeleteDocModal()" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition cursor-pointer">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <div class="space-y-3 text-xs text-slate-600">
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                    <span class="text-slate-400 font-medium">Judul Naskah:</span>
+                    <div id="deleteModalDocTitle" class="font-bold text-slate-800 text-sm mt-0.5 line-clamp-2">-</div>
+                </div>
+                <p class="text-slate-600 leading-relaxed">
+                    Apakah Anda yakin ingin menghapus karya ilmiah ini? Seluruh data laporan analisis, pasase kesepadanan, dan tautan verifikasi akan dihapus permanen dari sistem.
+                </p>
+            </div>
+
+            <div class="pt-2 flex items-center justify-end gap-2.5 border-t border-slate-100">
+                <button type="button" onclick="closeDeleteDocModal()" class="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition cursor-pointer">
+                    Batal
+                </button>
+                <button type="button" id="btnConfirmDelete" onclick="executeDeleteDoc()" class="px-4 py-2.5 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white shadow-sm transition flex items-center gap-1.5 cursor-pointer">
+                    <span id="btnConfirmDeleteText">Ya, Hapus Submisi</span>
+                </button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
 

@@ -443,8 +443,10 @@ Lakukan audit kritis dan kembalikan HANYA format JSON valid dengan struktur pers
     "pertanyaan_kritis_dosen": [
         {{
             "fokus": "Metodologi / Teori / Definisi Operasional / Sitasi",
+            "tingkat_urgensi": "KRITIS" | "TINGGI" | "SEDANG",
             "pertanyaan": "Pertanyaan lisan tajam yang wajib ditanyakan penguji untuk menguji pemahaman mahasiswa",
-            "alasan": "Mengapa pertanyaan ini penting diajukan"
+            "alasan": "Mengapa pertanyaan ini penting diajukan (tujuan pengujian bagi dosen)",
+            "strategi_jawaban": "Rekomendasi taktik & strategi pembelaan argumen metodologis bagi mahasiswa saat menjawab pertanyaan ini di hadapan dewan penguji sidang"
         }}
     ]
 }}

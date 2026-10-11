@@ -29,6 +29,7 @@ class DocumentModel extends Model
         'is_shared',
         'created_at',
         'updated_at',
+        'file_purged_at',
     ];
     protected $useTimestamps = false;
 }

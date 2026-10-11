@@ -1743,8 +1743,9 @@ class DashboardController extends BaseController
 
         // 1. Cari berdasarkan kolom verification_code
         $builder = $db->table('reports');
-        $builder->select('reports.*, documents.title AS document_title, documents.original_filename, documents.created_at AS document_created_at');
+        $builder->select('reports.*, documents.title AS document_title, documents.original_filename, documents.created_at AS document_created_at, documents.file_purged_at, documents.storage_path, documents.faculty, documents.department, documents.user_id, users.name AS author_name, users.institution AS author_institution');
         $builder->join('documents', 'documents.id = reports.document_id', 'left');
+        $builder->join('users', 'users.id = documents.user_id', 'left');
         $builder->where('reports.verification_code', $code);
         $report = $builder->get()->getRowArray();
 
@@ -1759,6 +1760,7 @@ class DashboardController extends BaseController
             ]);
         }
 
+        $report['ai_assessment'] = self::extractAiMetrics($report);
         $evidenceData = !empty($report['evidence_data']) ? (is_string($report['evidence_data']) ? json_decode($report['evidence_data'], true) : $report['evidence_data']) : [];
 
         // Ambil 5 rujukan teratas
@@ -1779,6 +1781,12 @@ class DashboardController extends BaseController
                 'title'             => $report['document_title'] ?? 'Dokumen Karya Ilmiah',
                 'original_filename' => $report['original_filename'] ?? "document_{$report['document_id']}.pdf",
                 'created_at'        => $report['document_created_at'] ?? $report['created_at'],
+                'file_purged_at'    => $report['file_purged_at'] ?? null,
+                'storage_path'      => $report['storage_path'] ?? null,
+                'faculty'           => $report['faculty'] ?? null,
+                'department'        => $report['department'] ?? null,
+                'author_name'       => $report['author_name'] ?? null,
+                'institution'       => $report['author_institution'] ?? null,
             ],
             'sources'      => $sources,
             'evidenceData' => $evidenceData,
@@ -1897,6 +1905,103 @@ class DashboardController extends BaseController
             ->setHeader('Content-Length', (string) strlen($pdfContent))
             ->setHeader('Cache-Control', 'public, max-age=86400')
             ->setBody($pdfContent);
+    }
+
+    /**
+     * Memusnahkan berkas naskah mentah secara permanen dari server demi kedaulatan privasi (Zero-Leakage & Data Sovereignty)
+     */
+    public function purgeDocumentFile($documentId)
+    {
+        $userId = session()->get('user_id');
+        $isAdmin = (session()->get('user_role') === 'admin');
+        if (! $userId) {
+            return $this->response->setStatusCode(401)->setJSON(['success' => false, 'message' => 'Silakan masuk terlebih dahulu.']);
+        }
+
+        $docModel = new DocumentModel();
+        $doc = $docModel->find($documentId);
+        if (! $doc) {
+            return $this->response->setStatusCode(404)->setJSON(['success' => false, 'message' => 'Dokumen tidak ditemukan.']);
+        }
+
+        if (! $isAdmin && (int) $doc['user_id'] !== (int) $userId) {
+            return $this->response->setStatusCode(403)->setJSON(['success' => false, 'message' => 'Hanya pemilik naskah yang berhak memusnahkan berkas fisik.']);
+        }
+
+        if (! empty($doc['file_purged_at'])) {
+            return $this->response->setJSON(['success' => true, 'message' => 'Berkas naskah ini sudah dimusnahkan sebelumnya.']);
+        }
+
+        // 1. Hapus berkas fisik dari server disk
+        if (! empty($doc['storage_path']) && file_exists($doc['storage_path']) && $doc['storage_path'] !== '[PURGED]') {
+            @unlink($doc['storage_path']);
+        }
+
+        // 2. Kosongkan teks mentah di document_chunks dan document_pages
+        $db = db_connect();
+        $db->table('document_chunks')->where('document_id', $documentId)->update(['text' => '']);
+        $db->table('document_pages')->where('document_id', $documentId)->update(['raw_text' => '']);
+
+        // 3. Update status dokumen
+        $now = date('Y-m-d H:i:s');
+        $docModel->update($documentId, [
+            'storage_path'   => '[PURGED]',
+            'file_purged_at' => $now,
+            'updated_at'     => $now,
+        ]);
+
+        return $this->response->setJSON([
+            'success'        => true,
+            'message'        => 'Berkas naskah asli (PDF/DOCX) dan teks mentah telah dimusnahkan secara permanen dari server peladen. Laporan analisis, skor kesepadanan, dan sertifikat verifikasi ber-QR Code tetap aman tersimpan.',
+            'file_purged_at' => date('d M Y, H:i', strtotime($now)) . ' WIB',
+        ]);
+    }
+
+    /**
+     * Menghapus naskah beserta laporannya secara menyeluruh oleh pemilik akun
+     */
+    public function deleteUserDocument($documentId)
+    {
+        $userId = session()->get('user_id');
+        $isAdmin = (session()->get('user_role') === 'admin');
+        if (! $userId) {
+            return $this->response->setStatusCode(401)->setJSON(['success' => false, 'message' => 'Silakan masuk terlebih dahulu.']);
+        }
+
+        $docModel = new DocumentModel();
+        $reportModel = new ReportModel();
+        $doc = $docModel->find($documentId);
+        if (! $doc) {
+            return $this->response->setStatusCode(404)->setJSON(['success' => false, 'message' => 'Dokumen tidak ditemukan.']);
+        }
+
+        if (! $isAdmin && (int) $doc['user_id'] !== (int) $userId) {
+            return $this->response->setStatusCode(403)->setJSON(['success' => false, 'message' => 'Hanya pemilik naskah yang berhak menghapus karya ilmiah ini.']);
+        }
+
+        $db = db_connect();
+        $reports = $reportModel->where('document_id', $documentId)->findAll();
+        foreach ($reports as $r) {
+            $db->table('report_matches')->where('report_id', $r['id'])->delete();
+            $db->table('report_sources')->where('report_id', $r['id'])->delete();
+            $reportModel->delete($r['id']);
+        }
+
+        $db->table('document_chunks')->where('document_id', $documentId)->delete();
+        $db->table('document_pages')->where('document_id', $documentId)->delete();
+        $db->table('fingerprints')->where('document_id', $documentId)->delete();
+        $db->table('document_shares')->where('document_id', $documentId)->delete();
+
+        if (! empty($doc['storage_path']) && file_exists($doc['storage_path']) && $doc['storage_path'] !== '[PURGED]') {
+            @unlink($doc['storage_path']);
+        }
+
+        $docModel->delete($documentId);
+
+        return $this->response->setJSON([
+            'success' => true,
+            'message' => 'Karya ilmiah beserta seluruh data laporan terkait telah berhasil dihapus secara permanen dari akun Anda.',
+        ]);
     }
 }
 

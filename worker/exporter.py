@@ -451,15 +451,23 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
         questions_boxes = ""
         for q_idx, q in enumerate(g_questions, 1):
             q_fokus = html_escape(q.get("fokus") or "Substansi")
+            q_urgensi = html_escape(q.get("tingkat_urgensi") or "")
             q_text = html_escape(q.get("pertanyaan") or "")
             q_alasan = html_escape(q.get("alasan") or "")
+            q_strategi = html_escape(q.get("strategi_jawaban") or "")
+
+            urgensi_badge = f'<span style="font-size: 6.5pt; font-weight: bold; padding: 1px 4px; border-radius: 3px; background: #fee2e2; color: #991b1b;">{q_urgensi}</span>' if q_urgensi else ''
+            strategi_html = f'<div style="font-size: 6.8pt; color: #065f46; margin-top: 3px; background: #f0fdf4; padding: 3px 6px; border-radius: 3px; border-left: 2px solid #10b981;"><strong>Strategi Jawaban Mahasiswa:</strong> {q_strategi}</div>' if q_strategi else ''
+
             questions_boxes += f"""
             <div style="margin-bottom: 5px; padding: 6px 9px; background: #ffffff; border: 1px solid #e2e8f0; border-left: 3px solid #6366f1; border-radius: 4px; font-size: 7.5pt;">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
                     <span style="font-weight: bold; color: #312e81; font-size: 7pt;">Pertanyaan #{q_idx} &bull; Fokus: {q_fokus}</span>
+                    {urgensi_badge}
                 </div>
                 <div style="font-weight: 600; color: #1e293b; margin-bottom: 2px; line-height: 1.35;">&ldquo;{q_text}&rdquo;</div>
                 <div style="font-size: 6.8pt; color: #64748b; font-style: italic;">Tujuan Pengujian: {q_alasan}</div>
+                {strategi_html}
             </div>
             """
 

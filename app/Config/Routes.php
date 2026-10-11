@@ -23,6 +23,8 @@ $routes->match(['get', 'head'], 'documents/(:num)/preview', 'DashboardController
 $routes->match(['get', 'head'], 'dashboard/documents/(:num)/preview', 'DashboardController::previewDocument/$1');
 $routes->match(['get', 'head'], 'documents/shared/(:segment)', 'DashboardController::sharedAccess/$1');
 $routes->match(['get', 'head'], 'dashboard/documents/shared/(:segment)', 'DashboardController::sharedAccess/$1');
+$routes->post('dashboard/documents/(:num)/purge-file', 'DashboardController::purgeDocumentFile/$1');
+$routes->post('dashboard/documents/(:num)/delete', 'DashboardController::deleteUserDocument/$1');
 $routes->match(['get', 'head'], 'verify/(:segment)', 'DashboardController::verify/$1');
 $routes->match(['get', 'head'], 'verify', 'DashboardController::verify');
 $routes->match(['get', 'head'], 'integrations/ojs/pdf', 'DashboardController::downloadOjsPdf');

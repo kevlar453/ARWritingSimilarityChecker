@@ -1414,48 +1414,241 @@
                 </div>
             </div>
 
-            <!-- Panduan Pertanyaan Kritis Ujian Lisan untuk Dosen / Penguji -->
+            <!-- FITUR 1: SIMULATOR KESIAPAN SIDANG UJIAN LISAN (DEFENSE READINESS SIMULATOR) -->
             <?php if (!empty($gQuestions)): ?>
-                <div class="border border-indigo-100 bg-indigo-50/30 rounded-xl p-4 sm:p-5 space-y-3.5">
-                    <div class="flex items-center justify-between">
+                <div class="border border-indigo-200/80 bg-gradient-to-br from-indigo-50/40 via-white to-slate-50/60 rounded-2xl p-5 sm:p-6 space-y-5 shadow-xs" id="defenseSimulatorSection">
+                    <!-- Simulator Header & Mode Switcher -->
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-indigo-100 pb-4">
                         <div>
-                            <h4 class="text-xs sm:text-sm font-bold text-indigo-950 flex items-center gap-2">
-                                <span>🎯</span> Panduan Pertanyaan Kritis Sidang Ujian Lisan (Untuk Dosen Penguji)
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-indigo-600 text-white shadow-2xs">
+                                    Simulasi Sidang Skripsi
+                                </span>
+                                <span class="text-[10px] font-bold font-mono-code text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200">
+                                    Dual-Perspective Engine
+                                </span>
+                            </div>
+                            <h4 class="text-sm sm:text-base font-extrabold text-slate-900 mt-1 flex items-center gap-2">
+                                <span>🎯</span> Simulator Kesiapan Sidang Ujian Lisan (Defense Readiness Simulator)
                             </h4>
-                            <p class="text-[11px] text-slate-500 mt-0.5">Pertanyaan terarah yang dirumuskan oleh AI untuk menguji pemahaman riil mahasiswa terhadap bagian-bagian sensitif naskah</p>
+                            <p class="text-[11px] sm:text-xs text-slate-500 mt-0.5 max-w-2xl">
+                                Dirumuskan oleh AI berbasis titik rawan metodologi, inkonsistensi data, dan sitasi naskah. Dilengkapi strategi pembelaan argumen ilmiah bagi mahasiswa dan rubrik evaluasi bagi dosen penguji.
+                            </p>
                         </div>
-                        <span class="text-[10px] font-bold font-mono-code px-2 py-0.5 rounded bg-indigo-100 text-indigo-800 border border-indigo-200">
-                            <?= count($gQuestions) ?> Pertanyaan
-                        </span>
+
+                        <!-- Mode Switch Tabs & Copy Action -->
+                        <div class="flex items-center gap-2 self-start md:self-auto flex-wrap">
+                            <div class="inline-flex p-1 bg-slate-200/80 rounded-xl text-xs font-bold text-slate-700">
+                                <button type="button" onclick="setDefensePerspective('student')" id="btnDefenseModeStudent" class="px-3 py-1.5 rounded-lg transition bg-white text-indigo-700 shadow-xs flex items-center gap-1.5 cursor-pointer">
+                                    <span>🎓</span> <span class="hidden sm:inline">Mode</span> Mahasiswa
+                                </button>
+                                <button type="button" onclick="setDefensePerspective('examiner')" id="btnDefenseModeExaminer" class="px-3 py-1.5 rounded-lg transition text-slate-600 hover:text-slate-900 flex items-center gap-1.5 cursor-pointer">
+                                    <span>👨‍🏫</span> <span class="hidden sm:inline">Mode</span> Dosen Penguji
+                                </button>
+                            </div>
+                            <button type="button" onclick="copyAllDefenseQuestions()" id="btnCopyAllDefense" class="px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition flex items-center gap-1 cursor-pointer" title="Salin seluruh pertanyaan untuk lembar catatan sidang / OJS">
+                                <span>📋</span> <span id="copyAllDefenseText">Salin Semua</span>
+                            </button>
+                        </div>
                     </div>
 
-                    <div class="space-y-3">
+                    <!-- Questions Grid / List -->
+                    <div class="space-y-4">
                         <?php foreach ($gQuestions as $qIdx => $q): ?>
                             <?php 
-                                $qFokus = is_array($q) ? ($q['fokus'] ?? 'Umum') : 'Umum';
+                                $qFokus = is_array($q) ? ($q['fokus'] ?? 'Metodologi & Teori') : 'Metodologi & Teori';
                                 $qText = is_array($q) ? ($q['pertanyaan'] ?? '') : (string)$q;
                                 $qAlasan = is_array($q) ? ($q['alasan'] ?? '') : '';
+                                $qStrategi = is_array($q) ? ($q['strategi_jawaban'] ?? '') : '';
+                                $qUrgensi = strtoupper(is_array($q) ? ($q['tingkat_urgensi'] ?? '') : '');
+                                if (!$qUrgensi) {
+                                    $qUrgensi = ($qIdx === 0) ? 'KRITIS' : (($qIdx === 1) ? 'TINGGI' : 'SEDANG');
+                                }
+
+                                if ($qUrgensi === 'KRITIS') {
+                                    $urgencyBadge = 'bg-rose-50 text-rose-700 border-rose-200';
+                                    $urgencyIcon = '🚨';
+                                    $urgencyLabel = 'Urgensi Kritis';
+                                } elseif ($qUrgensi === 'TINGGI') {
+                                    $urgencyBadge = 'bg-amber-50 text-amber-800 border-amber-200';
+                                    $urgencyIcon = '⚡';
+                                    $urgencyLabel = 'Urgensi Tinggi';
+                                } else {
+                                    $urgencyBadge = 'bg-sky-50 text-sky-700 border-sky-200';
+                                    $urgencyIcon = '💡';
+                                    $urgencyLabel = 'Urgensi Sedang';
+                                }
+
+                                // Fallback jika naskah lama belum memiliki strategi_jawaban
+                                if (empty($qStrategi)) {
+                                    $qStrategi = "Tegaskan batasan operasional penelitian pada bab metodologi, tunjukkan bukti lembar instrumen/kodingan analisis data, dan akui batasan penelitian sebagai saran pengembangan riset berikutnya secara ilmiah dan santun tanpa defensif emosional.";
+                                }
                             ?>
-                            <div class="bg-white p-3.5 rounded-xl border border-indigo-100 shadow-2xs space-y-2">
-                                <div class="flex items-center justify-between text-[11px]">
-                                    <span class="font-bold text-indigo-700 font-mono-code flex items-center gap-1.5">
-                                        <span class="w-5 h-5 rounded-full bg-indigo-100 text-indigo-800 flex items-center justify-center text-[10px] font-black"><?= $qIdx + 1 ?></span>
-                                        <span>Fokus: <?= esc($qFokus) ?></span>
-                                    </span>
-                                </div>
-                                <div class="text-xs sm:text-sm font-semibold text-slate-800 leading-relaxed pl-6">
-                                    "<?= esc($qText) ?>"
-                                </div>
-                                <?php if (!empty($qAlasan)): ?>
-                                    <div class="text-[11px] text-slate-500 pl-6 flex items-start gap-1.5 italic">
-                                        <span class="text-indigo-400 not-italic">💡</span>
-                                        <span><strong>Tujuan Pengujian:</strong> <?= esc($qAlasan) ?></span>
+                            <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs space-y-3.5 transition-all hover:border-indigo-300">
+                                <!-- Question Item Header -->
+                                <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <span class="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-black">
+                                            <?= $qIdx + 1 ?>
+                                        </span>
+                                        <span class="font-bold text-indigo-950 font-mono-code">
+                                            Fokus: <?= esc($qFokus) ?>
+                                        </span>
                                     </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border <?= $urgencyBadge ?>">
+                                            <span><?= $urgencyIcon ?></span>
+                                            <span><?= $urgencyLabel ?></span>
+                                        </span>
+                                        <button type="button" onclick="copySingleDefenseQuestion(<?= $qIdx ?>)" class="text-slate-400 hover:text-indigo-600 p-1 rounded hover:bg-slate-100 transition cursor-pointer" title="Salin pertanyaan ini">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Pertanyaan Sidang Lisan -->
+                                <div class="text-xs sm:text-sm font-bold text-slate-900 leading-relaxed pl-1 sm:pl-8 border-l-2 border-indigo-500 my-1">
+                                    <span id="defenseQuestionText_<?= $qIdx ?>">&ldquo;<?= esc($qText) ?>&rdquo;</span>
+                                </div>
+
+                                <!-- Tujuan Pengujian Bagi Dewan Penguji (Visible in both modes) -->
+                                <?php if (!empty($qAlasan)): ?>
+                                <div class="text-[11px] text-slate-500 pl-1 sm:pl-8 flex items-start gap-2 bg-slate-50/80 p-2.5 rounded-xl border border-slate-100">
+                                    <span class="text-indigo-600 font-bold flex-shrink-0 mt-0.5">🎯</span>
+                                    <div>
+                                        <strong class="text-slate-700">Tujuan Pengujian (Objektif Dewan Penguji):</strong>
+                                        <span class="text-slate-600"><?= esc($qAlasan) ?></span>
+                                    </div>
+                                </div>
                                 <?php endif; ?>
+
+                                <!-- PERSPEKTIF 1: MODE MAHASISWA (STRATEGI PEMBELAAN ARGUMEN & FLASHCARD REVEAL) -->
+                                <div class="defense-perspective-student pl-1 sm:pl-8 pt-1 space-y-2">
+                                    <div class="flex items-center justify-between">
+                                        <button type="button" onclick="toggleDefenseStrategy(<?= $qIdx ?>)" class="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-xl border border-emerald-200 transition cursor-pointer">
+                                            <span>🛡️</span>
+                                            <span id="btnStrategyLabel_<?= $qIdx ?>">Buka Kunci Strategi Pembelaan Argumen</span>
+                                            <svg id="strategyChevron_<?= $qIdx ?>" class="w-3.5 h-3.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                        </button>
+                                        <label class="inline-flex items-center gap-1.5 text-[11px] text-slate-500 cursor-pointer select-none">
+                                            <input type="checkbox" class="w-3.5 h-3.5 rounded text-indigo-600 focus:ring-indigo-500 border-slate-300">
+                                            <span>Tandai Sudah Dipelajari</span>
+                                        </label>
+                                    </div>
+
+                                    <!-- Collapsible Strategy Card -->
+                                    <div id="defenseStrategyCard_<?= $qIdx ?>" class="hidden bg-gradient-to-r from-emerald-50/80 via-teal-50/50 to-emerald-50/80 p-3.5 rounded-xl border border-emerald-200 text-xs text-emerald-950 space-y-2 animate-in fade-in duration-150">
+                                        <div class="flex items-center gap-2 font-bold text-emerald-900">
+                                            <span>💡 Rekomendasi Jawaban &amp; Argumen Ilmiah:</span>
+                                        </div>
+                                        <p class="text-emerald-900 leading-relaxed italic bg-white/80 p-2.5 rounded-lg border border-emerald-200/80 shadow-2xs">
+                                            &ldquo;<?= esc($qStrategi) ?>&rdquo;
+                                        </p>
+                                        <div class="text-[10px] text-emerald-800 flex items-center gap-1.5 pt-0.5">
+                                            <span>📁</span>
+                                            <span><strong>Tips Dokumen Bukti:</strong> Siapkan lembar instrumen asli, lampiran output statistik/kodingan, atau transkrip wawancara sebagai bukti otentik saat menjawab di ruang sidang.</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- PERSPEKTIF 2: MODE DOSEN PENGUJI (RUBRIK EVALUASI SIDANG) -->
+                                <div class="defense-perspective-examiner hidden pl-1 sm:pl-8 pt-1 space-y-2">
+                                    <div class="p-3 bg-indigo-50/60 rounded-xl border border-indigo-200 text-xs space-y-1.5">
+                                        <div class="font-bold text-indigo-900 flex items-center justify-between">
+                                            <span>📋 Rubrik Kesiapan Mahasiswa:</span>
+                                            <button type="button" onclick="copySingleDefenseQuestion(<?= $qIdx ?>)" class="text-[10px] text-indigo-700 hover:underline flex items-center gap-1 cursor-pointer">
+                                                <span>Salin Pertanyaan ke Form Nilai Sidang</span>
+                                            </button>
+                                        </div>
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] pt-1">
+                                            <div class="bg-white p-2 rounded-lg border border-emerald-200 text-emerald-900">
+                                                <strong class="text-emerald-700 block mb-0.5">✓ Indikasi Jawaban Baik:</strong>
+                                                Mahasiswa mampu merujuk data faktual, konsisten dengan bab metodologi, dan menjelaskan batasan penelitian dengan tenang.
+                                            </div>
+                                            <div class="bg-white p-2 rounded-lg border border-rose-200 text-rose-900">
+                                                <strong class="text-rose-700 block mb-0.5">✗ Indikasi Masalah (AI Halusinasi / Joki):</strong>
+                                                Mahasiswa gelagapan saat diminta menunjuk data spesifik, definisi variabel bertolak belakang dengan kuesioner, atau tidak tahu asal-usul sitasi.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         <?php endforeach; ?>
                     </div>
                 </div>
+
+                <!-- JavaScript Simulator Kesiapan Sidang -->
+                <script>
+                    function setDefensePerspective(mode) {
+                        const studentCards = document.querySelectorAll('.defense-perspective-student');
+                        const examinerCards = document.querySelectorAll('.defense-perspective-examiner');
+                        const btnStudent = document.getElementById('btnDefenseModeStudent');
+                        const btnExaminer = document.getElementById('btnDefenseModeExaminer');
+
+                        if (mode === 'student') {
+                            studentCards.forEach(el => el.classList.remove('hidden'));
+                            examinerCards.forEach(el => el.classList.add('hidden'));
+
+                            btnStudent.classList.add('bg-white', 'text-indigo-700', 'shadow-xs');
+                            btnStudent.classList.remove('text-slate-600');
+                            btnExaminer.classList.remove('bg-white', 'text-indigo-700', 'shadow-xs');
+                            btnExaminer.classList.add('text-slate-600');
+                        } else {
+                            studentCards.forEach(el => el.classList.add('hidden'));
+                            examinerCards.forEach(el => el.classList.remove('hidden'));
+
+                            btnExaminer.classList.add('bg-white', 'text-indigo-700', 'shadow-xs');
+                            btnExaminer.classList.remove('text-slate-600');
+                            btnStudent.classList.remove('bg-white', 'text-indigo-700', 'shadow-xs');
+                            btnStudent.classList.add('text-slate-600');
+                        }
+                    }
+
+                    function toggleDefenseStrategy(idx) {
+                        const card = document.getElementById('defenseStrategyCard_' + idx);
+                        const label = document.getElementById('btnStrategyLabel_' + idx);
+                        const chevron = document.getElementById('strategyChevron_' + idx);
+                        if (!card) return;
+
+                        if (card.classList.contains('hidden')) {
+                            card.classList.remove('hidden');
+                            if (label) label.innerText = 'Tutup Kunci Strategi';
+                            if (chevron) chevron.classList.add('rotate-180');
+                        } else {
+                            card.classList.add('hidden');
+                            if (label) label.innerText = 'Buka Kunci Strategi Pembelaan Argumen';
+                            if (chevron) chevron.classList.remove('rotate-180');
+                        }
+                    }
+
+                    function copySingleDefenseQuestion(idx) {
+                        const textEl = document.getElementById('defenseQuestionText_' + idx);
+                        if (!textEl) return;
+                        const cleanText = textEl.innerText.replace(/^“|”$/g, '').trim();
+                        navigator.clipboard.writeText(cleanText).then(() => {
+                            alert('Pertanyaan #' + (idx + 1) + ' berhasil disalin ke clipboard:\n\n' + cleanText);
+                        });
+                    }
+
+                    function copyAllDefenseQuestions() {
+                        const questionEls = document.querySelectorAll('[id^="defenseQuestionText_"]');
+                        if (!questionEls.length) return;
+
+                        let compiled = "SET PERTANYAAN KRITIS SIDANG UJIAN LISAN (AR TILIK):\n";
+                        questionEls.forEach((el, i) => {
+                            compiled += `\n${i + 1}. ${el.innerText.replace(/^“|”$/g, '').trim()}`;
+                        });
+
+                        navigator.clipboard.writeText(compiled).then(() => {
+                            const btnText = document.getElementById('copyAllDefenseText');
+                            if (btnText) {
+                                const orig = btnText.innerText;
+                                btnText.innerText = 'Tersalin!';
+                                setTimeout(() => { btnText.innerText = orig; }, 2000);
+                            }
+                        });
+                    }
+                </script>
             <?php endif; ?>
 
             <!-- Prinsip Etika & Keberlanjutan -->
