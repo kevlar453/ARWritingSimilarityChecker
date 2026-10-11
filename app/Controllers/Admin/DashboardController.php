@@ -764,5 +764,46 @@ class DashboardController extends BaseController
             'message' => 'Testimoni berhasil dihapus.',
         ]);
     }
+
+    /**
+     * API Realtime Polling Metrik Pengunjung (Auto-Reload Angka Tanpa Refresh Halaman)
+     */
+    public function getVisitorsRealtime(): ResponseInterface
+    {
+        $db = db_connect();
+        $visitorModel = new VisitorModel();
+        $stats = $visitorModel->getStats();
+
+        $today = date('Y-m-d');
+        $todayRow = $db->table('landing_visitors')
+                       ->select('visit_date, COUNT(DISTINCT visitor_hash) as unique_visitors, SUM(hits) as total_hits')
+                       ->where('visit_date', $today)
+                       ->groupBy('visit_date')
+                       ->get()
+                       ->getRowArray();
+
+        $unique = (int) ($todayRow['unique_visitors'] ?? $stats['today_unique'] ?? 0);
+        $hits = (int) ($todayRow['total_hits'] ?? $stats['today_hits'] ?? 0);
+        $avg = $unique > 0 ? round($hits / $unique, 2) : 1.00;
+
+        return $this->response->setJSON([
+            'status' => 'success',
+            'stats'  => [
+                'total_unique' => (int) ($stats['total_unique'] ?? 0),
+                'total_hits'   => (int) ($stats['total_hits'] ?? 0),
+                'today_unique' => (int) ($stats['today_unique'] ?? 0),
+                'today_hits'   => (int) ($stats['today_hits'] ?? 0),
+            ],
+            'today'  => [
+                'visit_date'       => $today,
+                'formatted_date'   => date('d F Y', strtotime($today)),
+                'unique_visitors'  => $unique,
+                'total_hits'       => $hits,
+                'average_hits'     => number_format($avg, 2),
+            ],
+            'synced_at' => date('H:i:s'),
+        ]);
+    }
 }
+
 

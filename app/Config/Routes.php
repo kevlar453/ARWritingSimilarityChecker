@@ -150,6 +150,7 @@ $routes->group('admin', ['filter' => 'admin'], function ($routes) {
     $routes->post('security/unblock', 'Admin\DashboardController::unblockSecurity');
     $routes->post('security/clear-all', 'Admin\DashboardController::clearAllLocks');
     $routes->get('analytics/export-csv', 'Admin\DashboardController::exportIntegrityCsv');
+    $routes->get('analytics/visitors-realtime', 'Admin\DashboardController::getVisitorsRealtime');
 
     // Corpus management API routes
     $routes->get('corpus/list', 'Admin\CorpusController::index');

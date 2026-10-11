@@ -1463,52 +1463,66 @@
         <!-- ========================================== -->
         <?php elseif ($activeTab === 'visitors'): ?>
             <div class="space-y-6">
-                <div>
-                    <h2 class="text-lg font-bold text-white">Analitik Pengunjung Unik Landing Page</h2>
-                    <p class="text-xs text-slate-400">Data analitik anonim pelacak pengunjung landing page 30 hari terakhir</p>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-lg font-bold text-white">Analitik Pengunjung Unik Landing Page</h2>
+                        <p class="text-xs text-slate-400">Data analitik anonim pelacak pengunjung landing page 30 hari terakhir</p>
+                    </div>
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800/60 border border-slate-700/60 text-xs text-slate-300 w-fit">
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        </span>
+                        <span class="font-medium text-slate-200">Auto-Reload Angka</span>
+                        <span class="text-slate-500">•</span>
+                        <span class="text-[11px] text-slate-400 font-mono" id="visitor-last-sync">Memuat...</span>
+                        <button type="button" onclick="refreshVisitorStatsRealtime(true)" id="btn-manual-sync-visitors" class="ml-1 p-1 hover:text-white text-slate-400 hover:bg-slate-700/50 rounded transition cursor-pointer" title="Perbarui angka sekarang">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-4">
                         <span class="text-xs text-slate-400">Total Pengunjung Unik</span>
-                        <div class="text-2xl font-bold text-white mt-1"><?= number_format($metrics['visitor_stats']['total_unique'] ?? 0) ?></div>
+                        <div id="metric-total-unique" class="text-2xl font-bold text-white mt-1 transition-all duration-300"><?= number_format($metrics['visitor_stats']['total_unique'] ?? 0) ?></div>
                     </div>
                     <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-4">
                         <span class="text-xs text-slate-400">Total Tayangan Halaman</span>
-                        <div class="text-2xl font-bold text-sky-400 mt-1"><?= number_format($metrics['visitor_stats']['total_hits'] ?? 0) ?></div>
+                        <div id="metric-total-hits" class="text-2xl font-bold text-sky-400 mt-1 transition-all duration-300"><?= number_format($metrics['visitor_stats']['total_hits'] ?? 0) ?></div>
                     </div>
                     <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-4">
                         <span class="text-xs text-slate-400">Pengunjung Unik Hari Ini</span>
-                        <div class="text-2xl font-bold text-emerald-400 mt-1"><?= number_format($metrics['visitor_stats']['today_unique'] ?? 0) ?></div>
+                        <div id="metric-today-unique" class="text-2xl font-bold text-emerald-400 mt-1 transition-all duration-300"><?= number_format($metrics['visitor_stats']['today_unique'] ?? 0) ?></div>
                     </div>
                     <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-4">
                         <span class="text-xs text-slate-400">Tayangan Laman Hari Ini</span>
-                        <div class="text-2xl font-bold text-purple-400 mt-1"><?= number_format($metrics['visitor_stats']['today_hits'] ?? 0) ?></div>
+                        <div id="metric-today-hits" class="text-2xl font-bold text-purple-400 mt-1 transition-all duration-300"><?= number_format($metrics['visitor_stats']['today_hits'] ?? 0) ?></div>
                     </div>
                 </div>
 
                 <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl overflow-hidden shadow-sm">
                     <!-- Mobile List: Tampilan Kartu Responsif Pengunjung Harian (Layar Ponsel) -->
-                    <div class="p-4 space-y-3 md:hidden">
+                    <div id="mobile-visitor-list" class="p-4 space-y-3 md:hidden">
                         <?php if (empty($dailyVisitors)): ?>
                             <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-6 text-center text-xs text-slate-500">
                                 Belum ada catatan pengunjung.
                             </div>
                         <?php else: ?>
                             <?php foreach ($dailyVisitors as $v): ?>
-                                <div class="bg-slate-800/60 border border-slate-700/70 rounded-2xl p-3.5 shadow-sm space-y-2">
+                                <div class="bg-slate-800/60 border border-slate-700/70 rounded-2xl p-3.5 shadow-sm space-y-2" data-mobile-date="<?= $v['visit_date'] ?>">
                                     <div class="flex items-center justify-between">
                                         <span class="font-bold text-slate-200 text-xs"><?= date('d F Y', strtotime($v['visit_date'])) ?></span>
-                                        <span class="text-[11px] text-slate-400 font-mono-code">Rata-rata: <?= $v['unique_visitors'] > 0 ? number_format($v['total_hits'] / $v['unique_visitors'], 2) : '1.00' ?> hits</span>
+                                        <span class="text-[11px] text-slate-400 font-mono-code" data-cell="avg">Rata-rata: <?= $v['unique_visitors'] > 0 ? number_format($v['total_hits'] / $v['unique_visitors'], 2) : '1.00' ?> hits</span>
                                     </div>
                                     <div class="grid grid-cols-2 gap-2 text-xs bg-slate-900/60 border border-slate-800/80 rounded-xl p-2.5">
                                         <div>
                                             <div class="text-[10px] text-slate-500 uppercase tracking-wider">Pengunjung Unik</div>
-                                            <div class="font-bold text-emerald-400 text-sm mt-0.5"><?= number_format($v['unique_visitors']) ?></div>
+                                            <div class="font-bold text-emerald-400 text-sm mt-0.5" data-cell="unique"><?= number_format($v['unique_visitors']) ?></div>
                                         </div>
                                         <div>
                                             <div class="text-[10px] text-slate-500 uppercase tracking-wider">Total Tayangan</div>
-                                            <div class="font-bold text-sky-400 text-sm mt-0.5"><?= number_format($v['total_hits']) ?></div>
+                                            <div class="font-bold text-sky-400 text-sm mt-0.5" data-cell="hits"><?= number_format($v['total_hits']) ?></div>
                                         </div>
                                     </div>
                                 </div>
@@ -1527,22 +1541,22 @@
                                     <th class="py-3 px-4 text-right">Rata-rata Hits/Pengunjung</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-slate-800/80">
+                            <tbody id="desktop-visitor-tbody" class="divide-y divide-slate-800/80">
                                 <?php if (empty($dailyVisitors)): ?>
                                     <tr><td colspan="4" class="py-6 text-center text-slate-500">Belum ada catatan pengunjung.</td></tr>
                                 <?php else: ?>
                                     <?php foreach ($dailyVisitors as $v): ?>
-                                        <tr class="hover:bg-slate-800/50 transition-colors">
+                                        <tr class="hover:bg-slate-800/50 transition-colors" data-visit-date="<?= $v['visit_date'] ?>">
                                             <td class="py-3 px-4 font-semibold text-slate-200">
                                                 <?= date('d F Y', strtotime($v['visit_date'])) ?>
                                             </td>
-                                            <td class="py-3 px-4 text-center font-bold text-emerald-400">
+                                            <td class="py-3 px-4 text-center font-bold text-emerald-400" data-cell="unique">
                                                 <?= number_format($v['unique_visitors']) ?>
                                             </td>
-                                            <td class="py-3 px-4 text-center font-bold text-sky-400">
+                                            <td class="py-3 px-4 text-center font-bold text-sky-400" data-cell="hits">
                                                 <?= number_format($v['total_hits']) ?>
                                             </td>
-                                            <td class="py-3 px-4 text-right text-slate-300 font-mono-code">
+                                            <td class="py-3 px-4 text-right text-slate-300 font-mono-code" data-cell="avg">
                                                 <?= $v['unique_visitors'] > 0 ? number_format($v['total_hits'] / $v['unique_visitors'], 2) : '1.00' ?>
                                             </td>
                                         </tr>
@@ -3810,6 +3824,121 @@
                 alert('Terjadi kesalahan koneksi.');
             }
         }
+
+        // ========================================================
+        // REALTIME AUTO-RELOAD KHUSUS ANGKA PENGUNJUNG (ZERO FLICKER)
+        // ========================================================
+        let visitorPollInterval = null;
+        let isFetchingVisitor = false;
+
+        function updateNumberWithHighlight(el, newFormattedVal) {
+            if (!el) return;
+            const currentVal = el.textContent.trim();
+            if (currentVal !== newFormattedVal) {
+                el.textContent = newFormattedVal;
+                // Efek visual highlight halus ketika angka berubah
+                el.classList.add('scale-105', 'text-emerald-300');
+                setTimeout(() => {
+                    el.classList.remove('scale-105', 'text-emerald-300');
+                }, 800);
+            }
+        }
+
+        async function refreshVisitorStatsRealtime(manual = false) {
+            if (isFetchingVisitor) return;
+            isFetchingVisitor = true;
+
+            const syncEl = document.getElementById('visitor-last-sync');
+            const syncBtn = document.getElementById('btn-manual-sync-visitors');
+            if (manual && syncBtn) {
+                syncBtn.classList.add('animate-spin');
+            }
+
+            try {
+                const res = await fetch('<?= base_url('admin/analytics/visitors-realtime') ?>', {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const data = await res.json();
+
+                if (data && data.status === 'success' && data.stats) {
+                    const stats = data.stats;
+                    // Update 4 Kartu Metrik
+                    updateNumberWithHighlight(document.getElementById('metric-total-unique'), Number(stats.total_unique).toLocaleString('en-US'));
+                    updateNumberWithHighlight(document.getElementById('metric-total-hits'), Number(stats.total_hits).toLocaleString('en-US'));
+                    updateNumberWithHighlight(document.getElementById('metric-today-unique'), Number(stats.today_unique).toLocaleString('en-US'));
+                    updateNumberWithHighlight(document.getElementById('metric-today-hits'), Number(stats.today_hits).toLocaleString('en-US'));
+
+                    // Update Baris Tabel Hari Ini (Desktop)
+                    if (data.today && data.today.visit_date) {
+                        const todayDate = data.today.visit_date;
+                        const trToday = document.querySelector(`tr[data-visit-date="${todayDate}"]`);
+                        if (trToday) {
+                            const tdUnique = trToday.querySelector('[data-cell="unique"]');
+                            const tdHits = trToday.querySelector('[data-cell="hits"]');
+                            const tdAvg = trToday.querySelector('[data-cell="avg"]');
+                            if (tdUnique) updateNumberWithHighlight(tdUnique, Number(data.today.unique_visitors).toLocaleString('en-US'));
+                            if (tdHits) updateNumberWithHighlight(tdHits, Number(data.today.total_hits).toLocaleString('en-US'));
+                            if (tdAvg) tdAvg.textContent = data.today.average_hits;
+                        }
+
+                        // Update Kartu Hari Ini (Mobile)
+                        const mobToday = document.querySelector(`div[data-mobile-date="${todayDate}"]`);
+                        if (mobToday) {
+                            const mUnique = mobToday.querySelector('[data-cell="unique"]');
+                            const mHits = mobToday.querySelector('[data-cell="hits"]');
+                            const mAvg = mobToday.querySelector('[data-cell="avg"]');
+                            if (mUnique) updateNumberWithHighlight(mUnique, Number(data.today.unique_visitors).toLocaleString('en-US'));
+                            if (mHits) updateNumberWithHighlight(mHits, Number(data.today.total_hits).toLocaleString('en-US'));
+                            if (mAvg) mAvg.textContent = 'Rata-rata: ' + data.today.average_hits + ' hits';
+                        }
+                    }
+
+                    if (syncEl) {
+                        syncEl.textContent = 'Sinkron: ' + (data.synced_at || new Date().toLocaleTimeString('id-ID'));
+                    }
+                }
+            } catch (err) {
+                console.warn('Realtime visitor poll skipped:', err.message);
+                if (syncEl && manual) {
+                    syncEl.textContent = 'Gagal sinkron';
+                }
+            } finally {
+                isFetchingVisitor = false;
+                if (syncBtn) syncBtn.classList.remove('animate-spin');
+            }
+        }
+
+        function initVisitorRealtimePolling() {
+            const metricEl = document.getElementById('metric-total-unique');
+            if (!metricEl) return; // Hanya aktif jika elemen metrik pengunjung ada di tab saat ini
+
+            const syncEl = document.getElementById('visitor-last-sync');
+            if (syncEl) {
+                const now = new Date();
+                const hh = now.getHours().toString().padStart(2, '0');
+                const mm = now.getMinutes().toString().padStart(2, '0');
+                const ss = now.getSeconds().toString().padStart(2, '0');
+                syncEl.textContent = 'Sinkron: ' + hh + ':' + mm + ':' + ss;
+            }
+
+            // Interval polling otomatis setiap 15 detik
+            if (visitorPollInterval) clearInterval(visitorPollInterval);
+            visitorPollInterval = setInterval(() => {
+                if (!document.hidden) {
+                    refreshVisitorStatsRealtime();
+                }
+            }, 15000);
+
+            // Re-fetch saat tab browser kembali aktif
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden) {
+                    refreshVisitorStatsRealtime();
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', initVisitorRealtimePolling);
     </script>
 </body>
 </html>
