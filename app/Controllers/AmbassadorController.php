@@ -194,7 +194,7 @@ class AmbassadorController extends BaseController
             setcookie('referred_by_code', $code, time() + (30 * 86400), '/', '', false, true);
         }
 
-        return redirect()->to(base_url('/?ref=' . urlencode($code)));
+        return redirect()->to(base_url('/?ref=' . urlencode($code) . '&auth=register'));
     }
 
     /**
@@ -281,3 +281,5 @@ class AmbassadorController extends BaseController
         ]);
     }
 }
+
+

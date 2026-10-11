@@ -3658,8 +3658,14 @@
                 <form id="formRegister" onsubmit="handleRegister(event)" style="display: none;">
                     <!-- Anti-Spam Time Token & Honeypot Trap -->
                     <input type="hidden" name="security_token" id="regSecurityToken" value="<?= esc($authSecurityToken ?? '') ?>">
+                    <input type="hidden" name="referral_code" id="regReferralCode" value="<?= esc(session()->get('referred_by_code') ?? ($_COOKIE['referred_by_code'] ?? '')) ?>">
                     <div style="display:none; visibility:hidden; opacity:0; position:absolute; left:-9999px;" aria-hidden="true">
                         <input type="text" name="fax_number" tabindex="-1" autocomplete="off">
+                    </div>
+
+                    <!-- Referral Bonus Badge -->
+                    <div id="referralBonusBadge" style="<?= empty(session()->get('referred_by_code')) && empty($_COOKIE['referred_by_code']) ? 'display:none;' : '' ?> background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 12px; padding: 10px 14px; margin-bottom: 16px; font-size: 11.5px; color: #065f46;">
+                        <span style="font-weight: 700;">🎁 Bonus Duta Kampus:</span> Kode <span id="displayRefCode" style="font-family: monospace; font-weight: 800; color: #047857;"><?= esc(session()->get('referred_by_code') ?? ($_COOKIE['referred_by_code'] ?? '')) ?></span> terpasang. Anda mendapatkan <strong>+1 bonus cek naskah gratis</strong>!
                     </div>
 
                     <div class="form-group">
@@ -4462,10 +4468,20 @@
                 <?php endif; ?>
                 const paramEmail = urlParams.get('email');
                 if (paramEmail) {
-                    const regEmailInput = document.querySelector('#registerForm input[name="email"]');
-                    const logEmailInput = document.querySelector('#loginForm input[name="email"]');
+                    const regEmailInput = document.querySelector('#formRegister input[name="email"]');
+                    const logEmailInput = document.querySelector('#formLogin input[name="email"]');
                     if (regEmailInput) regEmailInput.value = paramEmail;
                     if (logEmailInput) logEmailInput.value = paramEmail;
+                }
+
+                const paramRef = urlParams.get('ref');
+                if (paramRef) {
+                    const regRefInput = document.getElementById('regReferralCode');
+                    const badge = document.getElementById('referralBonusBadge');
+                    const codeSpan = document.getElementById('displayRefCode');
+                    if (regRefInput) regRefInput.value = paramRef.toUpperCase();
+                    if (codeSpan) codeSpan.textContent = paramRef.toUpperCase();
+                    if (badge) badge.style.display = 'block';
                 }
             }
 
