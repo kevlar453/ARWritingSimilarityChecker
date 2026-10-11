@@ -188,6 +188,41 @@ class TelegramNotifier
     }
 
     /**
+     * Mengirimkan notifikasi Pengajuan Penarikan Saldo Komisi Duta Kampus (Payout Request)
+     */
+    public static function notifyAmbassadorPayoutRequested(array $data, ?string $chatId = null): bool
+    {
+        $targetChat = $chatId ?: self::getActivityChatId();
+        $notifier = new self($targetChat);
+
+        $code = htmlspecialchars($data['payout_code'] ?? 'WD-XXXX', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $name = htmlspecialchars($data['ambassador_name'] ?? 'Duta Kampus', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $refCode = htmlspecialchars($data['referral_code'] ?? '-', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $institution = htmlspecialchars($data['institution'] ?? '-', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $amount = number_format((float)($data['amount'] ?? 0), 0, ',', '.');
+        $channel = htmlspecialchars(strtoupper((string)($data['payout_channel'] ?? 'BANK')), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $accNumber = htmlspecialchars((string)($data['payout_account_number'] ?? '-'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $accName = htmlspecialchars((string)($data['payout_account_name'] ?? '-'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $remaining = number_format((float)($data['remaining_balance'] ?? 0), 0, ',', '.');
+        $timeStr = date('d M Y, H:i') . ' WIB';
+        $adminUrl = function_exists('base_url') ? base_url('admin') : 'https://tilik.arsetontong.top/admin';
+
+        $msg = "💸 <b>[AR TILIK] PENGAJUAN PENARIKAN KOMISI DUTA KAMPUS</b>\n\n";
+        $msg .= "🔖 <b>Kode Penarikan:</b> <code>{$code}</code>\n";
+        $msg .= "👤 <b>Duta Kampus:</b> {$name} (<code>{$refCode}</code>)\n";
+        $msg .= "🏛️ <b>Kampus:</b> {$institution}\n\n";
+        $msg .= "💰 <b>Jumlah Penarikan:</b> <b>Rp {$amount}</b>\n";
+        $msg .= "🏦 <b>Metode / Bank:</b> {$channel}\n";
+        $msg .= "🔢 <b>No. Rekening / E-Wallet:</b> <code>{$accNumber}</code>\n";
+        $msg .= "📝 <b>Atas Nama:</b> <b>{$accName}</b>\n";
+        $msg .= "💳 <b>Sisa Saldo Komisi:</b> Rp {$remaining}\n\n";
+        $msg .= "🕒 <b>Waktu Pengajuan:</b> {$timeStr}\n\n";
+        $msg .= "👉 <a href=\"{$adminUrl}\">Buka Portal Admin untuk Proses Transfer Dana</a>";
+
+        return $notifier->sendMessage($msg, $targetChat);
+    }
+
+    /**
      * Mengirimkan notifikasi Testimoni & Evaluasi Akademik Pengguna
      */
     public static function notifyTestimonialSubmitted(array $data, ?string $chatId = null): bool

@@ -267,4 +267,102 @@ class AmbassadorAdminController extends BaseController
                               ->setHeader('Content-Disposition', 'inline; filename="' . basename($fullPath) . '"')
                               ->setBody($content);
     }
+
+    /**
+     * Mengambil daftar seluruh permohonan pencairan komisi (Admin API)
+     */
+    public function listPayouts(): ResponseInterface
+    {
+        $db = \Config\Database::connect();
+        $payouts = $db->table('ambassador_payouts ap')
+            ->select('ap.*, u.name as user_name, u.email as user_email, prof.referral_code, prof.institution')
+            ->join('users u', 'u.id = ap.user_id', 'left')
+            ->join('ambassador_profiles prof', 'prof.id = ap.ambassador_id', 'left')
+            ->orderBy('ap.id', 'DESC')
+            ->get()
+            ->getResultArray();
+
+        return $this->response->setJSON([
+            'success' => true,
+            'payouts' => $payouts,
+        ]);
+    }
+
+    /**
+     * Memproses / Menyelesaikan Penarikan Komisi Duta Kampus (Admin POST)
+     */
+    public function processPayout(int $id): ResponseInterface
+    {
+        $payoutModel = new \App\Models\AmbassadorPayoutModel();
+        $payout = $payoutModel->find($id);
+        if (!$payout) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Data penarikan komisi tidak ditemukan.'])->setStatusCode(404);
+        }
+
+        $action = trim((string) $this->request->getPost('action')); // 'completed', 'rejected', 'processing'
+        $adminNotes = trim((string) $this->request->getPost('admin_notes'));
+
+        if (!in_array($action, ['completed', 'rejected', 'processing'], true)) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Status pemrosesan tidak valid.'])->setStatusCode(400);
+        }
+
+        $proofPath = null;
+        $file = $this->request->getFile('transfer_proof');
+        if ($file && $file->isValid()) {
+            $allowed = ['jpg', 'jpeg', 'png', 'webp', 'pdf'];
+            $ext = strtolower($file->getExtension());
+            if (in_array($ext, $allowed, true)) {
+                $newName = 'transfer_' . $id . '_' . date('Ymd_His') . '_' . bin2hex(random_bytes(3)) . '.' . $ext;
+                $targetDir = WRITEPATH . 'uploads/payout_proofs/';
+                if (!is_dir($targetDir)) {
+                    mkdir($targetDir, 0775, true);
+                }
+                $file->move($targetDir, $newName);
+                $proofPath = 'uploads/payout_proofs/' . $newName;
+            }
+        }
+
+        $now = date('Y-m-d H:i:s');
+        $updateData = [
+            'status'      => $action,
+            'admin_notes' => $adminNotes ?: $payout['admin_notes'],
+            'updated_at'  => $now,
+        ];
+        if ($proofPath) {
+            $updateData['proof_transfer_path'] = $proofPath;
+        }
+        if ($action === 'completed') {
+            $updateData['processed_at'] = $now;
+        }
+
+        $payoutModel->update($id, $updateData);
+
+        return $this->response->setJSON([
+            'success' => true,
+            'message' => 'Status penarikan #' . $payout['payout_code'] . ' berhasil diperbarui menjadi ' . strtoupper($action) . '.',
+        ]);
+    }
+
+    /**
+     * Melihat Bukti Transfer Penarikan Komisi secara Aman
+     */
+    public function viewTransferProof(int $id): ResponseInterface
+    {
+        $payoutModel = new \App\Models\AmbassadorPayoutModel();
+        $payout = $payoutModel->find($id);
+        if (!$payout || empty($payout['proof_transfer_path'])) {
+            return $this->response->setStatusCode(404)->setBody('Bukti transfer tidak ditemukan.');
+        }
+
+        $fullPath = WRITEPATH . $payout['proof_transfer_path'];
+        if (!file_exists($fullPath)) {
+            return $this->response->setStatusCode(404)->setBody('Berkas fisik bukti transfer tidak ditemukan di penyimpanan server.');
+        }
+
+        $mime = mime_content_type($fullPath) ?: 'image/jpeg';
+        return $this->response->setHeader('Content-Type', $mime)
+                              ->setHeader('Content-Disposition', 'inline; filename="' . basename($fullPath) . '"')
+                              ->setBody(file_get_contents($fullPath));
+    }
 }
+

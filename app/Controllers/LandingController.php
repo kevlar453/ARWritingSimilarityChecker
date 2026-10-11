@@ -49,9 +49,9 @@ class LandingController extends BaseController
         $spamShield = new \App\Libraries\SpamShield();
         $authSecurityToken = $spamShield->generateTimeToken();
 
-        // Testimoni Publik Terverifikasi (Fase 1)
+        // Testimoni Publik Terverifikasi (Fase 1 Social Proof & SEO)
         $testimonialModel = new \App\Models\TestimonialModel();
-        $approvedTestimonials = $testimonialModel->getApprovedForPublic(6);
+        $approvedTestimonials = $testimonialModel->getApprovedForPublic(12);
         $testimonialStats = $testimonialModel->getStats();
 
         return view('landing/index', [

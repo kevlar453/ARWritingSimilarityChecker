@@ -276,9 +276,15 @@ class AmbassadorController extends BaseController
         $proofModel = new AmbassadorProofModel();
         $proofs = $proofModel->getProofs($profile['id']);
 
+        $payoutModel = new \App\Models\AmbassadorPayoutModel();
+        $financial = $payoutModel->getFinancialSummary($profile['id'], (float) $profile['estimated_commission']);
+        $payouts = $payoutModel->getPayouts($profile['id']);
+
         return view('ambassador/dashboard', [
-            'profile' => $profile,
-            'proofs'  => $proofs,
+            'profile'   => $profile,
+            'proofs'    => $proofs,
+            'financial' => $financial,
+            'payouts'   => $payouts,
         ]);
     }
 
@@ -358,6 +364,64 @@ class AmbassadorController extends BaseController
             'message' => 'Bukti promosi berhasil diunggah! Akan ditinjau pada rekap bulanan.',
         ]);
     }
+
+    /**
+     * Mengajukan Penarikan Komisi Duta Kampus (Payout Request POST)
+     */
+    public function requestPayout(): ResponseInterface
+    {
+        $userId = session()->get('user_id');
+        if (!$userId) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Silakan login terlebih dahulu.'])->setStatusCode(401);
+        }
+
+        $profileModel = new AmbassadorProfileModel();
+        $profile = $profileModel->getProfileWithStats($userId);
+        if (!$profile) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Profil Duta Kampus tidak ditemukan.'])->setStatusCode(404);
+        }
+
+        $amount = (float) $this->request->getPost('amount');
+        $channel = trim((string) $this->request->getPost('payout_channel'));
+        $accNumber = trim((string) $this->request->getPost('payout_account_number'));
+        $accName = trim((string) $this->request->getPost('payout_account_name'));
+
+        $payoutModel = new \App\Models\AmbassadorPayoutModel();
+        $result = $payoutModel->submitPayoutRequest([
+            'ambassador_id'         => $profile['id'],
+            'user_id'               => $userId,
+            'amount'                => $amount,
+            'payout_channel'        => $channel,
+            'payout_account_number' => $accNumber,
+            'payout_account_name'   => $accName,
+        ], (float) $profile['estimated_commission']);
+
+        if (!$result['success']) {
+            return $this->response->setJSON($result)->setStatusCode(400);
+        }
+
+        // Kirim notifikasi Telegram ke Admin agar segera ditransfer
+        try {
+            $userModel = new \App\Models\UserModel();
+            $ambUser = $userModel->find($userId);
+            \App\Libraries\TelegramNotifier::notifyAmbassadorPayoutRequested([
+                'payout_code'           => $result['payout_code'],
+                'ambassador_name'       => $ambUser['name'] ?? 'Duta Kampus',
+                'referral_code'         => $profile['referral_code'],
+                'institution'           => $ambUser['institution'] ?? '-',
+                'amount'                => $amount,
+                'payout_channel'        => $channel,
+                'payout_account_number' => $accNumber,
+                'payout_account_name'   => $accName,
+                'remaining_balance'     => $result['remaining_balance'] ?? 0,
+            ]);
+        } catch (\Throwable $te) {
+            log_message('warning', 'Gagal kirim notifikasi Telegram penarikan komisi: ' . $te->getMessage());
+        }
+
+        return $this->response->setJSON($result);
+    }
 }
+
 
 

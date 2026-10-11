@@ -95,7 +95,34 @@
           ],
           "author": {
             "@id": "<?= base_url('#organization') ?>"
-          }
+          },
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "<?= number_format($testimonialStats['avg_rating'] ?? 5.0, 1) ?>",
+            "ratingCount": "<?= max(1, (int)($testimonialStats['total_reviews'] ?? count($approvedTestimonials))) ?>",
+            "reviewCount": "<?= max(1, (int)($testimonialStats['total_reviews'] ?? count($approvedTestimonials))) ?>",
+            "bestRating": "5",
+            "worstRating": "1"
+          }<?php if (!empty($approvedTestimonials)): ?>,
+          "review": [
+            <?php foreach (array_slice($approvedTestimonials, 0, 5) as $sIdx => $sRev): ?>
+            {
+              "@type": "Review",
+              "author": {
+                "@type": "Person",
+                "name": "<?= esc($sRev['display_name'] ?? $sRev['author_name']) ?>"
+              },
+              "reviewRating": {
+                "@type": "Rating",
+                "ratingValue": "<?= (int)$sRev['rating'] ?>",
+                "bestRating": "5",
+                "worstRating": "1"
+              },
+              "reviewBody": "<?= esc(str_replace(['"', "\r", "\n"], ["'", ' ', ' '], $sRev['content'])) ?>"
+            }<?= $sIdx < min(4, count($approvedTestimonials) - 1) ? ',' : '' ?>
+            <?php endforeach; ?>
+          ]
+          <?php endif; ?>
         },
         {
           "@type": "FAQPage",
@@ -3158,7 +3185,7 @@
             </div>
 
             <!-- Trust Bar / KPI -->
-            <div style="display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-bottom: 40px;" data-aos="fade-up" data-aos-delay="100">
+            <div style="display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; margin-bottom: 30px;" data-aos="fade-up" data-aos-delay="100">
                 <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 100px; padding: 8px 24px; display: inline-flex; align-items: center; gap: 10px; box-shadow: var(--shadow-sm);">
                     <div style="color: #f59e0b; font-size: 16px;">★★★★★</div>
                     <div style="font-size: 13px; font-weight: 700; color: var(--text-dark);">
@@ -3170,10 +3197,41 @@
                 </div>
             </div>
 
-            <!-- Testimonials Grid -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;" data-aos="fade-up" data-aos-delay="200">
-                <?php foreach ($approvedTestimonials as $tItem): ?>
-                    <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 20px; padding: 28px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s, box-shadow 0.2s; position: relative;">
+            <!-- Filter Kategori Testimoni Interaktif -->
+            <div style="display: flex; justify-content: center; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 35px;" data-aos="fade-up" data-aos-delay="150">
+                <button type="button" onclick="filterTestimonials('all', this)" class="testi-filter-btn active-testi-filter" style="padding: 7px 18px; border-radius: 9999px; font-size: 12px; font-weight: 700; border: 1px solid var(--primary); background: var(--primary); color: #ffffff; cursor: pointer; transition: all 0.2s ease;">
+                    Semua Civitas (<?= count($approvedTestimonials) ?>)
+                </button>
+                <button type="button" onclick="filterTestimonials('mahasiswa', this)" class="testi-filter-btn" style="padding: 7px 18px; border-radius: 9999px; font-size: 12px; font-weight: 700; border: 1px solid var(--border); background: #ffffff; color: var(--text-dark); cursor: pointer; transition: all 0.2s ease;">
+                    🎓 Mahasiswa (Skripsi &amp; Tesis)
+                </button>
+                <button type="button" onclick="filterTestimonials('dosen', this)" class="testi-filter-btn" style="padding: 7px 18px; border-radius: 9999px; font-size: 12px; font-weight: 700; border: 1px solid var(--border); background: #ffffff; color: var(--text-dark); cursor: pointer; transition: all 0.2s ease;">
+                    👨‍🏫 Dosen &amp; Peneliti
+                </button>
+                <button type="button" onclick="filterTestimonials('jurnal', this)" class="testi-filter-btn" style="padding: 7px 18px; border-radius: 9999px; font-size: 12px; font-weight: 700; border: 1px solid var(--border); background: #ffffff; color: var(--text-dark); cursor: pointer; transition: all 0.2s ease;">
+                    📑 Pengelola Jurnal (OJS)
+                </button>
+            </div>
+
+            <!-- Testimonials Grid with Schema.org Microdata -->
+            <div id="testimonialsGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;" data-aos="fade-up" data-aos-delay="200">
+                <?php foreach ($approvedTestimonials as $tItem): 
+                    $roleLower = strtolower($tItem['author_role'] ?? '');
+                    if (str_contains($roleLower, 'dosen') || str_contains($roleLower, 'peneliti') || str_contains($roleLower, 'pengajar')) {
+                        $roleCategory = 'dosen';
+                    } elseif (str_contains($roleLower, 'jurnal') || str_contains($roleLower, 'editor') || str_contains($roleLower, 'reviewer') || str_contains($roleLower, 'ojs')) {
+                        $roleCategory = 'jurnal';
+                    } else {
+                        $roleCategory = 'mahasiswa';
+                    }
+                ?>
+                    <div class="testi-card" data-category="<?= $roleCategory ?>" itemscope itemtype="https://schema.org/Review" style="background: #ffffff; border: 1px solid var(--border); border-radius: 20px; padding: 28px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; justify-content: space-between; transition: all 0.25s ease; position: relative;">
+                        <!-- Hidden Schema Reference to Product -->
+                        <div itemprop="itemReviewed" itemscope itemtype="https://schema.org/WebApplication" style="display: none;">
+                            <meta itemprop="name" content="AR Tilik">
+                            <meta itemprop="url" content="<?= base_url() ?>">
+                        </div>
+
                         <?php if (!empty($tItem['is_featured'])): ?>
                             <div style="position: absolute; top: -10px; right: 20px; background: #fef3c7; color: #92400e; border: 1px solid #fde68a; border-radius: 20px; padding: 2px 10px; font-size: 10px; font-weight: 700; text-transform: uppercase;">
                                 ⭐ Unggulan
@@ -3181,27 +3239,30 @@
                         <?php endif; ?>
                         
                         <div>
-                            <!-- Rating Stars -->
-                            <div style="color: #f59e0b; font-size: 15px; margin-bottom: 14px;">
+                            <!-- Rating Stars (Schema.org Rating) -->
+                            <div itemprop="reviewRating" itemscope itemtype="https://schema.org/Rating" style="color: #f59e0b; font-size: 15px; margin-bottom: 14px;">
+                                <meta itemprop="ratingValue" content="<?= (int)$tItem['rating'] ?>">
+                                <meta itemprop="bestRating" content="5">
+                                <meta itemprop="worstRating" content="1">
                                 <?php for ($st = 1; $st <= 5; $st++): ?>
                                     <span><?= $st <= (int)$tItem['rating'] ? '★' : '☆' ?></span>
                                 <?php endfor; ?>
                             </div>
 
-                            <!-- Testimonial Quote -->
-                            <p style="font-size: 13.5px; line-height: 1.65; color: var(--text-dark); margin-bottom: 20px; font-style: italic;">
+                            <!-- Testimonial Quote (Schema.org reviewBody) -->
+                            <p itemprop="reviewBody" style="font-size: 13.5px; line-height: 1.65; color: var(--text-dark); margin-bottom: 20px; font-style: italic;">
                                 "<?= esc($tItem['content']) ?>"
                             </p>
                         </div>
 
-                        <!-- Author Meta -->
-                        <div style="border-top: 1px solid #f1f5f9; padding-top: 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+                        <!-- Author Meta (Schema.org Person) -->
+                        <div itemprop="author" itemscope itemtype="https://schema.org/Person" style="border-top: 1px solid #f1f5f9; padding-top: 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
                             <div style="display: flex; align-items: center; gap: 12px;">
                                 <div style="width: 40px; height: 40px; border-radius: 12px; background: #e0e7ff; color: #4338ca; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; flex-shrink: 0;">
                                     <?= mb_substr($tItem['display_name'] ?? 'A', 0, 1) ?>
                                 </div>
                                 <div>
-                                    <div style="font-weight: 700; font-size: 13px; color: var(--text-dark);">
+                                    <div itemprop="name" style="font-weight: 700; font-size: 13px; color: var(--text-dark);">
                                         <?= esc($tItem['display_name']) ?>
                                     </div>
                                     <div style="font-size: 11.5px; color: var(--primary); font-weight: 600;">
@@ -3221,8 +3282,45 @@
                     </div>
                 <?php endforeach; ?>
             </div>
+
+            <!-- Callout CTA Tulis Ulasan -->
+            <div style="margin-top: 40px; background: #ffffff; border: 1px dashed var(--border); border-radius: 20px; padding: 22px 28px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 18px;" data-aos="fade-up">
+                <div style="display: flex; align-items: center; gap: 14px;">
+                    <span style="font-size: 26px;">💬</span>
+                    <div>
+                        <div style="font-weight: 800; font-size: 13.5px; color: var(--text-dark);">Telah Menggunakan AR Tilik untuk Naskah Anda?</div>
+                        <div style="font-size: 12px; color: var(--text-muted);">Bagikan masukan dan rating kepuasan di dashboard naskah untuk mendukung integritas akademik Indonesia.</div>
+                    </div>
+                </div>
+                <a href="<?= base_url('dashboard') ?>" class="btn" style="background: #e0e7ff; color: #3730a3; font-weight: 800; font-size: 12px; padding: 9px 18px; border-radius: 10px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s ease;">
+                    <span>✍️</span> <span>Beri Ulasan di Dashboard</span> &rarr;
+                </a>
+            </div>
         </div>
     </section>
+
+    <!-- JavaScript Filter Testimoni Interaktif -->
+    <script>
+        function filterTestimonials(cat, btn) {
+            document.querySelectorAll('.testi-filter-btn').forEach(b => {
+                b.style.background = '#ffffff';
+                b.style.color = 'var(--text-dark)';
+                b.style.borderColor = 'var(--border)';
+            });
+            btn.style.background = 'var(--primary)';
+            btn.style.color = '#ffffff';
+            btn.style.borderColor = 'var(--primary)';
+
+            const cards = document.querySelectorAll('.testi-card');
+            cards.forEach(card => {
+                if (cat === 'all' || card.dataset.category === cat) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+    </script>
     <?php endif; ?>
 
     <!-- Section 4: Paket Berlangganan & Top-Up Kuota (Midtrans Aligned) -->

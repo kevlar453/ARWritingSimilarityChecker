@@ -144,11 +144,11 @@
                     <div class="text-[11px] text-slate-500">Target kelulusan: minimal 3 transaksi</div>
                 </div>
 
-                <!-- Metrik 3: Estimasi Komisi Bulanan -->
+                <!-- Metrik 3: Saldo Komisi Siap Tarik -->
                 <div class="bg-slate-900 border border-white/10 rounded-2xl p-5 space-y-1">
-                    <div class="text-[11px] uppercase font-bold text-slate-400 tracking-wider">Estimasi Komisi (20%)</div>
-                    <div class="text-3xl font-black text-amber-400">Rp <?= number_format($profile['estimated_commission'] ?? 0, 0, ',', '.') ?></div>
-                    <div class="text-[11px] text-slate-500">Siap cair di akhir bulan berjalan</div>
+                    <div class="text-[11px] uppercase font-bold text-slate-400 tracking-wider">Saldo Komisi Siap Tarik</div>
+                    <div class="text-3xl font-black text-amber-400">Rp <?= number_format($financial['available_balance'] ?? 0, 0, ',', '.') ?></div>
+                    <div class="text-[11px] text-slate-500">Min. penarikan: Rp 100.000</div>
                 </div>
             </div>
 
@@ -193,6 +193,158 @@
                     </div>
                 </div>
             <?php endif; ?>
+
+            <!-- Dompet Komisi & Penarikan Saldo (Payout Minimum Rp 100.000) -->
+            <div id="payout-section" class="bg-gradient-to-br from-slate-900 via-slate-900/90 to-amber-950/20 border border-amber-500/30 rounded-3xl p-6 sm:p-7 space-y-6 shadow-xl">
+                <div class="flex items-start sm:items-center justify-between flex-wrap gap-4 border-b border-white/10 pb-4">
+                    <div>
+                        <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-amber-500/20 text-amber-300 border border-amber-500/30 mb-1.5">
+                            <span>💸</span> <span>Bagi Hasil Kemitraan 20%</span>
+                        </div>
+                        <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+                            <span>Dompet Komisi &amp; Pencairan Saldo (Payout)</span>
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-0.5">
+                            Tarik saldo komisi langsung ke rekening Bank atau E-Wallet Anda (Minimum Rp <?= number_format($financial['min_payout'] ?? 100000, 0, ',', '.') ?> tanpa potongan biaya admin).
+                        </p>
+                    </div>
+
+                    <div>
+                        <?php if (!empty($financial['can_withdraw'])): ?>
+                            <button type="button" onclick="openPayoutModal()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/20 hover:scale-[1.02] active:scale-95 transition flex items-center gap-2 cursor-pointer">
+                                <span>💸</span>
+                                <span>Tarik Saldo Komisi &rarr;</span>
+                            </button>
+                        <?php else: ?>
+                            <div class="text-right">
+                                <button type="button" disabled class="px-4 py-2.5 rounded-xl bg-slate-800 text-slate-500 font-bold text-xs border border-white/5 cursor-not-allowed flex items-center gap-2">
+                                    <span>🔒</span>
+                                    <span>Tarik Saldo (Min. Rp 100.000)</span>
+                                </button>
+                                <span class="text-[10px] text-amber-400/80 block mt-1">
+                                    Saldo kurang Rp <?= number_format(max(0, ($financial['min_payout'] ?? 100000) - ($financial['available_balance'] ?? 0)), 0, ',', '.') ?> lagi
+                                </span>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <!-- 3 Kotak Rincian Saldo -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                    <!-- 1. Saldo Tersedia -->
+                    <div class="bg-black/40 border border-amber-500/30 rounded-2xl p-4 space-y-1 relative overflow-hidden">
+                        <div class="text-[11px] uppercase font-bold text-amber-300/80">Saldo Siap Ditarik</div>
+                        <div class="text-2xl font-black text-amber-300">
+                            Rp <?= number_format($financial['available_balance'] ?? 0, 0, ',', '.') ?>
+                        </div>
+                        <div class="text-[10px] text-slate-400 flex items-center justify-between pt-1">
+                            <span>Bisa dicairkan kapan saja</span>
+                            <?php if (!empty($financial['can_withdraw'])): ?>
+                                <span class="text-emerald-400 font-bold">✓ Memenuhi Syarat</span>
+                            <?php else: ?>
+                                <span class="text-slate-500">Min. Rp 100.000</span>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
+                    <!-- 2. Total Komisi Diperoleh -->
+                    <div class="bg-black/30 border border-white/5 rounded-2xl p-4 space-y-1">
+                        <div class="text-[11px] uppercase font-bold text-slate-400">Total Komisi Akumulasi</div>
+                        <div class="text-2xl font-black text-white">
+                            Rp <?= number_format($financial['total_earned'] ?? 0, 0, ',', '.') ?>
+                        </div>
+                        <div class="text-[10px] text-slate-500">
+                            Hasil bagi 20% dari <?= (int)($profile['total_transactions'] ?? 0) ?> transaksi teman
+                        </div>
+                    </div>
+
+                    <!-- 3. Total Dicairkan / Diproses -->
+                    <div class="bg-black/30 border border-white/5 rounded-2xl p-4 space-y-1">
+                        <div class="text-[11px] uppercase font-bold text-slate-400">Telah Ditarik / Diproses</div>
+                        <div class="text-2xl font-black text-indigo-300">
+                            Rp <?= number_format($financial['total_withdrawn'] ?? 0, 0, ',', '.') ?>
+                        </div>
+                        <div class="text-[10px] text-slate-500">
+                            Total penarikan yang telah diajukan
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Riwayat Penarikan Saldo -->
+                <div class="pt-2 space-y-3">
+                    <div class="flex items-center justify-between flex-wrap gap-2">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                            <span>📋</span> <span>Riwayat Penarikan Saldo (<?= count($payouts ?? []) ?>)</span>
+                        </h3>
+                        <span class="text-[11px] text-slate-500">Pencairan diproses 1-2 hari kerja</span>
+                    </div>
+
+                    <?php if (empty($payouts)): ?>
+                        <div class="p-6 text-center text-xs text-slate-500 bg-black/20 rounded-xl border border-white/5">
+                            Belum ada riwayat penarikan saldo. Komisi akan otomatis bertambah setiap ada transaksi dari kode referral Anda.
+                        </div>
+                    <?php else: ?>
+                        <div class="overflow-x-auto rounded-xl border border-white/10">
+                            <table class="w-full text-left text-xs border-collapse">
+                                <thead>
+                                    <tr class="bg-black/40 text-slate-400 border-b border-white/10 text-[11px]">
+                                        <th class="p-3 font-semibold">Kode Payout</th>
+                                        <th class="p-3 font-semibold">Tanggal</th>
+                                        <th class="p-3 font-semibold">Nominal</th>
+                                        <th class="p-3 font-semibold">Tujuan Rekening</th>
+                                        <th class="p-3 font-semibold">Status</th>
+                                        <th class="p-3 font-semibold text-right">Keterangan</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-white/5 bg-black/20">
+                                    <?php foreach ($payouts as $po): ?>
+                                        <tr class="hover:bg-white/[0.02] transition">
+                                            <td class="p-3 font-mono font-bold text-amber-300"><?= esc($po['payout_code']) ?></td>
+                                            <td class="p-3 text-slate-400"><?= date('d M Y, H:i', strtotime($po['requested_at'])) ?></td>
+                                            <td class="p-3 font-bold text-white">Rp <?= number_format($po['amount'], 0, ',', '.') ?></td>
+                                            <td class="p-3 text-slate-300">
+                                                <span class="font-bold uppercase text-slate-200"><?= esc($po['payout_channel']) ?></span> - 
+                                                <span class="font-mono text-slate-400"><?= esc($po['payout_account_number']) ?></span>
+                                                <div class="text-[10px] text-slate-500">a.n <?= esc($po['payout_account_name']) ?></div>
+                                            </td>
+                                            <td class="p-3">
+                                                <?php if ($po['status'] === 'completed'): ?>
+                                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                                                        ✓ SELESAI / DITRANSFER
+                                                    </span>
+                                                <?php elseif ($po['status'] === 'processing'): ?>
+                                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                                                        🔄 SEDANG DIPROSES
+                                                    </span>
+                                                <?php elseif ($po['status'] === 'rejected'): ?>
+                                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                                                        ✕ DITOLAK
+                                                    </span>
+                                                <?php else: ?>
+                                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                                                        ⏳ MENUNGGU TRANSFER
+                                                    </span>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td class="p-3 text-right text-slate-400 text-[11px]">
+                                                <?php if (!empty($po['proof_transfer_path'])): ?>
+                                                    <a href="<?= base_url('admin/ambassador/payouts/proof/' . $po['id']) ?>" target="_blank" class="text-indigo-300 hover:text-white underline font-semibold">
+                                                        Lihat Bukti Transfer
+                                                    </a>
+                                                <?php elseif (!empty($po['admin_notes'])): ?>
+                                                    <span><?= esc($po['admin_notes']) ?></span>
+                                                <?php else: ?>
+                                                    <span class="text-slate-600">-</span>
+                                                <?php endif; ?>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
 
             <!-- Formulir & Riwayat Unggah Bukti Promosi (Tahap 5 & 6) -->
             <div class="bg-slate-900 border border-white/10 rounded-3xl p-6 sm:p-7 space-y-6">
@@ -343,6 +495,139 @@
                 btnText.innerText = 'Simpan Bukti Promosi';
             }
         }
+
+        function openPayoutModal() {
+            document.getElementById('payoutModal').classList.remove('hidden');
+        }
+
+        function closePayoutModal() {
+            document.getElementById('payoutModal').classList.add('hidden');
+        }
+
+        function setMaxPayout(maxAmount) {
+            document.getElementById('payoutAmountInput').value = Math.floor(maxAmount);
+        }
+
+        async function submitPayoutRequest(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmitPayout');
+            const btnText = document.getElementById('btnSubmitPayoutText');
+            const form = document.getElementById('payoutForm');
+            const formData = new FormData(form);
+
+            const amount = parseFloat(formData.get('amount') || 0);
+            if (amount < 100000) {
+                alert('⚠️ Batas minimum penarikan saldo adalah Rp 100.000');
+                return;
+            }
+
+            btn.disabled = true;
+            btnText.innerText = 'Memproses...';
+
+            try {
+                const res = await fetch('<?= base_url('ambassador/payout') ?>', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                const data = await res.json();
+
+                if (res.ok && data.success) {
+                    alert('✓ ' + data.message);
+                    closePayoutModal();
+                    window.location.reload();
+                } else {
+                    alert('⚠️ ' + (data.message || 'Gagal mengajukan penarikan saldo.'));
+                }
+            } catch (err) {
+                console.error('Error payout request:', err);
+                alert('Terjadi kesalahan jaringan saat mengirimkan permintaan penarikan.');
+            } finally {
+                btn.disabled = false;
+                btnText.innerText = 'Kirim Permintaan Pencairan';
+            }
+        }
     </script>
+
+    <!-- Modal Penarikan Saldo Komisi (Minimum Rp 100.000) -->
+    <div id="payoutModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm hidden">
+        <div class="bg-slate-900 border border-amber-500/40 rounded-3xl p-6 sm:p-7 max-w-lg w-full space-y-5 shadow-2xl relative">
+            <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-xl">💸</span>
+                    <div>
+                        <h3 class="text-sm sm:text-base font-bold text-white">Tarik Saldo Komisi Duta</h3>
+                        <p class="text-[11px] text-slate-400">Minimum penarikan: Rp 100.000 &bull; Tanpa potongan admin</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closePayoutModal()" class="text-slate-400 hover:text-white text-lg font-bold p-1 cursor-pointer">&times;</button>
+            </div>
+
+            <!-- Info Saldo Tersedia -->
+            <div class="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-3.5 flex items-center justify-between text-xs">
+                <div>
+                    <span class="text-slate-400 block text-[11px]">Saldo Komisi Tersedia:</span>
+                    <strong class="text-amber-300 text-base font-mono">Rp <?= number_format($financial['available_balance'] ?? 0, 0, ',', '.') ?></strong>
+                </div>
+                <button type="button" onclick="setMaxPayout(<?= (float)($financial['available_balance'] ?? 0) ?>)" class="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-bold text-[11px] border border-amber-500/30 transition cursor-pointer">
+                    Tarik Semua Saldo
+                </button>
+            </div>
+
+            <form id="payoutForm" onsubmit="submitPayoutRequest(event)" class="space-y-4 text-xs">
+                <div>
+                    <label class="block font-semibold text-slate-300 mb-1">Jumlah Penarikan (Rp):</label>
+                    <div class="relative">
+                        <span class="absolute left-3.5 top-2.5 text-slate-400 font-bold text-xs">Rp</span>
+                        <input type="number" id="payoutAmountInput" name="amount" min="100000" max="<?= (float)($financial['available_balance'] ?? 0) ?>" step="1000" placeholder="100000" required class="w-full bg-slate-950 border border-white/15 rounded-xl pl-10 pr-3.5 py-2.5 text-white font-mono font-bold focus:outline-none focus:ring-2 focus:ring-amber-500">
+                    </div>
+                    <span class="text-[10px] text-slate-500 mt-1 block">Batas minimum Rp 100.000. Masukkan angka bulat (contoh: 150000).</span>
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-300 mb-1">Pilihan Saluran / Bank Tujuan:</label>
+                    <select name="payout_channel" required class="w-full bg-slate-950 border border-white/15 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
+                        <optgroup label="Bank Transfer">
+                            <option value="BCA" <?= ($profile['payout_channel'] ?? '') === 'BCA' ? 'selected' : '' ?>>Bank Central Asia (BCA)</option>
+                            <option value="Mandiri" <?= ($profile['payout_channel'] ?? '') === 'Mandiri' ? 'selected' : '' ?>>Bank Mandiri</option>
+                            <option value="BRI" <?= ($profile['payout_channel'] ?? '') === 'BRI' ? 'selected' : '' ?>>Bank Rakyat Indonesia (BRI)</option>
+                            <option value="BNI" <?= ($profile['payout_channel'] ?? '') === 'BNI' ? 'selected' : '' ?>>Bank Negara Indonesia (BNI)</option>
+                            <option value="BSI" <?= ($profile['payout_channel'] ?? '') === 'BSI' ? 'selected' : '' ?>>Bank Syariah Indonesia (BSI)</option>
+                            <option value="CIMB" <?= ($profile['payout_channel'] ?? '') === 'CIMB' ? 'selected' : '' ?>>CIMB Niaga</option>
+                        </optgroup>
+                        <optgroup label="E-Wallet">
+                            <option value="DANA" <?= ($profile['payout_channel'] ?? '') === 'DANA' ? 'selected' : '' ?>>DANA (No. HP)</option>
+                            <option value="GoPay" <?= ($profile['payout_channel'] ?? '') === 'GoPay' ? 'selected' : '' ?>>GoPay (No. HP)</option>
+                            <option value="OVO" <?= ($profile['payout_channel'] ?? '') === 'OVO' ? 'selected' : '' ?>>OVO (No. HP)</option>
+                            <option value="ShopeePay" <?= ($profile['payout_channel'] ?? '') === 'ShopeePay' ? 'selected' : '' ?>>ShopeePay (No. HP)</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-300 mb-1">Nomor Rekening / HP:</label>
+                        <input type="text" name="payout_account_number" value="<?= esc($profile['payout_account_number'] ?? '') ?>" placeholder="Misal: 1234567890 / 0812xxx" required class="w-full bg-slate-950 border border-white/15 rounded-xl px-3.5 py-2.5 text-white font-mono focus:outline-none focus:ring-2 focus:ring-amber-500">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-300 mb-1">Nama Pemilik Rekening:</label>
+                        <input type="text" name="payout_account_name" value="<?= esc($profile['payout_account_name'] ?? '') ?>" placeholder="Sesuai buku tabungan / akun" required class="w-full bg-slate-950 border border-white/15 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
+                    </div>
+                </div>
+
+                <div class="pt-2 flex items-center justify-end gap-3">
+                    <button type="button" onclick="closePayoutModal()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold cursor-pointer">
+                        Batal
+                    </button>
+                    <button type="submit" id="btnSubmitPayout" class="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black shadow-lg shadow-amber-500/25 active:scale-95 transition flex items-center gap-2 cursor-pointer">
+                        <span>💸</span>
+                        <span id="btnSubmitPayoutText">Kirim Permintaan Pencairan</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </body>
 </html>

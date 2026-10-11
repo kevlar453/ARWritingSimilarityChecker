@@ -63,6 +63,7 @@ $routes->match(['get', 'head'], 'ambassador/verify/(:segment)', 'AmbassadorContr
 $routes->post('ambassador/verify/(:segment)', 'AmbassadorController::submitVerification/$1');
 $routes->match(['get', 'head'], 'ambassador/dashboard', 'AmbassadorController::dashboard');
 $routes->post('ambassador/proof', 'AmbassadorController::submitProof');
+$routes->post('ambassador/payout', 'AmbassadorController::requestPayout');
 $routes->get('ref/(:segment)', 'AmbassadorController::ref/$1');
 
 // Shortcut / Alias Friendly Routes
@@ -187,6 +188,11 @@ $routes->group('admin', ['filter' => 'admin'], function ($routes) {
     $routes->post('ambassador/proof/reject/(:num)', 'Admin\AmbassadorAdminController::rejectProof/$1');
     $routes->get('ambassador/proof/file/(:num)', 'Admin\AmbassadorAdminController::viewProofFile/$1');
     $routes->get('ambassador/ktm/file/(:num)', 'Admin\AmbassadorAdminController::viewKtmFile/$1');
+
+    // Ambassador Payout Management
+    $routes->get('ambassador/payouts', 'Admin\AmbassadorAdminController::listPayouts');
+    $routes->post('ambassador/payouts/(:num)/process', 'Admin\AmbassadorAdminController::processPayout/$1');
+    $routes->get('ambassador/payouts/proof/(:num)', 'Admin\AmbassadorAdminController::viewTransferProof/$1');
 });
 
 // Human Review & Evaluation Subsystem (DINONAKTIFKAN - mitigasi risiko RCE lewat exec)
