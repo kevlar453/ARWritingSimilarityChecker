@@ -3075,7 +3075,7 @@
                                                 <?php endif; ?>
                                             </td>
                                             <td class="py-3 px-3 align-top text-center whitespace-nowrap" id="proof-status-badge-<?= (int)$pf['id'] ?>">
-                                                <?php if ($pf['status'] === 'approved'): ?>
+                                                <?php if (in_array($pf['status'], ['approved', 'verified'], true)): ?>
                                                     <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                                                         <span>✓</span> <span>Disetujui</span>
                                                     </span>
@@ -3089,8 +3089,8 @@
                                                     </span>
                                                 <?php endif; ?>
                                             </td>
-                                            <td class="py-3 px-3 align-top text-right whitespace-nowrap space-x-1">
-                                                <?php if ($pf['status'] !== 'approved'): ?>
+                                            <td class="py-3 px-3 align-top text-right whitespace-nowrap space-x-1" id="proof-actions-<?= (int)$pf['id'] ?>">
+                                                <?php if (!in_array($pf['status'], ['approved', 'verified'], true)): ?>
                                                     <button type="button" onclick="adminApproveProof(<?= (int)$pf['id'] ?>)" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] transition shadow-xs cursor-pointer" title="Verifikasi & setujui bukti promosi ini">
                                                         ✓ Setujui
                                                     </button>
@@ -3775,6 +3775,10 @@
                     if (badge) {
                         badge.innerHTML = '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"><span>✓</span> <span>Disetujui</span></span>';
                     }
+                    const actions = document.getElementById('proof-actions-' + id);
+                    if (actions) {
+                        actions.innerHTML = '<button type="button" onclick="adminRejectProof(' + id + ')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-rose-900 text-slate-300 hover:text-white text-[11px] transition cursor-pointer" title="Tolak bukti promosi">✕ Tolak</button>';
+                    }
                 } else {
                     alert('Gagal: ' + (res.message || 'Terjadi kesalahan.'));
                 }
@@ -3793,6 +3797,10 @@
                     const badge = document.getElementById('proof-status-badge-' + id);
                     if (badge) {
                         badge.innerHTML = '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30"><span>✕</span> <span>Ditolak</span></span>';
+                    }
+                    const actions = document.getElementById('proof-actions-' + id);
+                    if (actions) {
+                        actions.innerHTML = '<button type="button" onclick="adminApproveProof(' + id + ')" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] transition shadow-xs cursor-pointer" title="Verifikasi & setujui bukti promosi ini">✓ Setujui</button>';
                     }
                 } else {
                     alert('Gagal: ' + (res.message || 'Terjadi kesalahan.'));

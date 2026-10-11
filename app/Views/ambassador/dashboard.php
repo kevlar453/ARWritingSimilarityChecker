@@ -258,7 +258,7 @@
                                                 Tersimpan Aman
                                             </span>
                                         <?php endif; ?>
-                                        <?php if ($p['status'] === 'approved'): ?>
+                                        <?php if (in_array($p['status'], ['approved', 'verified'], true)): ?>
                                             <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                                                 ✓ DISETUJUI
                                             </span>

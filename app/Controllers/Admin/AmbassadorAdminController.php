@@ -179,8 +179,7 @@ class AmbassadorAdminController extends BaseController
         }
 
         $proofModel->update($id, [
-            'status'     => 'approved',
-            'updated_at' => date('Y-m-d H:i:s'),
+            'status' => 'approved',
         ]);
 
         return $this->response->setJSON([
@@ -206,7 +205,6 @@ class AmbassadorAdminController extends BaseController
         $proofModel->update($id, [
             'status'      => 'rejected',
             'description' => trim(($proof['description'] ?? '') . ' [Catatan Admin: ' . $reason . ']'),
-            'updated_at'  => date('Y-m-d H:i:s'),
         ]);
 
         return $this->response->setJSON([
