@@ -3160,7 +3160,7 @@
                     </div>
 
                     <!-- Micro Feature Badges -->
-                    <div class="hero-pills-wrap" data-aos="fade-up" data-aos-delay="250" data-aos-duration="700">
+                    <div class="hero-pills-wrap">
                         <div class="hero-pill-badge"><span>⚡</span> Dual-Lens 5-Gram & TF-IDF</div>
                         <div class="hero-pill-badge"><span>🌐</span> Cross-Lingual EN⇄ID</div>
                         <div class="hero-pill-badge"><span>🛡️</span> Anti-Cheat Font/Homoglyph</div>
@@ -3169,9 +3169,12 @@
                     </div>
                 </div>
 
-                <div data-aos="fade-left" data-aos-delay="200" data-aos-duration="900">
+                <div>
                     <div class="hero-visual-card">
-                        <img src="<?= base_url('images/hero_illustration.jpg') ?>" alt="Analisis Naskah Akademik AR Tilik" width="800" height="450" fetchpriority="high">
+                        <picture>
+                            <source srcset="<?= base_url('images/hero_illustration.webp') ?>" type="image/webp">
+                            <img src="<?= base_url('images/hero_illustration.jpg') ?>" alt="Analisis Naskah Akademik AR Tilik" width="800" height="450" fetchpriority="high">
+                        </picture>
                         <div class="hero-visual-overlay">
                             <span class="hero-visual-tag">
                                 <span>🔬</span> Dual-Lens Spectrum Analysis
@@ -3185,7 +3188,7 @@
             </div>
 
             <!-- Stats Bar -->
-            <div class="stats-bar" data-aos="fade-up" data-aos-delay="300" data-aos-duration="800">
+            <div class="stats-bar">
                 <div class="stat-item">
                     <div class="stat-val"><?= number_format($totalCorpus) ?>+</div>
                     <div class="stat-lbl">Korpus Terindeks</div>
@@ -3250,7 +3253,10 @@
             <!-- Spotlight Card: Visualisasi Dual-Lens Engine -->
             <div class="spotlight-card" data-aos="fade-up" data-aos-duration="800">
                 <div class="spotlight-img-wrap" data-aos="fade-right" data-aos-delay="100" data-aos-duration="800">
-                    <img src="<?= base_url('images/dual_lens_concept.jpg') ?>" alt="Konsep Arsitektur Dual-Lens AR Tilik" loading="lazy" width="800" height="450">
+                    <picture>
+                        <source srcset="<?= base_url('images/dual_lens_concept.webp') ?>" type="image/webp">
+                        <img src="<?= base_url('images/dual_lens_concept.jpg') ?>" alt="Konsep Arsitektur Dual-Lens AR Tilik" loading="lazy" width="800" height="450">
+                    </picture>
                     <div class="spotlight-caption">
                         <span>LENSA 1: Sequential 5-Gram</span>
                         <span>LENSA 2: Lexical TF-IDF</span>
@@ -3473,7 +3479,10 @@
                             <span>🔒</span> https://tilik.arsetontong.top/report/compare/SUB-704B1494
                         </div>
                     </div>
-                    <img src="<?= base_url('images/dual_reader_mockup.jpg') ?>" alt="Antarmuka Dual-Reader AR Tilik" loading="lazy" width="800" height="450">
+                    <picture>
+                        <source srcset="<?= base_url('images/dual_reader_mockup.webp') ?>" type="image/webp">
+                        <img src="<?= base_url('images/dual_reader_mockup.jpg') ?>" alt="Antarmuka Dual-Reader AR Tilik" loading="lazy" width="800" height="450">
+                    </picture>
                 </div>
 
                 <div class="dual-reader-features">
