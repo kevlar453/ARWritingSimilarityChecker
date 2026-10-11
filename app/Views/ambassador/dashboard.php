@@ -36,11 +36,14 @@
                 </div>
             </a>
             <div class="flex items-center gap-2.5 flex-wrap">
+                <a href="<?= base_url() ?>" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-slate-900/90 hover:bg-slate-800 border border-white/15 transition shadow-xs" title="Kembali ke Beranda Utama AR Tilik">
+                    <span>🏠</span> <span>Landing Page</span>
+                </a>
                 <a href="<?= base_url('ambassador/guide') ?>" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-amber-300 hover:text-white bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/30 transition shadow-xs">
                     <span>📖</span> <span>Panduan &amp; Template Promosi</span>
                 </a>
                 <a href="<?= base_url('dashboard') ?>" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-200 hover:text-white bg-slate-900 hover:bg-slate-800 border border-white/15 transition shadow-xs">
-                    <span>&larr;</span> <span>Kembali ke Dashboard</span>
+                    <span>&larr;</span> <span>Dashboard Pengguna</span>
                 </a>
                 <span class="text-xs px-2.5 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-bold font-mono">
                     <?= esc($profile['referral_code']) ?>

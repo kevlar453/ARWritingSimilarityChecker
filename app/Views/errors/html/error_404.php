@@ -4,6 +4,7 @@
  * Desain modern bertema AR Tilik dengan navigasi kembali yang jelas.
  */
 $homeUrl = function_exists('base_url') ? base_url('/') : '/';
+$dashboardUrl = function_exists('base_url') ? base_url('dashboard') : '/dashboard';
 $verifyUrl = function_exists('base_url') ? base_url('verify') : '/verify';
 ?>
 <!DOCTYPE html>
@@ -286,6 +287,9 @@ $verifyUrl = function_exists('base_url') ? base_url('verify') : '/verify';
                         <span>←</span> Kembali ke Halaman Sebelumnya
                     </a>
                     <a href="<?= esc($homeUrl) ?>" class="btn btn-secondary">
+                        <span>🏠</span> Ke Landing Page
+                    </a>
+                    <a href="<?= esc($dashboardUrl) ?>" class="btn btn-secondary">
                         <span>📊</span> Buka Dashboard
                     </a>
                     <a href="<?= esc($verifyUrl) ?>" class="btn btn-secondary">

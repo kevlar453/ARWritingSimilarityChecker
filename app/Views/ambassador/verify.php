@@ -39,9 +39,15 @@
                     <p class="text-xs text-slate-300 leading-relaxed">
                         Foto identitas telah tersimpan aman di server kami. Tim AR Tilik sedang menyiapkan kode referral unik dan akun premium Anda. Anda akan menerima paket sambutan via WhatsApp segera!
                     </p>
-                    <a href="<?= base_url('ambassador') ?>" class="inline-block mt-2 text-xs text-indigo-300 underline font-semibold">
-                        &larr; Kembali ke Halaman Duta Kampus
-                    </a>
+                    <div class="flex items-center justify-center gap-4 mt-3">
+                        <a href="<?= base_url('ambassador') ?>" class="text-xs text-indigo-300 underline font-semibold">
+                            &larr; Halaman Duta Kampus
+                        </a>
+                        <span class="text-slate-600">&bull;</span>
+                        <a href="<?= base_url() ?>" class="text-xs text-slate-400 hover:text-white underline font-semibold">
+                            🏠 Landing Page
+                        </a>
+                    </div>
                 </div>
             <?php else: ?>
                 <div class="bg-indigo-500/10 border border-indigo-500/20 rounded-xl p-3 text-xs text-slate-300 leading-relaxed flex items-start gap-2.5">

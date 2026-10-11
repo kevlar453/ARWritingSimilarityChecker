@@ -65,6 +65,19 @@ $routes->match(['get', 'head'], 'ambassador/dashboard', 'AmbassadorController::d
 $routes->post('ambassador/proof', 'AmbassadorController::submitProof');
 $routes->get('ref/(:segment)', 'AmbassadorController::ref/$1');
 
+// Shortcut / Alias Friendly Routes
+$routes->match(['get', 'head'], 'pricing', static function () {
+    return redirect()->to(base_url('/#langganan'));
+});
+$routes->match(['get', 'head'], 'login', static function () {
+    $redirect = service('request')->getGet('redirect');
+    $target = base_url('/?auth=login');
+    if (!empty($redirect)) {
+        $target .= '&redirect=' . urlencode((string) $redirect);
+    }
+    return redirect()->to($target);
+});
+
 // Auth Routes
 $routes->group('auth', function ($routes) {
     $routes->post('register', 'AuthController::register');

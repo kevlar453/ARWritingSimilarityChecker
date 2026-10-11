@@ -33,7 +33,10 @@
                     <span class="text-[10px] text-amber-400 font-mono block leading-none">Welcome Kit Duta Kampus</span>
                 </div>
             </a>
-            <div class="flex items-center gap-2.5">
+            <div class="flex items-center gap-2.5 flex-wrap">
+                <a href="<?= base_url() ?>" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-slate-900/90 hover:bg-slate-800 border border-white/15 transition shadow-xs" title="Kembali ke Beranda Utama AR Tilik">
+                    <span>🏠</span> <span>Landing Page</span>
+                </a>
                 <?php if (!empty($profile)): ?>
                     <a href="<?= base_url('ambassador/dashboard') ?>" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-amber-300 hover:text-white bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 transition shadow-xs">
                         <span>📊</span> <span>Dashboard Duta</span>

@@ -48,7 +48,10 @@
                     <span class="text-[10px] text-amber-400 font-mono block leading-none">Duta Kampus Hub</span>
                 </div>
             </a>
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2.5 flex-wrap">
+                <a href="<?= base_url() ?>" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-slate-900/90 hover:bg-slate-800 border border-white/15 transition shadow-xs" title="Kembali ke Beranda Utama AR Tilik">
+                    <span>🏠</span> <span>Landing Page</span>
+                </a>
                 <?php if (!empty($currentUser)): ?>
                     <a href="<?= base_url('dashboard') ?>" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-200 hover:text-white bg-slate-900 hover:bg-slate-800 border border-white/15 transition shadow-xs">
                         <span>&larr;</span> <span>Kembali ke Dashboard</span>
@@ -59,10 +62,10 @@
                         </a>
                     <?php endif; ?>
                 <?php else: ?>
-                    <a href="<?= base_url('login') ?>" class="text-xs text-slate-300 hover:text-white font-semibold transition">
+                    <a href="<?= base_url('/?auth=login') ?>" class="text-xs text-slate-300 hover:text-white font-semibold transition px-2 py-1">
                         Masuk
                     </a>
-                    <a href="<?= base_url('pricing') ?>" class="text-xs px-3 py-1.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold hover:bg-amber-500/30 transition">
+                    <a href="<?= base_url('/#langganan') ?>" class="text-xs px-3 py-1.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold hover:bg-amber-500/30 transition">
                         Paket Pemeriksaan
                     </a>
                 <?php endif; ?>
@@ -256,7 +259,7 @@
                                 <span class="text-lg text-amber-400">💡</span>
                                 <div class="text-xs text-slate-300">
                                     <strong class="text-amber-300">Catatan Kualifikasi:</strong> Duta Kampus wajib pernah melakukan pembelian paket pemeriksaan apapun di AR Tilik agar memahami alur kerja dan kualitas naskah secara nyata. Anda tetap dapat mengisi formulir sekarang, namun aktivasi kode referral akan menunggu riwayat pembelian paket pertama Anda. 
-                                    <a href="<?= base_url('pricing') ?>" target="_blank" class="text-amber-300 font-bold underline hover:text-white ml-1">Lihat Pilihan Paket &rarr;</a>
+                                    <a href="<?= base_url('/#langganan') ?>" target="_blank" class="text-amber-300 font-bold underline hover:text-white ml-1">Lihat Pilihan Paket &rarr;</a>
                                 </div>
                             </div>
                         <?php endif; ?>
@@ -264,7 +267,7 @@
                         <div class="bg-indigo-500/10 border border-indigo-500/20 rounded-2xl p-4 flex items-start gap-3">
                             <span class="text-lg text-indigo-400">ℹ️</span>
                             <div class="text-xs text-slate-300">
-                                Sudah memiliki akun AR Tilik? <a href="<?= base_url('login?redirect=ambassador') ?>" class="text-indigo-300 font-bold underline hover:text-white">Masuk terlebih dahulu</a> agar formulir terisi otomatis dari profil Anda.
+                                Sudah memiliki akun AR Tilik? <a href="<?= base_url('/?auth=login&redirect=' . urlencode(base_url('ambassador'))) ?>" class="text-indigo-300 font-bold underline hover:text-white">Masuk terlebih dahulu</a> agar formulir terisi otomatis dari profil Anda.
                             </div>
                         </div>
                     <?php endif; ?>
