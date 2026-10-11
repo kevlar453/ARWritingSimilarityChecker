@@ -236,7 +236,8 @@ class DashboardController extends BaseController
 
         // Ambil daftar user_id yang pernah membeli paket apa saja
         $paidUserRows = $db->table('payment_transactions')
-                           ->select('DISTINCT user_id')
+                           ->distinct()
+                           ->select('user_id')
                            ->whereIn('transaction_status', ['settlement', 'capture'])
                            ->get()
                            ->getResultArray();
