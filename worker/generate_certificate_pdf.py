@@ -72,7 +72,115 @@ def format_date_id(dt_val) -> tuple[str, str]:
     time_str = f"{dt.strftime('%H:%M')} WIB"
     return date_str, time_str
 
-def build_certificate_html(report: dict, document: dict) -> str:
+def calculate_dynamic_ai_score(gemini: dict, stylometrics_score: float = None) -> float:
+    audit = gemini.get("audit") or {}
+    if not audit and gemini.get("raw_output"):
+        m = re.search(r'"tingkat_indikasi_ai"\s*:\s*"([^"]+)"', gemini["raw_output"], re.IGNORECASE)
+        if m:
+            audit["tingkat_indikasi_ai"] = m.group(1)
+        m2 = re.search(r'"alasan_indikasi_ai"\s*:\s*"([^"]+)"', gemini["raw_output"], re.IGNORECASE)
+        if m2:
+            audit["alasan_indikasi_ai"] = m2.group(1)
+        m3 = re.search(r'"skor_indikasi_persen"\s*:\s*(\d+(?:\.\d+)?)', gemini["raw_output"], re.IGNORECASE)
+        if m3:
+            audit["skor_indikasi_persen"] = float(m3.group(1))
+
+    if "skor_indikasi_persen" in audit and audit["skor_indikasi_persen"] is not None:
+        try:
+            explicit = float(audit["skor_indikasi_persen"])
+            if 0.0 <= explicit <= 100.0:
+                return max(explicit, stylometrics_score) if stylometrics_score is not None else explicit
+        except (ValueError, TypeError):
+            pass
+
+    level = str(audit.get("tingkat_indikasi_ai") or "RENDAH").strip().upper()
+    reason = str(audit.get("alasan_indikasi_ai") or "")
+    contra = audit.get("inkonsistensi_metodologi_dan_logika") or []
+    citations = audit.get("integritas_sitasi") or []
+    ev_text = (reason + " " + " ".join([str(c) for c in contra]) + " " + " ".join([str(ci) for ci in citations])).lower()
+
+    if level == "RENDAH":
+        return stylometrics_score if stylometrics_score is not None else 0.0
+
+    if level == "SEDANG":
+        score = 50.0 + (5.0 if len(contra) > 1 or len(citations) > 1 else 0.0)
+        return round(max(score, stylometrics_score or 0.0), 1)
+
+    is_meta = bool(re.search(r"(kebocoran instruksi|meta-prompt|prompt leak|disalin-tempel secara langsung|copy-paste mentah|percakapan ai|chat ai|instruksi percakapan|bisa\. saya akan buat|tentu, berikut|sebagai model bahasa ai)", ev_text))
+    if is_meta:
+        return 98.0
+
+    has_cit = bool(re.search(r"(halusinasi|tokoh fiktif|nama jurnal .* diperlakukan sebagai|nama paroki .* diperlakukan sebagai|sitasi palsu|penulis fiktif|fabrikasi)", ev_text))
+    base = 80.0 if has_cit else 74.0
+    contra_w = min(len(contra) * 1.5, 4.5)
+    cit_w = min(len(citations) * 1.5, 4.5)
+    forensic_raw = base + contra_w + cit_w
+
+    if stylometrics_score is not None and stylometrics_score > 0:
+        if stylometrics_score >= 70.0:
+            final = max(forensic_raw, stylometrics_score + 6.0)
+        elif stylometrics_score >= 35.0:
+            final = (forensic_raw * 0.8) + (stylometrics_score * 0.2)
+        else:
+            final = forensic_raw
+    else:
+        final = forensic_raw
+    return round(min(max(final, 70.0), 99.0), 1)
+
+def extract_ai_assessment(evidence_data) -> tuple[float | None, str]:
+    if not evidence_data:
+        return None, "Otentik Alami"
+    try:
+        ev = json.loads(evidence_data) if isinstance(evidence_data, str) else evidence_data
+    except Exception:
+        return None, "Otentik Alami"
+
+    ai_sty = ev.get("ai_stylometrics") or ev.get("v1_1_presentation", {}).get("v1_2_evolution", {}).get("ai_stylometrics")
+    gemini = ev.get("gemini_forensic") or ev.get("v1_1_presentation", {}).get("v1_2_evolution", {}).get("gemini_forensic")
+
+    stylometrics_score = None
+    if isinstance(ai_sty, dict) and "ai_probability_score" in ai_sty and ai_sty["ai_probability_score"] is not None:
+        try:
+            stylometrics_score = float(ai_sty["ai_probability_score"])
+        except (ValueError, TypeError):
+            pass
+
+    forensic_level = None
+    if isinstance(gemini, dict) and gemini.get("status") == "completed":
+        g_audit = gemini.get("audit") or {}
+        if not g_audit and gemini.get("raw_output"):
+            m = re.search(r'"tingkat_indikasi_ai"\s*:\s*"([^"]+)"', gemini["raw_output"], re.IGNORECASE)
+            if m:
+                g_audit["tingkat_indikasi_ai"] = m.group(1)
+        if g_audit.get("tingkat_indikasi_ai"):
+            forensic_level = str(g_audit["tingkat_indikasi_ai"]).strip().upper()
+
+    composite_score = None
+    if forensic_level is not None and isinstance(gemini, dict) and gemini.get("status") == "completed":
+        composite_score = calculate_dynamic_ai_score(gemini, stylometrics_score)
+    else:
+        composite_score = stylometrics_score
+
+    if composite_score is None:
+        return None, "Otentik Alami"
+
+    is_meta = False
+    if isinstance(gemini, dict):
+        comb = json.dumps(gemini).lower()
+        is_meta = bool(re.search(r"(kebocoran instruksi|meta-prompt|prompt leak|disalin-tempel secara langsung|copy-paste mentah|bisa\. saya akan buat)", comb))
+
+    if is_meta:
+        label = "Indikasi Ekstrem (Prompt Leak)"
+    elif composite_score >= 70.0 or forensic_level == "TINGGI":
+        label = "Indikasi AI: Tinggi"
+    elif composite_score >= 35.0 or forensic_level == "SEDANG":
+        label = "Indikasi AI: Sedang"
+    else:
+        label = "Otentik Alami"
+
+    return composite_score, label
+
+def build_certificate_html(report: dict, document: dict, override_ai_score: float = None, override_ai_label: str = None) -> str:
     code = report.get("verification_code") or f"ART-{report['id']:04d}-CERT"
     overall_sim = float(report.get("overall_similarity") or 0)
     exact_sim = float(report.get("exact_similarity") or 0)
@@ -103,18 +211,23 @@ def build_certificate_html(report: dict, document: dict) -> str:
         p_date, p_time = format_date_id(file_purged_at)
         purged_str = f"{p_date}, {p_time}"
 
-    # AI assessment
-    ai_score = None
-    ai_label = "Otentik Alami"
-    if report.get("evidence_data"):
-        try:
-            ev = json.loads(report["evidence_data"]) if isinstance(report["evidence_data"], str) else report["evidence_data"]
-            ai_data = ev.get("ai_metrics") or ev.get("ai_assessment")
-            if ai_data:
-                ai_score = ai_data.get("score")
-                ai_label = ai_data.get("label") or ("Otentik Alami" if ai_score < 35 else "Indikasi Sintesis")
-        except Exception:
-            pass
+    # AI assessment (diselaraskan penuh dengan Audit Forensik Cerdas)
+    if override_ai_score is not None:
+        ai_score = float(override_ai_score)
+        ai_label = override_ai_label or ("Indikasi AI: Tinggi" if ai_score >= 70 else ("Indikasi AI: Sedang" if ai_score >= 35 else "Otentik Alami"))
+    else:
+        ai_score, ai_label = extract_ai_assessment(report.get("evidence_data"))
+
+    # Styling badge Pilar IV
+    if ai_score is not None and ai_score >= 70.0:
+        ai_val_class = "pillar-val-warning"
+        ai_badge_class = "pillar-badge-warning"
+    elif ai_score is not None and ai_score >= 35.0:
+        ai_val_class = ""
+        ai_badge_class = "pillar-badge-moderate"
+    else:
+        ai_val_class = ""
+        ai_badge_class = "pillar-badge-clean"
 
     # Verdict Classification
     if decision in ["no_match", "clean"]:
@@ -186,8 +299,8 @@ def build_certificate_html(report: dict, document: dict) -> str:
             background-color: #ffffff;
             background-image: 
                 radial-gradient(circle at 50% 50%, #fffefc 0%, #fcf9f2 80%, #f8f2e2 100%),
-                radial-gradient(circle at 10% 10%, rgba(197, 160, 89, 0.03) 0%, transparent 50%),
-                radial-gradient(circle at 90% 90%, rgba(197, 160, 89, 0.03) 0%, transparent 50%);
+                radial-gradient(circle at 10% 10%, rgba(197, 160, 89, 0.04) 0%, transparent 50%),
+                radial-gradient(circle at 90% 90%, rgba(197, 160, 89, 0.04) 0%, transparent 50%);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -475,6 +588,9 @@ def build_certificate_html(report: dict, document: dict) -> str:
             margin: 0.6mm 0;
             letter-spacing: 0.02em;
         }}
+        .pillar-val-warning {{
+            color: #b91c1c !important;
+        }}
         .pillar-method {{
             font-size: 5.8pt;
             color: #64748b;
@@ -491,6 +607,42 @@ def build_certificate_html(report: dict, document: dict) -> str:
             background: rgba(197, 160, 89, 0.16);
             color: #78510a;
             border: 0.4pt solid rgba(197, 160, 89, 0.5);
+        }}
+        .pillar-badge-warning {{
+            display: inline-block;
+            font-size: 5.6pt;
+            font-weight: bold;
+            padding: 0.3mm 1.4mm;
+            border-radius: 2pt;
+            margin-top: 0.6mm;
+            text-transform: uppercase;
+            background: #fee2e2;
+            color: #991b1b;
+            border: 0.4pt solid #f87171;
+        }}
+        .pillar-badge-moderate {{
+            display: inline-block;
+            font-size: 5.6pt;
+            font-weight: bold;
+            padding: 0.3mm 1.4mm;
+            border-radius: 2pt;
+            margin-top: 0.6mm;
+            text-transform: uppercase;
+            background: rgba(197, 160, 89, 0.16);
+            color: #78510a;
+            border: 0.4pt solid rgba(197, 160, 89, 0.5);
+        }}
+        .pillar-badge-clean {{
+            display: inline-block;
+            font-size: 5.6pt;
+            font-weight: bold;
+            padding: 0.3mm 1.4mm;
+            border-radius: 2pt;
+            margin-top: 0.6mm;
+            text-transform: uppercase;
+            background: #dcfce7;
+            color: #166534;
+            border: 0.4pt solid #86efac;
         }}
 
         /* Klausul Privasi Kedaulatan */
@@ -827,10 +979,10 @@ def build_certificate_html(report: dict, document: dict) -> str:
                 <div class="pillar-col">
                     <div class="pillar-card">
                         <div class="pillar-num">Pilar IV &bull; Sintesis</div>
-                        <div class="pillar-name">Forensik Sintesis Mesin / AI</div>
-                        <div class="pillar-value">{f"{ai_score:.1f}%" if ai_score is not None else "Alami"}</div>
-                        <div class="pillar-method">Stylometrik &amp; Sintaksis Teks</div>
-                        <div class="pillar-badge">{ai_label}</div>
+                        <div class="pillar-name">Forensik Sintesis Mesin</div>
+                        <div class="pillar-value {ai_val_class}">{f"{ai_score:.1f}%" if ai_score is not None else "Alami"}</div>
+                        <div class="pillar-method">Stylometrik &amp; Forensik Cerdas</div>
+                        <div class="{ai_badge_class}">{ai_label}</div>
                     </div>
                 </div>
             </div>
@@ -953,9 +1105,9 @@ def fetch_certificate_data(code: str = None, report_id: int = None) -> tuple[dic
     finally:
         conn.close()
 
-def generate_certificate_pdf(code: str = None, report_id: int = None, output_path: str = None) -> bytes:
+def generate_certificate_pdf(code: str = None, report_id: int = None, output_path: str = None, override_ai_score: float = None, override_ai_label: str = None) -> bytes:
     report, document = fetch_certificate_data(code=code, report_id=report_id)
-    html_content = build_certificate_html(report, document)
+    html_content = build_certificate_html(report, document, override_ai_score=override_ai_score, override_ai_label=override_ai_label)
 
     with tempfile.NamedTemporaryFile("w", suffix=".html", delete=False, encoding="utf-8") as f_html:
         f_html.write(html_content)
@@ -1021,6 +1173,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generator PDF Piagam Akreditasi AR Tilik (WeasyPrint)")
     parser.add_argument("--code", type=str, default=None, help="Kode Verifikasi Sertifikat (misal: ART-BFF9-774A-2C68)")
     parser.add_argument("--report", type=int, default=None, help="ID Laporan (opsional jika kode tidak diisi)")
+    parser.add_argument("--ai-score", type=float, default=None, help="Override skor metrik AI (0-100)")
+    parser.add_argument("--ai-label", type=str, default=None, help="Override label metrik AI")
     parser.add_argument("--output", type=str, default=None, help="Path berkas luaran PDF")
     parser.add_argument("--stdout", action="store_true", help="Keluarkan bytes PDF langsung ke stdout")
     args = parser.parse_args()
@@ -1029,7 +1183,13 @@ if __name__ == "__main__":
         parser.error("Harus memberikan argumen --code atau --report")
 
     try:
-        pdf_bytes = generate_certificate_pdf(code=args.code, report_id=args.report, output_path=args.output)
+        pdf_bytes = generate_certificate_pdf(
+            code=args.code,
+            report_id=args.report,
+            output_path=args.output,
+            override_ai_score=args.ai_score,
+            override_ai_label=args.ai_label
+        )
         if args.stdout:
             sys.stdout.buffer.write(pdf_bytes)
         elif args.output:

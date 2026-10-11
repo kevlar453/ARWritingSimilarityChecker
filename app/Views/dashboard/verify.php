@@ -200,18 +200,18 @@
 
                 // Klasifikasi Akreditasi Formal
                 if ($dec === 'match') {
-                    $verdictTitle = 'TIDAK MEMENUHI SYARAT (KEMIRIPAN TINGGI)';
-                    $verdictKriteria = 'PERLU PERBAIKAN & PARAFRASA INTENSIF';
+                    $verdictTitle = 'TIDAK MEMENUHI SYARAT';
+                    $verdictKriteria = 'KEMIRIPAN TINGGI • PERLU PERBAIKAN & PARAFRASA';
                     $verdictColor = 'text-rose-800';
                     $verdictBorder = 'border-rose-400 bg-rose-50/80';
                 } elseif ($dec === 'review') {
-                    $verdictTitle = 'MEMENUHI SYARAT BERSYARAT (REVIEW AKADEMIK)';
-                    $verdictKriteria = 'DALAM AMBANG BATAS TOLERANSI INSTITUSI';
+                    $verdictTitle = 'MEMENUHI SYARAT BERSYARAT';
+                    $verdictKriteria = 'DALAM AMBANG BATAS TOLERANSI REVIEW AKADEMIK';
                     $verdictColor = 'text-amber-800';
                     $verdictBorder = 'border-amber-400 bg-amber-50/80';
                 } else {
-                    $verdictTitle = 'TERAKREDITASI SANGAT BAIK (LOLOS BEBAS PLAGIARISME)';
-                    $verdictKriteria = 'MEMENUHI KAIDAH INTEGRITAS KARYA ILMIAH';
+                    $verdictTitle = 'TERAKREDITASI SANGAT BAIK';
+                    $verdictKriteria = 'LOLOS AMBANG BATAS ORISINALITAS ILMIAH';
                     $verdictColor = 'text-emerald-800';
                     $verdictBorder = 'border-emerald-500 bg-emerald-50/80';
                 }
@@ -219,7 +219,10 @@
                 // AI Indication Metrics
                 $aiData = $report['ai_assessment'] ?? null;
                 $aiScore = $aiData ? ($aiData['score'] ?? null) : null;
-                $aiLabel = $aiData ? ($aiData['label'] ?? ($aiScore >= 65 ? 'Indikasi Tinggi' : ($aiScore >= 35 ? 'Indikasi Sedang' : 'Otentik Alami'))) : 'Otentik Alami';
+                $aiLabel = $aiData ? ($aiData['label'] ?? null) : null;
+                if (!$aiLabel) {
+                    $aiLabel = ($aiScore !== null && $aiScore >= 70) ? 'Indikasi AI: Tinggi' : (($aiScore !== null && $aiScore >= 35) ? 'Indikasi AI: Sedang' : 'Otentik Alami');
+                }
 
                 // SHA-256 Signature
                 $docSignature = hash('sha256', $code . ($report['created_at'] ?? '') . ($document['title'] ?? '') . $overallSim);
@@ -355,7 +358,7 @@
                             <div class="font-mono-code text-sm font-black text-[#081a33] my-0.5"><?= number_format($cosineSim, 2) ?>%</div>
                             <div class="text-[8.5px] text-slate-500">TF-IDF Vector Cosine</div>
                             <div class="inline-block text-[8px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-amber-100/60 text-[#78510a] border border-[#c5a059]/40 mt-1">
-                                Korelasi Wajar
+                                Korelasi Topikal Wajar
                             </div>
                         </div>
 
@@ -374,9 +377,9 @@
                         <div class="border border-[#c5a059] bg-gradient-to-b from-[#fffdfa] to-[#faf6ec] rounded p-2 text-center shadow-2xs">
                             <div class="text-[9px] font-bold tracking-widest text-[#875c16] uppercase">Pilar IV &bull; Sintesis</div>
                             <div class="text-[10.5px] font-bold text-[#081a33] mt-0.5">Forensik Sintesis Mesin</div>
-                            <div class="font-mono-code text-sm font-black text-[#081a33] my-0.5"><?= $aiScore !== null ? number_format($aiScore, 1) . '%' : 'Alami' ?></div>
-                            <div class="text-[8.5px] text-slate-500">Stylometrik &amp; Sintaksis</div>
-                            <div class="inline-block text-[8px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-amber-100/60 text-[#78510a] border border-[#c5a059]/40 mt-1">
+                            <div class="font-mono-code text-sm font-black <?= ($aiScore !== null && $aiScore >= 70) ? 'text-rose-700' : (($aiScore !== null && $aiScore >= 35) ? 'text-amber-700' : 'text-[#081a33]') ?> my-0.5"><?= $aiScore !== null ? number_format($aiScore, 1) . '%' : 'Alami' ?></div>
+                            <div class="text-[8.5px] text-slate-500">Stylometrik &amp; Forensik Cerdas</div>
+                            <div class="inline-block text-[8px] font-bold uppercase tracking-wider px-2 py-0.5 rounded <?= ($aiScore !== null && $aiScore >= 70) ? 'bg-rose-100/90 text-rose-800 border border-rose-300' : (($aiScore !== null && $aiScore >= 35) ? 'bg-amber-100/60 text-[#78510a] border border-[#c5a059]/40' : 'bg-emerald-100/60 text-emerald-800 border border-emerald-300') ?> mt-1">
                                 <?= esc($aiLabel) ?>
                             </div>
                         </div>

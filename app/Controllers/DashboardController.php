@@ -200,6 +200,21 @@ class DashboardController extends BaseController
             );
         }
 
+        // Selaraskan label status dengan hasil akhir skor komposit dan Audit Forensik Cerdas
+        if ($isMetaPromptLeak) {
+            $label = 'Indikasi Ekstrem (Kebocoran Prompt AI)';
+            $level = 'EXTREME';
+        } elseif ($compositeScore >= 70.0 || $forensicLevel === 'TINGGI') {
+            $label = 'Indikasi AI: Tinggi';
+            $level = 'HIGH';
+        } elseif ($compositeScore >= 35.0 || $forensicLevel === 'SEDANG') {
+            $label = 'Indikasi AI: Sedang';
+            $level = 'MODERATE';
+        } else {
+            $label = 'Otentik Alami (Bebas AI)';
+            $level = 'LOW';
+        }
+
         return [
             'score'                => $compositeScore,
             'stylometrics_score'   => $stylometricsScore,
@@ -1818,7 +1833,13 @@ class DashboardController extends BaseController
             $pythonBin = 'python3';
         }
 
-        $cmd = escapeshellcmd($pythonBin) . ' ' . escapeshellarg($projectRoot . 'worker/generate_certificate_pdf.py') . ' --code ' . escapeshellarg($code) . ' --stdout';
+        $aiAssessment = self::extractAiMetrics($report);
+        $aiArg = '';
+        if ($aiAssessment && isset($aiAssessment['score'])) {
+            $aiArg = ' --ai-score ' . escapeshellarg((string)$aiAssessment['score']) . ' --ai-label ' . escapeshellarg((string)($aiAssessment['label'] ?? ''));
+        }
+
+        $cmd = escapeshellcmd($pythonBin) . ' ' . escapeshellarg($projectRoot . 'worker/generate_certificate_pdf.py') . ' --code ' . escapeshellarg($code) . $aiArg . ' --stdout';
 
         $descriptors = [
             0 => ['pipe', 'r'],
@@ -1875,7 +1896,13 @@ class DashboardController extends BaseController
             $pythonBin = 'python3';
         }
 
-        $cmd = escapeshellcmd($pythonBin) . ' ' . escapeshellarg($projectRoot . 'worker/generate_certificate_pdf.py') . ' --report ' . (int)$reportId . ' --stdout';
+        $aiAssessment = self::extractAiMetrics($report);
+        $aiArg = '';
+        if ($aiAssessment && isset($aiAssessment['score'])) {
+            $aiArg = ' --ai-score ' . escapeshellarg((string)$aiAssessment['score']) . ' --ai-label ' . escapeshellarg((string)($aiAssessment['label'] ?? ''));
+        }
+
+        $cmd = escapeshellcmd($pythonBin) . ' ' . escapeshellarg($projectRoot . 'worker/generate_certificate_pdf.py') . ' --report ' . (int)$reportId . $aiArg . ' --stdout';
 
         $descriptors = [
             0 => ['pipe', 'r'],
