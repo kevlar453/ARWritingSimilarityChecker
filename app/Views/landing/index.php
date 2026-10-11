@@ -2313,7 +2313,9 @@
 
                 <li><a href="#integrasi-ojs">Integrasi OJS 3.x</a></li>
                 <li><a href="#solusi">Solusi Institusi</a></li>
-                <li><a href="#testimoni">Testimoni</a></li>
+                <?php if (!empty($approvedTestimonials)): ?>
+                    <li><a href="#testimoni">Testimoni</a></li>
+                <?php endif; ?>
                 <li><a href="#langganan">Paket Tarif</a></li>
                 <li><a href="#faq">FAQ</a></li>
                 <li>
@@ -2439,11 +2441,13 @@
                     <span>Solusi Sivitas &amp; Kampus</span>
                     <span class="nav-arrow">›</span>
                 </a>
+                <?php if (!empty($approvedTestimonials)): ?>
                 <a href="#testimoni" class="mobile-nav-link" onclick="closeMobileNav()">
                     <span class="nav-icon">🌟</span>
                     <span>Testimoni Akademisi</span>
                     <span class="nav-arrow">›</span>
                 </a>
+                <?php endif; ?>
                 <a href="#langganan" class="mobile-nav-link" onclick="closeMobileNav()">
                     <span class="nav-icon">💳</span>
                     <span>Paket Tarif &amp; Top-Up</span>
@@ -3129,6 +3133,7 @@
         </div>
     </section>
 
+    <?php if (!empty($approvedTestimonials)): ?>
     <!-- Section: Testimoni & Bukti Nyata Akademisi (Fase 1 Social Proof) -->
     <section id="testimoni" class="section" style="background: #f8fafc; border-top: 1px solid var(--border); position: relative;">
         <div class="container">
@@ -3145,46 +3150,17 @@
                 <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 100px; padding: 8px 24px; display: inline-flex; align-items: center; gap: 10px; box-shadow: var(--shadow-sm);">
                     <div style="color: #f59e0b; font-size: 16px;">★★★★★</div>
                     <div style="font-size: 13px; font-weight: 700; color: var(--text-dark);">
-                        <?= number_format($testimonialStats['avg_rating'] ?? 4.9, 1) ?> / 5.0
+                        <?= number_format($testimonialStats['avg_rating'] ?? 5.0, 1) ?> / 5.0
                     </div>
                     <div style="font-size: 12px; color: var(--text-muted);">
-                        (Skor Kepuasan dari <?= max(120, (int)($testimonialStats['total_reviews'] ?? 0) + 120) ?>+ Ulasan Terverifikasi)
+                        (Skor Kepuasan dari <?= (int)($testimonialStats['total_reviews'] ?? count($approvedTestimonials)) ?>+ Ulasan Terverifikasi)
                     </div>
                 </div>
             </div>
 
             <!-- Testimonials Grid -->
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;" data-aos="fade-up" data-aos-delay="200">
-                <?php 
-                    $displayTestis = !empty($approvedTestimonials) ? $approvedTestimonials : [
-                        [
-                            'display_name'        => 'R***',
-                            'author_role'         => 'Mahasiswa S1 Teknik Informatika',
-                            'display_institution' => 'Perguruan Tinggi Negeri, Yogyakarta',
-                            'rating'              => 5,
-                            'content'             => 'Alhamdulillah sangat terbantu untuk verifikasi bab 2 dan bab 4 sebelum sidang skripsi. Deteksi sitasi masa depannya menyelamatkan saya dari salah kutip tahun rujukan.',
-                            'is_featured'         => 1,
-                        ],
-                        [
-                            'display_name'        => 'Dr. H***',
-                            'author_role'         => 'Dosen Pembimbing & Dewan Penguji',
-                            'display_institution' => 'Fakultas Ekonomi & Bisnis',
-                            'rating'              => 5,
-                            'content'             => 'Panduan pertanyaan ujian lisan yang dirumuskan sangat aplikatif untuk memvalidasi apakah mahasiswa benar-benar memahami metodologi riset yang ditulisnya.',
-                            'is_featured'         => 1,
-                        ],
-                        [
-                            'display_name'        => 'A. P***',
-                            'author_role'         => 'Pengelola Jurnal & Peneliti',
-                            'display_institution' => 'Jurnal Terakreditasi SINTA 2',
-                            'rating'              => 5,
-                            'content'             => 'Dekomposisi frasa metodologi membuktikan bab metode kami adalah formulasi ilmiah baku, bukan plagiat substantif. Sangat adil dan kredibel.',
-                            'is_featured'         => 1,
-                        ],
-                    ];
-                ?>
-
-                <?php foreach ($displayTestis as $tItem): ?>
+                <?php foreach ($approvedTestimonials as $tItem): ?>
                     <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 20px; padding: 28px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s, box-shadow 0.2s; position: relative;">
                         <?php if (!empty($tItem['is_featured'])): ?>
                             <div style="position: absolute; top: -10px; right: 20px; background: #fef3c7; color: #92400e; border: 1px solid #fde68a; border-radius: 20px; padding: 2px 10px; font-size: 10px; font-weight: 700; text-transform: uppercase;">
@@ -3235,6 +3211,7 @@
             </div>
         </div>
     </section>
+    <?php endif; ?>
 
     <!-- Section 4: Paket Berlangganan & Top-Up Kuota (Midtrans Aligned) -->
     <section id="langganan" class="section" style="background: #ffffff; border-top: 1px solid var(--border); position: relative;">
