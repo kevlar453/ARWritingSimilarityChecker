@@ -296,6 +296,11 @@ class TelegramNotifier
         $hash = md5(get_class($exception) . $exception->getMessage() . $exception->getFile() . $exception->getLine());
         $incidentId = 'INC-' . strtoupper(substr($hash, 0, 8));
 
+        // Abaikan notifikasi untuk 404 / PageNotFoundException agar tidak memicu false alarm
+        if ($exception instanceof \CodeIgniter\Exceptions\PageNotFoundException) {
+            return $incidentId;
+        }
+
         // Tentukan direktori writable secara aman (baik saat di dalam framework CI maupun standalone)
         $writableDir = defined('WRITEPATH') ? WRITEPATH : (defined('APPPATH') ? dirname(APPPATH) . '/writable/' : sys_get_temp_dir() . '/');
         $cacheDir = rtrim($writableDir, '/\\') . '/cache/';

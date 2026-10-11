@@ -7,10 +7,12 @@
 use CodeIgniter\CodeIgniter;
 
 $incidentId = 'INC-' . strtoupper(substr(md5($file . $line . $exception->getMessage() . time()), 0, 8));
-try {
-    $incidentId = \App\Libraries\TelegramNotifier::notifyException($exception);
-} catch (\Throwable $t) {
-    // Failsafe
+if (! ($exception instanceof \CodeIgniter\Exceptions\PageNotFoundException)) {
+    try {
+        $incidentId = \App\Libraries\TelegramNotifier::notifyException($exception);
+    } catch (\Throwable $t) {
+        // Failsafe
+    }
 }
 ?>
 <!DOCTYPE html>
