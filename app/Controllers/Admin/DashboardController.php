@@ -233,8 +233,17 @@ class DashboardController extends BaseController
         $featureStats = $voteModel->getFeatureStats();
         $recentFeedback = $voteModel->getRecentFeedback(25);
         $testimonialStats = $testimonialModel->getStats();
+
+        // Ambil daftar user_id yang pernah membeli paket apa saja
+        $paidUserRows = $db->table('payment_transactions')
+                           ->select('DISTINCT user_id')
+                           ->whereIn('transaction_status', ['settlement', 'capture'])
+                           ->get()
+                           ->getResultArray();
+        $paidUserMap = array_column($paidUserRows, 'user_id', 'user_id');
+
         $testimonialsList = $db->table('testimonials t')
-                               ->select('t.*, u.name as user_name, u.email as user_email, d.title as document_title')
+                               ->select('t.*, u.name as user_name, u.email as user_email, u.subscription_tier, d.title as document_title')
                                ->join('users u', 'u.id = t.user_id', 'left')
                                ->join('reports r', 'r.id = t.report_id', 'left')
                                ->join('documents d', 'd.id = r.document_id', 'left')
@@ -242,6 +251,13 @@ class DashboardController extends BaseController
                                ->limit(100)
                                ->get()
                                ->getResultArray();
+
+        foreach ($testimonialsList as &$item) {
+            $uId = $item['user_id'];
+            $tier = $item['subscription_tier'] ?? 'free';
+            $item['has_purchased'] = ($uId && (isset($paidUserMap[$uId]) || $tier !== 'free'));
+        }
+        unset($item);
 
         return view('admin/index', [
             'activeTab'            => $activeTab,

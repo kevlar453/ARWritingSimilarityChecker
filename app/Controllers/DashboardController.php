@@ -526,6 +526,17 @@ class DashboardController extends BaseController
         $userModel = new \App\Models\UserModel();
         $currentUser = $userId ? $userModel->find($userId) : null;
 
+        $paymentModel = new \App\Models\PaymentTransactionModel();
+        $hasPurchased = false;
+        if ($userId) {
+            $hasPurchased = $paymentModel->where('user_id', $userId)
+                ->whereIn('transaction_status', ['settlement', 'capture'])
+                ->countAllResults() > 0;
+            if (!$hasPurchased && !empty($currentUser['subscription_tier']) && $currentUser['subscription_tier'] !== 'free') {
+                $hasPurchased = true;
+            }
+        }
+
         return view('dashboard/report', [
             'report'              => $report,
             'document'            => $document,
@@ -549,6 +560,7 @@ class DashboardController extends BaseController
             'userVotes'           => $userVotes,
             'userReview'          => $userReview,
             'currentUser'         => $currentUser,
+            'hasPurchased'        => $hasPurchased,
         ]);
     }
 

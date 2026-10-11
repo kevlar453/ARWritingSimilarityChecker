@@ -2336,14 +2336,23 @@
                         <div class="w-10 h-10 rounded-xl bg-amber-400/20 border border-amber-400/30 text-amber-300 flex items-center justify-center text-xl flex-shrink-0">
                             🎓
                         </div>
-                        <div class="space-y-1">
+                        <div class="space-y-1.5">
                             <div class="flex items-center gap-2 flex-wrap">
                                 <span class="text-xs font-bold uppercase tracking-wider text-amber-300 bg-amber-400/10 px-2.5 py-0.5 rounded-full border border-amber-400/30">Program Spesial</span>
                                 <h4 class="text-sm font-bold text-white">Peluang Terpilih Menjadi Duta Kampus AR Tilik (Campus Ambassador)</h4>
                             </div>
                             <p class="text-xs text-slate-300 leading-relaxed">
-                                Pengguna yang berpartisipasi memberikan rating, voting fitur, dan ulasan/testimoni berkesempatan diprioritaskan menjadi <strong>Duta Kampus resmi AR Tilik</strong>. Dapatkan sertifikat apresiasi, kuota pemeriksaan naskah gratis, akses fitur laboratorium eksklusif, serta komisi afiliasi tertinggi di kampus Anda.
+                                Pengguna yang aktif memberikan rating &amp; ulasan serta <strong>telah pernah melakukan pembelian paket apapun</strong> berkesempatan diprioritaskan terpilih menjadi <strong>Duta Kampus resmi AR Tilik</strong>. Dapatkan sertifikat apresiasi, kuota naskah gratis, akses fitur laboratorium eksklusif, serta bagi hasil afiliasi tertinggi di kampus Anda.
                             </p>
+                            <?php if (!empty($hasPurchased)): ?>
+                                <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                                    <span>✓</span> <span>Akun Anda Memenuhi Syarat Kualifikasi (Pelanggan Pembeli Terverifikasi)</span>
+                                </div>
+                            <?php else: ?>
+                                <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-medium bg-amber-500/15 text-amber-200 border border-amber-500/30">
+                                    <span>💡</span> <span>Syarat Seleksi: Terbuka untuk akun yang pernah membeli paket pemeriksaan apapun. <a href="<?= base_url('pricing') ?>" class="underline font-bold text-amber-300 hover:text-white">Beli paket untuk aktivasi &rarr;</a></span>
+                                </div>
+                            <?php endif; ?>
                         </div>
                     </div>
                     <div class="self-stretch sm:self-auto flex items-center justify-end flex-shrink-0">
@@ -2502,7 +2511,7 @@
                 <div class="bg-amber-50 border border-amber-200/80 rounded-xl p-2.5 text-left flex items-start gap-2">
                     <span class="text-base flex-shrink-0">🎓</span>
                     <p class="text-[11px] text-amber-900 leading-snug">
-                        <strong>Peluang Duta Kampus:</strong> Berikan penilaian &amp; ulasan untuk berkesempatan terpilih menjadi Duta Kampus resmi AR Tilik dengan kuota gratis &amp; insentif khusus!
+                        <strong>Peluang Duta Kampus:</strong> Berikan penilaian &amp; ulasan untuk berkesempatan terpilih menjadi Duta Kampus resmi AR Tilik (khusus pelanggan yang pernah membeli paket pemeriksaan)!
                     </p>
                 </div>
             </div>

@@ -2678,6 +2678,11 @@
                                                 <?php if (!empty($t['is_anonymous'])): ?>
                                                     <span class="inline-block mt-1 text-[9px] px-1.5 py-0.5 rounded bg-slate-700 text-amber-300 font-mono-code">Anonim Publik</span>
                                                 <?php endif; ?>
+                                                <?php if (!empty($t['has_purchased'])): ?>
+                                                    <span class="inline-block mt-1 text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold" title="Pengguna telah pernah membeli paket pemeriksaan">🎓 Eligible Duta Kampus</span>
+                                                <?php else: ?>
+                                                    <span class="inline-block mt-1 text-[9px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-500" title="Akun belum memiliki riwayat pembelian paket">Non-Buyer</span>
+                                                <?php endif; ?>
                                             </td>
                                             <td class="py-3 px-3 align-top whitespace-nowrap">
                                                 <div class="text-amber-400 font-bold">
