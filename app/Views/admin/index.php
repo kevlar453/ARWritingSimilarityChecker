@@ -77,8 +77,9 @@
             animation: spinPreloader 0.8s linear infinite;
         }
     </style>
-    <!-- Tailwind CSS CDN -->
+    <!-- Tailwind CSS CDN & Chart.js CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -1473,10 +1474,10 @@
                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                             <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                         </span>
-                        <span class="font-medium text-slate-200">Auto-Reload Angka</span>
+                        <span class="font-medium text-slate-200">Sinkronisasi Real-Time</span>
                         <span class="text-slate-500">•</span>
                         <span class="text-[11px] text-slate-400 font-mono" id="visitor-last-sync">Memuat...</span>
-                        <button type="button" onclick="refreshVisitorStatsRealtime(true)" id="btn-manual-sync-visitors" class="ml-1 p-1 hover:text-white text-slate-400 hover:bg-slate-700/50 rounded transition cursor-pointer" title="Perbarui angka sekarang">
+                        <button type="button" onclick="refreshVisitorStatsRealtime(true)" id="btn-manual-sync-visitors" class="ml-1 p-1 hover:text-white text-slate-400 hover:bg-slate-700/50 rounded transition cursor-pointer" title="Perbarui data sekarang">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                         </button>
                     </div>
@@ -1501,7 +1502,54 @@
                     </div>
                 </div>
 
-                <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl overflow-hidden shadow-sm">
+                <!-- KARTU GRAFIK ANALITIK VISUAL (Real-time Live Sync) -->
+                <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-4 sm:p-5 shadow-sm space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                                <span>📈</span> Tren Kunjungan Harian Landing Page
+                            </h3>
+                            <p class="text-[11px] text-slate-400">Visualisasi dinamika Pengunjung Unik dan Total Tayangan (Hits)</p>
+                        </div>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <!-- Custom Legend Badges -->
+                            <div class="inline-flex items-center gap-3 px-3 py-1 bg-slate-900/60 border border-slate-700/70 rounded-xl text-xs">
+                                <span class="inline-flex items-center gap-1.5 text-emerald-400 font-semibold text-[11px]">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span> Pengunjung Unik
+                                </span>
+                                <span class="inline-flex items-center gap-1.5 text-sky-400 font-semibold text-[11px]">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-sky-400"></span> Total Tayangan
+                                </span>
+                            </div>
+                            <!-- Time Range Selector -->
+                            <div class="inline-flex p-0.5 rounded-xl bg-slate-900/80 border border-slate-700/70 text-xs font-medium">
+                                <button type="button" onclick="setChartRange(7, this)" class="chart-range-btn px-2.5 py-1 rounded-lg text-[11px] text-slate-300 hover:text-white transition cursor-pointer">7 Hari</button>
+                                <button type="button" onclick="setChartRange(14, this)" class="chart-range-btn px-2.5 py-1 rounded-lg text-[11px] text-slate-300 hover:text-white transition cursor-pointer">14 Hari</button>
+                                <button type="button" onclick="setChartRange(30, this)" class="chart-range-btn active-range-btn px-2.5 py-1 rounded-lg text-[11px] bg-indigo-600 text-white font-semibold shadow-xs transition cursor-pointer">30 Hari</button>
+                            </div>
+                            <!-- Tombol Toggle Tabel Data -->
+                            <button type="button" onclick="toggleVisitorTable()" id="btn-toggle-visitor-table" class="px-2.5 py-1 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700/70 text-slate-300 hover:text-white text-[11px] font-medium transition flex items-center gap-1.5 cursor-pointer" title="Tampilkan rincian tabel tabular">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                <span id="label-toggle-table">Buka Tabel Data</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Canvas Grafik -->
+                    <div class="relative w-full" style="height: 310px;">
+                        <canvas id="visitorAnalyticsChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- TABEL DATA RINCIAN (COLLAPSIBLE / OPSIONAL) -->
+                <div id="visitorTableWrapper" class="hidden bg-slate-800/40 border border-slate-700/60 rounded-2xl overflow-hidden shadow-sm transition-all duration-300">
+                    <div class="px-4 py-3 bg-slate-900/60 border-b border-slate-700/60 flex items-center justify-between">
+                        <span class="text-xs font-bold text-slate-300 flex items-center gap-2">
+                            <span>📋</span> Rincian Kunjungan Harian (Tabular)
+                        </span>
+                        <span class="text-[11px] text-slate-400">Sinkronisasi otomatis aktif</span>
+                    </div>
+
                     <!-- Mobile List: Tampilan Kartu Responsif Pengunjung Harian (Layar Ponsel) -->
                     <div id="mobile-visitor-list" class="p-4 space-y-3 md:hidden">
                         <?php if (empty($dailyVisitors)): ?>
@@ -3826,17 +3874,215 @@
         }
 
         // ========================================================
-        // REALTIME AUTO-RELOAD KHUSUS ANGKA PENGUNJUNG (ZERO FLICKER)
+        // SINKRONISASI REAL-TIME VISITOR & GRAFIK VISUAL (ZERO FLICKER)
         // ========================================================
+        const initialVisitorDaily = <?= json_encode(array_map(function($row) {
+            $u = (int) $row['unique_visitors'];
+            $h = (int) $row['total_hits'];
+            $a = $u > 0 ? round($h / $u, 2) : 1.00;
+            return [
+                'visit_date'      => $row['visit_date'],
+                'full_date'       => date('d F Y', strtotime($row['visit_date'])),
+                'unique_visitors' => $u,
+                'total_hits'      => $h,
+                'average_hits'    => number_format($a, 2),
+            ];
+        }, array_reverse($dailyVisitors ?? []))) ?>;
+
+        let visitorChart = null;
+        let rawDailyData = initialVisitorDaily || [];
+        let currentRangeDays = 30;
         let visitorPollInterval = null;
         let isFetchingVisitor = false;
+
+        function formatChartDate(dateStr) {
+            if (!dateStr) return '';
+            const d = new Date(dateStr);
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+            return `${d.getDate()} ${months[d.getMonth()]}`;
+        }
+
+        function initVisitorChart() {
+            const canvas = document.getElementById('visitorAnalyticsChart');
+            if (!canvas) return;
+
+            const sliced = rawDailyData.slice(-currentRangeDays);
+            const labels = sliced.map(d => formatChartDate(d.visit_date));
+            const uniqueData = sliced.map(d => Number(d.unique_visitors));
+            const hitsData = sliced.map(d => Number(d.total_hits));
+
+            const ctx = canvas.getContext('2d');
+
+            // Soft gradients
+            const gradientHits = ctx.createLinearGradient(0, 0, 0, 280);
+            gradientHits.addColorStop(0, 'rgba(56, 189, 248, 0.28)');
+            gradientHits.addColorStop(1, 'rgba(56, 189, 248, 0.00)');
+
+            const gradientUnique = ctx.createLinearGradient(0, 0, 0, 280);
+            gradientUnique.addColorStop(0, 'rgba(16, 185, 129, 0.30)');
+            gradientUnique.addColorStop(1, 'rgba(16, 185, 129, 0.00)');
+
+            visitorChart = new Chart(canvas, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Total Tayangan (Hits)',
+                            data: hitsData,
+                            borderColor: '#38bdf8',
+                            backgroundColor: gradientHits,
+                            borderWidth: 2.5,
+                            fill: true,
+                            tension: 0.35,
+                            pointBackgroundColor: '#0f172a',
+                            pointBorderColor: '#38bdf8',
+                            pointBorderWidth: 2,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            pointHoverBorderWidth: 3,
+                            pointHoverBackgroundColor: '#38bdf8',
+                            order: 2
+                        },
+                        {
+                            label: 'Pengunjung Unik',
+                            data: uniqueData,
+                            borderColor: '#10b981',
+                            backgroundColor: gradientUnique,
+                            borderWidth: 2.5,
+                            fill: true,
+                            tension: 0.35,
+                            pointBackgroundColor: '#0f172a',
+                            pointBorderColor: '#10b981',
+                            pointBorderWidth: 2,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            pointHoverBorderWidth: 3,
+                            pointHoverBackgroundColor: '#10b981',
+                            order: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                            titleColor: '#ffffff',
+                            titleFont: { size: 12, weight: '700', family: 'Plus Jakarta Sans' },
+                            bodyColor: '#cbd5e1',
+                            bodyFont: { size: 11, family: 'Plus Jakarta Sans' },
+                            borderColor: 'rgba(51, 65, 85, 0.8)',
+                            borderWidth: 1,
+                            padding: 12,
+                            cornerRadius: 12,
+                            boxPadding: 6,
+                            callbacks: {
+                                title: function(items) {
+                                    if (!items.length) return '';
+                                    const idx = items[0].dataIndex;
+                                    const d = sliced[idx];
+                                    return d ? d.full_date || d.visit_date : items[0].label;
+                                },
+                                label: function(item) {
+                                    return ` ${item.dataset.label}: ${item.raw.toLocaleString('id-ID')}`;
+                                },
+                                afterBody: function(items) {
+                                    if (!items.length) return '';
+                                    const idx = items[0].dataIndex;
+                                    const d = sliced[idx];
+                                    if (d && Number(d.unique_visitors) > 0) {
+                                        const avg = (Number(d.total_hits) / Number(d.unique_visitors)).toFixed(2);
+                                        return ` Rasio: ${avg} hits / pengunjung`;
+                                    }
+                                    return '';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.04)',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: '#64748b',
+                                font: { size: 10, family: 'Plus Jakarta Sans' },
+                                maxRotation: 0,
+                                autoSkip: true,
+                                maxTicksLimit: 10
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.05)',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: '#64748b',
+                                font: { size: 10, family: 'JetBrains Mono' },
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateChartWithData(newDailyData) {
+            if (Array.isArray(newDailyData) && newDailyData.length > 0) {
+                rawDailyData = newDailyData;
+            }
+            if (!visitorChart) {
+                initVisitorChart();
+                return;
+            }
+            const sliced = rawDailyData.slice(-currentRangeDays);
+            visitorChart.data.labels = sliced.map(d => formatChartDate(d.visit_date));
+            visitorChart.data.datasets[0].data = sliced.map(d => Number(d.total_hits));
+            visitorChart.data.datasets[1].data = sliced.map(d => Number(d.unique_visitors));
+            visitorChart.update('none');
+        }
+
+        function setChartRange(days, btn) {
+            currentRangeDays = days;
+            document.querySelectorAll('.chart-range-btn').forEach(b => {
+                b.classList.remove('bg-indigo-600', 'text-white', 'font-semibold', 'shadow-xs');
+                b.classList.add('text-slate-300');
+            });
+            btn.classList.add('bg-indigo-600', 'text-white', 'font-semibold', 'shadow-xs');
+            btn.classList.remove('text-slate-300');
+
+            updateChartWithData(rawDailyData);
+        }
+
+        function toggleVisitorTable() {
+            const wrap = document.getElementById('visitorTableWrapper');
+            const label = document.getElementById('label-toggle-table');
+            if (!wrap) return;
+
+            if (wrap.classList.contains('hidden')) {
+                wrap.classList.remove('hidden');
+                if (label) label.textContent = 'Tutup Tabel Data';
+            } else {
+                wrap.classList.add('hidden');
+                if (label) label.textContent = 'Buka Tabel Data';
+            }
+        }
 
         function updateNumberWithHighlight(el, newFormattedVal) {
             if (!el) return;
             const currentVal = el.textContent.trim();
             if (currentVal !== newFormattedVal) {
                 el.textContent = newFormattedVal;
-                // Efek visual highlight halus ketika angka berubah
                 el.classList.add('scale-105', 'text-emerald-300');
                 setTimeout(() => {
                     el.classList.remove('scale-105', 'text-emerald-300');
@@ -3869,7 +4115,12 @@
                     updateNumberWithHighlight(document.getElementById('metric-today-unique'), Number(stats.today_unique).toLocaleString('en-US'));
                     updateNumberWithHighlight(document.getElementById('metric-today-hits'), Number(stats.today_hits).toLocaleString('en-US'));
 
-                    // Update Baris Tabel Hari Ini (Desktop)
+                    // Update Grafik Visual Real-time
+                    if (Array.isArray(data.daily) && data.daily.length > 0) {
+                        updateChartWithData(data.daily);
+                    }
+
+                    // Update Baris Tabel Hari Ini (Desktop & Mobile)
                     if (data.today && data.today.visit_date) {
                         const todayDate = data.today.visit_date;
                         const trToday = document.querySelector(`tr[data-visit-date="${todayDate}"]`);
@@ -3882,7 +4133,6 @@
                             if (tdAvg) tdAvg.textContent = data.today.average_hits;
                         }
 
-                        // Update Kartu Hari Ini (Mobile)
                         const mobToday = document.querySelector(`div[data-mobile-date="${todayDate}"]`);
                         if (mobToday) {
                             const mUnique = mobToday.querySelector('[data-cell="unique"]');
@@ -3911,7 +4161,10 @@
 
         function initVisitorRealtimePolling() {
             const metricEl = document.getElementById('metric-total-unique');
-            if (!metricEl) return; // Hanya aktif jika elemen metrik pengunjung ada di tab saat ini
+            if (!metricEl) return;
+
+            // Inisialisasi Grafik
+            initVisitorChart();
 
             const syncEl = document.getElementById('visitor-last-sync');
             if (syncEl) {

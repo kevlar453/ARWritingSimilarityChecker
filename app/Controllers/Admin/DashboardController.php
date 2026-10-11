@@ -786,6 +786,30 @@ class DashboardController extends BaseController
         $hits = (int) ($todayRow['total_hits'] ?? $stats['today_hits'] ?? 0);
         $avg = $unique > 0 ? round($hits / $unique, 2) : 1.00;
 
+        // Data tren harian untuk visualisasi grafik analitik (30 hari terakhir, kronologis ASC)
+        $daily = $db->table('landing_visitors')
+                    ->select('visit_date, COUNT(DISTINCT visitor_hash) as unique_visitors, SUM(hits) as total_hits')
+                    ->groupBy('visit_date')
+                    ->orderBy('visit_date', 'DESC')
+                    ->limit(30)
+                    ->get()
+                    ->getResultArray();
+
+        $daily = array_reverse($daily);
+
+        $dailyFormatted = array_map(function ($row) {
+            $u = (int) $row['unique_visitors'];
+            $h = (int) $row['total_hits'];
+            $a = $u > 0 ? round($h / $u, 2) : 1.00;
+            return [
+                'visit_date'      => $row['visit_date'],
+                'full_date'       => date('d F Y', strtotime($row['visit_date'])),
+                'unique_visitors' => $u,
+                'total_hits'      => $h,
+                'average_hits'    => number_format($a, 2),
+            ];
+        }, $daily);
+
         return $this->response->setJSON([
             'status' => 'success',
             'stats'  => [
@@ -801,6 +825,7 @@ class DashboardController extends BaseController
                 'total_hits'       => $hits,
                 'average_hits'     => number_format($avg, 2),
             ],
+            'daily'     => $dailyFormatted,
             'synced_at' => date('H:i:s'),
         ]);
     }
