@@ -1939,8 +1939,13 @@ class DashboardController extends BaseController
 
         // 2. Kosongkan teks mentah di document_chunks dan document_pages
         $db = db_connect();
-        $db->table('document_chunks')->where('document_id', $documentId)->update(['text' => '']);
-        $db->table('document_pages')->where('document_id', $documentId)->update(['raw_text' => '']);
+        $db->table('document_chunks')->where('document_id', $documentId)->update([
+            'text'            => '',
+            'normalized_text' => '',
+        ]);
+        $db->table('document_pages')->where('document_id', $documentId)->update([
+            'text' => '',
+        ]);
 
         // 3. Update status dokumen
         $now = date('Y-m-d H:i:s');
