@@ -1451,9 +1451,16 @@ $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evi
                         <p class="text-xs text-slate-400">Verifikasi konsistensi logika antar-bab, kontradiksi metodologi, integritas sitasi, &amp; panduan pertanyaan ujian lisan sidang skripsi</p>
                     </div>
                 </div>
+                <?php
+                    $aiAssessment = $report['ai_assessment'] ?? \App\Controllers\DashboardController::extractAiMetrics($report);
+                    $aiScoreVal = (float)($aiAssessment['score'] ?? 0.0);
+                ?>
                 <div class="flex items-center gap-2 self-start sm:self-auto flex-wrap">
                     <span class="text-xs font-mono-code font-bold px-3 py-1 rounded-full border shadow-2xs <?= $gLevelBadge ?>">
-                        Indikasi AI: <strong class="<?= $gLevelColor ?>"><?= esc($gAiLevel) ?></strong>
+                        Indikasi AI: <strong class="<?= $gLevelColor ?>"><?= number_format($aiScoreVal, 1) ?>% (<?= esc($gAiLevel) ?>)</strong>
+                    </span>
+                    <span class="text-[10px] text-slate-500 font-mono-code bg-slate-50 px-2 py-0.5 rounded border border-slate-200">
+                        Rentang: [0–34%] Rendah • [35–69%] Menengah • [70–100%] Tinggi
                     </span>
                 </div>
             </div>

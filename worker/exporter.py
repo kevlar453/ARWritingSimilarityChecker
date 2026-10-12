@@ -348,8 +348,11 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
         ai_row = f"""
             <tr>
                 <td><strong>[Eksperimental] Indikator Gaya Bahasa &amp; Stylometri</strong><br><span style="font-size: 7.5pt; color: #64748b;">Eksperimental — Bukan Vonis AI</span></td>
-                <td style="text-align: center; font-weight: bold; color: {ai_color}; font-size: 10pt;">
+                <td style="text-align: center; font-weight: bold; color: {ai_color}; font-size: 10pt; line-height: 1.25;">
                     {ai_prob:.1f}% Indikator
+                    <div style="font-size: 6.5pt; font-weight: normal; color: #64748b; margin-top: 2px;">
+                        Rentang: [0–49%] Rendah &bull; [50–74%] Menengah &bull; [&ge;75%] Tinggi
+                    </div>
                 </td>
                 <td>
                     <strong>{ai_lbl}</strong>
@@ -367,8 +370,11 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
         xgb_row = f"""
             <tr>
                 <td><strong>Sintesis Risiko Akademik Berbobot</strong><br><span style="font-size: 7.5pt; color: #64748b;">Analisis Multi-Dimensi Determinan Risiko</span></td>
-                <td style="text-align: center; font-weight: bold; color: {xgb_color}; font-size: 10pt;">
+                <td style="text-align: center; font-weight: bold; color: {xgb_color}; font-size: 10pt; line-height: 1.25;">
                     {xgb_score:.1f}% Indeks Risiko
+                    <div style="font-size: 6.5pt; font-weight: normal; color: #64748b; margin-top: 2px;">
+                        Rentang: [0–34%] Rendah &bull; [35–69%] Menengah &bull; [70–100%] Tinggi
+                    </div>
                 </td>
                 <td>
                     <strong>{xgb_lbl}</strong>
@@ -394,16 +400,26 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
     g_cit = g_data.get("integritas_sitasi") or []
     g_questions = g_data.get("pertanyaan_kritis_dosen") or []
 
+    # Penilaian Komposit AI & Stylometri (diselaraskan penuh dengan Sertifikat & Daftar Karya Ilmiah)
+    from worker.generate_certificate_pdf import extract_ai_assessment
+    ai_composite_score, ai_composite_label = extract_ai_assessment(evidence_data)
+    if ai_composite_score is None:
+        ai_composite_score = 0.0
+    ai_composite_color = "#b91c1c" if (ai_composite_score >= 70.0 or g_level == "TINGGI") else ("#b45309" if (ai_composite_score >= 35.0 or g_level == "SEDANG") else "#047857")
+
     forensic_row = ""
     if forensic_completed:
         forensic_row = f"""
             <tr>
                 <td><strong>Audit Forensik Cerdas</strong><br><span style="font-size: 7.5pt; color: #64748b;">Konsistensi Semantik Antar-Bab &amp; Integritas Logika</span></td>
-                <td style="text-align: center; font-weight: bold; color: {g_color}; font-size: 10pt;">
-                    Indikasi AI: {g_level}
+                <td style="text-align: center; font-weight: bold; color: {ai_composite_color}; font-size: 10pt; line-height: 1.25;">
+                    {ai_composite_score:.1f}% Indikasi AI
+                    <div style="font-size: 6.5pt; font-weight: normal; color: #64748b; margin-top: 2px;">
+                        Rentang: [0–34%] Rendah &bull; [35–69%] Menengah &bull; [70–100%] Tinggi
+                    </div>
                 </td>
                 <td>
-                    <strong>Verifikasi Semantik Otomatis</strong>
+                    <strong>{ai_composite_label} (Status: {g_level})</strong>
                     <div style="font-size: 7.5pt; color: #475569;">
                         {len(g_contra)} inkonsistensi metodologi, {len(g_questions)} panduan pertanyaan sidang dosen
                     </div>
@@ -413,19 +429,25 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
 
     audit_html = f"""
     <h3 class="section-header">Audit Integritas Naskah, Sitasi &amp; Analisis Lintas Bahasa</h3>
+    <div style="font-size: 7pt; color: #64748b; margin-top: -3px; margin-bottom: 6px;">
+        * Panduan rentang nilai standar: <strong>[0–34%] Rendah (Aman)</strong> &bull; <strong>[35–69%] Menengah (Telaah)</strong> &bull; <strong>[70–100%] Tinggi (Atensi)</strong>. Rincian skala spesifik tercantum di bawah masing-masing indikator.
+    </div>
     <table class="data-table" style="margin-bottom: 14px; page-break-inside: avoid;">
         <thead>
             <tr>
-                <th style="text-align: left; width: 35%;">Parameter Audit</th>
-                <th style="text-align: center; width: 25%;">Skor / Indikator</th>
-                <th style="text-align: left; width: 40%;">Status &amp; Keterangan</th>
+                <th style="text-align: left; width: 33%;">Parameter Audit</th>
+                <th style="text-align: center; width: 30%;">Skor / Indikator</th>
+                <th style="text-align: left; width: 37%;">Status &amp; Keterangan</th>
             </tr>
         </thead>
         <tbody>
             <tr>
                 <td><strong>Integritas Karakter &amp; Anti-Evasion</strong><br><span style="font-size: 7.5pt; color: #64748b;">Deteksi Homoglif, Zero-Width, White-Text</span></td>
-                <td style="text-align: center; font-weight: bold; color: {ev_color}; font-size: 10pt;">
+                <td style="text-align: center; font-weight: bold; color: {ev_color}; font-size: 10pt; line-height: 1.25;">
                     {ev_risk:.1f}% Risiko
+                    <div style="font-size: 6.5pt; font-weight: normal; color: #64748b; margin-top: 2px;">
+                        Rentang: [0–9%] Rendah &bull; [10–34%] Menengah &bull; [&ge;35%] Tinggi
+                    </div>
                 </td>
                 <td>
                     <strong>{ev_lbl}</strong>
@@ -434,8 +456,11 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
             </tr>
             <tr>
                 <td><strong>Konsistensi Sitasi &amp; Daftar Pustaka</strong><br><span style="font-size: 7.5pt; color: #64748b;">Audit Sitasi Gaib (Phantom Citations)</span></td>
-                <td style="text-align: center; font-weight: bold; color: {cit_color}; font-size: 10pt;">
+                <td style="text-align: center; font-weight: bold; color: {cit_color}; font-size: 10pt; line-height: 1.25;">
                     {cit_health:.1f} / 100
+                    <div style="font-size: 6.5pt; font-weight: normal; color: #64748b; margin-top: 2px;">
+                        Rentang: [80–100] Prima &bull; [50–79] Menengah &bull; [&lt;50] Kritis
+                    </div>
                 </td>
                 <td>
                     <strong>{cit_label}</strong>
@@ -444,8 +469,11 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
             </tr>
             <tr>
                 <td><strong>Plagiarisme Terjemahan (ID ↔ EN)</strong><br><span style="font-size: 7.5pt; color: #64748b;">Analisis Semantik Proyeksi Konsep Dwibahasa</span></td>
-                <td style="text-align: center; font-weight: bold; color: {cl_color}; font-size: 10pt;">
+                <td style="text-align: center; font-weight: bold; color: {cl_color}; font-size: 10pt; line-height: 1.25;">
                     {cl_score:.1f}% Keselarasan
+                    <div style="font-size: 6.5pt; font-weight: normal; color: #64748b; margin-top: 2px;">
+                        Rentang: [0–14%] Rendah &bull; [15–34%] Menengah &bull; [&ge;35%] Tinggi
+                    </div>
                 </td>
                 <td>
                     <strong>{cl_lbl}</strong>

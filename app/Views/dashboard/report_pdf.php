@@ -585,19 +585,25 @@ if ($dec === 'match') {
         $clMatchPdf = !empty($clAudit['is_cross_lingual_match']);
     ?>
     <h3 class="section-header">3. Audit Integritas Naskah, Sitasi &amp; Analisis Lintas Bahasa</h3>
+    <div style="font-size: 7pt; color: #64748b; margin-top: -3px; margin-bottom: 6px;">
+        * Panduan rentang nilai standar: <strong>[0–34%] Rendah (Aman)</strong> &bull; <strong>[35–69%] Menengah (Telaah)</strong> &bull; <strong>[70–100%] Tinggi (Atensi)</strong>. Rincian skala spesifik tercantum di bawah masing-masing indikator.
+    </div>
     <table class="data-table" style="margin-bottom: 14px; page-break-inside: avoid;">
         <thead>
             <tr>
-                <th style="text-align: left; width: 35%;">Parameter Audit</th>
-                <th style="text-align: center; width: 25%;">Skor / Indikator</th>
-                <th style="text-align: left; width: 40%;">Status &amp; Keterangan</th>
+                <th style="text-align: left; width: 33%;">Parameter Audit</th>
+                <th style="text-align: center; width: 30%;">Skor / Indikator</th>
+                <th style="text-align: left; width: 37%;">Status &amp; Keterangan</th>
             </tr>
         </thead>
         <tbody>
             <tr>
                 <td><strong>Integritas Karakter &amp; Anti-Evasion</strong><br><span style="font-size: 7.5pt; color: #64748b;">Deteksi Homoglif, Zero-Width, White-Text</span></td>
-                <td style="text-align: center; font-weight: bold; color: <?= $evRisk >= 35 ? '#b91c1c' : ($evRisk >= 10 ? '#b45309' : '#047857') ?>; font-size: 10pt;">
+                <td style="text-align: center; font-weight: bold; color: <?= $evRisk >= 35 ? '#b91c1c' : ($evRisk >= 10 ? '#b45309' : '#047857') ?>; font-size: 10pt; line-height: 1.25;">
                     <?= number_format($evRisk, 1) ?>% Risiko
+                    <div style="font-size: 6.5pt; font-weight: normal; color: #64748b; margin-top: 2px;">
+                        Rentang: [0–9%] Rendah &bull; [10–34%] Menengah &bull; [&ge;35%] Tinggi
+                    </div>
                 </td>
                 <td>
                     <strong><?= $evStatus === 'MANIPULATED' ? 'Manipulasi Terencana Terdeteksi' : ($evStatus === 'SUSPICIOUS' ? 'Perlu Tinjauan Karakter' : 'Otentik &amp; Bebas Rekayasa') ?></strong>
@@ -606,8 +612,11 @@ if ($dec === 'match') {
             </tr>
             <tr>
                 <td><strong>Konsistensi Sitasi &amp; Daftar Pustaka</strong><br><span style="font-size: 7.5pt; color: #64748b;">Audit Sitasi Gaib (Phantom Citations)</span></td>
-                <td style="text-align: center; font-weight: bold; color: <?= $citHealth >= 80 ? '#047857' : ($citHealth >= 50 ? '#b45309' : '#b91c1c') ?>; font-size: 10pt;">
+                <td style="text-align: center; font-weight: bold; color: <?= $citHealth >= 80 ? '#047857' : ($citHealth >= 50 ? '#b45309' : '#b91c1c') ?>; font-size: 10pt; line-height: 1.25;">
                     <?= number_format($citHealth, 1) ?> / 100
+                    <div style="font-size: 6.5pt; font-weight: normal; color: #64748b; margin-top: 2px;">
+                        Rentang: [80–100] Prima &bull; [50–79] Menengah &bull; [&lt;50] Kritis
+                    </div>
                 </td>
                 <td>
                     <strong><?= esc($citAudit['verdict_label'] ?? 'Sitasi Selaras') ?></strong>
@@ -616,8 +625,11 @@ if ($dec === 'match') {
             </tr>
             <tr>
                 <td><strong>Plagiarisme Terjemahan (ID ↔ EN)</strong><br><span style="font-size: 7.5pt; color: #64748b;">Analisis Semantik Proyeksi Konsep Dwibahasa</span></td>
-                <td style="text-align: center; font-weight: bold; color: <?= $clScorePdf >= 35 ? '#b91c1c' : ($clScorePdf >= 15 ? '#b45309' : '#047857') ?>; font-size: 10pt;">
+                <td style="text-align: center; font-weight: bold; color: <?= $clScorePdf >= 35 ? '#b91c1c' : ($clScorePdf >= 15 ? '#b45309' : '#047857') ?>; font-size: 10pt; line-height: 1.25;">
                     <?= number_format($clScorePdf, 1) ?>% Keselarasan
+                    <div style="font-size: 6.5pt; font-weight: normal; color: #64748b; margin-top: 2px;">
+                        Rentang: [0–14%] Rendah &bull; [15–34%] Menengah &bull; [&ge;35%] Tinggi
+                    </div>
                 </td>
                 <td>
                     <strong><?= $clMatchPdf ? 'Terindikasi Terjemahan Langsung' : ($clScorePdf >= 15 ? 'Parafrasa Lintas Bahasa' : 'Orisinal / Bebas Terjemahan Mesin') ?></strong>
@@ -654,12 +666,20 @@ if ($dec === 'match') {
                 $gContraPdf = $gAuditData['inkonsistensi_metodologi_dan_logika'] ?? [];
                 $gCitPdf = $gAuditData['integritas_sitasi'] ?? [];
                 $gQuestionsPdf = $gAuditData['pertanyaan_kritis_dosen'] ?? [];
+
+                $aiAssessmentPdf = \App\Controllers\DashboardController::extractAiMetrics($report);
+                $aiCompScorePdf = (float)($aiAssessmentPdf['score'] ?? 0.0);
+                $aiCompLabelPdf = $aiAssessmentPdf['label'] ?? 'Otentik Alami';
+                $aiCompColorPdf = ($aiCompScorePdf >= 70.0 || $gLevelPdf === 'TINGGI') ? '#b91c1c' : (($aiCompScorePdf >= 35.0 || $gLevelPdf === 'SEDANG') ? '#b45309' : '#047857');
             ?>
             <?php if (!empty($aiAuditPdf)): ?>
             <tr>
                 <td><strong>[Eksperimental] Indikator Gaya Bahasa &amp; Stylometri</strong><br><span style="font-size: 7.5pt; color: #64748b;">Eksperimental — Bukan Vonis AI</span></td>
-                <td style="text-align: center; font-weight: bold; color: <?= $aiProbPdf >= 75 ? '#b91c1c' : ($aiProbPdf >= 50 ? '#b45309' : '#047857') ?>; font-size: 10pt;">
+                <td style="text-align: center; font-weight: bold; color: <?= $aiProbPdf >= 75 ? '#b91c1c' : ($aiProbPdf >= 50 ? '#b45309' : '#047857') ?>; font-size: 10pt; line-height: 1.25;">
                     <?= number_format($aiProbPdf, 1) ?>% Indikator
+                    <div style="font-size: 6.5pt; font-weight: normal; color: #64748b; margin-top: 2px;">
+                        Rentang: [0–49%] Rendah &bull; [50–74%] Menengah &bull; [&ge;75%] Tinggi
+                    </div>
                 </td>
                 <td>
                     <strong><?= esc($aiLabelPdf) ?></strong>
@@ -672,8 +692,11 @@ if ($dec === 'match') {
             <?php if (!empty($xgbAuditPdf)): ?>
             <tr>
                 <td><strong>Sintesis Risiko Akademik Berbobot</strong><br><span style="font-size: 7.5pt; color: #64748b;">Analisis Multi-Dimensi Determinan Risiko</span></td>
-                <td style="text-align: center; font-weight: bold; color: <?= $xgbScorePdf >= 70 ? '#b91c1c' : ($xgbScorePdf >= 35 ? '#b45309' : '#047857') ?>; font-size: 10pt;">
+                <td style="text-align: center; font-weight: bold; color: <?= $xgbScorePdf >= 70 ? '#b91c1c' : ($xgbScorePdf >= 35 ? '#b45309' : '#047857') ?>; font-size: 10pt; line-height: 1.25;">
                     <?= number_format($xgbScorePdf, 1) ?>% Indeks Risiko
+                    <div style="font-size: 6.5pt; font-weight: normal; color: #64748b; margin-top: 2px;">
+                        Rentang: [0–34%] Rendah &bull; [35–69%] Menengah &bull; [70–100%] Tinggi
+                    </div>
                 </td>
                 <td>
                     <strong><?= esc($xgbLabelPdf) ?></strong>
@@ -686,11 +709,14 @@ if ($dec === 'match') {
             <?php if ($geminiCompleted): ?>
             <tr>
                 <td><strong>Audit Forensik Cerdas</strong><br><span style="font-size: 7.5pt; color: #64748b;">Konsistensi Semantik Antar-Bab &amp; Integritas Logika</span></td>
-                <td style="text-align: center; font-weight: bold; color: <?= $gLevelPdf === 'TINGGI' ? '#b91c1c' : ($gLevelPdf === 'SEDANG' ? '#b45309' : '#047857') ?>; font-size: 10pt;">
-                    Indikasi AI: <?= esc($gLevelPdf) ?>
+                <td style="text-align: center; font-weight: bold; color: <?= $aiCompColorPdf ?>; font-size: 10pt; line-height: 1.25;">
+                    <?= number_format($aiCompScorePdf, 1) ?>% Indikasi AI
+                    <div style="font-size: 6.5pt; font-weight: normal; color: #64748b; margin-top: 2px;">
+                        Rentang: [0–34%] Rendah &bull; [35–69%] Menengah &bull; [70–100%] Tinggi
+                    </div>
                 </td>
                 <td>
-                    <strong>Verifikasi Semantik Otomatis</strong>
+                    <strong><?= esc($aiCompLabelPdf) ?> (Status: <?= esc($gLevelPdf) ?>)</strong>
                     <div style="font-size: 7.5pt; color: #475569;">
                         <?= count($gContraPdf) ?> inkonsistensi metodologi, <?= count($gQuestionsPdf) ?> panduan pertanyaan sidang dosen
                     </div>
