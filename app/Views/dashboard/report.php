@@ -59,13 +59,13 @@ $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evi
 
     <!-- Navbar -->
     <nav class="bg-white/95 backdrop-blur-md border-b border-slate-200/90 sticky top-0 z-40 shadow-xs">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between min-h-[3.75rem] sm:min-h-[4rem] py-2 sm:py-2.5 gap-2 sm:gap-4">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between min-h-[3.5rem] sm:min-h-[4rem] py-2 sm:py-2.5 gap-2 sm:gap-4 w-full">
                 <!-- Left: Navigation Back & Brand Context -->
-                <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+                <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
                     <!-- Kembali ke Dashboard (Navigasi hirarkis di sebelah kiri) -->
-                    <a href="<?= base_url('dashboard') ?>" class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 hover:text-indigo-600 px-2.5 sm:px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50/80 hover:bg-white hover:border-slate-300 transition shadow-2xs shrink-0" title="Kembali ke Dashboard">
-                        <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <a href="<?= base_url('dashboard') ?>" class="inline-flex items-center gap-1 text-xs font-semibold text-slate-700 hover:text-indigo-600 px-2 sm:px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50/80 hover:bg-white hover:border-slate-300 transition shadow-2xs shrink-0" title="Kembali ke Dashboard">
+                        <svg class="w-3.5 h-3.5 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                         </svg>
                         <span class="hidden sm:inline">Dashboard</span>
@@ -74,13 +74,13 @@ $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evi
                     <div class="h-5 w-px bg-slate-200 hidden sm:block shrink-0"></div>
 
                     <!-- Brand & Identitas Laporan -->
-                    <div class="flex items-center gap-2 sm:gap-2.5 min-w-0">
-                        <a href="<?= base_url('dashboard') ?>" class="flex-shrink-0 group flex items-center gap-2">
-                            <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik Logo" class="w-8 h-8 sm:w-9 sm:h-9 object-contain drop-shadow-sm group-hover:scale-105 transition-transform duration-200">
+                    <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+                        <a href="<?= base_url('dashboard') ?>" class="shrink-0 flex items-center gap-1.5 group">
+                            <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik Logo" class="w-7 h-7 sm:w-8 sm:h-8 object-contain drop-shadow-sm group-hover:scale-105 transition-transform duration-200">
                             <span class="text-base sm:text-lg font-bold bg-gradient-to-r from-indigo-700 to-indigo-500 bg-clip-text text-transparent hidden md:inline">AR Tilik</span>
                         </a>
-                        <div class="flex items-center gap-1.5 min-w-0">
-                            <span class="text-[11px] sm:text-xs px-2 sm:px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 font-bold border border-indigo-100 whitespace-nowrap">
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <span class="text-[11px] sm:text-xs px-2 sm:px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 font-bold border border-indigo-100 whitespace-nowrap shrink-0">
                                 #<?= $report['id'] ?>
                             </span>
                             <span class="hidden lg:inline-flex text-[9px] sm:text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200 whitespace-nowrap">
@@ -97,18 +97,18 @@ $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evi
                 </div>
 
                 <!-- Right: Action Toolbar (Konsisten, Berhirarki, & Responsif) -->
-                <div class="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar py-0.5 max-w-full shrink-0">
+                <div class="flex items-center gap-1.5 sm:gap-2 shrink-0 justify-end">
                     <?php if (($report['status'] ?? '') === 'completed'): ?>
-                        <!-- Daftarkan ke Korpus / Korpus Institusi -->
+                        <!-- Daftarkan ke Korpus (Desktop only) -->
                         <?php if (($document['document_type'] ?? '') === 'corpus'): ?>
-                            <span class="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 sm:px-3 py-1.5 rounded-lg whitespace-nowrap shadow-2xs shrink-0" title="Dokumen ini telah terdaftar sebagai korpus acuan institusi">
+                            <span class="hidden sm:inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 sm:px-3 py-1.5 rounded-lg whitespace-nowrap shadow-2xs shrink-0" title="Dokumen ini telah terdaftar sebagai korpus acuan institusi">
                                 <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                 </svg>
                                 <span class="hidden md:inline">Korpus Institusi</span>
                             </span>
                         <?php else: ?>
-                            <button id="btnEnrollCorpus" onclick="enrollDocumentAsCorpus(<?= $document['id'] ?>)" class="inline-flex items-center gap-1 text-xs font-semibold text-emerald-800 bg-emerald-50/80 hover:bg-emerald-100 border border-emerald-200/80 hover:border-emerald-300 px-2.5 sm:px-3 py-1.5 rounded-lg shadow-2xs transition cursor-pointer whitespace-nowrap shrink-0" title="Daftarkan naskah ini ke repositori korpus pembanding">
+                            <button id="btnEnrollCorpus" onclick="enrollDocumentAsCorpus(<?= $document['id'] ?>)" class="hidden sm:inline-flex items-center gap-1 text-xs font-semibold text-emerald-800 bg-emerald-50/80 hover:bg-emerald-100 border border-emerald-200/80 hover:border-emerald-300 px-2.5 sm:px-3 py-1.5 rounded-lg shadow-2xs transition cursor-pointer whitespace-nowrap shrink-0" title="Daftarkan naskah ini ke repositori korpus pembanding">
                                 <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                                 </svg>
@@ -117,30 +117,30 @@ $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evi
                             </button>
                         <?php endif; ?>
 
-                        <!-- Bagikan / Share -->
+                        <!-- Bagikan / Share (Desktop only) -->
                         <?php if (!empty($isSharedAccess)): ?>
-                            <span class="inline-flex items-center gap-1 text-xs font-semibold text-sky-700 bg-sky-50 border border-sky-200 px-2.5 sm:px-3 py-1.5 rounded-lg whitespace-nowrap shadow-2xs shrink-0" title="Naskah karya ilmiah ini dibagikan kepada Anda">
+                            <span class="hidden sm:inline-flex items-center gap-1 text-xs font-semibold text-sky-700 bg-sky-50 border border-sky-200 px-2.5 sm:px-3 py-1.5 rounded-lg whitespace-nowrap shadow-2xs shrink-0" title="Naskah karya ilmiah ini dibagikan kepada Anda">
                                 <svg class="w-3.5 h-3.5 text-sky-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
                                 <span class="hidden sm:inline">Dibagikan</span>
                             </span>
                         <?php endif; ?>
                         <?php if (!empty($isOwner) || (session()->get('user_role') === 'admin')): ?>
-                            <button onclick="openShareModal(<?= $document['id'] ?>, <?= htmlspecialchars(json_encode($document['title']), ENT_QUOTES, 'UTF-8') ?>)" class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 hover:text-indigo-600 bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 px-2.5 sm:px-3 py-1.5 rounded-lg shadow-2xs transition cursor-pointer whitespace-nowrap shrink-0" title="Bagikan laporan karya ilmiah ini">
+                            <button onclick="openShareModal(<?= $document['id'] ?>, <?= htmlspecialchars(json_encode($document['title']), ENT_QUOTES, 'UTF-8') ?>)" class="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 hover:text-indigo-600 bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 px-2.5 sm:px-3 py-1.5 rounded-lg shadow-2xs transition cursor-pointer whitespace-nowrap shrink-0" title="Bagikan laporan karya ilmiah ini">
                                 <svg class="w-3.5 h-3.5 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
                                 <span class="hidden sm:inline">Bagikan</span>
                             </button>
                         <?php endif; ?>
 
-                        <!-- Piagam Akreditasi -->
+                        <!-- Piagam Akreditasi (Desktop only) -->
                         <?php if (!empty($report['verification_code'])): ?>
-                            <a href="<?= base_url('verify/' . esc($report['verification_code'])) ?>" target="_blank" class="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-800 hover:text-amber-900 bg-amber-50/70 hover:bg-amber-100 border border-amber-200/80 hover:border-amber-300 px-2.5 sm:px-3 py-1.5 rounded-lg shadow-2xs transition whitespace-nowrap shrink-0" title="Buka Piagam Akreditasi Integritas Resmi">
+                            <a href="<?= base_url('verify/' . esc($report['verification_code'])) ?>" target="_blank" class="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-amber-800 hover:text-amber-900 bg-amber-50/70 hover:bg-amber-100 border border-amber-200/80 hover:border-amber-300 px-2.5 sm:px-3 py-1.5 rounded-lg shadow-2xs transition whitespace-nowrap shrink-0" title="Buka Piagam Akreditasi Integritas Resmi">
                                 <svg class="w-3.5 h-3.5 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
                                 <span class="hidden md:inline">Piagam</span>
                             </a>
                         <?php endif; ?>
 
-                        <!-- Unduh PDF -->
-                        <a href="<?= base_url('report/' . $report['id'] . '/export') ?>" target="_blank" onclick="handleDownloadPdfClick(event)" class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 hover:text-indigo-600 bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 px-2.5 sm:px-3 py-1.5 rounded-lg shadow-2xs transition whitespace-nowrap shrink-0" title="Unduh Laporan Format PDF">
+                        <!-- Unduh PDF (Mobile & Desktop) -->
+                        <a href="<?= base_url('report/' . $report['id'] . '/export') ?>" target="_blank" onclick="handleDownloadPdfClick(event)" class="inline-flex items-center gap-1 sm:gap-1.5 text-xs font-semibold text-slate-700 hover:text-indigo-600 bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 px-2 sm:px-3 py-1.5 rounded-lg shadow-2xs transition whitespace-nowrap shrink-0" title="Unduh Laporan Format PDF">
                             <svg class="w-3.5 h-3.5 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                             </svg>
@@ -148,13 +148,51 @@ $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evi
                             <span class="sm:hidden">PDF</span>
                         </a>
 
-                        <!-- Layar Ganda (Primary Action) -->
-                        <button onclick="openDualReaderModal()" class="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 px-3 sm:px-3.5 py-1.5 rounded-lg shadow-xs hover:shadow transition cursor-pointer whitespace-nowrap shrink-0" title="Buka Pembaca Komparasi Layar Ganda">
+                        <!-- Layar Ganda (Primary Action - Mobile & Desktop) -->
+                        <button onclick="openDualReaderModal()" class="inline-flex items-center gap-1 sm:gap-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 px-2.5 sm:px-3.5 py-1.5 rounded-lg shadow-xs hover:shadow transition cursor-pointer whitespace-nowrap shrink-0" title="Buka Pembaca Komparasi Layar Ganda">
                             <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/>
                             </svg>
                             <span>Layar Ganda</span>
                         </button>
+
+                        <!-- Mobile More Menu Dropdown (Visible on Mobile Only: < sm) -->
+                        <div class="relative sm:hidden shrink-0">
+                            <button type="button" onclick="toggleMobileReportMenu(event)" id="btnMobileReportMenu" class="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 hover:text-indigo-600 transition shadow-2xs cursor-pointer" aria-label="Menu Opsi Lainnya" aria-expanded="false" title="Menu Opsi Lainnya">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/>
+                                </svg>
+                            </button>
+                            <div id="mobileReportDropdown" class="hidden absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-50 text-xs font-medium divide-y divide-slate-100">
+                                <div class="py-1">
+                                    <?php if (!empty($report['verification_code'])): ?>
+                                        <a href="<?= base_url('verify/' . esc($report['verification_code'])) ?>" target="_blank" class="flex items-center gap-2.5 px-3.5 py-2 text-slate-700 hover:bg-amber-50 hover:text-amber-900 transition">
+                                            <svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+                                            <span>Piagam Akreditasi</span>
+                                        </a>
+                                    <?php endif; ?>
+                                    <?php if (!empty($isOwner) || (session()->get('user_role') === 'admin')): ?>
+                                        <button type="button" onclick="closeMobileReportMenu(); openShareModal(<?= $document['id'] ?>, <?= htmlspecialchars(json_encode($document['title']), ENT_QUOTES, 'UTF-8') ?>)" class="w-full text-left flex items-center gap-2.5 px-3.5 py-2 text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 transition cursor-pointer">
+                                            <svg class="w-4 h-4 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+                                            <span>Bagikan Naskah</span>
+                                        </button>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="py-1">
+                                    <?php if (($document['document_type'] ?? '') === 'corpus'): ?>
+                                        <div class="flex items-center gap-2.5 px-3.5 py-2 text-emerald-700 bg-emerald-50/60 font-semibold">
+                                            <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                            <span>Korpus Terdaftar</span>
+                                        </div>
+                                    <?php else: ?>
+                                        <button type="button" onclick="closeMobileReportMenu(); enrollDocumentAsCorpus(<?= $document['id'] ?>)" class="w-full text-left flex items-center gap-2.5 px-3.5 py-2 text-emerald-700 hover:bg-emerald-50 transition cursor-pointer">
+                                            <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                            <span>Daftarkan ke Korpus</span>
+                                        </button>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </div>
                     <?php endif; ?>
                 </div>
             </div>
@@ -4387,8 +4425,38 @@ $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evi
         </div>
     </div>
 
-    <!-- Script Logika Sharing -->
+    <!-- Script Logika Sharing & Navbar Menu Mobile -->
     <script>
+        function toggleMobileReportMenu(event) {
+            if (event) event.stopPropagation();
+            const dropdown = document.getElementById('mobileReportDropdown');
+            const btn = document.getElementById('btnMobileReportMenu');
+            if (!dropdown) return;
+            const isHidden = dropdown.classList.contains('hidden');
+            if (isHidden) {
+                dropdown.classList.remove('hidden');
+                if (btn) btn.setAttribute('aria-expanded', 'true');
+            } else {
+                dropdown.classList.add('hidden');
+                if (btn) btn.setAttribute('aria-expanded', 'false');
+            }
+        }
+
+        function closeMobileReportMenu() {
+            const dropdown = document.getElementById('mobileReportDropdown');
+            const btn = document.getElementById('btnMobileReportMenu');
+            if (dropdown) dropdown.classList.add('hidden');
+            if (btn) btn.setAttribute('aria-expanded', 'false');
+        }
+
+        document.addEventListener('click', function(e) {
+            const dropdown = document.getElementById('mobileReportDropdown');
+            const btn = document.getElementById('btnMobileReportMenu');
+            if (dropdown && !dropdown.contains(e.target) && btn && !btn.contains(e.target)) {
+                closeMobileReportMenu();
+            }
+        });
+
         let currentShareDocId = null;
 
         function openShareModal(docId, docTitle) {
