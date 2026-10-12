@@ -214,8 +214,8 @@ FRONT_MATTER_PATTERNS = [
 
 # Pola Spesifik Back Matter
 BACK_MATTER_PATTERNS = [
-    (re.compile(r"(?im)^\s*(?:DAFTAR\s+PUSTAKA|BIBLIOGRAFI|REFERENSI|DAFTAR\s+RUJUKAN)\s*$"), SectionType.DAFTAR_PUSTAKA),
-    (re.compile(r"(?im)^\s*(?:LAMPIRAN(?:\s+[A-Z0-9\.\-]+)?)\s*$"), SectionType.LAMPIRAN),
+    (re.compile(r"(?im)^\s*(?:DAFTAR\s+PUSTAKA|BIBLIOGRAFI|BIBLIOGRAPHY|REFERENCES?|DAFTAR\s+REFERENSI|DAFTAR\s+RUJUKAN|REFERENSI|SUMBER\s+RUJUKAN|LITERATURE\s+CITED|WORKS\s+CITED)\s*$"), SectionType.DAFTAR_PUSTAKA),
+    (re.compile(r"(?im)^\s*(?:LAMPIRAN(?:\s+[A-Z0-9\.\-]+)?|APPENDICES|APPENDIX)\s*$"), SectionType.LAMPIRAN),
 ]
 
 # Pola Seksi Tubuh Proposal / Karya Ilmiah Standalone (tanpa label kata 'BAB')

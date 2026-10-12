@@ -137,7 +137,7 @@ def split_body_and_bibliography(text: str, segmentation_res: Any = None) -> Tupl
                 type_val = getattr(sec_type, "value", str(sec_type))
 
             sec_text = getattr(s, "text", "")
-            if any(k in type_val.upper() for k in ("DAFTAR_PUSTAKA", "BIBLIOGRAFI", "SUMBER_BACAAN", "RUJUKAN", "KEPUSTAKAAN")):
+            if any(k in type_val.upper() for k in ("DAFTAR_PUSTAKA", "BIBLIOGRAFI", "BIBLIOGRAPHY", "REFERENCES", "SUMBER_BACAAN", "RUJUKAN", "KEPUSTAKAAN")):
                 bib_parts.append(sec_text)
                 has_bib = True
             elif "LAMPIRAN" not in type_val.upper() and "COVER" not in type_val.upper():
@@ -148,7 +148,7 @@ def split_body_and_bibliography(text: str, segmentation_res: Any = None) -> Tupl
 
     # 2. Heuristik regex deterministik untuk menemukan heading Daftar Pustaka
     bib_heading_pattern = re.compile(
-        r'(?:\n|\A)(?:[0-9\.\s]*\b(?:DAFTAR\s+PUSTAKA|REFERENCES|BIBLIOGRAFI|DAFTAR\s+REFERENSI|SUMBER\s+BACAAN(?:\s+UTAMA|\s+PENDUKUNG)?|SUMBER\s+PUSTAKA|SUMBER\s+RUJUKAN|BAHAN\s+BACAAN|KEPUSTAKAAN|RUJUKAN)\b[^\n]*\n?)',
+        r'(?:\n|\A)(?:[0-9\.\s]*\b(?:DAFTAR\s+PUSTAKA|REFERENCES?|BIBLIOGRAPHY|BIBLIOGRAFI|DAFTAR\s+REFERENSI|SUMBER\s+BACAAN(?:\s+UTAMA|\s+PENDUKUNG)?|SUMBER\s+PUSTAKA|SUMBER\s+RUJUKAN|BAHAN\s+BACAAN|KEPUSTAKAAN|RUJUKAN|LITERATURE\s+CITED|WORKS\s+CITED)\b[^\n]*\n?)',
         re.IGNORECASE
     )
     matches = list(bib_heading_pattern.finditer(text))
@@ -325,7 +325,7 @@ def extract_bibliography_entries(bib_text: str) -> List[BibliographyEntry]:
         words = re.findall(r'[A-Z][a-zA-Z]+', prefix)
         for w in words:
             clean_w = normalize_author_name(w)
-            if clean_w and clean_w not in {"dkk", "dan", "and", "al", "vol", "no", "pp", "hal", "jurnal", "prosiding", "in", "the", "of"}:
+            if clean_w and clean_w not in {"dkk", "dan", "and", "al", "vol", "no", "pp", "hal", "jurnal", "prosiding", "in", "the", "of", "ed", "eds"}:
                 if clean_w not in author_keys:
                     author_keys.append(clean_w)
 
@@ -354,7 +354,8 @@ def extract_bibliography_entries(bib_text: str) -> List[BibliographyEntry]:
         # Indikator 1: Dimulai dengan nomor [1] atau 1.
         is_num_start = bool(re.match(r'^(?:\[\d+\]|\d+\.)\s+', clean_l))
         # Indikator 2: Dimulai dengan nama penulis kapital dan baris sebelumnya sudah cukup panjang
-        is_author_start = bool(re.match(r'^[A-Z][a-zA-Z\s\-\.\,]+,\s*[A-Z]', clean_l))
+        # Mendukung: "Santoso, B.", "Halawa, arius", "Fatmawati. (2007)", "John Bamba (Ed.). (2008)"
+        is_author_start = bool(re.match(r'^[A-Z][a-zA-Z\s\-\.\,]+,\s*[a-zA-Z]', clean_l)) or bool(re.match(r'^[A-Z][a-zA-Z\s\-\.\,\'\(\)]+?\s*\((?:19|20\d{2}|n\.d\.)', clean_l))
         # Indikator 3: baris berupa URL mentah (satu URL = satu entri)
         is_url_start = bool(re.match(r'^(?:https?://|www\.)', clean_l, re.IGNORECASE))
 

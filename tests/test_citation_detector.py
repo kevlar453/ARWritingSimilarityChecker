@@ -219,3 +219,29 @@ def test_enrich_contract_non_suppression_invariant():
     assert enriched.citation_confidence == CitationConfidence.HIGH.value
     assert enriched.context_span == "Menurut Smith (2024)"
     assert enriched.rationale is not None
+
+
+def test_citation_auditor_bibliography_english_and_single_name():
+    from worker.citation_auditor import audit_citations_and_bibliography
+
+    sample_doc = """
+    Penelitian ini mendalami konstruksi identitas menurut pandangan sosial (Ritzer & Smart, 2012).
+    Selain itu, integrasi sosial suku juga dipelajari oleh (Fatmawati, 2007) dan (Halawa, 2022).
+    Pemikiran tentang subsuku juga diungkapkan oleh (John Bamba, 2008).
+
+    BIBLIOGRAPHY
+
+    Fatmawati. (2007). Integrasi Sosial Masyarakat Multi-etnis di kecamatan Sungai Ambawang.
+    Halawa, arius arifman. (2022). Syncretism on Catholic Symbols in The Invulnerability Rituals.
+    John Bamba (Ed.). (2008). Keberagaman subsuku dan bahasa Dayak di Kalimantan Barat.
+    Ritzer, G., & Smart, B. (2012). Handbook Teori Sosial. Nusa Indah.
+    """
+
+    res = audit_citations_and_bibliography(sample_doc)
+    assert res.has_bibliography_section is True
+    assert res.total_in_text_citations == 4
+    assert res.total_bibliography_entries == 4
+    assert res.matched_citations_count == 4
+    assert res.phantom_citations_count == 0
+    assert res.citation_health_score == 100.0
+
