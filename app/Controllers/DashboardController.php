@@ -42,9 +42,9 @@ class DashboardController extends BaseController
         $totalCorpus = $docModel->where('document_type', 'corpus')->where('benchmark_run_id IS NULL', null, false)->countAllResults();
 
         foreach ($submissions as &$sub) {
-            $latestReport = $reportModel->where('document_id', $sub['id'])
-                                        ->orderBy('id', 'DESC')
-                                        ->first();
+            $latestReport = (new ReportModel())->where('document_id', $sub['id'])
+                                               ->orderBy('id', 'DESC')
+                                               ->first();
             if ($latestReport) {
                 $latestReport['ai_assessment'] = self::extractAiMetrics($latestReport);
                 $latestReport['corpus_docs_count'] = self::extractCorpusCount($latestReport, $totalCorpus);
@@ -90,10 +90,18 @@ class DashboardController extends BaseController
         // Riwayat benchmark runs
         $benchmarkRuns = $db->table('benchmark_runs')->orderBy('id', 'DESC')->get(10)->getResultArray();
 
-        // Statistik Keseluruhan
-        $totalSubmissions = $docModel->where('document_type', 'submission')->where('benchmark_run_id IS NULL', null, false)->countAllResults();
-        $totalCorpus = $docModel->where('document_type', 'corpus')->where('benchmark_run_id IS NULL', null, false)->countAllResults();
-        $totalReports = $reportModel->countAllResults();
+        // Statistik Keseluruhan (Stabil & Konsisten terhadap status selesai)
+        $totalSubmissions = $db->table('documents')
+                               ->where('document_type', 'submission')
+                               ->where('benchmark_run_id IS NULL', null, false)
+                               ->countAllResults();
+        $totalCorpus = $db->table('documents')
+                          ->where('document_type', 'corpus')
+                          ->where('benchmark_run_id IS NULL', null, false)
+                          ->countAllResults();
+        $totalReports = $db->table('reports')
+                           ->where('status', 'completed')
+                           ->countAllResults();
 
         // Dokumen yang dibagikan oleh pengguna lain kepada akun ini (Model A+B)
         $shareModel = new \App\Models\DocumentShareModel();

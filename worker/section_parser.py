@@ -218,11 +218,18 @@ BACK_MATTER_PATTERNS = [
     (re.compile(r"(?im)^\s*(?:LAMPIRAN(?:\s+[A-Z0-9\.\-]+)?|APPENDICES|APPENDIX)\s*$"), SectionType.LAMPIRAN),
 ]
 
-# Pola Seksi Tubuh Proposal / Karya Ilmiah Standalone (tanpa label kata 'BAB')
+# Pola Seksi Tubuh Proposal / Artikel Ilmiah Standalone (tanpa label kata 'BAB')
 PROPOSAL_BODY_PATTERNS = [
-    (re.compile(r"(?im)^[^\S\r\n]*(?:[A-Z]\.\s*)?LATAR\s+BELAKANG\s*$"), SectionZone.BODY_TEXT, SectionType.BAB_1_PENDAHULUAN),
-    (re.compile(r"(?im)^[^\S\r\n]*(?:[A-Z]\.\s*)?(?:LANDASAN|KAJIAN)\s+TEORI\s*$"), SectionZone.BODY_TEXT, SectionType.BAB_2_LANDASAN_TEORI),
-    (re.compile(r"(?im)^[^\S\r\n]*(?:[A-Z]\.\s*)?(?:METODE|METODOLOGI)\s+PENELITIAN\s*$"), SectionZone.METHODOLOGY, SectionType.BAB_3_METODE_PENELITIAN),
+    # 1. Pendahuluan / Introduction / Latar Belakang
+    (re.compile(r"(?im)^[^\S\r\n]*(?:(?:[0-9IVXA-Z]+[\.\)]\s*)?(?:PENDAHULUAN|LATAR\s+BELAKANG|INTRODUCTION)\b(?:[^\S\r\n]*[:.\-–—]?[^\S\r\n]*.*)?)$"), SectionZone.BODY_TEXT, SectionType.BAB_1_PENDAHULUAN),
+    # 2. Landasan Teori / Tinjauan Pustaka / Kajian Teori / Literature Review
+    (re.compile(r"(?im)^[^\S\r\n]*(?:(?:[0-9IVXA-Z]+[\.\)]\s*)?(?:(?:LANDASAN|KAJIAN|TINJAUAN)\s+(?:TEORI|PUSTAKA)|KERANGKA\s+(?:TEORITIS|KONSEPTUAL)|LITERATURE\s+REVIEW)\b(?:[^\S\r\n]*[:.\-–—]?[^\S\r\n]*.*)?)$"), SectionZone.BODY_TEXT, SectionType.BAB_2_LANDASAN_TEORI),
+    # 3. Metode Penelitian / Metodologi / Method
+    (re.compile(r"(?im)^[^\S\r\n]*(?:(?:[0-9IVXA-Z]+[\.\)]\s*)?(?:METODE\s+PENELITIAN|METODOLOGI(?:\s+PENELITIAN)?|METODE|RESEARCH\s+METHOD(?:OLOGY)?|MATERIALS?\s+AND\s+METHODS?)\b(?:[^\S\r\n]*[:.\-–—]?[^\S\r\n]*.*)?)$"), SectionZone.METHODOLOGY, SectionType.BAB_3_METODE_PENELITIAN),
+    # 4. Hasil dan Pembahasan / Pembahasan / Discussion
+    (re.compile(r"(?im)^[^\S\r\n]*(?:(?:[0-9IVXA-Z]+[\.\)]\s*)?(?:HASIL\s+DAN\s+PEMBAHASAN|HASIL\s+PENELITIAN(?:\s+DAN\s+PEMBAHASAN)?|PEMBAHASAN|RESULTS?\s+AND\s+DISCUSSION|DISCUSSION)\b(?:[^\S\r\n]*[:.\-–—]?[^\S\r\n]*.*)?)$"), SectionZone.BODY_TEXT, SectionType.BAB_4_HASIL_PEMBAHASAN),
+    # 5. Kesimpulan dan Saran / Kesimpulan / Penutup / Conclusion
+    (re.compile(r"(?im)^[^\S\r\n]*(?:(?:[0-9IVXA-Z]+[\.\)]\s*)?(?:KESIMPULAN\s+DAN\s+SARAN|KESIMPULAN|PENUTUP|CONCLUSIONS?(?:\s+AND\s+SUGGESTIONS?)?)\b(?:[^\S\r\n]*[:.\-–—]?[^\S\r\n]*.*)?)$"), SectionZone.BODY_TEXT, SectionType.BAB_5_KESIMPULAN_SARAN),
 ]
 
 
@@ -264,8 +271,10 @@ def _classify_bab_title(bab_label: str, subtitle: str) -> tuple[Optional[Section
 
 
 def _count_words(text: str) -> int:
-    tokens = text.split()
-    return len(tokens)
+    if not text:
+        return 0
+    from worker.normalizer import tokenize, normalize_text
+    return len(tokenize(normalize_text(text)))
 
 
 def parse_document_sections(
@@ -322,10 +331,9 @@ def parse_document_sections(
                 "type": SectionType.BAB_4_HASIL_PEMBAHASAN
             })
 
-    # Fallback Proposal Tanpa Label BAB: jika Bab I belum tertangkap (format proposal A, B, C...)
-    has_bab1 = any(c["type"] == SectionType.BAB_1_PENDAHULUAN for c in heading_candidates)
-    if not has_bab1:
-        for pattern, zone, stype in PROPOSAL_BODY_PATTERNS:
+    # Fallback Proposal / Format Artikel Tanpa Label BAB
+    for pattern, zone, stype in PROPOSAL_BODY_PATTERNS:
+        if not any(c["type"] == stype for c in heading_candidates):
             for m in pattern.finditer(text):
                 heading_candidates.append({
                     "pos": m.start(),
@@ -392,24 +400,44 @@ def parse_document_sections(
     # 3. Potong Teks Menjadi ParsedSection
     sections: List[ParsedSection] = []
 
-    # Jika ada teks sebelum heading pertama (misalnya Halaman Judul/Cover tanpa kata 'COVER')
+    # Jika ada teks sebelum heading pertama (misalnya Halaman Judul/Cover atau Substansi tanpa heading Bab)
     if filtered_headings and filtered_headings[0]["pos"] > 0:
         pre_text = text[:filtered_headings[0]["pos"]].strip()
         if pre_text:
             p_words = _count_words(pre_text)
-            sections.append(ParsedSection(
-                section_id="SECTION_0_PRE_FRONT",
-                section_zone=SectionZone.FRONT_MATTER,
-                section_type=SectionType.COVER,
-                title="HALAMAN SAMPUL / JUDUL",
-                start_char=0,
-                end_char=filtered_headings[0]["pos"],
-                word_count=p_words,
-                character_count=len(pre_text),
-                text=pre_text,
-                is_core_substance=False,
-                is_administrative=True
-            ))
+            first_heading_zone = filtered_headings[0]["zone"]
+
+            # Jika heading pertama yang terdeteksi adalah BACK_MATTER (mis. DAFTAR PUSTAKA),
+            # atau jika teks pembuka panjang (> 150 kata) dan bukan formalitas cover,
+            # maka teks sebelum heading tersebut adalah TUBUH UTAMA (BODY_TEXT) naskah!
+            if first_heading_zone == SectionZone.BACK_MATTER or p_words > 150:
+                sections.append(ParsedSection(
+                    section_id="SECTION_0_BODY",
+                    section_zone=SectionZone.BODY_TEXT,
+                    section_type=SectionType.OTHER_BODY,
+                    title="SUBSTANSI NASKAH",
+                    start_char=0,
+                    end_char=filtered_headings[0]["pos"],
+                    word_count=p_words,
+                    character_count=len(pre_text),
+                    text=pre_text,
+                    is_core_substance=True,
+                    is_administrative=False
+                ))
+            else:
+                sections.append(ParsedSection(
+                    section_id="SECTION_0_PRE_FRONT",
+                    section_zone=SectionZone.FRONT_MATTER,
+                    section_type=SectionType.COVER,
+                    title="HALAMAN SAMPUL / JUDUL",
+                    start_char=0,
+                    end_char=filtered_headings[0]["pos"],
+                    word_count=p_words,
+                    character_count=len(pre_text),
+                    text=pre_text,
+                    is_core_substance=False,
+                    is_administrative=True
+                ))
 
     # Proses setiap heading
     for idx, h in enumerate(filtered_headings):

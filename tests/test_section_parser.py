@@ -449,4 +449,55 @@ def test_extract_academic_title_variations():
     assert extract_academic_title("Satu Dua") is None
 
 
+def test_standard_journal_article_structure():
+    """
+    Memastikan artikel ilmiah dengan penomoran non-BAB (1. Pendahuluan, 2. Pembahasan, dsb.)
+    terklasifikasi dengan benar ke BODY_TEXT, bukan FRONT_MATTER.
+    """
+    article_text = """
+    PENGARUH TEKNOLOGI INFORMASI TERHADAP KINERJA ORGANISASI
+    Penulis: Budi Santoso
+
+    1. Pendahuluan
+    Perkembangan teknologi informasi membawa implikasi transformatif terhadap produktivitas organisasi kontemporer.
+    Penerapan sistem komputasi terpadu memfasilitasi integrasi data dan efisiensi waktu kerja pegawai.
+
+    2. Pembahasan
+    Hasil investigasi empiris membuktikan korelasi kuat antara pemanfaatan sistem informasi dan output tugas karyawan.
+    Adaptasi sistem digital yang baik menurunkan beban kognitif dalam penyelesaian dokumen administratif.
+
+    3. Kesimpulan
+    Implementasi teknologi berkontribusi nyata pada keunggulan kompetitif organisasi.
+
+    Daftar Pustaka
+    Pratama, A., & Kusuma, B. (2022). Sistem Informasi Modern. Jurnal Manajemen, 10(2), 100-110.
+    """
+    res = parse_document_sections(article_text)
+    assert res.zone_word_distribution[SectionZone.BODY_TEXT.value] > 0
+    assert res.zone_percentage_distribution[SectionZone.BODY_TEXT.value] > 50.0
+    assert res.zone_percentage_distribution.get(SectionZone.FRONT_MATTER.value, 0) < 25.0
+    assert res.zone_word_distribution[SectionZone.BACK_MATTER.value] > 0
+
+
+def test_document_with_only_bibliography_at_end():
+    """
+    Memastikan naskah tanpa heading eksplisit sebelum Daftar Pustaka
+    mengklasifikasikan tubuh teks sebagai BODY_TEXT, BUKAN 93% FRONT_MATTER.
+    """
+    doc_text = """
+    Penelitian ini mengkaji efektivitas penerapan algoritma pencocokan dokumen teks berskala besar.
+    Evaluasi dilakukan dengan menguji ketahanan sistem terhadap parafrasa leksikal dan perubahan urutan klausa.
+    Temuan memperlihatkan peningkatan akurasi penemuan pasase sekuensial secara konsisten pada seluruh skenario uji.
+    Secara praktis, mekanisme ini dapat diintegrasikan pada alur verifikasi berkas karya ilmiah mahasiswa.
+
+    Daftar Pustaka
+    Kusuma, B. (2021). Evaluasi Algoritma Deteksi Teks. Jakarta: Riset Sains.
+    """
+    res = parse_document_sections(doc_text)
+    assert res.zone_word_distribution[SectionZone.BODY_TEXT.value] > 0
+    assert res.zone_word_distribution.get(SectionZone.FRONT_MATTER.value, 0) == 0
+    assert res.zone_percentage_distribution[SectionZone.BODY_TEXT.value] > 70.0
+
+
+
 

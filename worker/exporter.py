@@ -110,10 +110,13 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
     total_words = evidence_data.get("total_words", 0)
     exec_time = evidence_data.get("execution_time_seconds", 0)
     corpus_docs_count = int(evidence_data.get("corpus_docs_count") or evidence_data.get("substantive_summary", {}).get("corpus_docs_count") or 0)
-    if corpus_docs_count == 0 and connection:
+    if corpus_docs_count == 0:
         try:
+            from worker.database import get_connection
             from worker.matcher import get_corpus_document_count
-            corpus_docs_count = get_corpus_document_count(connection)
+            _conn = get_connection()
+            corpus_docs_count = get_corpus_document_count(_conn)
+            _conn.close()
         except Exception:
             pass
     sub_summary = evidence_data.get("substantive_summary") or {}
@@ -144,7 +147,7 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
         <h3 class="section-header">Dekomposisi Struktur & Zonasi Naskah (Smart Section Segmentation)</h3>
         <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px 12px; margin-bottom: 14px; page-break-inside: avoid;">
             <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; font-size: 8.5pt;">
-                <span><strong>Distribusi Fungsional Dokumen:</strong> Total {sec_seg.get('total_words', total_words):,} kata</span>
+                <span><strong>Distribusi Fungsional Dokumen:</strong> Total {total_words:,} kata</span>
                 <span style="font-weight: bold; color: #1e3a8a; background: #eef2ff; padding: 2px 8px; border-radius: 4px; border: 1px solid #c7d2fe;">
                     {core_pct:.1f}% Substansi Pokok
                 </span>
@@ -455,7 +458,7 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
                 </td>
             </tr>
             <tr>
-                <td><strong>Konsistensi Sitasi &amp; Daftar Pustaka</strong><br><span style="font-size: 7.5pt; color: #64748b;">Audit Sitasi Gaib (Phantom Citations)</span></td>
+                <td><strong>Konsistensi Sitasi Internal</strong><br><span style="font-size: 7.5pt; color: #64748b;">Kesesuaian Teks vs Daftar Pustaka (Audit Internal)</span></td>
                 <td style="text-align: center; font-weight: bold; color: {cit_color}; font-size: 10pt; line-height: 1.25;">
                     {cit_health:.1f} / 100
                     <div style="font-size: 6.5pt; font-weight: normal; color: #64748b; margin-top: 2px;">
@@ -464,7 +467,7 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
                 </td>
                 <td>
                     <strong>{cit_label}</strong>
-                    <div style="font-size: 7.5pt; color: #475569;">Sitasi Gaib: {int(cit_audit.get('phantom_citations_count') or 0)}, Pustaka Yatim: {int(cit_audit.get('orphan_references_count') or 0)}</div>
+                    <div style="font-size: 7.5pt; color: #475569;">Sitasi Tanpa Pustaka: {int(cit_audit.get('phantom_citations_count') or 0)}, Pustaka Tak Dikutip: {int(cit_audit.get('orphan_references_count') or 0)}</div>
                 </td>
             </tr>
             <tr>

@@ -611,7 +611,7 @@ if ($dec === 'match') {
                 </td>
             </tr>
             <tr>
-                <td><strong>Konsistensi Sitasi &amp; Daftar Pustaka</strong><br><span style="font-size: 7.5pt; color: #64748b;">Audit Sitasi Gaib (Phantom Citations)</span></td>
+                <td><strong>Konsistensi Sitasi Internal</strong><br><span style="font-size: 7.5pt; color: #64748b;">Kesesuaian Teks vs Daftar Pustaka (Audit Internal)</span></td>
                 <td style="text-align: center; font-weight: bold; color: <?= $citHealth >= 80 ? '#047857' : ($citHealth >= 50 ? '#b45309' : '#b91c1c') ?>; font-size: 10pt; line-height: 1.25;">
                     <?= number_format($citHealth, 1) ?> / 100
                     <div style="font-size: 6.5pt; font-weight: normal; color: #64748b; margin-top: 2px;">
@@ -620,7 +620,7 @@ if ($dec === 'match') {
                 </td>
                 <td>
                     <strong><?= esc($citAudit['verdict_label'] ?? 'Sitasi Selaras') ?></strong>
-                    <div style="font-size: 7.5pt; color: #475569;">Sitasi Gaib: <?= (int)($citAudit['phantom_citations_count'] ?? 0) ?>, Pustaka Yatim: <?= (int)($citAudit['orphan_references_count'] ?? 0) ?></div>
+                    <div style="font-size: 7.5pt; color: #475569;">Sitasi Tanpa Pustaka: <?= (int)($citAudit['phantom_citations_count'] ?? 0) ?>, Pustaka Tak Dikutip: <?= (int)($citAudit['orphan_references_count'] ?? 0) ?></div>
                 </td>
             </tr>
             <tr>
