@@ -20,6 +20,8 @@ sys.path.insert(0, BASE_DIR)
 from worker.database import get_connection
 from worker.gemini_forensic import audit_proposal_with_gemini
 from worker.section_parser import parse_document_sections, get_substantive_including_methodology
+from worker.extractor import extract_document_metadata
+from worker.citation_auditor import audit_citations_and_bibliography
 
 
 def main():
@@ -72,12 +74,21 @@ def main():
         except Exception:
             substantive_body = submission_text[:25000]
 
-        # Jalankan audit dengan fallback
+        # Ekstrak metadata dokumen untuk mendeteksi era pra-LLM
+        doc_meta = None
+        if doc.get("storage_path") and os.path.exists(doc["storage_path"]):
+            try:
+                doc_meta = extract_document_metadata(doc["storage_path"], doc.get("mime_type"))
+            except Exception:
+                doc_meta = None
+
+        # Jalankan audit dengan fallback dan metadata era dokumen
         audit_res = audit_proposal_with_gemini(
             document_text=submission_text,
             substantive_text=substantive_body,
             title=doc.get("title", ""),
-            connection=conn
+            connection=conn,
+            doc_metadata=doc_meta
         )
 
         # Update evidence_data di reports
@@ -89,11 +100,24 @@ def main():
                 evidence = {}
 
         evidence["gemini_forensic"] = audit_res
+        if doc_meta:
+            evidence["document_metadata"] = doc_meta
+
+        # Perbarui juga audit konsistensi sitasi dengan parser terbaru
+        try:
+            citation_audit_res = audit_citations_and_bibliography(submission_text, seg)
+            evidence["citation_audit"] = citation_audit_res.to_dict()
+        except Exception:
+            pass
 
         # Sinkronkan juga ke v1_1_presentation.v1_2_evolution jika ada
         if "v1_1_presentation" in evidence and isinstance(evidence["v1_1_presentation"], dict):
             if "v1_2_evolution" in evidence["v1_1_presentation"] and isinstance(evidence["v1_1_presentation"]["v1_2_evolution"], dict):
                 evidence["v1_1_presentation"]["v1_2_evolution"]["gemini_forensic"] = audit_res
+                if doc_meta:
+                    evidence["v1_1_presentation"]["v1_2_evolution"]["document_metadata"] = doc_meta
+                if "citation_audit" in evidence:
+                    evidence["v1_1_presentation"]["v1_2_evolution"]["citation_audit"] = evidence["citation_audit"]
 
         cursor.execute(
             "UPDATE reports SET evidence_data = %s, updated_at = NOW() WHERE id = %s",

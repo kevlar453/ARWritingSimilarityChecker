@@ -121,6 +121,9 @@ def split_body_and_bibliography(text: str, segmentation_res: Any = None) -> Tupl
     if not text:
         return "", "", False
 
+    if isinstance(text, list):
+        text = "\n\n".join(str(p) for p in text)
+
     # 1. Coba gunakan hasil segmentation_res bila tersedia
     if segmentation_res and hasattr(segmentation_res, "sections"):
         body_parts = []
@@ -134,7 +137,7 @@ def split_body_and_bibliography(text: str, segmentation_res: Any = None) -> Tupl
                 type_val = getattr(sec_type, "value", str(sec_type))
 
             sec_text = getattr(s, "text", "")
-            if "DAFTAR_PUSTAKA" in type_val.upper() or "BIBLIOGRAFI" in type_val.upper():
+            if any(k in type_val.upper() for k in ("DAFTAR_PUSTAKA", "BIBLIOGRAFI", "SUMBER_BACAAN", "RUJUKAN", "KEPUSTAKAAN")):
                 bib_parts.append(sec_text)
                 has_bib = True
             elif "LAMPIRAN" not in type_val.upper() and "COVER" not in type_val.upper():
@@ -145,7 +148,7 @@ def split_body_and_bibliography(text: str, segmentation_res: Any = None) -> Tupl
 
     # 2. Heuristik regex deterministik untuk menemukan heading Daftar Pustaka
     bib_heading_pattern = re.compile(
-        r'(?:\n|\A)(?:[0-9\.\s]*\b(?:DAFTAR\s+PUSTAKA|REFERENCES|BIBLIOGRAFI|DAFTAR\s+REFERENSI)\b[^\n]*\n)',
+        r'(?:\n|\A)(?:[0-9\.\s]*\b(?:DAFTAR\s+PUSTAKA|REFERENCES|BIBLIOGRAFI|DAFTAR\s+REFERENSI|SUMBER\s+BACAAN(?:\s+UTAMA|\s+PENDUKUNG)?|SUMBER\s+PUSTAKA|SUMBER\s+RUJUKAN|BAHAN\s+BACAAN|KEPUSTAKAAN|RUJUKAN)\b[^\n]*\n?)',
         re.IGNORECASE
     )
     matches = list(bib_heading_pattern.finditer(text))
@@ -251,6 +254,9 @@ def extract_in_text_citations(body_text: str) -> List[InTextCitation]:
             range_match = re.match(r'^(\d+)\s*[\-\–]\s*(\d+)$', part)
             if range_match:
                 r_start, r_end = int(range_match.group(1)), int(range_match.group(2))
+                # Abaikan rentang tahun seperti [1644-1912] atau [1912-1949] (bukan nomor referensi IEEE)
+                if r_start >= 1000 or r_end >= 1000 or r_start > 500:
+                    continue
                 if r_start <= r_end and (r_end - r_start) <= 50:
                     for n in range(r_start, r_end + 1):
                         citations.append(InTextCitation(
@@ -267,6 +273,9 @@ def extract_in_text_citations(body_text: str) -> List[InTextCitation]:
                 num_match = re.match(r'^\d+$', part)
                 if num_match:
                     n = int(num_match.group(0))
+                    # Abaikan 4-digit tahun tunggal e.g. [1969] jika bukan nomor urut referensi
+                    if n >= 1000 or n > 500:
+                        continue
                     citations.append(InTextCitation(
                         raw_citation=f"[{n}]",
                         author_key=f"ref_{n}",
@@ -328,9 +337,17 @@ def extract_bibliography_entries(bib_text: str) -> List[BibliographyEntry]:
             numeric_id=numeric_id
         ))
 
+    subheading_pattern = re.compile(r'^(?:sumber\s+bacaan|sumber\s+pendukung|sumber\s+rujukan|bacaan|rujukan)\b.*:$', re.IGNORECASE)
+
     for line in raw_lines:
         clean_l = line.strip()
         if not clean_l:
+            continue
+
+        if subheading_pattern.match(clean_l):
+            if current_entry_lines:
+                commit_entry(current_entry_lines)
+                current_entry_lines = []
             continue
 
         # Cek apakah baris ini adalah awal entri baru:

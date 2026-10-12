@@ -116,3 +116,32 @@ def test_citation_auditor_url_only_bibliography():
     assert result.phantom_citations_count == 0
     assert result.health_verdict == "NEEDS_ATTENTION"
     assert "Daftar Pustaka Berupa URL" in result.verdict_label
+
+
+def test_citation_auditor_sumber_bacaan_and_year_range():
+    """Menguji deteksi heading 'Sumber Bacaan' dan penolakan rentang tahun [1912-1949] sebagai IEEE citation."""
+    sample_text = """
+    Dinasti Qing [1644 - 1912] dan berlanjut ke Republik Tiongkok [1912-1949] menandai masa transisi.
+    Kaum pergerakan mendirikan sekolah modern untuk mendidik generasi muda.
+
+    Sumber Bacaan Utama:
+    Hoai, Kwee Tek. The Origins Of The Modern Chinese Movement In Indonesia. Ithaca: 1969.
+
+    Sumber Pendukung lain:
+    Kartodirjo, Sartono. Sejak Indische Sampai Indonesia. Jakarta: 2005.
+
+    Sumber Pendukung dari Internet:
+    http://www.artikata.com/arti-322642-bumiputra.html
+    http://en.wikipedia.org
+    """
+    body, bib, has_bib = split_body_and_bibliography(sample_text)
+    assert has_bib is True
+    assert "Hoai, Kwee Tek" in bib
+
+    res = audit_citations_and_bibliography(sample_text)
+    assert res.has_bibliography_section is True
+    # Rentang tahun [1912-1949] dan [1644 - 1912] tidak boleh dideteksi sebagai 38 IEEE citations
+    assert res.total_in_text_citations == 0
+    assert res.phantom_citations_count == 0
+    assert res.total_bibliography_entries >= 3
+
