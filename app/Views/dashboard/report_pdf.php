@@ -25,6 +25,7 @@ $cert_hash = "ART-" . substr($h, 0, 4) . "-" . substr($h, 4, 4) . "-" . substr($
 
 $total_words = $evidenceData['total_words'] ?? 0;
 $exec_time = $evidenceData['execution_time_seconds'] ?? 0;
+$corpus_docs_count = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evidenceData['substantive_summary']['corpus_docs_count'] ?? $evidenceData['exact_evidence']['corpus_docs_count'] ?? 0);
 
 if ($dec === 'match') {
     $dec_label = "MATCH (Kesamaan Harfiah Kuat)";
@@ -413,7 +414,7 @@ if ($dec === 'match') {
             <td class="meta-label">Arsitektur Mesin</td>
             <td class="meta-val">AR Tilik Dual-Lens Hybrid v1.3</td>
             <td class="meta-label">Cakupan Korpus</td>
-            <td class="meta-val"><?= !empty($evidenceData['corpus_docs_count']) ? number_format((int)$evidenceData['corpus_docs_count']) . ' dokumen pembanding' : number_format($exec_time, 2) . ' detik' ?></td>
+            <td class="meta-val"><?= $corpus_docs_count > 0 ? number_format($corpus_docs_count, 0, ',', '.') . ' dokumen pembanding' : 'Seluruh repositori aktif' ?></td>
         </tr>
         <?php if (!empty($document['faculty']) || !empty($document['department'])): ?>
         <tr>

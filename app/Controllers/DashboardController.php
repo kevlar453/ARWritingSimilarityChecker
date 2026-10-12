@@ -38,12 +38,16 @@ class DashboardController extends BaseController
 
         $submissions = $subBuilder->orderBy('id', 'DESC')->findAll(20);
 
+        // Hitung total korpus aktif untuk fallback metrik pembanding
+        $totalCorpus = $docModel->where('document_type', 'corpus')->where('benchmark_run_id IS NULL', null, false)->countAllResults();
+
         foreach ($submissions as &$sub) {
             $latestReport = $reportModel->where('document_id', $sub['id'])
                                         ->orderBy('id', 'DESC')
                                         ->first();
             if ($latestReport) {
                 $latestReport['ai_assessment'] = self::extractAiMetrics($latestReport);
+                $latestReport['corpus_docs_count'] = self::extractCorpusCount($latestReport, $totalCorpus);
             }
             $sub['latest_report'] = $latestReport;
         }
@@ -98,6 +102,7 @@ class DashboardController extends BaseController
         foreach ($sharedDocuments as &$item) {
             if (!empty($item['latest_report'])) {
                 $item['latest_report']['ai_assessment'] = self::extractAiMetrics($item['latest_report']);
+                $item['latest_report']['corpus_docs_count'] = self::extractCorpusCount($item['latest_report'], $totalCorpus);
             }
         }
         unset($item);
@@ -380,6 +385,32 @@ class DashboardController extends BaseController
         return round(min(max($finalScore, 70.0), 99.0), 1);
     }
 
+    /**
+     * Mengekstrak jumlah dokumen korpus pembanding dari evidence_data laporan
+     */
+    public static function extractCorpusCount(?array $report, int $fallbackTotal = 0): int
+    {
+        if (!$report) {
+            return $fallbackTotal;
+        }
+        $evidence = $report['evidence_data'] ?? null;
+        if (is_string($evidence)) {
+            $evidence = json_decode($evidence, true) ?: [];
+        }
+        if (is_array($evidence)) {
+            if (!empty($evidence['corpus_docs_count'])) {
+                return (int) $evidence['corpus_docs_count'];
+            }
+            if (!empty($evidence['substantive_summary']['corpus_docs_count'])) {
+                return (int) $evidence['substantive_summary']['corpus_docs_count'];
+            }
+            if (!empty($evidence['exact_evidence']['corpus_docs_count'])) {
+                return (int) $evidence['exact_evidence']['corpus_docs_count'];
+            }
+        }
+        return $fallbackTotal;
+    }
+
     public function report($id)
     {
         $reportModel = new ReportModel();
@@ -628,6 +659,9 @@ class DashboardController extends BaseController
             $isAmbassador = !empty($ambProfile);
         }
 
+        $fallbackCorpus = (new DocumentModel())->where('document_type', 'corpus')->where('benchmark_run_id IS NULL', null, false)->countAllResults();
+        $corpusCount = self::extractCorpusCount($report, $fallbackCorpus);
+
         return view('dashboard/report', [
             'report'              => $report,
             'document'            => $document,
@@ -646,6 +680,7 @@ class DashboardController extends BaseController
             'citationAudit'       => $citationAudit,
             'evasionDetection'    => $evasionDetection,
             'geminiForensic'      => $geminiForensic,
+            'corpusCount'         => $corpusCount,
             'isOwner'             => $isOwner,
             'isSharedAccess'      => $isSharedToUser,
             'userVotes'           => $userVotes,
@@ -1659,12 +1694,16 @@ class DashboardController extends BaseController
         }
         unset($m);
 
+        $fallbackCorpus = (new DocumentModel())->where('document_type', 'corpus')->where('benchmark_run_id IS NULL', null, false)->countAllResults();
+        $corpusCount = self::extractCorpusCount($report, $fallbackCorpus);
+
         return view('dashboard/report_pdf', [
             'report'       => $report,
             'document'     => $document,
             'evidenceData' => $evidenceData,
             'sources'      => $sources,
             'matches'      => $matches,
+            'corpusCount'  => $corpusCount,
         ]);
     }
 

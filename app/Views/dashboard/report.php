@@ -1,3 +1,6 @@
+<?php
+$corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evidenceData['substantive_summary']['corpus_docs_count'] ?? $evidenceData['exact_evidence']['corpus_docs_count'] ?? 0);
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -70,6 +73,12 @@
                                 <span class="text-[9px] sm:text-[10px] uppercase font-bold tracking-wider px-1.5 sm:px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200 whitespace-nowrap">
                                     Engine: <?= strtoupper(esc($report['engine'] ?? 'hybrid')) ?>
                                 </span>
+                                <?php if ($corpusCount > 0): ?>
+                                    <span class="inline-flex items-center gap-1 text-[9px] sm:text-[10px] font-semibold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 whitespace-nowrap" title="Jumlah repositori dokumen korpus yang dijadikan pembanding">
+                                        <svg class="w-3 h-3 text-indigo-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                                        <span><?= number_format($corpusCount, 0, ',', '.') ?> Korpus</span>
+                                    </span>
+                                <?php endif; ?>
                             </div>
                             <p class="hidden sm:block text-[11px] text-slate-400 truncate">Academic Writing Similarity & Evidence Checker</p>
                         </div>
@@ -160,6 +169,10 @@
                     <?php if (!empty($evidenceData['total_words'])): ?>
                         <span>•</span>
                         <span>Total: <strong class="text-slate-700"><?= number_format($evidenceData['total_words']) ?> kata</strong></span>
+                    <?php endif; ?>
+                    <?php if ($corpusCount > 0): ?>
+                        <span>•</span>
+                        <span>Basis Pembanding: <strong class="text-indigo-700 font-semibold"><?= number_format($corpusCount, 0, ',', '.') ?> Dokumen Korpus</strong></span>
                     <?php endif; ?>
                     <?php if (!empty($document['faculty']) || !empty($document['department'])): ?>
                         <span>•</span>
@@ -369,9 +382,9 @@
                 </div>
             </div>
 
-            <!-- Tier 1: Synthesis Decision, Pattern, Agreement -->
+            <!-- Tier 1: Synthesis Decision, Korpus, Pattern, Agreement -->
             <div class="p-6 border-b border-slate-200 bg-slate-50/60">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <!-- Decision -->
                     <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
                         <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Decision</div>
@@ -388,6 +401,20 @@
                             <?php endif; ?>
                         </div>
                         <div class="text-[11px] text-slate-500 mt-1">Klasifikasi objektif sistem</div>
+                    </div>
+
+                    <!-- Korpus Pembanding -->
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
+                        <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1 flex items-center justify-between">
+                            <span>Korpus Pembanding</span>
+                            <svg class="w-3.5 h-3.5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                        </div>
+                        <div class="font-bold text-lg text-slate-900 font-mono-code">
+                            <?= number_format($corpusCount, 0, ',', '.') ?> <span class="text-xs font-semibold text-slate-500 font-sans">Dokumen</span>
+                        </div>
+                        <div class="text-[11px] text-slate-500 mt-1 truncate" title="Jumlah naskah korpus pembanding aktif di repositori">
+                            Basis repositori rujukan aktif
+                        </div>
                     </div>
 
                     <!-- Pattern -->

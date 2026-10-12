@@ -110,6 +110,12 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
     total_words = evidence_data.get("total_words", 0)
     exec_time = evidence_data.get("execution_time_seconds", 0)
     corpus_docs_count = int(evidence_data.get("corpus_docs_count") or evidence_data.get("substantive_summary", {}).get("corpus_docs_count") or 0)
+    if corpus_docs_count == 0 and connection:
+        try:
+            from worker.matcher import get_corpus_document_count
+            corpus_docs_count = get_corpus_document_count(connection)
+        except Exception:
+            pass
     sub_summary = evidence_data.get("substantive_summary") or {}
     sub_sim_val = sub_summary.get("substantive_similarity")
     sub_longest_val = sub_summary.get("substantive_longest_words")

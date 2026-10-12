@@ -331,7 +331,10 @@ def run_hybrid_similarity_check(
         exclude_same_user=exclude_same_user
     )
     
-    analysis = aggregate_evidence(exact_ev, tfidf_ev)
+    from worker.matcher import get_corpus_document_count
+    total_corpus_docs = get_corpus_document_count(connection, corpus_scope, benchmark_run_id)
+    exact_ev["corpus_docs_count"] = total_corpus_docs
+    analysis = aggregate_evidence(exact_ev, tfidf_ev, corpus_docs_count=total_corpus_docs)
     
     total_words = exact_raw.get("total_words", tfidf_raw.get("total_words", 0))
     
@@ -396,6 +399,7 @@ def run_hybrid_similarity_check(
         "average_shared_term_idf": tfidf_ev["avg_idf"] or 0.0,
         "source_count": len(merged_sources),
         "match_count": exact_ev["match_count"],
+        "corpus_docs_count": total_corpus_docs,
         
         # Bukti Mandiri Tiap Engine
         "exact_evidence": exact_ev,

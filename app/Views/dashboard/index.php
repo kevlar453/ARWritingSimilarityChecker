@@ -517,6 +517,7 @@
                                                     <?php 
                                                         $dec = $rep['predicted_decision'] ?? 'no_match';
                                                         $status = $rep['status'] ?? 'pending';
+                                                        $cCount = (int) ($rep['corpus_docs_count'] ?? \App\Controllers\DashboardController::extractCorpusCount($rep, $totalCorpus ?? 0));
                                                     ?>
                                                     <?php if ($status === 'completed'): ?>
                                                         <?php if ($dec === 'match'): ?>
@@ -532,11 +533,22 @@
                                                                 NO MATCH (Aman)
                                                             </span>
                                                         <?php endif; ?>
+                                                        <?php if ($cCount > 0): ?>
+                                                            <span class="text-[10px] text-slate-500 font-medium flex items-center gap-1 whitespace-nowrap" title="<?= number_format($cCount, 0, ',', '.') ?> korpus pembanding">
+                                                                <svg class="w-3 h-3 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                                                                <span><?= number_format($cCount, 0, ',', '.') ?> korpus</span>
+                                                            </span>
+                                                        <?php endif; ?>
                                                     <?php elseif ($status === 'processing'): ?>
                                                         <span class="inline-flex items-center gap-1 text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 animate-pulse whitespace-nowrap">
                                                             <span class="w-1.5 h-1.5 rounded-full bg-blue-600 animate-ping"></span>
                                                             Memproses...
                                                         </span>
+                                                        <?php if ($cCount > 0): ?>
+                                                            <span class="text-[10px] text-slate-400 font-medium whitespace-nowrap">
+                                                                vs <?= number_format($cCount, 0, ',', '.') ?> korpus
+                                                            </span>
+                                                        <?php endif; ?>
                                                     <?php else: ?>
                                                         <span class="inline-flex items-center text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 whitespace-nowrap">
                                                             Antrean (Pending)
@@ -782,6 +794,7 @@
                                             <?php if ($rep): 
                                                 $dec = $rep['predicted_decision'] ?? 'no_match';
                                                 $status = $rep['status'] ?? 'pending';
+                                                $cCount = (int) ($rep['corpus_docs_count'] ?? \App\Controllers\DashboardController::extractCorpusCount($rep, $totalCorpus ?? 0));
                                             ?>
                                                 <?php if ($status === 'completed'): ?>
                                                     <?php if ($dec === 'match'): ?>
@@ -790,6 +803,12 @@
                                                         <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 whitespace-nowrap">REVIEW (Perlu Ditelaah)</span>
                                                     <?php else: ?>
                                                         <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 whitespace-nowrap">NO MATCH (Aman)</span>
+                                                    <?php endif; ?>
+                                                    <?php if ($cCount > 0): ?>
+                                                        <span class="text-[10px] text-slate-500 font-medium flex items-center gap-1 whitespace-nowrap mt-1" title="<?= number_format($cCount, 0, ',', '.') ?> korpus pembanding">
+                                                            <svg class="w-3 h-3 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                                                            <span><?= number_format($cCount, 0, ',', '.') ?> korpus</span>
+                                                        </span>
                                                     <?php endif; ?>
                                                 <?php elseif ($status === 'processing'): ?>
                                                     <span class="inline-flex items-center gap-1 text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 animate-pulse whitespace-nowrap">Memproses...</span>
