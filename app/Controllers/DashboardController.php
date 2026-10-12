@@ -597,8 +597,7 @@ class DashboardController extends BaseController
             if (! file_exists($pythonBin)) {
                 $pythonBin = 'python3';
             }
-            $scriptPath = ROOTPATH . 'worker/section_parser.py';
-            $cmd = escapeshellcmd($pythonBin) . ' ' . escapeshellarg($scriptPath) . ' --heal-report ' . (int) $reportId;
+            $cmd = 'cd ' . escapeshellarg(ROOTPATH) . ' && ' . escapeshellcmd($pythonBin) . ' -m worker.section_parser --heal-report ' . (int) $reportId;
             @exec($cmd);
 
             // Muat ulang data report & evidence_data terbaru setelah pemulihan otomatis
