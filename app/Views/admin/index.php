@@ -843,33 +843,37 @@
                                             <td class="py-3 px-3 text-slate-400 text-[11px] whitespace-nowrap">
                                                 <?= date('d M Y', strtotime($u['created_at'])) ?>
                                             </td>
-                                            <td class="py-3 px-4 text-right whitespace-nowrap min-w-[280px]">
-                                                <div class="flex items-center justify-end gap-1.5 flex-nowrap">
+                                            <td class="py-3 px-4 text-right whitespace-nowrap">
+                                                <div class="inline-flex items-center rounded-xl bg-slate-900/90 border border-slate-700/70 p-0.5 shadow-xs divide-x divide-slate-800">
                                                     <!-- Verifikasi Manual jika pending -->
                                                     <?php if ($u['status'] === 'pending_verification'): ?>
-                                                        <button onclick="handleUserAction(<?= (int) $u['id'] ?>, 'verify_email')" class="px-2.5 py-1 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-[11px] font-semibold transition-colors" title="Verifikasi email manual tanpa menunggu klik tautan">
-                                                            ✓ Verifikasi
+                                                        <button type="button" onclick="handleUserAction(<?= (int) $u['id'] ?>, 'verify_email')" class="p-1.5 text-emerald-400 hover:text-emerald-200 hover:bg-emerald-500/20 rounded-lg transition-colors cursor-pointer" title="Verifikasi email manual tanpa menunggu konfirmasi" aria-label="Verifikasi Email Manual">
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                                                         </button>
                                                     <?php endif; ?>
 
                                                     <!-- Reset Mingguan -->
-                                                    <button onclick="handleUserAction(<?= (int) $u['id'] ?>, 'reset_weekly_quota')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-[11px] transition-colors" title="Reset kuota terpakai mingguan ke 0">
-                                                        ↺ Reset Kuota
+                                                    <button type="button" onclick="handleUserAction(<?= (int) $u['id'] ?>, 'reset_weekly_quota')" class="p-1.5 text-sky-400 hover:text-sky-200 hover:bg-sky-500/20 rounded-lg transition-colors cursor-pointer" title="Reset kuota terpakai mingguan ke 0" aria-label="Reset Kuota Mingguan">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                                                     </button>
 
                                                     <!-- Tambah Bonus Kuota -->
-                                                    <button onclick="promptBonusQuota(<?= (int) $u['id'] ?>)" class="px-2.5 py-1 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-[11px] font-semibold transition-colors" title="Tambah bonus kuota submisi">
-                                                        + Kuota
+                                                    <button type="button" onclick="promptBonusQuota(<?= (int) $u['id'] ?>)" class="p-1.5 text-indigo-400 hover:text-indigo-200 hover:bg-indigo-500/20 rounded-lg transition-colors cursor-pointer" title="Tambah bonus kuota submisi dokumen" aria-label="Tambah Bonus Kuota">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                                     </button>
 
                                                     <!-- Toggle Role -->
-                                                    <button onclick="handleUserAction(<?= (int) $u['id'] ?>, 'set_role', {role: '<?= $u['role'] === 'admin' ? 'user' : 'admin' ?>'})" class="px-2.5 py-1 rounded-lg bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 text-[11px] transition-colors" title="Ganti peran antara Admin dan Pengguna">
-                                                        <?= $u['role'] === 'admin' ? 'Jadikan User' : 'Jadikan Admin' ?>
+                                                    <button type="button" onclick="handleUserAction(<?= (int) $u['id'] ?>, 'set_role', {role: '<?= $u['role'] === 'admin' ? 'user' : 'admin' ?>'})" class="p-1.5 <?= $u['role'] === 'admin' ? 'text-amber-400 hover:text-amber-200 hover:bg-amber-500/20' : 'text-purple-400 hover:text-purple-200 hover:bg-purple-500/20' ?> rounded-lg transition-colors cursor-pointer" title="<?= $u['role'] === 'admin' ? 'Cabut hak Admin (Jadikan Pengguna Biasa)' : 'Beri hak Admin (Jadikan Administrator)' ?>" aria-label="<?= $u['role'] === 'admin' ? 'Jadikan User' : 'Jadikan Admin' ?>">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
                                                     </button>
 
                                                     <!-- Toggle Status -->
-                                                    <button onclick="handleUserAction(<?= (int) $u['id'] ?>, 'set_status', {status: '<?= $u['status'] === 'active' ? 'inactive' : 'active' ?>'})" class="px-2.5 py-1 rounded-lg <?= $u['status'] === 'active' ? 'bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border-rose-500/30' : 'bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border-emerald-500/30' ?> border text-[11px] transition-colors">
-                                                        <?= $u['status'] === 'active' ? 'Suspend' : 'Aktifkan' ?>
+                                                    <button type="button" onclick="handleUserAction(<?= (int) $u['id'] ?>, 'set_status', {status: '<?= $u['status'] === 'active' ? 'inactive' : 'active' ?>'})" class="p-1.5 <?= $u['status'] === 'active' ? 'text-rose-400 hover:text-rose-200 hover:bg-rose-500/20' : 'text-emerald-400 hover:text-emerald-200 hover:bg-emerald-500/20' ?> rounded-lg transition-colors cursor-pointer" title="<?= $u['status'] === 'active' ? 'Bekukan / Suspend Akun Pengguna' : 'Aktifkan Kembali Akun Pengguna' ?>" aria-label="<?= $u['status'] === 'active' ? 'Suspend Akun' : 'Aktifkan Akun' ?>">
+                                                        <?php if ($u['status'] === 'active'): ?>
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
+                                                        <?php else: ?>
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                        <?php endif; ?>
                                                     </button>
                                                 </div>
                                             </td>
