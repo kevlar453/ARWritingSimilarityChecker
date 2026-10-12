@@ -844,7 +844,7 @@ class DashboardController extends BaseController
         $bibText = '';
         $hasBib = false;
 
-        if (preg_match('/(?:\n|\A)(?:[0-9\.\s]*\b(?:DAFTAR\s+PUSTAKA|REFERENCES|BIBLIOGRAFI|DAFTAR\s+REFERENSI)\b[^\n]*\n)/iu', $text, $matches, PREG_OFFSET_CAPTURE)) {
+        if (preg_match('/(?:\n|\A)(?:[0-9\.\s]*\b(?:DAFTAR\s+PUSTAKA|REFERENCES|BIBLIOGRAFI|DAFTAR\s+REFERENSI|SUMBER\s+BACAAN(?:\s*\([^\)]+\))?|SUMBER\s+PUSTAKA|BAHAN\s+BACAAN|KEPUSTAKAAN|RUJUKAN)\b[^\n]*\n)/iu', $text, $matches, PREG_OFFSET_CAPTURE)) {
             $hasBib = true;
             $pos = $matches[0][1];
             $bodyText = substr($text, 0, $pos);
@@ -910,6 +910,9 @@ class DashboardController extends BaseController
                     if (preg_match('/^(\d+)\s*[\-\–]\s*(\d+)$/', $p, $rMatch)) {
                         $rStart = (int) $rMatch[1];
                         $rEnd = (int) $rMatch[2];
+                        if ($rStart >= 1000 || $rEnd >= 1000 || $rStart > 500) {
+                            continue;
+                        }
                         if ($rStart <= $rEnd && ($rEnd - $rStart) <= 50) {
                             for ($n = $rStart; $n <= $rEnd; $n++) {
                                 $citations[] = [
@@ -924,6 +927,9 @@ class DashboardController extends BaseController
                         }
                     } elseif (preg_match('/^\d+$/', $p)) {
                         $n = (int) $p;
+                        if ($n >= 1000 || $n > 500) {
+                            continue;
+                        }
                         $citations[] = [
                             'raw_citation' => "[{$n}]",
                             'author_key' => "ref_{$n}",
@@ -1083,6 +1089,37 @@ class DashboardController extends BaseController
         $phantomCount = count($phantomCitations);
         $orphanCount = count($orphanReferences);
         $totalBib = count($entries);
+
+        $urlEntriesCount = 0;
+        foreach ($entries as $e) {
+            if (preg_match('/^(?:https?:\/\/|www\.)/i', $e['raw_text'])) {
+                $urlEntriesCount++;
+            }
+        }
+        $isUrlDominantBib = (!empty($entries)) && (
+            ($urlEntriesCount >= 3 && ($urlEntriesCount / count($entries)) >= 0.4)
+            || ($urlEntriesCount === count($entries))
+        );
+
+        if ($isUrlDominantBib) {
+            return [
+                'detected_style' => $style,
+                'has_bibliography_section' => true,
+                'total_in_text_citations' => count($citations),
+                'unique_in_text_count' => $uniqueCount,
+                'total_bibliography_entries' => $totalBib,
+                'matched_citations_count' => $matchedCount,
+                'phantom_citations_count' => 0,
+                'orphan_references_count' => $orphanCount,
+                'citation_health_score' => 60.0,
+                'health_verdict' => 'NEEDS_ATTENTION',
+                'verdict_label' => 'Daftar Pustaka Berupa URL (0 Sitasi Gaib)',
+                'summary_rationale' => "Daftar pustaka memuat {$urlEntriesCount} tautan URL mentah (seperti Wikipedia/blog) dari total {$totalBib} rujukan. Seluruh kutipan bebas dari sitasi gaib (0 sitasi gaib), namun format rujukan web disarankan disempurnakan ke kaidah sitasi akademik baku (APA/Chicago/IEEE) untuk kelayakan sidang.",
+                'matched_items' => $matchedItems,
+                'phantom_citations' => [],
+                'orphan_references' => $orphanReferences,
+            ];
+        }
 
         if (!$hasBib) {
             $healthScore = ($uniqueCount > 0) ? 0.0 : 100.0;
