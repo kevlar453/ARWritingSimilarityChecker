@@ -40,6 +40,9 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
                 mime_type=document.get("mime_type"),
                 is_corpus=(document.get("document_type") == "corpus")
             )
+            # Muat ulang data dokumen setelah pengindeksan selesai
+            cursor.execute("SELECT * FROM documents WHERE id = %s", (document_id,))
+            document = cursor.fetchone()
 
         # Validasi kecukupan teks dokumen (Guard against scanned PDFs / empty documents)
         cursor.execute("""
@@ -55,7 +58,27 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
                 "atau dokumen dalam keadaan kosong."
             )
 
-        # 3b. Just-In-Time (JIT) Topic Harvesting (Pencarian Korpus Sebidang Otomatis)
+        # 3b. Pastikan dokumen memiliki judul karya ilmiah asli (bukan nama berkas mentah)
+        cur_doc_title = (document.get("title") or "").strip()
+        orig_fname = (document.get("original_filename") or "").strip()
+        from pathlib import Path
+        fname_stem = Path(orig_fname).stem.strip()
+        if not cur_doc_title or cur_doc_title.lower() == fname_stem.lower() or cur_doc_title.lower() == orig_fname.lower():
+            cursor.execute(
+                "SELECT text FROM document_chunks WHERE document_id = %s ORDER BY chunk_index ASC LIMIT 2",
+                (document_id,)
+            )
+            early_chunk_rows = cursor.fetchall()
+            if early_chunk_rows:
+                from worker.section_parser import extract_academic_title
+                chunk_sample = "\n".join(r["text"] for r in early_chunk_rows if r.get("text"))
+                detected_title = extract_academic_title(chunk_sample)
+                if detected_title:
+                    cursor.execute("UPDATE documents SET title = %s WHERE id = %s", (detected_title, document_id))
+                    connection.commit()
+                    document["title"] = detected_title
+
+        # 3c. Just-In-Time (JIT) Topic Harvesting (Pencarian Korpus Sebidang Otomatis)
         jit_harvest_res = None
         if document.get("document_type") != "corpus":
             doc_title = document.get("title") or document.get("original_filename") or ""
@@ -417,6 +440,9 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
                 result["substantive_similarity"] = sub_sim
                 result["substantive_matched_words"] = sub_covered_words
                 result["corpus_docs_count"] = total_corpus_docs
+
+            result["document_title"] = document.get("title") or ""
+            result["original_filename"] = document.get("original_filename") or ""
 
             result["substantive_summary"] = {
                 "substantive_similarity": sub_sim,

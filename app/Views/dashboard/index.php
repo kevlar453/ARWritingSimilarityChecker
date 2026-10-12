@@ -335,6 +335,15 @@
                         </div>
                     </div>
 
+                    <!-- Optional Custom Title Input -->
+                    <div class="bg-slate-50/70 border border-slate-200/80 rounded-xl p-3.5 space-y-1">
+                        <label for="submissionCustomTitle" class="block text-[11px] font-bold text-slate-700 uppercase tracking-wider">
+                            Judul Karya Ilmiah <span class="text-slate-400 font-normal lowercase">(opsional):</span>
+                        </label>
+                        <input type="text" id="submissionCustomTitle" name="custom_title" placeholder="Kosongkan jika ingin judul diekstrak otomatis dari sampul naskah..." class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white placeholder:text-slate-400">
+                        <p class="text-[10px] text-slate-400">Jika dikosongkan, mesin AR Tilik otomatis mendeteksi dan mengekstrak judul karya ilmiah asli dari halaman sampul.</p>
+                    </div>
+
                     <div class="space-y-2.5 pt-1">
                         <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">Metode Mesin Pemeriksaan (Engine Mode):</label>
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 text-xs">
@@ -1528,6 +1537,10 @@
                 const subDepartment = document.getElementById('subDepartment')?.value?.trim();
                 if (subDepartment) {
                     formData.append('department', subDepartment);
+                }
+                const subCustomTitle = document.getElementById('submissionCustomTitle')?.value?.trim();
+                if (subCustomTitle && total === 1) {
+                    formData.append('custom_title', subCustomTitle);
                 }
 
                 try {

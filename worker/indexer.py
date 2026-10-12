@@ -250,15 +250,64 @@ def index_document(
         if is_corpus:
             save_fingerprint_documents(connection, document_id, shingles)
             
+        # Ekstraksi judul karya ilmiah asli dari halaman muka jika judul saat ini masih berupa nama berkas
+        extracted_academic_title = None
+        if pages:
+            early_sample_text = pages[0].get("text", "")
+            if len(pages) > 1 and len(early_sample_text.split()) < 35:
+                early_sample_text += "\n" + pages[1].get("text", "")
+            try:
+                from worker.section_parser import extract_academic_title
+                extracted_academic_title = extract_academic_title(early_sample_text)
+            except Exception:
+                extracted_academic_title = None
+
         cursor = connection.cursor()
-        cursor.execute("""
-            UPDATE documents
-            SET page_count = %s,
-                status = 'completed',
-                indexing_status = 'completed',
-                updated_at = NOW()
-            WHERE id = %s
-        """, (total_pages, document_id))
+        if extracted_academic_title:
+            cursor.execute("SELECT title, original_filename FROM documents WHERE id = %s", (document_id,))
+            row_meta = cursor.fetchone()
+            if row_meta:
+                cur_t = ((row_meta.get("title") if isinstance(row_meta, dict) else row_meta[0]) or "").strip().lower()
+                fname = ((row_meta.get("original_filename") if isinstance(row_meta, dict) else row_meta[1]) or "").strip().lower()
+                from pathlib import Path
+                fname_stem = Path(fname).stem.lower()
+                if not cur_t or cur_t == fname_stem or cur_t == fname:
+                    cursor.execute("""
+                        UPDATE documents
+                        SET title = %s,
+                            page_count = %s,
+                            status = 'completed',
+                            indexing_status = 'completed',
+                            updated_at = NOW()
+                        WHERE id = %s
+                    """, (extracted_academic_title, total_pages, document_id))
+                else:
+                    cursor.execute("""
+                        UPDATE documents
+                        SET page_count = %s,
+                            status = 'completed',
+                            indexing_status = 'completed',
+                            updated_at = NOW()
+                        WHERE id = %s
+                    """, (total_pages, document_id))
+            else:
+                cursor.execute("""
+                    UPDATE documents
+                    SET page_count = %s,
+                        status = 'completed',
+                        indexing_status = 'completed',
+                        updated_at = NOW()
+                    WHERE id = %s
+                """, (total_pages, document_id))
+        else:
+            cursor.execute("""
+                UPDATE documents
+                SET page_count = %s,
+                    status = 'completed',
+                    indexing_status = 'completed',
+                    updated_at = NOW()
+                WHERE id = %s
+            """, (total_pages, document_id))
         connection.commit()
         cursor.close()
         

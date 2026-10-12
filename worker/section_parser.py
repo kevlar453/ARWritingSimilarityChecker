@@ -551,3 +551,89 @@ def get_substantive_including_methodology(segmentation: DocumentSegmentationResu
     mengabaikan halaman formalitas depan dan lampiran belakang.
     """
     return filter_text_by_zones(segmentation, [SectionZone.BODY_TEXT, SectionZone.METHODOLOGY])
+
+
+# =========================================================================
+# Ekstraktor Judul Karya Ilmiah (Academic Paper Title Extractor)
+# =========================================================================
+
+def extract_academic_title(text: str) -> Optional[str]:
+    """
+    Mengekstrak judul karya ilmiah asli dari halaman muka / sampul naskah
+    (skripsi, tesis, disertasi, makalah, artikel jurnal, atau proposal).
+    Mengembalikan string judul karya ilmiah yang valid (>= 3 kata), atau None jika tidak konklusif.
+    """
+    if not text or not isinstance(text, str):
+        return None
+
+    lines = [l.strip() for l in text.splitlines() if l.strip()]
+    if not lines:
+        return None
+
+    # 1. Bersihkan nomor halaman, angka romawi, atau header sepele di baris teratas
+    while lines and (
+        lines[0].isdigit() 
+        or len(lines[0]) <= 2 
+        or re.match(r'^(halaman|page|\d+/\d+|[ivxlcdm]+)$', lines[0], re.IGNORECASE)
+    ):
+        lines.pop(0)
+
+    # 2. Bersihkan header jurnal/penerbit (misal: 'Jurnal Teologi Vol. 1', 'ISSN: 1234-5678', link DOI/URL)
+    while lines and re.match(r'^(jurnal|journal|vol\.|volume|no\.|issn|e-issn|prosiding|proceedings|https?://|doi:)', lines[0], re.IGNORECASE):
+        lines.pop(0)
+
+    if not lines:
+        return None
+
+    # Jika baris pertama berdiri sendiri hanya sebagai label jenis naskah (misal: "TESIS", "SKRIPSI", "PROPOSAL PENELITIAN")
+    genre_only_pattern = r'^(tesis|thesis|skripsi|disertasi|dissertation|proposal|proposal penelitian|proposal tesis|proposal skripsi|laporan akhir|laporan penelitian|makalah|karya tulis ilmiah|tugas akhir|artikel ilmiah)$'
+    if re.match(genre_only_pattern, lines[0], re.IGNORECASE) and len(lines) > 1:
+        lines.pop(0)
+
+    # Pola pembatas penanda bahwa judul karya ilmiah telah selesai
+    stop_patterns = [
+        r'^(tesis|thesis|skripsi|disertasi|dissertation|proposal|proposal penelitian|laporan akhir|laporan penelitian|makalah|karya tulis ilmiah|tugas akhir|artikel ilmiah)\b',
+        r'^(oleh|disusun oleh|diajukan oleh|diajukan untuk|diajukan sebagai|sebagai satu di antara|untuk memenuhi|penulis|author|nama|nim|npm|nidn|kelompok)\s*[:.]?',
+        r'^(program studi|jurusan|departemen|fakultas|universitas|institut|sekolah tinggi|politeknik|akademi)\b',
+        r'^(lembar persetujuan|lembar pengesahan|halaman judul|halaman pengesahan)\b',
+        r'^(abstrak|abstract|ringkasan|kata kunci|keywords?|pendahuluan|latar belakang|bab\s+[i|1])\b',
+        r'^(email\s*:|e-mail\s*:|https?://|doi\s*:)',
+    ]
+    stop_regex = re.compile('|'.join(stop_patterns), re.IGNORECASE)
+
+    collected = []
+    word_count = 0
+    for idx, line in enumerate(lines[:15]):
+        if stop_regex.search(line):
+            break
+        # Penulis dengan email atau afiliasi institusi
+        if re.search(r'@[a-zA-Z0-9.-]+', line) or re.search(r'\b(gmail|yahoo|ac\.id)\b', line, re.IGNORECASE):
+            break
+        # Penulis bergaya jurnal dengan catatan kaki / superskrip / koma nama (misal: 'Anthony Kurniawan Wyatno1, Laurentius Prasetyo2')
+        if re.search(r'[a-zA-Z]+\d+', line) or re.search(r'^[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\d*,\s*[A-Z]', line):
+            break
+        # Jika baris berikutnya adalah nama institusi/afiliasi, email, atau abstrak, dan judul sudah terkumpul
+        if idx + 1 < len(lines):
+            next_line = lines[idx + 1]
+            if re.search(r'^(universitas|institut|sekolah tinggi|politeknik|fakultas|jurusan|program studi|email|e-mail|departemen|abstrak|abstract)\b', next_line, re.IGNORECASE):
+                if collected and len(line.split()) <= 10:
+                    break
+
+        words = line.split()
+        if word_count + len(words) > 45:
+            break
+        collected.append(line)
+        word_count += len(words)
+
+    if not collected or word_count < 3:
+        return None
+
+    title = " ".join(collected)
+    title = re.sub(r'\s+', ' ', title).strip()
+    title = re.sub(r'[:\-,]+$', '', title).strip()
+
+    if len(title.split()) < 3:
+        return None
+
+    return title
+

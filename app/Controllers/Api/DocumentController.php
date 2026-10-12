@@ -78,10 +78,13 @@ class DocumentController extends BaseController
             $rawVisibility = (string) $this->request->getPost('corpus_visibility');
             $visibility = in_array($rawVisibility, ['private', 'institution', 'corpus'], true) ? $rawVisibility : 'private';
 
+            $customTitle = trim((string) ($this->request->getPost('custom_title') ?: $this->request->getPost('title') ?: ''));
+            $docTitle = !empty($customTitle) ? $customTitle : pathinfo($file->getClientName(), PATHINFO_FILENAME);
+
             $documentModel = new DocumentModel();
             $documentId = $documentModel->insert([
                 'user_id'           => $userId,
-                'title'             => pathinfo($file->getClientName(), PATHINFO_FILENAME),
+                'title'             => $docTitle,
                 'original_filename' => $file->getClientName(),
                 'mime_type'         => $mime,
                 'file_size'         => $file->getSize(),
@@ -653,7 +656,7 @@ class DocumentController extends BaseController
             $filename = $file->getRandomName();
             $file->move($storagePath, $filename);
 
-            $customTitle = trim((string)$this->request->getPost('title'));
+            $customTitle = trim((string)($this->request->getPost('custom_title') ?: $this->request->getPost('title') ?: ''));
             $title = !empty($customTitle) ? $customTitle : pathinfo($file->getClientName(), PATHINFO_FILENAME);
             $engine = $this->request->getPost('engine') ?: 'hybrid';
             $now = date('Y-m-d H:i:s');

@@ -25,6 +25,8 @@ $routes->match(['get', 'head'], 'documents/shared/(:segment)', 'DashboardControl
 $routes->match(['get', 'head'], 'dashboard/documents/shared/(:segment)', 'DashboardController::sharedAccess/$1');
 $routes->post('dashboard/documents/(:num)/purge-file', 'DashboardController::purgeDocumentFile/$1');
 $routes->post('dashboard/documents/(:num)/delete', 'DashboardController::deleteUserDocument/$1');
+$routes->post('dashboard/documents/(:num)/update-title', 'DashboardController::updateDocumentTitle/$1');
+$routes->post('documents/(:num)/update-title', 'DashboardController::updateDocumentTitle/$1');
 $routes->match(['get', 'head'], 'verify/(:segment)/pdf', 'DashboardController::downloadCertificatePdf/$1');
 $routes->match(['get', 'head'], 'dashboard/reports/(:num)/certificate-pdf', 'DashboardController::downloadCertificatePdfByReportId/$1');
 $routes->match(['get', 'head'], 'verify/(:segment)', 'DashboardController::verify/$1');

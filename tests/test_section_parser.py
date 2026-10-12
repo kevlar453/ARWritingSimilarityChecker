@@ -405,3 +405,48 @@ def test_roman_normalization_variations():
     assert _bab_number("BAB 5") == 5
 
 
+def test_extract_academic_title_variations():
+    """
+    Memastikan ekstraksi judul karya ilmiah akurat pada format tesis, skripsi,
+    artikel jurnal, dan proposal penelitian.
+    """
+    from worker.section_parser import extract_academic_title
+
+    # 1. Format Tesis dengan Judul di Awal (misal: Helena Nina)
+    t1 = """
+    STRATEGI PENDAMPINGAN PERAYAAN EKARISTI
+    BAGI ANAK BERKEBUTUHAN KHUSUS
+    DI KAPEL RUMAH RETRET TIRTA RIA PONTIANAK
+    
+    TESIS
+    Oleh:
+    HELENA NINA
+    NIM. 24201007
+    """
+    assert extract_academic_title(t1) == "STRATEGI PENDAMPINGAN PERAYAAN EKARISTI BAGI ANAK BERKEBUTUHAN KHUSUS DI KAPEL RUMAH RETRET TIRTA RIA PONTIANAK"
+
+    # 2. Format Tesis dengan Label Genre di Baris Pertama (misal: Emiliana Vivi)
+    t2 = """
+    TESIS
+    ADORASI EKARISTI DALAM SACRAMENTUM CARITATIS
+    Oleh: Emiliana Vivi
+    NIM: 24201009
+    """
+    assert extract_academic_title(t2) == "ADORASI EKARISTI DALAM SACRAMENTUM CARITATIS"
+
+    # 3. Format Artikel Jurnal dengan Afiliasi & Abstrak
+    t3 = """
+    DARI PENGHAMBAAN ALGORITMA MENUJU KEHIDUPAN DALAM KRISTUS: BUAH ROH SEBAGAI INDIKATOR ETIS
+    Anthony Kurniawan Wyatno1, Laurentius Prasetyo2
+    Sekolah Tinggi Agama Katolik Negeri Pontianak1,2
+    Email: Anthonywyatno@gmail.com
+    Abstract: The dominance of social media algorithms...
+    """
+    assert extract_academic_title(t3) == "DARI PENGHAMBAAN ALGORITMA MENUJU KEHIDUPAN DALAM KRISTUS: BUAH ROH SEBAGAI INDIKATOR ETIS"
+
+    # 4. Format Dokumen Kosong / Kurang Kata
+    assert extract_academic_title("") is None
+    assert extract_academic_title("Satu Dua") is None
+
+
+

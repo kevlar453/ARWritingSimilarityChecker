@@ -2289,5 +2289,48 @@ class DashboardController extends BaseController
             'message' => 'Karya ilmiah beserta seluruh data laporan terkait telah berhasil dihapus secara permanen dari akun Anda.',
         ]);
     }
+
+    /**
+     * Memperbarui judul karya ilmiah oleh pemilik naskah atau administrator
+     */
+    public function updateDocumentTitle($documentId)
+    {
+        $userId = session()->get('user_id');
+        $isAdmin = (session()->get('role') === 'admin' || session()->get('user_role') === 'admin');
+
+        if (! $userId) {
+            return $this->response->setStatusCode(401)->setJSON(['success' => false, 'message' => 'Silakan masuk terlebih dahulu.']);
+        }
+
+        $docModel = new DocumentModel();
+        $doc = $docModel->find($documentId);
+        if (! $doc) {
+            return $this->response->setStatusCode(404)->setJSON(['success' => false, 'message' => 'Dokumen tidak ditemukan.']);
+        }
+
+        if ((int) $doc['user_id'] !== (int) $userId && ! $isAdmin) {
+            return $this->response->setStatusCode(403)->setJSON(['success' => false, 'message' => 'Anda tidak memiliki wewenang untuk mengubah judul naskah ini.']);
+        }
+
+        $newTitle = trim((string) $this->request->getPost('title'));
+        if (mb_strlen($newTitle) < 3) {
+            return $this->response->setStatusCode(400)->setJSON(['success' => false, 'message' => 'Judul karya ilmiah minimal 3 karakter.']);
+        }
+
+        if (mb_strlen($newTitle) > 300) {
+            $newTitle = mb_substr($newTitle, 0, 300);
+        }
+
+        $docModel->update($documentId, [
+            'title'      => $newTitle,
+            'updated_at' => date('Y-m-d H:i:s'),
+        ]);
+
+        return $this->response->setJSON([
+            'success' => true,
+            'message' => 'Judul karya ilmiah berhasil diperbarui.',
+            'title'   => $newTitle,
+        ]);
+    }
 }
 

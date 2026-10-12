@@ -159,9 +159,16 @@ $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evi
                     <span class="text-xs text-slate-400">•</span>
                     <span class="text-xs text-slate-500">ID Submisi #<?= $document['id'] ?? $report['document_id'] ?></span>
                 </div>
-                <h1 class="text-xl sm:text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight break-words">
-                    <?= esc($document['title'] ?? 'Dokumen Karya Ilmiah') ?>
-                </h1>
+                <div class="flex items-start gap-2.5 group">
+                    <h1 id="documentTitleHeading" class="text-xl sm:text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight break-words">
+                        <?= esc($document['title'] ?? 'Dokumen Karya Ilmiah') ?>
+                    </h1>
+                    <?php if (!empty($isOwner) || session()->get('role') === 'admin' || session()->get('user_role') === 'admin'): ?>
+                        <button type="button" onclick="openEditTitleModal()" class="shrink-0 text-slate-400 hover:text-indigo-600 p-1.5 rounded-lg hover:bg-indigo-50 border border-transparent hover:border-indigo-100 transition mt-0.5" title="Sesuaikan / Edit Judul Naskah">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                        </button>
+                    <?php endif; ?>
+                </div>
                 <p class="text-xs sm:text-sm text-slate-500 mt-1 flex flex-wrap items-center gap-3">
                     <span>File: <span class="font-mono-code text-slate-700 font-semibold break-all"><?= esc($document['original_filename'] ?? '-') ?></span></span>
                     <span>•</span>
@@ -4800,6 +4807,88 @@ $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evi
                 console.error(err);
             }
         }
+
+        // ── MODAL EDIT JUDUL KARYA ILMIAH ──
+        function openEditTitleModal() {
+            const heading = document.getElementById('documentTitleHeading');
+            const input = document.getElementById('inputNewTitle');
+            if (heading && input) {
+                input.value = heading.textContent.trim();
+            }
+            const modal = document.getElementById('editTitleModal');
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeEditTitleModal() {
+            const modal = document.getElementById('editTitleModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        async function saveDocumentTitle() {
+            const input = document.getElementById('inputNewTitle');
+            const btn = document.getElementById('btnSaveTitle');
+            if (!input) return;
+            const newTitle = input.value.trim();
+            if (newTitle.length < 3) {
+                alert('Judul minimal 3 karakter.');
+                return;
+            }
+
+            const docId = <?= (int) ($document['id'] ?? $report['document_id']) ?>;
+            const origText = btn ? btn.textContent : '';
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = 'Menyimpan...';
+            }
+
+            try {
+                const formData = new FormData();
+                formData.append('title', newTitle);
+                const resp = await fetch(`<?= base_url('dashboard/documents') ?>/${docId}/update-title`, {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    body: formData
+                });
+                const res = await resp.json();
+                if (res.success) {
+                    const heading = document.getElementById('documentTitleHeading');
+                    if (heading) heading.textContent = res.title || newTitle;
+                    closeEditTitleModal();
+                } else {
+                    alert(res.message || 'Gagal memperbarui judul karya ilmiah.');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Terjadi kesalahan jaringan.');
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = origText;
+                }
+            }
+        }
     </script>
+
+    <!-- Modal Edit Judul Karya Ilmiah -->
+    <div id="editTitleModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl p-6 sm:p-7 max-w-lg w-full shadow-2xl border border-slate-100 space-y-4 animate-in fade-in zoom-in-95 duration-150">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-2">
+                    <span class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">✎</span>
+                    <h3 class="text-base font-bold text-slate-800">Edit Judul Karya Ilmiah</h3>
+                </div>
+                <button type="button" onclick="closeEditTitleModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold">✕</button>
+            </div>
+            <div>
+                <label for="inputNewTitle" class="block text-xs font-semibold text-slate-600 mb-1.5">Judul Naskah Akademik:</label>
+                <textarea id="inputNewTitle" rows="3" class="w-full text-sm p-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-semibold text-slate-800" placeholder="Masukkan judul karya ilmiah..."></textarea>
+                <p class="text-[11px] text-slate-400 mt-1">Judul ini akan tercantum pada laporan, piagam sertifikat integritas, dan dokumen ekspor resmi.</p>
+            </div>
+            <div class="flex items-center justify-end gap-2 pt-2">
+                <button type="button" onclick="closeEditTitleModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition">Batal</button>
+                <button type="button" id="btnSaveTitle" onclick="saveDocumentTitle()" class="px-5 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-xs transition">Simpan Perubahan</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
