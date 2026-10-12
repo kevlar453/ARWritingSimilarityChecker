@@ -447,7 +447,21 @@ def extract_docx(path: str) -> list[dict]:
     # Ekstraksi catatan kaki & catatan akhir jika ada (misal gaya Chicago / naskah sejarah)
     footnotes = extract_docx_footnotes(path)
     if footnotes:
-        text_blocks.append('\n\n[Catatan Kaki / Footnotes]\n' + '\n'.join(footnotes))
+        fn_text = '\n\n[Catatan Kaki / Footnotes]\n' + '\n'.join(footnotes)
+        # Sisipkan SEBELUM Daftar Pustaka / Lampiran jika ada, agar tidak mencemari bagian referensi
+        back_matter_re = re.compile(
+            r'^\s*(?:DAFTAR\s+PUSTAKA|BIBLIOGRAFI|BIBLIOGRAPHY|REFERENCES?|DAFTAR\s+REFERENSI|DAFTAR\s+RUJUKAN|SUMBER\s+RUJUKAN|LAMPIRAN)\b',
+            re.IGNORECASE
+        )
+        insert_idx = None
+        for i, block in enumerate(text_blocks):
+            if back_matter_re.match(block.strip()):
+                insert_idx = i
+                break
+        if insert_idx is not None:
+            text_blocks.insert(insert_idx, fn_text)
+        else:
+            text_blocks.append(fn_text)
 
     return [{
         "page_number": 1,

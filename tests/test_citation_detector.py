@@ -245,3 +245,29 @@ def test_citation_auditor_bibliography_english_and_single_name():
     assert res.phantom_citations_count == 0
     assert res.citation_health_score == 100.0
 
+
+def test_citation_auditor_footnotes_not_leaking_into_bibliography():
+    from worker.citation_auditor import audit_citations_and_bibliography
+
+    sample_doc = """
+    Penelitian ini mendalami pendidikan asrama (Yuswanto, 2021).
+    Dalam tradisi lokal, ritual pengobatan sering menggunakan doa tradisional.
+
+    BIBLIOGRAPHY
+
+    Yuswanto, F. (2021). Revitalisasi Pengelolaan Asrama Dalam Mengembangkan Pendidikan Katolik Bagi Suku Dayak di Wilayah Perbatasan Kabupaten Sanggau. VOCAT: JURNAL PENDIDIKAN KATOLIK, 1(1), 30–36.
+
+    [Catatan Kaki / Footnotes]
+    Dayak Mentuka adalah: Sub suku Dayak di Kalimantan Barat umumnya menempati wilayah Kabupaten Sekadau.
+    Dalam penulisan berikutnya, anggota suku Dayak Mentuka yang akan berpindah agama ke agama Islam akan disebut sebagai konversan. Sinan adalah istilah khas dalam suku Dayak Mentuka.
+    """
+
+    res = audit_citations_and_bibliography(sample_doc)
+    assert res.has_bibliography_section is True
+    assert res.total_in_text_citations == 1
+    assert res.total_bibliography_entries == 1
+    assert res.matched_citations_count == 1
+    assert res.orphan_references_count == 0
+    assert len(res.orphan_references) == 0
+    assert res.matched_items[0]["matched_entry_text"].strip().endswith("30–36.")
+

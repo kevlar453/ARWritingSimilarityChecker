@@ -114,6 +114,43 @@ def normalize_author_name(name: str) -> str:
     return tokens[-1] if tokens else ""
 
 
+def clean_bib_and_reclaim_footnotes(body_text: str, bib_text: str) -> Tuple[str, str]:
+    """
+    Memastikan bahwa teks Daftar Pustaka (bib_text) tidak terkontaminasi oleh Lampiran
+    atau Catatan Kaki / Footnotes (misal hasil ekstraksi docx di mana footnotes ditaruh di akhir).
+    Jika ditemukan [Catatan Kaki / Footnotes] di bib_text, blok tersebut dipisahkan dari bib_text
+    dan dikembalikan ke body_text agar sitasi di catatan kaki dapat terhitung di naskah.
+    """
+    if not bib_text:
+        return body_text, bib_text
+
+    lampiran_pattern = re.compile(r'(?:\n|\A)\s*(?:[0-9\.\s]*\b(?:LAMPIRAN|APPENDICES|APPENDIX)\b[^\n]*\n?)', re.IGNORECASE)
+    footnote_pattern = re.compile(r'(?:\n|\A)\s*(?:\[\s*(?:Catatan\s+Kaki|Footnotes?)(?:\s*/\s*(?:Footnotes?|Catatan\s+Kaki))?\s*\][^\n]*)', re.IGNORECASE)
+
+    lamp_match = lampiran_pattern.search(bib_text)
+    fn_match = footnote_pattern.search(bib_text)
+
+    if fn_match:
+        if lamp_match and lamp_match.start() > fn_match.start():
+            fn_content = bib_text[fn_match.start():lamp_match.start()]
+        else:
+            fn_content = bib_text[fn_match.start():]
+        body_text = (body_text + "\n\n" + fn_content).strip()
+
+    cutoff_pos = None
+    if lamp_match and fn_match:
+        cutoff_pos = min(lamp_match.start(), fn_match.start())
+    elif lamp_match:
+        cutoff_pos = lamp_match.start()
+    elif fn_match:
+        cutoff_pos = fn_match.start()
+
+    if cutoff_pos is not None:
+        bib_text = bib_text[:cutoff_pos].strip()
+
+    return body_text, bib_text
+
+
 def split_body_and_bibliography(text: str, segmentation_res: Any = None) -> Tuple[str, str, bool]:
     """
     Memisahkan naskah menjadi teks tubuh (body) dan teks daftar pustaka (bibliography).
@@ -144,7 +181,8 @@ def split_body_and_bibliography(text: str, segmentation_res: Any = None) -> Tupl
                 body_parts.append(sec_text)
 
         if has_bib and bib_parts:
-            return "\n".join(body_parts), "\n".join(bib_parts), True
+            b_text, b_bib = clean_bib_and_reclaim_footnotes("\n".join(body_parts), "\n".join(bib_parts))
+            return b_text, b_bib, True
 
     # 2. Heuristik regex deterministik untuk menemukan heading Daftar Pustaka
     bib_heading_pattern = re.compile(
@@ -158,13 +196,8 @@ def split_body_and_bibliography(text: str, segmentation_res: Any = None) -> Tupl
         body_text = text[:last_match.start()]
         bib_text = text[start_bib:]
 
-        # Jika ada section LAMPIRAN sesudah Daftar Pustaka, potong di awal Lampiran
-        lampiran_pattern = re.compile(r'(?:\n|\A)(?:[0-9\.\s]*\b(?:LAMPIRAN|APPENDICES|APPENDIX)\b[^\n]*\n)', re.IGNORECASE)
-        lamp_match = lampiran_pattern.search(bib_text)
-        if lamp_match:
-            bib_text = bib_text[:lamp_match.start()]
-
-        return body_text, bib_text, True
+        b_text, b_bib = clean_bib_and_reclaim_footnotes(body_text, bib_text)
+        return b_text, b_bib, True
 
     # 3. Fallback: blok URL mentah di akhir naskah (tanpa heading) dianggap daftar rujukan
     lines = text.rstrip().split("\n")
@@ -174,7 +207,8 @@ def split_body_and_bibliography(text: str, segmentation_res: Any = None) -> Tupl
         idx -= 1
     url_count = sum(1 for ln in lines[idx:] if url_re.match(ln))
     if url_count >= 3:
-        return "\n".join(lines[:idx]), "\n".join(lines[idx:]), True
+        b_text, b_bib = clean_bib_and_reclaim_footnotes("\n".join(lines[:idx]), "\n".join(lines[idx:]))
+        return b_text, b_bib, True
 
     return text, "", False
 
@@ -328,6 +362,15 @@ def extract_bibliography_entries(bib_text: str) -> List[BibliographyEntry]:
             if clean_w and clean_w not in {"dkk", "dan", "and", "al", "vol", "no", "pp", "hal", "jurnal", "prosiding", "in", "the", "of", "ed", "eds"}:
                 if clean_w not in author_keys:
                     author_keys.append(clean_w)
+
+        # Validasi karakteristik bibliografi minimum:
+        # Menolak teks naratif / potongan footnote liar yang tidak sengaja lolos ke bib_text
+        has_nd = bool(re.search(r'\b(?:n\.d\.|t\.th\.|no\s+date|tanpa\s+tahun)\b', text_entry, re.IGNORECASE))
+        has_url_doi = bool(re.search(r'(?:https?://|www\.|doi\.org|10\.\d{4,9}/)', text_entry, re.IGNORECASE))
+        has_academic_meta = bool(re.search(r'\b(?:jurnal|journal|vol\.|volume|no\.|issue|hal\.|hlm\.|pp\.|press|penerbit|publisher|university|universitas|skripsi|tesis|disertasi|prosiding|proceedings|isbn|issn)\b', text_entry, re.IGNORECASE))
+
+        if year is None and numeric_id is None and not has_nd and not has_url_doi and not has_academic_meta:
+            return
 
         entries.append(BibliographyEntry(
             entry_id=len(entries) + 1,
