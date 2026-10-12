@@ -829,6 +829,50 @@ class DashboardController extends BaseController
             'synced_at' => date('H:i:s'),
         ]);
     }
+
+    /**
+     * API Realtime Polling Metrik Badge Sidebar Admin (Auto-Reload Nilai Tanpa Refresh Halaman)
+     */
+    public function getSidebarBadgesRealtime(): ResponseInterface
+    {
+        $db = db_connect();
+        $userModel = new UserModel();
+        $docModel = new DocumentModel();
+        $paymentModel = new PaymentTransactionModel();
+        $ambAppModel = new \App\Models\AmbassadorApplicationModel();
+        $visitorModel = new VisitorModel();
+
+        $totalUsers = $userModel->countAllResults();
+        $queueCount = $docModel->whereIn('status', ['uploaded', 'processing'])->countAllResults();
+        $totalCorpus = $docModel->where('document_type', 'corpus')->countAllResults();
+        $totalAudited = $db->table('reports')->where('status', 'completed')->countAllResults();
+        $totalApiKeys = $db->table('api_keys')->countAllResults();
+        $activeGoogleKeys = $db->table('google_api_keys')->where('status', 'active')->countAllResults();
+        $paymentStats = $paymentModel->getPaymentStats();
+        $testimonialStats = (new \App\Models\TestimonialModel())->getStats();
+        $ambStats = $ambAppModel->getAdminStats();
+        $activeLocks = $db->table('auth_rate_limits')->where('locked_until >', date('Y-m-d H:i:s'))->countAllResults();
+        $visitorStats = $visitorModel->getStats();
+
+        return $this->response->setJSON([
+            'status'    => 'success',
+            'synced_at' => date('H:i:s'),
+            'badges'    => [
+                'users'              => (int) $totalUsers,
+                'queue'              => (int) $queueCount,
+                'corpus'             => (int) $totalCorpus,
+                'analytics'          => (int) $totalAudited,
+                'api_keys'           => (int) $totalApiKeys,
+                'google_keys_active' => (int) $activeGoogleKeys,
+                'payments_settled'   => (int) ($paymentStats['settled_count'] ?? 0),
+                'testimonials'       => (int) ($testimonialStats['total_reviews'] ?? 0),
+                'ambassador_pending' => (int) ($ambStats['pending_review'] ?? 0),
+                'ambassador_active'  => (int) ($ambStats['active_ambassadors'] ?? 0),
+                'security_locks'     => (int) $activeLocks,
+                'visitors_today'     => (int) ($visitorStats['today_unique'] ?? 0),
+            ]
+        ]);
+    }
 }
 
 

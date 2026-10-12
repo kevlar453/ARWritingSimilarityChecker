@@ -194,8 +194,18 @@
 
                 <!-- Group 1: Menu Utama -->
                 <div class="space-y-1">
-                    <div class="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                        Menu Utama
+                    <div class="flex items-center justify-between px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                        <span>Menu Utama</span>
+                        <div class="flex items-center gap-1.5 font-normal normal-case font-mono text-[9px] text-slate-400" title="Auto-reload metrik sidebar setiap 12 detik">
+                            <span class="relative flex h-1.5 w-1.5">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                            </span>
+                            <span id="sidebar-last-sync" class="text-slate-400">Live</span>
+                            <button type="button" onclick="refreshSidebarBadgesRealtime(true)" id="btn-manual-sync-sidebar" class="hover:text-slate-200 transition p-0.5 rounded cursor-pointer" title="Perbarui angka sidebar sekarang">
+                                <svg class="w-3 h-3 text-slate-400 hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                            </button>
+                        </div>
                     </div>
                     <a href="<?= base_url('admin?tab=overview') ?>" class="group flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 <?= $activeTab === 'overview' ? 'bg-indigo-600/15 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent' ?>">
                         <div class="flex items-center gap-2.5">
@@ -215,7 +225,7 @@
                             <svg class="w-4 h-4 <?= $activeTab === 'users' ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                             <span>Pengguna & Kuota</span>
                         </div>
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold <?= $activeTab === 'users' ? 'bg-indigo-500/20 text-indigo-300' : 'bg-slate-800 text-slate-300' ?>">
+                        <span id="sidebar-badge-users" class="px-2 py-0.5 rounded-full text-[10px] font-semibold transition-all duration-300 <?= $activeTab === 'users' ? 'bg-indigo-500/20 text-indigo-300' : 'bg-slate-800 text-slate-300' ?>">
                             <?= (int) $metrics['total_users'] ?>
                         </span>
                     </a>
@@ -224,18 +234,17 @@
                             <svg class="w-4 h-4 <?= $activeTab === 'documents' ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                             <span>Dokumen & Antrean</span>
                         </div>
-                        <?php if ($metrics['queue_uploaded'] + $metrics['queue_processing'] > 0): ?>
-                            <span class="px-2 py-0.5 rounded-full text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold animate-pulse">
-                                <?= $metrics['queue_uploaded'] + $metrics['queue_processing'] ?> proses
-                            </span>
-                        <?php endif; ?>
+                        <?php $totalQueue = (int)($metrics['queue_uploaded'] ?? 0) + (int)($metrics['queue_processing'] ?? 0); ?>
+                        <span id="sidebar-badge-documents" class="px-2 py-0.5 rounded-full text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold animate-pulse transition-all duration-300 <?= $totalQueue > 0 ? '' : 'hidden' ?>">
+                            <?= $totalQueue > 0 ? ($totalQueue . ' proses') : '' ?>
+                        </span>
                     </a>
                     <a href="<?= base_url('admin?tab=corpus') ?>" class="group flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 <?= $activeTab === 'corpus' ? 'bg-indigo-600/15 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent' ?>">
                         <div class="flex items-center gap-2.5">
                             <svg class="w-4 h-4 <?= $activeTab === 'corpus' ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
                             <span>Korpus Repositori</span>
                         </div>
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold <?= $activeTab === 'corpus' ? 'bg-indigo-500/20 text-indigo-300' : 'bg-slate-800 text-slate-300' ?>">
+                        <span id="sidebar-badge-corpus" class="px-2 py-0.5 rounded-full text-[10px] font-semibold transition-all duration-300 <?= $activeTab === 'corpus' ? 'bg-indigo-500/20 text-indigo-300' : 'bg-slate-800 text-slate-300' ?>">
                             <?= (int) $metrics['total_corpus'] ?>
                         </span>
                     </a>
@@ -251,7 +260,7 @@
                             <svg class="w-4 h-4 <?= $activeTab === 'analytics' ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                             <span>Analitik Institusi</span>
                         </div>
-                        <span class="px-2 py-0.5 rounded-full text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold">
+                        <span id="sidebar-badge-analytics" class="px-2 py-0.5 rounded-full text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold transition-all duration-300">
                             <?= (int) ($integrityAnalytics['total_audited'] ?? 0) ?>
                         </span>
                     </a>
@@ -260,7 +269,7 @@
                             <svg class="w-4 h-4 <?= $activeTab === 'api_keys' ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
                             <span>Integrasi API & OJS</span>
                         </div>
-                        <span class="px-2 py-0.5 rounded-full text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-semibold">
+                        <span id="sidebar-badge-api_keys" class="px-2 py-0.5 rounded-full text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-semibold transition-all duration-300">
                             <?= count($apiKeysList ?? []) ?>
                         </span>
                     </a>
@@ -269,7 +278,7 @@
                             <svg class="w-4 h-4 <?= $activeTab === 'google_keys' ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                             <span>Google AI Keys (Pool)</span>
                         </div>
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold <?= ($activeGoogleKeysCount ?? 0) > 0 ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-slate-800 text-slate-400' ?>">
+                        <span id="sidebar-badge-google_keys" class="px-2 py-0.5 rounded-full text-[10px] font-semibold transition-all duration-300 <?= ($activeGoogleKeysCount ?? 0) > 0 ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-slate-800 text-slate-400' ?>">
                             <?= (int) ($activeGoogleKeysCount ?? 0) ?> aktif
                         </span>
                     </a>
@@ -278,37 +287,42 @@
                             <svg class="w-4 h-4 <?= $activeTab === 'payments' ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
                             <span>Transaksi & Pembayaran</span>
                         </div>
-                        <?php if (!empty($metrics['payment_stats']['settled_count'])): ?>
-                            <span class="px-2 py-0.5 rounded-full text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold">
-                                <?= (int) $metrics['payment_stats']['settled_count'] ?> lunas
-                            </span>
-                        <?php endif; ?>
+                        <?php $settledCount = (int) ($metrics['payment_stats']['settled_count'] ?? 0); ?>
+                        <span id="sidebar-badge-payments" class="px-2 py-0.5 rounded-full text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold transition-all duration-300 <?= $settledCount > 0 ? '' : 'hidden' ?>">
+                            <?= $settledCount > 0 ? ($settledCount . ' lunas') : '' ?>
+                        </span>
                     </a>
                     <a href="<?= base_url('admin?tab=feedback') ?>" class="group flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 <?= $activeTab === 'feedback' ? 'bg-indigo-600/15 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent' ?>">
                         <div class="flex items-center gap-2.5">
                             <svg class="w-4 h-4 <?= $activeTab === 'feedback' ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
                             <span>Feedback &amp; Testimoni</span>
                         </div>
-                        <?php if (!empty($testimonialStats['total_reviews'])): ?>
-                            <span class="px-2 py-0.5 rounded-full text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold">
-                                <?= (int) $testimonialStats['total_reviews'] ?>
-                            </span>
-                        <?php endif; ?>
+                        <?php $totalReviews = (int) ($testimonialStats['total_reviews'] ?? 0); ?>
+                        <span id="sidebar-badge-feedback" class="px-2 py-0.5 rounded-full text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold transition-all duration-300 <?= $totalReviews > 0 ? '' : 'hidden' ?>">
+                            <?= $totalReviews > 0 ? $totalReviews : '' ?>
+                        </span>
                     </a>
                     <a href="<?= base_url('admin?tab=ambassador') ?>" class="group flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 <?= $activeTab === 'ambassador' ? 'bg-indigo-600/15 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent' ?>">
                         <div class="flex items-center gap-2.5">
                             <span class="text-sm">🎓</span>
                             <span>Duta Kampus (Afiliasi)</span>
                         </div>
-                        <?php if (!empty($ambStats['pending_review'])): ?>
-                            <span class="px-2 py-0.5 rounded-full text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold">
-                                <?= (int) $ambStats['pending_review'] ?> baru
-                            </span>
-                        <?php elseif (!empty($ambStats['active_ambassadors'])): ?>
-                            <span class="px-2 py-0.5 rounded-full text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold">
-                                <?= (int) $ambStats['active_ambassadors'] ?> aktif
-                            </span>
-                        <?php endif; ?>
+                        <?php
+                        $ambPending = (int) ($ambStats['pending_review'] ?? 0);
+                        $ambActive = (int) ($ambStats['active_ambassadors'] ?? 0);
+                        $ambText = '';
+                        $ambClass = 'hidden';
+                        if ($ambPending > 0) {
+                            $ambClass = 'bg-amber-500/20 text-amber-300 border border-amber-500/30';
+                            $ambText = $ambPending . ' baru';
+                        } elseif ($ambActive > 0) {
+                            $ambClass = 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+                            $ambText = $ambActive . ' aktif';
+                        }
+                        ?>
+                        <span id="sidebar-badge-ambassador" class="px-2 py-0.5 rounded-full text-[10px] font-semibold transition-all duration-300 <?= $ambClass ?>">
+                            <?= $ambText ?>
+                        </span>
                     </a>
                 </div>
 
@@ -322,11 +336,10 @@
                             <svg class="w-4 h-4 <?= $activeTab === 'security' ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
                             <span>Keamanan & Limit</span>
                         </div>
-                        <?php if ($metrics['active_locks_count'] > 0): ?>
-                            <span class="px-2 py-0.5 rounded-full text-[10px] bg-rose-500/20 text-rose-300 border border-rose-500/30 font-semibold">
-                                <?= $metrics['active_locks_count'] ?> lock
-                            </span>
-                        <?php endif; ?>
+                        <?php $locksCount = (int) ($metrics['active_locks_count'] ?? 0); ?>
+                        <span id="sidebar-badge-security" class="px-2 py-0.5 rounded-full text-[10px] bg-rose-500/20 text-rose-300 border border-rose-500/30 font-semibold transition-all duration-300 <?= $locksCount > 0 ? '' : 'hidden' ?>">
+                            <?= $locksCount > 0 ? ($locksCount . ' lock') : '' ?>
+                        </span>
                     </a>
                     <a href="<?= base_url('admin?tab=visitors') ?>" class="group flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 <?= $activeTab === 'visitors' ? 'bg-indigo-600/15 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent' ?>">
                         <div class="flex items-center gap-2.5">
@@ -4192,7 +4205,142 @@
             });
         }
 
-        document.addEventListener('DOMContentLoaded', initVisitorRealtimePolling);
+        // ==========================================
+        // REALTIME POLLING SIDEBAR BADGES (Auto-Reload Nilai Tanpa Refresh Halaman)
+        // ==========================================
+        let isFetchingSidebarBadges = false;
+        let sidebarBadgesPollInterval = null;
+
+        function updateBadgeWithHighlight(el, newFormattedVal, show = true) {
+            if (!el) return;
+            if (!show) {
+                el.classList.add('hidden');
+                return;
+            }
+            el.classList.remove('hidden');
+            const currentVal = el.textContent.trim();
+            const targetVal = String(newFormattedVal).trim();
+            if (currentVal !== targetVal) {
+                el.textContent = targetVal;
+                el.classList.add('scale-110', 'ring-2', 'ring-emerald-500/50', 'transition-transform');
+                setTimeout(() => {
+                    el.classList.remove('scale-110', 'ring-2', 'ring-emerald-500/50', 'transition-transform');
+                }, 900);
+            }
+        }
+
+        async function refreshSidebarBadgesRealtime(manual = false) {
+            if (isFetchingSidebarBadges) return;
+            isFetchingSidebarBadges = true;
+
+            const syncEl = document.getElementById('sidebar-last-sync');
+            const syncBtn = document.getElementById('btn-manual-sync-sidebar');
+            if (manual && syncBtn) {
+                syncBtn.classList.add('animate-spin');
+            }
+
+            try {
+                const res = await fetch('<?= base_url('admin/sidebar-badges-realtime') ?>', {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const data = await res.json();
+
+                if (data && data.status === 'success' && data.badges) {
+                    const b = data.badges;
+
+                    // 1. Pengguna & Kuota
+                    updateBadgeWithHighlight(document.getElementById('sidebar-badge-users'), b.users);
+
+                    // 2. Dokumen & Antrean
+                    const queueCount = Number(b.queue || 0);
+                    updateBadgeWithHighlight(document.getElementById('sidebar-badge-documents'), queueCount + ' proses', queueCount > 0);
+
+                    // 3. Korpus Repositori
+                    updateBadgeWithHighlight(document.getElementById('sidebar-badge-corpus'), b.corpus);
+
+                    // 4. Analitik Institusi
+                    updateBadgeWithHighlight(document.getElementById('sidebar-badge-analytics'), b.analytics);
+
+                    // 5. Integrasi API & OJS
+                    updateBadgeWithHighlight(document.getElementById('sidebar-badge-api_keys'), b.api_keys);
+
+                    // 6. Google AI Keys (Pool)
+                    const gKeys = Number(b.google_keys_active || 0);
+                    const elGKeys = document.getElementById('sidebar-badge-google_keys');
+                    if (elGKeys) {
+                        if (gKeys > 0) {
+                            elGKeys.className = 'px-2 py-0.5 rounded-full text-[10px] font-semibold transition-all duration-300 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+                        } else {
+                            elGKeys.className = 'px-2 py-0.5 rounded-full text-[10px] font-semibold transition-all duration-300 bg-slate-800 text-slate-400';
+                        }
+                    }
+                    updateBadgeWithHighlight(elGKeys, gKeys + ' aktif');
+
+                    // 7. Transaksi & Pembayaran
+                    const settled = Number(b.payments_settled || 0);
+                    updateBadgeWithHighlight(document.getElementById('sidebar-badge-payments'), settled + ' lunas', settled > 0);
+
+                    // 8. Feedback & Testimoni
+                    const testims = Number(b.testimonials || 0);
+                    updateBadgeWithHighlight(document.getElementById('sidebar-badge-feedback'), testims, testims > 0);
+
+                    // 9. Duta Kampus (Afiliasi)
+                    const ambPending = Number(b.ambassador_pending || 0);
+                    const ambActive = Number(b.ambassador_active || 0);
+                    const elAmb = document.getElementById('sidebar-badge-ambassador');
+                    if (elAmb) {
+                        if (ambPending > 0) {
+                            elAmb.className = 'px-2 py-0.5 rounded-full text-[10px] font-semibold transition-all duration-300 bg-amber-500/20 text-amber-300 border border-amber-500/30';
+                            updateBadgeWithHighlight(elAmb, ambPending + ' baru', true);
+                        } else if (ambActive > 0) {
+                            elAmb.className = 'px-2 py-0.5 rounded-full text-[10px] font-semibold transition-all duration-300 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+                            updateBadgeWithHighlight(elAmb, ambActive + ' aktif', true);
+                        } else {
+                            elAmb.classList.add('hidden');
+                        }
+                    }
+
+                    // 10. Keamanan & Limit
+                    const secLocks = Number(b.security_locks || 0);
+                    updateBadgeWithHighlight(document.getElementById('sidebar-badge-security'), secLocks + ' lock', secLocks > 0);
+
+                    // Update timestamp indicator
+                    if (syncEl && data.synced_at) {
+                        syncEl.textContent = data.synced_at;
+                    }
+                }
+            } catch (err) {
+                console.warn('[SidebarRealtime] Polling error:', err);
+            } finally {
+                isFetchingSidebarBadges = false;
+                if (syncBtn) {
+                    setTimeout(() => syncBtn.classList.remove('animate-spin'), 300);
+                }
+            }
+        }
+
+        function initSidebarRealtimePolling() {
+            // Polling otomatis setiap 12 detik
+            if (sidebarBadgesPollInterval) clearInterval(sidebarBadgesPollInterval);
+            sidebarBadgesPollInterval = setInterval(() => {
+                if (!document.hidden) {
+                    refreshSidebarBadgesRealtime();
+                }
+            }, 12000);
+
+            // Re-fetch saat tab browser kembali aktif
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden) {
+                    refreshSidebarBadgesRealtime();
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initVisitorRealtimePolling();
+            initSidebarRealtimePolling();
+        });
     </script>
 </body>
 </html>
