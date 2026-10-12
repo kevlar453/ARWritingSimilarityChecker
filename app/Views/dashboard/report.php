@@ -2385,7 +2385,7 @@ $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evi
                             <h3 class="font-bold text-base text-slate-900">Transparansi Bobot Kosakata (Term-Level IDF Drill-Down)</h3>
                             <span class="text-[10px] font-bold font-mono-code uppercase px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-100">Modul 2</span>
                         </div>
-                        <p class="text-xs text-slate-400">Dekomposisi kontribusi dot-product setiap istilah bersama terhadap skor kemiripan kosinus (Explainable TF-IDF)</p>
+                        <p class="text-xs text-slate-400">Dekomposisi kontribusi setiap istilah bersama terhadap skor kemiripan leksikal dengan Dokumen Rujukan Utama (Peringkat #1)</p>
                     </div>
                 </div>
                 <span class="text-xs font-mono-code font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs self-start sm:self-auto">
@@ -2443,7 +2443,7 @@ $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evi
                                 <td class="py-2.5 px-3 font-bold text-slate-900"><?= esc($tc['term']) ?></td>
                                 <td class="py-2.5 px-3 text-center text-slate-600"><?= (int)($tc['sub_count'] ?? 0) ?>x / <?= (int)($tc['doc_count'] ?? 0) ?>x</td>
                                 <td class="py-2.5 px-3 text-right text-slate-700"><?= number_format($tc['idf'] ?? 0, 3) ?></td>
-                                <td class="py-2.5 px-3 text-right font-bold text-emerald-700"><?= number_format($tc['contribution_pct'] ?? 0, 1) ?>%</td>
+                                <td class="py-2.5 px-3 text-right font-bold text-emerald-700"><?= number_format($tc['contribution_percentage'] ?? $tc['contribution_pct'] ?? 0, 1) ?>%</td>
                                 <td class="py-2.5 px-3 text-center">
                                     <span class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded border <?= $tierBadge ?>">
                                         <?= $tierLabel ?>

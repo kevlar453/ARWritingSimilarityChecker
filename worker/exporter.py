@@ -171,22 +171,37 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
 
     term_drill_html = ""
     if term_drill and term_drill.get("top_contributing_terms"):
+        top_src = sources[0] if sources else None
+        top_src_id = top_src.get("source_document_id") if top_src else None
+        header_title = f"Transparansi Bobot Kosakata (Dekomposisi Rujukan Utama: ID #{top_src_id})" if top_src_id else "Transparansi Bobot Kosakata (Term-Level IDF Decomposition)"
+        
+        ref_note_html = ""
+        if top_src_id:
+            td_cos = float(term_drill.get("cosine_similarity") or 0.0)
+            ref_note_html = f"""
+            <div style="font-size: 7.5pt; color: #334155; margin-bottom: 8px; line-height: 1.35; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 4px; padding: 6px 10px;">
+                <strong>Konteks Rujukan Teratas:</strong> Dekomposisi istilah di bawah dihitung khusus terhadap <strong>Dokumen Rujukan Utama (Peringkat #1: ID #{top_src_id})</strong>. Berbeda dengan skor kemiripan topikal global korpus pada Lembar 1 (<strong>{cosine_sim:.2f}%</strong>), nilai kemiripan leksikal di bawah (<strong>{td_cos:.2f}%</strong>) menguraikan kontribusi kata kunci non-stopword spesifik terhadap dokumen rujukan utama ini.
+            </div>
+            """
+
         t_rows = ""
         for tc in term_drill["top_contributing_terms"][:6]:
             tier = tc.get("significance_tier", "COMMON_VOCABULARY")
             tier_label = "Khas Disipliner" if tier == "DISCIPLINARY_KEYWORD" else ("Bidang Kajian" if tier == "TOPICAL_TERM" else "Kosakata Umum")
+            c_pct = float(tc.get('contribution_percentage') or tc.get('contribution_pct') or 0.0)
             t_rows += f"""
             <tr>
                 <td style="padding: 4px 8px; border: 1px solid #e2e8f0; font-weight: bold;">{tc.get('term')}</td>
                 <td style="padding: 4px 8px; border: 1px solid #e2e8f0; text-align: center;">{tc.get('sub_count', 0)}x / {tc.get('doc_count', 0)}x</td>
                 <td style="padding: 4px 8px; border: 1px solid #e2e8f0; text-align: right;">{float(tc.get('idf', 0)):.3f}</td>
-                <td style="padding: 4px 8px; border: 1px solid #e2e8f0; text-align: right; font-weight: bold; color: #047857;">{float(tc.get('contribution_pct', 0)):.1f}%</td>
+                <td style="padding: 4px 8px; border: 1px solid #e2e8f0; text-align: right; font-weight: bold; color: #047857;">{c_pct:.1f}%</td>
                 <td style="padding: 4px 8px; border: 1px solid #e2e8f0; text-align: center; font-size: 7.5pt;">{tier_label}</td>
             </tr>
             """
         narrative = term_drill.get("explanation_narrative", "")
         term_drill_html = f"""
-        <h3 class="section-header">Transparansi Bobot Kosakata (Term-Level IDF Decomposition)</h3>
+        <h3 class="section-header">{header_title}</h3>
+        {ref_note_html}
         <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px 12px; margin-bottom: 14px; page-break-inside: avoid;">
             <div style="font-size: 8pt; font-style: italic; color: #334155; margin-bottom: 8px; background: #f8fafc; padding: 6px 10px; border-left: 3px solid #0f294a; border-radius: 0 4px 4px 0;">
                 &ldquo;{narrative}&rdquo;
@@ -239,9 +254,10 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
     }
     pattern_desc = pattern_desc_map.get(pattern, "Pola bukti teridentifikasi secara objektif.")
 
-    # Sources rows
+    # Sources rows (Tampilkan Top 6 agar pas di Halaman 2 dan tidak terpotong ke halaman berikutnya)
     sources_html = ""
-    for s in sources[:10]:
+    display_sources = sources[:6]
+    for s in display_sources:
         s_rank = s.get("source_rank", 1)
         s_title = s.get("source_title") or s.get("title") or f"Rujukan #{s.get('source_document_id')}"
         s_sim = float(s.get("similarity") or 0)
@@ -252,9 +268,9 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
         sources_html += f"""
         <tr>
             <td style="text-align: center; font-weight: bold; width: 40px;">#{s_rank}</td>
-            <td>
-                <strong>{s_title}</strong>
-                <div style="font-size: 8pt; color: #64748b;">ID #{s.get('source_document_id')} • {s_type}</div>
+            <td style="padding: 4px 8px;">
+                <strong style="color: #0f294a;">{s_title}</strong>
+                <div style="font-size: 7.5pt; color: #64748b; margin-top: 1px;">ID #{s.get('source_document_id')} • {s_type}</div>
             </td>
             <td style="text-align: right; font-weight: bold; width: 75px; color: #1e3a8a;">{s_sim:.1f}%</td>
             <td style="text-align: right; width: 65px; color: #475569;">{s_exact:.1f}%</td>
@@ -270,6 +286,33 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
             </td>
         </tr>
         """
+
+    sources_count_note = ""
+    if len(sources) > len(display_sources):
+        sources_count_note = f"""
+        <div style="font-size: 7.5pt; color: #64748b; margin-top: 4px; text-align: right; font-style: italic;">
+            * Menampilkan {len(display_sources)} dokumen rujukan berbobot tertinggi dari total {len(sources)} dokumen pembanding beririsan di korpus.
+        </div>
+        """
+
+    sources_section_html = f"""
+    <h3 class="section-header">Dokumen Rujukan Teratas Terdeteksi</h3>
+    <table class="data-table" style="margin-bottom: 6px;">
+        <thead>
+            <tr>
+                <th style="width: 35px; text-align: center;">Peringkat</th>
+                <th style="text-align: left;">Judul Dokumen Rujukan</th>
+                <th style="width: 75px; text-align: right;">Skor Gabungan</th>
+                <th style="width: 65px; text-align: right;">Exact</th>
+                <th style="width: 65px; text-align: right;">Kosinus</th>
+            </tr>
+        </thead>
+        <tbody>
+            {sources_html}
+        </tbody>
+    </table>
+    {sources_count_note}
+    """
 
     # Ekstraksi Audit Integritas Naskah, Sitasi & Lintas Bahasa
     ev_audit = evidence_data.get("evasion_detection") or v12_evol.get("evasion_detection") or {}
@@ -416,7 +459,8 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
     </table>
     """
 
-    forensic_section_html = ""
+    forensic_findings_html = ""
+    questions_section_html = ""
     if forensic_completed and (g_data.get("alasan_indikasi_ai") or g_contra or g_cit or g_questions):
         g_reason_txt = g_data.get("alasan_indikasi_ai") or ""
         reason_box = ""
@@ -424,20 +468,23 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
             reason_box = f"""
             <div style="margin-bottom: 8px; padding: 7px 10px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 7.5pt; color: #334155; line-height: 1.4;">
                 <div style="font-weight: bold; color: {g_color}; margin-bottom: 2px; font-size: 7pt; text-transform: uppercase;">
-                    &bull; Evaluasi Sintetis &amp; Indikasi Perakitan AI (Status: {g_level}):
+                    Evaluasi Sintetis &amp; Indikasi Perakitan AI (Status: {g_level}):
                 </div>
                 <div style="font-style: italic;">&ldquo;{html_escape(g_reason_txt)}&rdquo;</div>
             </div>
             """
 
-        contra_items = "".join([f"<li style='margin-bottom: 3px;'>{html_escape(c)}</li>" for c in g_contra]) or "<li style='color: #64748b; font-style: italic;'>Tidak ditemukan kontradiksi logika mayor antar-bab.</li>"
-        cit_items = "".join([f"<li style='margin-bottom: 3px;'>{html_escape(c)}</li>" for c in g_cit]) or "<li style='color: #64748b; font-style: italic;'>Sitasi rujukan selaras dan tidak ditemukan anomali temporal.</li>"
+        filtered_contra = [c.strip() for c in g_contra if c and c.strip()]
+        filtered_cit = [c.strip() for c in g_cit if c and c.strip()]
+
+        contra_items = "".join([f"<li style='margin-bottom: 3px;'>{html_escape(c)}</li>" for c in filtered_contra]) or "<li style='color: #64748b; font-style: italic;'>Tidak ditemukan kontradiksi logika mayor antar-bab.</li>"
+        cit_items = "".join([f"<li style='margin-bottom: 3px;'>{html_escape(c)}</li>" for c in filtered_cit]) or "<li style='color: #64748b; font-style: italic;'>Sitasi rujukan selaras dan tidak ditemukan anomali temporal.</li>"
 
         findings_grid = f"""
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
             <div style="background: #ffffff; padding: 7px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 7.5pt;">
                 <div style="font-weight: bold; color: #9a3412; font-size: 7pt; margin-bottom: 4px; text-transform: uppercase;">
-                    &bull; Inkonsistensi Metodologi &amp; Logika ({len(g_contra)})
+                    Inkonsistensi Metodologi &amp; Logika ({len(filtered_contra)})
                 </div>
                 <ul style="margin: 0; padding-left: 12px; color: #334155; line-height: 1.35;">
                     {contra_items}
@@ -445,7 +492,7 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
             </div>
             <div style="background: #ffffff; padding: 7px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 7.5pt;">
                 <div style="font-weight: bold; color: #0369a1; font-size: 7pt; margin-bottom: 4px; text-transform: uppercase;">
-                    &bull; Integritas Sitasi &amp; Anomali Rujukan ({len(g_cit)})
+                    Integritas Sitasi &amp; Anomali Rujukan ({len(filtered_cit)})
                 </div>
                 <ul style="margin: 0; padding-left: 12px; color: #334155; line-height: 1.35;">
                     {cit_items}
@@ -454,47 +501,54 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
         </div>
         """
 
-        questions_boxes = ""
-        for q_idx, q in enumerate(g_questions, 1):
-            q_fokus = html_escape(q.get("fokus") or "Substansi")
-            q_urgensi = html_escape(q.get("tingkat_urgensi") or "")
-            q_text = html_escape(q.get("pertanyaan") or "")
-            q_alasan = html_escape(q.get("alasan") or "")
-            q_strategi = html_escape(q.get("strategi_jawaban") or "")
-
-            urgensi_badge = f'<span style="font-size: 6.5pt; font-weight: bold; padding: 1px 4px; border-radius: 3px; background: #fee2e2; color: #991b1b;">{q_urgensi}</span>' if q_urgensi else ''
-            strategi_html = f'<div style="font-size: 6.8pt; color: #065f46; margin-top: 3px; background: #f0fdf4; padding: 3px 6px; border-radius: 3px; border-left: 2px solid #10b981;"><strong>Strategi Jawaban Mahasiswa:</strong> {q_strategi}</div>' if q_strategi else ''
-
-            questions_boxes += f"""
-            <div style="margin-bottom: 5px; padding: 6px 9px; background: #ffffff; border: 1px solid #e2e8f0; border-left: 3px solid #6366f1; border-radius: 4px; font-size: 7.5pt;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
-                    <span style="font-weight: bold; color: #312e81; font-size: 7pt;">Pertanyaan #{q_idx} &bull; Fokus: {q_fokus}</span>
-                    {urgensi_badge}
-                </div>
-                <div style="font-weight: 600; color: #1e293b; margin-bottom: 2px; line-height: 1.35;">&ldquo;{q_text}&rdquo;</div>
-                <div style="font-size: 6.8pt; color: #64748b; font-style: italic;">Tujuan Pengujian: {q_alasan}</div>
-                {strategi_html}
-            </div>
-            """
-
-        forensic_section_html = f"""
-        <div style="margin-top: 12px; margin-bottom: 12px; page-break-inside: avoid;">
-            <h3 class="section-header" style="margin-bottom: 6px;">Audit Forensik Cerdas &amp; Panduan Ujian Lisan Sidang</h3>
+        forensic_findings_html = f"""
+        <div style="margin-top: 10px; margin-bottom: 8px; page-break-inside: avoid;">
+            <h3 class="section-header" style="margin-bottom: 6px;">Audit Forensik Cerdas (Evaluasi Semantik &amp; Logika Metodologi)</h3>
             {reason_box}
             {findings_grid}
-            <div style="background: #faf5ff; border: 1px solid #e9d5ff; border-radius: 6px; padding: 7px; margin-bottom: 8px;">
-                <div style="font-weight: bold; color: #6b21a8; font-size: 7.5pt; margin-bottom: 5px; display: flex; align-items: center; justify-content: space-between;">
-                    <span>Panduan Pertanyaan Kritis Dosen Penguji Sidang</span>
-                    <span style="font-size: 6.8pt; font-weight: normal; color: #7e22ce;">Instrumen Uji Penguasaan Orisinalitas</span>
-                </div>
-                {questions_boxes}
-            </div>
         </div>
         """
 
-    # Matches rows
+        if g_questions:
+            questions_boxes = ""
+            for q_idx, q in enumerate(g_questions, 1):
+                q_fokus = html_escape(q.get("fokus") or "Substansi")
+                q_urgensi = html_escape(q.get("tingkat_urgensi") or "")
+                q_text = html_escape(q.get("pertanyaan") or "")
+                q_alasan = html_escape(q.get("alasan") or "")
+                q_strategi = html_escape(q.get("strategi_jawaban") or "")
+
+                urgensi_badge = f'<span style="font-size: 6.5pt; font-weight: bold; padding: 1px 4px; border-radius: 3px; background: #fee2e2; color: #991b1b;">{q_urgensi}</span>' if q_urgensi else ''
+                strategi_html = f'<div style="font-size: 6.8pt; color: #065f46; margin-top: 3px; background: #f0fdf4; padding: 3px 6px; border-radius: 3px; border-left: 2px solid #10b981;"><strong>Strategi Jawaban Mahasiswa:</strong> {q_strategi}</div>' if q_strategi else ''
+
+                questions_boxes += f"""
+                <div style="margin-bottom: 5px; padding: 5px 8px; background: #ffffff; border: 1px solid #e2e8f0; border-left: 3px solid #6366f1; border-radius: 4px; font-size: 7.5pt;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
+                        <span style="font-weight: bold; color: #312e81; font-size: 7pt;">Pertanyaan #{q_idx} • Fokus: {q_fokus}</span>
+                        {urgensi_badge}
+                    </div>
+                    <div style="font-weight: 600; color: #1e293b; margin-bottom: 2px; line-height: 1.35;">&ldquo;{q_text}&rdquo;</div>
+                    <div style="font-size: 6.8pt; color: #64748b; font-style: italic;">Tujuan Pengujian: {q_alasan}</div>
+                    {strategi_html}
+                </div>
+                """
+
+            questions_section_html = f"""
+            <div style="margin-top: 6px; margin-bottom: 10px; page-break-inside: avoid;">
+                <h3 class="section-header" style="margin-bottom: 6px;">Panduan Ujian Lisan Sidang Dosen &amp; Instrumen Pengujian Orisinalitas</h3>
+                <div style="background: #faf5ff; border: 1px solid #e9d5ff; border-radius: 6px; padding: 7px; margin-bottom: 6px;">
+                    <div style="font-weight: bold; color: #6b21a8; font-size: 7.5pt; margin-bottom: 5px; display: flex; align-items: center; justify-content: space-between;">
+                        <span>Panduan Pertanyaan Kritis Ujian Sidang Skripsi / Tesis</span>
+                        <span style="font-size: 6.8pt; font-weight: normal; color: #7e22ce;">{len(g_questions)} Pertanyaan Penguji</span>
+                    </div>
+                    {questions_boxes}
+                </div>
+            </div>
+            """
+
+    # Matches rows (Tampilkan 2 pasase teratas agar muat bersama tanda tangan di Halaman 4)
     matches_html = ""
-    for idx, m in enumerate(matches[:8], 1):
+    for idx, m in enumerate(matches[:2], 1):
         w_cnt = m.get("word_count", 0)
         m_type = (m.get("match_type") or "exact").upper()
         s_sub = m.get("submission_snippet", "")
@@ -508,25 +562,25 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
             bp_phr = m.get("boilerplate_phrase", "")
             bp_rat = m.get("boilerplate_rationale", "")
             bp_html = f"""
-            <div style="margin-top: 6px; padding: 4px 8px; background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 4px; font-size: 7.5pt; color: #3730a3;">
-                <strong>• Formulasi Ilmiah Baku ({bp_cat}):</strong> &ldquo;{bp_phr}&rdquo; &mdash; {bp_rat} (Konvensi penulisan standar).
+            <div style="margin-top: 4px; padding: 3px 6px; background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 4px; font-size: 7pt; color: #3730a3;">
+                <strong>Formulasi Ilmiah Baku ({bp_cat}):</strong> &ldquo;{bp_phr}&rdquo; &mdash; {bp_rat}
             </div>
             """
 
         matches_html += f"""
-        <div class="match-item" style="margin-bottom: 12px; padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px; background-color: #f8fafc; page-break-inside: avoid;">
-            <div style="display: flex; justify-content: space-between; font-size: 8.5pt; margin-bottom: 6px; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px;">
+        <div class="match-item" style="margin-bottom: 8px; padding: 6px 9px; border: 1px solid #e2e8f0; border-radius: 6px; background-color: #f8fafc; page-break-inside: avoid;">
+            <div style="display: flex; justify-content: space-between; font-size: 8pt; margin-bottom: 4px; border-bottom: 1px solid #cbd5e1; padding-bottom: 3px;">
                 <span><strong>Pasase #{idx}</strong> • {sub_span} ({w_cnt} kata)</span>
                 <span>Rujukan: <strong>Doc #{src_id}</strong> • Tipe: <strong>{m_type}</strong></span>
             </div>
-            <div style="font-size: 8pt; line-height: 1.4; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                <div style="background: #ffffff; padding: 6px; border: 1px solid #e2e8f0; border-radius: 4px;">
-                    <div style="font-weight: bold; color: #1e3a8a; font-size: 7.5pt; margin-bottom: 3px; text-transform: uppercase;">Cuplikan Naskah Submisi</div>
-                    <div style="color: #334155; font-style: italic;">&ldquo;{s_sub[:280] + ('...' if len(s_sub) > 280 else '')}&rdquo;</div>
+            <div style="font-size: 7.5pt; line-height: 1.35; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <div style="background: #ffffff; padding: 5px; border: 1px solid #e2e8f0; border-radius: 4px;">
+                    <div style="font-weight: bold; color: #1e3a8a; font-size: 7pt; margin-bottom: 2px; text-transform: uppercase;">Cuplikan Naskah Submisi</div>
+                    <div style="color: #334155; font-style: italic;">&ldquo;{s_sub[:240] + ('...' if len(s_sub) > 240 else '')}&rdquo;</div>
                 </div>
-                <div style="background: #ffffff; padding: 6px; border: 1px solid #e2e8f0; border-radius: 4px;">
-                    <div style="font-weight: bold; color: #475569; font-size: 7.5pt; margin-bottom: 3px; text-transform: uppercase;">Cuplikan Dokumen Rujukan</div>
-                    <div style="color: #334155; font-style: italic;">&ldquo;{s_src[:280] + ('...' if len(s_src) > 280 else '')}&rdquo;</div>
+                <div style="background: #ffffff; padding: 5px; border: 1px solid #e2e8f0; border-radius: 4px;">
+                    <div style="font-weight: bold; color: #475569; font-size: 7pt; margin-bottom: 2px; text-transform: uppercase;">Cuplikan Dokumen Rujukan</div>
+                    <div style="color: #334155; font-style: italic;">&ldquo;{s_src[:240] + ('...' if len(s_src) > 240 else '')}&rdquo;</div>
                 </div>
             </div>
             {bp_html}
@@ -535,10 +589,17 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
 
     if not matches:
         matches_html = """
-        <div style="text-align: center; color: #64748b; font-style: italic; padding: 16px; border: 1px dashed #cbd5e1; border-radius: 6px;">
+        <div style="text-align: center; color: #64748b; font-style: italic; padding: 12px; border: 1px dashed #cbd5e1; border-radius: 6px; font-size: 7.5pt;">
             Tidak ditemukan pasase kata berurutan yang melebihi batas deteksi sekuensial.
         </div>
         """
+
+    matches_section_html = f"""
+    <div style="margin-top: 8px; margin-bottom: 8px; page-break-inside: avoid;">
+        <h3 class="section-header" style="margin-bottom: 6px;">Cuplikan Pasase Beririsan (Sampel Kontekstual)</h3>
+        {matches_html}
+    </div>
+    """
 
     verify_url = f"{VERIFY_BASE_URL}/verify/{cert_hash}"
     logo_path = Path(__file__).resolve().parents[1] / "public" / "images" / "logo.png"
@@ -554,6 +615,9 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
     qr_code_base64 = generate_qr_code_base64(verify_url)
     qr_img_tag = f'<img src="data:image/png;base64,{qr_code_base64}" alt="QR Verifikasi" style="width: 52px; height: 52px; border: 1px solid #cbd5e1; border-radius: 4px; padding: 2px; background: #ffffff;" />' if qr_code_base64 else ''
 
+    page_break_after_sources = '<div class="page-break"></div>'
+    page_break_after_forensic = '<div class="page-break"></div>' if forensic_completed else ''
+
     html = f"""<!DOCTYPE html>
 <html lang="id">
 <head>
@@ -562,7 +626,7 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
 <style>
     @page {{
         size: A4;
-        margin: 15mm 15mm 18mm 15mm;
+        margin: 13mm 14mm 15mm 14mm;
         @top-right {{
             content: "AR Tilik v1.3.0 • Sertifikasi #{cert_hash}";
             font-size: 7pt;
@@ -592,6 +656,11 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
         padding: 0;
         font-size: 9pt;
         line-height: 1.45;
+    }}
+
+    .page-break {{
+        page-break-after: always;
+        break-after: page;
     }}
 
     /* Header & Kop Surat */
@@ -803,14 +872,14 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
     .data-table th {{
         background: #0f294a;
         color: #ffffff;
-        padding: 6px 8px;
-        font-size: 8pt;
+        padding: 5px 7px;
+        font-size: 7.5pt;
         text-transform: uppercase;
         letter-spacing: 0.5px;
         border: 1px solid #0f294a;
     }}
     .data-table td {{
-        padding: 5px 8px;
+        padding: 4px 7px;
         border: 1px solid #e2e8f0;
         vertical-align: middle;
     }}
@@ -823,7 +892,7 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
         display: grid;
         grid-template-columns: 1fr 1fr 1fr;
         gap: 15px;
-        margin-top: 24px;
+        margin-top: 14px;
         page-break-inside: avoid;
     }}
     .sig-box {{
@@ -833,7 +902,7 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
     }}
     .sig-role {{
         font-weight: bold;
-        margin-bottom: 50px;
+        margin-bottom: 35px;
         color: #0f294a;
     }}
     .sig-line {{
@@ -843,14 +912,14 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
     }}
 
     h3.section-header {{
-        font-size: 10pt;
+        font-size: 9pt;
         font-weight: bold;
         color: #0f294a;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        margin: 14px 0 8px 0;
+        margin: 10px 0 6px 0;
         border-bottom: 1.5px solid #e2e8f0;
-        padding-bottom: 4px;
+        padding-bottom: 3px;
     }}
 </style>
 </head>
@@ -988,34 +1057,24 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
     </div>
 
     {section_seg_html}
+
+    <div class="page-break"></div>
+
+    <!-- Lembar 2: Transparansi Kosakata & Dokumen Rujukan Utama -->
     {term_drill_html}
+    {sources_section_html}
 
-    <!-- Sources Table -->
-    <h3 class="section-header">Dokumen Rujukan Teratas Terdeteksi</h3>
-    <table class="data-table">
-        <thead>
-            <tr>
-                <th style="width: 35px; text-align: center;">Peringkat</th>
-                <th style="text-align: left;">Judul Dokumen Rujukan</th>
-                <th style="width: 75px; text-align: right;">Skor Gabungan</th>
-                <th style="width: 65px; text-align: right;">Exact</th>
-                <th style="width: 65px; text-align: right;">Kosinus</th>
-            </tr>
-        </thead>
-        <tbody>
-            {sources_html}
-        </tbody>
-    </table>
+    {page_break_after_sources}
 
-    <!-- Audit Integritas Naskah, Sitasi & Lintas Bahasa -->
+    <!-- Lembar 3: Audit Integritas & Forensik Cerdas -->
     {audit_html}
+    {forensic_findings_html}
 
-    <!-- Audit Forensik Cerdas & Panduan Ujian Lisan Sidang -->
-    {forensic_section_html}
+    {page_break_after_forensic}
 
-    <!-- Matching Passages -->
-    <h3 class="section-header">Cuplikan Pasase Beririsan (Sampel Kontekstual)</h3>
-    {matches_html}
+    <!-- Lembar 4: Panduan Ujian Sidang, Sampel Pasase & Pengesahan -->
+    {questions_section_html}
+    {matches_section_html}
 
     <!-- Signatures Section -->
     <div class="signature-grid">

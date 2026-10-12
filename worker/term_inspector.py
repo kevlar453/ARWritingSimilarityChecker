@@ -68,6 +68,7 @@ class TermContribution:
             "doc_weight": round(self.doc_weight, 5),
             "dot_product": round(self.dot_product, 6),
             "contribution_percentage": round(self.contribution_pct, 2),
+            "contribution_pct": round(self.contribution_pct, 2),
             "significance_tier": self.significance_tier.value,
         }
 
@@ -96,6 +97,7 @@ class TermDrillDownReport:
             "topical_terms_count": self.topical_terms_count,
             "common_terms_count": self.common_terms_count,
             "disciplinary_contribution_percentage": round(self.disciplinary_contribution_pct, 2),
+            "disciplinary_contribution_pct": round(self.disciplinary_contribution_pct, 2),
             "explanation_narrative": self.explanation_narrative,
             "top_contributing_terms": [t.to_dict() for t in self.top_terms],
         }
