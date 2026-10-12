@@ -469,7 +469,7 @@
                                 <th class="p-3.5 sm:p-4 min-w-[120px]">Similarity</th>
                                 <th class="p-3.5 sm:p-4 min-w-[135px]">Indikasi AI</th>
                                 <th class="p-3.5 sm:p-4 min-w-[130px] whitespace-nowrap">Tanggal Unggah</th>
-                                <th class="p-3.5 sm:p-4 text-right min-w-[200px] whitespace-nowrap">Aksi</th>
+                                <th class="p-3.5 sm:p-4 text-right min-w-[175px] whitespace-nowrap">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
@@ -481,11 +481,19 @@
                                 <?php foreach ($submissions as $sub): 
                                     $rep = $sub['latest_report'] ?? null;
                                     $isProcessing = $rep && in_array($rep['status'] ?? '', ['processing', 'pending'], true);
+                                    $isPurged = !empty($sub['file_purged_at']) || ($sub['storage_path'] ?? '') === '[PURGED]';
                                 ?>
                                     <tr class="submission-row <?= $isProcessing ? 'submission-processing' : '' ?> hover:bg-slate-50/70 transition-colors">
                                         <td class="p-3.5 sm:p-4 font-medium text-slate-800">
                                             <div class="font-semibold text-slate-900 line-clamp-1" title="<?= esc($sub['title']) ?>"><?= esc($sub['title']) ?></div>
-                                            <div class="text-[11px] text-slate-400 truncate max-w-[220px]" title="<?= esc($sub['original_filename']) ?>"><?= esc($sub['original_filename']) ?></div>
+                                            <div class="flex items-center gap-1.5 flex-wrap mt-0.5">
+                                                <span class="text-[11px] text-slate-400 truncate max-w-[200px]" title="<?= esc($sub['original_filename']) ?>"><?= esc($sub['original_filename']) ?></span>
+                                                <?php if ($isPurged): ?>
+                                                    <span class="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-700 border border-emerald-200/80 cursor-help" title="Berkas fisik naskah asli (PDF/DOCX) telah dimusnahkan secara mandiri dari peladen pada <?= !empty($sub['file_purged_at']) ? date('d M Y, H:i', strtotime($sub['file_purged_at'])) : '-' ?> WIB demi kerahasiaan data. Skor analitik dan sertifikat publik tetap utuh.">
+                                                        🛡️ Berkas Dimusnahkan
+                                                    </span>
+                                                <?php endif; ?>
+                                            </div>
                                             <?php if (!empty($sub['faculty']) || !empty($sub['department'])): ?>
                                                 <div class="mt-1 flex items-center gap-1.5 flex-wrap">
                                                     <?php if (!empty($sub['faculty'])): ?>
@@ -642,12 +650,6 @@
                                                     <svg class="w-3.5 h-3.5 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
                                                     <span>Bagikan</span>
                                                 </button>
-
-                                                <?php if ($isPurged): ?>
-                                                    <span class="px-2 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg text-[11px] font-semibold inline-flex items-center gap-1 cursor-help" title="Berkas fisik naskah asli telah dimusnahkan secara mandiri dari server pada <?= !empty($sub['file_purged_at']) ? date('d M Y, H:i', strtotime($sub['file_purged_at'])) : '-' ?> WIB demi kerahasiaan & privasi. Skor dan sertifikat tetap utuh.">
-                                                        🛡️ <span class="hidden md:inline">Dimusnahkan</span>
-                                                    </span>
-                                                <?php endif; ?>
 
                                                 <!-- Dropdown Menu Aksi Lainnya (•••) -->
                                                 <div class="relative inline-block text-left action-dropdown-container">
