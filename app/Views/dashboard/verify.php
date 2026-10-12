@@ -311,8 +311,13 @@
 
                         <!-- Data Penulis & Metadata Naskah -->
                         <div class="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-[11px] text-slate-600 max-w-4xl mx-auto">
-                            <?php if (!empty($document['author_name'])): ?>
-                            <div>Penulis: <strong class="text-[#081a33]"><?= esc($document['author_name']) ?></strong></div>
+                            <?php if (!empty($document['author'])): ?>
+                                <div>Penulis: <strong class="text-[#081a33]"><?= esc($document['author']) ?></strong></div>
+                                <?php if (!empty($document['uploader_name']) && $document['uploader_name'] !== $document['author']): ?>
+                                    <div>Pengunggah: <span class="font-medium text-slate-700"><?= esc($document['uploader_name']) ?></span></div>
+                                <?php endif; ?>
+                            <?php else: ?>
+                                <div>Pengunggah: <strong class="text-[#081a33]"><?= esc($document['uploader_name'] ?? $document['author_name'] ?? 'Pengguna Terdaftar') ?></strong></div>
                             <?php endif; ?>
                             <?php if (!empty($document['institution'])): ?>
                             <div>Institusi: <strong class="text-[#081a33]"><?= esc($document['institution']) ?></strong></div>

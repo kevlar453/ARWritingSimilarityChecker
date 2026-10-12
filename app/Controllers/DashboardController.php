@@ -1889,7 +1889,7 @@ class DashboardController extends BaseController
 
         // 1. Cari berdasarkan kolom verification_code
         $builder = $db->table('reports');
-        $builder->select('reports.*, documents.title AS document_title, documents.original_filename, documents.created_at AS document_created_at, documents.file_purged_at, documents.storage_path, documents.faculty, documents.department, documents.user_id, users.name AS author_name, users.institution AS author_institution');
+        $builder->select('reports.*, documents.title AS document_title, documents.author AS document_author, documents.original_filename, documents.created_at AS document_created_at, documents.file_purged_at, documents.storage_path, documents.faculty, documents.department, documents.user_id, users.name AS author_name, users.institution AS author_institution');
         $builder->join('documents', 'documents.id = reports.document_id', 'left');
         $builder->join('users', 'users.id = documents.user_id', 'left');
         $builder->where('reports.verification_code', $code);
@@ -1918,6 +1918,9 @@ class DashboardController extends BaseController
                       ->limit(5)
                       ->get()->getResultArray();
 
+        $docAuthor = !empty($report['document_author']) ? trim((string)$report['document_author']) : null;
+        $uploaderName = !empty($report['author_name']) ? trim((string)$report['author_name']) : 'Pengguna Terdaftar';
+
         return view('dashboard/verify', [
             'status'       => 'valid',
             'code'         => $code,
@@ -1925,13 +1928,15 @@ class DashboardController extends BaseController
             'document'     => [
                 'id'                => $report['document_id'],
                 'title'             => $report['document_title'] ?? 'Dokumen Karya Ilmiah',
+                'author'            => $docAuthor,
+                'uploader_name'     => $uploaderName,
+                'author_name'       => $docAuthor ?: $uploaderName,
                 'original_filename' => $report['original_filename'] ?? "document_{$report['document_id']}.pdf",
                 'created_at'        => $report['document_created_at'] ?? $report['created_at'],
                 'file_purged_at'    => $report['file_purged_at'] ?? null,
                 'storage_path'      => $report['storage_path'] ?? null,
                 'faculty'           => $report['faculty'] ?? null,
                 'department'        => $report['department'] ?? null,
-                'author_name'       => $report['author_name'] ?? null,
                 'institution'       => $report['author_institution'] ?? null,
             ],
             'sources'      => $sources,
@@ -2312,24 +2317,36 @@ class DashboardController extends BaseController
             return $this->response->setStatusCode(403)->setJSON(['success' => false, 'message' => 'Anda tidak memiliki wewenang untuk mengubah judul naskah ini.']);
         }
 
-        $newTitle = trim((string) $this->request->getPost('title'));
-        if (mb_strlen($newTitle) < 3) {
-            return $this->response->setStatusCode(400)->setJSON(['success' => false, 'message' => 'Judul karya ilmiah minimal 3 karakter.']);
+        $updateData = ['updated_at' => date('Y-m-d H:i:s')];
+
+        $titleInput = $this->request->getPost('title');
+        if ($titleInput !== null) {
+            $newTitle = trim((string) $titleInput);
+            if (mb_strlen($newTitle) < 3) {
+                return $this->response->setStatusCode(400)->setJSON(['success' => false, 'message' => 'Judul karya ilmiah minimal 3 karakter.']);
+            }
+            if (mb_strlen($newTitle) > 300) {
+                $newTitle = mb_substr($newTitle, 0, 300);
+            }
+            $updateData['title'] = $newTitle;
         }
 
-        if (mb_strlen($newTitle) > 300) {
-            $newTitle = mb_substr($newTitle, 0, 300);
+        $authorInput = $this->request->getPost('author');
+        if ($authorInput !== null) {
+            $newAuthor = trim((string) $authorInput);
+            if (mb_strlen($newAuthor) > 255) {
+                $newAuthor = mb_substr($newAuthor, 0, 255);
+            }
+            $updateData['author'] = $newAuthor !== '' ? $newAuthor : null;
         }
 
-        $docModel->update($documentId, [
-            'title'      => $newTitle,
-            'updated_at' => date('Y-m-d H:i:s'),
-        ]);
+        $docModel->update($documentId, $updateData);
 
         return $this->response->setJSON([
             'success' => true,
-            'message' => 'Judul karya ilmiah berhasil diperbarui.',
-            'title'   => $newTitle,
+            'message' => 'Informasi karya ilmiah berhasil diperbarui.',
+            'title'   => $updateData['title'] ?? $doc['title'],
+            'author'  => $updateData['author'] ?? ($doc['author'] ?? null),
         ]);
     }
 }

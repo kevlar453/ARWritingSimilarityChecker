@@ -179,8 +179,20 @@ $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evi
                         <?= esc($document['title'] ?? 'Dokumen Karya Ilmiah') ?>
                     </h1>
                     <?php if (!empty($isOwner) || session()->get('role') === 'admin' || session()->get('user_role') === 'admin'): ?>
-                        <button type="button" onclick="openEditTitleModal()" class="shrink-0 text-slate-400 hover:text-indigo-600 p-1.5 rounded-lg hover:bg-indigo-50 border border-transparent hover:border-indigo-100 transition mt-0.5" title="Sesuaikan / Edit Judul Naskah">
+                        <button type="button" onclick="openEditMetadataModal()" class="shrink-0 text-slate-400 hover:text-indigo-600 p-1.5 rounded-lg hover:bg-indigo-50 border border-transparent hover:border-indigo-100 transition mt-0.5" title="Sesuaikan / Edit Judul & Penulis Naskah">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                        </button>
+                    <?php endif; ?>
+                </div>
+                <div class="flex items-center gap-2 mt-1 mb-1.5 flex-wrap text-xs">
+                    <span class="font-medium text-slate-500">Penulis:</span>
+                    <span id="documentAuthorHeading" class="font-bold text-slate-800 bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200">
+                        <?= !empty($document['author']) ? esc($document['author']) : '<em class="text-slate-400 font-normal">Belum ditentukan (nama akun pengunggah)</em>' ?>
+                    </span>
+                    <?php if (!empty($isOwner) || session()->get('role') === 'admin' || session()->get('user_role') === 'admin'): ?>
+                        <button type="button" onclick="openEditMetadataModal()" class="text-indigo-600 hover:text-indigo-800 font-semibold inline-flex items-center gap-1 hover:underline text-[11px]">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                            <span><?= empty($document['author']) ? 'Atur Penulis' : 'Ubah' ?></span>
                         </button>
                     <?php endif; ?>
                 </div>
@@ -4823,29 +4835,47 @@ $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evi
             }
         }
 
-        // ── MODAL EDIT JUDUL KARYA ILMIAH ──
-        function openEditTitleModal() {
-            const heading = document.getElementById('documentTitleHeading');
-            const input = document.getElementById('inputNewTitle');
-            if (heading && input) {
-                input.value = heading.textContent.trim();
+        // ── MODAL EDIT INFORMASI NASKAH (JUDUL & PENULIS) ──
+        let currentDocumentAuthor = <?= json_encode($document['author'] ?? '') ?>;
+
+        function openEditMetadataModal() {
+            const headingTitle = document.getElementById('documentTitleHeading');
+            const inputTitle = document.getElementById('inputNewTitle');
+            const inputAuthor = document.getElementById('inputNewAuthor');
+            if (headingTitle && inputTitle) {
+                inputTitle.value = headingTitle.textContent.trim();
             }
-            const modal = document.getElementById('editTitleModal');
+            if (inputAuthor) {
+                inputAuthor.value = currentDocumentAuthor;
+            }
+            const modal = document.getElementById('editMetadataModal');
             if (modal) modal.classList.remove('hidden');
         }
 
-        function closeEditTitleModal() {
-            const modal = document.getElementById('editTitleModal');
+        function openEditTitleModal() {
+            openEditMetadataModal();
+        }
+
+        function closeEditMetadataModal() {
+            const modal = document.getElementById('editMetadataModal');
             if (modal) modal.classList.add('hidden');
         }
 
-        async function saveDocumentTitle() {
-            const input = document.getElementById('inputNewTitle');
-            const btn = document.getElementById('btnSaveTitle');
-            if (!input) return;
-            const newTitle = input.value.trim();
+        function closeEditTitleModal() {
+            closeEditMetadataModal();
+        }
+
+        async function saveDocumentMetadata() {
+            const inputTitle = document.getElementById('inputNewTitle');
+            const inputAuthor = document.getElementById('inputNewAuthor');
+            const btn = document.getElementById('btnSaveMetadata');
+            if (!inputTitle) return;
+
+            const newTitle = inputTitle.value.trim();
+            const newAuthor = inputAuthor ? inputAuthor.value.trim() : '';
+
             if (newTitle.length < 3) {
-                alert('Judul minimal 3 karakter.');
+                alert('Judul naskah minimal 3 karakter.');
                 return;
             }
 
@@ -4859,6 +4889,7 @@ $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evi
             try {
                 const formData = new FormData();
                 formData.append('title', newTitle);
+                formData.append('author', newAuthor);
                 const resp = await fetch(`<?= base_url('dashboard/documents') ?>/${docId}/update-title`, {
                     method: 'POST',
                     headers: { 'X-Requested-With': 'XMLHttpRequest' },
@@ -4866,11 +4897,21 @@ $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evi
                 });
                 const res = await resp.json();
                 if (res.success) {
-                    const heading = document.getElementById('documentTitleHeading');
-                    if (heading) heading.textContent = res.title || newTitle;
-                    closeEditTitleModal();
+                    const headingTitle = document.getElementById('documentTitleHeading');
+                    if (headingTitle) headingTitle.textContent = res.title || newTitle;
+
+                    currentDocumentAuthor = (res.author !== undefined) ? (res.author || '') : newAuthor;
+                    const headingAuthor = document.getElementById('documentAuthorHeading');
+                    if (headingAuthor) {
+                        if (currentDocumentAuthor) {
+                            headingAuthor.textContent = currentDocumentAuthor;
+                        } else {
+                            headingAuthor.innerHTML = '<em class="text-slate-400 font-normal">Belum ditentukan (nama akun pengunggah)</em>';
+                        }
+                    }
+                    closeEditMetadataModal();
                 } else {
-                    alert(res.message || 'Gagal memperbarui judul karya ilmiah.');
+                    alert(res.message || 'Gagal memperbarui informasi naskah.');
                 }
             } catch (err) {
                 console.error(err);
@@ -4882,26 +4923,37 @@ $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evi
                 }
             }
         }
+
+        function saveDocumentTitle() {
+            saveDocumentMetadata();
+        }
     </script>
 
-    <!-- Modal Edit Judul Karya Ilmiah -->
-    <div id="editTitleModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center hidden p-4">
+    <!-- Modal Edit Informasi Naskah Karya Ilmiah -->
+    <div id="editMetadataModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white rounded-2xl p-6 sm:p-7 max-w-lg w-full shadow-2xl border border-slate-100 space-y-4 animate-in fade-in zoom-in-95 duration-150">
             <div class="flex items-center justify-between pb-3 border-b border-slate-100">
                 <div class="flex items-center gap-2">
                     <span class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">✎</span>
-                    <h3 class="text-base font-bold text-slate-800">Edit Judul Karya Ilmiah</h3>
+                    <h3 class="text-base font-bold text-slate-800">Edit Informasi Naskah</h3>
                 </div>
-                <button type="button" onclick="closeEditTitleModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold">✕</button>
+                <button type="button" onclick="closeEditMetadataModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold">✕</button>
             </div>
-            <div>
-                <label for="inputNewTitle" class="block text-xs font-semibold text-slate-600 mb-1.5">Judul Naskah Akademik:</label>
-                <textarea id="inputNewTitle" rows="3" class="w-full text-sm p-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-semibold text-slate-800" placeholder="Masukkan judul karya ilmiah..."></textarea>
-                <p class="text-[11px] text-slate-400 mt-1">Judul ini akan tercantum pada laporan, piagam sertifikat integritas, dan dokumen ekspor resmi.</p>
+            <div class="space-y-3.5">
+                <div>
+                    <label for="inputNewTitle" class="block text-xs font-semibold text-slate-700 mb-1.5">Judul Naskah Akademik:</label>
+                    <textarea id="inputNewTitle" rows="3" class="w-full text-xs sm:text-sm p-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-semibold text-slate-800" placeholder="Masukkan judul karya ilmiah..."></textarea>
+                    <p class="text-[11px] text-slate-400 mt-1">Judul ini tercantum pada laporan, sertifikat akreditasi, dan ekspor resmi.</p>
+                </div>
+                <div>
+                    <label for="inputNewAuthor" class="block text-xs font-semibold text-slate-700 mb-1.5">Nama Penulis Asli Naskah:</label>
+                    <input type="text" id="inputNewAuthor" class="w-full text-xs sm:text-sm p-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium text-slate-800" placeholder="Contoh: Yuswanto atau Dr. Budi Santoso, M.Pd">
+                    <p class="text-[11px] text-slate-400 mt-1">Nama mahasiswa/peneliti penulis naskah sebenarnya. Jika dikosongkan, sertifikat resmi akan mencantumkan nama akun pengunggah.</p>
+                </div>
             </div>
             <div class="flex items-center justify-end gap-2 pt-2">
-                <button type="button" onclick="closeEditTitleModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition">Batal</button>
-                <button type="button" id="btnSaveTitle" onclick="saveDocumentTitle()" class="px-5 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-xs transition">Simpan Perubahan</button>
+                <button type="button" onclick="closeEditMetadataModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition">Batal</button>
+                <button type="button" id="btnSaveMetadata" onclick="saveDocumentMetadata()" class="px-5 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-xs transition">Simpan Perubahan</button>
             </div>
         </div>
     </div>

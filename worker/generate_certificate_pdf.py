@@ -230,7 +230,8 @@ def build_certificate_html(report: dict, document: dict, override_ai_score: floa
     # Title & Metadata
     title = document.get("title") or "Dokumen Karya Ilmiah"
     filename = document.get("original_filename") or f"document_{document.get('id', '')}.docx"
-    author_name = document.get("author_name") or document.get("user_name") or "Sivitas Akademika"
+    doc_author = (document.get("author") or "").strip()
+    uploader_name = document.get("user_name") or document.get("author_name") or "Pengguna Terdaftar"
     institution = document.get("institution") or document.get("user_inst") or "Institusi Akademik"
     faculty = document.get("faculty")
     department = document.get("department")
@@ -954,7 +955,8 @@ def build_certificate_html(report: dict, document: dict, override_ai_score: floa
                 </div>
 
                 <div class="meta-strip">
-                    <span>Penulis: <strong>{author_name}</strong></span>
+                    {f'<span>Penulis: <strong>{doc_author}</strong></span><span>&bull;</span>' if doc_author else ''}
+                    <span>Pengunggah: <strong>{uploader_name}</strong></span>
                     <span>&bull;</span>
                     <span>Institusi: <strong>{institution}</strong></span>
                     {f'<span>&bull;</span><span>Bidang: <strong>{fac_dept}</strong></span>' if fac_dept else ''}
@@ -1081,7 +1083,7 @@ def fetch_certificate_data(code: str = None, report_id: int = None) -> tuple[dic
         if code:
             cur.execute("""
                 SELECT r.*, 
-                       d.title AS doc_title, d.original_filename, d.faculty, d.department,
+                       d.title AS doc_title, d.author AS doc_author, d.original_filename, d.faculty, d.department,
                        d.file_purged_at, d.storage_path, d.created_at AS doc_created_at,
                        u.name AS user_name, u.institution AS user_inst
                 FROM reports r
@@ -1093,7 +1095,7 @@ def fetch_certificate_data(code: str = None, report_id: int = None) -> tuple[dic
         elif report_id:
             cur.execute("""
                 SELECT r.*, 
-                       d.title AS doc_title, d.original_filename, d.faculty, d.department,
+                       d.title AS doc_title, d.author AS doc_author, d.original_filename, d.faculty, d.department,
                        d.file_purged_at, d.storage_path, d.created_at AS doc_created_at,
                        u.name AS user_name, u.institution AS user_inst
                 FROM reports r
@@ -1126,6 +1128,7 @@ def fetch_certificate_data(code: str = None, report_id: int = None) -> tuple[dic
         document = {
             "id": row["document_id"],
             "title": row.get("doc_title") or "Dokumen Karya Ilmiah",
+            "author": row.get("doc_author"),
             "original_filename": row.get("original_filename"),
             "faculty": row.get("faculty"),
             "department": row.get("department"),

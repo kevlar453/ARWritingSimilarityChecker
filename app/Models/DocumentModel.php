@@ -11,6 +11,7 @@ class DocumentModel extends Model
     protected $allowedFields = [
         'user_id',
         'title',
+        'author',
         'original_filename',
         'mime_type',
         'file_size',
