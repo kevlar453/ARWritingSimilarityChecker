@@ -337,6 +337,90 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
     cl_color = "#b91c1c" if cl_score >= 35 else ("#b45309" if cl_score >= 15 else "#047857")
     cl_lbl = "Terindikasi Terjemahan Langsung" if cl_match else ("Parafrasa Lintas Bahasa" if cl_score >= 15 else "Orisinal / Bebas Terjemahan Mesin")
 
+    ext_ver = cit_audit.get("external_verification") or {}
+    if not ext_ver and cit_audit.get("has_bibliography_section"):
+        try:
+            from worker.citation_auditor import extract_bibliography_entries, split_body_and_bibliography
+            from worker.external_citation_verifier import verify_bibliography_list
+            from worker.database import get_connection
+            _conn = get_connection()
+            _cur = _conn.cursor(dictionary=True)
+            _cur.execute("SELECT text FROM document_chunks WHERE document_id = %s ORDER BY chunk_index ASC", (document.get("id"),))
+            _chunks = _cur.fetchall()
+            _cur.close()
+            _conn.close()
+            if _chunks:
+                _full_t = " ".join(ch["text"] for ch in _chunks if ch.get("text"))
+                _, _b_t, _has_b = split_body_and_bibliography(_full_t)
+                if _has_b and _b_t:
+                    _entries = extract_bibliography_entries(_b_t)
+                    if _entries:
+                        ext_ver = verify_bibliography_list(_entries)
+        except Exception:
+            pass
+
+    ext_ver_row = ""
+    ext_ver_details_html = ""
+    if ext_ver and ext_ver.get("enabled"):
+        v_tot = ext_ver.get("total_checked", 0)
+        v_ok = ext_ver.get("verified_count", 0)
+        v_fake = ext_ver.get("suspected_fake_count", 0)
+        v_unv = ext_ver.get("unverified_count", 0)
+        v_rate = float(ext_ver.get("veracity_rate") or 0.0)
+        has_fake = bool(ext_ver.get("has_suspected_fakes"))
+
+        if has_fake:
+            v_color = "#b91c1c"
+            v_label = f"Terindikasi Sitasi Fiktif ({v_fake} entri)"
+            v_desc = f"Ditemukan {v_fake} rujukan di Daftar Pustaka yang tidak terdaftar di indeks publikasi global (>250 juta paper OpenAlex & Crossref), mengindikasikan fabrikasi AI."
+        elif v_ok > 0:
+            v_color = "#047857"
+            v_label = "Rujukan Terverifikasi Sahih"
+            v_desc = f"Seluruh {v_ok} rujukan yang diperiksa terdaftar sah pada pangkalan data indeks publikasi global."
+        else:
+            v_color = "#64748b"
+            v_label = "Perlu Penelusuran Mandiri"
+            v_desc = "Rujukan belum dapat diverifikasi secara otomatis (buku teks/sumber lokal)."
+
+        ext_ver_row = f"""
+            <tr>
+                <td><strong>Verifikasi Rujukan Eksternal (Deteksi Sitasi Fiktif)</strong><br><span style="font-size: 7.5pt; color: #64748b;">Audit Ontologis via OpenAlex &amp; Crossref Global API</span></td>
+                <td style="text-align: center; font-weight: bold; color: {v_color}; font-size: 10pt; line-height: 1.25;">
+                    {v_rate:.1f}% Sahih
+                    <div style="font-size: 6.5pt; font-weight: normal; color: #64748b; margin-top: 2px;">
+                        {v_ok} Sahih &bull; {v_fake} Fiktif AI &bull; {v_unv} Non-Indeks
+                    </div>
+                </td>
+                <td>
+                    <strong style="color: {v_color};">{v_label}</strong>
+                    <div style="font-size: 7.5pt; color: #475569;">{v_desc}</div>
+                </td>
+            </tr>
+        """
+
+        if ext_ver.get("items"):
+            fakes = [it for it in ext_ver["items"] if it.get("status") == "suspected_fake"]
+            verified = [it for it in ext_ver["items"] if it.get("status") == "verified"]
+            detail_lines = []
+            for it in fakes:
+                t_sh = html_escape(it.get("extracted_title") or "")
+                detail_lines.append(f"<li style='color: #b91c1c; margin-bottom: 2px;'><strong>[Terindikasi Fiktif / Halusinasi AI]:</strong> &ldquo;{t_sh}&rdquo; &mdash; Tidak ditemukan di pangkalan data global (>250 juta rekaman).</li>")
+            for it in verified[:2]:
+                t_sh = html_escape(it.get("extracted_title") or "")
+                c_cnt = it.get("cited_by_count", 0)
+                detail_lines.append(f"<li style='color: #047857; margin-bottom: 2px;'><strong>[Terverifikasi Sahih]:</strong> &ldquo;{t_sh}&rdquo; ({c_cnt} sitasi global).</li>")
+            if detail_lines:
+                ext_ver_details_html = f"""
+                <div style="margin-top: 6px; padding: 6px 10px; background: {'#fff1f2' if fakes else '#f0fdf4'}; border: 1px solid {'#fecdd3' if fakes else '#bbf7d0'}; border-radius: 6px; font-size: 7.5pt; line-height: 1.35; page-break-inside: avoid;">
+                    <div style="font-weight: bold; color: {'#9f1239' if fakes else '#166534'}; margin-bottom: 3px;">
+                        Audit Keberadaan Rujukan Ilmiah (OpenAlex / Crossref Global Index):
+                    </div>
+                    <ul style="margin: 0; padding-left: 14px;">
+                        {''.join(detail_lines)}
+                    </ul>
+                </div>
+                """
+
     ai_row = ""
     if ai_audit:
         ai_prob = float(ai_audit.get("ai_probability_score") or 0.0)
@@ -470,6 +554,7 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
                     <div style="font-size: 7.5pt; color: #475569;">Sitasi Tanpa Pustaka: {int(cit_audit.get('phantom_citations_count') or 0)}, Pustaka Tak Dikutip: {int(cit_audit.get('orphan_references_count') or 0)}</div>
                 </td>
             </tr>
+            {ext_ver_row}
             <tr>
                 <td><strong>Plagiarisme Terjemahan (ID ↔ EN)</strong><br><span style="font-size: 7.5pt; color: #64748b;">Analisis Semantik Proyeksi Konsep Dwibahasa</span></td>
                 <td style="text-align: center; font-weight: bold; color: {cl_color}; font-size: 10pt; line-height: 1.25;">
@@ -488,6 +573,7 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
             {forensic_row}
         </tbody>
     </table>
+    {ext_ver_details_html}
     """
 
     forensic_findings_html = ""

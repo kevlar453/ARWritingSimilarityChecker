@@ -921,6 +921,15 @@ $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evi
                         <span>✅ Terverifikasi Cocok</span>
                         <span class="px-1.5 py-0.2 rounded-full bg-slate-200 text-slate-800 text-[10px]"><?= $matchedCount ?></span>
                     </button>
+                    <?php $extVer = $citationAudit['external_verification'] ?? null; ?>
+                    <?php if (!empty($extVer)): ?>
+                        <?php $extFakes = (int)($extVer['suspected_fake_count'] ?? 0); ?>
+                        <?php $extVerified = (int)($extVer['verified_count'] ?? 0); ?>
+                        <button type="button" onclick="switchCitationAuditTab('external')" id="tabBtnExternal" class="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer <?= $extFakes > 0 ? 'bg-rose-100 text-rose-800 border border-rose-300' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' ?>">
+                            <span>🌐 Verifikasi Ontologis (OpenAlex/AI)</span>
+                            <span class="px-1.5 py-0.2 rounded-full <?= $extFakes > 0 ? 'bg-rose-200 text-rose-900' : 'bg-slate-200 text-slate-800' ?> text-[10px]"><?= $extFakes > 0 ? "⚠️ {$extFakes} Fiktif" : "{$extVerified} Sahih" ?></span>
+                        </button>
+                    <?php endif; ?>
                 </div>
 
                 <!-- Tab Panel 1: Phantom Citations -->
@@ -1010,6 +1019,75 @@ $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evi
                         </div>
                     <?php endif; ?>
                 </div>
+
+                <!-- Tab Panel 4: External Publication Verification (OpenAlex / Global Index) -->
+                <?php if (!empty($extVer)): ?>
+                <div id="panelCitationExternal" class="space-y-2 hidden">
+                    <?php if (empty($extVer['items'])): ?>
+                        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-500">
+                            Belum ada rujukan yang diverifikasi ke pangkalan data eksternal.
+                        </div>
+                    <?php else: ?>
+                        <div class="p-3 rounded-xl <?= !empty($extVer['has_suspected_fakes']) ? 'bg-rose-50 border border-rose-200 text-rose-900' : 'bg-emerald-50 border border-emerald-200 text-emerald-900' ?> text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                            <div>
+                                <strong>Hasil Verifikasi Pangkalan Data Global (OpenAlex &amp; Crossref):</strong>
+                                <span class="block sm:inline sm:ml-1"><?= (int)$extVer['verified_count'] ?> Sahih &bull; <?= (int)$extVer['suspected_fake_count'] ?> Terindikasi Fiktif/AI &bull; <?= (int)$extVer['unverified_count'] ?> Perlu Penelusuran</span>
+                            </div>
+                            <span class="font-bold px-2.5 py-1 rounded-full text-[11px] self-start sm:self-auto <?= !empty($extVer['has_suspected_fakes']) ? 'bg-rose-200 text-rose-950' : 'bg-emerald-200 text-emerald-950' ?>">
+                                <?= !empty($extVer['has_suspected_fakes']) ? '⚠️ Ditemukan Sitasi Fiktif' : '✅ 100% Sahih' ?>
+                            </span>
+                        </div>
+                        <div class="space-y-2 max-h-72 overflow-y-auto pr-1">
+                            <?php foreach ($extVer['items'] as $evItem): ?>
+                                <?php
+                                    $isFake = ($evItem['status'] ?? '') === 'suspected_fake';
+                                    $isVer = ($evItem['status'] ?? '') === 'verified';
+                                ?>
+                                <div class="p-3 rounded-xl border <?= $isFake ? 'border-rose-300 bg-rose-50/50' : ($isVer ? 'border-emerald-200 bg-emerald-50/30' : 'border-slate-200 bg-slate-50/50') ?> text-xs flex flex-col sm:flex-row sm:items-start justify-between gap-2">
+                                    <div class="space-y-1">
+                                        <div class="flex items-center gap-2">
+                                            <span class="font-bold text-sm <?= $isFake ? 'text-rose-900' : ($isVer ? 'text-emerald-900' : 'text-slate-800') ?>">
+                                                <?= esc($evItem['extracted_title'] ?: $evItem['raw_text']) ?>
+                                            </span>
+                                            <span class="text-[10px] font-bold px-2 py-0.5 rounded <?= $isFake ? 'bg-rose-100 text-rose-800' : ($isVer ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-700') ?>">
+                                                <?= esc($evItem['badge_label']) ?>
+                                            </span>
+                                        </div>
+                                        <p class="text-[11px] text-slate-600 bg-white/70 p-2 rounded border <?= $isFake ? 'border-rose-100' : ($isVer ? 'border-emerald-100' : 'border-slate-100') ?> leading-relaxed">
+                                            <?= esc($evItem['raw_text']) ?>
+                                        </p>
+                                        <?php if (!empty($evItem['openalex_id']) || !empty($evItem['doi'])): ?>
+                                            <div class="text-[10px] text-slate-500 flex items-center gap-2">
+                                                <?php if (!empty($evItem['doi'])): ?>
+                                                    <span>DOI: <?= esc($evItem['doi']) ?></span>
+                                                <?php endif; ?>
+                                                <?php if (!empty($evItem['openalex_id'])): ?>
+                                                    <span>OpenAlex ID: <?= esc($evItem['openalex_id']) ?></span>
+                                                <?php endif; ?>
+                                                <?php if (!empty($evItem['cited_by_count'])): ?>
+                                                    <span class="font-bold text-emerald-700">&bull; <?= (int)$evItem['cited_by_count'] ?> sitasi</span>
+                                                <?php endif; ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="sm:text-right shrink-0 mt-1 sm:mt-0">
+                                        <?php if ($isFake): ?>
+                                            <span class="text-[11px] font-bold text-rose-700 block">❌ Tidak Terdaftar di Dunia</span>
+                                            <span class="text-[10px] text-rose-500">Terindikasi karangan AI</span>
+                                        <?php elseif ($isVer): ?>
+                                            <span class="text-[11px] font-bold text-emerald-700 block">✅ Publikasi Sahih</span>
+                                            <span class="text-[10px] text-emerald-600">Terindeks global</span>
+                                        <?php else: ?>
+                                            <span class="text-[11px] font-bold text-slate-600 block">ℹ️ Perlu Cek Manual</span>
+                                            <span class="text-[10px] text-slate-400">Buku / sumber lokal</span>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+                <?php endif; ?>
             </div>
 
             <!-- Narrative Box & Academic Guidance -->
@@ -1031,7 +1109,7 @@ $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evi
 
         <script>
         function switchCitationAuditTab(tab) {
-            const tabs = ['phantom', 'orphan', 'matched'];
+            const tabs = ['phantom', 'orphan', 'matched', 'external'];
             tabs.forEach(t => {
                 const btn = document.getElementById('tabBtn' + t.charAt(0).toUpperCase() + t.slice(1));
                 const panel = document.getElementById('panelCitation' + t.charAt(0).toUpperCase() + t.slice(1));
@@ -1042,6 +1120,8 @@ $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evi
                             btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer bg-rose-100 text-rose-800 border border-rose-300';
                         } else if (t === 'orphan') {
                             btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer bg-amber-100 text-amber-800 border border-amber-300';
+                        } else if (t === 'external') {
+                            btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer bg-rose-100 text-rose-800 border border-rose-300';
                         } else {
                             btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer bg-emerald-100 text-emerald-800 border border-emerald-300';
                         }

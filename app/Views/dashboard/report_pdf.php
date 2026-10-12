@@ -623,6 +623,35 @@ if ($dec === 'match') {
                     <div style="font-size: 7.5pt; color: #475569;">Sitasi Tanpa Pustaka: <?= (int)($citAudit['phantom_citations_count'] ?? 0) ?>, Pustaka Tak Dikutip: <?= (int)($citAudit['orphan_references_count'] ?? 0) ?></div>
                 </td>
             </tr>
+            <?php
+                $extVerPdf = $citAudit['external_verification'] ?? [];
+            ?>
+            <?php if (!empty($extVerPdf) && !empty($extVerPdf['enabled'])): ?>
+            <?php
+                $vTot = (int)($extVerPdf['total_checked'] ?? 0);
+                $vOk = (int)($extVerPdf['verified_count'] ?? 0);
+                $vFake = (int)($extVerPdf['suspected_fake_count'] ?? 0);
+                $vUnv = (int)($extVerPdf['unverified_count'] ?? 0);
+                $vRate = (float)($extVerPdf['veracity_rate'] ?? 0.0);
+                $hasFake = !empty($extVerPdf['has_suspected_fakes']);
+                $vColor = $hasFake ? '#b91c1c' : ($vOk > 0 ? '#047857' : '#64748b');
+                $vLabel = $hasFake ? "Terindikasi Sitasi Fiktif ({$vFake} entri)" : ($vOk > 0 ? 'Rujukan Terverifikasi Sahih' : 'Perlu Penelusuran Mandiri');
+                $vDesc = $hasFake ? "Ditemukan {$vFake} rujukan di Daftar Pustaka yang tidak terdaftar di indeks publikasi global (>250 juta paper OpenAlex & Crossref), mengindikasikan fabrikasi AI." : ($vOk > 0 ? "Seluruh {$vOk} rujukan yang diperiksa terdaftar sah pada pangkalan data indeks publikasi global." : 'Rujukan belum dapat diverifikasi otomatis ke indeks publikasi global.');
+            ?>
+            <tr>
+                <td><strong>Verifikasi Rujukan Eksternal (Deteksi Sitasi Fiktif)</strong><br><span style="font-size: 7.5pt; color: #64748b;">Audit Ontologis via OpenAlex &amp; Crossref Global API</span></td>
+                <td style="text-align: center; font-weight: bold; color: <?= $vColor ?>; font-size: 10pt; line-height: 1.25;">
+                    <?= number_format($vRate, 1) ?>% Sahih
+                    <div style="font-size: 6.5pt; font-weight: normal; color: #64748b; margin-top: 2px;">
+                        <?= $vOk ?> Sahih &bull; <?= $vFake ?> Fiktif AI &bull; <?= $vUnv ?> Non-Indeks
+                    </div>
+                </td>
+                <td>
+                    <strong style="color: <?= $vColor ?>;"><?= esc($vLabel) ?></strong>
+                    <div style="font-size: 7.5pt; color: #475569;"><?= esc($vDesc) ?></div>
+                </td>
+            </tr>
+            <?php endif; ?>
             <tr>
                 <td><strong>Plagiarisme Terjemahan (ID ↔ EN)</strong><br><span style="font-size: 7.5pt; color: #64748b;">Analisis Semantik Proyeksi Konsep Dwibahasa</span></td>
                 <td style="text-align: center; font-weight: bold; color: <?= $clScorePdf >= 35 ? '#b91c1c' : ($clScorePdf >= 15 ? '#b45309' : '#047857') ?>; font-size: 10pt; line-height: 1.25;">
@@ -725,6 +754,32 @@ if ($dec === 'match') {
             <?php endif; ?>
         </tbody>
     </table>
+
+    <?php if (!empty($extVerPdf) && !empty($extVerPdf['items'])): ?>
+        <?php
+            $pdfFakes = array_filter($extVerPdf['items'], fn($it) => ($it['status'] ?? '') === 'suspected_fake');
+            $pdfVerified = array_filter($extVerPdf['items'], fn($it) => ($it['status'] ?? '') === 'verified');
+        ?>
+        <?php if (!empty($pdfFakes) || !empty($pdfVerified)): ?>
+        <div style="margin-top: 6px; padding: 6px 10px; background: <?= !empty($pdfFakes) ? '#fff1f2' : '#f0fdf4' ?>; border: 1px solid <?= !empty($pdfFakes) ? '#fecdd3' : '#bbf7d0' ?>; border-radius: 6px; font-size: 7.5pt; line-height: 1.35; page-break-inside: avoid;">
+            <div style="font-weight: bold; color: <?= !empty($pdfFakes) ? '#9f1239' : '#166534' ?>; margin-bottom: 3px;">
+                Audit Keberadaan Rujukan Ilmiah (OpenAlex / Crossref Global Index):
+            </div>
+            <ul style="margin: 0; padding-left: 14px;">
+                <?php foreach ($pdfFakes as $pf): ?>
+                    <li style="color: #b91c1c; margin-bottom: 2px;">
+                        <strong>[Terindikasi Fiktif / Halusinasi AI]:</strong> &ldquo;<?= esc($pf['extracted_title'] ?? '') ?>&rdquo; &mdash; Tidak ditemukan di pangkalan data global (&gt;250 juta rekaman).
+                    </li>
+                <?php endforeach; ?>
+                <?php foreach (array_slice($pdfVerified, 0, 2) as $pv): ?>
+                    <li style="color: #047857; margin-bottom: 2px;">
+                        <strong>[Terverifikasi Sahih]:</strong> &ldquo;<?= esc($pv['extracted_title'] ?? '') ?>&rdquo; (<?= (int)($pv['cited_by_count'] ?? 0) ?> sitasi global).
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+        <?php endif; ?>
+    <?php endif; ?>
 
     <!-- Section 4: Audit Forensik Cerdas & Panduan Ujian Lisan Sidang -->
     <?php if ($geminiCompleted && (!empty($gAuditData['alasan_indikasi_ai']) || !empty($gContraPdf) || !empty($gCitPdf) || !empty($gQuestionsPdf))): ?>

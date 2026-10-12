@@ -78,6 +78,7 @@ class CitationAuditResult:
     matched_items: List[Dict[str, Any]] = field(default_factory=list)
     phantom_citations: List[Dict[str, Any]] = field(default_factory=list)
     orphan_references: List[Dict[str, Any]] = field(default_factory=list)
+    external_verification: Optional[Dict[str, Any]] = None
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -96,6 +97,7 @@ class CitationAuditResult:
             "matched_items": self.matched_items,
             "phantom_citations": self.phantom_citations,
             "orphan_references": self.orphan_references,
+            "external_verification": self.external_verification,
         }
 
 
@@ -414,9 +416,14 @@ def extract_bibliography_entries(bib_text: str) -> List[BibliographyEntry]:
     return entries
 
 
-def audit_citations_and_bibliography(submission_text: str, segmentation_res: Any = None) -> CitationAuditResult:
+def audit_citations_and_bibliography(
+    submission_text: str,
+    segmentation_res: Any = None,
+    verify_external: bool = True
+) -> CitationAuditResult:
     """
-    Melakukan audit konsistensi naskah secara komprehensif.
+    Melakukan audit konsistensi naskah secara komprehensif, mencakup konsistensi
+    internal (teks vs daftar pustaka) serta verifikasi keberadaan eksternal (OpenAlex/Crossref).
     """
     body_text, bib_text, has_bib = split_body_and_bibliography(submission_text, segmentation_res)
     citations = extract_in_text_citations(body_text)
@@ -577,6 +584,33 @@ def audit_citations_and_bibliography(submission_text: str, segmentation_res: Any
             verdict_label = "Inkonsistensi Kritis"
             rationale = f"Sebagian besar sitasi ({phantom_count} dari {unique_count}) tidak memiliki padanan di Daftar Pustaka. Diperlukan peninjauan ulang menyeluruh sebelum sidang."
 
+    # 5. Verifikasi Eksternal Keberadaan Karya Ilmiah via OpenAlex / Crossref
+    external_ver_res = None
+    if verify_external and entries:
+        try:
+            from worker.external_citation_verifier import verify_bibliography_list
+            external_ver_res = verify_bibliography_list(entries)
+        except Exception as e:
+            external_ver_res = {
+                "enabled": False,
+                "error": str(e),
+                "total_checked": 0,
+                "verified_count": 0,
+                "suspected_fake_count": 0,
+                "unverified_count": 0,
+                "items": []
+            }
+
+    if external_ver_res and external_ver_res.get("has_suspected_fakes"):
+        f_count = external_ver_res.get("suspected_fake_count", 0)
+        rationale += (
+            f" [PERINGATAN INTEGRITAS: Terdeteksi {f_count} entri di Daftar Pustaka "
+            f"yang tidak ditemukan pada pangkalan data publikasi ilmiah global "
+            f"(OpenAlex & Crossref), mengindikasikan sitasi fiktif / halusinasi generator AI.]"
+        )
+        if health_verdict in ("EXCELLENT", "GOOD"):
+            verdict_label = f"{verdict_label} — Terindikasi Sitasi Fiktif (AI)"
+
     return CitationAuditResult(
         detected_style=detected_style,
         has_bibliography_section=has_bib,
@@ -593,4 +627,5 @@ def audit_citations_and_bibliography(submission_text: str, segmentation_res: Any
         matched_items=matched_items,
         phantom_citations=phantom_citations,
         orphan_references=orphan_references,
+        external_verification=external_ver_res,
     )
