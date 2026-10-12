@@ -892,94 +892,96 @@
                     <p class="text-xs text-slate-400">Seluruh dokumen yang diuji kemiripan dan status eksekusi worker analisis</p>
                 </div>
 
-                <!-- Mobile List: Tampilan Kartu Responsif Dokumen (Layar Ponsel) -->
-                <div class="space-y-3.5 md:hidden">
+                <!-- Mobile List: Tampilan Kartu Responsif & Ringkas Dokumen (Layar Ponsel) -->
+                <div class="space-y-2.5 md:hidden">
                     <?php if (empty($documentsList)): ?>
                         <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-6 text-center text-xs text-slate-500">
                             Tidak ada dokumen ditemukan.
                         </div>
                     <?php else: ?>
                         <?php foreach ($documentsList as $d): ?>
-                            <div class="bg-slate-800/60 border border-slate-700/70 rounded-2xl p-4 shadow-sm space-y-3">
-                                <!-- Header Judul & Status -->
-                                <div class="space-y-1.5">
-                                    <div class="flex items-start justify-between gap-2">
-                                        <div class="font-bold text-slate-100 text-sm leading-snug"><?= esc($d['title']) ?></div>
-                                        <span class="px-2 py-0.5 rounded text-[10px] font-semibold shrink-0 <?= $d['document_type'] === 'corpus' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' : 'bg-sky-500/20 text-sky-300 border border-sky-500/30' ?>">
+                            <div class="bg-slate-800/60 hover:bg-slate-800/80 border border-slate-700/70 rounded-xl p-3 shadow-xs space-y-2.5 transition-colors">
+                                <!-- Baris 1: Status Badges di Kiri, Button-Group Aksi di Kanan -->
+                                <div class="flex items-center justify-between gap-2">
+                                    <div class="flex items-center gap-1.5 flex-wrap min-w-0">
+                                        <span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider <?= $d['document_type'] === 'corpus' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' : 'bg-sky-500/20 text-sky-300 border border-sky-500/30' ?>">
                                             <?= strtoupper($d['document_type']) ?>
                                         </span>
-                                    </div>
-                                    <div class="text-[11px] text-slate-400 font-mono-code truncate"><?= esc($d['original_filename']) ?></div>
-                                    
-                                    <?php if (!empty($d['faculty']) || !empty($d['department'])): ?>
-                                        <div class="flex items-center gap-1.5 flex-wrap pt-1">
-                                            <?php if (!empty($d['faculty'])): ?>
-                                                <span class="inline-flex items-center text-[10px] font-medium px-2 py-0.5 rounded bg-slate-900 text-slate-300 border border-slate-700">🏛️ <?= esc($d['faculty']) ?></span>
-                                            <?php endif; ?>
-                                            <?php if (!empty($d['department'])): ?>
-                                                <span class="inline-flex items-center text-[10px] font-medium px-2 py-0.5 rounded bg-indigo-900/40 text-indigo-300 border border-indigo-700/50">🎓 <?= esc($d['department']) ?></span>
-                                            <?php endif; ?>
-                                        </div>
-                                    <?php endif; ?>
-                                </div>
-
-                                <!-- Pengunggah & Status Worker -->
-                                <div class="flex items-center justify-between text-xs pt-1 border-t border-slate-700/50">
-                                    <div>
-                                        <div class="text-[10px] text-slate-500 uppercase tracking-wider">Pengunggah</div>
-                                        <div class="font-medium text-slate-200"><?= esc($d['user_name'] ?? 'Tamu / Anonim') ?></div>
-                                        <div class="text-[10px] text-slate-400 font-mono-code"><?= esc($d['user_email'] ?? '-') ?></div>
-                                    </div>
-                                    <div class="text-right">
-                                        <div class="text-[10px] text-slate-500 uppercase tracking-wider mb-0.5">Status Worker</div>
                                         <?php if ($d['status'] === 'completed'): ?>
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold">Completed</span>
+                                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-semibold">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Selesai
+                                            </span>
                                         <?php elseif ($d['status'] === 'processing'): ?>
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] bg-sky-500/10 text-sky-400 border border-sky-500/20 font-semibold animate-pulse">Processing</span>
+                                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] bg-sky-500/15 text-sky-300 border border-sky-500/30 font-semibold animate-pulse">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-sky-400 animate-ping"></span> Proses
+                                            </span>
                                         <?php elseif ($d['status'] === 'failed'): ?>
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] bg-rose-500/10 text-rose-400 border border-rose-500/20 font-semibold">Failed</span>
+                                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] bg-rose-500/15 text-rose-300 border border-rose-500/30 font-semibold">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> Gagal
+                                            </span>
                                         <?php else: ?>
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 font-semibold">Uploaded</span>
+                                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] bg-amber-500/15 text-amber-300 border border-amber-500/30 font-semibold">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> Antre
+                                            </span>
                                         <?php endif; ?>
                                     </div>
+
+                                    <!-- Button-Group Aksi Berbasis Ikon di Ponsel -->
+                                    <div class="inline-flex items-center rounded-lg bg-slate-900/90 border border-slate-700/80 p-0.5 shadow-xs divide-x divide-slate-800 shrink-0">
+                                        <?php if (isset($d['report']['id'])): ?>
+                                            <a href="<?= base_url('report/' . $d['report']['id']) ?>" target="_blank" class="p-1.5 text-indigo-400 hover:text-indigo-200 hover:bg-indigo-500/20 rounded-md transition-colors cursor-pointer" title="Lihat Laporan Hasil Audit" aria-label="Lihat Laporan">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                            </a>
+                                        <?php endif; ?>
+                                        <button type="button" onclick="handleDocReprocess(<?= (int) $d['id'] ?>)" class="p-1.5 text-sky-400 hover:text-sky-200 hover:bg-sky-500/20 rounded-md transition-colors cursor-pointer" title="Proses Ulang Dokumen (Re-process)" aria-label="Proses Ulang">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                        </button>
+                                        <button type="button" onclick="handleDocDelete(<?= (int) $d['id'] ?>)" class="p-1.5 text-rose-400 hover:text-rose-200 hover:bg-rose-500/20 rounded-md transition-colors cursor-pointer" title="Musnahkan / Hapus Dokumen" aria-label="Hapus Dokumen">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                        </button>
+                                    </div>
                                 </div>
 
-                                <!-- Metrik Kemiripan & Waktu (2 Kolom) -->
-                                <div class="grid grid-cols-2 gap-2 bg-slate-900/60 border border-slate-800/80 rounded-xl p-2.5 text-xs">
-                                    <div>
-                                        <div class="text-[10px] text-slate-500 uppercase tracking-wider">Skor Kemiripan</div>
+                                <!-- Baris 2: Judul Naskah & Nama Berkas -->
+                                <div class="space-y-0.5">
+                                    <div class="font-bold text-slate-100 text-xs sm:text-sm leading-snug line-clamp-2" title="<?= esc($d['title']) ?>">
+                                        <?= esc($d['title']) ?>
+                                    </div>
+                                    <div class="text-[10px] text-slate-400 font-mono-code truncate">
+                                        <?= esc($d['original_filename']) ?>
+                                    </div>
+                                </div>
+
+                                <!-- Tag Fakultas & Prodi (jika ada) -->
+                                <?php if (!empty($d['faculty']) || !empty($d['department'])): ?>
+                                    <div class="flex items-center gap-1.5 flex-wrap">
+                                        <?php if (!empty($d['faculty'])): ?>
+                                            <span class="inline-flex items-center text-[9px] font-medium px-1.5 py-0.5 rounded bg-slate-900/90 text-slate-300 border border-slate-700/80 truncate max-w-[140px]" title="<?= esc($d['faculty']) ?>">🏛️ <?= esc($d['faculty']) ?></span>
+                                        <?php endif; ?>
+                                        <?php if (!empty($d['department'])): ?>
+                                            <span class="inline-flex items-center text-[9px] font-medium px-1.5 py-0.5 rounded bg-indigo-950/60 text-indigo-300 border border-indigo-700/50 truncate max-w-[140px]" title="<?= esc($d['department']) ?>">🎓 <?= esc($d['department']) ?></span>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php endif; ?>
+
+                                <!-- Baris 3: Info Pengunggah & Waktu di Kiri, Skor Kemiripan di Kanan -->
+                                <div class="pt-2 border-t border-slate-700/50 flex items-center justify-between text-[11px] gap-2">
+                                    <div class="min-w-0 flex-1">
+                                        <div class="text-slate-300 font-medium truncate text-xs"><?= esc($d['user_name'] ?? 'Tamu / Anonim') ?></div>
+                                        <div class="text-[10px] text-slate-500 font-mono"><?= date('d M Y, H:i', strtotime($d['created_at'])) ?></div>
+                                    </div>
+                                    <div class="text-right shrink-0">
                                         <?php if (isset($d['report']['overall_score'])): ?>
-                                            <div class="font-bold text-sm <?= $d['report']['overall_score'] >= 25 ? 'text-rose-400' : 'text-emerald-400' ?>">
+                                            <div class="font-bold font-mono text-xs leading-tight <?= $d['report']['overall_score'] >= 25 ? 'text-rose-400' : 'text-emerald-400' ?>">
                                                 <?= number_format($d['report']['overall_score'], 1) ?>%
                                             </div>
-                                            <div class="text-[10px] text-slate-500">
-                                                V: <?= number_format($d['report']['verbatim_score'] ?? 0, 1) ?>% | P: <?= number_format($d['report']['paraphrase_score'] ?? 0, 1) ?>%
+                                            <div class="text-[9px] text-slate-500 font-mono">
+                                                V:<?= number_format($d['report']['verbatim_score'] ?? 0, 0) ?>% P:<?= number_format($d['report']['paraphrase_score'] ?? 0, 0) ?>%
                                             </div>
                                         <?php else: ?>
-                                            <span class="text-slate-500 text-xs">Belum ada skor</span>
+                                            <span class="text-slate-500 text-xs font-mono">-</span>
                                         <?php endif; ?>
                                     </div>
-                                    <div>
-                                        <div class="text-[10px] text-slate-500 uppercase tracking-wider">Waktu Masuk</div>
-                                        <div class="text-slate-300 font-medium mt-0.5 text-[11px]">
-                                            <?= date('d M Y, H:i', strtotime($d['created_at'])) ?>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Tombol Aksi Mobile -->
-                                <div class="pt-2 border-t border-slate-700/60 flex items-center gap-2">
-                                    <?php if (isset($d['report']['id'])): ?>
-                                        <a href="<?= base_url('report/' . $d['report']['id']) ?>" target="_blank" class="flex-1 py-2 px-2.5 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-xs font-semibold text-center transition-colors">
-                                            📄 Laporan
-                                        </a>
-                                    <?php endif; ?>
-                                    <button onclick="handleDocReprocess(<?= (int) $d['id'] ?>)" class="flex-1 py-2 px-2.5 rounded-xl bg-sky-600/20 hover:bg-sky-600/30 text-sky-300 border border-sky-500/30 text-xs font-medium text-center transition-colors">
-                                        ↺ Reproses
-                                    </button>
-                                    <button onclick="handleDocDelete(<?= (int) $d['id'] ?>)" class="py-2 px-3 rounded-xl bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 text-xs font-medium transition-colors" title="Hapus Dokumen">
-                                        ✕
-                                    </button>
                                 </div>
                             </div>
                         <?php endforeach; ?>
@@ -998,7 +1000,7 @@
                                     <th class="py-3 px-3">Status Worker</th>
                                     <th class="py-3 px-3 text-center">Skor Kemiripan</th>
                                     <th class="py-3 px-3">Waktu Masuk</th>
-                                    <th class="py-3 px-4 text-right">Aksi</th>
+                                    <th class="py-3 px-4 text-right w-28">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-800/80">
@@ -1057,17 +1059,17 @@
                                                 <?= date('d M Y, H:i', strtotime($d['created_at'])) ?>
                                             </td>
                                             <td class="py-3 px-4 text-right whitespace-nowrap">
-                                                <div class="flex items-center justify-end gap-1.5 flex-nowrap">
+                                                <div class="inline-flex items-center rounded-xl bg-slate-900/90 border border-slate-700/70 p-0.5 shadow-xs divide-x divide-slate-800">
                                                     <?php if (isset($d['report']['id'])): ?>
-                                                        <a href="<?= base_url('report/' . $d['report']['id']) ?>" target="_blank" class="px-2.5 py-1 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-[11px] font-semibold transition-colors">
-                                                            Laporan
+                                                        <a href="<?= base_url('report/' . $d['report']['id']) ?>" target="_blank" class="p-1.5 text-indigo-400 hover:text-indigo-200 hover:bg-indigo-500/20 rounded-lg transition-colors cursor-pointer" title="Lihat Laporan Hasil Audit" aria-label="Lihat Laporan">
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                                                         </a>
                                                     <?php endif; ?>
-                                                    <button onclick="handleDocReprocess(<?= (int) $d['id'] ?>)" class="px-2.5 py-1 rounded-lg bg-sky-600/20 hover:bg-sky-600/30 text-sky-300 border border-sky-500/30 text-[11px] transition-colors" title="Jalankan ulang analisis dokumen ini">
-                                                        ↺ Re-process
+                                                    <button type="button" onclick="handleDocReprocess(<?= (int) $d['id'] ?>)" class="p-1.5 text-sky-400 hover:text-sky-200 hover:bg-sky-500/20 rounded-lg transition-colors cursor-pointer" title="Jalankan ulang analisis dokumen ini (Re-process)" aria-label="Jalankan Ulang">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                                                     </button>
-                                                    <button onclick="handleDocDelete(<?= (int) $d['id'] ?>)" class="px-2.5 py-1 rounded-lg bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 text-[11px] transition-colors" title="Hapus dokumen dari sistem">
-                                                        ✕
+                                                    <button type="button" onclick="handleDocDelete(<?= (int) $d['id'] ?>)" class="p-1.5 text-rose-400 hover:text-rose-200 hover:bg-rose-500/20 rounded-lg transition-colors cursor-pointer" title="Musnahkan / Hapus dokumen dari sistem" aria-label="Hapus Dokumen">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                                     </button>
                                                 </div>
                                             </td>
