@@ -483,11 +483,22 @@ def postprocess_ai_claim(audit: Dict[str, Any], full_text: str, doc_metadata: Op
         audit["alasan_indikasi_ai_mentah"] = audit.get("alasan_indikasi_ai", "")
         audit["alasan_indikasi_ai"] = (
             "Tidak ditemukan bukti tekstual konkret ciri keluaran AI yang dapat diverifikasi pada naskah. "
-            "Temuan lain (inkonsistensi logika/sitasi) disajikan terpisah sebagai catatan kualitas, bukan indikasi AI."
+            "Gaya bahasa dan alur berpikir mencerminkan tulisan mahasiswa secara alami. "
+            "Temuan lain (inkonsistensi logika/sitasi) disajikan terpisah sebagai catatan kualitas metodologi, bukan indikasi AI."
         )
     audit["tingkat_indikasi_ai"] = final_level
     audit["bukti_ai_terverifikasi"] = (final_level in ("SEDANG", "TINGGI")) and len(verified) >= MIN_VERIFIED_QUOTES
     audit["catatan_validasi"] = notes
+
+    # Sanitasi istilah: ganti ungkapan keliru 'tulisan tangan' menjadi 'tulisan mahasiswa'
+    if "alasan_indikasi_ai" in audit and isinstance(audit["alasan_indikasi_ai"], str):
+        audit["alasan_indikasi_ai"] = re.sub(
+            r'\btulisan\s+tangan(?:\s+manusia)?\b',
+            'tulisan mahasiswa',
+            audit["alasan_indikasi_ai"],
+            flags=re.IGNORECASE
+        )
+
     return audit
 
 
@@ -548,6 +559,7 @@ ATURAN PENILAIAN "tingkat_indikasi_ai" (wajib dipatuhi, untuk mencegah tuduhan k
 4. Jika memilih "SEDANG"/"TINGGI", isi "bukti_kutipan_ai" dengan minimal 2 kutipan PERSIS (verbatim, maks. 200 karakter)
    yang disalin dari naskah. Tanpa kutipan yang dapat diverifikasi, klaim akan dibatalkan otomatis.
 5. Naskah bisa saja ditulis jauh sebelum tahun 2022, ketika AI generatif belum ada.
+6. Pedoman Istilah/Terminologi: Gunakan istilah "tulisan mahasiswa" atau "karya tulis manusia asli". DILARANG menggunakan istilah rancu seperti "tulisan tangan manusia" karena seluruh berkas di sistem ini merupakan dokumen digital/ketikan.
 
 Judul Dokumen: {title or 'Karya Ilmiah'}
 
@@ -557,7 +569,7 @@ Potongan Naskah:
 Lakukan audit kritis dan kembalikan HANYA format JSON valid dengan struktur persis berikut:
 {{
     "tingkat_indikasi_ai": "TINGGI" | "SEDANG" | "RENDAH",
-    "alasan_indikasi_ai": "Ringkasan CIRI TEKSTUAL yang mendasari penilaian (bukan kualitas argumen)",
+    "alasan_indikasi_ai": "Ringkasan CIRI TEKSTUAL yang mendasari penilaian (gunakan istilah 'tulisan mahasiswa' atau 'karya tulis manusia', jangan gunakan 'tulisan tangan')",
     "bukti_kutipan_ai": ["kutipan persis dari naskah (wajib minimal 2 jika SEDANG/TINGGI, kosongkan jika RENDAH)"],
     "inkonsistensi_metodologi_dan_logika": [
         "Jelaskan kontradiksi jika ada (misal: menyebut regresi tetapi diagram/lampiran menuliskan uji-t, atau variabel di teori berbeda dengan di kuesioner)"

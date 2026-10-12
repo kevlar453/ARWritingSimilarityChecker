@@ -470,7 +470,7 @@ def audit_citations_and_bibliography(submission_text: str, segmentation_res: Any
     # Jangan melabeli sitasi sebagai "gaib" (phantom) karena itu keterbatasan format non-baku, bukan kepalsuan sitasi.
     url_entries_count = sum(1 for e in entries if re.match(r'^(?:https?://|www\.)', e.raw_text, re.IGNORECASE))
     is_url_dominant_bib = bool(entries) and (
-        (url_entries_count >= 3 and (url_entries_count / len(entries)) >= 0.4)
+        (url_entries_count >= 2 and (url_entries_count / len(entries)) >= 0.4)
         or (url_entries_count == len(entries))
     )
     if is_url_dominant_bib:
@@ -483,18 +483,19 @@ def audit_citations_and_bibliography(submission_text: str, segmentation_res: Any
             total_bibliography_entries=len(entries),
             matched_citations_count=len(matched_items),
             phantom_citations_count=0,
-            orphan_references_count=len(orphan_references),
+            orphan_references_count=0,
             citation_health_score=60.0,
             health_verdict="NEEDS_ATTENTION",
             verdict_label="Daftar Pustaka Berupa URL (0 Sitasi Gaib)",
             summary_rationale=(
                 f"Daftar pustaka memuat {url_entries_count} tautan URL mentah (seperti Wikipedia/blog) dari total {len(entries)} rujukan. "
-                "Seluruh kutipan bebas dari sitasi gaib (0 sitasi gaib), namun format rujukan web disarankan disempurnakan "
-                "ke kaidah sitasi akademik baku (APA/Chicago/IEEE) untuk kelayakan sidang."
+                "Seluruh rujukan bebas dari sitasi gaib (0 sitasi gaib) dan tidak diklasifikasikan sebagai pustaka yatim "
+                "karena rujukan internet tidak menggunakan kunci sitasi baku. "
+                "Format rujukan web disarankan disempurnakan ke kaidah sitasi akademik baku (APA/Chicago/IEEE) untuk kelayakan sidang."
             ),
             matched_items=matched_items,
             phantom_citations=[],
-            orphan_references=orphan_references
+            orphan_references=[]
         )
 
     # Perhitungan Skor Kesehatan Sitasi (0.0 - 100.0)

@@ -1097,7 +1097,7 @@ class DashboardController extends BaseController
             }
         }
         $isUrlDominantBib = (!empty($entries)) && (
-            ($urlEntriesCount >= 3 && ($urlEntriesCount / count($entries)) >= 0.4)
+            ($urlEntriesCount >= 2 && ($urlEntriesCount / count($entries)) >= 0.4)
             || ($urlEntriesCount === count($entries))
         );
 
@@ -1110,14 +1110,14 @@ class DashboardController extends BaseController
                 'total_bibliography_entries' => $totalBib,
                 'matched_citations_count' => $matchedCount,
                 'phantom_citations_count' => 0,
-                'orphan_references_count' => $orphanCount,
+                'orphan_references_count' => 0,
                 'citation_health_score' => 60.0,
                 'health_verdict' => 'NEEDS_ATTENTION',
                 'verdict_label' => 'Daftar Pustaka Berupa URL (0 Sitasi Gaib)',
-                'summary_rationale' => "Daftar pustaka memuat {$urlEntriesCount} tautan URL mentah (seperti Wikipedia/blog) dari total {$totalBib} rujukan. Seluruh kutipan bebas dari sitasi gaib (0 sitasi gaib), namun format rujukan web disarankan disempurnakan ke kaidah sitasi akademik baku (APA/Chicago/IEEE) untuk kelayakan sidang.",
+                'summary_rationale' => "Daftar pustaka memuat {$urlEntriesCount} tautan URL mentah (seperti Wikipedia/blog) dari total {$totalBib} rujukan. Seluruh rujukan bebas dari sitasi gaib (0 sitasi gaib) dan tidak diklasifikasikan sebagai pustaka yatim karena rujukan internet tidak menggunakan kunci sitasi baku. Format rujukan web disarankan disempurnakan ke kaidah sitasi akademik baku (APA/Chicago/IEEE) untuk kelayakan sidang.",
                 'matched_items' => $matchedItems,
                 'phantom_citations' => [],
-                'orphan_references' => $orphanReferences,
+                'orphan_references' => [],
             ];
         }
 

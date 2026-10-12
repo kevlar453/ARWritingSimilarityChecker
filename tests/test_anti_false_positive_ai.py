@@ -114,6 +114,9 @@ def test_citation_auditor_url_only_bibliography():
     assert result.has_bibliography_section is True
     # Tidak boleh ada phantom citations (sitasi gaib) karena rujukan berupa URL mentah
     assert result.phantom_citations_count == 0
+    # Tidak boleh ada orphan references (pustaka yatim) yang dibebankan ke mahasiswa untuk rujukan URL
+    assert result.orphan_references_count == 0
+    assert len(result.orphan_references) == 0
     assert result.health_verdict == "NEEDS_ATTENTION"
     assert "Daftar Pustaka Berupa URL" in result.verdict_label
 
@@ -144,4 +147,18 @@ def test_citation_auditor_sumber_bacaan_and_year_range():
     assert res.total_in_text_citations == 0
     assert res.phantom_citations_count == 0
     assert res.total_bibliography_entries >= 3
+    # Naskah dominan URL: pustaka yatim harus 0
+    assert res.orphan_references_count == 0
+
+
+def test_postprocess_ai_claim_sanitizes_tulisan_tangan():
+    """Memastikan ungkapan 'tulisan tangan manusia' disanitasi menjadi 'tulisan mahasiswa'."""
+    raw_audit = {
+        "tingkat_indikasi_ai": "RENDAH",
+        "alasan_indikasi_ai": "Struktur naskah mencerminkan pola tulisan tangan manusia secara wajar.",
+        "bukti_kutipan_ai": []
+    }
+    processed = postprocess_ai_claim(raw_audit, "Teks dokumen naskah.", doc_metadata=None)
+    assert "tulisan tangan" not in processed["alasan_indikasi_ai"].lower()
+    assert "tulisan mahasiswa" in processed["alasan_indikasi_ai"]
 
