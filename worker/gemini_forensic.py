@@ -393,11 +393,110 @@ def call_gemini_api(api_key: str, model_name: str, prompt: str, timeout: int = 4
         }
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# VALIDASI KLAIM "INDIKASI AI" (anti false-positive)
+# Prinsip: LLM tidak boleh menjadi hakim tunggal. Klaim SEDANG/TINGGI hanya dipertahankan
+# bila (a) naskah bukan dari era pra-LLM menurut metadata, dan (b) setidaknya
+# MIN_VERIFIED_QUOTES kutipan bukti yang diberikan LLM benar-benar ada di naskah.
+# ─────────────────────────────────────────────────────────────────────────────
+MIN_VERIFIED_QUOTES = 2
+MIN_QUOTE_CHARS = 20
+
+# Penanda kebocoran percakapan chatbot pada teks naskah (deterministik, bukan opini LLM)
+META_PROMPT_LEAK_PATTERNS = [
+    r"\bbisa\.\s*saya akan buat\b",
+    r"\btentu,?\s*(?:berikut|ini)\s+(?:adalah\s+)?(?:draf|contoh|versi|bab|revisi)\b",
+    r"\bsebagai (?:sebuah )?model bahasa(?: ai| buatan)?(?:,| saya| yang)\b",
+    r"\bas an ai (?:language )?model\b",
+    r"\bregenerate response\b",
+    r"\bsaya tidak dapat (?:memenuhi|membantu) permintaan (?:ini|tersebut)\b",
+]
+
+
+def _norm_for_match(text: str) -> str:
+    return re.sub(r"[\W_]+", " ", (text or "").lower()).strip()
+
+
+def detect_meta_prompt_leak(full_text: str) -> List[str]:
+    """Mencari sisa percakapan chatbot pada teks naskah. Mengembalikan daftar cuplikan yang cocok."""
+    hits: List[str] = []
+    for pat in META_PROMPT_LEAK_PATTERNS:
+        for m in re.finditer(pat, full_text or "", flags=re.IGNORECASE):
+            start = max(0, m.start() - 40)
+            end = min(len(full_text), m.end() + 40)
+            hits.append(full_text[start:end].replace("\n", " ").strip())
+            if len(hits) >= 5:
+                return hits
+    return hits
+
+
+def postprocess_ai_claim(audit: Dict[str, Any], full_text: str, doc_metadata: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    """
+    Memvalidasi klaim indikasi AI dari LLM terhadap naskah dan metadata.
+    Menambahkan field: bukti_ai_terverifikasi, kutipan_terverifikasi, meta_prompt_leak_terverifikasi,
+    catatan_validasi. Klaim yang tidak lolos diturunkan ke RENDAH (nilai asli disimpan di *_mentah).
+    """
+    audit = dict(audit or {})
+    raw_level = str(audit.get("tingkat_indikasi_ai", "RENDAH") or "RENDAH").strip().upper()
+    if raw_level not in ("RENDAH", "SEDANG", "TINGGI"):
+        raw_level = "RENDAH"
+
+    # 1. Kebocoran prompt: deterministik pada teks, tidak bergantung pada LLM
+    leak_hits = detect_meta_prompt_leak(full_text)
+    audit["meta_prompt_leak_terverifikasi"] = bool(leak_hits)
+    audit["meta_prompt_leak_cuplikan"] = leak_hits
+
+    # 2. Verifikasi kutipan bukti terhadap naskah
+    norm_doc = _norm_for_match(full_text)
+    quotes = audit.get("bukti_kutipan_ai") or []
+    if not isinstance(quotes, list):
+        quotes = []
+    verified = []
+    for q in quotes:
+        nq = _norm_for_match(str(q))
+        if len(nq) >= MIN_QUOTE_CHARS and nq in norm_doc:
+            verified.append(str(q).strip())
+    audit["kutipan_terverifikasi"] = verified
+
+    # 3. Metadata era pra-LLM
+    pre_llm = bool((doc_metadata or {}).get("is_pre_llm_era"))
+    audit["metadata_pra_llm"] = pre_llm
+
+    notes = []
+    final_level = raw_level
+    if raw_level in ("SEDANG", "TINGGI"):
+        if pre_llm and not leak_hits:
+            final_level = "RENDAH"
+            notes.append(
+                "Klaim indikasi AI diturunkan: metadata berkas menunjukkan naskah dibuat dan terakhir diubah "
+                "sebelum era LLM generatif (sebelum 30 Nov 2022)."
+            )
+        elif len(verified) < MIN_VERIFIED_QUOTES:
+            final_level = "RENDAH"
+            notes.append(
+                f"Klaim indikasi AI diturunkan: hanya {len(verified)} dari {len(quotes)} kutipan bukti yang dapat "
+                f"diverifikasi pada naskah (minimal {MIN_VERIFIED_QUOTES})."
+            )
+
+    audit["tingkat_indikasi_ai_mentah"] = raw_level
+    if final_level != raw_level:
+        audit["alasan_indikasi_ai_mentah"] = audit.get("alasan_indikasi_ai", "")
+        audit["alasan_indikasi_ai"] = (
+            "Tidak ditemukan bukti tekstual konkret ciri keluaran AI yang dapat diverifikasi pada naskah. "
+            "Temuan lain (inkonsistensi logika/sitasi) disajikan terpisah sebagai catatan kualitas, bukan indikasi AI."
+        )
+    audit["tingkat_indikasi_ai"] = final_level
+    audit["bukti_ai_terverifikasi"] = (final_level in ("SEDANG", "TINGGI")) and len(verified) >= MIN_VERIFIED_QUOTES
+    audit["catatan_validasi"] = notes
+    return audit
+
+
 def audit_proposal_with_gemini(
     document_text: str,
     substantive_text: str = "",
     title: str = "",
-    connection=None
+    connection=None,
+    doc_metadata: Optional[Dict[str, Any]] = None
 ) -> Dict[str, Any]:
     """
     Menjalankan audit forensik semantik menggunakan Google Gemini API
@@ -415,6 +514,17 @@ def audit_proposal_with_gemini(
     content_sample = substantive_text if (substantive_text and len(substantive_text.strip()) >= 500) else document_text
     truncated_content = content_sample[:25000]
 
+    meta = doc_metadata or {}
+    if meta.get("created") or meta.get("modified"):
+        metadata_note = (
+            f"Metadata berkas: dibuat {meta.get('created') or 'tidak diketahui'}, "
+            f"terakhir diubah {meta.get('modified') or 'tidak diketahui'}."
+            + (" Berkas ini berasal dari SEBELUM era AI generatif; indikasi AI hampir pasti RENDAH."
+               if meta.get("is_pre_llm_era") else "")
+        )
+    else:
+        metadata_note = "Metadata berkas: tidak tersedia."
+
     current_year = time.strftime("%Y")
     current_date_str = time.strftime("%d %B %Y")
 
@@ -425,6 +535,20 @@ kontradiksi metodologi, distorsi sitasi (halusinasi AI), dan memberikan panduan 
 Konteks Waktu Saat Ini: Tahun {current_year} (per tanggal {current_date_str}).
 Catatan Penting Garis Waktu: Pemeriksaan dilakukan pada tahun {current_year}. Publikasi dan data bertahun <= {current_year} (termasuk tahun {int(current_year)-1} dan {current_year}) adalah referensi yang realistis dan sah dalam garis waktu naskah saat ini, jangan anggap tahun {current_year} atau sebelumnya sebagai "sitasi masa depan". Hanya tandai anomali masa depan jika terdapat rujukan dengan tahun > {current_year} atau fabrikasi sitasi fiktif.
 
+{metadata_note}
+ATURAN PENILAIAN "tingkat_indikasi_ai" (wajib dipatuhi, untuk mencegah tuduhan keliru terhadap mahasiswa):
+1. Default-nya "RENDAH". Jika ragu, jawab "RENDAH".
+2. "SEDANG"/"TINGGI" HANYA boleh dipilih bila ada bukti TEKSTUAL konkret ciri keluaran AI, misalnya: sisa percakapan chatbot
+   ("Tentu, berikut..."), frasa templat generik yang berulang tanpa isi spesifik, tokoh/jurnal/sitasi yang jelas fiktif,
+   atau struktur kalimat identik antar-bagian.
+3. Hal berikut BUKAN bukti AI, karena lazim pada tulisan mahasiswa: kontradiksi atau perubahan klaim di akhir tulisan,
+   asumsi pribadi yang diakui penulis, kelemahan metodologi, sitasi tidak baku, daftar pustaka berupa URL atau tidak ada,
+   gaya naratif/rangkuman, topik sejarah, salah ketik. Laporkan hal-hal ini HANYA pada
+   "inkonsistensi_metodologi_dan_logika", "integritas_sitasi", dan "pertanyaan_kritis_dosen", jangan jadikan dasar indikasi AI.
+4. Jika memilih "SEDANG"/"TINGGI", isi "bukti_kutipan_ai" dengan minimal 2 kutipan PERSIS (verbatim, maks. 200 karakter)
+   yang disalin dari naskah. Tanpa kutipan yang dapat diverifikasi, klaim akan dibatalkan otomatis.
+5. Naskah bisa saja ditulis jauh sebelum tahun 2022, ketika AI generatif belum ada.
+
 Judul Dokumen: {title or 'Karya Ilmiah'}
 
 Potongan Naskah:
@@ -433,7 +557,8 @@ Potongan Naskah:
 Lakukan audit kritis dan kembalikan HANYA format JSON valid dengan struktur persis berikut:
 {{
     "tingkat_indikasi_ai": "TINGGI" | "SEDANG" | "RENDAH",
-    "alasan_indikasi_ai": "Ringkasan penilaian apakah terdapat perakitan draf/template AI",
+    "alasan_indikasi_ai": "Ringkasan CIRI TEKSTUAL yang mendasari penilaian (bukan kualitas argumen)",
+    "bukti_kutipan_ai": ["kutipan persis dari naskah (wajib minimal 2 jika SEDANG/TINGGI, kosongkan jika RENDAH)"],
     "inkonsistensi_metodologi_dan_logika": [
         "Jelaskan kontradiksi jika ada (misal: menyebut regresi tetapi diagram/lampiran menuliskan uji-t, atau variabel di teori berbeda dengan di kuesioner)"
     ],
@@ -477,7 +602,7 @@ Lakukan audit kritis dan kembalikan HANYA format JSON valid dengan struktur pers
                 # Bersihkan pembungkus markdown ```json ... ``` bila ada
                 clean_json_str = re.sub(r"^```(?:json)?\s*", "", raw_text.strip(), flags=re.MULTILINE)
                 clean_json_str = re.sub(r"\s*```$", "", clean_json_str.strip(), flags=re.MULTILINE)
-                parsed_audit = json.loads(clean_json_str)
+                parsed_audit = postprocess_ai_claim(json.loads(clean_json_str), document_text, doc_metadata)
                 return {
                     "status": "completed",
                     "is_available": True,
@@ -491,12 +616,14 @@ Lakukan audit kritis dan kembalikan HANYA format JSON valid dengan struktur pers
                 ai_reason_match = re.search(r'"alasan_indikasi_ai"\s*:\s*"([^"]+)"', raw_text)
                 
                 fallback_audit = {
-                    "tingkat_indikasi_ai": ai_level_match.group(1).upper() if ai_level_match else "SEDANG",
+                    "tingkat_indikasi_ai": ai_level_match.group(1).upper() if ai_level_match else "RENDAH",
                     "alasan_indikasi_ai": ai_reason_match.group(1).strip() if ai_reason_match else raw_text[:500],
+                    "bukti_kutipan_ai": [],
                     "inkonsistensi_metodologi_dan_logika": [],
                     "integritas_sitasi": [],
                     "pertanyaan_kritis_dosen": []
                 }
+                fallback_audit = postprocess_ai_claim(fallback_audit, document_text, doc_metadata)
                 return {
                     "status": "completed",
                     "is_available": True,
@@ -505,6 +632,7 @@ Lakukan audit kritis dan kembalikan HANYA format JSON valid dengan struktur pers
                     "audit": fallback_audit,
                     "raw_output": raw_text
                 }
+
         else:
             # Gagal: klasifikasi error untuk backoff & update status
             is_quota = res.get("is_quota", False)

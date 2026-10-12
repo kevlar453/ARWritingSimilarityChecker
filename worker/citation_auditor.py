@@ -163,6 +163,16 @@ def split_body_and_bibliography(text: str, segmentation_res: Any = None) -> Tupl
 
         return body_text, bib_text, True
 
+    # 3. Fallback: blok URL mentah di akhir naskah (tanpa heading) dianggap daftar rujukan
+    lines = text.rstrip().split("\n")
+    url_re = re.compile(r"^\s*(?:https?://|www\.)\S+\s*$", re.IGNORECASE)
+    idx = len(lines)
+    while idx > 0 and (not lines[idx - 1].strip() or url_re.match(lines[idx - 1])):
+        idx -= 1
+    url_count = sum(1 for ln in lines[idx:] if url_re.match(ln))
+    if url_count >= 3:
+        return "\n".join(lines[:idx]), "\n".join(lines[idx:]), True
+
     return text, "", False
 
 
@@ -328,8 +338,10 @@ def extract_bibliography_entries(bib_text: str) -> List[BibliographyEntry]:
         is_num_start = bool(re.match(r'^(?:\[\d+\]|\d+\.)\s+', clean_l))
         # Indikator 2: Dimulai dengan nama penulis kapital dan baris sebelumnya sudah cukup panjang
         is_author_start = bool(re.match(r'^[A-Z][a-zA-Z\s\-\.\,]+,\s*[A-Z]', clean_l))
+        # Indikator 3: baris berupa URL mentah (satu URL = satu entri)
+        is_url_start = bool(re.match(r'^(?:https?://|www\.)', clean_l, re.IGNORECASE))
 
-        if (is_num_start or is_author_start) and current_entry_lines:
+        if (is_num_start or is_author_start or is_url_start) and current_entry_lines:
             commit_entry(current_entry_lines)
             current_entry_lines = [clean_l]
         else:
@@ -436,6 +448,32 @@ def audit_citations_and_bibliography(submission_text: str, segmentation_res: Any
     phantom_count = len(phantom_citations)
     orphan_count = len(orphan_references)
     total_bib = len(entries)
+
+    # Daftar rujukan berupa URL mentah: sitasi penulis-tahun tidak mungkin dicocokkan secara otomatis.
+    # Jangan melabeli sitasi sebagai "gaib" (phantom) karena itu keterbatasan format, bukan kesalahan penulis.
+    url_only_bib = bool(entries) and all(re.match(r'^(?:https?://|www\.)', e.raw_text, re.IGNORECASE) for e in entries)
+    if url_only_bib:
+        unverifiable = len(phantom_citations)
+        phantom_citations = []
+        matched_items = []
+        return CitationAuditResult(
+            detected_style=detected_style,
+            has_bibliography_section=True,
+            total_in_text_citations=len(citations),
+            unique_in_text_count=len(unique_in_text_keys),
+            total_bibliography_entries=len(entries),
+            matched_citations_count=0,
+            phantom_citations_count=0,
+            orphan_references_count=0,
+            citation_health_score=50.0,
+            health_verdict="NEEDS_ATTENTION",
+            verdict_label="Daftar Pustaka Berupa URL (Pencocokan Sitasi Tidak Dapat Dilakukan)",
+            summary_rationale=(
+                f"Rujukan berupa {len(entries)} URL mentah tanpa penulis/tahun, sehingga {unverifiable} "
+                "pola sitasi di tubuh naskah tidak dapat dicocokkan secara otomatis. Sarankan penulis memakai "
+                "format sitasi baku (APA/Chicago)."
+            ),
+        )
 
     # Perhitungan Skor Kesehatan Sitasi (0.0 - 100.0)
     if not has_bib:

@@ -85,6 +85,22 @@ def calculate_dynamic_ai_score(gemini: dict, stylometrics_score: float = None) -
         if m3:
             audit["skor_indikasi_persen"] = float(m3.group(1))
 
+    reason = str(audit.get("alasan_indikasi_ai") or "")
+    contra = audit.get("inkonsistensi_metodologi_dan_logika") or []
+    citations = audit.get("integritas_sitasi") or []
+    ev_text = (reason + " " + " ".join([str(c) for c in contra]) + " " + " ".join([str(ci) for ci in citations])).lower()
+
+    # Cek kebocoran percakapan prompt AI mentah
+    is_meta = bool(audit.get("meta_prompt_leak_terverifikasi")) or bool(re.search(r"(kebocoran instruksi|meta-prompt|prompt leak|disalin-tempel secara langsung|copy-paste mentah|percakapan ai|chat ai|instruksi percakapan|bisa\. saya akan buat|tentu, berikut|sebagai model bahasa ai)", ev_text))
+    if is_meta:
+        return 98.0
+
+    # Naskah pra-LLM atau bukti AI tidak terverifikasi konkret pada naskah
+    is_pre_llm = bool(audit.get("metadata_pra_llm"))
+    is_verified = bool(audit.get("bukti_ai_terverifikasi"))
+    if is_pre_llm or ("bukti_ai_terverifikasi" in audit and not is_verified):
+        return stylometrics_score if stylometrics_score is not None else 0.0
+
     if "skor_indikasi_persen" in audit and audit["skor_indikasi_persen"] is not None:
         try:
             explicit = float(audit["skor_indikasi_persen"])
@@ -94,21 +110,15 @@ def calculate_dynamic_ai_score(gemini: dict, stylometrics_score: float = None) -
             pass
 
     level = str(audit.get("tingkat_indikasi_ai") or "RENDAH").strip().upper()
-    reason = str(audit.get("alasan_indikasi_ai") or "")
-    contra = audit.get("inkonsistensi_metodologi_dan_logika") or []
-    citations = audit.get("integritas_sitasi") or []
-    ev_text = (reason + " " + " ".join([str(c) for c in contra]) + " " + " ".join([str(ci) for ci in citations])).lower()
 
     if level == "RENDAH":
         return stylometrics_score if stylometrics_score is not None else 0.0
 
     if level == "SEDANG":
+        if not is_verified and stylometrics_score is not None and stylometrics_score < 30.0:
+            return stylometrics_score
         score = 50.0 + (5.0 if len(contra) > 1 or len(citations) > 1 else 0.0)
         return round(max(score, stylometrics_score or 0.0), 1)
-
-    is_meta = bool(re.search(r"(kebocoran instruksi|meta-prompt|prompt leak|disalin-tempel secara langsung|copy-paste mentah|percakapan ai|chat ai|instruksi percakapan|bisa\. saya akan buat|tentu, berikut|sebagai model bahasa ai)", ev_text))
-    if is_meta:
-        return 98.0
 
     has_cit = bool(re.search(r"(halusinasi|tokoh fiktif|nama jurnal .* diperlakukan sebagai|nama paroki .* diperlakukan sebagai|sitasi palsu|penulis fiktif|fabrikasi)", ev_text))
     base = 80.0 if has_cit else 74.0
@@ -137,6 +147,8 @@ def extract_ai_assessment(evidence_data) -> tuple[float | None, str]:
 
     ai_sty = ev.get("ai_stylometrics") or ev.get("v1_1_presentation", {}).get("v1_2_evolution", {}).get("ai_stylometrics")
     gemini = ev.get("gemini_forensic") or ev.get("v1_1_presentation", {}).get("v1_2_evolution", {}).get("gemini_forensic")
+    doc_meta = ev.get("document_metadata") or {}
+    is_pre_llm = bool(doc_meta.get("is_pre_llm_era"))
 
     stylometrics_score = None
     if isinstance(ai_sty, dict) and "ai_probability_score" in ai_sty and ai_sty["ai_probability_score"] is not None:
@@ -146,6 +158,9 @@ def extract_ai_assessment(evidence_data) -> tuple[float | None, str]:
             pass
 
     forensic_level = None
+    is_verified_ai = False
+    is_meta = False
+
     if isinstance(gemini, dict) and gemini.get("status") == "completed":
         g_audit = gemini.get("audit") or {}
         if not g_audit and gemini.get("raw_output"):
@@ -154,9 +169,24 @@ def extract_ai_assessment(evidence_data) -> tuple[float | None, str]:
                 g_audit["tingkat_indikasi_ai"] = m.group(1)
         if g_audit.get("tingkat_indikasi_ai"):
             forensic_level = str(g_audit["tingkat_indikasi_ai"]).strip().upper()
+        is_verified_ai = bool(g_audit.get("bukti_ai_terverifikasi"))
+        is_meta = bool(g_audit.get("meta_prompt_leak_terverifikasi"))
 
-    composite_score = None
-    if forensic_level is not None and isinstance(gemini, dict) and gemini.get("status") == "completed":
+    if not is_meta and isinstance(gemini, dict):
+        comb = json.dumps(gemini).lower()
+        is_meta = bool(re.search(r"(kebocoran instruksi|meta-prompt|prompt leak|disalin-tempel secara langsung|copy-paste mentah|bisa\. saya akan buat)", comb))
+
+    # Advisory jika era pra-LLM atau tidak terverifikasi dan stylometri rendah
+    is_advisory = False
+    if forensic_level in ("SEDANG", "TINGGI") and not is_meta:
+        if is_pre_llm or not is_verified_ai or (stylometrics_score is not None and stylometrics_score < 30.0):
+            is_advisory = True
+
+    if is_meta:
+        composite_score = 98.0
+    elif is_advisory:
+        composite_score = stylometrics_score if stylometrics_score is not None else 0.0
+    elif forensic_level is not None and isinstance(gemini, dict) and gemini.get("status") == "completed":
         composite_score = calculate_dynamic_ai_score(gemini, stylometrics_score)
     else:
         composite_score = stylometrics_score
@@ -164,19 +194,22 @@ def extract_ai_assessment(evidence_data) -> tuple[float | None, str]:
     if composite_score is None:
         return None, "Otentik Alami"
 
-    is_meta = False
-    if isinstance(gemini, dict):
-        comb = json.dumps(gemini).lower()
-        is_meta = bool(re.search(r"(kebocoran instruksi|meta-prompt|prompt leak|disalin-tempel secara langsung|copy-paste mentah|bisa\. saya akan buat)", comb))
-
     if is_meta:
         label = "Indikasi Ekstrem (Prompt Leak)"
+    elif is_advisory:
+        if composite_score >= 70.0:
+            label = "Indikasi AI: Tinggi"
+        elif composite_score >= 35.0:
+            label = "Indikasi AI: Sedang"
+        else:
+            label = "Otentik Alami"
     elif composite_score >= 70.0 or forensic_level == "TINGGI":
         label = "Indikasi AI: Tinggi"
     elif composite_score >= 35.0 or forensic_level == "SEDANG":
         label = "Indikasi AI: Sedang"
     else:
         label = "Otentik Alami"
+
 
     return composite_score, label
 

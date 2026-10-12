@@ -561,10 +561,12 @@
                                                     $gfLevel = $aiData['forensic_level'] ?? null;
                                                     $styScore = $aiData['stylometrics_score'] ?? null;
                                                     $isElevated = !empty($aiData['is_forensic_elevated']);
-                                                    $isMetaLeak = !empty($aiData['is_meta_prompt_leak']) || $aiScore >= 95.0;
+                                                    $isMetaLeak = !empty($aiData['is_meta_prompt_leak']);
+                                                    $isAdvisory = !empty($aiData['forensic_advisory']);
 
-                                                    $isHigh = ($aiScore >= 65 || $gfLevel === 'TINGGI');
-                                                    $isMod  = (!$isHigh && ($aiScore >= 35 || $gfLevel === 'SEDANG'));
+                                                    $aiLevel = $aiData['level'] ?? 'LOW';
+                                                    $isHigh = in_array($aiLevel, ['HIGH', 'EXTREME'], true);
+                                                    $isMod  = (!$isHigh && $aiLevel === 'MODERATE');
                                                     $aiColor = $isHigh ? 'text-rose-600' : ($isMod ? 'text-amber-600' : 'text-emerald-600');
                                                     $badgeBg = $isMetaLeak ? 'bg-rose-100 text-rose-800 border-rose-300 font-extrabold' : ($isHigh ? 'bg-rose-50 text-rose-700 border-rose-200' : ($isMod ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'));
                                                     $badgeLabel = $isMetaLeak ? 'Indikasi Sangat Tinggi' : ($isHigh ? 'Indikasi Tinggi' : ($isMod ? 'Indikasi Sedang' : 'Alami (Rendah)'));
@@ -573,11 +575,13 @@
                                                     if ($isMetaLeak) {
                                                         $tooltipParts[] = '⚠️ Bukti Kuat: Salin-Tempel Percakapan AI Mentah';
                                                     }
-                                                    $tooltipParts[] = 'Probabilitas Terpadu: ' . number_format($aiScore, 1) . '%';
+                                                    $tooltipParts[] = 'Skor Stylometri: ' . number_format($aiScore, 1) . '%';
                                                     if ($gfLevel !== null) {
-                                                        $tooltipParts[] = 'Audit Forensik Cerdas: ' . $gfLevel;
+                                                        $tooltipParts[] = $isAdvisory
+                                                            ? 'Catatan Audit Forensik (tidak memengaruhi skor, belum terverifikasi): ' . $gfLevel
+                                                            : 'Audit Forensik Cerdas: ' . $gfLevel;
                                                     }
-                                                    if ($styScore !== null) {
+                                                    if ($styScore !== null && abs($styScore - $aiScore) > 0.05) {
                                                         $tooltipParts[] = 'Stylometri: ' . number_format($styScore, 1) . '%';
                                                     }
                                                     if (!empty($aiData['label'])) {
@@ -591,7 +595,9 @@
                                                             <?php if ($isMetaLeak): ?>
                                                                 <span class="text-[11px] cursor-help" title="Ditemukan bukti kebocoran instruksi/percakapan obrolan AI mentah (Meta-Prompt Leak)">⚠️</span>
                                                             <?php elseif ($isElevated): ?>
-                                                                <span class="text-[10px] cursor-help" title="Skor terpadu dinaikkan berdasarkan temuan mendalam Audit Forensik Cerdas">✨</span>
+                                                                <span class="text-[10px] cursor-help" title="Level dinaikkan karena temuan Audit Forensik terverifikasi dan stylometri ikut di atas ambang">✨</span>
+                                                            <?php elseif ($isAdvisory): ?>
+                                                                <span class="text-[10px] cursor-help text-slate-400" title="Audit Forensik Cerdas menandai catatan (<?= esc($gfLevel) ?>) yang belum terverifikasi dan TIDAK memengaruhi skor. Telaah manual di halaman laporan.">ⓘ</span>
                                                             <?php endif; ?>
                                                         </div>
                                                         <span class="inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded border <?= $badgeBg ?> whitespace-nowrap">
@@ -788,10 +794,12 @@
                                                     $gfLevel = $aiData['forensic_level'] ?? null;
                                                     $styScore = $aiData['stylometrics_score'] ?? null;
                                                     $isElevated = !empty($aiData['is_forensic_elevated']);
-                                                    $isMetaLeak = !empty($aiData['is_meta_prompt_leak']) || $aiScore >= 95.0;
+                                                    $isMetaLeak = !empty($aiData['is_meta_prompt_leak']);
+                                                    $isAdvisory = !empty($aiData['forensic_advisory']);
 
-                                                    $isHigh = ($aiScore >= 65 || $gfLevel === 'TINGGI');
-                                                    $isMod  = (!$isHigh && ($aiScore >= 35 || $gfLevel === 'SEDANG'));
+                                                    $aiLevel = $aiData['level'] ?? 'LOW';
+                                                    $isHigh = in_array($aiLevel, ['HIGH', 'EXTREME'], true);
+                                                    $isMod  = (!$isHigh && $aiLevel === 'MODERATE');
                                                     $aiColor = $isHigh ? 'text-rose-600' : ($isMod ? 'text-amber-600' : 'text-emerald-600');
                                                     $badgeBg = $isMetaLeak ? 'bg-rose-100 text-rose-800 border-rose-300 font-extrabold' : ($isHigh ? 'bg-rose-50 text-rose-700 border-rose-200' : ($isMod ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'));
                                                     $badgeLabel = $isMetaLeak ? 'Indikasi Sangat Tinggi' : ($isHigh ? 'Indikasi Tinggi' : ($isMod ? 'Indikasi Sedang' : 'Alami (Rendah)'));
@@ -800,11 +808,13 @@
                                                     if ($isMetaLeak) {
                                                         $tooltipParts[] = '⚠️ Bukti Kuat: Salin-Tempel Percakapan AI Mentah';
                                                     }
-                                                    $tooltipParts[] = 'Probabilitas Terpadu: ' . number_format($aiScore, 1) . '%';
+                                                    $tooltipParts[] = 'Skor Stylometri: ' . number_format($aiScore, 1) . '%';
                                                     if ($gfLevel !== null) {
-                                                        $tooltipParts[] = 'Audit Forensik Cerdas: ' . $gfLevel;
+                                                        $tooltipParts[] = $isAdvisory
+                                                            ? 'Catatan Audit Forensik (tidak memengaruhi skor, belum terverifikasi): ' . $gfLevel
+                                                            : 'Audit Forensik Cerdas: ' . $gfLevel;
                                                     }
-                                                    if ($styScore !== null) {
+                                                    if ($styScore !== null && abs($styScore - $aiScore) > 0.05) {
                                                         $tooltipParts[] = 'Stylometri: ' . number_format($styScore, 1) . '%';
                                                     }
                                                     if (!empty($aiData['label'])) {
@@ -818,7 +828,9 @@
                                                             <?php if ($isMetaLeak): ?>
                                                                 <span class="text-[11px] cursor-help" title="Ditemukan bukti kebocoran instruksi/percakapan obrolan AI mentah (Meta-Prompt Leak)">⚠️</span>
                                                             <?php elseif ($isElevated): ?>
-                                                                <span class="text-[10px] cursor-help" title="Skor terpadu dinaikkan berdasarkan temuan mendalam Audit Forensik Cerdas">✨</span>
+                                                                <span class="text-[10px] cursor-help" title="Level dinaikkan karena temuan Audit Forensik terverifikasi dan stylometri ikut di atas ambang">✨</span>
+                                                            <?php elseif ($isAdvisory): ?>
+                                                                <span class="text-[10px] cursor-help text-slate-400" title="Audit Forensik Cerdas menandai catatan (<?= esc($gfLevel) ?>) yang belum terverifikasi dan TIDAK memengaruhi skor. Telaah manual di halaman laporan.">ⓘ</span>
                                                             <?php endif; ?>
                                                         </div>
                                                         <span class="inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded border <?= $badgeBg ?> whitespace-nowrap">

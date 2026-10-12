@@ -151,6 +151,8 @@ class DashboardController extends BaseController
 
         $aiSty = $ev['ai_stylometrics'] ?? $ev['v1_1_presentation']['v1_2_evolution']['ai_stylometrics'] ?? null;
         $gemini = $ev['gemini_forensic'] ?? $ev['v1_1_presentation']['v1_2_evolution']['gemini_forensic'] ?? null;
+        $docMeta = $ev['document_metadata'] ?? null;
+        $isPreLlm = !empty($docMeta['is_pre_llm_era']);
 
         $stylometricsScore = null;
         $label = null;
@@ -163,6 +165,9 @@ class DashboardController extends BaseController
         }
 
         $forensicLevel = null;
+        $isVerifiedAi = false;
+        $isMetaPromptLeak = false;
+
         if (is_array($gemini) && ($gemini['status'] ?? '') === 'completed') {
             $gAudit = $gemini['audit'] ?? [];
             if (empty($gAudit) && !empty($gemini['raw_output'])) {
@@ -173,10 +178,34 @@ class DashboardController extends BaseController
             if (!empty($gAudit['tingkat_indikasi_ai'])) {
                 $forensicLevel = strtoupper(trim((string) $gAudit['tingkat_indikasi_ai']));
             }
+            $isVerifiedAi = !empty($gAudit['bukti_ai_terverifikasi']);
+            $isMetaPromptLeak = !empty($gAudit['meta_prompt_leak_terverifikasi']);
+        }
+
+        // Deteksi apakah terdapat bukti kebocoran instruksi/percakapan prompt AI mentah
+        if (!$isMetaPromptLeak && is_array($gemini)) {
+            $combinedEv = strtolower(json_encode($gemini));
+            $isMetaPromptLeak = (bool) preg_match(
+                '/(kebocoran instruksi|meta-prompt|prompt leak|disalin-tempel secara langsung|copy-paste mentah|bisa\. saya akan buat|sebagai model bahasa)/i', 
+                $combinedEv
+            );
+        }
+
+        // Temuan forensik hanya advisory jika: naskah pra-LLM, atau bukti AI belum terverifikasi,
+        // atau stylometri sangat rendah (< 30) tanpa kebocoran prompt mentah
+        $isAdvisory = false;
+        if (in_array($forensicLevel, ['SEDANG', 'TINGGI'], true) && !$isMetaPromptLeak) {
+            if ($isPreLlm || !$isVerifiedAi || ($stylometricsScore !== null && $stylometricsScore < 30.0)) {
+                $isAdvisory = true;
+            }
         }
 
         // Hitung skor komposit secara dinamis dan berjenjang berdasarkan derajat bukti forensik
-        if ($forensicLevel !== null && is_array($gemini) && ($gemini['status'] ?? '') === 'completed') {
+        if ($isMetaPromptLeak) {
+            $compositeScore = 98.0;
+        } elseif ($isAdvisory) {
+            $compositeScore = $stylometricsScore !== null ? $stylometricsScore : 0.0;
+        } elseif ($forensicLevel !== null && is_array($gemini) && ($gemini['status'] ?? '') === 'completed') {
             $compositeScore = self::calculateDynamicAiScore($gemini, $stylometricsScore);
         } else {
             $compositeScore = $stylometricsScore;
@@ -186,24 +215,27 @@ class DashboardController extends BaseController
             return null;
         }
 
-        // Menandai apakah skor komposit dinaikkan oleh temuan mendalam Audit Forensik Cerdas
-        $isForensicElevated = ($forensicLevel === 'TINGGI' && ($stylometricsScore === null || $stylometricsScore < 65.0))
-                           || ($forensicLevel === 'SEDANG' && ($stylometricsScore === null || $stylometricsScore < 35.0));
-
-        // Deteksi apakah terdapat bukti kebocoran instruksi/percakapan prompt AI mentah
-        $isMetaPromptLeak = false;
-        if (is_array($gemini)) {
-            $combinedEv = strtolower(json_encode($gemini));
-            $isMetaPromptLeak = (bool) preg_match(
-                '/(kebocoran instruksi|meta-prompt|prompt leak|disalin-tempel secara langsung|copy-paste mentah|bisa\. saya akan buat)/i', 
-                $combinedEv
-            );
-        }
+        // Menandai apakah skor komposit dinaikkan oleh temuan mendalam Audit Forensik Cerdas yang terverifikasi
+        $isForensicElevated = !$isAdvisory && !$isMetaPromptLeak && (
+            ($forensicLevel === 'TINGGI' && ($stylometricsScore === null || $stylometricsScore < 65.0)) ||
+            ($forensicLevel === 'SEDANG' && ($stylometricsScore === null || $stylometricsScore < 35.0))
+        );
 
         // Selaraskan label status dengan hasil akhir skor komposit dan Audit Forensik Cerdas
         if ($isMetaPromptLeak) {
             $label = 'Indikasi Ekstrem (Kebocoran Prompt AI)';
             $level = 'EXTREME';
+        } elseif ($isAdvisory) {
+            if ($compositeScore >= 70.0) {
+                $label = 'Indikasi AI: Tinggi';
+                $level = 'HIGH';
+            } elseif ($compositeScore >= 35.0) {
+                $label = 'Indikasi AI: Sedang';
+                $level = 'MODERATE';
+            } else {
+                $label = 'Otentik Alami (Bebas AI)';
+                $level = 'LOW';
+            }
         } elseif ($compositeScore >= 70.0 || $forensicLevel === 'TINGGI') {
             $label = 'Indikasi AI: Tinggi';
             $level = 'HIGH';
@@ -223,6 +255,8 @@ class DashboardController extends BaseController
             'forensic_level'       => $forensicLevel,
             'is_forensic_elevated' => $isForensicElevated,
             'is_meta_prompt_leak'  => $isMetaPromptLeak,
+            'forensic_advisory'    => $isAdvisory,
+            'is_pre_llm_era'       => $isPreLlm,
         ];
     }
 
@@ -260,11 +294,31 @@ class DashboardController extends BaseController
 
         $evidenceText = strtolower($reason . ' ' . implode(' ', $contra) . ' ' . implode(' ', $citations));
 
+        // Cek penanda kebocoran instruksi
+        $isMetaPromptLeak = !empty($audit['meta_prompt_leak_terverifikasi']) || (bool) preg_match(
+            '/(kebocoran instruksi|meta-prompt|prompt leak|disalin-tempel secara langsung|copy-paste mentah|percakapan ai|chat ai|instruksi percakapan|bisa\. saya akan buat|tentu, berikut|sebagai model bahasa ai)/i',
+            $evidenceText
+        );
+        if ($isMetaPromptLeak) {
+            return 98.0;
+        }
+
+        $isPreLlm = !empty($audit['metadata_pra_llm']);
+        $isVerified = !empty($audit['bukti_ai_terverifikasi']);
+
+        // Naskah era pra-LLM atau klaim tidak lolos verifikasi kutipan naskah
+        if ($isPreLlm || (isset($audit['bukti_ai_terverifikasi']) && !$isVerified)) {
+            return $stylometricsScore !== null ? $stylometricsScore : 0.0;
+        }
+
         if ($level === 'RENDAH') {
             return $stylometricsScore !== null ? $stylometricsScore : 0.0;
         }
 
         if ($level === 'SEDANG') {
+            if (!$isVerified && $stylometricsScore !== null && $stylometricsScore < 30.0) {
+                return $stylometricsScore;
+            }
             $score = 50.0;
             if (count($contra) > 1 || count($citations) > 1) {
                 $score += 5.0;
@@ -274,6 +328,7 @@ class DashboardController extends BaseController
             }
             return round($score, 1);
         }
+
 
         // --- LEVEL TINGGI: Evaluasi Berjenjang Berbasis Bukti Nyata ---
 

@@ -274,6 +274,16 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
             )
             result["evasion_detection"] = evasion_res.to_dict()
 
+            # 8a. Metadata berkas (tanggal dibuat/diubah) sebagai konteks era pra-LLM
+            doc_meta = None
+            try:
+                from worker.extractor import extract_document_metadata
+                if document.get("storage_path") and os.path.exists(document["storage_path"]):
+                    doc_meta = extract_document_metadata(document["storage_path"], document.get("mime_type"))
+            except Exception as meta_err:
+                print(f"  [METADATA WARNING] Gagal membaca metadata berkas Doc #{document_id}: {meta_err}")
+            result["document_metadata"] = doc_meta
+
             # 8. Google Gemini AI Semantic Forensic Auditor (Pool Round-Robin)
             gemini_forensic_res = None
             try:
@@ -282,7 +292,8 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
                     document_text=submission_text,
                     substantive_text=subst_body_text,
                     title=document.get("title", ""),
-                    connection=connection
+                    connection=connection,
+                    doc_metadata=doc_meta
                 )
                 result["gemini_forensic"] = gemini_forensic_res
             except Exception as gem_err:

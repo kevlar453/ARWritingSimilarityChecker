@@ -101,6 +101,10 @@ def test_audit_proposal_round_robin_failover():
             valid_audit_json = json.dumps({
                 "tingkat_indikasi_ai": "SEDANG",
                 "alasan_indikasi_ai": "Terdapat frasa transisi generik AI pada Bab 2.",
+                "bukti_kutipan_ai": [
+                    "Proposal penelitian pengaruh AI terhadap produktivitas kerja",
+                    "dalam meningkatkan efisiensi operasional organisasi"
+                ],
                 "inkonsistensi_metodologi_dan_logika": ["Populasi di bab 1 ditulis 100, tapi di bab 3 ditulis 50."],
                 "integritas_sitasi": ["Tahun sitasi Kotler (2025) padahal buku diterbitkan 2021."],
                 "pertanyaan_kritis_dosen": [
@@ -120,7 +124,7 @@ def test_audit_proposal_round_robin_failover():
          patch("worker.gemini_forensic.mark_key_success") as mock_success:
 
         res = audit_proposal_with_gemini(
-            document_text="Proposal penelitian pengaruh AI terhadap produktivitas kerja...",
+            document_text="Proposal penelitian pengaruh AI terhadap produktivitas kerja dalam meningkatkan efisiensi operasional organisasi...",
             substantive_text="Metodologi penelitian...",
             title="Pengaruh AI Terhadap Produktivitas",
         )

@@ -1,5 +1,8 @@
 import os
 import re
+import zipfile
+import xml.etree.ElementTree as ET
+from datetime import datetime, timezone
 from pathlib import Path
 
 # Pemetaan karakter Private Use Area (PUA) dari font Symbol / Wingdings ke Unicode standar
@@ -384,6 +387,30 @@ def extract_pdf(path: str) -> list[dict]:
     doc.close()
     return pages
 
+def extract_docx_footnotes(path: str) -> list[str]:
+    """Ekstraksi teks catatan kaki (footnotes) dan catatan akhir (endnotes) dari paket OpenXML docx."""
+    notes = []
+    try:
+        with zipfile.ZipFile(path) as z:
+            for part_name in ('word/footnotes.xml', 'word/endnotes.xml'):
+                if part_name in z.namelist():
+                    xml_content = z.read(part_name)
+                    root = ET.fromstring(xml_content)
+                    ns = {'w': 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'}
+                    tag_prefix = 'footnote' if 'footnotes' in part_name else 'endnote'
+                    for fn in root.findall(f'.//w:{tag_prefix}', ns):
+                        fn_type = fn.get('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}type')
+                        if fn_type in ('separator', 'continuationSeparator'):
+                            continue
+                        texts = [node.text for node in fn.findall('.//w:t', ns) if node.text]
+                        if texts:
+                            note_text = ''.join(texts).strip()
+                            if note_text:
+                                notes.append(note_text)
+    except Exception:
+        pass
+    return notes
+
 def extract_docx(path: str) -> list[dict]:
     from docx import Document
     from docx.text.paragraph import Paragraph
@@ -417,6 +444,11 @@ def extract_docx(path: str) -> list[dict]:
             if table_lines:
                 text_blocks.append('\n' + '\n'.join(table_lines) + '\n')
 
+    # Ekstraksi catatan kaki & catatan akhir jika ada (misal gaya Chicago / naskah sejarah)
+    footnotes = extract_docx_footnotes(path)
+    if footnotes:
+        text_blocks.append('\n\n[Catatan Kaki / Footnotes]\n' + '\n'.join(footnotes))
+
     return [{
         "page_number": 1,
         "text": clean_extracted_text("\n\n".join(text_blocks))
@@ -426,7 +458,7 @@ def extract_text_file(path: str) -> list[dict]:
     with open(path, "rb") as f:
         raw_bytes = f.read()
 
-    encodings = ["utf-8-sig", "utf-8", "utf-16", "cp1252"]
+    encodings = ["utf-8-sig", "utf-8", "cp1252", "latin-1"]
     text = ""
     for enc in encodings:
         try:
@@ -452,3 +484,69 @@ def extract_document(path: str, mime_type: str | None = None) -> list[dict]:
         return extract_text_file(path)
     else:
         raise ValueError(f"Format dokumen tidak didukung: {ext} ({mime_type})")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Metadata berkas (era pra-LLM)
+# ─────────────────────────────────────────────────────────────────────────────
+# Peluncuran ChatGPT (30 Nov 2022) dipakai sebagai batas konservatif "era AI generatif".
+PRE_LLM_CUTOFF = datetime(2022, 11, 30, tzinfo=timezone.utc)
+
+
+def _as_utc(dt):
+    if dt is None:
+        return None
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(timezone.utc)
+
+
+def _parse_pdf_date(value):
+    """Parse tanggal PDF format D:YYYYMMDDHHmmSS (+zona opsional)."""
+    if not value:
+        return None
+    m = re.match(r"D:(\d{4})(\d{2})?(\d{2})?(\d{2})?(\d{2})?", str(value))
+    if not m:
+        return None
+    parts = [int(g) if g else d for g, d in zip(m.groups(), (1970, 1, 1, 0, 0, 0))]
+    try:
+        return datetime(*parts, tzinfo=timezone.utc)
+    except ValueError:
+        return None
+
+
+def extract_document_metadata(path: str, mime_type: str | None = None) -> dict:
+    """
+    Membaca tanggal dibuat/diubah dari metadata berkas (docx / pdf).
+    Metadata dapat diubah atau terbawa dari templat, jadi hasilnya HANYA bersifat pendukung:
+    dipakai untuk membatalkan klaim indikasi-AI berbasis LLM, bukan untuk membuktikan keaslian.
+    """
+    ext = os.path.splitext(path)[1].lower()
+    created = modified = None
+    author = last_modified_by = None
+    try:
+        if ext == ".docx" or (mime_type and "officedocument.wordprocessingml" in mime_type):
+            from docx import Document
+            cp = Document(path).core_properties
+            created, modified = _as_utc(cp.created), _as_utc(cp.modified)
+            author, last_modified_by = cp.author, cp.last_modified_by
+        elif ext == ".pdf" or mime_type == "application/pdf":
+            import fitz
+            doc = fitz.open(path)
+            md = doc.metadata or {}
+            created, modified = _parse_pdf_date(md.get("creationDate")), _parse_pdf_date(md.get("modDate"))
+            author = md.get("author")
+            doc.close()
+    except Exception:
+        pass
+
+    newest = max([d for d in (created, modified) if d is not None], default=None)
+    return {
+        "created": created.isoformat() if created else None,
+        "modified": modified.isoformat() if modified else None,
+        "author": author or None,
+        "last_modified_by": last_modified_by or None,
+        # Pra-LLM hanya jika ada tanggal dan SEMUA tanggal yang tersedia sebelum batas.
+        "is_pre_llm_era": bool(newest is not None and newest < PRE_LLM_CUTOFF),
+        "reliability_note": "Metadata berkas dapat diubah atau terbawa dari templat; gunakan sebagai petunjuk, bukan bukti.",
+    }
