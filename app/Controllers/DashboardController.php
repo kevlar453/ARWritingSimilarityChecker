@@ -579,6 +579,35 @@ class DashboardController extends BaseController
                         ->get()->getResultArray();
         $submissionText = implode("\n\n", array_column($subChunks, 'text'));
 
+        // Auto-heal section_segmentation jika kosong, anomali zonasi (BODY_TEXT == 0 pada teks > 100 kata), atau word count tidak konsisten
+        $v11Pres = $evidenceData['v1_1_presentation'] ?? [];
+        $v12Evol = $v11Pres['v1_2_evolution'] ?? [];
+        $secSeg = $v12Evol['section_segmentation'] ?? null;
+        $totalWords = (int) ($evidenceData['total_words'] ?? 0);
+        $secTotalWords = (int) ($secSeg['total_words'] ?? 0);
+        $bodyPct = (float) ($secSeg['zone_percentage_distribution']['BODY_TEXT'] ?? 0.0);
+        $zoneSum = 0;
+        if (!empty($secSeg['zone_word_distribution']) && is_array($secSeg['zone_word_distribution'])) {
+            $zoneSum = array_sum($secSeg['zone_word_distribution']);
+        }
+
+        $needsHeal = empty($secSeg) || ($totalWords > 100 && $bodyPct == 0.0) || ($totalWords > 0 && ($secTotalWords !== $totalWords || $zoneSum !== $totalWords));
+        if ($needsHeal) {
+            $pythonBin = ROOTPATH . '.venv/bin/python';
+            if (! file_exists($pythonBin)) {
+                $pythonBin = 'python3';
+            }
+            $scriptPath = ROOTPATH . 'worker/section_parser.py';
+            $cmd = escapeshellcmd($pythonBin) . ' ' . escapeshellarg($scriptPath) . ' --heal-report ' . (int) $reportId;
+            @exec($cmd);
+
+            // Muat ulang data report & evidence_data terbaru setelah pemulihan otomatis
+            $freshReport = $reportModel->find($reportId);
+            if (!empty($freshReport['evidence_data'])) {
+                $evidenceData = is_string($freshReport['evidence_data']) ? json_decode($freshReport['evidence_data'], true) : $freshReport['evidence_data'];
+            }
+        }
+
         $sourceTexts = [];
         foreach ($sources as $s) {
             $sDocId = (int) $s['source_document_id'];

@@ -2384,7 +2384,7 @@ $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evi
             <div class="space-y-2">
                 <div class="flex justify-between text-xs text-slate-500 font-medium">
                     <span>Distribusi Proporsi Naskah</span>
-                    <span>Total Volume: <strong class="text-slate-700 font-mono-code"><?= number_format($secSeg['total_words'] ?? 0) ?> kata</strong></span>
+                    <span>Total Volume: <strong class="text-slate-700 font-mono-code"><?= number_format(!empty($evidenceData['total_words']) ? (int)$evidenceData['total_words'] : (int)($secSeg['total_words'] ?? 0)) ?> kata</strong></span>
                 </div>
                 <?php
                     $pctFront = (float)($secSeg['zone_percentage_distribution']['FRONT_MATTER'] ?? 0);

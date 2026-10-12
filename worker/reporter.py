@@ -211,7 +211,7 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
             from worker.cross_lingual import calculate_cross_lingual_similarity
 
             # 1. Smart Section Parser
-            segmentation_res = parse_document_sections(submission_text)
+            segmentation_res = parse_document_sections(submission_text, expected_total_words=doc_word_count)
 
             # 2. Term-Level Drill-Down (jika terdapat dokumen rujukan)
             ref_text = ""

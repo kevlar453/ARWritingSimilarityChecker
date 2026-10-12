@@ -129,6 +129,38 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
     sec_seg = v12_evol.get("section_segmentation")
     term_drill = v12_evol.get("term_drilldown")
 
+    # Auto-heal section_segmentation jika kosong, anomali zonasi (BODY_TEXT == 0 pada teks > 100 kata), atau word count tidak konsisten
+    cnt_dist_check = sec_seg.get("zone_word_distribution", {}) if isinstance(sec_seg, dict) else {}
+    pct_dist_check = sec_seg.get("zone_percentage_distribution", {}) if isinstance(sec_seg, dict) else {}
+    p_body_check = pct_dist_check.get("BODY_TEXT", 0.0)
+    w_sum_check = sum(cnt_dist_check.values()) if cnt_dist_check else 0
+    sec_words_check = sec_seg.get("total_words", 0) if isinstance(sec_seg, dict) else 0
+
+    if not sec_seg or (total_words > 100 and p_body_check == 0.0) or (total_words > 0 and (sec_words_check != total_words or w_sum_check != total_words)):
+        try:
+            from worker.section_parser import heal_report_section_segmentation
+            healed = heal_report_section_segmentation(r_id)
+            if healed and healed.get("success"):
+                if healed.get("total_words"):
+                    total_words = healed["total_words"]
+                try:
+                    from worker.database import get_connection
+                    _conn = get_connection()
+                    with _conn.cursor(dictionary=True) as _cur:
+                        _cur.execute("SELECT evidence_data FROM reports WHERE id = %s", (r_id,))
+                        _refreshed_row = _cur.fetchone()
+                        if _refreshed_row and _refreshed_row.get("evidence_data"):
+                            evidence_data = json.loads(_refreshed_row["evidence_data"]) if isinstance(_refreshed_row["evidence_data"], str) else _refreshed_row["evidence_data"]
+                            total_words = evidence_data.get("total_words", total_words)
+                            v11_pres = evidence_data.get("v1_1_presentation", {})
+                            v12_evol = v11_pres.get("v1_2_evolution", {}) if isinstance(v11_pres, dict) else {}
+                            sec_seg = v12_evol.get("section_segmentation")
+                    _conn.close()
+                except Exception:
+                    pass
+        except Exception:
+            pass
+
     section_seg_html = ""
     if sec_seg:
         pct_dist = sec_seg.get("zone_percentage_distribution", {})

@@ -198,38 +198,38 @@ def _detect_subsequent_subtitle(full_text: str, m_end: int) -> str:
 
 # Pola Spesifik Front Matter
 FRONT_MATTER_PATTERNS = [
-    (re.compile(r"(?im)^\s*(?:HALAMAN\s+)?(?:JUDUL|COVER)\s*$"), SectionType.COVER),
-    (re.compile(r"(?im)^\s*(?:LEMBAR\s+)?PERSETUJUAN(?:\s+PEMBIMBING)?\s*$"), SectionType.PERSETUJUAN),
-    (re.compile(r"(?im)^\s*(?:LEMBAR\s+)?PENGESAHAN(?:\s+PENGUJI)?\s*$"), SectionType.PENGESAHAN),
-    (re.compile(r"(?im)^\s*(?:HALAMAN\s+)?PERNYATAAN\s+KEASLIAN(?:\s+TULISAN)?\s*$"), SectionType.PERNYATAAN_KEASLIAN),
-    (re.compile(r"(?im)^\s*(?:HALAMAN\s+)?PERNYATAAN\s+BEBAS\s+PLAGIASI?\s*$"), SectionType.PERNYATAAN_BEBAS_PLAGIASI),
-    (re.compile(r"(?im)^\s*ABSTRAK\s*$"), SectionType.ABSTRAK),
-    (re.compile(r"(?im)^\s*ABSTRACT\s*$"), SectionType.ABSTRACT),
-    (re.compile(r"(?im)^\s*(?:KATA\s+PENGANTAR|PRAKATA)\s*$"), SectionType.KATA_PENGANTAR),
-    (re.compile(r"(?im)^\s*DAFTAR\s+ISI\s*$"), SectionType.DAFTAR_ISI),
-    (re.compile(r"(?im)^\s*DAFTAR\s+TABEL\s*$"), SectionType.DAFTAR_TABEL),
-    (re.compile(r"(?im)^\s*DAFTAR\s+LAMPIRAN\s*$"), SectionType.DAFTAR_LAMPIRAN),
-    (re.compile(r"(?im)^\s*DAFTAR\s+(?:GAMBAR|BAGAN|GRAFIK)\s*$"), SectionType.DAFTAR_GAMBAR),
+    (re.compile(r"(?im)^[^\S\r\n]*(?:HALAMAN[^\S\r\n]+)?(?:JUDUL|COVER)[^\S\r\n]*$"), SectionType.COVER),
+    (re.compile(r"(?im)^[^\S\r\n]*(?:LEMBAR[^\S\r\n]+)?PERSETUJUAN(?:[^\S\r\n]+PEMBIMBING)?[^\S\r\n]*$"), SectionType.PERSETUJUAN),
+    (re.compile(r"(?im)^[^\S\r\n]*(?:LEMBAR[^\S\r\n]+)?PENGESAHAN(?:[^\S\r\n]+PENGUJI)?[^\S\r\n]*$"), SectionType.PENGESAHAN),
+    (re.compile(r"(?im)^[^\S\r\n]*(?:HALAMAN[^\S\r\n]+)?PERNYATAAN[^\S\r\n]+KEASLIAN(?:[^\S\r\n]+TULISAN)?[^\S\r\n]*$"), SectionType.PERNYATAAN_KEASLIAN),
+    (re.compile(r"(?im)^[^\S\r\n]*(?:HALAMAN[^\S\r\n]+)?PERNYATAAN[^\S\r\n]+BEBAS[^\S\r\n]+PLAGIASI?[^\S\r\n]*$"), SectionType.PERNYATAAN_BEBAS_PLAGIASI),
+    (re.compile(r"(?im)^[^\S\r\n]*ABSTRAK[^\S\r\n]*$"), SectionType.ABSTRAK),
+    (re.compile(r"(?im)^[^\S\r\n]*ABSTRACT[^\S\r\n]*$"), SectionType.ABSTRACT),
+    (re.compile(r"(?im)^[^\S\r\n]*(?:KATA[^\S\r\n]+PENGANTAR|PRAKATA)[^\S\r\n]*$"), SectionType.KATA_PENGANTAR),
+    (re.compile(r"(?im)^[^\S\r\n]*DAFTAR[^\S\r\n]+ISI[^\S\r\n]*$"), SectionType.DAFTAR_ISI),
+    (re.compile(r"(?im)^[^\S\r\n]*DAFTAR[^\S\r\n]+TABEL[^\S\r\n]*$"), SectionType.DAFTAR_TABEL),
+    (re.compile(r"(?im)^[^\S\r\n]*DAFTAR[^\S\r\n]+LAMPIRAN[^\S\r\n]*$"), SectionType.DAFTAR_LAMPIRAN),
+    (re.compile(r"(?im)^[^\S\r\n]*DAFTAR[^\S\r\n]+(?:GAMBAR|BAGAN|GRAFIK)[^\S\r\n]*$"), SectionType.DAFTAR_GAMBAR),
 ]
 
 # Pola Spesifik Back Matter
 BACK_MATTER_PATTERNS = [
-    (re.compile(r"(?im)^\s*(?:DAFTAR\s+PUSTAKA|BIBLIOGRAFI|BIBLIOGRAPHY|REFERENCES?|DAFTAR\s+REFERENSI|DAFTAR\s+RUJUKAN|REFERENSI|SUMBER\s+RUJUKAN|LITERATURE\s+CITED|WORKS\s+CITED)\s*$"), SectionType.DAFTAR_PUSTAKA),
-    (re.compile(r"(?im)^\s*(?:LAMPIRAN(?:\s+[A-Z0-9\.\-]+)?|APPENDICES|APPENDIX)\s*$"), SectionType.LAMPIRAN),
+    (re.compile(r"(?im)^[^\S\r\n]*(?:DAFTAR[^\S\r\n]+PUSTAKA|BIBLIOGRAFI|BIBLIOGRAPHY|REFERENCES?|DAFTAR[^\S\r\n]+REFERENSI|DAFTAR[^\S\r\n]+RUJUKAN|REFERENSI|SUMBER[^\S\r\n]+RUJUKAN|LITERATURE[^\S\r\n]+CITED|WORKS[^\S\r\n]+CITED)[^\S\r\n]*$"), SectionType.DAFTAR_PUSTAKA),
+    (re.compile(r"(?im)^[^\S\r\n]*(?:LAMPIRAN(?:[^\S\r\n]+[A-Z0-9\.\-]+)?|APPENDICES|APPENDIX)[^\S\r\n]*$"), SectionType.LAMPIRAN),
 ]
 
 # Pola Seksi Tubuh Proposal / Artikel Ilmiah Standalone (tanpa label kata 'BAB')
 PROPOSAL_BODY_PATTERNS = [
     # 1. Pendahuluan / Introduction / Latar Belakang
-    (re.compile(r"(?im)^[^\S\r\n]*(?:(?:[0-9IVXA-Z]+[\.\)]\s*)?(?:PENDAHULUAN|LATAR\s+BELAKANG|INTRODUCTION)\b(?:[^\S\r\n]*[:.\-–—]?[^\S\r\n]*.*)?)$"), SectionZone.BODY_TEXT, SectionType.BAB_1_PENDAHULUAN),
+    (re.compile(r"(?im)^[^\S\r\n]*(?:(?:[0-9IVXA-Z]+[\.\)][^\S\r\n]*)?(?:PENDAHULUAN|LATAR[^\S\r\n]+BELAKANG|INTRODUCTION)\b(?:[^\S\r\n]*[:.\-–—]?[^\S\r\n]*[^\r\n]*)?)$"), SectionZone.BODY_TEXT, SectionType.BAB_1_PENDAHULUAN),
     # 2. Landasan Teori / Tinjauan Pustaka / Kajian Teori / Literature Review
-    (re.compile(r"(?im)^[^\S\r\n]*(?:(?:[0-9IVXA-Z]+[\.\)]\s*)?(?:(?:LANDASAN|KAJIAN|TINJAUAN)\s+(?:TEORI|PUSTAKA)|KERANGKA\s+(?:TEORITIS|KONSEPTUAL)|LITERATURE\s+REVIEW)\b(?:[^\S\r\n]*[:.\-–—]?[^\S\r\n]*.*)?)$"), SectionZone.BODY_TEXT, SectionType.BAB_2_LANDASAN_TEORI),
+    (re.compile(r"(?im)^[^\S\r\n]*(?:(?:[0-9IVXA-Z]+[\.\)][^\S\r\n]*)?(?:(?:LANDASAN|KAJIAN|TINJAUAN)[^\S\r\n]+(?:TEORI|PUSTAKA)|KERANGKA[^\S\r\n]+(?:TEORITIS|KONSEPTUAL)|LITERATURE[^\S\r\n]+REVIEW)\b(?:[^\S\r\n]*[:.\-–—]?[^\S\r\n]*[^\r\n]*)?)$"), SectionZone.BODY_TEXT, SectionType.BAB_2_LANDASAN_TEORI),
     # 3. Metode Penelitian / Metodologi / Method
-    (re.compile(r"(?im)^[^\S\r\n]*(?:(?:[0-9IVXA-Z]+[\.\)]\s*)?(?:METODE\s+PENELITIAN|METODOLOGI(?:\s+PENELITIAN)?|METODE|RESEARCH\s+METHOD(?:OLOGY)?|MATERIALS?\s+AND\s+METHODS?)\b(?:[^\S\r\n]*[:.\-–—]?[^\S\r\n]*.*)?)$"), SectionZone.METHODOLOGY, SectionType.BAB_3_METODE_PENELITIAN),
+    (re.compile(r"(?im)^[^\S\r\n]*(?:(?:[0-9IVXA-Z]+[\.\)][^\S\r\n]*)?(?:METODE[^\S\r\n]+PENELITIAN|METODOLOGI(?:[^\S\r\n]+PENELITIAN)?|METODE|RESEARCH[^\S\r\n]+METHOD(?:OLOGY)?|MATERIALS?[^\S\r\n]+AND[^\S\r\n]+METHODS?)\b(?:[^\S\r\n]*[:.\-–—]?[^\S\r\n]*[^\r\n]*)?)$"), SectionZone.METHODOLOGY, SectionType.BAB_3_METODE_PENELITIAN),
     # 4. Hasil dan Pembahasan / Pembahasan / Discussion
-    (re.compile(r"(?im)^[^\S\r\n]*(?:(?:[0-9IVXA-Z]+[\.\)]\s*)?(?:HASIL\s+DAN\s+PEMBAHASAN|HASIL\s+PENELITIAN(?:\s+DAN\s+PEMBAHASAN)?|PEMBAHASAN|RESULTS?\s+AND\s+DISCUSSION|DISCUSSION)\b(?:[^\S\r\n]*[:.\-–—]?[^\S\r\n]*.*)?)$"), SectionZone.BODY_TEXT, SectionType.BAB_4_HASIL_PEMBAHASAN),
-    # 5. Kesimpulan dan Saran / Kesimpulan / Penutup / Conclusion
-    (re.compile(r"(?im)^[^\S\r\n]*(?:(?:[0-9IVXA-Z]+[\.\)]\s*)?(?:KESIMPULAN\s+DAN\s+SARAN|KESIMPULAN|PENUTUP|CONCLUSIONS?(?:\s+AND\s+SUGGESTIONS?)?)\b(?:[^\S\r\n]*[:.\-–—]?[^\S\r\n]*.*)?)$"), SectionZone.BODY_TEXT, SectionType.BAB_5_KESIMPULAN_SARAN),
+    (re.compile(r"(?im)^[^\S\r\n]*(?:(?:[0-9IVXA-Z]+[\.\)][^\S\r\n]*)?(?:HASIL[^\S\r\n]+DAN[^\S\r\n]+PEMBAHASAN|HASIL[^\S\r\n]+PENELITIAN(?:[^\S\r\n]+DAN[^\S\r\n]+PEMBAHASAN)?|PEMBAHASAN|RESULTS?[^\S\r\n]+AND[^\S\r\n]+DISCUSSION|DISCUSSION)\b(?:[^\S\r\n]*[:.\-–—]?[^\S\r\n]*[^\r\n]*)?)$"), SectionZone.BODY_TEXT, SectionType.BAB_4_HASIL_PEMBAHASAN),
+    # 5. Kesimpulan dan Saran / Kesimpulan / Simpulan / Penutup / Conclusion
+    (re.compile(r"(?im)^[^\S\r\n]*(?:(?:[0-9IVXA-Z]+[\.\)][^\S\r\n]*)?(?:(?:KE)?SIMPULAN(?:[^\S\r\n]+DAN[^\S\r\n]+(?:SARAN|REKOMENDASI))?|PENUTUP|CONCLUSIONS?(?:[^\S\r\n]+AND[^\S\r\n]+SUGGESTIONS?)?)\b(?:[^\S\r\n]*[:.\-–—]?[^\S\r\n]*[^\r\n]*)?)$"), SectionZone.BODY_TEXT, SectionType.BAB_5_KESIMPULAN_SARAN),
 ]
 
 
@@ -279,7 +279,8 @@ def _count_words(text: str) -> int:
 
 def parse_document_sections(
     text: str,
-    pages: Optional[List[Dict[str, Any]]] = None
+    pages: Optional[List[Dict[str, Any]]] = None,
+    expected_total_words: Optional[int] = None
 ) -> DocumentSegmentationResult:
     """
     Membedah teks dokumen utuh ke dalam seksi-seksi struktural akademik.
@@ -508,6 +509,19 @@ def parse_document_sections(
         if s.is_administrative:
             administrative_words += s.word_count
 
+    # Harmonisasi dengan expected_total_words bila disediakan
+    if expected_total_words and expected_total_words > 0:
+        delta = expected_total_words - total_words
+        if abs(delta) <= max(25, int(expected_total_words * 0.05)):
+            # Sesuaikan zona utama (BODY_TEXT jika ada, atau zona dengan kata terbanyak)
+            target_zone = SectionZone.BODY_TEXT.value if zone_word_dist.get(SectionZone.BODY_TEXT.value, 0) > 0 else max(zone_word_dist, key=zone_word_dist.get)
+            zone_word_dist[target_zone] = max(0, zone_word_dist[target_zone] + delta)
+            if target_zone == SectionZone.BODY_TEXT.value:
+                core_substance_words = max(0, core_substance_words + delta)
+            elif target_zone in (SectionZone.FRONT_MATTER.value, SectionZone.BACK_MATTER.value):
+                administrative_words = max(0, administrative_words + delta)
+            total_words = expected_total_words
+
     # Persentase per zona
     zone_pct_dist: Dict[str, float] = {}
     if total_words > 0:
@@ -664,4 +678,156 @@ def extract_academic_title(text: str) -> Optional[str]:
         return None
 
     return title
+
+
+def heal_report_section_segmentation(report_id: int, conn=None, dry_run: bool = False) -> Optional[dict]:
+    """
+    Memperbaiki rekaman section_segmentation dan konsistensi jumlah kata pada report tertentu.
+    Memperbarui evidence_data pada tabel reports secara langsung di database.
+    """
+    import json
+    should_close = False
+    if conn is None:
+        from worker.database import get_connection
+        conn = get_connection()
+        should_close = True
+
+    try:
+        cur = conn.cursor(dictionary=True)
+        cur.execute(
+            "SELECT id, document_id, evidence_data FROM reports WHERE id = %s",
+            (report_id,)
+        )
+        report = cur.fetchone()
+        if not report:
+            return None
+
+        doc_id = report["document_id"]
+        evidence_data = {}
+        if report.get("evidence_data"):
+            evidence_data = json.loads(report["evidence_data"]) if isinstance(report["evidence_data"], str) else report["evidence_data"]
+
+        # Ambil seluruh chunk dokumen
+        cur.execute(
+            "SELECT text, word_count FROM document_chunks WHERE document_id = %s ORDER BY chunk_index ASC",
+            (doc_id,)
+        )
+        chunks = cur.fetchall()
+        if not chunks:
+            return None
+
+        chunk_sum_words = sum(c["word_count"] for c in chunks)
+        doc_total_words = evidence_data.get("total_words") or chunk_sum_words
+        full_text = "\n\n".join(c["text"] for c in chunks if c.get("text"))
+
+        # Re-parse menggunakan parser terbaru dengan expected_total_words
+        seg_res = parse_document_sections(full_text, expected_total_words=doc_total_words)
+
+        # Update evidence_data
+        evidence_data["total_words"] = seg_res.total_words
+        if "substantive_summary" in evidence_data and isinstance(evidence_data["substantive_summary"], dict):
+            evidence_data["substantive_summary"]["total_words"] = seg_res.total_words
+
+        v11_pres = evidence_data.setdefault("v1_1_presentation", {})
+        if not isinstance(v11_pres, dict):
+            v11_pres = {}
+            evidence_data["v1_1_presentation"] = v11_pres
+
+        v12_evol = v11_pres.setdefault("v1_2_evolution", {})
+        if not isinstance(v12_evol, dict):
+            v12_evol = {}
+            v11_pres["v1_2_evolution"] = v12_evol
+
+        v12_evol["section_segmentation"] = seg_res.to_dict()
+
+        if not dry_run:
+            cur.execute(
+                "UPDATE reports SET evidence_data = %s WHERE id = %s",
+                (json.dumps(evidence_data, ensure_ascii=False), report_id)
+            )
+            conn.commit()
+
+        return {
+            "success": True,
+            "report_id": report_id,
+            "document_id": doc_id,
+            "total_words": seg_res.total_words,
+            "core_substance_pct": seg_res.core_substance_percentage,
+            "zone_words": seg_res.zone_word_distribution,
+            "zone_pct": seg_res.zone_percentage_distribution
+        }
+    finally:
+        if should_close:
+            conn.close()
+
+
+def heal_all_report_anomalies(conn=None, dry_run: bool = False) -> List[dict]:
+    """
+    Memindai seluruh laporan di database dan memperbaiki yang memiliki
+    anomali segmentasi zonasi atau ketidakkonsistenan jumlah kata.
+    """
+    import json
+    should_close = False
+    if conn is None:
+        from worker.database import get_connection
+        conn = get_connection()
+        should_close = True
+
+    healed_list = []
+    try:
+        cur = conn.cursor(dictionary=True)
+        cur.execute("SELECT id, document_id, evidence_data FROM reports ORDER BY id DESC")
+        reports = cur.fetchall()
+        for r in reports:
+            if not r.get("evidence_data"):
+                continue
+            ev = json.loads(r["evidence_data"]) if isinstance(r["evidence_data"], str) else r["evidence_data"]
+            tot = ev.get("total_words", 0)
+            v12 = ev.get("v1_1_presentation", {}).get("v1_2_evolution", {})
+            sec = v12.get("section_segmentation")
+
+            needs_heal = False
+            if not sec:
+                needs_heal = True
+            else:
+                sec_tot = sec.get("total_words", 0)
+                body_pct = sec.get("zone_percentage_distribution", {}).get("BODY_TEXT", 0.0)
+                w_dist = sec.get("zone_word_distribution", {})
+                w_sum = sum(w_dist.values()) if w_dist else 0
+                if (tot > 100 and body_pct == 0.0) or (tot > 0 and (sec_tot != tot or w_sum != tot)):
+                    needs_heal = True
+
+            if needs_heal:
+                h_res = heal_report_section_segmentation(r["id"], conn=conn, dry_run=dry_run)
+                if h_res and h_res.get("success"):
+                    healed_list.append(h_res)
+        return healed_list
+    finally:
+        if should_close:
+            conn.close()
+
+
+if __name__ == "__main__":
+    import argparse
+    import json
+    import sys
+
+    parser = argparse.ArgumentParser(description="AR Tilik Section Parser & Healer CLI")
+    parser.add_argument("--heal-report", type=int, help="Heal section segmentation for report ID")
+    parser.add_argument("--heal-all", action="store_true", help="Heal all reports with segmentation anomalies")
+    parser.add_argument("--dry-run", action="store_true", help="Dry run without writing to DB")
+    args = parser.parse_args()
+
+    if args.heal_report:
+        res = heal_report_section_segmentation(args.heal_report, dry_run=args.dry_run)
+        print(json.dumps(res, indent=2))
+        sys.exit(0 if res and res.get("success") else 1)
+    elif args.heal_all:
+        results = heal_all_report_anomalies(dry_run=args.dry_run)
+        print(f"Healed {len(results)} reports.")
+        print(json.dumps(results[:5], indent=2))
+        sys.exit(0)
+    else:
+        parser.print_help()
+
 

@@ -499,5 +499,54 @@ def test_document_with_only_bibliography_at_end():
     assert res.zone_percentage_distribution[SectionZone.BODY_TEXT.value] > 70.0
 
 
+def test_document_with_simpulan_and_expected_words():
+    """
+    Memastikan naskah berstruktur Cover - Abstrak - Pendahuluan - Metode - Pembahasan - Simpulan - Daftar Pustaka
+    (seperti Dokumen #3058) dikenali secara sempurna dan jumlah kata terharmonisasi 100%.
+    """
+    doc_text = """PENGARUH LITERASI DIGITAL TERHADAP KUALITAS
+PEMBELAJARAN DI SEKOLAH MENENGAH ATAS
+Drs. Uji Coba, M.Pd.
+SMA Negeri Contoh, Indonesia
+ujicoba@contoh.sch.id
+
+Abstrak
+Penelitian ini bertujuan menganalisis pengaruh literasi digital terhadap kualitas pembelajaran di sekolah menengah atas.
+
+Pendahuluan
+Perkembangan teknologi informasi telah mengubah lanskap pendidikan secara fundamental.
+Literasi digital menjadi kecakapan vital dalam rangka komunikasi dan interaksi pendidikan.
+
+Metode
+Penelitian ini menggunakan pendekatan studi literatur terhadap berbagai sumber akademik bereputasi.
+
+Pembahasan
+Literasi digital memengaruhi kualitas pembelajaran melalui kemandirian belajar siswa dan kolaborasi.
+Analisis empiris menegaskan peranan penting fasilitas pendukung.
+
+Simpulan
+Literasi digital berpengaruh positif terhadap kualitas pembelajaran di sekolah menengah atas.
+
+Daftar Pustaka
+Gilster, P. (1997). Digital literacy. New York: Wiley.
+Pratama, D., & Kusuma, A. (2022). Efektivitas pembelajaran digital. Jurnal Inovasi, 8(3), 201-215.
+"""
+    res = parse_document_sections(doc_text, expected_total_words=115)
+    assert res.total_words == 115
+    # Cek seksi Simpulan teridentifikasi
+    section_types = [s.section_type for s in res.sections]
+    assert SectionType.BAB_5_KESIMPULAN_SARAN in section_types
+    assert SectionType.BAB_3_METODE_PENELITIAN in section_types
+    assert SectionType.BAB_1_PENDAHULUAN in section_types
+    assert SectionType.BAB_4_HASIL_PEMBAHASAN in section_types
+
+    # Pastikan jumlah total kata di zone_word_distribution tepat sama dengan total_words
+    sum_zone_words = sum(res.zone_word_distribution.values())
+    assert sum_zone_words == res.total_words == 115
+    assert res.core_substance_percentage > 30.0
+
+
+
+
 
 
