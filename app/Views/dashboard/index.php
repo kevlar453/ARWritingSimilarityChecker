@@ -469,7 +469,7 @@
                                 <th class="p-3.5 sm:p-4 min-w-[120px]">Similarity</th>
                                 <th class="p-3.5 sm:p-4 min-w-[135px]">Indikasi AI</th>
                                 <th class="p-3.5 sm:p-4 min-w-[130px] whitespace-nowrap">Tanggal Unggah</th>
-                                <th class="p-3.5 sm:p-4 text-right min-w-[270px] whitespace-nowrap">Aksi</th>
+                                <th class="p-3.5 sm:p-4 text-right min-w-[200px] whitespace-nowrap">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
@@ -625,47 +625,70 @@
                                                     $isPurged = !empty($sub['file_purged_at']) || ($sub['storage_path'] ?? '') === '[PURGED]';
                                                 ?>
                                                 <?php if ($rep && $rep['status'] === 'completed'): ?>
-                                                    <a href="<?= base_url('dashboard/report/' . $rep['id']) ?>" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg text-xs shadow-xs transition flex items-center gap-1">
-                                                        Buka Laporan
+                                                    <a href="<?= base_url('dashboard/report/' . $rep['id']) ?>" class="px-2.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg text-xs shadow-xs transition inline-flex items-center gap-1 group" title="Buka Laporan Hasil Analisis">
+                                                        <span>Buka Laporan</span>
+                                                        <svg class="w-3.5 h-3.5 opacity-80 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                                                     </a>
-                                                    <button onclick="openShareModal(<?= $sub['id'] ?>, <?= htmlspecialchars(json_encode($sub['title']), ENT_QUOTES, 'UTF-8') ?>)" class="px-2 py-1 bg-sky-50 hover:bg-sky-100 text-sky-700 font-medium rounded-lg text-xs transition flex items-center gap-1 cursor-pointer" title="Bagikan naskah ini ke pengguna lain">
-                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
-                                                        <span>Bagikan</span>
-                                                    </button>
-                                                    <?php if (! $isPurged): ?>
-                                                    <button onclick="triggerCheck(<?= $sub['id'] ?>)" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-lg text-xs transition" title="Ulangi pemeriksaan">
-                                                        ↻ Ulangi
-                                                    </button>
-                                                    <?php endif; ?>
                                                 <?php else: ?>
                                                     <?php if (! $isPurged): ?>
-                                                    <button onclick="triggerCheck(<?= $sub['id'] ?>)" class="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold rounded-lg text-xs transition">
-                                                        Cek Similarity
+                                                    <button type="button" onclick="triggerCheck(<?= $sub['id'] ?>)" class="px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold rounded-lg text-xs transition inline-flex items-center gap-1.5 cursor-pointer">
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                                        <span>Cek Similarity</span>
                                                     </button>
                                                     <?php endif; ?>
-                                                    <button onclick="openShareModal(<?= $sub['id'] ?>, <?= htmlspecialchars(json_encode($sub['title']), ENT_QUOTES, 'UTF-8') ?>)" class="px-2 py-1 bg-sky-50 hover:bg-sky-100 text-sky-700 font-medium rounded-lg text-xs transition flex items-center gap-1 cursor-pointer" title="Bagikan naskah ini ke pengguna lain">
-                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
-                                                        <span>Bagikan</span>
-                                                    </button>
                                                 <?php endif; ?>
+
+                                                <button type="button" onclick="openShareModal(<?= $sub['id'] ?>, <?= htmlspecialchars(json_encode($sub['title']), ENT_QUOTES, 'UTF-8') ?>)" class="px-2.5 py-1.5 bg-sky-50 hover:bg-sky-100 text-sky-700 font-medium rounded-lg text-xs border border-sky-100 transition inline-flex items-center gap-1 cursor-pointer" title="Bagikan naskah ini ke pengguna lain">
+                                                    <svg class="w-3.5 h-3.5 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+                                                    <span>Bagikan</span>
+                                                </button>
 
                                                 <?php if ($isPurged): ?>
-                                                    <span class="px-2 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg text-xs font-semibold inline-flex items-center gap-1 cursor-help" title="Berkas fisik naskah asli telah dimusnahkan secara mandiri dari server pada <?= !empty($sub['file_purged_at']) ? date('d M Y, H:i', strtotime($sub['file_purged_at'])) : '-' ?> WIB demi kerahasiaan & privasi. Skor dan sertifikat tetap utuh.">
-                                                        🛡️ <span class="hidden sm:inline">Dimusnahkan</span>
+                                                    <span class="px-2 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg text-[11px] font-semibold inline-flex items-center gap-1 cursor-help" title="Berkas fisik naskah asli telah dimusnahkan secara mandiri dari server pada <?= !empty($sub['file_purged_at']) ? date('d M Y, H:i', strtotime($sub['file_purged_at'])) : '-' ?> WIB demi kerahasiaan & privasi. Skor dan sertifikat tetap utuh.">
+                                                        🛡️ <span class="hidden md:inline">Dimusnahkan</span>
                                                     </span>
-                                                <?php else: ?>
-                                                    <button type="button" onclick="openPurgeFileModal(<?= $sub['id'] ?>, <?= htmlspecialchars(json_encode($sub['title']), ENT_QUOTES, 'UTF-8') ?>)" class="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-semibold rounded-lg text-xs transition inline-flex items-center gap-1 cursor-pointer" title="Musnahkan berkas fisik naskah dari disk peladen demi privasi (skor & sertifikat tetap utuh)">
-                                                        🛡️ <span class="hidden sm:inline">Musnahkan</span>
-                                                    </button>
                                                 <?php endif; ?>
 
-                                                <a href="<?= base_url('api/documents/' . $sub['id']) ?>" target="_blank" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-mono rounded-lg text-xs transition" title="Lihat JSON">
-                                                    JSON
-                                                </a>
+                                                <!-- Dropdown Menu Aksi Lainnya (•••) -->
+                                                <div class="relative inline-block text-left action-dropdown-container">
+                                                    <button type="button" onclick="toggleActionDropdown(this, event)" class="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 active:bg-slate-200 rounded-lg border border-slate-200/80 transition cursor-pointer flex items-center justify-center" title="Tindakan Lainnya (Ulangi, Musnahkan, JSON, Hapus)">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/></svg>
+                                                    </button>
+                                                    <div class="action-dropdown-menu hidden bg-white rounded-xl shadow-xl border border-slate-100 py-1.5 w-48 text-left text-xs divide-y divide-slate-100">
+                                                        <div class="py-1">
+                                                            <?php if (! $isPurged): ?>
+                                                            <button type="button" onclick="closeAllActionDropdowns(); triggerCheck(<?= $sub['id'] ?>)" class="w-full text-left px-3 py-1.5 text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 flex items-center gap-2 transition cursor-pointer">
+                                                                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                                                <span>Ulangi Pemeriksaan</span>
+                                                            </button>
+                                                            <?php endif; ?>
 
-                                                <button type="button" onclick="openDeleteDocModal(<?= $sub['id'] ?>, <?= htmlspecialchars(json_encode($sub['title']), ENT_QUOTES, 'UTF-8') ?>)" class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition cursor-pointer" title="Hapus submisi ini dari riwayat">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                                </button>
+                                                            <?php if (! $isPurged): ?>
+                                                            <button type="button" onclick="closeAllActionDropdowns(); openPurgeFileModal(<?= $sub['id'] ?>, <?= htmlspecialchars(json_encode($sub['title']), ENT_QUOTES, 'UTF-8') ?>)" class="w-full text-left px-3 py-1.5 text-rose-700 hover:bg-rose-50 flex items-center gap-2 transition cursor-pointer">
+                                                                <span class="text-sm">🛡️</span>
+                                                                <span>Musnahkan Berkas</span>
+                                                            </button>
+                                                            <?php else: ?>
+                                                            <div class="px-3 py-1.5 text-[11px] text-emerald-700 bg-emerald-50/50 flex items-center gap-2 cursor-default font-medium">
+                                                                <span class="text-sm">🛡️</span>
+                                                                <span>Berkas Dimusnahkan</span>
+                                                            </div>
+                                                            <?php endif; ?>
+
+                                                            <a href="<?= base_url('api/documents/' . $sub['id']) ?>" target="_blank" onclick="closeAllActionDropdowns()" class="w-full text-left px-3 py-1.5 text-slate-700 hover:bg-slate-50 flex items-center gap-2 transition font-mono">
+                                                                <svg class="w-4 h-4 text-slate-400 font-sans" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                                                                <span class="font-sans">Lihat Data (JSON)</span>
+                                                            </a>
+                                                        </div>
+
+                                                        <div class="py-1">
+                                                            <button type="button" onclick="closeAllActionDropdowns(); openDeleteDocModal(<?= $sub['id'] ?>, <?= htmlspecialchars(json_encode($sub['title']), ENT_QUOTES, 'UTF-8') ?>)" class="w-full text-left px-3 py-1.5 text-rose-600 hover:bg-rose-50 flex items-center gap-2 transition cursor-pointer">
+                                                                <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                                <span>Hapus Submisi</span>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </td>
                                     </tr>
@@ -2610,6 +2633,63 @@
                 btnText.innerText = 'Ya, Hapus Submisi';
             }
         }
+
+        // --- Action Dropdown Handler (Kolom AKSI Modern) ---
+        function closeAllActionDropdowns() {
+            document.querySelectorAll('.action-dropdown-menu').forEach(m => m.classList.add('hidden'));
+        }
+
+        function toggleActionDropdown(btn, event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            const container = btn.closest('.action-dropdown-container');
+            const menu = container.querySelector('.action-dropdown-menu');
+            const isHidden = menu.classList.contains('hidden');
+
+            closeAllActionDropdowns();
+
+            if (isHidden) {
+                menu.classList.remove('hidden');
+                const rect = btn.getBoundingClientRect();
+                const menuWidth = 192; // 12rem / w-48
+                const menuHeight = menu.offsetHeight || 160;
+
+                const spaceBelow = window.innerHeight - rect.bottom;
+                const openUpward = spaceBelow < menuHeight && rect.top > menuHeight;
+
+                menu.style.position = 'fixed';
+                menu.style.zIndex = '9999';
+
+                if (openUpward) {
+                    menu.style.top = `${rect.top - menuHeight - 4}px`;
+                } else {
+                    menu.style.top = `${rect.bottom + 4}px`;
+                }
+
+                let leftPos = rect.right - menuWidth;
+                if (leftPos < 8) leftPos = 8;
+                menu.style.left = `${leftPos}px`;
+            }
+        }
+
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.action-dropdown-container')) {
+                closeAllActionDropdowns();
+            }
+        });
+
+        window.addEventListener('scroll', function() {
+            closeAllActionDropdowns();
+        }, true);
+
+        window.addEventListener('resize', closeAllActionDropdowns);
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeAllActionDropdowns();
+            }
+        });
     </script>
 
     <!-- MODAL PEMUSNAHAN BERKAS MENTAH (SELF-PURGE PRIVACY) -->
