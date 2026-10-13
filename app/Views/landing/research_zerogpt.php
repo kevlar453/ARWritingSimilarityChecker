@@ -1,731 +1,1472 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="color-scheme" content="light dark" />
-  <meta name="theme-color" content="#f2efe8" media="(prefers-color-scheme: light)" />
-  <meta name="theme-color" content="#11171a" media="(prefers-color-scheme: dark)" />
-  <meta name="description" content="Perbandingan mendalam AR Tilik vs ZeroGPT: Analisis berbasis riset independen mengenai perbedaan audit bukti integritas naskah vs deteksi probabilitas AI." />
-  <link rel="icon" href="<?= base_url('images/logo.png') ?>" type="image/png" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&display=swap" rel="stylesheet" />
-  <title>Perbandingan AR Tilik vs ZeroGPT — Analisis Berbasis Riset &amp; Whitepaper Integritas</title>
-  <style>
-    :root {
-      color-scheme: light dark;
-      --bg: #f2efe8;
-      --surface: #fffdf8;
-      --surface-2: #e8e4dc;
-      --ink: #142027;
-      --muted: #506067;
-      --line: #c7c2b8;
-      --navy: #173e52;
-      --navy-soft: #d5e3e8;
-      --orange: #e7562e;
-      --orange-soft: #f5d8cd;
-      --green: #2e6a56;
-      --green-soft: #d7e7df;
-      --yellow: #bd7b18;
-      --shadow: 0 20px 60px rgba(20,32,39,.08);
-      --sans: "IBM Plex Sans", ui-sans-serif, sans-serif;
-      --serif: "Newsreader", Georgia, serif;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #11171a;
-        --surface: #172126;
-        --surface-2: #202c31;
-        --ink: #f2eee5;
-        --muted: #b5c0c3;
-        --line: #3b494e;
-        --navy: #8bc1d5;
-        --navy-soft: #203d48;
-        --orange: #ff7b55;
-        --orange-soft: #4a2a23;
-        --green: #83c9ab;
-        --green-soft: #203d33;
-        --yellow: #efb658;
-        --shadow: 0 24px 70px rgba(0,0,0,.25);
-      }
-    }
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--ink);
-      font-family: var(--sans);
-      line-height: 1.6;
-      text-rendering: optimizeLegibility;
-    }
-    a { color: inherit; }
-    a:focus-visible, button:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
-    .wrap { width: min(1160px, calc(100% - 40px)); margin: 0 auto; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title><?= esc($title ?? 'Perbandingan AR Tilik vs ZeroGPT — Whitepaper Riset Integritas Akademik') ?></title>
+    <meta name="description" content="Analisis komparatif berbasis riset independen: Mengapa AR Tilik mengaudit bukti tekstual & rujukan nyata, sementara detektor probabilitas AI seperti ZeroGPT kerap memicu false-positive tinggi pada naskah akademik Indonesia.">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+    <link rel="canonical" href="<?= base_url('riset/ar-tilik-vs-zerogpt') ?>">
+    <meta name="theme-color" content="#4338ca">
 
-    /* Top Platform Header Bar */
-    .top-bar {
-      background: var(--surface-2);
-      border-bottom: 1px solid var(--line);
-      font-size: .84rem;
-      padding: 10px 0;
-    }
-    .top-bar-inner {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-    .top-brand {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-weight: 700;
-      text-decoration: none;
-      letter-spacing: -.02em;
-    }
-    .top-brand img { width: 22px; height: 22px; border-radius: 4px; }
-    .top-actions {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-    .top-link {
-      text-decoration: none;
-      color: var(--muted);
-      font-weight: 600;
-      transition: color .15s ease;
-    }
-    .top-link:hover { color: var(--orange); }
-    .btn-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 5px 14px;
-      border-radius: 9999px;
-      background: var(--navy);
-      color: #ffffff !important;
-      text-decoration: none;
-      font-weight: 600;
-      font-size: .8rem;
-      transition: opacity .15s ease, transform .15s ease;
-    }
-    .btn-pill:hover { opacity: .9; transform: translateY(-1px); }
+    <!-- Open Graph -->
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="id_ID">
+    <meta property="og:site_name" content="AR Tilik">
+    <meta property="og:title" content="Bukan Lomba Menebak AI: Perbandingan AR Tilik vs ZeroGPT">
+    <meta property="og:description" content="Analisis berbasis riset independen mengenai audit bukti integritas naskah vs deteksi probabilitas gaya bahasa AI.">
+    <meta property="og:url" content="<?= base_url('riset/ar-tilik-vs-zerogpt') ?>">
+    <meta property="og:image" content="<?= base_url('images/og-artilik.png') ?>">
 
-    .mast {
-      display: grid;
-      grid-template-columns: minmax(0, 1.35fr) minmax(280px, .65fr);
-      gap: clamp(32px, 7vw, 96px);
-      padding: clamp(48px, 8vw, 100px) 0 54px;
-      align-items: end;
-      border-bottom: 1px solid var(--line);
-    }
-    .stamp {
-      display: inline-flex;
-      gap: 8px;
-      align-items: center;
-      color: var(--muted);
-      font-size: .83rem;
-      font-weight: 600;
-      letter-spacing: .04em;
-      margin-bottom: 20px;
-    }
-    .stamp::before { content: ""; width: 25px; height: 3px; background: var(--orange); }
-    h1, h2, h3, p { margin-top: 0; }
-    h1 {
-      font-family: var(--serif);
-      font-size: clamp(3.15rem, 7.4vw, 6.9rem);
-      line-height: .91;
-      letter-spacing: -.052em;
-      max-width: 880px;
-      margin-bottom: 30px;
-    }
-    h1 em { color: var(--orange); font-style: normal; }
-    .lede {
-      max-width: 760px;
-      font-family: var(--serif);
-      font-size: clamp(1.35rem, 2.4vw, 2rem);
-      line-height: 1.25;
-      margin: 0;
-    }
-    .verdict-card {
-      background: var(--navy);
-      color: #f6f2e8;
-      padding: 28px;
-      box-shadow: var(--shadow);
-    }
-    @media (prefers-color-scheme: dark) { .verdict-card { color: #102128; } }
-    .verdict-card strong { display: block; font-size: 1.05rem; margin-bottom: 12px; }
-    .verdict-card p { margin: 0; line-height: 1.5; }
-    .verdict-mark {
-      display: block;
-      font-family: var(--serif);
-      font-size: 4.5rem;
-      line-height: .7;
-      color: var(--orange);
-      margin-bottom: 22px;
-    }
-    .quick-nav {
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      background: color-mix(in srgb, var(--bg) 92%, transparent);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--line);
-    }
-    .quick-nav .wrap { display: flex; gap: 8px 24px; flex-wrap: wrap; padding: 12px 0; }
-    .quick-nav a { text-decoration: none; color: var(--muted); font-size: .88rem; font-weight: 600; }
-    .quick-nav a:hover { color: var(--orange); }
-    section { padding: clamp(64px, 9vw, 112px) 0; }
-    .section-head { display: grid; grid-template-columns: minmax(160px, .42fr) minmax(0, 1fr); gap: 30px; align-items: start; margin-bottom: 42px; }
-    .num { color: var(--orange); font-weight: 600; font-variant-numeric: tabular-nums; }
-    h2 {
-      font-family: var(--serif);
-      font-size: clamp(2.35rem, 5vw, 4.6rem);
-      line-height: 1;
-      letter-spacing: -.035em;
-      margin-bottom: 16px;
-    }
-    .section-intro { color: var(--muted); max-width: 760px; margin-bottom: 0; font-size: 1.08rem; }
-    .comparison {
-      display: grid;
-      grid-template-columns: .85fr 1fr 1fr;
-      border-top: 1px solid var(--line);
-    }
-    .comparison > div { padding: 21px 18px; border-bottom: 1px solid var(--line); }
-    .comparison .label { color: var(--muted); font-size: .85rem; font-weight: 600; }
-    .comparison .colhead { font-family: var(--serif); font-size: 1.6rem; padding-top: 27px; }
-    .comparison .ar { background: var(--navy-soft); }
-    .comparison .zero { background: var(--orange-soft); }
-    .comparison p { margin: 0; }
-    .comparison strong { color: var(--ink); }
-    .callout {
-      margin-top: 34px;
-      display: grid;
-      grid-template-columns: auto 1fr;
-      gap: 18px;
-      padding: 24px;
-      background: var(--surface);
-      box-shadow: var(--shadow);
-      max-width: 900px;
-    }
-    .callout b { color: var(--orange); font-size: 1.7rem; line-height: 1; }
-    .callout p { margin: 0; }
-    .evidence-band { background: var(--surface); }
-    .claim-split { display: grid; grid-template-columns: .74fr 1.26fr; gap: 24px; align-items: start; }
-    .vendor-claim {
-      min-height: 420px;
-      padding: clamp(28px, 5vw, 52px);
-      background: var(--orange);
-      color: #fff9f2;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-    .vendor-claim .big { font-family: var(--serif); font-size: clamp(5rem, 10vw, 8.5rem); line-height: .75; letter-spacing: -.05em; font-variant-numeric: tabular-nums; }
-    .vendor-claim small { font-size: .87rem; max-width: 310px; line-height: 1.5; }
-    .studies { padding: 8px 0 0; }
-    .study {
-      display: grid;
-      grid-template-columns: 128px 1fr;
-      gap: 22px;
-      padding: 20px 0;
-      border-bottom: 1px solid var(--line);
-      align-items: baseline;
-    }
-    .study:first-child { border-top: 1px solid var(--line); }
-    .study .metric { font-family: var(--serif); font-size: 2.35rem; line-height: 1; color: var(--navy); font-variant-numeric: tabular-nums; }
-    .study p { margin: 0; }
-    .study small { display: block; color: var(--muted); margin-top: 6px; }
-    .source-link { text-decoration-color: var(--orange); text-decoration-thickness: 2px; text-underline-offset: 3px; }
-    .source-link:hover { color: var(--orange); }
-    .caution { margin-top: 28px; padding: 18px 22px; border: 1px solid var(--yellow); color: var(--ink); }
-    .caution strong { color: var(--yellow); }
-    .forensics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-    .engine {
-      padding: 28px;
-      background: var(--surface);
-      border-top: 5px solid var(--navy);
-    }
-    .engine.orange { border-color: var(--orange); }
-    .engine h3 { font-family: var(--serif); font-size: 2rem; line-height: 1.08; margin-bottom: 14px; }
-    .flow { list-style: none; margin: 28px 0 0; padding: 0; counter-reset: flow; }
-    .flow li { counter-increment: flow; display: grid; grid-template-columns: 34px 1fr; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); }
-    .flow li::before { content: counter(flow, decimal-leading-zero); color: var(--orange); font-weight: 600; font-size: .82rem; }
-    .audit-note { color: var(--muted); font-size: .9rem; margin-top: 20px; }
-    .citation-case {
-      margin-top: 24px;
-      background: var(--green-soft);
-      padding: 28px;
-      display: grid;
-      grid-template-columns: auto 1fr;
-      gap: 20px;
-      align-items: start;
-    }
-    .seal { width: 54px; height: 54px; border: 2px solid var(--green); border-radius: 50%; display: grid; place-items: center; color: var(--green); font-weight: 600; }
-    .citation-case h3 { margin-bottom: 8px; }
-    .citation-case p { margin-bottom: 8px; }
-    .citation-case small { color: var(--muted); }
-    .limits { background: var(--navy); color: #f6f2e8; }
-    @media (prefers-color-scheme: dark) { .limits { color: #102128; } }
-    .limits .num, .limits h2 { color: inherit; }
-    .limits .section-intro { color: color-mix(in srgb, currentColor 72%, transparent); }
-    .risk-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: color-mix(in srgb, currentColor 25%, transparent); border: 1px solid color-mix(in srgb, currentColor 25%, transparent); }
-    .risk { background: var(--navy); padding: 28px; min-height: 235px; }
-    .risk .tag { color: var(--orange); font-weight: 600; font-size: .82rem; display: block; margin-bottom: 18px; }
-    .risk h3 { font-family: var(--serif); font-size: 1.65rem; line-height: 1.1; }
-    .risk p { margin: 0; opacity: .84; }
-    .decision-tool { display: grid; grid-template-columns: .55fr 1.45fr; gap: clamp(24px, 7vw, 80px); align-items: start; }
-    .role-buttons { display: grid; gap: 8px; }
-    .role-buttons button {
-      appearance: none;
-      border: 1px solid var(--line);
-      background: transparent;
-      color: var(--ink);
-      font: 600 .92rem var(--sans);
-      padding: 14px 16px;
-      text-align: left;
-      cursor: pointer;
-    }
-    .role-buttons button:hover { border-color: var(--orange); }
-    .role-buttons button[aria-selected="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
-    .advice { min-height: 310px; background: var(--surface); padding: clamp(28px, 5vw, 54px); box-shadow: var(--shadow); }
-    .advice .mini { color: var(--orange); font-weight: 600; font-size: .84rem; }
-    .advice h3 { font-family: var(--serif); font-size: clamp(2rem, 4vw, 3.5rem); line-height: 1.02; margin: 10px 0 18px; }
-    .advice p { max-width: 690px; }
-    .advice .action { margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--line); font-weight: 600; }
-    .final-word { background: var(--orange-soft); }
-    .final-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(260px, .75fr); gap: 52px; align-items: start; }
-    .final-grid blockquote { margin: 0; font: 500 clamp(2rem, 4.8vw, 4.5rem)/1.02 var(--serif); letter-spacing: -.035em; }
-    .final-grid aside { border-top: 4px solid var(--orange); padding-top: 20px; }
-    .final-grid aside p:last-child { margin-bottom: 0; }
-    
-    /* Dedicated Actions Band */
-    .cta-band {
-      background: var(--surface);
-      border-top: 1px solid var(--line);
-      border-bottom: 1px solid var(--line);
-      padding: 56px 0;
-      text-align: center;
-    }
-    .cta-box {
-      max-width: 720px;
-      margin: 0 auto;
-    }
-    .cta-box h3 {
-      font-family: var(--serif);
-      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
-      line-height: 1.1;
-      margin-bottom: 12px;
-    }
-    .cta-box p {
-      color: var(--muted);
-      font-size: 1.05rem;
-      margin-bottom: 24px;
-    }
-    .cta-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 14px;
-      flex-wrap: wrap;
-    }
-    .btn-main {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 24px;
-      background: var(--orange);
-      color: #ffffff !important;
-      text-decoration: none;
-      font-weight: 600;
-      font-size: .95rem;
-      border-radius: 6px;
-      box-shadow: 0 4px 14px rgba(231,86,46,.25);
-      transition: transform .15s ease, opacity .15s ease;
-    }
-    .btn-main:hover { transform: translateY(-2px); opacity: .95; }
-    .btn-secondary {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 24px;
-      background: transparent;
-      border: 1px solid var(--line);
-      color: var(--ink) !important;
-      text-decoration: none;
-      font-weight: 600;
-      font-size: .95rem;
-      border-radius: 6px;
-      transition: border-color .15s ease;
-    }
-    .btn-secondary:hover { border-color: var(--ink); }
+    <!-- Favicon & Brand Icons -->
+    <link rel="icon" type="image/x-icon" href="<?= base_url('favicon.ico?v=20261008') ?>">
+    <link rel="icon" type="image/png" sizes="32x32" href="<?= base_url('favicon-32x32.png?v=20261008') ?>">
+    <link rel="icon" type="image/png" sizes="16x16" href="<?= base_url('favicon-16x16.png?v=20261008') ?>">
+    <link rel="apple-touch-icon" sizes="180x180" href="<?= base_url('apple-touch-icon.png?v=20261008') ?>">
+    <link rel="manifest" href="<?= base_url('site.webmanifest') ?>">
 
-    .sources { padding-bottom: 48px; }
-    .sources h2 { font-size: 2.4rem; }
-    .source-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0 34px; padding: 0; margin: 0; list-style: none; }
-    .source-list li { padding: 16px 0; border-top: 1px solid var(--line); font-size: .9rem; color: var(--muted); }
-    .source-list a { color: var(--ink); font-weight: 600; }
-    .method-note { margin-top: 30px; color: var(--muted); font-size: .85rem; max-width: 840px; }
+    <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono (AR Tilik Official Fonts) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    @media (max-width: 820px) {
-      .mast, .section-head, .claim-split, .forensics-grid, .decision-tool, .final-grid { grid-template-columns: 1fr; }
-      .mast { align-items: start; }
-      .verdict-card { max-width: 540px; }
-      .section-head { gap: 10px; }
-      .risk-grid { grid-template-columns: 1fr; }
-      .source-list { grid-template-columns: 1fr; }
-      .comparison { grid-template-columns: .7fr 1fr 1fr; font-size: .92rem; }
-      .comparison > div { padding: 16px 10px; }
-      .comparison .colhead { font-size: 1.3rem; }
-      .vendor-claim { min-height: 340px; }
-    }
-    @media (max-width: 560px) {
-      .wrap { width: min(100% - 28px, 1160px); }
-      h1 { font-size: clamp(3rem, 17vw, 4.6rem); }
-      .quick-nav .wrap { flex-wrap: nowrap; overflow: hidden; gap: 15px; }
-      .quick-nav a:nth-child(4), .quick-nav a:nth-child(5) { display: none; }
-      .comparison { display: block; border: 0; }
-      .comparison .blank { display: none; }
-      .comparison .colhead { position: sticky; top: 47px; z-index: 2; padding: 13px 14px; }
-      .comparison .label { padding: 25px 0 5px; border: 0; }
-      .comparison .ar, .comparison .zero { padding: 14px; border: 0; margin-bottom: 7px; }
-      .comparison .ar::before, .comparison .zero::before { display: block; font-size: .7rem; font-weight: 600; margin-bottom: 4px; }
-      .comparison .ar::before { content: "AR TILIK"; color: var(--navy); }
-      .comparison .zero::before { content: "ZEROGPT"; color: var(--orange); }
-      .comparison .colhead { display: none; }
-      .study { grid-template-columns: 92px 1fr; gap: 14px; }
-      .study .metric { font-size: 1.9rem; }
-      .citation-case { grid-template-columns: 1fr; }
-      .callout { grid-template-columns: 1fr; }
-    }
-    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-  </style>
+    <style>
+        :root {
+            --primary: #4338ca;
+            --primary-dark: #312e81;
+            --primary-light: #6366f1;
+            --secondary: #0ea5e9;
+            --accent-emerald: #059669;
+            --accent-amber: #d97706;
+            --accent-orange: #ea580c;
+            --accent-rose: #e11d48;
+            --dark: #0f172a;
+            --dark-surface: #1e293b;
+            --light-bg: #f8fafc;
+            --surface: #ffffff;
+            --border: #e2e8f0;
+            --border-subtle: #cbd5e1;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+            --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06);
+            --shadow-md: 0 4px 20px -2px rgba(15, 23, 42, 0.07);
+            --shadow-lg: 0 16px 40px -10px rgba(15, 23, 42, 0.12);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: var(--sans);
+            background: var(--light-bg);
+            color: var(--text-main);
+            line-height: 1.65;
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+        }
+        a { color: inherit; text-decoration: none; }
+        a:focus-visible, button:focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; }
+
+        .container {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* ─── Fixed Glassmorphism Navbar (AR Tilik Standard) ─── */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 10px 0;
+            transition: all 0.2s ease;
+        }
+        .nav-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+        .brand-logo {
+            width: 38px;
+            height: 38px;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+        .brand-title {
+            font-size: 19px;
+            font-weight: 800;
+            color: var(--dark);
+            letter-spacing: -0.5px;
+        }
+        .brand-badge {
+            background: rgba(67, 56, 202, 0.1);
+            color: var(--primary);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 6px;
+            border: 1px solid rgba(67, 56, 202, 0.2);
+            text-transform: uppercase;
+        }
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+            list-style: none;
+        }
+        .nav-links a {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: color 0.15s ease;
+        }
+        .nav-links a:hover { color: var(--primary); }
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn-nav-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 9999px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-muted);
+            background: #f1f5f9;
+            border: 1px solid var(--border);
+            transition: all 0.15s ease;
+        }
+        .btn-nav-back:hover {
+            color: var(--dark);
+            background: #e2e8f0;
+        }
+        .btn-nav-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 9999px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #ffffff;
+            background: var(--primary);
+            box-shadow: 0 4px 12px rgba(67, 56, 202, 0.25);
+            transition: all 0.15s ease;
+        }
+        .btn-nav-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        /* ─── Breadcrumbs & Masthead Hero ─── */
+        .hero-wrap {
+            padding-top: 110px;
+            padding-bottom: 48px;
+            background: radial-gradient(circle at 85% 20%, rgba(67, 56, 202, 0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 15% 60%, rgba(14, 165, 233, 0.06) 0%, transparent 40%),
+                        #ffffff;
+            border-bottom: 1px solid var(--border);
+        }
+        .breadcrumbs {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+        .breadcrumbs a:hover { color: var(--primary); }
+        .mast-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.4fr) minmax(300px, 0.8fr);
+            gap: clamp(24px, 5vw, 64px);
+            align-items: center;
+        }
+        .pill-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 14px;
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: rgba(67, 56, 202, 0.08);
+            color: var(--primary);
+            border: 1px solid rgba(67, 56, 202, 0.2);
+            margin-bottom: 18px;
+        }
+        .pill-tag .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--primary); }
+        h1.hero-title {
+            font-size: clamp(32px, 4.2vw, 54px);
+            font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: -1.2px;
+            color: var(--dark);
+            margin-bottom: 20px;
+        }
+        h1.hero-title em {
+            font-style: normal;
+            background: linear-gradient(90deg, #4338ca, #0284c7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero-lead {
+            font-size: clamp(16px, 1.4vw, 19px);
+            color: #475569;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .hero-meta {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 13px;
+            color: var(--text-muted);
+            flex-wrap: wrap;
+        }
+
+        /* Verdict Card (Dark Navy Accent) */
+        .verdict-card {
+            background: var(--dark);
+            border: 1px solid #1e293b;
+            border-radius: 24px;
+            padding: clamp(26px, 4vw, 36px);
+            color: #f8fafc;
+            box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+        .verdict-card::before {
+            content: "“";
+            position: absolute;
+            top: -20px;
+            right: 20px;
+            font-size: 120px;
+            color: rgba(255, 255, 255, 0.05);
+            font-family: Georgia, serif;
+            line-height: 1;
+            pointer-events: none;
+        }
+        .verdict-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            margin-bottom: 14px;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+        .verdict-card h3 {
+            font-size: 18px;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 10px;
+            letter-spacing: -0.3px;
+        }
+        .verdict-card p {
+            font-size: 14px;
+            color: #cbd5e1;
+            line-height: 1.6;
+            margin-bottom: 0;
+        }
+
+        /* ─── Sticky Sub-Navigation Bar ─── */
+        .subnav {
+            position: sticky;
+            top: 58px;
+            z-index: 990;
+            background: rgba(248, 250, 252, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 8px 0;
+        }
+        .subnav-inner {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            overflow-x: auto;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .subnav-inner::-webkit-scrollbar { display: none; }
+        .subnav-link {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
+            padding: 6px 14px;
+            border-radius: 9999px;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .subnav-link:hover {
+            color: var(--dark);
+            background: #e2e8f0;
+        }
+        .subnav-link.active {
+            color: #ffffff;
+            background: var(--primary);
+        }
+
+        /* ─── Section Shared Styles ─── */
+        .section-white {
+            background: #ffffff;
+            border-bottom: 1px solid var(--border);
+            padding: clamp(60px, 8vw, 96px) 0;
+        }
+        .section-slate {
+            background: var(--light-bg);
+            border-bottom: 1px solid var(--border);
+            padding: clamp(60px, 8vw, 96px) 0;
+        }
+        .section-header {
+            max-width: 820px;
+            margin-bottom: 40px;
+        }
+        .section-number {
+            font-family: var(--mono);
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        .section-title {
+            font-size: clamp(24px, 3.2vw, 38px);
+            font-weight: 800;
+            color: var(--dark);
+            line-height: 1.25;
+            letter-spacing: -0.8px;
+            margin-bottom: 12px;
+        }
+        .section-desc {
+            font-size: 15px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* ─── 01 Comparison Matrix Table ─── */
+        .comparison-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        .comparison-table th, .comparison-table td {
+            padding: 18px 22px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+            text-align: left;
+        }
+        .comparison-table thead th {
+            background: #f8fafc;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+        }
+        .comparison-table thead th.th-ar {
+            background: rgba(67, 56, 202, 0.06);
+            color: var(--primary);
+            font-size: 14px;
+            border-bottom: 2px solid var(--primary);
+        }
+        .comparison-table thead th.th-zero {
+            background: rgba(234, 88, 12, 0.05);
+            color: var(--accent-orange);
+            font-size: 14px;
+            border-bottom: 2px solid var(--accent-orange);
+        }
+        .comparison-table tbody tr:last-child td { border-bottom: none; }
+        .comparison-table .td-label {
+            font-weight: 700;
+            color: var(--dark);
+            font-size: 13px;
+            width: 25%;
+            background: #fbfcfe;
+        }
+        .comparison-table .td-ar {
+            background: rgba(67, 56, 202, 0.02);
+            color: #1e293b;
+            width: 38%;
+        }
+        .comparison-table .td-zero {
+            background: #ffffff;
+            color: #475569;
+            width: 37%;
+        }
+
+        .alert-callout {
+            margin-top: 24px;
+            padding: 20px 24px;
+            border-radius: 16px;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            font-size: 14px;
+            color: #1e3a8a;
+            line-height: 1.6;
+        }
+        .alert-callout strong { color: #1e40af; }
+
+        /* ─── 02 Empirical Studies Split ─── */
+        .studies-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+            gap: 28px;
+            align-items: stretch;
+        }
+        .vendor-claim-card {
+            background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+            border-radius: 20px;
+            padding: clamp(28px, 4vw, 40px);
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 16px 36px -8px rgba(234, 88, 12, 0.35);
+        }
+        .claim-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 24px;
+            width: fit-content;
+        }
+        .claim-big {
+            font-family: var(--mono);
+            font-size: clamp(56px, 8vw, 84px);
+            font-weight: 800;
+            line-height: 0.9;
+            letter-spacing: -2px;
+            margin-bottom: 12px;
+        }
+        .claim-sub {
+            font-size: 15px;
+            color: #ffedd5;
+            line-height: 1.5;
+            margin-bottom: 30px;
+        }
+        .claim-footer {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            padding-top: 16px;
+        }
+
+        .studies-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .study-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px 24px;
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            gap: 20px;
+            align-items: center;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.15s ease, border-color 0.15s ease;
+        }
+        .study-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary-light);
+            box-shadow: var(--shadow-md);
+        }
+        .study-metric {
+            font-family: var(--mono);
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1;
+        }
+        .study-metric.orange { color: var(--accent-orange); }
+        .study-metric.rose { color: var(--accent-rose); }
+        .study-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+        .study-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* ─── 03 Engines Comparison ─── */
+        .engines-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+        .engine-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+        }
+        .engine-card.ar {
+            border-top: 5px solid var(--primary);
+        }
+        .engine-card.zero {
+            border-top: 5px solid var(--accent-orange);
+        }
+        .engine-tag {
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+        .engine-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 12px;
+            letter-spacing: -0.4px;
+        }
+        .engine-flow {
+            list-style: none;
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .engine-flow li {
+            display: grid;
+            grid-template-columns: 28px 1fr;
+            gap: 12px;
+            font-size: 13px;
+            color: #334155;
+            line-height: 1.5;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .engine-flow li:last-child { border-bottom: none; }
+        .flow-step {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            color: var(--text-muted);
+            font-family: var(--mono);
+            font-size: 11px;
+            font-weight: 700;
+            display: grid;
+            place-items: center;
+        }
+        .engine-card.ar .flow-step {
+            background: rgba(67, 56, 202, 0.1);
+            color: var(--primary);
+        }
+        .engine-card.zero .flow-step {
+            background: rgba(234, 88, 12, 0.1);
+            color: var(--accent-orange);
+        }
+
+        .citation-box {
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            border-radius: 20px;
+            padding: 28px 32px;
+            display: grid;
+            grid-template-columns: 56px 1fr;
+            gap: 24px;
+            align-items: center;
+        }
+        .seal-check {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: #10b981;
+            color: #ffffff;
+            display: grid;
+            place-items: center;
+            font-size: 28px;
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        /* ─── 04 Limits Grid ─── */
+        .limits-box {
+            background: var(--dark);
+            border-radius: 24px;
+            padding: clamp(36px, 5vw, 60px);
+            color: #ffffff;
+        }
+        .limits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 32px;
+        }
+        .limit-item {
+            background: #1e293b;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 24px;
+        }
+        .limit-tag {
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            display: inline-block;
+        }
+        .limit-tag.zero { color: #fdba74; }
+        .limit-tag.ar { color: #93c5fd; }
+        .limit-tag.both { color: #86efac; }
+        .limit-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 8px;
+        }
+        .limit-desc {
+            font-size: 13px;
+            color: #94a3b8;
+            line-height: 1.55;
+            margin: 0;
+        }
+
+        /* ─── 05 Role Selector ─── */
+        .decision-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 0.65fr) minmax(0, 1.35fr);
+            gap: 32px;
+            align-items: stretch;
+        }
+        .role-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .role-btn {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px 20px;
+            text-align: left;
+            font-family: var(--sans);
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--dark);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.15s ease;
+        }
+        .role-btn:hover {
+            border-color: var(--primary-light);
+            background: #f8fafc;
+        }
+        .role-btn[aria-selected="true"] {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+            box-shadow: 0 4px 14px rgba(67, 56, 202, 0.3);
+        }
+        .role-advice-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: clamp(28px, 4vw, 44px);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .advice-kicker {
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        .advice-title {
+            font-size: clamp(20px, 2.5vw, 28px);
+            font-weight: 800;
+            color: var(--dark);
+            line-height: 1.25;
+            margin-bottom: 14px;
+            letter-spacing: -0.5px;
+        }
+        .advice-body {
+            font-size: 15px;
+            color: #334155;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+        .advice-action {
+            background: #f8fafc;
+            border-left: 4px solid var(--primary);
+            border-radius: 8px;
+            padding: 14px 18px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        /* ─── Call to Action Banner ─── */
+        .cta-banner {
+            background: linear-gradient(135deg, #090d16 0%, #1e1b4b 60%, #0f172a 100%);
+            border-radius: 28px;
+            padding: clamp(36px, 5vw, 60px);
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+            margin-top: 30px;
+        }
+        .cta-banner h2 {
+            font-size: clamp(24px, 3.4vw, 40px);
+            font-weight: 800;
+            letter-spacing: -0.8px;
+            margin-bottom: 14px;
+        }
+        .cta-banner p {
+            font-size: 16px;
+            color: #cbd5e1;
+            max-width: 680px;
+            line-height: 1.6;
+            margin-bottom: 28px;
+        }
+        .cta-btn-group {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .btn-cta-main {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #0f172a;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            box-shadow: 0 8px 20px rgba(245, 158, 11, 0.35);
+            transition: all 0.15s ease;
+        }
+        .btn-cta-main:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.05);
+        }
+        .btn-cta-outline {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.15s ease;
+        }
+        .btn-cta-outline:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* ─── Sources List ─── */
+        .source-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 24px;
+        }
+        .source-item {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px 20px;
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+        .source-item strong { color: var(--dark); display: block; margin-bottom: 2px; }
+        .source-item a { color: var(--primary); text-decoration: underline; text-underline-offset: 3px; }
+
+        /* ─── Standard AR Tilik Footer ─── */
+        .footer {
+            background: var(--dark);
+            color: #94a3b8;
+            padding: 60px 0 30px;
+            font-size: 13px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1.2fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        .footer-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+        }
+        .footer-links a {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.15s ease;
+        }
+        .footer-links a:hover { color: #ffffff; }
+        .footer-bottom {
+            border-top: 1px solid #1e293b;
+            padding-top: 24px;
+            text-align: center;
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        /* ─── Responsive Media Queries ─── */
+        @media (max-width: 900px) {
+            .mast-grid, .studies-grid, .engines-grid, .decision-grid, .footer-grid { grid-template-columns: 1fr; }
+            .source-grid { grid-template-columns: 1fr; }
+            .nav-links { display: none; }
+        }
+        @media (max-width: 600px) {
+            .study-card { grid-template-columns: 1fr; gap: 8px; }
+            .citation-box { grid-template-columns: 1fr; text-align: center; }
+            .seal-check { margin: 0 auto; }
+            .comparison-card { overflow-x: auto; }
+            .comparison-table { min-width: 580px; }
+        }
+    </style>
 </head>
 <body>
 
-  <!-- Top Bar Navigating back to AR Tilik Main Platform -->
-  <aside class="top-bar" aria-label="Navigasi Platform">
-    <div class="wrap top-bar-inner">
-      <a href="<?= base_url() ?>" class="top-brand">
-        <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik Logo" width="22" height="22" />
-        <span>AR Tilik</span>
-        <span style="font-weight: normal; color: var(--muted);">&bull; Whitepaper Riset</span>
-      </a>
-      <div class="top-actions">
-        <a href="<?= base_url() ?>" class="top-link">&larr; Kembali ke Beranda</a>
-        <a href="<?= base_url('dashboard') ?>" class="btn-pill">Buka Aplikasi &rarr;</a>
-      </div>
-    </div>
-  </aside>
+    <!-- ─── Fixed Header Navbar ─── -->
+    <header class="navbar">
+        <div class="container nav-inner">
+            <a href="<?= base_url() ?>" class="brand">
+                <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik Logo" class="brand-logo" width="38" height="38">
+                <div>
+                    <span class="brand-title">AR Tilik</span>
+                </div>
+                <span class="brand-badge">Whitepaper Riset</span>
+            </a>
 
-  <header class="wrap mast">
-    <div>
-      <div class="stamp">Analisis berbasis riset &bull; Edisi 2026</div>
-      <h1>Bukan lomba siapa paling pintar <em>menebak AI.</em></h1>
-      <p class="lede">AR Tilik dan ZeroGPT menjawab dua pertanyaan berbeda. ZeroGPT menaksir “apakah teks ini dibuat AI?”; AR Tilik memeriksa “apa yang dapat diverifikasi dari naskah ini?”</p>
-    </div>
-    <aside class="verdict-card" aria-label="Putusan singkat">
-      <span class="verdict-mark">&ldquo;</span>
-      <strong>Putusan singkat</strong>
-      <p>Untuk skrining naskah jurnal Indonesia, saya lebih percaya audit bukti AR Tilik daripada skor probabilitas AI ZeroGPT. Namun AR Tilik bukan pengganti detektor AI—dan belum punya benchmark komparatif skala besar.</p>
-    </aside>
-  </header>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="<?= base_url() ?>#teori">Dual-Lens</a></li>
+                    <li><a href="<?= base_url() ?>#fitur-unggulan">Inovasi Mesin</a></li>
+                    <li><a href="<?= base_url() ?>#integrasi-ojs">Integrasi OJS</a></li>
+                    <li><a href="<?= base_url('docs/Brosur_Eksekutif_ARTilik.pdf') ?>" target="_blank" download="Brosur_Eksekutif_ARTilik.pdf">Brosur Kampus</a></li>
+                </ul>
+            </nav>
 
-  <nav class="quick-nav" aria-label="Navigasi analisis">
-    <div class="wrap">
-      <a href="#beda">Perbedaan dasar</a>
-      <a href="#bukti">Bukti angka</a>
-      <a href="#mesin">Cara kerja</a>
-      <a href="#batas">Batasan</a>
-      <a href="#pilih">Rekomendasi</a>
-      <a href="#aksi">Tindakan</a>
-    </div>
-  </nav>
-
-  <main>
-    <section id="beda" class="wrap">
-      <div class="section-head">
-        <div class="num">01 — Peta masalah</div>
-        <div>
-          <h2>Perbandingan yang adil dimulai dari objek yang diukur.</h2>
-          <p class="section-intro">Menyebut keduanya “detektor AI” menyamarkan perbedaan terpenting: satu mengklasifikasi gaya bahasa, satu mengaudit kemiripan dan rujukan.</p>
-        </div>
-      </div>
-
-      <div class="comparison" role="table" aria-label="Matriks perbandingan AR Tilik dan ZeroGPT">
-        <div class="blank"></div><div class="colhead ar">AR Tilik</div><div class="colhead zero">ZeroGPT</div>
-        <div class="label">Pertanyaan utama</div>
-        <div class="ar"><p>Ada <strong>bukti kemiripan, parafrasa semantik, atau rujukan bermasalah</strong>?</p></div>
-        <div class="zero"><p>Seberapa mungkin teks ini <strong>dihasilkan AI</strong>?</p></div>
-        <div class="label">Jenis keluaran</div>
-        <div class="ar"><p>Empat pilar metrik, vonis risiko, pola temuan, dan audit rujukan.</p></div>
-        <div class="zero"><p>Skor/kelas AI, penyorotan tingkat kalimat, termasuk sinyal campuran.</p></div>
-        <div class="label">Sifat bukti</div>
-        <div class="ar"><p>Dapat ditelusuri ke kemiripan teks dan pangkalan data rujukan.</p></div>
-        <div class="zero"><p>Inferensi statistik proprietari; bobot dan dataset evaluasi tidak dibuka.</p></div>
-        <div class="label">Bahasa Indonesia</div>
-        <div class="ar"><p>Fokus pada naskah akademik Indonesia; didukung korpus ilmiah lokal.</p></div>
-        <div class="zero"><p>Diklaim mendukung semua bahasa, tetapi satu studi Indonesia menemukan akurasi 37,5%.</p></div>
-        <div class="label">Sitasi fabrikasi AI</div>
-        <div class="ar"><p>Ada verifikasi eksternal melalui OpenAlex dan Crossref; lolos uji terkontrol.</p></div>
-        <div class="zero"><p>Tidak ditemukan bukti fitur verifikasi keaslian rujukan.</p></div>
-        <div class="label">Posisi terbaik</div>
-        <div class="ar"><p><strong>Audit integritas naskah.</strong></p></div>
-        <div class="zero"><p><strong>Sinyal awal</strong> yang wajib ditinjau manusia.</p></div>
-      </div>
-
-      <div class="callout">
-        <b>&ne;</b>
-        <p><strong>Tidak ada uji head-to-head yang sama.</strong> Data yang tersedia tidak membolehkan kesimpulan “AR Tilik X% lebih akurat”. Yang bisa dinilai adalah ketepatan sasaran: bukti yang dapat diverifikasi lebih cocok untuk keputusan akademik berisiko tinggi daripada dugaan kepengarangan.</p>
-      </div>
-    </section>
-
-    <section id="bukti" class="evidence-band">
-      <div class="wrap">
-        <div class="section-head">
-          <div class="num">02 — Klaim vs temuan</div>
-          <div>
-            <h2>Angka ZeroGPT pecah ketika dibawa ke dunia nyata.</h2>
-            <p class="section-intro">Klaim internal bukan otomatis salah, tetapi ia belum direplikasi secara independen—dan hasil pada tulisan formal atau penulis non-native jauh lebih buruk.</p>
-          </div>
-        </div>
-
-        <div class="claim-split">
-          <article class="vendor-claim">
-            <div>
-              <div class="big">98,4%</div>
-              <p>akurasi yang dilaporkan ZeroGPT, dengan klaim false positive <strong>&lt;1%</strong>.</p>
+            <div class="nav-actions">
+                <a href="<?= base_url() ?>" class="btn-nav-back">&larr; Beranda</a>
+                <a href="<?= base_url('dashboard') ?>" class="btn-nav-primary">Buka Dashboard &rarr;</a>
             </div>
-            <small>Sumber: <a class="source-link" href="https://www.zerogpt.com/deep-analyse" target="_blank" rel="noopener noreferrer">DeepAnalyse&trade; resmi</a>. Dataset evaluasi dan rincian benchmark tidak dipublikasikan.</small>
-          </article>
+        </div>
+    </header>
 
-          <div class="studies" aria-label="Ringkasan temuan independen">
-            <div class="study">
-              <div class="metric">59–74%</div>
-              <p><strong>Weber-Wulff et al. (2023)</strong> memberi tiga hasil tergantung metode penilaian: 59% binary, 74% binary-inclusive, dan 67% semi-binary.<small>14 alat, 756 pengujian; DOI 10.1007/s40979-023-00146-z.</small></p>
+    <!-- ─── Hero Masthead ─── -->
+    <section class="hero-wrap">
+        <div class="container">
+            <div class="breadcrumbs">
+                <a href="<?= base_url() ?>">Beranda</a>
+                <span>&rsaquo;</span>
+                <span>Riset &amp; Integritas</span>
+                <span>&rsaquo;</span>
+                <span style="color: var(--dark);">AR Tilik vs ZeroGPT</span>
             </div>
-            <div class="study">
-              <div class="metric">46,1%</div>
-              <p><strong>Perkins et al. (2024)</strong> melaporkan akurasi baseline ZeroGPT 46,1%; 31,3% pada keluaran yang tidak dimanipulasi.<small>Angka dilaporkan dari Table 7 melalui catatan lapangan riset.</small></p>
+
+            <div class="mast-grid">
+                <div>
+                    <div class="pill-tag">
+                        <span class="dot"></span>
+                        <span>Analisis Berbasis Riset Independen &bull; Edisi 2026</span>
+                    </div>
+                    <h1 class="hero-title">
+                        Bukan lomba siapa paling pintar <em>menebak AI.</em>
+                    </h1>
+                    <p class="hero-lead">
+                        AR Tilik dan ZeroGPT menjawab dua pertanyaan yang berbeda secara filosofis. ZeroGPT menaksir <strong>“apakah teks ini dibuat AI?”</strong>; sementara AR Tilik memeriksa <strong>“apa bukti empiris yang dapat diverifikasi dari naskah ini?”</strong>
+                    </p>
+                    <div class="hero-meta">
+                        <span>🗓️ Diperbarui: 13 Oktober 2026</span>
+                        <span>&bull;</span>
+                        <span>⏱️ Waktu Baca: ~7 Menit</span>
+                        <span>&bull;</span>
+                        <span>🎯 Fokus: Karya Ilmiah &amp; Jurnal Indonesia</span>
+                    </div>
+                </div>
+
+                <aside class="verdict-card" aria-label="Putusan Ringkas">
+                    <span class="verdict-badge">Putusan Ringkas</span>
+                    <h3>Audit Bukti vs Dugaan Probabilitas</h3>
+                    <p>
+                        Untuk skrining naskah jurnal dan karya ilmiah di lingkungan kampus Indonesia, kami lebih mempercayai audit bukti objektif AR Tilik daripada skor probabilitas gaya bahasa ZeroGPT. Namun AR Tilik bukan pengganti detektor AI—melainkan instrumen pembuktian ilmiah berbasis keadilan akademik.
+                    </p>
+                </aside>
             </div>
-            <div class="study">
-              <div class="metric">61,22%</div>
-              <p><strong>Liang et al. (2023) - Stanford University</strong> menemukan rata-rata false-positive pada esai TOEFL penulis non-native untuk tujuh detektor, termasuk ZeroGPT; sekitar 5% pada esai penutur asli.<small>Angka 61,22% adalah rerata lintas tujuh detektor, bukan skor ZeroGPT sendirian.</small></p>
+        </div>
+    </section>
+
+    <!-- ─── Sticky Sub-Navigation ─── -->
+    <nav class="subnav" aria-label="Navigasi Analisis">
+        <div class="container subnav-inner">
+            <a href="#beda" class="subnav-link active">01 — Peta Masalah</a>
+            <a href="#bukti" class="subnav-link">02 — Klaim vs Temuan</a>
+            <a href="#mesin" class="subnav-link">03 — Cara Kerja Mesin</a>
+            <a href="#batas" class="subnav-link">04 — Batas Kepercayaan</a>
+            <a href="#pilih" class="subnav-link">05 — Rekomendasi Peran</a>
+            <a href="#sumber" class="subnav-link">06 — Sumber Pustaka</a>
+        </div>
+    </nav>
+
+    <!-- ─── 01 Peta Masalah ─── -->
+    <section id="beda" class="section-white">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-number">01 — Peta Masalah</div>
+                <h2 class="section-title">Perbandingan yang adil dimulai dari objek yang diukur.</h2>
+                <p class="section-desc">
+                    Menyebut keduanya sekadar “detektor AI” menyamarkan perbedaan arsitektural terpenting: satu mengklasifikasi gaya penulisan melalui probabilitas tertutup, sementara satu lagi mengaudit bukti kemiripan dan integritas rujukan secara transparan.
+                </p>
             </div>
-            <div class="study">
-              <div class="metric">37,5%</div>
-              <p><strong>Falaq (2026)</strong> menguji 80 teks akademik Bahasa Indonesia. ZeroGPT benar pada 30 dari 80 teks; 32 dari 40 tulisan manusia ditandai AI.<small><a class="source-link" href="https://jurnalcahayaedukasi.com/index.php/jce/article/download/316/219/1288" target="_blank" rel="noopener noreferrer">Baca studi Jurnal Cahaya Edukasi</a> &bull; FPR 80%; FNR 45%.</small></p>
+
+            <div class="comparison-card">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th class="td-label">Parameter Telaah</th>
+                            <th class="th-ar">AR Tilik (Dual-Lens Engine)</th>
+                            <th class="th-zero">ZeroGPT (DeepAnalyse™)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="td-label">Pertanyaan Utama</td>
+                            <td class="td-ar">Ada <strong>bukti kemiripan fisik, parafrasa semantik, atau rujukan bermasalah</strong>?</td>
+                            <td class="td-zero">Seberapa mungkin teks ini <strong>dihasilkan model AI</strong>?</td>
+                        </tr>
+                        <tr>
+                            <td class="td-label">Bentuk Keluaran</td>
+                            <td class="td-ar">Dekomposisi Catur Pilar, skor exact/kosinus, pola temuan, dan audit sitasi phantom.</td>
+                            <td class="td-zero">Skor probabilitas tunggal (persentase AI) dan penyorotan kalimat.</td>
+                        </tr>
+                        <tr>
+                            <td class="td-label">Sifat Bukti</td>
+                            <td class="td-ar"><strong>Dapat ditelusuri &amp; dibantah:</strong> Cuplikan pasase berpasangan dan verifikasi Crossref/OpenAlex.</td>
+                            <td class="td-zero"><strong>Kotak hitam (Black-Box):</strong> Inferensi statistik proprietari; bobot model tidak dibuka.</td>
+                        </tr>
+                        <tr>
+                            <td class="td-label">Bahasa Indonesia</td>
+                            <td class="td-ar">Dioptimalkan untuk teks akademik Indonesia dengan dukungan korpus ilmiah lokal terverifikasi.</td>
+                            <td class="td-zero">Mengklaim semua bahasa, namun studi independen lokal menemukan akurasi 37,5%.</td>
+                        </tr>
+                        <tr>
+                            <td class="td-label">Sitasi Fabrikasi AI</td>
+                            <td class="td-ar"><strong>Ada auditor rujukan aktif:</strong> Memeriksa eksistensi DOI dan pustaka ke pangkalan data global.</td>
+                            <td class="td-zero"><strong>Tidak ada:</strong> Tidak memverifikasi apakah daftar pustaka benar-benar ada di dunia nyata.</td>
+                        </tr>
+                        <tr>
+                            <td class="td-label">Posisi Terbaik</td>
+                            <td class="td-ar"><strong>Audit integritas naskah &amp; instrumen sidang lisan.</strong></td>
+                            <td class="td-zero"><strong>Sinyal awal</strong> yang wajib ditelaah ulang oleh manusia.</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-          </div>
-        </div>
 
-        <div class="caution"><strong>Jangan campur metrik.</strong> Akurasi, false-positive rate, dan false-negative rate mengukur hal berbeda. Rentang 46–74% di atas berasal dari studi dan metode yang berbeda—bukan satu meta-analisis tunggal.</div>
-      </div>
+            <div class="alert-callout">
+                <span style="font-size: 22px;">⚖️</span>
+                <div>
+                    <strong>Penting: Tidak Ada Uji Head-to-Head yang Identik.</strong>
+                    Data yang tersedia tidak membolehkan kesimpulan serampangan seperti “AR Tilik X% lebih akurat”. Yang dinilai adalah ketepatan sasaran: bukti empiris yang dapat diverifikasi jauh lebih cocok untuk keputusan akademik berisiko tinggi (skripsi, tesis, akreditasi jurnal) daripada dugaan kepengarangan statistik.
+                </div>
+            </div>
+        </div>
     </section>
 
-    <section id="mesin" class="wrap">
-      <div class="section-head">
-        <div class="num">03 — Di balik keluaran</div>
-        <div>
-          <h2>Satu membaca pola. Satu mengumpulkan jejak.</h2>
-          <p class="section-intro">Perbedaan arsitektur menjelaskan mengapa kedua alat gagal dengan cara yang berbeda.</p>
+    <!-- ─── 02 Klaim vs Temuan ─── -->
+    <section id="bukti" class="section-slate">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-number">02 — Klaim vs Temuan Lapangan</div>
+                <h2 class="section-title">Angka klaim pecah ketika diuji di dunia nyata.</h2>
+                <p class="section-desc">
+                    Klaim internal produk komersial bukan otomatis salah, namun belum direplikasi secara independen pada korpus penulisan formal dan penulis non-native berbahasa Indonesia.
+                </p>
+            </div>
+
+            <div class="studies-grid">
+                <article class="vendor-claim-card">
+                    <div>
+                        <span class="claim-badge">Klaim Resmi Vendor</span>
+                        <div class="claim-big">98,4%</div>
+                        <p class="claim-sub">
+                            Akurasi yang dilaporkan ZeroGPT, dengan klaim tingkat false-positive <strong>&lt; 1%</strong>.
+                        </p>
+                    </div>
+                    <div class="claim-footer">
+                        Sumber: <a href="https://www.zerogpt.com/deep-analyse" target="_blank" rel="noopener noreferrer" style="color: #ffffff; text-decoration: underline;">Dokumentasi DeepAnalyse™</a>. Dataset evaluasi tidak dipublikasikan ke publik.
+                    </div>
+                </article>
+
+                <div class="studies-list">
+                    <div class="study-card">
+                        <div class="study-metric">59–74%</div>
+                        <div>
+                            <div class="study-title">Weber-Wulff et al. (2023) — IJEE</div>
+                            <p class="study-desc">
+                                Menguji 14 detektor AI pada 756 sampel. ZeroGPT mencatat akurasi 59% (binary) dan 74% (binary-inclusive). Kesimpulan: detektor AI belum memadai untuk penetapan sanksi akademik.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="study-card">
+                        <div class="study-metric orange">46,1%</div>
+                        <div>
+                            <div class="study-title">Perkins et al. (2024)</div>
+                            <p class="study-desc">
+                                Melaporkan akurasi baseline ZeroGPT hanya 46,1% pada teks akademik; dan turun menjadi 31,3% pada keluaran teks yang tidak dimanipulasi.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="study-card">
+                        <div class="study-metric rose">61,22%</div>
+                        <div>
+                            <div class="study-title">Liang et al. (2023) — Stanford University</div>
+                            <p class="study-desc">
+                                Membuktikan detektor AI memiliki bias berat terhadap penulis non-native (ESL/EFL). Esai TOEFL karya manusia ditandai sebagai AI dengan false-positive rata-rata 61,22%.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="study-card">
+                        <div class="study-metric rose">37,5%</div>
+                        <div>
+                            <div class="study-title">Falaq (2026) — Jurnal Cahaya Edukasi</div>
+                            <p class="study-desc">
+                                Menguji 80 teks akademik Bahasa Indonesia. ZeroGPT hanya benar pada 30 dari 80 teks; <strong>32 dari 40 karya asli manusia ditandai AI (False Positive Rate 80%)</strong>.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-
-      <div class="forensics-grid">
-        <article class="engine">
-          <h3>AR Tilik: mesin hibrida + audit forensik</h3>
-          <p>Pengujian langsung Report #1167 memperlihatkan dekomposisi empat pilar dan jejak yang bisa diperiksa.</p>
-          <ol class="flow">
-            <li><span>5-gram sekuensial mengukur kecocokan frasa identik.</span></li>
-            <li><span>TF-IDF kosinus mengukur kedekatan topik dan istilah leksikal.</span></li>
-            <li><span>Pasase terpanjang dan istilah beririsan memberi konteks pembuktian.</span></li>
-            <li><span>XGBoost v3.4 menyintesis risiko; Audit Forensik Cerdas mengevaluasi konsistensi logika antar-bab secara terstruktur.</span></li>
-            <li><span>OpenAlex dan Crossref memeriksa eksistensi dan integritas rujukan secara eksternal.</span></li>
-          </ol>
-          <p class="audit-note">Pada naskah uji empiris: exact 0.29%; cosine 24.34%; pasase terpanjang 6 kata; vonis MEMENUHI SYARAT BERSYARAT. Korpus rujukan diverifikasi secara terpadu tanpa kebocoran berkas naskah.</p>
-        </article>
-
-        <article class="engine orange">
-          <h3>ZeroGPT: DeepAnalyse&trade; yang proprietari</h3>
-          <p>Situs resmi menjelaskan pipeline bertingkat, tetapi tidak membuka bobot model atau dataset evaluasinya.</p>
-          <ol class="flow">
-            <li><span>Macro analysis membaca karakteristik teks secara luas.</span></li>
-            <li><span>Sentence analysis menyorot kalimat yang dianggap berpola AI.</span></li>
-            <li><span>Micro analysis mencari pola probabilitas halus yang dipelajari.</span></li>
-            <li><span>Komponen digabung menjadi skor persentase probabilitas AI.</span></li>
-          </ol>
-          <p class="audit-note">ZeroGPT mengklaim pelatihan pada teks internet, data pendidikan, dan data sintetis; cakupan 35+ keluarga LLM. Penilaian berpusat pada sifat gaya penulisan, bukan pembuktian keberadaan sumber rujukan. <a class="source-link" href="https://www.zerogpt.com/deep-analyse" target="_blank" rel="noopener noreferrer">Metodologi resmi ZeroGPT</a>.</p>
-        </article>
-      </div>
-
-      <article class="citation-case">
-        <div class="seal">&check;</div>
-        <div>
-          <h3>Uji sitasi yang membedakan keduanya</h3>
-          <p>Dalam audit langsung, rujukan fabrikasi “Pratama &amp; Kusuma (2022)” awalnya lolos pemeriksaan internal. Setelah AR Tilik menambahkan verifikasi eksternal pangkalan data global, rujukan itu ditandai fiktif (sitasi gaib); sedangkan rujukan autentik seperti Gilster (1997) diverifikasi sahih dengan 823 sitasi global.</p>
-          <small>Makna praktis: kemiripan internal tidak membuktikan sebuah rujukan benar-benar ada di dunia nyata. Detektor AI murni tidak memeriksa validitas sitasi.</small>
-        </div>
-      </article>
     </section>
 
-    <section id="batas" class="limits">
-      <div class="wrap">
-        <div class="section-head">
-          <div class="num">04 — Batas kepercayaan</div>
-          <div>
-            <h2>Jangan berikan kuasa lebih besar daripada buktinya.</h2>
-            <p class="section-intro">Kedua alat punya batas nyata. Perbedaannya adalah konsekuensi kesalahannya.</p>
-          </div>
+    <!-- ─── 03 Cara Kerja Mesin ─── -->
+    <section id="mesin" class="section-white">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-number">03 — Di Balik Layar</div>
+                <h2 class="section-title">Satu membaca pola probabilitas. Satu mengumpulkan jejak bukti.</h2>
+                <p class="section-desc">
+                    Perbedaan arsitektur menjelaskan mengapa kedua sistem menghasilkan kesimpulan yang sangat berlainan.
+                </p>
+            </div>
+
+            <div class="engines-grid">
+                <article class="engine-card ar">
+                    <span class="engine-tag" style="color: var(--primary);">Arsitektur AR Tilik</span>
+                    <h3 class="engine-title">Mesin Dual-Lens + Audit Forensik Cerdas</h3>
+                    <p style="font-size: 13.5px; color: var(--text-muted);">
+                        Mendekomposisi naskah ke dalam pilar matematis terbuka yang setiap pasasenya dapat ditinjau ulang:
+                    </p>
+                    <ol class="engine-flow">
+                        <li>
+                            <span class="flow-step">1</span>
+                            <span><strong>5-Gram Sequential Shingling:</strong> Mengukur pasase kalimat yang identik kata-demi-kata secara deterministik.</span>
+                        </li>
+                        <li>
+                            <span class="flow-step">2</span>
+                            <span><strong>Sparse TF-IDF Cosine:</strong> Menganalisis kedekatan orientasi topik leksikal dan istilah bidang ilmu.</span>
+                        </li>
+                        <li>
+                            <span class="flow-step">3</span>
+                            <span><strong>Sintesis XGBoost v3.4:</strong> Menimbang 11 determinan risiko secara non-linear tanpa vonis kaku.</span>
+                        </li>
+                        <li>
+                            <span class="flow-step">4</span>
+                            <span><strong>Audit Sitasi Phantom:</strong> Memvalidasi eksistensi rujukan secara eksternal ke OpenAlex &amp; Crossref.</span>
+                        </li>
+                    </ol>
+                </article>
+
+                <article class="engine-card zero">
+                    <span class="engine-tag" style="color: var(--accent-orange);">Arsitektur ZeroGPT</span>
+                    <h3 class="engine-title">DeepAnalyse™ Proprietari Tertutup</h3>
+                    <p style="font-size: 13.5px; color: var(--text-muted);">
+                        Situs resmi menjelaskan pipeline bertingkat tanpa membuka bobot atau dataset evaluasi:
+                    </p>
+                    <ol class="engine-flow">
+                        <li>
+                            <span class="flow-step">1</span>
+                            <span><strong>Macro Analysis:</strong> Membaca karakteristik statistik teks secara menyeluruh (perplexity/gaya penulisan).</span>
+                        </li>
+                        <li>
+                            <span class="flow-step">2</span>
+                            <span><strong>Sentence Analysis:</strong> Menandai kalimat yang dianggap memiliki distribusi probabilitas khas model bahasa.</span>
+                        </li>
+                        <li>
+                            <span class="flow-step">3</span>
+                            <span><strong>Micro Analysis:</strong> Menghitung sinyal residual untuk membedakan teks murni atau percampuran.</span>
+                        </li>
+                        <li>
+                            <span class="flow-step">4</span>
+                            <span><strong>Agregasi Skor:</strong> Mengeluarkan persentase probabilitas tunggal tanpa bukti pasase eksternal.</span>
+                        </li>
+                    </ol>
+                </article>
+            </div>
+
+            <!-- Kasus Pembuktian Sitasi Fiktif -->
+            <div class="citation-box">
+                <div class="seal-check">✓</div>
+                <div>
+                    <h3 style="font-size: 18px; font-weight: 800; color: #065f46; margin-bottom: 6px;">Studi Kasus Pembuktian Sitasi: Mengapa Detektor AI Gagal?</h3>
+                    <p style="font-size: 14px; color: #047857; line-height: 1.6; margin-bottom: 6px;">
+                        Dalam audit naskah uji, sitasi fabrikasi <em>“Pratama &amp; Kusuma (2022)”</em> yang dirakit oleh AI generatif dapat ditulis dengan tata bahasa yang sangat rapi sehingga lolos deteksi ZeroGPT. Namun modul <strong>Auditor Sitasi AR Tilik</strong> menandainya sebagai sitasi gaib (phantom citation) karena tidak ditemukan di pangkalan data riset global; sedangkan karya riil seperti <em>Gilster (1997)</em> diverifikasi keabsahannya dengan 823 sitasi global.
+                    </p>
+                    <small style="font-size: 12px; color: #059669; font-weight: 600;">Kesimpulan: Detektor AI hanya menilai gaya kalimat; integritas ilmiah mensyaratkan pembuktian eksistensi sumber.</small>
+                </div>
+            </div>
         </div>
-        <div class="risk-grid">
-          <article class="risk">
-            <span class="tag">ZEROGPT</span>
-            <h3>Tulisan formal bisa tampak “terlalu rapi”.</h3>
-            <p>Studi Indonesia menunjukkan bias berat pada prosa akademik manusia: 80% false positive dalam sampel 40 esai autentik.</p>
-          </article>
-          <article class="risk">
-            <span class="tag">ZEROGPT</span>
-            <h3>Parafrasa melemahkan sinyal.</h3>
-            <p>FAQ ZeroGPT sendiri mengakui paraphrasing dapat mengurangi sebagian sinyal. Bukti sistematis untuk teks campuran manusia+AI juga belum ditemukan.</p>
-          </article>
-          <article class="risk">
-            <span class="tag">AR TILIK</span>
-            <h3>Audit produk berfokus pada bukti tekstual.</h3>
-            <p>Belum ada benchmark akurasi populasi raksasa. Menghindari vonis biner mutlak demi menjaga asas keadilan akademik (academic fairness).</p>
-          </article>
-          <article class="risk">
-            <span class="tag">AR TILIK</span>
-            <h3>Bukan identifikasi kepengarangan.</h3>
-            <p>AR Tilik tidak mengklaim tahu isi pikiran penulis. Ia menyajikan gejala yang dapat diverifikasi: frasa identik, sitasi gaib, dan pola metodologi.</p>
-          </article>
-          <article class="risk">
-            <span class="tag">KEDUANYA</span>
-            <h3>Temuan bukan vonis.</h3>
-            <p>Kemiripan bukan plagiarisme otomatis; skor AI bukan bukti pelanggaran. Keputusan substantif mutlak memerlukan peninjauan manusia.</p>
-          </article>
-          <article class="risk">
-            <span class="tag">PRINSIP AKADEMIK</span>
-            <h3>Klarifikasi lisan adalah kunci.</h3>
-            <p>Instrumen pertanyaan sidang lisan AR Tilik dirancang untuk mengonfirmasi pemahaman mahasiswa, bukan menghukum dari angka semata.</p>
-          </article>
-        </div>
-      </div>
     </section>
 
-    <section id="pilih" class="wrap">
-      <div class="section-head">
-        <div class="num">05 — Keputusan</div>
-        <div>
-          <h2>Pilih alat dari risiko keputusanmu.</h2>
-          <p class="section-intro">Gunakan lensa peran untuk melihat rekomendasi yang lebih spesifik.</p>
+    <!-- ─── 04 Batas Kepercayaan ─── -->
+    <section id="batas" class="section-slate">
+        <div class="container">
+            <div class="limits-box">
+                <div class="section-number" style="color: #93c5fd;">04 — Batas Kepercayaan</div>
+                <h2 class="section-title" style="color: #ffffff;">Jangan berikan kuasa lebih besar daripada buktinya.</h2>
+                <p class="section-desc" style="color: #94a3b8;">
+                    Setiap instrumen komputasi memiliki batasan yang nyata. Perbedaannya terletak pada seberapa fatal konsekuensi kesalahannya bagi mahasiswa dan peneliti.
+                </p>
+
+                <div class="limits-grid">
+                    <article class="limit-item">
+                        <span class="limit-tag zero">ZEROGPT</span>
+                        <h4 class="limit-title">Tulisan Formal Tampak “Terlalu Rapi”</h4>
+                        <p class="limit-desc">
+                            Studi independen membuktikan prosa akademik yang terstruktur dan minim kesalahan ketik kerap disangka buatan AI (FPR 80% pada esai Indonesia).
+                        </p>
+                    </article>
+
+                    <article class="limit-item">
+                        <span class="limit-tag zero">ZEROGPT</span>
+                        <h4 class="limit-title">Parafrasa Melemahkan Sinyal</h4>
+                        <p class="limit-desc">
+                            Dokumentasi ZeroGPT sendiri mengakui parafrasa dapat menurunkan akurasi deteksi secara drastis, sehingga manipulasi teks mudah lolos.
+                        </p>
+                    </article>
+
+                    <article class="limit-item">
+                        <span class="limit-tag ar">AR TILIK</span>
+                        <h4 class="limit-title">Audit Berfokus pada Bukti Fisik</h4>
+                        <p class="limit-desc">
+                            AR Tilik tidak memvonis apakah seorang mahasiswa menggunakan AI atau tidak. Sistem menyajikan pasase beririsan nyata dan daftar ketidaksinkronan sitasi.
+                        </p>
+                    </article>
+
+                    <article class="limit-item">
+                        <span class="limit-tag ar">AR TILIK</span>
+                        <h4 class="limit-title">Bukan Alat Vonis Tunggal</h4>
+                        <p class="limit-desc">
+                            Laporan AR Tilik dirancang sebagai panduan telaah sidang lisan bagi dosen, bukan vonis mutlak otomatis tanpa hak pembelaan mahasiswa.
+                        </p>
+                    </article>
+
+                    <article class="limit-item">
+                        <span class="limit-tag both">KEDUANYA</span>
+                        <h4 class="limit-title">Hasil Analisis Bukan Putusan Hukum</h4>
+                        <p class="limit-desc">
+                            Kemiripan leksikal bukan berarti plagiarisme otomatis; skor AI bukan bukti pelanggaran etik. Keputusan akhir mutlak membutuhkan pertimbangan manusia.
+                        </p>
+                    </article>
+
+                    <article class="limit-item">
+                        <span class="limit-tag both">PRINSIP AKADEMIK</span>
+                        <h4 class="limit-title">Klarifikasi Lisan Adalah Kunci</h4>
+                        <p class="limit-desc">
+                            Mahasiswa yang menulis sendiri naskahnya akan mampu menjelaskan argumen dan metodologinya saat diuji di ruang sidang, terlepas dari skor probabilitas apa pun.
+                        </p>
+                    </article>
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="decision-tool">
-        <div class="role-buttons" role="tablist" aria-label="Pilih peran">
-          <button type="button" role="tab" aria-selected="true" aria-controls="advice" data-role="editor">Editor jurnal</button>
-          <button type="button" role="tab" aria-selected="false" aria-controls="advice" data-role="dosen">Dosen</button>
-          <button type="button" role="tab" aria-selected="false" aria-controls="advice" data-role="penulis">Mahasiswa / penulis</button>
-          <button type="button" role="tab" aria-selected="false" aria-controls="advice" data-role="institusi">Institusi</button>
+    </section>
+
+    <!-- ─── 05 Rekomendasi Berdasarkan Peran ─── -->
+    <section id="pilih" class="section-white">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-number">05 — Rekomendasi Keputusan</div>
+                <h2 class="section-title">Pilih alat berdasarkan tingkat risiko keputusan Anda.</h2>
+                <p class="section-desc">
+                    Gunakan lensa peran untuk melihat panduan tindakan yang aman secara metodologis dan etis:
+                </p>
+            </div>
+
+            <div class="decision-grid">
+                <div class="role-nav" role="tablist" aria-label="Pilih Peran">
+                    <button type="button" class="role-btn" role="tab" aria-selected="true" data-role="editor">
+                        <span>📰 Editor Jurnal Ilmiah</span>
+                        <span>&rsaquo;</span>
+                    </button>
+                    <button type="button" class="role-btn" role="tab" aria-selected="false" data-role="dosen">
+                        <span>🎓 Dosen Pembimbing &amp; Penguji</span>
+                        <span>&rsaquo;</span>
+                    </button>
+                    <button type="button" class="role-btn" role="tab" aria-selected="false" data-role="penulis">
+                        <span>✍️ Mahasiswa &amp; Penulis Naskah</span>
+                        <span>&rsaquo;</span>
+                    </button>
+                    <button type="button" class="role-btn" role="tab" aria-selected="false" data-role="institusi">
+                        <span>🏛️ LPPM &amp; Pimpinan Universitas</span>
+                        <span>&rsaquo;</span>
+                    </button>
+                </div>
+
+                <article class="role-advice-card" id="advicePanel" role="tabpanel">
+                    <div>
+                        <div class="advice-kicker" id="adviceKicker">UNTUK EDITOR JURNAL ILMIAH</div>
+                        <h3 class="advice-title" id="adviceTitle">Utamakan bukti konkret yang dapat ditindaklanjuti.</h3>
+                        <p class="advice-body" id="adviceBody">
+                            AR Tilik selaras dengan standar COPE dan alur editorial OJS: temuan kemiripan fisik, pola parafrasa, dan verifikasi eksistensi rujukan dapat ditunjukkan kepada penulis saat meminta revisi. Jika detektor AI seperti ZeroGPT dipakai, batasi hanya sebagai sinyal pemicu baca ulang—jangan pernah menolak naskah semata-mata karena skor persentase AI.
+                        </p>
+                    </div>
+                    <div class="advice-action" id="adviceAction">
+                        Alur Aman: Skrining Bukti &rarr; Telaah Manual Editor &rarr; Permintaan Klarifikasi Sitasi &rarr; Keputusan Substantif.
+                    </div>
+                </article>
+            </div>
+
+            <!-- Call to Action Banner -->
+            <div class="cta-banner">
+                <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #fdba74; margin-bottom: 10px;">
+                    UJI INTEGRITAS ILMIAH SEKARANG
+                </div>
+                <h2>Buktikan Sendiri pada Naskah Karya Ilmiah Anda</h2>
+                <p>
+                    Rasakan pengalaman telaah naskah berbasis bukti tekstual transparan, audit rujukan global Crossref/OpenAlex, dan sertifikasi digital berstempel kriptografis SHA-256.
+                </p>
+                <div class="cta-btn-group">
+                    <a href="<?= base_url('dashboard') ?>" class="btn-cta-main">
+                        <span>🚀 Mulai Pemeriksaan di Dashboard</span>
+                        <span>&rarr;</span>
+                    </a>
+                    <a href="<?= base_url('docs/ojs/pdf') ?>" class="btn-cta-outline" target="_blank">
+                        <span>📖 Unduh Panduan OJS 3.x</span>
+                    </a>
+                </div>
+            </div>
         </div>
-        <article class="advice" id="advice" role="tabpanel" aria-live="polite">
-          <div class="mini" id="advice-kicker">UNTUK EDITOR JURNAL</div>
-          <h3 id="advice-title">Utamakan bukti yang bisa ditindaklanjuti.</h3>
-          <p id="advice-body">AR Tilik lebih selaras dengan alur editorial: temuan kemiripan, pola parafrasa, dan verifikasi rujukan dapat diperiksa kembali. Jika ZeroGPT dipakai, batasi sebagai pemicu baca ulang—bukan alasan penolakan.</p>
-          <p class="action" id="advice-action">Alur aman: skrining &rarr; telaah manusia &rarr; minta klarifikasi penulis &rarr; dokumentasikan alasan.</p>
-        </article>
-      </div>
     </section>
 
-    <section class="final-word">
-      <div class="wrap final-grid">
-        <blockquote>“Dalam integritas akademik, alat terbaik bukan yang paling yakin—melainkan yang paling mudah dibantah, diperiksa, dan diperbaiki.”</blockquote>
-        <aside>
-          <h3>Pendapat akhir</h3>
-          <p><strong>ZeroGPT unggul sebagai pengalaman deteksi AI yang cepat, luas, dan mudah dicoba.</strong> Free tier-nya menerima 15.000 karakter per pemindaian, mengklaim semua bahasa, dan menyorot kalimat.</p>
-          <p><strong>AR Tilik lebih masuk akal untuk tata kelola karya ilmiah &amp; jurnal Indonesia</strong> karena ia memindahkan fokus dari dugaan “dibuat AI” ke isu yang dapat diverifikasi: kemiripan sekuensial, pola parafrasa, dan keaslian rujukan.</p>
-          <p>Rekomendasi kami: jangan jadikan deteksi AI sebagai vonis mutlak. Posisikan sistem sebagai <strong>audit integritas yang berpegang pada bukti objektif</strong>.</p>
-        </aside>
-      </div>
-    </section>
+    <!-- ─── 06 Sumber & Status Bukti ─── -->
+    <section id="sumber" class="section-slate">
+        <div class="container">
+            <div class="section-header" style="margin-bottom: 24px;">
+                <div class="section-number">06 — Referensi &amp; Landasan Bukti</div>
+                <h2 class="section-title" style="font-size: 26px;">Daftar Pustaka &amp; Rujukan Independen</h2>
+            </div>
 
-    <!-- Call to Action Band -->
-    <section id="aksi" class="cta-band">
-      <div class="wrap cta-box">
-        <h3>Buktikan Sendiri pada Naskah Anda</h3>
-        <p>Rasakan bedanya telaah berbasis bukti tekstual objektif, audit rujukan global, dan sertifikasi digital terverifikasi.</p>
-        <div class="cta-buttons">
-          <a href="<?= base_url('dashboard') ?>" class="btn-main">
-            <span>Uji Coba AR Tilik Sekarang</span>
-            <span>&rarr;</span>
-          </a>
-          <a href="<?= base_url('docs/ojs/pdf') ?>" class="btn-secondary">
-            <span>Panduan Integrasi OJS 3 Kampus</span>
-          </a>
+            <div class="source-grid">
+                <div class="source-item">
+                    <strong>ZeroGPT DeepAnalyse™ Methodology (2026)</strong>
+                    Klaim resmi vendor: akurasi 98,4%, false positive &lt;1%, dan cakupan 35+ keluarga model bahasa. Diverifikasi 2026 via <a href="https://www.zerogpt.com/deep-analyse" target="_blank" rel="noopener noreferrer">zerogpt.com</a>.
+                </div>
+                <div class="source-item">
+                    <strong>Falaq, Y. (2026) — Jurnal Cahaya Edukasi</strong>
+                    Studi empiris akurasi detektor AI pada 80 teks akademik Bahasa Indonesia (Akurasi 37,5%; False Positive Rate 80%; False Negative Rate 45%). <a href="https://jurnalcahayaedukasi.com/index.php/jce/article/download/316/219/1288" target="_blank" rel="noopener noreferrer">Akses Unduhan Naskah</a>.
+                </div>
+                <div class="source-item">
+                    <strong>Weber-Wulff, D. et al. (2023) — IJEE</strong>
+                    <em>Testing of detection tools for AI-generated text.</em> International Journal for Educational Integrity, DOI: 10.1007/s40979-023-00146-z (Pengujian 14 alat terhadap 756 sampel penulisan).
+                </div>
+                <div class="source-item">
+                    <strong>Liang, W. et al. (2023) — Stanford University</strong>
+                    <em>GPT detectors are biased against non-native English writers.</em> arXiv:2304.02819. Menemukan tingkat false positive 61,22% pada esai penulis non-native.
+                </div>
+                <div class="source-item">
+                    <strong>Perkins, M. et al. (2024)</strong>
+                    Evaluasi komparatif akurasi detektor generatif terhadap teks akademik terapan; akurasi baseline ZeroGPT tercatat 46,1%.
+                </div>
+                <div class="source-item">
+                    <strong>Audit Produk AR Tilik (Report #1159 &amp; #1167)</strong>
+                    Pengujian empiris sistem Dual-Lens, audit sitasi phantom, ekstraksi 5-gram sekuensial, dan sintesis risiko akademik terkalibrasi XGBoost v3.4.
+                </div>
+            </div>
+
+            <p style="font-size: 12px; color: var(--text-muted); margin-top: 24px; line-height: 1.6;">
+                * Catatan Metodologis: Klaim komersial dan temuan riset akademik independen dipisahkan secara tegas. Tidak ada nilai yang digabung menjadi satu skor pemenang semu karena variasi dataset, ragam bahasa, dan metodologi pengujian yang berbeda.
+            </p>
         </div>
-      </div>
     </section>
 
-    <section class="wrap sources" aria-labelledby="sources-title">
-      <h2 id="sources-title">Sumber &amp; status bukti</h2>
-      <ul class="source-list">
-        <li><a href="https://www.zerogpt.com/deep-analyse" target="_blank" rel="noopener noreferrer">ZeroGPT DeepAnalyse&trade;</a><br />Metodologi, klaim 98,4% akurasi, &lt;1% false positive, 35+ keluarga LLM. Diverifikasi 2026.</li>
-        <li><a href="https://www.zerogpt.com/faq" target="_blank" rel="noopener noreferrer">FAQ resmi ZeroGPT</a><br />Mendukung semua bahasa, panjang optimal 150–200+ kata, dan batasan parafrasa.</li>
-        <li><a href="https://www.zerogpt.com/plagiarism-checker" target="_blank" rel="noopener noreferrer">ZeroGPT Plagiarism Checker</a><br />Produk kemiripan terpisah; klaim miliaran sumber, 190+ bahasa, dan laporan PDF.</li>
-        <li><a href="https://jurnalcahayaedukasi.com/index.php/jce/article/download/316/219/1288" target="_blank" rel="noopener noreferrer">Falaq (2026), Jurnal Cahaya Edukasi</a><br />80 teks akademik Indonesia; akurasi 37,5%; FPR 80%; FNR 45%.</li>
-        <li><strong>Audit Produk AR Tilik, Report #1159 / #1167</strong><br />Pengujian empiris sistem Dual-Lens, audit sitasi phantom, dan sintesis risiko XGBoost.</li>
-        <li><strong>Weber-Wulff et al. (2023)</strong><br />International Journal for Educational Integrity; DOI 10.1007/s40979-023-00146-z; 14 alat dan 756 pengujian.</li>
-      </ul>
-      <p class="method-note">Catatan metodologi: angka komersial dan klaim produk dibedakan dari temuan akademik independen. Tidak ada nilai yang digabung menjadi satu “skor pemenang” karena dataset, bahasa, dan definisi hasil berbeda.</p>
-    </section>
-  </main>
+    <!-- ─── AR Tilik Standard Footer ─── -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+                        <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik Logo" width="34" height="34" style="width: 34px; height: 34px; object-fit: contain; border-radius: 8px;">
+                        <span style="font-size: 20px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px;">AR Tilik</span>
+                    </div>
+                    <p style="line-height: 1.6; max-width: 380px;">
+                        Sistem Pemeriksa Kesepadanan Naskah Akademik Berbasis Bukti Transparan. Dikembangkan dengan komitmen tinggi terhadap keadilan akademik dan kedaulatan naskah perguruan tinggi di Indonesia.
+                    </p>
+                </div>
 
-  <script>
-    (function () {
-      var recommendations = {
-        editor: {
-          kicker: "UNTUK EDITOR JURNAL",
-          title: "Utamakan bukti yang bisa ditindaklanjuti.",
-          body: "AR Tilik lebih selaras dengan alur editorial: temuan kemiripan, pola parafrasa, dan verifikasi rujukan dapat diperiksa kembali. Jika ZeroGPT dipakai, batasi sebagai pemicu baca ulang—bukan alasan penolakan.",
-          action: "Alur aman: skrining \u2192 telaah manusia \u2192 minta klarifikasi penulis \u2192 dokumentasikan alasan."
-        },
-        dosen: {
-          kicker: "UNTUK DOSEN",
-          title: "Jangan jadikan skor AI sebagai bukti disipliner.",
-          body: "False positive pada tulisan formal dan non-native terlalu tinggi untuk keputusan berisiko besar. Gunakan percakapan tentang proses, sumber, draf, dan kemampuan mahasiswa menjelaskan argumennya.",
-          action: "Alur aman: lihat sinyal \u2192 periksa proses penulisan \u2192 beri kesempatan menjelaskan \u2192 nilai bukti, bukan probabilitas."
-        },
-        penulis: {
-          kicker: "UNTUK MAHASISWA / PENULIS",
-          title: "Perbaiki yang dapat dibuktikan, bukan mengejar skor hijau.",
-          body: "Jangan mengubah tulisan semata-mata agar lolos ZeroGPT. Prioritaskan sumber yang benar-benar ada, kutipan yang tepat, parafrasa yang bertanggung jawab, dan catatan proses penulisan.",
-          action: "Simpan draf dan daftar sumber; cek setiap DOI, judul, penulis, dan tahun sebelum menyerahkan."
-        },
-        institusi: {
-          kicker: "UNTUK INSTITUSI",
-          title: "Bangun kebijakan yang tahan terhadap salah klasifikasi.",
-          body: "Sebelum adopsi, uji kedua alat pada korpus lokal berlabel yang mewakili disiplin dan ragam Bahasa Indonesia. Pisahkan fungsi skrining dari keputusan sanksi, dan audit false positive per kelompok penulis.",
-          action: "Syarat minimal: benchmark lokal, ambang yang terdokumentasi, review manusia, hak banding, dan log alasan keputusan."
-        }
-      };
-      var buttons = document.querySelectorAll("[data-role]");
-      var kicker = document.getElementById("advice-kicker");
-      var title = document.getElementById("advice-title");
-      var body = document.getElementById("advice-body");
-      var action = document.getElementById("advice-action");
-      buttons.forEach(function (button) {
-        button.addEventListener("click", function () {
-          var item = recommendations[button.getAttribute("data-role")];
-          buttons.forEach(function (b) { b.setAttribute("aria-selected", String(b === button)); });
-          kicker.textContent = item.kicker;
-          title.textContent = item.title;
-          body.textContent = item.body;
-          action.textContent = item.action;
-        });
-      });
-    }());
-  </script>
+                <div>
+                    <strong style="color: #ffffff; display: block; margin-bottom: 14px;">Fitur &amp; Inovasi</strong>
+                    <ul class="footer-links">
+                        <li><a href="<?= base_url() ?>#teori">Dual-Lens Engine (5-Gram &amp; Cosine)</a></li>
+                        <li><a href="<?= base_url() ?>#fitur-unggulan">Deteksi Lintas Bahasa (EN⇄ID)</a></li>
+                        <li><a href="<?= base_url() ?>#fitur-unggulan">Perisai Anti-Manipulasi Karakter</a></li>
+                        <li><a href="<?= base_url() ?>#fitur-unggulan">Auditor Sitasi &amp; Daftar Pustaka</a></li>
+                        <li><a href="<?= base_url() ?>#fitur-unggulan">Pemanen Neliti &amp; GARUDA Dikti</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <strong style="color: #ffffff; display: block; margin-bottom: 14px;">Layanan &amp; Solusi</strong>
+                    <ul class="footer-links">
+                        <li><a href="<?= base_url() ?>#integrasi-ojs">Integrasi OJS 3.x Jurnal</a></li>
+                        <li><a href="<?= base_url() ?>#solusi">Solusi Sivitas Akademika</a></li>
+                        <li><a href="<?= base_url('ambassador') ?>">Program Duta Kampus (Afiliasi)</a></li>
+                        <li><a href="<?= base_url('verify') ?>">Portal Verifikasi QR</a></li>
+                        <li><a href="<?= base_url() ?>#langganan">Paket Tarif &amp; Top-Up</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <strong style="color: #ffffff; display: block; margin-bottom: 14px;">Dokumentasi &amp; Legal</strong>
+                    <ul class="footer-links">
+                        <li><a href="<?= base_url('riset/ar-tilik-vs-zerogpt') ?>" style="color: #fdba74; font-weight: 600;">📊 Whitepaper: AR Tilik vs ZeroGPT</a></li>
+                        <li><a href="<?= base_url('docs/Brosur_Eksekutif_ARTilik.pdf') ?>" target="_blank" download="Brosur_Eksekutif_ARTilik.pdf">Brosur Eksekutif Kampus (PDF)</a></li>
+                        <li><a href="<?= base_url('integrations/ojs/Panduan_Integrasi_OJS_ARTilik.pdf') ?>" target="_blank" download="Panduan_Integrasi_OJS_ARTilik.pdf">Buku Panduan OJS (PDF)</a></li>
+                        <li><a href="<?= base_url('privacy') ?>">Kebijakan Privasi</a></li>
+                        <li><a href="<?= base_url('terms') ?>">Ketentuan Layanan (ToS)</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                AR Tilik &copy; <?= date('Y') ?> &bull; Academic Writing Similarity &amp; Evidence Checker &bull; <a href="https://www.arsetontong.top" target="_blank" rel="noopener noreferrer" style="color: #94a3b8; text-decoration: underline; text-underline-offset: 2px;">Powered by ARSetontong</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        (function () {
+            var recommendations = {
+                editor: {
+                    kicker: "UNTUK EDITOR JURNAL ILMIAH",
+                    title: "Utamakan bukti konkret yang dapat ditindaklanjuti.",
+                    body: "AR Tilik selaras dengan standar COPE dan alur editorial OJS: temuan kemiripan fisik, pola parafrasa, dan verifikasi eksistensi rujukan dapat ditunjukkan kepada penulis saat meminta revisi. Jika detektor AI seperti ZeroGPT dipakai, batasi hanya sebagai sinyal pemicu baca ulang—jangan pernah menolak naskah semata-mata karena skor persentase AI.",
+                    action: "Alur Aman: Skrining Bukti \u2192 Telaah Manual Editor \u2192 Permintaan Klarifikasi Sitasi \u2192 Keputusan Substantif."
+                },
+                dosen: {
+                    kicker: "UNTUK DOSEN PEMBIMBING & PENGUJI",
+                    title: "Jangan jadikan skor AI sebagai vonis disipliner sepihak.",
+                    body: "Tingginya angka false-positive pada tulisan akademik formal dan penulis non-native terlalu berisiko untuk sanksi etik. Gunakan instrumen panduan pertanyaan sidang AR Tilik untuk mengonfirmasi penguasaan materi dan kedalaman nalar mahasiswa secara lisan di hadapan dewan penguji.",
+                    action: "Alur Aman: Analisis Bukti \u2192 Uji Pemahaman Lewat Pertanyaan Sidang \u2192 Nilai Penguasaan Nalar, Bukan Probabilitas."
+                },
+                penulis: {
+                    kicker: "UNTUK MAHASISWA & PENULIS NASKAH",
+                    title: "Perbaiki aspek yang dapat dibuktikan, bukan mengejar skor hijau.",
+                    body: "Jangan mengubah tulisan Anda menjadi kaku atau sengaja menambahkan kesalahan ketik demi mengelabui ZeroGPT. Fokuslah pada substansi: pastikan seluruh rujukan benar-benar ada di dunia nyata, lakukan sitasi yang tepat, dan simpan draf tulisan serta catatan proses riset Anda.",
+                    action: "Tips Aman: Simpan riwayat draf, periksa setiap DOI di Crossref, dan kuasai argumen setiap bab tulisan Anda."
+                },
+                institusi: {
+                    kicker: "UNTUK LPPM & PIMPINAN UNIVERSITAS",
+                    title: "Bangun regulasi kampus yang tahan terhadap salah klasifikasi.",
+                    body: "Sebelum mengadopsi perangkat lunak, uji coba pada naskah lokal berbahasa Indonesia. Pisahkan fungsi skrining format dari prosedur penetapan sanksi etik, dan wajibkan adanya hak klarifikasi mahasiswa sebelum keputusan dijatuhkan.",
+                    action: "Syarat Kebijakan: Ambang batas terdokumentasi, review manusia independen, hak banding mahasiswa, dan audit berkala."
+                }
+            };
+
+            var buttons = document.querySelectorAll("[data-role]");
+            var kicker = document.getElementById("adviceKicker");
+            var title = document.getElementById("adviceTitle");
+            var body = document.getElementById("adviceBody");
+            var action = document.getElementById("adviceAction");
+
+            buttons.forEach(function (button) {
+                button.addEventListener("click", function () {
+                    var role = button.getAttribute("data-role");
+                    var item = recommendations[role];
+                    buttons.forEach(function (b) { b.setAttribute("aria-selected", String(b === button)); });
+                    if (item) {
+                        kicker.textContent = item.kicker;
+                        title.textContent = item.title;
+                        body.textContent = item.body;
+                        action.textContent = item.action;
+                    }
+                });
+            });
+        }());
+    </script>
 </body>
 </html>
