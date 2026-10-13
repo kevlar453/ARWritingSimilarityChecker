@@ -100,16 +100,20 @@ class LandingController extends BaseController
     /**
      * Whitepaper Riset & Publikasi Benchmark Terbuka Naskah Akademik Indonesia
      */
-    public function benchmark(): string
+    public function benchmark()
     {
+        $this->response->setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+        $this->response->setHeader('Pragma', 'no-cache');
+        $this->response->setHeader('Expires', '0');
+
         $metrics = \App\Libraries\SystemSpecs::getLiveMetrics();
         $capabilities = \App\Libraries\SystemSpecs::getCapabilities();
 
-        return view('landing/benchmark', [
+        return $this->response->setBody(view('landing/benchmark', [
             'title'        => 'Benchmark Terbuka Naskah Akademik Indonesia — Evaluasi Empiris AR Tilik',
             'metrics'      => $metrics,
             'capabilities' => $capabilities,
-        ]);
+        ]));
     }
 
     /**
