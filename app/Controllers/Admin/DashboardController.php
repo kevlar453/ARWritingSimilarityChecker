@@ -415,6 +415,70 @@ class DashboardController extends BaseController
                 $msg = "Kuota gratis mingguan {$user['name']} berhasil direset ke 3 submisi (jadwal berikutnya: Senin depan).";
                 break;
 
+            case 'activate_trial_kampus':
+                $trialDays = 14;
+                $bonusGrant = 50;
+                $expiresAt = date('Y-m-d H:i:s', strtotime("+{$trialDays} days"));
+                $currentBonus = (int) ($user['bonus_submissions'] ?? 0);
+                $newBonus = $currentBonus + $bonusGrant;
+
+                $userModel->update($userId, [
+                    'subscription_tier'       => 'trial_kampus',
+                    'subscription_expires_at' => $expiresAt,
+                    'bonus_submissions'       => $newBonus,
+                    'status'                  => 'active',
+                    'updated_at'              => $now,
+                ]);
+
+                // Otomatis terbitkan Kunci API Konektor OJS jika belum ada kunci aktif
+                $apiKeyModel = new \App\Models\ApiKeyModel();
+                $existingOjsKey = $apiKeyModel->where('user_id', $userId)
+                                              ->where('system_type', 'ojs')
+                                              ->where('is_active', 1)
+                                              ->first();
+                $generatedRawKey = null;
+                $keyPrefix = null;
+                if (! $existingOjsKey) {
+                    $institutionLabel = !empty($user['institution']) ? $user['institution'] : $user['name'];
+                    $keyName = 'Trial OJS - ' . $institutionLabel;
+                    $keyResult = $apiKeyModel->generateKey(
+                        $userId,
+                        $keyName,
+                        'ojs',
+                        50,
+                        60,
+                        $expiresAt
+                    );
+                    $generatedRawKey = $keyResult['raw_key'] ?? null;
+                    $keyPrefix = $keyResult['prefix'] ?? null;
+                } else {
+                    $keyPrefix = $existingOjsKey['key_prefix'];
+                }
+
+                $msg = "Program Uji Coba Resmi Jurnal & Kampus (14 Hari & 50 Kuota Submisi) berhasil diaktifkan untuk {$user['name']}!";
+                $extraData = [
+                    'ojs_key'    => $generatedRawKey,
+                    'ojs_prefix' => $keyPrefix,
+                    'expires_at' => $expiresAt,
+                    'new_bonus'  => $newBonus,
+                ];
+                break;
+
+            case 'set_subscription':
+                $tier = (string) ($this->request->getPost('tier') ?? 'free');
+                $days = (int) ($this->request->getPost('days') ?? 30);
+                if (! in_array($tier, ['free', 'skripsi', 'dosen_pro', 'trial_kampus'], true)) {
+                    return $this->response->setStatusCode(400)->setJSON(['status' => 'error', 'message' => 'Tier langganan tidak valid.']);
+                }
+                $expiresAt = ($tier === 'free') ? null : date('Y-m-d H:i:s', strtotime("+{$days} days"));
+                $userModel->update($userId, [
+                    'subscription_tier'       => $tier,
+                    'subscription_expires_at' => $expiresAt,
+                    'updated_at'              => $now,
+                ]);
+                $msg = "Status langganan {$user['name']} berhasil diubah menjadi {$tier}.";
+                break;
+
             default:
                 return $this->response->setStatusCode(400)->setJSON([
                     'status'  => 'error',
@@ -422,11 +486,16 @@ class DashboardController extends BaseController
                 ]);
         }
 
-        return $this->response->setJSON([
+        $responseData = [
             'status'  => 'success',
             'message' => $msg,
             'user'    => $userModel->find($userId),
-        ]);
+        ];
+        if (isset($extraData)) {
+            $responseData['extra'] = $extraData;
+        }
+
+        return $this->response->setJSON($responseData);
     }
 
     /**

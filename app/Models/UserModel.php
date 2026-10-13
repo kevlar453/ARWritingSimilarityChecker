@@ -112,9 +112,10 @@ class UserModel extends Model
         $subExpiresAt = $user['subscription_expires_at'] ?? null;
         $isSubscribed = ($subTier !== 'free' && !empty($subExpiresAt) && strtotime($subExpiresAt) > time());
         $subLabel = match ($subTier) {
-            'skripsi'   => 'Pejuang Skripsi',
-            'dosen_pro' => 'Dosen & Akademisi Pro',
-            default     => 'Paket Standar (Gratis)'
+            'skripsi'      => 'Pejuang Skripsi',
+            'dosen_pro'    => 'Dosen & Akademisi Pro',
+            'trial_kampus' => 'Program Uji Coba Resmi Jurnal & Kampus',
+            default        => 'Paket Standar (Gratis)'
         };
         $daysUntilSubExpires = $isSubscribed ? max(1, (int) ceil((strtotime($subExpiresAt) - time()) / 86400)) : 0;
 

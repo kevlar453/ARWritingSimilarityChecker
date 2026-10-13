@@ -717,6 +717,13 @@
                                         <span class="px-2 py-0.5 rounded text-[10px] font-bold <?= $u['role'] === 'admin' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' : 'bg-slate-800 text-slate-300 border border-slate-700/60' ?>">
                                             <?= strtoupper($u['role']) ?>
                                         </span>
+                                        <?php if (($u['subscription_tier'] ?? 'free') === 'trial_kampus'): ?>
+                                            <span class="px-2 py-0.5 rounded text-[10px] bg-gradient-to-r from-emerald-500/20 to-teal-500/20 text-emerald-300 border border-emerald-500/40 font-bold" title="Uji Coba Kampus s.d. <?= esc($u['subscription_expires_at'] ?? '-') ?>">🎓 TRIAL 14H</span>
+                                        <?php elseif (($u['subscription_tier'] ?? 'free') === 'skripsi'): ?>
+                                            <span class="px-2 py-0.5 rounded text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold">SKRIPSI</span>
+                                        <?php elseif (($u['subscription_tier'] ?? 'free') === 'dosen_pro'): ?>
+                                            <span class="px-2 py-0.5 rounded text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-semibold">DOSEN PRO</span>
+                                        <?php endif; ?>
                                         <?php if ($u['status'] === 'active'): ?>
                                             <span class="px-2 py-0.5 rounded text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold">Aktif</span>
                                         <?php elseif ($u['status'] === 'pending_verification'): ?>
@@ -759,6 +766,11 @@
                                 <div class="pt-2 border-t border-slate-700/60">
                                     <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">Aksi Kontrol</div>
                                     <div class="grid grid-cols-2 gap-2">
+                                        <!-- Tombol Aktivasi Program Uji Coba Resmi Kampus & Jurnal -->
+                                        <button onclick="activateTrialKampus(<?= (int) $u['id'] ?>, '<?= esc($u['name'], 'js') ?>')" class="col-span-2 py-2 px-3 rounded-xl bg-gradient-to-r from-emerald-600/20 to-teal-600/20 hover:from-emerald-600/30 hover:to-teal-600/30 text-emerald-300 border border-emerald-500/30 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors active:scale-98">
+                                            <span>🎓</span> <?= ($u['subscription_tier'] ?? '') === 'trial_kampus' ? 'Perpanjang Trial Kampus (+14H & +50)' : 'Aktifkan Trial Jurnal & Kampus (+50 Kuota)' ?>
+                                        </button>
+
                                         <?php if ($u['status'] === 'pending_verification'): ?>
                                             <button onclick="handleUserAction(<?= (int) $u['id'] ?>, 'verify_email')" class="col-span-2 py-2 px-3 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors active:scale-98">
                                                 <span>✓</span> Verifikasi Email Manual
@@ -821,6 +833,13 @@
                                                     <span class="px-2 py-0.5 rounded text-[10px] font-bold <?= $u['role'] === 'admin' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' : 'bg-slate-800 text-slate-400 border border-slate-700/60' ?>">
                                                         <?= strtoupper($u['role']) ?>
                                                     </span>
+                                                    <?php if (($u['subscription_tier'] ?? 'free') === 'trial_kampus'): ?>
+                                                        <span class="px-2 py-0.5 rounded text-[10px] bg-gradient-to-r from-emerald-500/20 to-teal-500/20 text-emerald-300 border border-emerald-500/40 font-bold" title="Uji Coba Kampus s.d. <?= esc($u['subscription_expires_at'] ?? '-') ?>">🎓 TRIAL 14H</span>
+                                                    <?php elseif (($u['subscription_tier'] ?? 'free') === 'skripsi'): ?>
+                                                        <span class="px-2 py-0.5 rounded text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold">SKRIPSI</span>
+                                                    <?php elseif (($u['subscription_tier'] ?? 'free') === 'dosen_pro'): ?>
+                                                        <span class="px-2 py-0.5 rounded text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-semibold">DOSEN PRO</span>
+                                                    <?php endif; ?>
                                                     <?php if ($u['status'] === 'active'): ?>
                                                         <span class="px-2 py-0.5 rounded text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold">Aktif</span>
                                                     <?php elseif ($u['status'] === 'pending_verification'): ?>
@@ -845,6 +864,11 @@
                                             </td>
                                             <td class="py-3 px-4 text-right whitespace-nowrap">
                                                 <div class="inline-flex items-center rounded-xl bg-slate-900/90 border border-slate-700/70 p-0.5 shadow-xs divide-x divide-slate-800">
+                                                    <!-- Aktivasi Uji Coba Resmi Kampus & Jurnal -->
+                                                    <button type="button" onclick="activateTrialKampus(<?= (int) $u['id'] ?>, '<?= esc($u['name'], 'js') ?>')" class="p-1.5 text-emerald-400 hover:text-emerald-200 hover:bg-emerald-500/20 rounded-lg transition-colors cursor-pointer" title="Aktifkan Uji Coba Resmi Jurnal & Kampus (14 Hari, +50 Kuota & Kunci API OJS)" aria-label="Aktifkan Trial Kampus">
+                                                        <span class="text-xs">🎓</span>
+                                                    </button>
+
                                                     <!-- Verifikasi Manual jika pending -->
                                                     <?php if ($u['status'] === 'pending_verification'): ?>
                                                         <button type="button" onclick="handleUserAction(<?= (int) $u['id'] ?>, 'verify_email')" class="p-1.5 text-emerald-400 hover:text-emerald-200 hover:bg-emerald-500/20 rounded-lg transition-colors cursor-pointer" title="Verifikasi email manual tanpa menunggu konfirmasi" aria-label="Verifikasi Email Manual">
@@ -3413,6 +3437,38 @@
                 }
             });
             return await res.json();
+        }
+
+        async function activateTrialKampus(userId, userName) {
+            const confirmMsg = `Aktifkan Program Uji Coba Resmi Jurnal & Kampus untuk "${userName}"?\n\n` +
+                               `• Masa Berlaku: 14 Hari Penuh\n` +
+                               `• Bonus Kuota Submisi: +50 Naskah Lengkap\n` +
+                               `• Akses Seluruh Fitur Enterprise (Catur Pilar, Forensik Gemini AI, Sertifikat SINTA/ARJUNA, Pemusnahan Nol Jejak)\n` +
+                               `• Otomatis terbitkan Kunci API Konektor REST OJS 3.x (Batas 50 Submisi)\n\n` +
+                               `Lanjutkan aktivasi sekarang?`;
+            if (!confirm(confirmMsg)) return;
+
+            try {
+                const res = await postJson('<?= base_url('admin/users/update') ?>', {
+                    user_id: userId,
+                    action: 'activate_trial_kampus'
+                });
+                if (res.status === 'success') {
+                    if (res.extra && res.extra.ojs_key) {
+                        prompt(
+                            `🎉 BERHASIL DIAKTIFKAN!\n\nSalin API Key Konektor OJS berikut untuk diberikan kepada Pengelola Jurnal/Editor OJS:\n(Catatan: Kunci lengkap hanya dapat dilihat pada saat ini)`,
+                            res.extra.ojs_key
+                        );
+                    } else {
+                        alert(res.message);
+                    }
+                    window.location.reload();
+                } else {
+                    alert('Gagal: ' + (res.message || 'Terjadi kesalahan sistem.'));
+                }
+            } catch (err) {
+                alert('Terjadi kesalahan koneksi.');
+            }
         }
 
         async function handleUserAction(userId, action, extra = {}) {

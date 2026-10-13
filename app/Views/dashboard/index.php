@@ -180,9 +180,15 @@
                             Akun: <?= esc($currentUser['name']) ?>
                         </span>
                         <?php if (!empty($quotaInfo['is_subscribed'])): ?>
-                        <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-500/25 text-amber-300 border border-amber-500/40 flex items-center gap-1 shadow-xs">
-                            ⭐ <?= esc($quotaInfo['subscription_label']) ?> (Sisa <?= (int) ($quotaInfo['subscription_days_left'] ?? 0) ?> hari)
-                        </span>
+                            <?php if (($quotaInfo['subscription_tier'] ?? '') === 'trial_kampus'): ?>
+                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-gradient-to-r from-emerald-500/30 via-teal-500/30 to-indigo-500/30 text-emerald-300 border border-emerald-400/50 flex items-center gap-1.5 shadow-xs">
+                                🎓 Program Uji Coba Resmi Jurnal &amp; Kampus (Sisa <?= (int) ($quotaInfo['subscription_days_left'] ?? 0) ?> hari)
+                            </span>
+                            <?php else: ?>
+                            <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-500/25 text-amber-300 border border-amber-500/40 flex items-center gap-1 shadow-xs">
+                                ⭐ <?= esc($quotaInfo['subscription_label']) ?> (Sisa <?= (int) ($quotaInfo['subscription_days_left'] ?? 0) ?> hari)
+                            </span>
+                            <?php endif; ?>
                         <?php endif; ?>
                         <span class="text-xs text-slate-400">• <?= esc($currentUser['email']) ?></span>
                     </div>
@@ -250,6 +256,25 @@
                 <a href="<?= base_url('ambassador') ?>" class="text-amber-300 hover:text-white font-bold inline-flex items-center gap-1 transition whitespace-nowrap">
                     Daftar Duta Kampus &rarr;
                 </a>
+            </div>
+            <?php endif; ?>
+
+            <?php if (($quotaInfo['subscription_tier'] ?? '') === 'trial_kampus'): ?>
+            <div class="mt-4 pt-3.5 border-t border-emerald-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs bg-emerald-950/40 -mx-5 -mb-5 p-4 rounded-b-2xl border-b border-x border-emerald-500/20">
+                <div class="flex items-start sm:items-center gap-2.5">
+                    <span class="text-2xl shrink-0">🎓</span>
+                    <div>
+                        <div class="font-bold text-emerald-300 text-xs sm:text-sm">Akses Program Uji Coba Resmi Jurnal &amp; Kampus Aktif</div>
+                        <p class="text-[11px] text-slate-300 mt-0.5 leading-relaxed">
+                            Masa uji coba 14 hari dengan kuota submisi penuh. Seluruh fitur aktif: Catur Pilar, Forensik Gemini AI, Sertifikat Ber-QR SINTA/ARJUNA, Konektor REST OJS 3.x, dan Pemusnahan Nol Jejak (Zero-Leakage Purge).
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                    <a href="<?= base_url('integrations/ojs/Panduan_Integrasi_OJS_ARTilik.pdf') ?>" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-200 border border-emerald-500/40 text-xs font-semibold transition whitespace-nowrap">
+                        <span>📥 Unduh Panduan OJS</span>
+                    </a>
+                </div>
             </div>
             <?php endif; ?>
         </div>

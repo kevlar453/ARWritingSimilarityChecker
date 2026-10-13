@@ -36,7 +36,7 @@ class ApiKeyModel extends Model
     /**
      * Membuat API Key baru dengan format artilik_live_[hex]
      */
-    public function generateKey(int $userId, string $keyName, string $systemType = 'ojs', int $quotaLimit = 1000, int $rateLimit = 60): array
+    public function generateKey(int $userId, string $keyName, string $systemType = 'ojs', int $quotaLimit = 1000, int $rateLimit = 60, ?string $expiresAt = null): array
     {
         $prefix = 'artilik_' . ($systemType === 'ojs' ? 'ojs_' : 'live_');
         $randomHex = bin2hex(random_bytes(24));
@@ -53,6 +53,7 @@ class ApiKeyModel extends Model
             'quota_limit'           => $quotaLimit,
             'quota_used'            => 0,
             'is_active'             => 1,
+            'expires_at'            => $expiresAt,
             'created_at'            => date('Y-m-d H:i:s'),
             'updated_at'            => date('Y-m-d H:i:s'),
         ];
