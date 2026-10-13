@@ -544,6 +544,8 @@ class DashboardController extends BaseController
         $db->table('document_chunks')->where('document_id', $documentId)->delete();
         $db->table('document_pages')->where('document_id', $documentId)->delete();
         $db->table('fingerprints')->where('document_id', $documentId)->delete();
+        $db->table('fingerprint_documents')->where('document_id', $documentId)->delete();
+        $db->table('document_shares')->where('document_id', $documentId)->delete();
 
         // Hapus file fisik jika ada
         if (! empty($doc['storage_path']) && file_exists($doc['storage_path'])) {
