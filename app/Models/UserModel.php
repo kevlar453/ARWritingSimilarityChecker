@@ -25,6 +25,7 @@ class UserModel extends Model
         'free_submissions_used_this_week',
         'week_reset_at',
         'bonus_submissions',
+        'referral_code',
         'referred_by_code',
         'uploaded_corpus_count',
         'last_login_at',
@@ -310,6 +311,66 @@ class UserModel extends Model
         }
 
         return $this->db->affectedRows();
+    }
+
+    /**
+     * Menghasilkan kode referral unik untuk pengguna (Format: REF-XXXX-YYYY)
+     */
+    public function generateUniqueReferralCode(int $userId, ?string $name = null): string
+    {
+        $cleanPart = sprintf('%04X', ($userId * 31 + 1047) % 65536);
+        $chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        $suffix = '';
+        for ($i = 0; $i < 4; $i++) {
+            $suffix .= $chars[random_int(0, strlen($chars) - 1)];
+        }
+        $candidate = "REF-{$cleanPart}-{$suffix}";
+
+        while ($this->where('referral_code', $candidate)->countAllResults() > 0) {
+            $suffix = '';
+            for ($i = 0; $i < 4; $i++) {
+                $suffix .= $chars[random_int(0, strlen($chars) - 1)];
+            }
+            $candidate = "REF-{$cleanPart}-{$suffix}";
+        }
+
+        return $candidate;
+    }
+
+    /**
+     * Memastikan pengguna memiliki kode referral aktif di database
+     */
+    public function ensureReferralCode(int $userId): string
+    {
+        $user = $this->find($userId);
+        if (!$user) {
+            return '';
+        }
+
+        if (!empty($user['referral_code'])) {
+            return $user['referral_code'];
+        }
+
+        $newCode = $this->generateUniqueReferralCode($userId, $user['name'] ?? null);
+        $this->update($userId, [
+            'referral_code' => $newCode,
+            'updated_at'    => date('Y-m-d H:i:s'),
+        ]);
+
+        return $newCode;
+    }
+
+    /**
+     * Mengambil pengguna berdasarkan kode referral
+     */
+    public function getByReferralCode(string $code): ?array
+    {
+        $code = strtoupper(trim($code));
+        if (empty($code)) {
+            return null;
+        }
+
+        return $this->where('referral_code', $code)->first();
     }
 }
 

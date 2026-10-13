@@ -35,6 +35,7 @@ $routes->post('dashboard/documents/(:num)/purge-file', 'DashboardController::pur
 $routes->post('dashboard/documents/(:num)/delete', 'DashboardController::deleteUserDocument/$1');
 $routes->post('dashboard/documents/(:num)/update-title', 'DashboardController::updateDocumentTitle/$1');
 $routes->post('documents/(:num)/update-title', 'DashboardController::updateDocumentTitle/$1');
+$routes->match(['get', 'head'], 'dashboard/referral/stats', 'DashboardController::referralStats');
 $routes->match(['get', 'head'], 'verify/(:segment)/pdf', 'DashboardController::downloadCertificatePdf/$1');
 $routes->match(['get', 'head'], 'dashboard/reports/(:num)/certificate-pdf', 'DashboardController::downloadCertificatePdfByReportId/$1');
 $routes->match(['get', 'head'], 'verify/(:segment)', 'DashboardController::verify/$1');
@@ -78,7 +79,7 @@ $routes->post('ambassador/verify/(:segment)', 'AmbassadorController::submitVerif
 $routes->match(['get', 'head'], 'ambassador/dashboard', 'AmbassadorController::dashboard');
 $routes->post('ambassador/proof', 'AmbassadorController::submitProof');
 $routes->post('ambassador/payout', 'AmbassadorController::requestPayout');
-$routes->get('ref/(:segment)', 'AmbassadorController::ref/$1');
+$routes->match(['get', 'head'], 'ref/(:segment)', 'AmbassadorController::ref/$1');
 
 // Ambassador Certificate & Public Verification (Fitur 2 - Kelulusan Duta Kampus)
 $routes->match(['get', 'head'], 'ambassador/certificate/(:segment)', 'AmbassadorController::certificate/$1');

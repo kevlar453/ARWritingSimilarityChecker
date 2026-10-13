@@ -251,6 +251,10 @@ class AmbassadorController extends BaseController
             // Simpan ke session & cookie 30 hari
             session()->set('referred_by_code', $code);
             setcookie('referred_by_code', $code, time() + (30 * 86400), '/', '', false, true);
+
+            $db = \Config\Database::connect();
+            $isAmb = $db->table('ambassador_profiles')->where('referral_code', $code)->countAllResults() > 0;
+            session()->set('referral_type', $isAmb ? 'ambassador' : 'member');
         }
 
         return redirect()->to(base_url('/?ref=' . urlencode($code) . '&auth=register'));

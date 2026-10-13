@@ -120,9 +120,13 @@ class DashboardController extends BaseController
         if ($userId) {
             $ambProfileModel = new \App\Models\AmbassadorProfileModel();
             $ambProfile = $ambProfileModel->where('user_id', (int) $userId)
-                                          ->whereIn('status', ['probation', 'active'])
+                                          ->whereIn('status', ['probation', 'active', 'graduated'])
                                           ->first();
         }
+
+        // Program Referral Reguler (Member-Get-Member)
+        $referralModel = new \App\Models\ReferralModel();
+        $referralStats = $referralModel->getReferralStats((int) $userId);
 
         return view('dashboard/index', [
             'submissions'         => $submissions,
@@ -140,6 +144,7 @@ class DashboardController extends BaseController
             'currentUser'         => $currentUser,
             'quotaInfo'           => $quotaInfo,
             'ambProfile'          => $ambProfile,
+            'referralStats'       => $referralStats,
         ]);
     }
 
@@ -2384,6 +2389,28 @@ class DashboardController extends BaseController
             'message' => 'Informasi karya ilmiah berhasil diperbarui.',
             'title'   => $updateData['title'] ?? $doc['title'],
             'author'  => $updateData['author'] ?? ($doc['author'] ?? null),
+        ]);
+    }
+
+    /**
+     * Endpoint API JSON Statistik Program Referral Reguler (Member-Get-Member)
+     */
+    public function referralStats(): ResponseInterface
+    {
+        $userId = session()->get('user_id');
+        if (!$userId) {
+            return $this->response->setStatusCode(401)->setJSON([
+                'status'  => 'error',
+                'message' => 'Silakan masuk untuk melihat statistik referral Anda.',
+            ]);
+        }
+
+        $referralModel = new \App\Models\ReferralModel();
+        $stats = $referralModel->getReferralStats((int) $userId);
+
+        return $this->response->setJSON([
+            'status' => 'success',
+            'data'   => $stats,
         ]);
     }
 }

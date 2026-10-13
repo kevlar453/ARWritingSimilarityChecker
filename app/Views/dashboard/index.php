@@ -320,6 +320,10 @@
             <button onclick="switchTab('tab-benchmark')" id="btn-tab-benchmark" class="tab-btn pb-3 font-medium text-xs sm:text-sm text-slate-500 hover:text-slate-800 border-b-2 border-transparent flex items-center gap-1.5 sm:gap-2 flex-shrink-0 whitespace-nowrap transition-colors">
                 🧪 Benchmark Lab
             </button>
+            <button onclick="switchTab('tab-referral')" id="btn-tab-referral" class="tab-btn pb-3 font-medium text-xs sm:text-sm text-slate-500 hover:text-emerald-700 border-b-2 border-transparent flex items-center gap-1.5 sm:gap-2 flex-shrink-0 whitespace-nowrap transition-colors" title="Program Ajak Teman & Raih Bonus Kuota">
+                🎁 Ajak Teman
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700">+2 Kuota</span>
+            </button>
             <?php if (!empty($ambProfile)): ?>
             <a href="<?= base_url('ambassador/dashboard') ?>" class="tab-btn pb-3 font-semibold text-xs sm:text-sm text-amber-600 hover:text-amber-800 border-b-2 border-transparent hover:border-amber-500 flex items-center gap-1.5 sm:gap-2 flex-shrink-0 whitespace-nowrap transition-colors" title="Buka Dashboard Afiliasi Duta Kampus">
                 🎓 Dashboard Duta
@@ -334,6 +338,28 @@
 
         <!-- TAB 1: Submisi & Pemeriksaan -->
         <div id="tab-submission" class="tab-content space-y-6">
+            <!-- Referral Program Mini Banner -->
+            <div class="rounded-xl bg-gradient-to-r from-emerald-50 via-teal-50 to-indigo-50 border border-emerald-200/80 p-3.5 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-lg flex-shrink-0 shadow-xs">
+                        🎁
+                    </div>
+                    <div>
+                        <div class="text-xs sm:text-sm font-bold text-slate-800 flex items-center gap-2">
+                            <span>Ajak Teman &amp; Raih Bonus Cek Naskah Gratis</span>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">+2 Kuota / Sahabat</span>
+                        </div>
+                        <div class="text-[11px] sm:text-xs text-slate-500 mt-0.5">
+                            Dapatkan tambahan kuota gratis setiap kali rekan Anda mengaktifkan akun lewat tautan referral Anda.
+                        </div>
+                    </div>
+                </div>
+                <button type="button" onclick="switchTab('tab-referral')" class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 transition flex-shrink-0 cursor-pointer shadow-xs">
+                    <span>Lihat Tautan Undangan</span>
+                    <span>→</span>
+                </button>
+            </div>
+
             <!-- Upload Box -->
             <div class="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-xs">
                 <h2 class="text-base sm:text-lg font-bold text-slate-800 mb-1.5">Unggah Karya Ilmiah</h2>
@@ -1275,6 +1301,232 @@
                 </div>
             </div>
         </div>
+
+        <!-- TAB 4: Program Referral Reguler (Member-Get-Member) -->
+        <div id="tab-referral" class="tab-content space-y-6 hidden">
+            <!-- Hero Banner Sahabat AR Tilik -->
+            <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-950 via-slate-900 to-teal-950 text-white p-6 sm:p-8 shadow-xl border border-emerald-500/20">
+                <div class="absolute -right-16 -top-16 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute -left-16 -bottom-16 w-64 h-64 bg-teal-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                
+                <div class="relative z-10 max-w-3xl">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 mb-3">
+                        <span>🎁</span>
+                        <span>Program Sahabat AR Tilik • Member-Get-Member</span>
+                    </div>
+                    <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight mb-2">
+                        Ajak Rekan Kampus, Raih Kuota Cek Naskah Gratis!
+                    </h2>
+                    <p class="text-xs sm:text-sm text-slate-300 leading-relaxed mb-4">
+                        Bagikan tautan referral pribadi Anda kepada teman kuliah, mahasiswa bimbingan, atau rekan peneliti. Setiap rekan yang mendaftar dan mengaktifkan emailnya memberikan <strong>+2 bonus kuota cek naskah</strong> untuk Anda. Rekan Anda juga otomatis mendapatkan <strong>+1 kuota gratis</strong> dan <strong>diskon perdana 10%</strong>!
+                    </p>
+                    <div class="flex flex-wrap items-center gap-4 text-xs text-emerald-200/90 font-medium">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-emerald-400">✓</span> <span>+2 Kuota Gratis / Aktivasi Sahabat</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-emerald-400">✓</span> <span>+5 Kuota Ekstra Saat Teman Langganan Perdana</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-emerald-400">✓</span> <span>Sahabat Dapat Diskon 10% Langsung</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kartu Tautan Referral & Alat Berbagi -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Box Tautan & Kode -->
+                <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-xs space-y-4">
+                    <h3 class="text-sm sm:text-base font-bold text-slate-800 flex items-center gap-2">
+                        <span>🔗</span> Tautan &amp; Kode Undangan Pribadi
+                    </h3>
+
+                    <!-- Kode Referral -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1.5">Kode Referral Anda</label>
+                        <div class="flex items-center gap-2">
+                            <div class="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-mono text-sm sm:text-base font-black text-emerald-700 tracking-wider">
+                                <span id="refCodeText"><?= esc($referralStats['referral_code'] ?? '') ?></span>
+                            </div>
+                            <button type="button" onclick="copyReferralCode()" class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition flex items-center gap-1.5 cursor-pointer">
+                                <span id="copyCodeIcon">📋</span> <span id="copyCodeLabel">Salin Kode</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Tautan Lengkap -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1.5">Tautan Undangan Langsung (Pendaftaran Otomatis)</label>
+                        <div class="flex items-center gap-2">
+                            <input type="text" id="refUrlInput" readonly value="<?= esc($referralStats['referral_url'] ?? '') ?>" class="flex-1 px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-mono text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            <button type="button" onclick="copyReferralUrl()" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs transition flex items-center gap-1.5 cursor-pointer">
+                                <span id="copyUrlIcon">🔗</span> <span id="copyUrlLabel">Salin Tautan</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Tombol Cepat Bagikan Media Sosial -->
+                    <div class="pt-2 border-t border-slate-100">
+                        <label class="block text-xs font-semibold text-slate-600 mb-2">Bagikan Langsung dalam 1-Klik:</label>
+                        <?php 
+                            $shareUrl = esc($referralStats['referral_url'] ?? '');
+                            $shareText = rawurlencode("Halo! Cek kemiripan naskah skripsi & jurnal kamu di AR Tilik dengan deteksi integritas akademik terlengkap. Daftar melalui link undanganku untuk dapat +1 bonus cek naskah gratis & diskon langganan 10%: " . ($referralStats['referral_url'] ?? ''));
+                            $waUrl = "https://api.whatsapp.com/send?text={$shareText}";
+                            $tgUrl = "https://t.me/share/url?url=" . rawurlencode($referralStats['referral_url'] ?? '') . "&text=" . rawurlencode("Cek kemiripan karya ilmiah di AR Tilik. Daftar lewat link ini untuk klaim bonus kuota gratis & diskon:");
+                            $xUrl = "https://twitter.com/intent/tweet?text=" . rawurlencode("Cek integritas karya ilmiah skripsi & jurnal di @ARTilik. Gunakan tautan ini untuk kuota gratis & diskon:") . "&url=" . rawurlencode($referralStats['referral_url'] ?? '');
+                        ?>
+                        <div class="flex flex-wrap gap-2.5">
+                            <a href="<?= $waUrl ?>" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-xs shadow-xs transition">
+                                <span>💬</span> WhatsApp
+                            </a>
+                            <a href="<?= $tgUrl ?>" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#229ED9] hover:bg-[#1f8fc4] text-white font-bold text-xs shadow-xs transition">
+                                <span>✈️</span> Telegram
+                            </a>
+                            <a href="<?= $xUrl ?>" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-black text-white font-bold text-xs shadow-xs transition">
+                                <span>𝕏</span> Bagikan ke X
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Petunjuk 3 Langkah -->
+                <div class="bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl border border-slate-200 p-5 sm:p-6 shadow-xs flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-sm sm:text-base font-bold text-slate-800 mb-3 flex items-center gap-2">
+                            <span>💡</span> Cara Kerja Program
+                        </h3>
+                        <ol class="space-y-3 text-xs text-slate-600">
+                            <li class="flex items-start gap-2.5">
+                                <span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center flex-shrink-0 text-[11px] mt-0.5">1</span>
+                                <div><strong>Bagikan Tautan:</strong> Kirimkan tautan referral ke rekan mahasiswa, grup angkatan, atau rekan penelitian.</div>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center flex-shrink-0 text-[11px] mt-0.5">2</span>
+                                <div><strong>Rekan Mendaftar:</strong> Rekan Anda membuka tautan, mendaftar, dan mengaktifkan akun via email.</div>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center flex-shrink-0 text-[11px] mt-0.5">3</span>
+                                <div><strong>Bonus Langsung Aktif:</strong> Akun Anda otomatis menerima <strong>+2 kuota cek gratis</strong> tanpa batas waktu!</div>
+                            </li>
+                        </ol>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-slate-200/80 text-[11px] text-slate-500">
+                        <span class="font-bold text-slate-700">Catatan Etika:</span> Bonus dihitung per akun terverifikasi unik untuk menjaga integritas ekosistem AR Tilik.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kartu Metrik Kinerja Undangan -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div class="bg-white rounded-xl border border-slate-200 p-4 sm:p-5 shadow-xs">
+                    <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Sahabat Bergabung</div>
+                    <div class="text-2xl sm:text-3xl font-black text-slate-800 font-mono">
+                        <?= (int) ($referralStats['total_invited'] ?? 0) ?>
+                    </div>
+                    <div class="text-[11px] text-slate-500 mt-1">Total teman terdaftar</div>
+                </div>
+
+                <div class="bg-white rounded-xl border border-slate-200 p-4 sm:p-5 shadow-xs">
+                    <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Terverifikasi Aktif</div>
+                    <div class="text-2xl sm:text-3xl font-black text-emerald-600 font-mono">
+                        <?= (int) ($referralStats['total_verified'] ?? 0) ?>
+                    </div>
+                    <div class="text-[11px] text-slate-500 mt-1">Email telah aktif</div>
+                </div>
+
+                <div class="bg-white rounded-xl border border-slate-200 p-4 sm:p-5 shadow-xs">
+                    <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Bonus Kuota Didapat</div>
+                    <div class="text-2xl sm:text-3xl font-black text-indigo-600 font-mono">
+                        +<?= (int) ($referralStats['total_bonus_submissions'] ?? 0) ?>
+                    </div>
+                    <div class="text-[11px] text-slate-500 mt-1">Submisi naskah gratis</div>
+                </div>
+
+                <div class="bg-white rounded-xl border border-slate-200 p-4 sm:p-5 shadow-xs">
+                    <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Bonus Transaksi</div>
+                    <div class="text-2xl sm:text-3xl font-black text-amber-600 font-mono">
+                        +5
+                    </div>
+                    <div class="text-[11px] text-slate-500 mt-1">Tiap transaksi perdana teman</div>
+                </div>
+            </div>
+
+            <!-- Tabel Riwayat Sahabat yang Diundang -->
+            <div class="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-xs">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm sm:text-base font-bold text-slate-800 flex items-center gap-2">
+                        <span>👥</span> Riwayat Rekan yang Bergabung
+                    </h3>
+                    <span class="text-xs font-semibold text-slate-500">
+                        Total: <?= count($referralStats['invited_users'] ?? []) ?> Sahabat
+                    </span>
+                </div>
+
+                <?php if (empty($referralStats['invited_users'])): ?>
+                    <div class="text-center py-10 px-4 bg-slate-50/70 rounded-xl border border-dashed border-slate-200">
+                        <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl">
+                            🎁
+                        </div>
+                        <h4 class="text-sm font-bold text-slate-700 mb-1">Belum Ada Rekan yang Bergabung</h4>
+                        <p class="text-xs text-slate-500 max-w-md mx-auto mb-4">
+                            Salin tautan atau kode referral Anda di atas, lalu bagikan ke rekan mahasiswa atau kolega Anda untuk mulai mendapatkan bonus kuota cek naskah gratis.
+                        </p>
+                        <button type="button" onclick="copyReferralUrl()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs transition inline-flex items-center gap-2 cursor-pointer shadow-xs">
+                            <span>🔗</span> Salin Tautan Sekarang
+                        </button>
+                    </div>
+                <?php else: ?>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs sm:text-sm">
+                            <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+                                <tr>
+                                    <th class="p-3 sm:p-3.5">Nama Rekan</th>
+                                    <th class="p-3 sm:p-3.5">Email</th>
+                                    <th class="p-3 sm:p-3.5">Tanggal Bergabung</th>
+                                    <th class="p-3 sm:p-3.5">Status Akun</th>
+                                    <th class="p-3 sm:p-3.5 text-right">Reward Anda</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                <?php foreach ($referralStats['invited_users'] as $inv): ?>
+                                    <tr class="hover:bg-slate-50/70 transition-colors">
+                                        <td class="p-3 sm:p-3.5 font-semibold text-slate-800">
+                                            <?= esc($inv['name_masked']) ?>
+                                        </td>
+                                        <td class="p-3 sm:p-3.5 font-mono text-xs text-slate-600">
+                                            <?= esc($inv['email_masked']) ?>
+                                        </td>
+                                        <td class="p-3 sm:p-3.5 text-slate-500 text-xs whitespace-nowrap">
+                                            <?= esc($inv['registered_at']) ?>
+                                        </td>
+                                        <td class="p-3 sm:p-3.5">
+                                            <?php if ($inv['is_verified']): ?>
+                                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                                    <span>✓</span> Terverifikasi Aktif
+                                                </span>
+                                            <?php else: ?>
+                                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                                                    <span>⏳</span> Menunggu Aktivasi Email
+                                                </span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td class="p-3 sm:p-3.5 text-right font-mono font-bold">
+                                            <?php if ($inv['bonus_earned'] > 0): ?>
+                                                <span class="text-emerald-600">+<?= (int) $inv['bonus_earned'] ?> Kuota</span>
+                                            <?php else: ?>
+                                                <span class="text-slate-400 text-xs">Menunggu Verifikasi</span>
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
     </main>
 
     <!-- Footer -->
@@ -1365,6 +1617,54 @@
                     history.replaceState(null, null, '#' + tabId);
                 }
             } catch (e) {}
+        }
+
+        function copyReferralCode() {
+            const codeEl = document.getElementById('refCodeText');
+            if (!codeEl) return;
+            const code = codeEl.innerText.trim();
+            if (!code) return;
+
+            navigator.clipboard.writeText(code).then(() => {
+                const label = document.getElementById('copyCodeLabel');
+                const icon = document.getElementById('copyCodeIcon');
+                if (label) label.innerText = 'Tersalin!';
+                if (icon) icon.innerText = '✓';
+                setTimeout(() => {
+                    if (label) label.innerText = 'Salin Kode';
+                    if (icon) icon.innerText = '📋';
+                }, 2000);
+            }).catch(() => {
+                const ta = document.createElement('textarea');
+                ta.value = code;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                alert('Kode referral berhasil disalin: ' + code);
+            });
+        }
+
+        function copyReferralUrl() {
+            const inputEl = document.getElementById('refUrlInput');
+            if (!inputEl) return;
+            const url = inputEl.value.trim();
+            if (!url) return;
+
+            navigator.clipboard.writeText(url).then(() => {
+                const label = document.getElementById('copyUrlLabel');
+                const icon = document.getElementById('copyUrlIcon');
+                if (label) label.innerText = 'Tautan Tersalin!';
+                if (icon) icon.innerText = '✓';
+                setTimeout(() => {
+                    if (label) label.innerText = 'Salin Tautan';
+                    if (icon) icon.innerText = '🔗';
+                }, 2000);
+            }).catch(() => {
+                inputEl.select();
+                document.execCommand('copy');
+                alert('Tautan referral berhasil disalin: ' + url);
+            });
         }
 
         function handleFileSelect(input, labelId) {

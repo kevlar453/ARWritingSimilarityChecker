@@ -112,6 +112,9 @@ class AuthController extends BaseController
             return $this->respondError('Gagal mendaftarkan akun. Silakan coba kembali.', 500);
         }
 
+        // Buat kode referral unik personal untuk pengguna baru
+        $userModel->ensureReferralCode((int) $userId);
+
         $user = $userModel->find($userId);
 
         // Kirimkan email verifikasi aktivasi akun melalui server SMTP
@@ -169,6 +172,14 @@ class AuthController extends BaseController
             'last_login_at'                 => $currentDate,
             'updated_at'                    => $currentDate,
         ]);
+
+        // Berikan reward Member-Get-Member (+2 kuota cek naskah) ke pengundang
+        try {
+            $referralModel = new \App\Models\ReferralModel();
+            $referralModel->awardVerificationBonus((int) $user['id']);
+        } catch (\Throwable $e) {
+            log_message('error', 'Gagal memproses bonus referral verifikasi: ' . $e->getMessage());
+        }
 
         $activeUser = $userModel->find($user['id']);
         $this->setUserSession($activeUser);

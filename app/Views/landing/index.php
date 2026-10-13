@@ -4785,7 +4785,7 @@
 
                     <!-- Referral Bonus Badge -->
                     <div id="referralBonusBadge" style="<?= empty(session()->get('referred_by_code')) && empty($_COOKIE['referred_by_code']) ? 'display:none;' : '' ?> background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 12px; padding: 10px 14px; margin-bottom: 16px; font-size: 11.5px; color: #065f46;">
-                        <span style="font-weight: 700;">🎁 Bonus Duta Kampus:</span> Kode <span id="displayRefCode" style="font-family: monospace; font-weight: 800; color: #047857;"><?= esc(session()->get('referred_by_code') ?? ($_COOKIE['referred_by_code'] ?? '')) ?></span> terpasang. Anda mendapatkan <strong>+1 bonus cek naskah gratis</strong>!
+                        <span style="font-weight: 700;">🎁 Bonus Sahabat & Duta:</span> Kode <span id="displayRefCode" style="font-family: monospace; font-weight: 800; color: #047857;"><?= esc(session()->get('referred_by_code') ?? ($_COOKIE['referred_by_code'] ?? '')) ?></span> terpasang. Anda mendapatkan <strong>+1 bonus cek naskah gratis</strong> & <strong>diskon perdana 10%</strong>!
                     </div>
 
                     <div class="form-group">

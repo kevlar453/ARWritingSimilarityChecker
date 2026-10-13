@@ -26,10 +26,19 @@ class PaymentController extends BaseController
      */
     public function packages(): ResponseInterface
     {
+        $isEligibleDiscount = false;
+        $userId = session()->get('user_id');
+        if ($userId) {
+            $referralModel = new \App\Models\ReferralModel();
+            $isEligibleDiscount = $referralModel->isEligibleForReferralDiscount((int) $userId);
+        }
+
         return $this->response->setJSON([
-            'status'     => 'success',
-            'client_key' => $this->midtransService->getClientKey(),
-            'packages'   => array_values(MidtransService::getPackages()),
+            'status'               => 'success',
+            'client_key'           => $this->midtransService->getClientKey(),
+            'packages'             => array_values(MidtransService::getPackages()),
+            'is_eligible_discount' => $isEligibleDiscount,
+            'discount_percent'     => $isEligibleDiscount ? 10 : 0,
         ]);
     }
 
@@ -63,6 +72,16 @@ class PaymentController extends BaseController
             ]);
         }
 
+        // Cek eligibilitas diskon selamat datang Member-Get-Member (10%)
+        $referralModel = new \App\Models\ReferralModel();
+        $isEligibleDiscount = $referralModel->isEligibleForReferralDiscount((int) $user['id']);
+        $originalAmount = (int) $package['amount'];
+        $discountAmount = 0;
+        if ($isEligibleDiscount) {
+            $discountAmount = (int) round($originalAmount * 0.10);
+        }
+        $finalAmount = max(1000, $originalAmount - $discountAmount);
+
         // Buat Order ID unik dengan entropi tinggi AR Tilik: TILIK-{timestamp}-{random12hex}
         $orderId = 'TILIK-' . date('YmdHis') . '-' . strtoupper(bin2hex(random_bytes(6)));
 
@@ -71,8 +90,8 @@ class PaymentController extends BaseController
             'user_id'            => (int) $user['id'],
             'order_id'           => $orderId,
             'package_id'         => $package['id'],
-            'package_name'       => $package['name'],
-            'amount'             => (float) $package['amount'],
+            'package_name'       => $package['name'] . ($discountAmount > 0 ? ' (Diskon Referral 10%)' : ''),
+            'amount'             => (float) $finalAmount,
             'submissions_added'  => (int) $package['submissions'],
             'subscription_tier'  => $package['tier'],
             'subscription_days'  => (int) $package['days'],
@@ -95,21 +114,34 @@ class PaymentController extends BaseController
             $orderDetail = "{$userName} order paket {$packageName}";
         }
 
+        $itemDetails = [
+            [
+                'id'            => $package['id'],
+                'price'         => $originalAmount,
+                'quantity'      => 1,
+                'name'          => substr($package['name'], 0, 50),
+                'category'      => 'Kuota Submisi AR Tilik',
+                'merchant_name' => 'AR Tilik',
+            ]
+        ];
+
+        if ($discountAmount > 0) {
+            $itemDetails[] = [
+                'id'            => 'DISC-REFERRAL-10',
+                'price'         => -$discountAmount,
+                'quantity'      => 1,
+                'name'          => 'Diskon Sahabat Tilik 10%',
+                'category'      => 'Diskon Promosi',
+                'merchant_name' => 'AR Tilik',
+            ];
+        }
+
         $params = [
             'transaction_details' => [
                 'order_id'     => $orderId,
-                'gross_amount' => (int) $package['amount'],
+                'gross_amount' => $finalAmount,
             ],
-            'item_details' => [
-                [
-                    'id'            => $package['id'],
-                    'price'         => (int) $package['amount'],
-                    'quantity'      => 1,
-                    'name'          => substr($package['name'], 0, 50),
-                    'category'      => 'Kuota Submisi AR Tilik',
-                    'merchant_name' => 'AR Tilik',
-                ]
-            ],
+            'item_details' => $itemDetails,
             'customer_details' => [
                 'first_name'       => $userName,
                 'email'            => $userEmail,
@@ -281,6 +313,14 @@ class PaymentController extends BaseController
                         'status'  => 'error',
                         'message' => 'Database transaction failed',
                     ]);
+                }
+
+                // Berikan reward Member-Get-Member atas transaksi perdana (+5 kuota cek gratis ke pengundang)
+                try {
+                    $referralModel = new \App\Models\ReferralModel();
+                    $referralModel->awardPurchaseBonus((int) $transaction['id']);
+                } catch (\Throwable $re) {
+                    log_message('error', 'Gagal memproses bonus referral purchase: ' . $re->getMessage());
                 }
 
                 // Kirim notifikasi instan ke Telegram Bot
