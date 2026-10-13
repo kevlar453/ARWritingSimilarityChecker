@@ -80,7 +80,7 @@ class AuthController extends BaseController
         }
 
         $now = date('Y-m-d H:i:s');
-        $resetAt = date('Y-m-d H:i:s', strtotime('+7 days'));
+        $resetAt = date('Y-m-d 00:00:00', strtotime('next monday'));
         $token = bin2hex(random_bytes(32));
         $tokenExpiresAt = date('Y-m-d H:i:s', strtotime('+24 hours'));
 

@@ -409,10 +409,10 @@ class DashboardController extends BaseController
             case 'reset_weekly_quota':
                 $userModel->update($userId, [
                     'free_submissions_used_this_week' => 0,
-                    'week_reset_at'                   => date('Y-m-d H:i:s', strtotime('+7 days')),
+                    'week_reset_at'                   => date('Y-m-d 00:00:00', strtotime('next monday')),
                     'updated_at'                      => $now,
                 ]);
-                $msg = "Kuota gratis mingguan {$user['name']} berhasil direset ke 3 submisi.";
+                $msg = "Kuota gratis mingguan {$user['name']} berhasil direset ke 3 submisi (jadwal berikutnya: Senin depan).";
                 break;
 
             default:

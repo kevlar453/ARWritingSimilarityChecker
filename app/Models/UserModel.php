@@ -34,7 +34,7 @@ class UserModel extends Model
     protected $useTimestamps = false;
 
     /**
-     * Memeriksa dan memperbarui masa berlaku kuota gratis mingguan (7 hari) secara aman
+     * Memeriksa dan memperbarui masa berlaku kuota gratis mingguan (reset tiap Senin 00:00 WIB)
      */
     public function refreshWeeklyQuota(array $user): array
     {
@@ -42,7 +42,7 @@ class UserModel extends Model
         $resetTime = !empty($user['week_reset_at']) ? strtotime($user['week_reset_at']) : 0;
 
         if ($now >= $resetTime) {
-            $newResetAt = date('Y-m-d H:i:s', strtotime('+7 days'));
+            $newResetAt = date('Y-m-d 00:00:00', strtotime('next monday'));
             $nowStr = date('Y-m-d H:i:s');
 
             $this->db->query("
@@ -82,7 +82,7 @@ class UserModel extends Model
                 'uploaded_corpus_count'   => 0,
                 'corpus_to_next_bonus'    => 3,
                 'corpus_progress_percent' => 0,
-                'reset_date'              => date('Y-m-d H:i:s', strtotime('+7 days')),
+                'reset_date'              => date('Y-m-d 00:00:00', strtotime('next monday')),
                 'days_until_reset'        => 7,
                 'subscription_tier'       => 'free',
                 'subscription_expires_at' => null,
@@ -148,9 +148,9 @@ class UserModel extends Model
     {
         $db = \Config\Database::connect();
         $nowStr = date('Y-m-d H:i:s');
-        $nextReset = date('Y-m-d H:i:s', strtotime('+7 days'));
+        $nextReset = date('Y-m-d 00:00:00', strtotime('next monday'));
 
-        // 1. Reset otomatis kuota mingguan jika sudah melewati batas waktu 7 hari
+        // 1. Reset otomatis kuota mingguan jika sudah melewati batas waktu (Senin 00:00 WIB)
         $db->query("
             UPDATE {$this->table}
             SET free_submissions_used_this_week = 0,
@@ -280,4 +280,27 @@ class UserModel extends Model
             'quota_info'      => $quotaInfo,
         ];
     }
+
+    /**
+     * Mereset seluruh kuota gratis mingguan pengguna ke 0 dan memajukan jadwal ke Senin berikutnya
+     * Digunakan oleh CLI command quota:reset-weekly dan administrasi sistem
+     */
+    public function resetAllWeeklyQuotas(): int
+    {
+        $nextReset = date('Y-m-d 00:00:00', strtotime('next monday'));
+        $nowStr = date('Y-m-d H:i:s');
+
+        $this->db->query("
+            UPDATE {$this->table}
+            SET free_submissions_used_this_week = 0,
+                week_reset_at = ?,
+                updated_at = ?
+            WHERE free_submissions_used_this_week > 0 
+               OR week_reset_at <= ? 
+               OR week_reset_at IS NULL
+        ", [$nextReset, $nowStr, $nowStr]);
+
+        return $this->db->affectedRows();
+    }
 }
+

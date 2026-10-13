@@ -76,7 +76,7 @@ class CreateUser extends BaseCommand
         $institution = trim((string) (CLI::getOption('institution') ?? 'Institusi Akademik'));
 
         $now = date('Y-m-d H:i:s');
-        $resetAt = date('Y-m-d H:i:s', strtotime('+7 days'));
+        $resetAt = date('Y-m-d 00:00:00', strtotime('next monday'));
 
         $userData = [
             'name'                            => $name,
