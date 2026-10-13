@@ -1048,8 +1048,23 @@ guna menguji pengaruh variabel independen terhadap variabel dependen dengan tara
                 </table>
             </div>
 
-            <div class="code-box">
-# Menjalankan AR Tilik di Pusat Data Internal Kampus (On-Premise Ready)
+            <div class="callout-box callout-indigo" style="margin-top: 20px; border-left: 4px solid var(--primary); background: #f8faff; padding: 18px 22px; border-radius: 8px;">
+                <div class="callout-icon" style="font-size: 22px; margin-right: 14px;">🔒</div>
+                <div class="callout-text">
+                    <h4 style="margin: 0 0 6px 0; font-size: 14.5px; color: var(--dark); font-weight: 700;">Akses Repositori &amp; Paket Kontainer On-Premise</h4>
+                    <p style="margin: 0 0 8px 0; font-size: 13.5px; line-height: 1.6; color: var(--text);">
+                        Repositori kode sumber saat ini berstatus privat. <strong>Akses repositori diberikan sesuai permintaan</strong> bagi institusi perguruan tinggi, pengelola jurnal, dan peneliti untuk kebutuhan verifikasi integritas, audit kedaulatan data, atau implementasi on-premise (air-gapped).
+                    </p>
+                    <p style="margin: 0; font-size: 13px; color: var(--muted);">
+                        Permintaan akses kolaborator dapat diajukan melalui email: <a href="mailto:admin@tilik.arsetontong.top?subject=Permintaan%20Akses%20Repositori%20On-Premise%20AR%20Tilik" style="color: var(--primary); font-weight: 600; text-decoration: underline;">admin@tilik.arsetontong.top</a>
+                    </p>
+                </div>
+            </div>
+
+            <div class="code-box" style="margin-top: 16px;">
+# Menjalankan AR Tilik di Pusat Data Internal Kampus (Akses Repositori Diberikan Sesuai Permintaan)
+# 1. Ajukan akses kolaborator via email ke admin@tilik.arsetontong.top
+# 2. Setelah izin akses diberikan:
 git clone https://github.com/kevlar453/ARWritingSimilarityChecker.git
 cd ARWritingSimilarityChecker
 docker compose -f docker-compose.yml up -d
@@ -1084,6 +1099,7 @@ docker compose -f docker-compose.yml up -d
 
             <div class="code-box" style="max-width: 680px; margin: 24px auto 0 auto; text-align: left;">
 # Cara Menjalankan Evaluasi Regresi Mandiri via CLI:
+# (Berkas dataset JSON dapat langsung diuji di atas; CLI tool './artilik' dapat diakses setelah repositori diberikan sesuai permintaan)
 ./artilik test
 ./artilik eval run
 ./artilik eval review
