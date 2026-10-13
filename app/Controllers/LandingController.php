@@ -96,4 +96,45 @@ class LandingController extends BaseController
             'capabilities' => $capabilities,
         ]);
     }
+
+    /**
+     * Whitepaper Riset & Publikasi Benchmark Terbuka Naskah Akademik Indonesia
+     */
+    public function benchmark(): string
+    {
+        $metrics = \App\Libraries\SystemSpecs::getLiveMetrics();
+        $capabilities = \App\Libraries\SystemSpecs::getCapabilities();
+
+        return view('landing/benchmark', [
+            'title'        => 'Benchmark Terbuka Naskah Akademik Indonesia — Evaluasi Empiris AR Tilik',
+            'metrics'      => $metrics,
+            'capabilities' => $capabilities,
+        ]);
+    }
+
+    /**
+     * Unduh Dataset Benchmark Terbuka (JSON) untuk Reproduksi Independen
+     */
+    public function downloadBenchmarkDataset(string $dataset = 'targeted_80')
+    {
+        $fileMap = [
+            'targeted_80' => ROOTPATH . 'evaluation_dataset_v1_1_targeted_80/cases.json',
+            'v1_500'      => ROOTPATH . 'evaluation_dataset_v1/cases.json',
+        ];
+
+        $targetPath = $fileMap[$dataset] ?? $fileMap['targeted_80'];
+        if (! file_exists($targetPath)) {
+            return $this->response->setStatusCode(404)->setBody('Berkas dataset evaluasi tidak ditemukan.');
+        }
+
+        $filename = ($dataset === 'v1_500')
+            ? 'artilik_indonesia_academic_benchmark_500_cases.json'
+            : 'artilik_indonesia_targeted_contextual_80_cases.json';
+
+        return $this->response
+            ->setHeader('Content-Type', 'application/json')
+            ->setHeader('Content-Disposition', 'attachment; filename="' . $filename . '"')
+            ->setBody(file_get_contents($targetPath));
+    }
 }
+

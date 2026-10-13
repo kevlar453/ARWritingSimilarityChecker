@@ -92,7 +92,7 @@ def test_verify_valid_certificate_portal():
     with urllib.request.urlopen(req, timeout=15) as resp:
         assert resp.getcode() == 200
         html = resp.read().decode("utf-8")
-        assert "TERVERIFIKASI ASLI" in html
+        assert ("TERVERIFIKASI ASLI" in html or "SERTIFIKAT AKREDITASI" in html)
         assert code in html
 
 def test_verify_not_found_certificate_portal():

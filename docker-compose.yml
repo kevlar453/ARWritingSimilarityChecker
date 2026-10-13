@@ -1,0 +1,88 @@
+# ==============================================================================
+# AR Tilik — On-Premise Enterprise Stack (Docker Compose)
+# Stack: PHP 8.5 App + Python Worker Daemon + MariaDB 10.11 + Redis Cache
+# Data Sovereignty Guarantee: 100% Offline / Private Network Ready
+# ==============================================================================
+
+version: '3.8'
+
+services:
+  # ─── 1. AR Tilik Web Application & Background Worker ───
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: artilik/core:1.3.0-enterprise
+    container_name: artilik_app
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-8085}:80"
+    environment:
+      CI_ENVIRONMENT: "${CI_ENVIRONMENT:-production}"
+      app.baseURL: "${APP_URL:-http://localhost:8085/}"
+      database.default.hostname: db
+      database.default.database: "${DB_DATABASE:-db_artilik}"
+      database.default.username: "${DB_USERNAME:-artilik_user}"
+      database.default.password: "${DB_PASSWORD:-ArtilikSecurePass2026!}"
+      database.default.DBDriver: MySQLi
+      database.default.port: 3306
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    volumes:
+      - artilik_storage:/var/www/html/storage
+      - artilik_writable:/var/www/html/writable
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - artilik_net
+
+  # ─── 2. MariaDB Enterprise Relational Database ───
+  db:
+    image: mariadb:10.11
+    container_name: artilik_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: "${DB_ROOT_PASSWORD:-RootSecurePass2026!}"
+      MYSQL_DATABASE: "${DB_DATABASE:-db_artilik}"
+      MYSQL_USER: "${DB_USERNAME:-artilik_user}"
+      MYSQL_PASSWORD: "${DB_PASSWORD:-ArtilikSecurePass2026!}"
+    volumes:
+      - artilik_db_data:/var/lib/mysql
+      - ./schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+    ports:
+      - "${DB_PORT:-33066}:3306"
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - artilik_net
+
+  # ─── 3. Redis In-Memory Cache & Queue Broker ───
+  redis:
+    image: redis:7-alpine
+    container_name: artilik_redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - artilik_redis_data:/data
+    networks:
+      - artilik_net
+
+volumes:
+  artilik_storage:
+    driver: local
+  artilik_writable:
+    driver: local
+  artilik_db_data:
+    driver: local
+  artilik_redis_data:
+    driver: local
+
+networks:
+  artilik_net:
+    driver: bridge

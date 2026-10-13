@@ -674,6 +674,28 @@ $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evi
                     </div>
                 <?php endif; ?>
 
+                <!-- Prominent Dual-Reader Interactive Trigger Banner -->
+                <div class="p-4 rounded-xl bg-gradient-to-r from-indigo-50 via-sky-50 to-indigo-50 border border-indigo-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-lg shadow-xs shrink-0">
+                            📖
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h4 class="font-bold text-sm text-indigo-950">Mode Penelaahan Layar Ganda (Interactive Dual-Reader)</h4>
+                                <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-indigo-100 text-indigo-800 border border-indigo-200">Fitur Unggulan</span>
+                            </div>
+                            <p class="text-xs text-slate-600 mt-0.5">
+                                Sandingkan naskah submisi dan dokumen pembanding secara berdampingan dengan penyorotan pasase sinkron kata demi kata.
+                            </p>
+                        </div>
+                    </div>
+                    <button type="button" onclick="openDualReaderModal()" class="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold text-xs rounded-xl shadow-xs transition cursor-pointer whitespace-nowrap shrink-0">
+                        <span>Buka Layar Ganda</span>
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                    </button>
+                </div>
+
                 <!-- Group 1: DIRECT TEXTUAL OVERLAP (Exact Sequential Matcher) -->
                 <div class="space-y-3">
                     <div class="flex items-center justify-between border-b border-indigo-100 pb-1.5">

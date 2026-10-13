@@ -985,6 +985,7 @@
                     <li><a href="<?= base_url() ?>#fitur-unggulan">Inovasi Mesin</a></li>
                     <li><a href="<?= base_url() ?>#integrasi-ojs">Integrasi OJS</a></li>
                     <li><a href="<?= base_url('riset/ar-tilik-vs-turnitin') ?>">AR Tilik vs Turnitin</a></li>
+                    <li><a href="<?= base_url('benchmark') ?>">Benchmark Indonesia</a></li>
                     <li><a href="<?= base_url('docs/Brosur_Eksekutif_ARTilik.pdf') ?>" target="_blank" download="Brosur_Eksekutif_ARTilik.pdf">Brosur Kampus</a></li>
                 </ul>
             </nav>

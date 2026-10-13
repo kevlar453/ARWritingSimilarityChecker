@@ -2963,6 +2963,13 @@
                                 <span class="dropdown-sub">Whitepaper audit bukti vs deteksi AI</span>
                             </div>
                         </a>
+                        <a href="<?= base_url('benchmark') ?>" class="dropdown-item" onclick="closeAllNavDropdowns()">
+                            <div class="dropdown-icon" style="background: #eef2ff; color: #4338ca;">🔬</div>
+                            <div class="dropdown-content">
+                                <span class="dropdown-title">Benchmark Terbuka Indonesia</span>
+                                <span class="dropdown-sub">Hasil uji empiris &amp; transparansi 14 mismatch</span>
+                            </div>
+                        </a>
                         <a href="<?= base_url('docs/Brosur_Eksekutif_ARTilik.pdf') ?>" target="_blank" download="Brosur_Eksekutif_ARTilik.pdf" class="dropdown-item" onclick="closeAllNavDropdowns()">
                             <div class="dropdown-icon" style="background: #ecfdf5; color: #059669;">📄</div>
                             <div class="dropdown-content">
@@ -3448,10 +3455,14 @@
                         “Dalam integritas akademik, alat terbaik bukan yang paling yakin—melainkan yang paling mudah dibantah, diperiksa, dan diperbaiki.”
                     </h3>
                     <p style="font-size: 14px; color: #94a3b8; line-height: 1.6; margin: 0;">
-                        Kami memublikasikan dua riset komparatif mendalam: telaah audit rujukan nyata dan kedaulatan data vs Turnitin, serta analisis pembuktian empiris vs deteksi probabilitas AI ZeroGPT.
+                        Kami memublikasikan hasil riset dan benchmark empiris terbuka: benchmark korpus akademik Bahasa Indonesia (termasuk 14 kasus mismatch), telaah rujukan nyata vs Turnitin, serta analisis pembuktian empiris vs deteksi AI ZeroGPT.
                     </p>
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 10px; align-items: stretch; justify-content: center;">
+                    <a href="<?= base_url('benchmark') ?>" class="btn btn-primary" style="background: #4338ca; border-color: #4338ca; padding: 13px 20px; font-size: 13.5px; font-weight: 700; text-align: center; border-radius: 10px; box-shadow: 0 6px 16px rgba(67, 56, 202, 0.35); text-decoration: none;">
+                        <span>🔬 Benchmark Terbuka Naskah Indonesia</span>
+                        <span style="margin-left: 6px;">&rarr;</span>
+                    </a>
                     <a href="<?= base_url('riset/ar-tilik-vs-turnitin') ?>" class="btn btn-primary" style="background: #0f766e; border-color: #0f766e; padding: 13px 20px; font-size: 13.5px; font-weight: 700; text-align: center; border-radius: 10px; box-shadow: 0 6px 16px rgba(15, 118, 110, 0.35); text-decoration: none;">
                         <span>🏛️ Whitepaper: AR Tilik vs Turnitin</span>
                         <span style="margin-left: 6px;">&rarr;</span>

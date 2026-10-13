@@ -70,6 +70,18 @@ class SitemapController extends BaseController
                 'priority'   => '0.9',
             ],
             [
+                'loc'        => $baseUrl . '/benchmark',
+                'lastmod'    => $today,
+                'changefreq' => 'weekly',
+                'priority'   => '1.0',
+            ],
+            [
+                'loc'        => $baseUrl . '/riset/benchmark-naskah-indonesia',
+                'lastmod'    => $today,
+                'changefreq' => 'weekly',
+                'priority'   => '0.9',
+            ],
+            [
                 'loc'        => $baseUrl . '/privacy',
                 'lastmod'    => '2026-10-07',
                 'changefreq' => 'monthly',

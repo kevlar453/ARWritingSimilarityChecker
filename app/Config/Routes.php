@@ -8,6 +8,10 @@ $routes->match(['get', 'head'], 'riset/ar-tilik-vs-zerogpt', 'LandingController:
 $routes->match(['get', 'head'], 'perbandingan/zerogpt', 'LandingController::researchZerogpt');
 $routes->match(['get', 'head'], 'riset/ar-tilik-vs-turnitin', 'LandingController::researchTurnitin');
 $routes->match(['get', 'head'], 'perbandingan/turnitin', 'LandingController::researchTurnitin');
+$routes->match(['get', 'head'], 'riset/benchmark-naskah-indonesia', 'LandingController::benchmark');
+$routes->match(['get', 'head'], 'benchmark', 'LandingController::benchmark');
+$routes->match(['get', 'head'], 'benchmark/dataset/(:segment)', 'LandingController::downloadBenchmarkDataset/$1');
+$routes->match(['get', 'head'], 'benchmark/dataset', 'LandingController::downloadBenchmarkDataset');
 $routes->match(['get', 'head'], 'dashboard', 'DashboardController::index');
 $routes->match(['get', 'head'], 'report/(:num)', 'DashboardController::report/$1');
 $routes->match(['get', 'head'], 'reports/(:num)', 'DashboardController::report/$1');
