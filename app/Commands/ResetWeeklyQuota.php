@@ -42,14 +42,24 @@ class ResetWeeklyQuota extends BaseCommand
         $nextReset = date('Y-m-d 00:00:00', strtotime('next monday', $now));
         $nowStr = date('Y-m-d H:i:s', $now);
 
-        // Cari pengguna yang memiliki kuota terpakai > 0 atau waktu reset telah lewat/belum teratur
-        $usersToReset = $userModel
-            ->groupStart()
-                ->where('free_submissions_used_this_week >', 0)
-                ->orWhere('week_reset_at <=', $nowStr)
-                ->orWhere('week_reset_at IS NULL', null, false)
-            ->groupEnd()
-            ->countAllResults();
+        // Hitung pengguna yang memenuhi kriteria reset
+        $queryBuilder = $userModel;
+        if ($force) {
+            $usersToReset = $queryBuilder
+                ->groupStart()
+                    ->where('free_submissions_used_this_week >', 0)
+                    ->orWhere('week_reset_at !=', $nextReset)
+                    ->orWhere('week_reset_at IS NULL', null, false)
+                ->groupEnd()
+                ->countAllResults();
+        } else {
+            $usersToReset = $queryBuilder
+                ->groupStart()
+                    ->where('week_reset_at <=', $nowStr)
+                    ->orWhere('week_reset_at IS NULL', null, false)
+                ->groupEnd()
+                ->countAllResults();
+        }
 
         $totalUsers = $userModel->countAllResults();
 
@@ -64,7 +74,7 @@ class ResetWeeklyQuota extends BaseCommand
 
         CLI::write("[*] Menjalankan pembaruan kuota gratis serentak ke 0/3...", 'cyan');
 
-        $affected = $userModel->resetAllWeeklyQuotas();
+        $affected = $userModel->resetAllWeeklyQuotas($force);
 
         CLI::write("[✓] Berhasil mereset kuota mingguan untuk {$affected} akun pengguna.", 'green');
         CLI::write("[✓] Waktu reset berikutnya ditetapkan pada: {$nextReset} WIB (Senin depan).", 'green');

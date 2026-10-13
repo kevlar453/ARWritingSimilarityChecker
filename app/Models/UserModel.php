@@ -285,20 +285,28 @@ class UserModel extends Model
      * Mereset seluruh kuota gratis mingguan pengguna ke 0 dan memajukan jadwal ke Senin berikutnya
      * Digunakan oleh CLI command quota:reset-weekly dan administrasi sistem
      */
-    public function resetAllWeeklyQuotas(): int
+    public function resetAllWeeklyQuotas(bool $force = false): int
     {
         $nextReset = date('Y-m-d 00:00:00', strtotime('next monday'));
         $nowStr = date('Y-m-d H:i:s');
 
-        $this->db->query("
-            UPDATE {$this->table}
-            SET free_submissions_used_this_week = 0,
-                week_reset_at = ?,
-                updated_at = ?
-            WHERE free_submissions_used_this_week > 0 
-               OR week_reset_at <= ? 
-               OR week_reset_at IS NULL
-        ", [$nextReset, $nowStr, $nowStr]);
+        if ($force) {
+            $this->db->query("
+                UPDATE {$this->table}
+                SET free_submissions_used_this_week = 0,
+                    week_reset_at = ?,
+                    updated_at = ?
+            ", [$nextReset, $nowStr]);
+        } else {
+            $this->db->query("
+                UPDATE {$this->table}
+                SET free_submissions_used_this_week = 0,
+                    week_reset_at = ?,
+                    updated_at = ?
+                WHERE week_reset_at <= ? 
+                   OR week_reset_at IS NULL
+            ", [$nextReset, $nowStr, $nowStr]);
+        }
 
         return $this->db->affectedRows();
     }
