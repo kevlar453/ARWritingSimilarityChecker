@@ -66,4 +66,14 @@ class LandingController extends BaseController
             'testimonialStats'     => $testimonialStats,
         ]);
     }
+
+    /**
+     * Whitepaper Riset & Analisis Komparatif: AR Tilik vs ZeroGPT
+     */
+    public function researchZerogpt(): string
+    {
+        return view('landing/research_zerogpt', [
+            'title' => 'Perbandingan AR Tilik vs ZeroGPT — Analisis Berbasis Riset & Whitepaper Integritas',
+        ]);
+    }
 }

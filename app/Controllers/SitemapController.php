@@ -58,6 +58,12 @@ class SitemapController extends BaseController
                 'priority'   => '0.8',
             ],
             [
+                'loc'        => $baseUrl . '/riset/ar-tilik-vs-zerogpt',
+                'lastmod'    => $today,
+                'changefreq' => 'weekly',
+                'priority'   => '0.9',
+            ],
+            [
                 'loc'        => $baseUrl . '/privacy',
                 'lastmod'    => '2026-10-07',
                 'changefreq' => 'monthly',
