@@ -271,3 +271,41 @@ def test_citation_auditor_footnotes_not_leaking_into_bibliography():
     assert len(res.orphan_references) == 0
     assert res.matched_items[0]["matched_entry_text"].strip().endswith("30–36.")
 
+
+def test_citation_auditor_compound_multi_year_and_narrative_citations():
+    from worker.citation_auditor import audit_citations_and_bibliography
+
+    sample_doc = """
+    Beberapa riset terdahulu menunjukkan pentingnya dinamika sosial (Bansal et al., 2024; Masenya, 2021).
+    Selain itu, fenomena integrasi juga ditinjau oleh (Howitt, 2002; Laurie et al., 2003).
+    Kajian penting lainnya diungkapkan dalam (Maarif, 2012, 2023).
+    Dalam analisis kualitatif, Miles, Huberman, and Saldaña (2014) mengusulkan kondensasi data.
+    Pendekatan evaluatif juga didasarkan pada Patton's (2015) serta Radcliffe-Brown (1940, 1965).
+
+    REFERENCES
+
+    Bansal, S., & Masenya, T. (2024). Social dynamics in indigenous communities.
+    Howitt, R. (2002). Rethinking resource management.
+    Laurie, N., Andolina, R., & Radcliffe, S. (2003). Indigenous professionalization.
+    Maarif, S. (2012). Dimensions of religious conversion.
+    Maarif, S. (2023). Customary governance in Kalimantan.
+    Masenya, T. M. (2021). Indigenous knowledge preservation.
+    Miles, M. B., Huberman, A. M., & Saldaña, J. (2014). Qualitative data analysis: A methods sourcebook.
+    Patton, M. Q. (2015). Qualitative research & evaluation methods.
+    Radcliffe-Brown, A. R. (1940). On social structure.
+    Radcliffe-Brown, A. R. (1965). Structure and function in primitive society.
+    """
+
+    res = audit_citations_and_bibliography(sample_doc, verify_external=False)
+    assert res.has_bibliography_section is True
+    assert res.total_bibliography_entries == 10
+    # Citations in text:
+    # Bansal (2024), Masenya (2021), Howitt (2002), Laurie (2003), Maarif (2012), Maarif (2023),
+    # Saldana/Miles (2014), Patton (2015), Radcliffe-Brown (1940), Radcliffe-Brown (1965)
+    assert res.total_in_text_citations == 10
+    assert res.matched_citations_count == 10
+    assert res.phantom_citations_count == 0
+    assert res.orphan_references_count == 0
+    assert res.citation_health_score == 100.0
+
+

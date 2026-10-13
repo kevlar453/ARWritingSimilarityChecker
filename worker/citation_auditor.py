@@ -105,13 +105,15 @@ def normalize_author_name(name: str) -> str:
     """Membersihkan dan menormalisasi nama belakang / penulis untuk pencocokan."""
     if not name:
         return ""
-    # Hapus aksen Unicode
+    # Hapus aksen Unicode (diacritics: Saldaña -> Saldana)
     nfkd = unicodedata.normalize('NFKD', name)
     cleaned = "".join([c for c in nfkd if not unicodedata.combining(c)])
+    # Hapus bentuk possessive 's (misal: Patton's -> Patton, Radcliffe-Brown's -> Radcliffe-Brown)
+    cleaned = re.sub(r"\'s\b", '', cleaned)
     # Hapus gelar atau embel-embel
     cleaned = re.sub(r'\b(?:dkk|et\s+al|Prof|Dr|Drs|Ir|M\.Si|Ph\.D|M\.Kom|S\.T|S\.Kom)\b\.?', '', cleaned, flags=re.IGNORECASE)
-    # Ambil hanya karakter alfabet
-    cleaned = re.sub(r'[^a-zA-Z\s]', '', cleaned).strip().lower()
+    # Ganti karakter non-alfabet (seperti tanda hubung '-' atau titik) dengan spasi
+    cleaned = re.sub(r'[^a-zA-Z\s]', ' ', cleaned).strip().lower()
     tokens = cleaned.split()
     return tokens[-1] if tokens else ""
 
@@ -224,50 +226,113 @@ def extract_in_text_citations(body_text: str) -> List[InTextCitation]:
     if not body_text:
         return citations
 
-    # 1. Parenthetical Author-Year: (Smith, 2021) atau (Pratama & Santoso, 2020) atau (Kurniawan dkk., 2019)
-    # Termasuk multiple: (Smith, 2019; Lee, 2021)
-    re_paren = re.compile(
-        r'\(\s*([A-Z][a-zA-Z\s\-\'\.\&]+?(?:(?:et\s+al\.|dkk\.)|\s*(?:&|and|dan)\s*[A-Z][a-zA-Z\s\-\']+)?)\s*,\s*((?:19|20)\d{2}[a-z]?)(?::\s*\d+(?:[\-\–]\d+)?)?\s*\)'
-    )
-    for m in re_paren.finditer(body_text):
-        raw = m.group(0)
-        auth_raw = m.group(1).strip()
-        year = m.group(2).strip()
-        auth_key = normalize_author_name(auth_raw)
-        if auth_key and len(auth_key) >= 2:
-            start = max(0, m.start() - 60)
-            end = min(len(body_text), m.end() + 60)
-            ctx = body_text[start:end].replace('\n', ' ').strip()
-            citations.append(InTextCitation(
-                raw_citation=raw,
-                author_key=auth_key,
-                year=year,
-                citation_type="author_year",
-                span_start=m.start(),
-                span_end=m.end(),
-                context_sentence=ctx
-            ))
+    # 1. Parenthetical Author-Year:
+    # Mendukung single (Smith, 2021), compound (Bansal et al., 2024; Masenya, 2021),
+    # multi-tahun (Maarif, 2012, 2023), serta awalan (e.g., Howitt, 2002; see also Laurie et al., 2003)
+    re_paren_block = re.compile(r'\(([^()]*?(?:19|20)\d{2}[^()]*?)\)')
+    prefix_clean_re = re.compile(r'^(?:e\.g\.|see\s+also|see|cf\.|misalnya|contohnya|lihat|bandingkan)\b[,:\s]*', re.IGNORECASE)
 
-    # 2. Narrative Author-Year: Menurut Santoso (2021), Pratama dkk. (2020)
-    re_narrative = re.compile(
-        r'\b([A-Z][a-zA-Z\s\-\'\&]+?(?:(?:et\s+al\.|dkk\.)|\s*(?:&|and|dan)\s*[A-Z][a-zA-Z\s\-\']+)?)\s*\(((?:19|20)\d{2}[a-z]?)(?::\s*\d+(?:[\-\–]\d+)?)?\)'
-    )
-    for m in re_narrative.finditer(body_text):
-        raw = m.group(0)
-        auth_raw = m.group(1).strip()
-        year = m.group(2).strip()
-        # Hindari false positive seperti Gambar (2021) atau Tabel (2021)
-        if auth_raw.lower() in {"gambar", "tabel", "lampiran", "grafik", "bagan", "figure", "table"}:
+    for m in re_paren_block.finditer(body_text):
+        inner = m.group(1).strip()
+
+        # Abaikan rentang tahun murni seperti (1999–2002) atau nomor halaman murni
+        if re.match(r'^(?:19|20)\d{2}\s*[\-\–]\s*(?:19|20)\d{2}$', inner):
             continue
-        auth_key = normalize_author_name(auth_raw)
-        if auth_key and len(auth_key) >= 2:
+        if re.match(r'^\d+$', inner):
+            continue
+
+        # Pecah sitasi majemuk yang dipisahkan titik koma (;)
+        parts = [p.strip() for p in inner.split(';') if p.strip()]
+
+        for part in parts:
+            cleaned_part = prefix_clean_re.sub('', part).strip()
+
+            # Temukan semua tahun 4-digit dalam bagian ini (mendukung multi-tahun: Maarif, 2012, 2023)
+            years_found = list(re.finditer(r'\b((?:19|20)\d{2}[a-z]?)\b', cleaned_part))
+            if not years_found:
+                continue
+
+            first_year_m = years_found[0]
+            author_segment = cleaned_part[:first_year_m.start()].strip()
+            author_segment = re.sub(r'[\s,:\(\)]+$', '', author_segment)
+
+            if not author_segment:
+                continue
+
+            words = [w for w in re.split(r'[\s,\&]+', author_segment) if w]
+            if not words or not any(w[0].isupper() for w in words if w):
+                continue
+
+            # Hindari false positive seperti Gambar, Tabel, UU, dsb.
+            if any(w.lower() in {"gambar", "tabel", "lampiran", "grafik", "bagan", "figure", "table", "hal", "hlm", "pp", "vol", "no", "uu", "pasal"} for w in words):
+                continue
+
+            auth_key = normalize_author_name(author_segment)
+            if not auth_key or len(auth_key) < 2:
+                continue
+
             start = max(0, m.start() - 60)
             end = min(len(body_text), m.end() + 60)
             ctx = body_text[start:end].replace('\n', ' ').strip()
+
+            for ym in years_found:
+                yr = ym.group(1).strip()
+                citations.append(InTextCitation(
+                    raw_citation=f"({cleaned_part})",
+                    author_key=auth_key,
+                    year=yr,
+                    citation_type="author_year",
+                    span_start=m.start(),
+                    span_end=m.end(),
+                    context_sentence=ctx
+                ))
+
+    # 2. Narrative Author-Year: Menurut Santoso (2021), Pratama dkk. (2020),
+    # Miles, Huberman, and Saldaña (2014), Patton's (2015), Radcliffe-Brown (1940, 1965)
+    re_narrative = re.compile(
+        r'([^\n()\[\]]{2,100}?)\s*\(((?:19|20)\d{2}[a-z]?(?:\s*,\s*(?:19|20)\d{2}[a-z]?)*)(?::\s*\d+(?:[\-\–]\d+)?)?\)'
+    )
+    valid_connectors = {'and', '&', 'dan', 'et', 'al.', 'al', 'dkk.', 'dkk', 'van', 'von', 'de', 'der', 'la', 'le'}
+    fp_keywords = {
+        "gambar", "tabel", "lampiran", "grafik", "bagan", "figure", "table",
+        "undang-undang", "uu", "perpres", "permendikbud", "tahun", "pada", "sejak",
+        "dalam", "antara", "hingga", "dari", "periode", "era", "year", "in", "since"
+    }
+
+    for m in re_narrative.finditer(body_text):
+        raw_prefix = m.group(1).strip()
+        years_inner = m.group(2).strip()
+
+        words = raw_prefix.split()
+        collected = []
+        for w in reversed(words):
+            clean_w = re.sub(r'^[^\w]+|[^\w]+$', '', w).lower()
+            if w and (w[0].isupper() or clean_w in valid_connectors or (len(w) > 1 and w[0] in "'\"" and w[1].isupper())):
+                collected.append(w)
+            else:
+                break
+
+        if not collected:
+            continue
+        collected.reverse()
+        auth_raw = " ".join(collected)
+
+        auth_key = normalize_author_name(auth_raw)
+        if not auth_key or len(auth_key) < 2 or auth_key in fp_keywords:
+            continue
+
+        raw = f"{auth_raw} ({years_inner})"
+        start = max(0, m.start() - 60)
+        end = min(len(body_text), m.end() + 60)
+        ctx = body_text[start:end].replace('\n', ' ').strip()
+
+        # Mendukung multi-tahun naratif: Radcliffe-Brown (1940, 1965)
+        for ym in re.finditer(r'\b((?:19|20)\d{2}[a-z]?)\b', years_inner):
+            yr = ym.group(1).strip()
             citations.append(InTextCitation(
                 raw_citation=raw,
                 author_key=auth_key,
-                year=year,
+                year=yr,
                 citation_type="author_year",
                 span_start=m.start(),
                 span_end=m.end(),
@@ -358,7 +423,11 @@ def extract_bibliography_entries(bib_text: str) -> List[BibliographyEntry]:
         if year_match:
             prefix = text_entry[:year_match.start()]
 
-        words = re.findall(r'[A-Z][a-zA-Z]+', prefix)
+        # Normalisasi diakritik unicode (misal: Saldaña -> Saldana) agar nama cocok dengan token ASCII
+        nfkd_prefix = unicodedata.normalize('NFKD', prefix)
+        prefix_clean = "".join([c for c in nfkd_prefix if not unicodedata.combining(c)])
+
+        words = re.findall(r'[A-Z][a-zA-Z]+', prefix_clean)
         for w in words:
             clean_w = normalize_author_name(w)
             if clean_w and clean_w not in {"dkk", "dan", "and", "al", "vol", "no", "pp", "hal", "jurnal", "prosiding", "in", "the", "of", "ed", "eds"}:
