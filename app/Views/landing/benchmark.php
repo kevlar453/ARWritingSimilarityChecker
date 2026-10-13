@@ -101,22 +101,27 @@
             gap: 16px;
         }
         .brand {
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 12px;
             text-decoration: none;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
         .brand-logo {
             width: 36px;
             height: 36px;
             object-fit: contain;
             border-radius: 8px;
+            flex-shrink: 0;
         }
         .brand-title {
             font-size: 19px;
             font-weight: 800;
             color: var(--dark);
             letter-spacing: -0.5px;
+            white-space: nowrap;
+            line-height: 1.2;
         }
         .brand-badge {
             background: rgba(67, 56, 202, 0.1);
@@ -127,6 +132,7 @@
             border-radius: 6px;
             border: 1px solid rgba(67, 56, 202, 0.2);
             text-transform: uppercase;
+            white-space: nowrap;
         }
         .nav-links {
             display: flex;
@@ -139,12 +145,14 @@
             font-weight: 600;
             color: var(--text-muted);
             transition: color 0.15s ease;
+            white-space: nowrap;
         }
         .nav-links a:hover, .nav-links a.active { color: var(--primary); }
         .nav-actions {
             display: flex;
             align-items: center;
             gap: 10px;
+            flex-shrink: 0;
         }
         .btn-nav-back {
             display: inline-flex;
@@ -158,6 +166,7 @@
             background: #f1f5f9;
             border: 1px solid var(--border);
             transition: all 0.15s ease;
+            white-space: nowrap;
         }
         .btn-nav-back:hover { color: var(--dark); background: #e2e8f0; }
         .btn-nav-primary {
@@ -172,8 +181,201 @@
             background: var(--primary);
             box-shadow: 0 4px 12px rgba(67, 56, 202, 0.25);
             transition: all 0.15s ease;
+            white-space: nowrap;
         }
         .btn-nav-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+
+        /* Hamburger Toggle Button */
+        .hamburger-btn {
+            display: none;
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            padding: 9px 8px;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+        .hamburger-btn:hover { background: #f1f5f9; border-color: #cbd5e1; }
+        .hamburger-btn span {
+            display: block;
+            width: 20px;
+            height: 2px;
+            background: var(--dark);
+            border-radius: 2px;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: center;
+        }
+        .hamburger-btn.active span:nth-child(1) {
+            transform: translateY(6.5px) rotate(45deg);
+            background: var(--primary);
+        }
+        .hamburger-btn.active span:nth-child(2) {
+            opacity: 0;
+            transform: scaleX(0);
+        }
+        .hamburger-btn.active span:nth-child(3) {
+            transform: translateY(-6.5px) rotate(-45deg);
+            background: var(--primary);
+        }
+
+        /* Mobile Nav Drawer & Overlay */
+        .mobile-nav-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 1040;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .mobile-nav-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .mobile-nav-drawer {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: min(88vw, 360px);
+            background: #ffffff;
+            z-index: 1050;
+            box-shadow: -8px 0 32px rgba(15, 23, 42, 0.2);
+            transform: translateX(100%);
+            visibility: hidden;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .mobile-nav-drawer.active {
+            transform: translateX(0);
+            visibility: visible;
+        }
+        .mobile-drawer-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border);
+            background: #f8fafc;
+        }
+        .mobile-drawer-close {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: #ffffff;
+            color: var(--text-muted);
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            line-height: 1;
+        }
+        .mobile-drawer-close:hover {
+            background: #fee2e2;
+            color: #ef4444;
+            border-color: #fca5a5;
+        }
+        .mobile-drawer-body {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 18px;
+        }
+        .mobile-nav-group-title {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--text-muted);
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+        .mobile-nav-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .mobile-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: #f8fafc;
+            border: 1px solid transparent;
+            transition: all 0.15s ease;
+        }
+        .mobile-nav-item:hover {
+            background: #f1f5f9;
+            border-color: var(--border);
+        }
+        .mobile-nav-item.active {
+            background: #eef2ff;
+            border-color: #c7d2fe;
+        }
+        .mobile-nav-item.active strong {
+            color: var(--primary);
+        }
+        .mobile-nav-item .item-icon {
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .mobile-nav-item .item-text {
+            display: flex;
+            flex-direction: column;
+        }
+        .mobile-nav-item .item-text strong {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--dark);
+            line-height: 1.3;
+        }
+        .mobile-nav-item .item-text small {
+            font-size: 11.5px;
+            color: var(--text-muted);
+            line-height: 1.25;
+            margin-top: 2px;
+        }
+        .mobile-jump-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .mobile-jump-chip {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 11px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 600;
+            background: #f1f5f9;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            transition: all 0.15s ease;
+        }
+        .mobile-jump-chip:hover {
+            background: #e2e8f0;
+            color: var(--dark);
+        }
+        .mobile-jump-chip.mismatch-chip {
+            background: #fff1f2;
+            border-color: #fecdd3;
+            color: var(--accent-rose);
+            font-weight: 700;
+        }
 
         /* Secondary Sub-Nav */
         .subnav {
@@ -485,11 +687,46 @@
             text-align: center;
         }
 
+        @media (max-width: 992px) {
+            .nav-links { display: none; }
+            .hamburger-btn { display: flex; }
+            .btn-desktop-only { display: none !important; }
+            .navbar { padding: 8px 0; }
+            .nav-inner { gap: 10px; }
+            .brand { gap: 8px; }
+            .brand-logo { width: 32px; height: 32px; }
+            .brand-title { font-size: 17px; }
+            .btn-nav-back { padding: 6px 12px; font-size: 12px; }
+        }
+
         @media (max-width: 768px) {
             .subnav { display: none; }
-            .hero-wrap { padding-top: 85px; }
+            html { scroll-padding-top: 75px; }
+            .hero-wrap { padding-top: 75px; }
             .stats-grid { margin-top: 16px; }
             .section-block { padding: 24px 16px; }
+        }
+
+        @media (max-width: 480px) {
+            .container { padding: 0 14px; }
+            .navbar { padding: 7px 0; }
+            .nav-inner { gap: 8px; }
+            .brand { gap: 6px; }
+            .brand-logo { width: 28px; height: 28px; border-radius: 6px; }
+            .brand-title { font-size: 15.5px; }
+            .brand-badge { font-size: 10px; padding: 2px 6px; }
+            .btn-nav-back { padding: 5px 9px; font-size: 11px; gap: 4px; }
+            .hamburger-btn { width: 34px; height: 34px; padding: 8px 7px; border-radius: 8px; }
+            .hamburger-btn span { width: 17px; height: 2px; }
+            .hamburger-btn.active span:nth-child(1) { transform: translateY(5px) rotate(45deg); }
+            .hamburger-btn.active span:nth-child(3) { transform: translateY(-5px) rotate(-45deg); }
+        }
+
+        @media (max-width: 360px) {
+            .brand-badge { display: none; }
+            .brand-title { font-size: 14.5px; }
+            .btn-nav-back .btn-nav-text { display: none; }
+            .btn-nav-back { padding: 5px 8px; }
         }
     </style>
 </head>
@@ -499,11 +736,12 @@
     <header class="navbar">
         <div class="container nav-inner">
             <a href="<?= base_url('/') ?>" class="brand">
-                <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik Logo" class="brand-logo" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 40 40\'><rect width=\'40\' height=\'40\' rx=\'8\' fill=\'%234338ca\'/><text x=\'50%52\' y=\'55%52\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'white\' font-family=\'sans-serif\' font-size=\'20\' font-weight=\'bold\'>AR</text></svg>'">
+                <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik Logo" class="brand-logo" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 40 40\'><rect width=\'40\' height=\'40\' rx=\'8\' fill=\'%234338ca\'/><text x=\'50%25\' y=\'55%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'white\' font-family=\'sans-serif\' font-size=\'20\' font-weight=\'bold\'>AR</text></svg>'">
                 <span class="brand-title">AR Tilik</span>
                 <span class="brand-badge">Riset</span>
             </a>
 
+            <!-- Desktop Nav Links -->
             <ul class="nav-links">
                 <li><a href="<?= base_url('/#keunggulan') ?>">Metodologi</a></li>
                 <li><a href="<?= base_url('benchmark') ?>" class="active">Benchmark Lokal</a></li>
@@ -513,14 +751,106 @@
             </ul>
 
             <div class="nav-actions">
-                <a href="<?= base_url('/') ?>" class="btn-nav-back">
+                <a href="<?= base_url('/') ?>" class="btn-nav-back" title="Kembali ke Beranda">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                    <span>Beranda</span>
+                    <span class="btn-nav-text">Beranda</span>
                 </a>
-                <a href="<?= base_url('/?auth=register') ?>" class="btn-nav-primary">Coba Sekarang</a>
+                <a href="<?= base_url('/?auth=register') ?>" class="btn-nav-primary btn-desktop-only">Coba Sekarang</a>
+
+                <!-- Mobile Hamburger Toggle Button -->
+                <button type="button" id="hamburgerBtn" class="hamburger-btn" onclick="toggleMobileNav()" aria-label="Buka Menu Navigasi" aria-expanded="false">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
             </div>
         </div>
     </header>
+
+    <!-- Mobile Nav Overlay & Drawer -->
+    <div id="mobileNavOverlay" class="mobile-nav-overlay" onclick="closeMobileNav()"></div>
+    <div id="mobileNavDrawer" class="mobile-nav-drawer" role="dialog" aria-modal="true" aria-label="Menu Navigasi Mobile">
+        <div class="mobile-drawer-header">
+            <div class="brand" style="gap: 8px;">
+                <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik Logo" class="brand-logo" style="width: 28px; height: 28px;">
+                <span class="brand-title" style="font-size: 16px;">AR Tilik</span>
+                <span class="brand-badge" style="font-size: 10px; padding: 2px 6px;">Riset</span>
+            </div>
+            <button type="button" class="mobile-drawer-close" onclick="closeMobileNav()" aria-label="Tutup Menu">&times;</button>
+        </div>
+
+        <div class="mobile-drawer-body">
+            <div class="mobile-nav-group-title">Navigasi Utama &amp; Publikasi</div>
+            <ul class="mobile-nav-list">
+                <li>
+                    <a href="<?= base_url('benchmark') ?>" class="mobile-nav-item active" onclick="closeMobileNav()">
+                        <span class="item-icon">🔬</span>
+                        <div class="item-text">
+                            <strong>Benchmark Naskah Indonesia</strong>
+                            <small>80 Kasus Terarah + 14 Mismatch Terbuka</small>
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href="<?= base_url('riset/ar-tilik-vs-turnitin') ?>" class="mobile-nav-item" onclick="closeMobileNav()">
+                        <span class="item-icon">⚖️</span>
+                        <div class="item-text">
+                            <strong>AR Tilik vs Turnitin</strong>
+                            <small>Komparasi Kedaulatan &amp; Hapus Mandiri</small>
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href="<?= base_url('riset/ar-tilik-vs-zerogpt') ?>" class="mobile-nav-item" onclick="closeMobileNav()">
+                        <span class="item-icon">🛡️</span>
+                        <div class="item-text">
+                            <strong>AR Tilik vs ZeroGPT</strong>
+                            <small>Riset Independen False-Positive 80%</small>
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href="<?= base_url('/#keunggulan') ?>" class="mobile-nav-item" onclick="closeMobileNav()">
+                        <span class="item-icon">📐</span>
+                        <div class="item-text">
+                            <strong>Metodologi &amp; 4 Pilar</strong>
+                            <small>N-Gram, Cosine, Pasase, XGBoost</small>
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href="<?= base_url('integrations/ojs/pdf') ?>" target="_blank" class="mobile-nav-item" onclick="closeMobileNav()">
+                        <span class="item-icon">🔌</span>
+                        <div class="item-text">
+                            <strong>Konektor Integrasi OJS</strong>
+                            <small>Panduan Teknis Workflow Redaksi Jurnal</small>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="mobile-nav-group-title" style="margin-top: 20px;">Lompat ke Bagian Benchmark</div>
+            <div class="mobile-jump-grid">
+                <a href="#ringkasan" class="mobile-jump-chip" onclick="closeMobileNav()">Latar Belakang</a>
+                <a href="#dataset" class="mobile-jump-chip" onclick="closeMobileNav()">Komposisi Dataset</a>
+                <a href="#gates" class="mobile-jump-chip" onclick="closeMobileNav()">Quality Gates</a>
+                <a href="#mismatch" class="mobile-jump-chip mismatch-chip" onclick="closeMobileNav()">14 Mismatch</a>
+                <a href="#stylometri" class="mobile-jump-chip" onclick="closeMobileNav()">Stylometri &amp; AI</a>
+                <a href="#dualreader" class="mobile-jump-chip" onclick="closeMobileNav()">Dual-Reader</a>
+                <a href="#onpremise" class="mobile-jump-chip" onclick="closeMobileNav()">On-Premise &amp; Privasi</a>
+                <a href="#unduh" class="mobile-jump-chip" onclick="closeMobileNav()">Unduh Dataset</a>
+            </div>
+
+            <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px;">
+                <a href="<?= base_url('/?auth=register') ?>" class="btn-primary" style="justify-content: center; padding: 12px; font-size: 13.5px;" onclick="closeMobileNav()">
+                    <span>Coba AR Tilik Sekarang</span>
+                </a>
+                <a href="<?= base_url('/') ?>" class="btn-secondary" style="justify-content: center; padding: 10px; font-size: 13px;" onclick="closeMobileNav()">
+                    <span>Kembali ke Halaman Beranda</span>
+                </a>
+            </div>
+        </div>
+    </div>
 
     <!-- ─── Sticky Subnav Quick Links ─── -->
     <nav class="subnav">
@@ -1123,5 +1453,40 @@ docker compose -f docker-compose.yml up -d
         </div>
     </footer>
 
+    <script>
+        function toggleMobileNav() {
+            var drawer = document.getElementById('mobileNavDrawer');
+            var overlay = document.getElementById('mobileNavOverlay');
+            var btn = document.getElementById('hamburgerBtn');
+            if (!drawer || !overlay || !btn) return;
+            var isOpen = drawer.classList.contains('active');
+            if (isOpen) {
+                closeMobileNav();
+            } else {
+                drawer.classList.add('active');
+                overlay.classList.add('active');
+                btn.classList.add('active');
+                btn.setAttribute('aria-expanded', 'true');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeMobileNav() {
+            var drawer = document.getElementById('mobileNavDrawer');
+            var overlay = document.getElementById('mobileNavOverlay');
+            var btn = document.getElementById('hamburgerBtn');
+            if (drawer) drawer.classList.remove('active');
+            if (overlay) overlay.classList.remove('active');
+            if (btn) {
+                btn.classList.remove('active');
+                btn.setAttribute('aria-expanded', 'false');
+            }
+            document.body.style.overflow = '';
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeMobileNav();
+        });
+    </script>
 </body>
 </html>
