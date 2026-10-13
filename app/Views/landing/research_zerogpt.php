@@ -930,6 +930,7 @@
                     <li><a href="<?= base_url() ?>#teori">Dual-Lens</a></li>
                     <li><a href="<?= base_url() ?>#fitur-unggulan">Inovasi Mesin</a></li>
                     <li><a href="<?= base_url() ?>#integrasi-ojs">Integrasi OJS</a></li>
+                    <li><a href="<?= base_url('riset/ar-tilik-vs-turnitin') ?>">AR Tilik vs Turnitin</a></li>
                     <li><a href="<?= base_url('docs/Brosur_Eksekutif_ARTilik.pdf') ?>" target="_blank" download="Brosur_Eksekutif_ARTilik.pdf">Brosur Kampus</a></li>
                 </ul>
             </nav>
@@ -1379,6 +1380,22 @@
                 * Catatan Metodologis: Klaim komersial dan temuan riset akademik independen dipisahkan secara tegas. Tidak ada nilai yang digabung menjadi satu skor pemenang semu karena variasi dataset, ragam bahasa, dan metodologi pengujian yang berbeda.
             </p>
         </div>
+
+        <!-- Crosslink Banner to Turnitin Whitepaper -->
+        <div class="container" style="margin-top: 36px;">
+            <div style="background: linear-gradient(135deg, #0f766e 0%, #0369a1 100%); border-radius: 20px; padding: clamp(24px, 3.5vw, 36px); color: #ffffff; display: flex; align-items: center; justify-content: space-between; gap: 24px; box-shadow: 0 12px 30px rgba(15, 118, 110, 0.25); flex-wrap: wrap;">
+                <div style="max-width: 720px;">
+                    <h4 style="font-size: 19px; font-weight: 800; margin-bottom: 6px; color: #ffffff;">Baca Juga Whitepaper: AR Tilik vs Turnitin</h4>
+                    <p style="font-size: 14px; color: rgba(255, 255, 255, 0.9); line-height: 1.5; margin: 0;">
+                        Analisis objektif untuk pengelola jurnal dan kampus Indonesia: mengapa Turnitin unggul pada skala korpus global, sementara AR Tilik berfokus pada verifikasi sitasi nyata, kedaulatan data lokal, dan integrasi OJS.
+                    </p>
+                </div>
+                <a href="<?= base_url('riset/ar-tilik-vs-turnitin') ?>" style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 22px; background: #ffffff; color: #0f766e; font-size: 13.5px; font-weight: 800; border-radius: 9999px; white-space: nowrap; text-decoration: none; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
+                    <span>Baca Whitepaper Turnitin</span>
+                    <span>&rarr;</span>
+                </a>
+            </div>
+        </div>
     </section>
 
     <!-- ─── AR Tilik Standard Footer ─── -->
@@ -1420,6 +1437,7 @@
                 <div>
                     <strong style="color: #ffffff; display: block; margin-bottom: 14px;">Dokumentasi &amp; Legal</strong>
                     <ul class="footer-links">
+                        <li><a href="<?= base_url('riset/ar-tilik-vs-turnitin') ?>" style="color: #38bdf8; font-weight: 600;">📊 Whitepaper: AR Tilik vs Turnitin</a></li>
                         <li><a href="<?= base_url('riset/ar-tilik-vs-zerogpt') ?>" style="color: #fdba74; font-weight: 600;">📊 Whitepaper: AR Tilik vs ZeroGPT</a></li>
                         <li><a href="<?= base_url('docs/Brosur_Eksekutif_ARTilik.pdf') ?>" target="_blank" download="Brosur_Eksekutif_ARTilik.pdf">Brosur Eksekutif Kampus (PDF)</a></li>
                         <li><a href="<?= base_url('integrations/ojs/Panduan_Integrasi_OJS_ARTilik.pdf') ?>" target="_blank" download="Panduan_Integrasi_OJS_ARTilik.pdf">Buku Panduan OJS (PDF)</a></li>

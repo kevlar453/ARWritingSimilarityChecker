@@ -2949,6 +2949,13 @@
                                 <span class="dropdown-sub">Keadilan akademik &amp; kedaulatan naskah</span>
                             </div>
                         </a>
+                        <a href="<?= base_url('riset/ar-tilik-vs-turnitin') ?>" class="dropdown-item" onclick="closeAllNavDropdowns()">
+                            <div class="dropdown-icon" style="background: #f0fdfa; color: #0f766e;">🏛️</div>
+                            <div class="dropdown-content">
+                                <span class="dropdown-title">Riset: AR Tilik vs Turnitin</span>
+                                <span class="dropdown-sub">Analisis untuk jurnal &amp; kampus Indonesia</span>
+                            </div>
+                        </a>
                         <a href="<?= base_url('riset/ar-tilik-vs-zerogpt') ?>" class="dropdown-item" onclick="closeAllNavDropdowns()">
                             <div class="dropdown-icon" style="background: #fff7ed; color: #ea580c;">📊</div>
                             <div class="dropdown-content">
@@ -3135,6 +3142,11 @@
 
             <div class="mobile-nav-group-title" style="margin-top: 20px;">Unduhan &amp; Bantuan</div>
             <nav class="mobile-nav-menu">
+                <a href="<?= base_url('riset/ar-tilik-vs-turnitin') ?>" class="mobile-nav-link" onclick="closeMobileNav()">
+                    <span class="nav-icon">🏛️</span>
+                    <span>Whitepaper: AR Tilik vs Turnitin</span>
+                    <span class="nav-badge" style="background: rgba(15, 118, 110, 0.15); color: #0f766e; font-weight: 700;">Riset</span>
+                </a>
                 <a href="<?= base_url('riset/ar-tilik-vs-zerogpt') ?>" class="mobile-nav-link" onclick="closeMobileNav()">
                     <span class="nav-icon">📊</span>
                     <span>Whitepaper: AR Tilik vs ZeroGPT</span>
@@ -3430,21 +3442,25 @@
             <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius: 20px; padding: clamp(24px, 4vw, 40px); color: #ffffff; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 28px; align-items: center; box-shadow: 0 16px 40px -10px rgba(15, 23, 42, 0.2);" data-aos="fade-up" data-aos-duration="800">
                 <div>
                     <div style="display: inline-flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #fdba74; margin-bottom: 8px;">
-                        <span>📖</span> Edisi Riset Akademik 2026
+                        <span>📖</span> Seri Whitepaper Riset Akademik 2026
                     </div>
                     <h3 style="font-size: clamp(19px, 2.2vw, 26px); font-weight: 800; line-height: 1.3; margin-bottom: 12px; color: #ffffff;">
                         “Dalam integritas akademik, alat terbaik bukan yang paling yakin—melainkan yang paling mudah dibantah, diperiksa, dan diperbaiki.”
                     </h3>
                     <p style="font-size: 14px; color: #94a3b8; line-height: 1.6; margin: 0;">
-                        Pelajari analisis komparatif cara kerja mesin Dual-Lens AR Tilik vs DeepAnalyse™ ZeroGPT, dekomposisi data empiris Report #1167, serta rekomendasi khusus untuk Editor Jurnal, Dosen, Mahasiswa, dan Institusi Kampus.
+                        Kami memublikasikan dua riset komparatif mendalam: telaah audit rujukan nyata dan kedaulatan data vs Turnitin, serta analisis pembuktian empiris vs deteksi probabilitas AI ZeroGPT.
                     </p>
                 </div>
-                <div style="display: flex; flex-direction: column; gap: 12px; align-items: stretch; justify-content: center;">
-                    <a href="<?= base_url('riset/ar-tilik-vs-zerogpt') ?>" class="btn btn-primary" style="background: #ea580c; border-color: #ea580c; padding: 14px 22px; font-size: 14px; font-weight: 700; text-align: center; border-radius: 10px; box-shadow: 0 8px 20px rgba(234, 88, 12, 0.35); text-decoration: none;">
-                        <span>Baca Whitepaper Riset Lengkap</span>
+                <div style="display: flex; flex-direction: column; gap: 10px; align-items: stretch; justify-content: center;">
+                    <a href="<?= base_url('riset/ar-tilik-vs-turnitin') ?>" class="btn btn-primary" style="background: #0f766e; border-color: #0f766e; padding: 13px 20px; font-size: 13.5px; font-weight: 700; text-align: center; border-radius: 10px; box-shadow: 0 6px 16px rgba(15, 118, 110, 0.35); text-decoration: none;">
+                        <span>🏛️ Whitepaper: AR Tilik vs Turnitin</span>
                         <span style="margin-left: 6px;">&rarr;</span>
                     </a>
-                    <a href="<?= base_url('dashboard') ?>" class="btn" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); color: #ffffff; padding: 12px 20px; font-size: 13px; font-weight: 600; text-align: center; border-radius: 10px; text-decoration: none;">
+                    <a href="<?= base_url('riset/ar-tilik-vs-zerogpt') ?>" class="btn btn-primary" style="background: #ea580c; border-color: #ea580c; padding: 13px 20px; font-size: 13.5px; font-weight: 700; text-align: center; border-radius: 10px; box-shadow: 0 6px 16px rgba(234, 88, 12, 0.35); text-decoration: none;">
+                        <span>📊 Whitepaper: AR Tilik vs ZeroGPT</span>
+                        <span style="margin-left: 6px;">&rarr;</span>
+                    </a>
+                    <a href="<?= base_url('dashboard') ?>" class="btn" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); color: #ffffff; padding: 11px 18px; font-size: 13px; font-weight: 600; text-align: center; border-radius: 10px; text-decoration: none;">
                         Uji Coba Audit Naskah Mandiri
                     </a>
                 </div>
@@ -4631,6 +4647,7 @@
                 <div>
                     <strong style="color: #ffffff; display: block; margin-bottom: 14px;">Dokumentasi &amp; Legal</strong>
                     <ul class="footer-links">
+                        <li><a href="<?= base_url('riset/ar-tilik-vs-turnitin') ?>" style="color: #38bdf8; font-weight: 600;">🏛️ Whitepaper: AR Tilik vs Turnitin</a></li>
                         <li><a href="<?= base_url('riset/ar-tilik-vs-zerogpt') ?>" style="color: #fdba74; font-weight: 600;">📊 Whitepaper: AR Tilik vs ZeroGPT</a></li>
                         <li><a href="<?= base_url('docs/Brosur_Eksekutif_ARTilik.pdf') ?>" target="_blank" download="Brosur_Eksekutif_ARTilik.pdf">Brosur Eksekutif Institusi (PDF)</a></li>
                         <li><a href="<?= base_url('integrations/ojs/Panduan_Integrasi_OJS_ARTilik.pdf') ?>" target="_blank" download="Panduan_Integrasi_OJS_ARTilik.pdf">Buku Panduan OJS (PDF)</a></li>

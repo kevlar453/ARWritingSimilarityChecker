@@ -76,4 +76,14 @@ class LandingController extends BaseController
             'title' => 'Perbandingan AR Tilik vs ZeroGPT — Analisis Berbasis Riset & Whitepaper Integritas',
         ]);
     }
+
+    /**
+     * Whitepaper Riset & Analisis Komparatif: AR Tilik vs Turnitin (& iThenticate)
+     */
+    public function researchTurnitin(): string
+    {
+        return view('landing/research_turnitin', [
+            'title' => 'Perbandingan AR Tilik vs Turnitin — Analisis untuk Jurnal & Kampus Indonesia',
+        ]);
+    }
 }
