@@ -53,10 +53,16 @@
             --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06);
             --shadow-md: 0 4px 20px -2px rgba(15, 23, 42, 0.07);
             --shadow-lg: 0 16px 40px -10px rgba(15, 23, 42, 0.12);
+            --nav-height: 58px;
+            --subnav-height: 48px;
+            --header-offset: calc(var(--nav-height) + var(--subnav-height) + 24px);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        html { scroll-behavior: smooth; }
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: var(--header-offset, 130px);
+        }
         body {
             font-family: var(--sans);
             background: var(--light-bg);
@@ -300,13 +306,14 @@
         /* ─── Sticky Sub-Navigation Bar ─── */
         .subnav {
             position: sticky;
-            top: 58px;
+            top: var(--nav-height, 58px);
             z-index: 990;
-            background: rgba(248, 250, 252, 0.95);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
             border-bottom: 1px solid var(--border);
             padding: 8px 0;
+            box-shadow: 0 4px 14px -2px rgba(15, 23, 42, 0.05);
         }
         .subnav-inner {
             display: flex;
@@ -316,29 +323,39 @@
             white-space: nowrap;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
+            padding: 2px 0;
         }
         .subnav-inner::-webkit-scrollbar { display: none; }
         .subnav-link {
-            font-size: 12px;
+            font-size: 12.5px;
             font-weight: 700;
             color: var(--text-muted);
-            padding: 6px 14px;
+            padding: 7px 15px;
             border-radius: 9999px;
-            transition: all 0.15s ease;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
+            border: 1px solid transparent;
+            text-decoration: none;
+            white-space: nowrap;
         }
         .subnav-link:hover {
             color: var(--dark);
-            background: #e2e8f0;
+            background: #f1f5f9;
+            border-color: var(--border);
         }
         .subnav-link.active {
             color: #ffffff;
             background: var(--primary);
+            border-color: var(--primary);
+            box-shadow: 0 2px 8px rgba(67, 56, 202, 0.28);
         }
 
-        /* ─── Section Shared Styles ─── */
+        /* ─── Section Shared Styles & Scroll Margins ─── */
+        section[id] {
+            scroll-margin-top: var(--header-offset, 130px);
+        }
         .section-white {
             background: #ffffff;
             border-bottom: 1px solid var(--border);
@@ -1260,7 +1277,7 @@
     <section id="pilih" class="section-white">
         <div class="container">
             <div class="section-header">
-                <div class="section-number">05 — Rekomendasi Keputusan</div>
+                <div class="section-number">05 — Rekomendasi Peran &amp; Keputusan</div>
                 <h2 class="section-title">Pilih alat berdasarkan tingkat risiko keputusan Anda.</h2>
                 <p class="section-desc">
                     Gunakan lensa peran untuk melihat panduan tindakan yang aman secara metodologis dan etis:
@@ -1466,6 +1483,111 @@
                     }
                 });
             });
+
+            /* ─── Sub-Navigation & Scroll Offset Handling ─── */
+            var subnav = document.querySelector(".subnav");
+            var navbar = document.querySelector(".navbar");
+            var subnavLinks = document.querySelectorAll(".subnav-link");
+            var sectionIds = ["beda", "bukti", "mesin", "batas", "pilih", "sumber"];
+            var sections = sectionIds.map(function (id) { return document.getElementById(id); }).filter(Boolean);
+
+            function syncNavHeights() {
+                if (navbar) {
+                    var navH = navbar.offsetHeight;
+                    document.documentElement.style.setProperty("--nav-height", navH + "px");
+                }
+                if (subnav) {
+                    var subH = subnav.offsetHeight;
+                    document.documentElement.style.setProperty("--subnav-height", subH + "px");
+                }
+            }
+
+            syncNavHeights();
+            window.addEventListener("resize", syncNavHeights, { passive: true });
+
+            function getHeaderOffset() {
+                var navH = navbar ? navbar.offsetHeight : 58;
+                var subH = subnav ? subnav.offsetHeight : 48;
+                return navH + subH + 20; // 20px extra breathing room
+            }
+
+            function setActiveSubnav(targetId) {
+                var cleanId = targetId.replace(/^#/, "");
+                subnavLinks.forEach(function (link) {
+                    var href = link.getAttribute("href") || "";
+                    var linkId = href.replace(/^#/, "");
+                    var isActive = (linkId === cleanId);
+                    link.classList.toggle("active", isActive);
+                    if (isActive) {
+                        link.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+                    }
+                });
+            }
+
+            // Smooth Scroll on Subnav Link Click with Exact Dynamic Offset
+            subnavLinks.forEach(function (link) {
+                link.addEventListener("click", function (e) {
+                    var href = this.getAttribute("href");
+                    if (href && href.startsWith("#")) {
+                        var target = document.querySelector(href);
+                        if (target) {
+                            e.preventDefault();
+                            var offset = getHeaderOffset();
+                            var targetTop = target.getBoundingClientRect().top + window.scrollY - offset;
+                            window.scrollTo({
+                                top: targetTop,
+                                behavior: "smooth"
+                            });
+                            if (window.history && window.history.pushState) {
+                                window.history.pushState(null, "", href);
+                            }
+                            setActiveSubnav(href);
+                        }
+                    }
+                });
+            });
+
+            // Scroll Spy using IntersectionObserver
+            if ("IntersectionObserver" in window) {
+                var observer = new IntersectionObserver(function (entries) {
+                    entries.forEach(function (entry) {
+                        if (entry.isIntersecting) {
+                            setActiveSubnav(entry.target.id);
+                        }
+                    });
+                }, {
+                    rootMargin: "-20% 0px -60% 0px",
+                    threshold: 0
+                });
+
+                sections.forEach(function (sec) {
+                    observer.observe(sec);
+                });
+            } else {
+                window.addEventListener("scroll", function () {
+                    var offset = getHeaderOffset();
+                    var scrollY = window.scrollY + offset + 30;
+                    for (var i = sections.length - 1; i >= 0; i--) {
+                        if (scrollY >= sections[i].offsetTop) {
+                            setActiveSubnav(sections[i].id);
+                            break;
+                        }
+                    }
+                }, { passive: true });
+            }
+
+            // Hash on page load
+            if (window.location.hash) {
+                setTimeout(function () {
+                    var target = document.querySelector(window.location.hash);
+                    if (target) {
+                        var offset = getHeaderOffset();
+                        var targetTop = target.getBoundingClientRect().top + window.scrollY - offset;
+                        window.scrollTo({ top: targetTop, behavior: "smooth" });
+                        setActiveSubnav(window.location.hash);
+                    }
+                }, 100);
+            }
         }());
     </script>
 </body>
