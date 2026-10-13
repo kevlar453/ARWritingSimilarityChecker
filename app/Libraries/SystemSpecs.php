@@ -51,17 +51,9 @@ class SystemSpecs
                 ->countAllResults();
         } catch (\Throwable $e) {
             // Fallback aman jika query database mengalami kendala
-            $totalCorpus = 854;
-            $totalSubmissions = 1200;
-            $totalReports = 1167;
-        }
-
-        // Pastikan angka representatif jika database lokal baru disetup
-        if ($totalCorpus < 854) {
-            $totalCorpus = 854;
-        }
-        if ($totalReports < 1167) {
-            $totalReports = 1167;
+            $totalCorpus = 0;
+            $totalSubmissions = 0;
+            $totalReports = 0;
         }
 
         return [
