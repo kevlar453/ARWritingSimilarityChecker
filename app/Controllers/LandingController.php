@@ -72,8 +72,13 @@ class LandingController extends BaseController
      */
     public function researchZerogpt(): string
     {
+        $metrics = \App\Libraries\SystemSpecs::getLiveMetrics();
+        $capabilities = \App\Libraries\SystemSpecs::getCapabilities();
+
         return view('landing/research_zerogpt', [
-            'title' => 'Perbandingan AR Tilik vs ZeroGPT — Analisis Berbasis Riset & Whitepaper Integritas',
+            'title'        => 'Perbandingan AR Tilik vs ZeroGPT — Analisis Berbasis Riset & Whitepaper Integritas',
+            'metrics'      => $metrics,
+            'capabilities' => $capabilities,
         ]);
     }
 
@@ -82,8 +87,13 @@ class LandingController extends BaseController
      */
     public function researchTurnitin(): string
     {
+        $metrics = \App\Libraries\SystemSpecs::getLiveMetrics();
+        $capabilities = \App\Libraries\SystemSpecs::getCapabilities();
+
         return view('landing/research_turnitin', [
-            'title' => 'Perbandingan AR Tilik vs Turnitin — Analisis untuk Jurnal & Kampus Indonesia',
+            'title'        => 'Perbandingan AR Tilik vs Turnitin — Analisis untuk Jurnal & Kampus Indonesia',
+            'metrics'      => $metrics,
+            'capabilities' => $capabilities,
         ]);
     }
 }

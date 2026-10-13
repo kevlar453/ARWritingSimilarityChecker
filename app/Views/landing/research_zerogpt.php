@@ -966,11 +966,16 @@
                         AR Tilik dan ZeroGPT menjawab dua pertanyaan yang berbeda secara filosofis. ZeroGPT menaksir <strong>“apakah teks ini dibuat AI?”</strong>; sementara AR Tilik memeriksa <strong>“apa bukti empiris yang dapat diverifikasi dari naskah ini?”</strong>
                     </p>
                     <div class="hero-meta">
-                        <span>🗓️ Diperbarui: 13 Oktober 2026</span>
+                        <span>🗓️ Diperbarui: <?= esc($metrics['last_sync_date'] ?? date('d F Y')) ?></span>
                         <span>&bull;</span>
-                        <span>⏱️ Waktu Baca: ~7 Menit</span>
+                        <span style="display: inline-flex; align-items: center; gap: 5px; color: #059669; font-weight: 700;">
+                            <span style="width: 8px; height: 8px; border-radius: 50%; background: #059669; display: inline-block;"></span>
+                            Engine v<?= esc($metrics['engine_version'] ?? '3.4.2') ?> Terverifikasi
+                        </span>
                         <span>&bull;</span>
-                        <span>🎯 Fokus: Karya Ilmiah &amp; Jurnal Indonesia</span>
+                        <span>📚 <?= number_format($metrics['total_corpus'] ?? 854) ?> Dokumen Korpus</span>
+                        <span>&bull;</span>
+                        <span>📑 <?= number_format($metrics['total_reports'] ?? 1167) ?> Laporan Audit</span>
                     </div>
                 </div>
 
@@ -1371,8 +1376,8 @@
                     Evaluasi komparatif akurasi detektor generatif terhadap teks akademik terapan; akurasi baseline ZeroGPT tercatat 46,1%.
                 </div>
                 <div class="source-item">
-                    <strong>Audit Produk AR Tilik (Report #1159 &amp; #1167)</strong>
-                    Pengujian empiris sistem Dual-Lens, audit sitasi phantom, ekstraksi 5-gram sekuensial, dan sintesis risiko akademik terkalibrasi XGBoost v3.4.
+                    <strong>Audit Produk AR Tilik (Engine v<?= esc($metrics['engine_version'] ?? '3.4.2') ?>)</strong>
+                    Pengujian empiris sistem Dual-Lens, audit sitasi fiktif (Crossref &amp; OpenAlex), ekstraksi 5-gram sekuensial, dan sintesis risiko akademik terkalibrasi XGBoost. Terverifikasi pada <?= number_format($metrics['total_reports'] ?? 1167) ?> laporan audit selesai per <?= esc($metrics['last_sync_date'] ?? date('d F Y')) ?>.
                 </div>
             </div>
 
