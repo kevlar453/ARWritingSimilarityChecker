@@ -583,10 +583,28 @@ if ($dec === 'match') {
         $citVerdict = $citAudit['health_verdict'] ?? 'GOOD';
         $clScorePdf = (float)($clAudit['cross_lingual_score'] ?? 0);
         $clMatchPdf = !empty($clAudit['is_cross_lingual_match']);
+
+        $formatRentangPdf = function(array $tiers): string {
+            $pills = [];
+            foreach ($tiers as $t) {
+                $lbl = $t['label'];
+                $color = $t['color'];
+                $bg = $t['bg'] ?? '#f8fafc';
+                $border = $t['border'] ?? '#cbd5e1';
+                $isActive = !empty($t['active']);
+                if ($isActive) {
+                    $pills[] = '<span style="display: inline-block; white-space: nowrap; color: ' . $color . '; background: ' . $bg . '; border: 1px solid ' . $border . '; border-radius: 3px; padding: 0.5px 3.5px; font-weight: bold;">' . $lbl . '</span>';
+                } else {
+                    $pills[] = '<span style="display: inline-block; white-space: nowrap; color: ' . $color . '; opacity: 0.82;">' . $lbl . '</span>';
+                }
+            }
+            $sep = '<span style="color: #94a3b8; margin: 0 1px;">&bull;</span>';
+            return '<div style="font-size: 6.5pt; font-weight: normal; margin-top: 3px; line-height: 1.45;"><span style="color: #64748b;">Rentang:</span> ' . implode(" {$sep} ", $pills) . '</div>';
+        };
     ?>
     <h3 class="section-header">3. Audit Integritas Naskah, Sitasi &amp; Analisis Lintas Bahasa</h3>
     <div style="font-size: 7pt; color: #64748b; margin-top: -3px; margin-bottom: 6px;">
-        * Panduan rentang nilai standar: <strong>[0–34%] Rendah (Aman)</strong> &bull; <strong>[35–69%] Menengah (Telaah)</strong> &bull; <strong>[70–100%] Tinggi (Atensi)</strong>. Rincian skala spesifik tercantum di bawah masing-masing indikator.
+        * Panduan rentang nilai standar: <span style="display: inline-block; background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; border-radius: 3px; padding: 0.5px 4px; font-weight: bold;">[0–34%] Rendah (Aman)</span> &bull; <span style="display: inline-block; background: #fffbeb; color: #b45309; border: 1px solid #fde68a; border-radius: 3px; padding: 0.5px 4px; font-weight: bold;">[35–69%] Menengah (Telaah)</span> &bull; <span style="display: inline-block; background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; border-radius: 3px; padding: 0.5px 4px; font-weight: bold;">[70–100%] Tinggi (Atensi)</span>. Rincian skala spesifik tercantum di bawah masing-masing indikator.
     </div>
     <table class="data-table" style="margin-bottom: 14px; page-break-inside: avoid;">
         <thead>
@@ -601,9 +619,11 @@ if ($dec === 'match') {
                 <td><strong>Integritas Karakter &amp; Anti-Evasion</strong><br><span style="font-size: 7.5pt; color: #64748b;">Deteksi Homoglif, Zero-Width, White-Text</span></td>
                 <td style="text-align: center; font-weight: bold; color: <?= $evRisk >= 35 ? '#b91c1c' : ($evRisk >= 10 ? '#b45309' : '#047857') ?>; font-size: 10pt; line-height: 1.25;">
                     <?= number_format($evRisk, 1) ?>% Risiko
-                    <div style="font-size: 6.5pt; font-weight: normal; color: #64748b; margin-top: 2px;">
-                        Rentang: [0–9%] Rendah &bull; [10–34%] Menengah &bull; [&ge;35%] Tinggi
-                    </div>
+                    <?= $formatRentangPdf([
+                        ['label' => '[0–9%] Rendah', 'color' => '#047857', 'bg' => '#ecfdf5', 'border' => '#a7f3d0', 'active' => $evRisk < 10.0],
+                        ['label' => '[10–34%] Menengah', 'color' => '#b45309', 'bg' => '#fffbeb', 'border' => '#fde68a', 'active' => ($evRisk >= 10.0 && $evRisk < 35.0)],
+                        ['label' => '[≥35%] Tinggi', 'color' => '#b91c1c', 'bg' => '#fef2f2', 'border' => '#fecaca', 'active' => $evRisk >= 35.0],
+                    ]) ?>
                 </td>
                 <td>
                     <strong><?= $evStatus === 'MANIPULATED' ? 'Manipulasi Terencana Terdeteksi' : ($evStatus === 'SUSPICIOUS' ? 'Perlu Tinjauan Karakter' : 'Otentik &amp; Bebas Rekayasa') ?></strong>
@@ -614,9 +634,11 @@ if ($dec === 'match') {
                 <td><strong>Konsistensi Sitasi Internal</strong><br><span style="font-size: 7.5pt; color: #64748b;">Kesesuaian Teks vs Daftar Pustaka (Audit Internal)</span></td>
                 <td style="text-align: center; font-weight: bold; color: <?= $citHealth >= 80 ? '#047857' : ($citHealth >= 50 ? '#b45309' : '#b91c1c') ?>; font-size: 10pt; line-height: 1.25;">
                     <?= number_format($citHealth, 1) ?> / 100
-                    <div style="font-size: 6.5pt; font-weight: normal; color: #64748b; margin-top: 2px;">
-                        Rentang: [80–100] Prima &bull; [50–79] Menengah &bull; [&lt;50] Kritis
-                    </div>
+                    <?= $formatRentangPdf([
+                        ['label' => '[80–100] Prima', 'color' => '#047857', 'bg' => '#ecfdf5', 'border' => '#a7f3d0', 'active' => $citHealth >= 80.0],
+                        ['label' => '[50–79] Menengah', 'color' => '#b45309', 'bg' => '#fffbeb', 'border' => '#fde68a', 'active' => ($citHealth >= 50.0 && $citHealth < 80.0)],
+                        ['label' => '[<50] Kritis', 'color' => '#b91c1c', 'bg' => '#fef2f2', 'border' => '#fecaca', 'active' => $citHealth < 50.0],
+                    ]) ?>
                 </td>
                 <td>
                     <strong><?= esc($citAudit['verdict_label'] ?? 'Sitasi Selaras') ?></strong>
@@ -642,8 +664,12 @@ if ($dec === 'match') {
                 <td><strong>Verifikasi Rujukan Eksternal (Deteksi Sitasi Fiktif)</strong><br><span style="font-size: 7.5pt; color: #64748b;">Audit Ontologis via OpenAlex &amp; Crossref Global API</span></td>
                 <td style="text-align: center; font-weight: bold; color: <?= $vColor ?>; font-size: 10pt; line-height: 1.25;">
                     <?= number_format($vRate, 1) ?>% Sahih
-                    <div style="font-size: 6.5pt; font-weight: normal; color: #64748b; margin-top: 2px;">
-                        <?= $vOk ?> Sahih &bull; <?= $vFake ?> Fiktif AI &bull; <?= $vUnv ?> Non-Indeks
+                    <div style="font-size: 6.5pt; font-weight: normal; margin-top: 3px; line-height: 1.45;">
+                        <span style="display: inline-block; white-space: nowrap; color: #047857; <?= ($vOk > 0 && !$hasFake) ? 'background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 3px; padding: 0.5px 3.5px; font-weight: bold;' : '' ?>"><?= $vOk ?> Sahih</span>
+                        <span style="color: #94a3b8; margin: 0 1px;">&bull;</span>
+                        <span style="display: inline-block; white-space: nowrap; color: <?= $vFake > 0 ? '#b91c1c' : '#64748b' ?>; <?= $vFake > 0 ? 'background: #fef2f2; border: 1px solid #fecaca; border-radius: 3px; padding: 0.5px 3.5px; font-weight: bold;' : '' ?>"><?= $vFake ?> Fiktif AI</span>
+                        <span style="color: #94a3b8; margin: 0 1px;">&bull;</span>
+                        <span style="display: inline-block; white-space: nowrap; color: #64748b;"><?= $vUnv ?> Non-Indeks</span>
                     </div>
                 </td>
                 <td>
@@ -656,9 +682,11 @@ if ($dec === 'match') {
                 <td><strong>Plagiarisme Terjemahan (ID ↔ EN)</strong><br><span style="font-size: 7.5pt; color: #64748b;">Analisis Semantik Proyeksi Konsep Dwibahasa</span></td>
                 <td style="text-align: center; font-weight: bold; color: <?= $clScorePdf >= 35 ? '#b91c1c' : ($clScorePdf >= 15 ? '#b45309' : '#047857') ?>; font-size: 10pt; line-height: 1.25;">
                     <?= number_format($clScorePdf, 1) ?>% Keselarasan
-                    <div style="font-size: 6.5pt; font-weight: normal; color: #64748b; margin-top: 2px;">
-                        Rentang: [0–14%] Rendah &bull; [15–34%] Menengah &bull; [&ge;35%] Tinggi
-                    </div>
+                    <?= $formatRentangPdf([
+                        ['label' => '[0–14%] Rendah', 'color' => '#047857', 'bg' => '#ecfdf5', 'border' => '#a7f3d0', 'active' => $clScorePdf < 15.0],
+                        ['label' => '[15–34%] Menengah', 'color' => '#b45309', 'bg' => '#fffbeb', 'border' => '#fde68a', 'active' => ($clScorePdf >= 15.0 && $clScorePdf < 35.0)],
+                        ['label' => '[≥35%] Tinggi', 'color' => '#b91c1c', 'bg' => '#fef2f2', 'border' => '#fecaca', 'active' => $clScorePdf >= 35.0],
+                    ]) ?>
                 </td>
                 <td>
                     <strong><?= $clMatchPdf ? 'Terindikasi Terjemahan Langsung' : ($clScorePdf >= 15 ? 'Parafrasa Lintas Bahasa' : 'Orisinal / Bebas Terjemahan Mesin') ?></strong>
@@ -706,9 +734,11 @@ if ($dec === 'match') {
                 <td><strong>[Eksperimental] Indikator Gaya Bahasa &amp; Stylometri</strong><br><span style="font-size: 7.5pt; color: #64748b;">Eksperimental — Bukan Vonis AI</span></td>
                 <td style="text-align: center; font-weight: bold; color: <?= $aiProbPdf >= 75 ? '#b91c1c' : ($aiProbPdf >= 50 ? '#b45309' : '#047857') ?>; font-size: 10pt; line-height: 1.25;">
                     <?= number_format($aiProbPdf, 1) ?>% Indikator
-                    <div style="font-size: 6.5pt; font-weight: normal; color: #64748b; margin-top: 2px;">
-                        Rentang: [0–49%] Rendah &bull; [50–74%] Menengah &bull; [&ge;75%] Tinggi
-                    </div>
+                    <?= $formatRentangPdf([
+                        ['label' => '[0–49%] Rendah', 'color' => '#047857', 'bg' => '#ecfdf5', 'border' => '#a7f3d0', 'active' => $aiProbPdf < 50.0],
+                        ['label' => '[50–74%] Menengah', 'color' => '#b45309', 'bg' => '#fffbeb', 'border' => '#fde68a', 'active' => ($aiProbPdf >= 50.0 && $aiProbPdf < 75.0)],
+                        ['label' => '[≥75%] Tinggi', 'color' => '#b91c1c', 'bg' => '#fef2f2', 'border' => '#fecaca', 'active' => $aiProbPdf >= 75.0],
+                    ]) ?>
                 </td>
                 <td>
                     <strong><?= esc($aiLabelPdf) ?></strong>
@@ -723,9 +753,11 @@ if ($dec === 'match') {
                 <td><strong>Sintesis Risiko Akademik Berbobot</strong><br><span style="font-size: 7.5pt; color: #64748b;">Analisis Multi-Dimensi Determinan Risiko</span></td>
                 <td style="text-align: center; font-weight: bold; color: <?= $xgbScorePdf >= 70 ? '#b91c1c' : ($xgbScorePdf >= 35 ? '#b45309' : '#047857') ?>; font-size: 10pt; line-height: 1.25;">
                     <?= number_format($xgbScorePdf, 1) ?>% Indeks Risiko
-                    <div style="font-size: 6.5pt; font-weight: normal; color: #64748b; margin-top: 2px;">
-                        Rentang: [0–34%] Rendah &bull; [35–69%] Menengah &bull; [70–100%] Tinggi
-                    </div>
+                    <?= $formatRentangPdf([
+                        ['label' => '[0–34%] Rendah', 'color' => '#047857', 'bg' => '#ecfdf5', 'border' => '#a7f3d0', 'active' => $xgbScorePdf < 35.0],
+                        ['label' => '[35–69%] Menengah', 'color' => '#b45309', 'bg' => '#fffbeb', 'border' => '#fde68a', 'active' => ($xgbScorePdf >= 35.0 && $xgbScorePdf < 70.0)],
+                        ['label' => '[70–100%] Tinggi', 'color' => '#b91c1c', 'bg' => '#fef2f2', 'border' => '#fecaca', 'active' => $xgbScorePdf >= 70.0],
+                    ]) ?>
                 </td>
                 <td>
                     <strong><?= esc($xgbLabelPdf) ?></strong>
@@ -740,9 +772,11 @@ if ($dec === 'match') {
                 <td><strong>Audit Forensik Cerdas</strong><br><span style="font-size: 7.5pt; color: #64748b;">Konsistensi Semantik Antar-Bab &amp; Integritas Logika</span></td>
                 <td style="text-align: center; font-weight: bold; color: <?= $aiCompColorPdf ?>; font-size: 10pt; line-height: 1.25;">
                     <?= number_format($aiCompScorePdf, 1) ?>% Indikasi AI
-                    <div style="font-size: 6.5pt; font-weight: normal; color: #64748b; margin-top: 2px;">
-                        Rentang: [0–34%] Rendah &bull; [35–69%] Menengah &bull; [70–100%] Tinggi
-                    </div>
+                    <?= $formatRentangPdf([
+                        ['label' => '[0–34%] Rendah', 'color' => '#047857', 'bg' => '#ecfdf5', 'border' => '#a7f3d0', 'active' => $aiCompScorePdf < 35.0],
+                        ['label' => '[35–69%] Menengah', 'color' => '#b45309', 'bg' => '#fffbeb', 'border' => '#fde68a', 'active' => ($aiCompScorePdf >= 35.0 && $aiCompScorePdf < 70.0)],
+                        ['label' => '[70–100%] Tinggi', 'color' => '#b91c1c', 'bg' => '#fef2f2', 'border' => '#fecaca', 'active' => $aiCompScorePdf >= 70.0],
+                    ]) ?>
                 </td>
                 <td>
                     <strong><?= esc($aiCompLabelPdf) ?> (Status: <?= esc($gLevelPdf) ?>)</strong>

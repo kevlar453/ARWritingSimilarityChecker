@@ -55,6 +55,35 @@ def generate_verification_hash(report_id: int, doc_id: int, created_at: str, sim
     h = hashlib.sha256(seed.encode("utf-8")).hexdigest().upper()[:12]
     return f"ART-{h[:4]}-{h[4:8]}-{h[8:12]}"
 
+def format_rentang_html(tiers: list[dict]) -> str:
+    """
+    Menghasilkan HTML indikator rentang nilai dengan pewarnaan semantik
+    (Hijau: Rendah/Prima, Oranye/Kuning: Menengah, Merah: Tinggi/Kritis)
+    dan penyorotan (badge) pada rentang aktif yang sesuai dengan skor saat ini.
+    """
+    pills = []
+    for t in tiers:
+        lbl = t["label"]
+        color = t["color"]
+        bg = t.get("bg", "#f8fafc")
+        border = t.get("border", "#cbd5e1")
+        is_active = t.get("active", False)
+        if is_active:
+            pills.append(
+                f'<span style="display: inline-block; white-space: nowrap; color: {color}; '
+                f'background: {bg}; border: 1px solid {border}; border-radius: 3px; '
+                f'padding: 0.5px 3.5px; font-weight: bold;">{lbl}</span>'
+            )
+        else:
+            pills.append(
+                f'<span style="display: inline-block; white-space: nowrap; color: {color}; opacity: 0.82;">{lbl}</span>'
+            )
+    sep = '<span style="color: #94a3b8; margin: 0 1px;">&bull;</span>'
+    return (
+        f'<div style="font-size: 6.5pt; font-weight: normal; margin-top: 3px; line-height: 1.45;">'
+        f'<span style="color: #64748b;">Rentang:</span> ' + f" {sep} ".join(pills) + "</div>"
+    )
+
 def build_report_html(report: dict, document: dict, sources: list[dict], matches: list[dict]) -> str:
     r_id = report["id"]
     d_id = report["document_id"]
@@ -414,14 +443,21 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
             v_label = "Perlu Penelusuran Mandiri"
             v_desc = "Rujukan belum dapat diverifikasi secara otomatis (buku teks/sumber lokal)."
 
+        ext_ver_counts_html = f"""
+            <div style="font-size: 6.5pt; font-weight: normal; margin-top: 3px; line-height: 1.45;">
+                <span style="display: inline-block; white-space: nowrap; color: #047857; {'background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 3px; padding: 0.5px 3.5px; font-weight: bold;' if (v_ok > 0 and not has_fake) else ''}">{v_ok} Sahih</span>
+                <span style="color: #94a3b8; margin: 0 1px;">&bull;</span>
+                <span style="display: inline-block; white-space: nowrap; color: {'#b91c1c' if v_fake > 0 else '#64748b'}; {'background: #fef2f2; border: 1px solid #fecaca; border-radius: 3px; padding: 0.5px 3.5px; font-weight: bold;' if v_fake > 0 else ''}">{v_fake} Fiktif AI</span>
+                <span style="color: #94a3b8; margin: 0 1px;">&bull;</span>
+                <span style="display: inline-block; white-space: nowrap; color: #64748b;">{v_unv} Non-Indeks</span>
+            </div>
+        """
         ext_ver_row = f"""
             <tr>
                 <td><strong>Verifikasi Rujukan Eksternal (Deteksi Sitasi Fiktif)</strong><br><span style="font-size: 7.5pt; color: #64748b;">Audit Ontologis via OpenAlex &amp; Crossref Global API</span></td>
                 <td style="text-align: center; font-weight: bold; color: {v_color}; font-size: 10pt; line-height: 1.25;">
                     {v_rate:.1f}% Sahih
-                    <div style="font-size: 6.5pt; font-weight: normal; color: #64748b; margin-top: 2px;">
-                        {v_ok} Sahih &bull; {v_fake} Fiktif AI &bull; {v_unv} Non-Indeks
-                    </div>
+                    {ext_ver_counts_html}
                 </td>
                 <td>
                     <strong style="color: {v_color};">{v_label}</strong>
@@ -464,14 +500,17 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
         burst_lbl = "Ritme Alami Manusia" if burstiness >= 0.35 else "Ritme Seragam"
         seg_ratio = float(ai_metrics.get("segmental_monotony_ratio") or 0.0)
         seg_str = f" • Monotoni Paragraf: {seg_ratio:.1f}%" if seg_ratio > 0 else ""
+        ai_rentang = format_rentang_html([
+            {"label": "[0–49%] Rendah", "color": "#047857", "bg": "#ecfdf5", "border": "#a7f3d0", "active": ai_prob < 50.0},
+            {"label": "[50–74%] Menengah", "color": "#b45309", "bg": "#fffbeb", "border": "#fde68a", "active": 50.0 <= ai_prob < 75.0},
+            {"label": "[≥75%] Tinggi", "color": "#b91c1c", "bg": "#fef2f2", "border": "#fecaca", "active": ai_prob >= 75.0},
+        ])
         ai_row = f"""
             <tr>
                 <td><strong>[Eksperimental] Indikator Gaya Bahasa &amp; Stylometri</strong><br><span style="font-size: 7.5pt; color: #64748b;">Eksperimental — Bukan Vonis AI</span></td>
                 <td style="text-align: center; font-weight: bold; color: {ai_color}; font-size: 10pt; line-height: 1.25;">
                     {ai_prob:.1f}% Indikator
-                    <div style="font-size: 6.5pt; font-weight: normal; color: #64748b; margin-top: 2px;">
-                        Rentang: [0–49%] Rendah &bull; [50–74%] Menengah &bull; [&ge;75%] Tinggi
-                    </div>
+                    {ai_rentang}
                 </td>
                 <td>
                     <strong>{ai_lbl}</strong>
@@ -486,14 +525,17 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
         xgb_lbl = xgb_audit.get("verdict_label") or "Risiko Rendah / Mandiri"
         xgb_level = xgb_audit.get("risk_level") or "LOW"
         xgb_color = "#b91c1c" if xgb_score >= 70 else ("#b45309" if xgb_score >= 35 else "#047857")
+        xgb_rentang = format_rentang_html([
+            {"label": "[0–34%] Rendah", "color": "#047857", "bg": "#ecfdf5", "border": "#a7f3d0", "active": xgb_score < 35.0},
+            {"label": "[35–69%] Menengah", "color": "#b45309", "bg": "#fffbeb", "border": "#fde68a", "active": 35.0 <= xgb_score < 70.0},
+            {"label": "[70–100%] Tinggi", "color": "#b91c1c", "bg": "#fef2f2", "border": "#fecaca", "active": xgb_score >= 70.0},
+        ])
         xgb_row = f"""
             <tr>
                 <td><strong>Sintesis Risiko Akademik Berbobot</strong><br><span style="font-size: 7.5pt; color: #64748b;">Analisis Multi-Dimensi Determinan Risiko</span></td>
                 <td style="text-align: center; font-weight: bold; color: {xgb_color}; font-size: 10pt; line-height: 1.25;">
                     {xgb_score:.1f}% Indeks Risiko
-                    <div style="font-size: 6.5pt; font-weight: normal; color: #64748b; margin-top: 2px;">
-                        Rentang: [0–34%] Rendah &bull; [35–69%] Menengah &bull; [70–100%] Tinggi
-                    </div>
+                    {xgb_rentang}
                 </td>
                 <td>
                     <strong>{xgb_lbl}</strong>
@@ -528,14 +570,17 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
 
     forensic_row = ""
     if forensic_completed:
+        forensic_rentang = format_rentang_html([
+            {"label": "[0–34%] Rendah", "color": "#047857", "bg": "#ecfdf5", "border": "#a7f3d0", "active": ai_composite_score < 35.0},
+            {"label": "[35–69%] Menengah", "color": "#b45309", "bg": "#fffbeb", "border": "#fde68a", "active": 35.0 <= ai_composite_score < 70.0},
+            {"label": "[70–100%] Tinggi", "color": "#b91c1c", "bg": "#fef2f2", "border": "#fecaca", "active": ai_composite_score >= 70.0},
+        ])
         forensic_row = f"""
             <tr>
                 <td><strong>Audit Forensik Cerdas</strong><br><span style="font-size: 7.5pt; color: #64748b;">Konsistensi Semantik Antar-Bab &amp; Integritas Logika</span></td>
                 <td style="text-align: center; font-weight: bold; color: {ai_composite_color}; font-size: 10pt; line-height: 1.25;">
                     {ai_composite_score:.1f}% Indikasi AI
-                    <div style="font-size: 6.5pt; font-weight: normal; color: #64748b; margin-top: 2px;">
-                        Rentang: [0–34%] Rendah &bull; [35–69%] Menengah &bull; [70–100%] Tinggi
-                    </div>
+                    {forensic_rentang}
                 </td>
                 <td>
                     <strong>{ai_composite_label} (Status: {g_level})</strong>
@@ -546,10 +591,26 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
             </tr>
         """
 
+    ev_rentang = format_rentang_html([
+        {"label": "[0–9%] Rendah", "color": "#047857", "bg": "#ecfdf5", "border": "#a7f3d0", "active": ev_risk < 10.0},
+        {"label": "[10–34%] Menengah", "color": "#b45309", "bg": "#fffbeb", "border": "#fde68a", "active": 10.0 <= ev_risk < 35.0},
+        {"label": "[≥35%] Tinggi", "color": "#b91c1c", "bg": "#fef2f2", "border": "#fecaca", "active": ev_risk >= 35.0},
+    ])
+    cit_rentang = format_rentang_html([
+        {"label": "[80–100] Prima", "color": "#047857", "bg": "#ecfdf5", "border": "#a7f3d0", "active": cit_health >= 80.0},
+        {"label": "[50–79] Menengah", "color": "#b45309", "bg": "#fffbeb", "border": "#fde68a", "active": 50.0 <= cit_health < 80.0},
+        {"label": "[<50] Kritis", "color": "#b91c1c", "bg": "#fef2f2", "border": "#fecaca", "active": cit_health < 50.0},
+    ])
+    cl_rentang = format_rentang_html([
+        {"label": "[0–14%] Rendah", "color": "#047857", "bg": "#ecfdf5", "border": "#a7f3d0", "active": cl_score < 15.0},
+        {"label": "[15–34%] Menengah", "color": "#b45309", "bg": "#fffbeb", "border": "#fde68a", "active": 15.0 <= cl_score < 35.0},
+        {"label": "[≥35%] Tinggi", "color": "#b91c1c", "bg": "#fef2f2", "border": "#fecaca", "active": cl_score >= 35.0},
+    ])
+
     audit_html = f"""
     <h3 class="section-header">Audit Integritas Naskah, Sitasi &amp; Analisis Lintas Bahasa</h3>
     <div style="font-size: 7pt; color: #64748b; margin-top: -3px; margin-bottom: 6px;">
-        * Panduan rentang nilai standar: <strong>[0–34%] Rendah (Aman)</strong> &bull; <strong>[35–69%] Menengah (Telaah)</strong> &bull; <strong>[70–100%] Tinggi (Atensi)</strong>. Rincian skala spesifik tercantum di bawah masing-masing indikator.
+        * Panduan rentang nilai standar: <span style="display: inline-block; background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; border-radius: 3px; padding: 0.5px 4px; font-weight: bold;">[0–34%] Rendah (Aman)</span> &bull; <span style="display: inline-block; background: #fffbeb; color: #b45309; border: 1px solid #fde68a; border-radius: 3px; padding: 0.5px 4px; font-weight: bold;">[35–69%] Menengah (Telaah)</span> &bull; <span style="display: inline-block; background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; border-radius: 3px; padding: 0.5px 4px; font-weight: bold;">[70–100%] Tinggi (Atensi)</span>. Rincian skala spesifik tercantum di bawah masing-masing indikator.
     </div>
     <table class="data-table" style="margin-bottom: 14px; page-break-inside: avoid;">
         <thead>
@@ -564,9 +625,7 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
                 <td><strong>Integritas Karakter &amp; Anti-Evasion</strong><br><span style="font-size: 7.5pt; color: #64748b;">Deteksi Homoglif, Zero-Width, White-Text</span></td>
                 <td style="text-align: center; font-weight: bold; color: {ev_color}; font-size: 10pt; line-height: 1.25;">
                     {ev_risk:.1f}% Risiko
-                    <div style="font-size: 6.5pt; font-weight: normal; color: #64748b; margin-top: 2px;">
-                        Rentang: [0–9%] Rendah &bull; [10–34%] Menengah &bull; [&ge;35%] Tinggi
-                    </div>
+                    {ev_rentang}
                 </td>
                 <td>
                     <strong>{ev_lbl}</strong>
@@ -577,9 +636,7 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
                 <td><strong>Konsistensi Sitasi Internal</strong><br><span style="font-size: 7.5pt; color: #64748b;">Kesesuaian Teks vs Daftar Pustaka (Audit Internal)</span></td>
                 <td style="text-align: center; font-weight: bold; color: {cit_color}; font-size: 10pt; line-height: 1.25;">
                     {cit_health:.1f} / 100
-                    <div style="font-size: 6.5pt; font-weight: normal; color: #64748b; margin-top: 2px;">
-                        Rentang: [80–100] Prima &bull; [50–79] Menengah &bull; [&lt;50] Kritis
-                    </div>
+                    {cit_rentang}
                 </td>
                 <td>
                     <strong>{cit_label}</strong>
@@ -591,9 +648,7 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
                 <td><strong>Plagiarisme Terjemahan (ID ↔ EN)</strong><br><span style="font-size: 7.5pt; color: #64748b;">Analisis Semantik Proyeksi Konsep Dwibahasa</span></td>
                 <td style="text-align: center; font-weight: bold; color: {cl_color}; font-size: 10pt; line-height: 1.25;">
                     {cl_score:.1f}% Keselarasan
-                    <div style="font-size: 6.5pt; font-weight: normal; color: #64748b; margin-top: 2px;">
-                        Rentang: [0–14%] Rendah &bull; [15–34%] Menengah &bull; [&ge;35%] Tinggi
-                    </div>
+                    {cl_rentang}
                 </td>
                 <td>
                     <strong>{cl_lbl}</strong>

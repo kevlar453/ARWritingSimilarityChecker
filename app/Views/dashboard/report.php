@@ -1539,8 +1539,13 @@ $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evi
                     <span class="text-xs font-mono-code font-bold px-3 py-1 rounded-full border shadow-2xs <?= $gLevelBadge ?>">
                         Indikasi AI: <strong class="<?= $gLevelColor ?>"><?= number_format($aiScoreVal, 1) ?>% (<?= esc($gAiLevel) ?>)</strong>
                     </span>
-                    <span class="text-[10px] text-slate-500 font-mono-code bg-slate-50 px-2 py-0.5 rounded border border-slate-200">
-                        Rentang: [0–34%] Rendah • [35–69%] Menengah • [70–100%] Tinggi
+                    <span class="text-[10px] font-mono-code bg-slate-50 px-2 py-0.5 rounded border border-slate-200 inline-flex items-center gap-1.5 flex-wrap">
+                        <span class="text-slate-500">Rentang:</span>
+                        <span class="px-1.5 py-0.5 rounded <?= $aiScoreVal < 35.0 ? 'bg-emerald-100 text-emerald-800 font-bold border border-emerald-300' : 'text-emerald-700' ?>">[0–34%] Rendah</span>
+                        <span class="text-slate-400">•</span>
+                        <span class="px-1.5 py-0.5 rounded <?= ($aiScoreVal >= 35.0 && $aiScoreVal < 70.0) ? 'bg-amber-100 text-amber-800 font-bold border border-amber-300' : 'text-amber-700' ?>">[35–69%] Menengah</span>
+                        <span class="text-slate-400">•</span>
+                        <span class="px-1.5 py-0.5 rounded <?= $aiScoreVal >= 70.0 ? 'bg-rose-100 text-rose-800 font-bold border border-rose-300' : 'text-rose-700' ?>">[70–100%] Tinggi</span>
                     </span>
                 </div>
             </div>
