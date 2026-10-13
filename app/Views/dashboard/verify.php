@@ -59,6 +59,14 @@
             outline-offset: -6px;
             box-shadow: 0 20px 40px -15px rgba(8, 26, 51, 0.25), inset 0 0 70px rgba(197, 160, 89, 0.08);
         }
+        @media (max-width: 640px) {
+            .diploma-border-outer {
+                border-width: 3.5px;
+                outline-width: 1.5px;
+                outline-offset: -5px;
+                box-shadow: 0 10px 25px -10px rgba(8, 26, 51, 0.25);
+            }
+        }
         .diploma-border-inner {
             border: 1px solid #c5a059;
             box-shadow: inset 0 0 0 0.5px rgba(8, 26, 51, 0.15);
@@ -139,6 +147,31 @@
                 padding: 5mm 6.5mm !important;
                 box-sizing: border-box !important;
             }
+            .print-desktop-kop {
+                display: flex !important;
+            }
+            .print-mobile-kop {
+                display: none !important;
+            }
+            .print-desktop-footer {
+                display: flex !important;
+                flex-direction: row !important;
+                align-items: flex-end !important;
+            }
+            .print-desktop-footer .order-1 {
+                order: 2 !important;
+                margin-bottom: 0 !important;
+            }
+            .print-desktop-footer .order-2 {
+                order: 1 !important;
+            }
+            .print-desktop-footer .order-3 {
+                order: 3 !important;
+                text-align: right !important;
+            }
+            .print-pillars-grid {
+                grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+            }
         }
     </style>
 </head>
@@ -146,31 +179,35 @@
 
     <!-- Top Action Toolbar (Tersembunyi Saat Dicetak) -->
     <header class="bg-slate-950/90 backdrop-blur-md border-b border-slate-800 sticky top-0 z-50 shadow-md no-print">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-            <a href="<?= base_url() ?>" class="flex items-center gap-3 hover:opacity-95 transition group">
-                <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik Logo" class="w-8 h-8 object-contain drop-shadow-xs">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-2">
+            <a href="<?= base_url() ?>" class="flex items-center gap-2 sm:gap-3 hover:opacity-95 transition group shrink-0">
+                <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik Logo" class="w-7 h-7 sm:w-8 sm:h-8 object-contain drop-shadow-xs">
                 <div class="flex items-center gap-2">
-                    <span class="font-bold text-base text-white tracking-tight">AR Tilik</span>
-                    <span class="hidden sm:inline-block text-[10px] font-bold uppercase tracking-wider text-amber-300 bg-amber-950/60 px-2.5 py-0.5 rounded-full border border-amber-600/40">
+                    <span class="font-bold text-sm sm:text-base text-white tracking-tight">AR Tilik</span>
+                    <span class="hidden md:inline-block text-[10px] font-bold uppercase tracking-wider text-amber-300 bg-amber-950/60 px-2.5 py-0.5 rounded-full border border-amber-600/40">
                         Portal Verifikasi Piagam Resmi
                     </span>
                 </div>
             </a>
-            <div class="flex items-center gap-2.5">
+            <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
                 <?php if ($status === 'valid'): ?>
-                <a href="<?= base_url('verify/' . esc($code) . '/pdf') ?>" download class="px-3.5 py-1.5 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 text-xs font-black rounded-lg shadow-sm hover:shadow transition flex items-center gap-1.5 cursor-pointer border border-amber-300">
-                    <svg class="w-4 h-4 text-slate-950" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                    <span>Unduh Piagam PDF Resmi (A4)</span>
+                <a href="<?= base_url('verify/' . esc($code) . '/pdf') ?>" download class="px-2.5 sm:px-3.5 py-1.5 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 text-xs font-black rounded-lg shadow-sm hover:shadow transition flex items-center gap-1 sm:gap-1.5 cursor-pointer border border-amber-300 whitespace-nowrap">
+                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-950 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    <span class="hidden md:inline">Unduh Piagam PDF Resmi (A4)</span>
+                    <span class="hidden sm:inline md:hidden">Unduh PDF A4</span>
+                    <span class="sm:hidden font-bold">Unduh PDF</span>
                 </a>
-                <button type="button" onclick="window.print()" class="hidden sm:flex px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg border border-slate-700 transition items-center gap-1.5 cursor-pointer">
-                    <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                <button type="button" onclick="window.print()" class="hidden md:flex px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg border border-slate-700 transition items-center gap-1.5 cursor-pointer">
+                    <svg class="w-4 h-4 text-slate-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
                     <span>Cetak</span>
                 </button>
-                <button type="button" id="btnCopyUrlNav" onclick="copyVerifyUrl()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-lg border border-slate-700 transition flex items-center gap-1 cursor-pointer">
-                    <span id="btnCopyUrlText">Salin Tautan</span>
+                <button type="button" id="btnCopyUrlNav" onclick="copyVerifyUrl()" class="px-2 sm:px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-lg border border-slate-700 transition flex items-center gap-1 cursor-pointer whitespace-nowrap">
+                    <svg class="w-3.5 h-3.5 text-slate-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                    <span class="hidden sm:inline" id="btnCopyUrlText">Salin Tautan</span>
+                    <span class="sm:hidden" id="btnCopyUrlTextMobile">Salin</span>
                 </button>
                 <?php endif; ?>
-                <a href="<?= base_url('dashboard') ?>" class="text-xs font-semibold text-slate-300 hover:text-white px-2.5 py-1.5 rounded-lg border border-slate-700 hover:bg-slate-800 transition">
+                <a href="<?= base_url('dashboard') ?>" class="text-xs font-semibold text-slate-300 hover:text-white px-2 sm:px-2.5 py-1.5 rounded-lg border border-slate-700 hover:bg-slate-800 transition whitespace-nowrap shrink-0">
                     Dashboard
                 </a>
             </div>
@@ -230,28 +267,28 @@
             ?>
 
             <!-- LEMBAR PIAGAM RESMI AKREDITASI (DIPLOMA-GRADE CANVAS LANDSCAPE A4) -->
-            <div class="print-certificate-canvas diploma-parchment diploma-border-outer p-5 sm:p-7 w-full max-w-[1140px] relative rounded-lg text-slate-900 select-text shadow-2xl">
+            <div class="print-certificate-canvas diploma-parchment diploma-border-outer p-3.5 sm:p-7 w-full max-w-[1140px] relative rounded-lg text-slate-900 select-text shadow-2xl overflow-hidden">
                 
                 <!-- Inner Fine-Line Decorative Frame -->
-                <div class="print-inner-frame diploma-border-inner p-4 sm:p-6 relative flex flex-col justify-between h-full space-y-3.5">
+                <div class="print-inner-frame diploma-border-inner p-3 sm:p-6 relative flex flex-col justify-between h-full space-y-3 sm:space-y-3.5">
 
                     <!-- 4 Sudut Ornamen Vektor Guilloche -->
-                    <svg class="absolute top-1 left-1 w-14 h-14 pointer-events-none opacity-85 z-10" viewBox="0 0 100 100" fill="none">
+                    <svg class="absolute top-1 left-1 w-6 h-6 sm:w-14 sm:h-14 pointer-events-none opacity-60 sm:opacity-85 z-10" viewBox="0 0 100 100" fill="none">
                         <path d="M0,0 L60,0 C40,0 20,20 20,40 C20,20 0,40 0,60 Z" fill="#c5a059"/>
                         <path d="M5,5 L80,5 C60,5 30,25 25,60 C25,30 5,60 5,80 Z" stroke="#081a33" stroke-width="1.5" fill="none"/>
                         <circle cx="20" cy="20" r="4" fill="#c5a059"/>
                     </svg>
-                    <svg class="absolute top-1 right-1 w-14 h-14 pointer-events-none opacity-85 z-10 scale-x-[-1]" viewBox="0 0 100 100" fill="none">
+                    <svg class="absolute top-1 right-1 w-6 h-6 sm:w-14 sm:h-14 pointer-events-none opacity-60 sm:opacity-85 z-10 scale-x-[-1]" viewBox="0 0 100 100" fill="none">
                         <path d="M0,0 L60,0 C40,0 20,20 20,40 C20,20 0,40 0,60 Z" fill="#c5a059"/>
                         <path d="M5,5 L80,5 C60,5 30,25 25,60 C25,30 5,60 5,80 Z" stroke="#081a33" stroke-width="1.5" fill="none"/>
                         <circle cx="20" cy="20" r="4" fill="#c5a059"/>
                     </svg>
-                    <svg class="absolute bottom-1 left-1 w-14 h-14 pointer-events-none opacity-85 z-10 scale-y-[-1]" viewBox="0 0 100 100" fill="none">
+                    <svg class="absolute bottom-1 left-1 w-6 h-6 sm:w-14 sm:h-14 pointer-events-none opacity-60 sm:opacity-85 z-10 scale-y-[-1]" viewBox="0 0 100 100" fill="none">
                         <path d="M0,0 L60,0 C40,0 20,20 20,40 C20,20 0,40 0,60 Z" fill="#c5a059"/>
                         <path d="M5,5 L80,5 C60,5 30,25 25,60 C25,30 5,60 5,80 Z" stroke="#081a33" stroke-width="1.5" fill="none"/>
                         <circle cx="20" cy="20" r="4" fill="#c5a059"/>
                     </svg>
-                    <svg class="absolute bottom-1 right-1 w-14 h-14 pointer-events-none opacity-85 z-10 scale-[-1]" viewBox="0 0 100 100" fill="none">
+                    <svg class="absolute bottom-1 right-1 w-6 h-6 sm:w-14 sm:h-14 pointer-events-none opacity-60 sm:opacity-85 z-10 scale-[-1]" viewBox="0 0 100 100" fill="none">
                         <path d="M0,0 L60,0 C40,0 20,20 20,40 C20,20 0,40 0,60 Z" fill="#c5a059"/>
                         <path d="M5,5 L80,5 C60,5 30,25 25,60 C25,30 5,60 5,80 Z" stroke="#081a33" stroke-width="1.5" fill="none"/>
                         <circle cx="20" cy="20" r="4" fill="#c5a059"/>
@@ -263,54 +300,76 @@
                     </div>
 
                     <!-- 1. KOP RESMI PIAGAM AKREDITASI -->
-                    <div class="relative z-20 text-center border-b border-[#c5a059] pb-2.5">
-                        <div class="flex items-center justify-between gap-4">
+                    <div class="relative z-20 text-center border-b border-[#c5a059] pb-3">
+                        <!-- Desktop Layout (md and up): 3 Columns -->
+                        <div class="hidden md:flex print-desktop-kop items-center justify-between gap-4">
                             <!-- Logo Lambang Kiri -->
-                            <div class="w-16 h-16 flex items-center justify-center flex-shrink-0">
+                            <div class="w-16 h-16 flex items-center justify-center shrink-0">
                                 <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik Emblem" class="w-14 h-14 object-contain drop-shadow-xs">
                             </div>
 
                             <!-- Teks Judul Piagam Utama -->
-                            <div class="flex-1 space-y-0.5">
-                                <div class="font-sans text-[10px] sm:text-[11px] tracking-[0.28em] text-[#081a33] font-extrabold uppercase">
+                            <div class="flex-1 space-y-0.5 text-center">
+                                <div class="font-sans text-[11px] tracking-[0.28em] text-[#081a33] font-extrabold uppercase">
                                     REPUBLIK INDONESIA &bull; STANDAR INTEGRITAS SINTA / ARJUNA
                                 </div>
-                                <h1 class="font-diploma-serif text-lg sm:text-2xl font-black tracking-wider text-[#081a33] uppercase">
+                                <h1 class="font-diploma-serif text-2xl font-black tracking-wider text-[#081a33] uppercase">
                                     SERTIFIKAT AKREDITASI INTEGRITAS AKADEMIK
                                 </h1>
-                                <div class="font-editorial-serif italic text-xs sm:text-sm text-[#875c16] font-semibold">
+                                <div class="font-editorial-serif italic text-sm text-[#875c16] font-semibold">
                                     Certificate of Academic Integrity &amp; Originality Attestation
                                 </div>
                             </div>
 
                             <!-- Nomor Registrasi Piagam Kanan -->
-                            <div class="w-auto flex-shrink-0 text-right">
+                            <div class="w-auto shrink-0 text-right">
                                 <div class="border border-[#c5a059] bg-[#fffdf8] px-3.5 py-1.5 rounded text-right shadow-2xs">
                                     <div class="text-[9px] font-sans tracking-widest text-[#875c16] uppercase font-bold">Nomor Registrasi:</div>
-                                    <div class="font-mono-code text-xs sm:text-sm font-bold text-[#081a33] whitespace-nowrap tracking-wider">
+                                    <div class="font-mono-code text-sm font-bold text-[#081a33] whitespace-nowrap tracking-wider">
                                         <?= esc($code) ?>
                                     </div>
                                     <div class="text-[8.5px] text-slate-500">Terbit: <?= esc($dateFormatted) ?></div>
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Mobile Layout (< md): Clean Vertical Stack -->
+                        <div class="md:hidden print-mobile-kop flex flex-col items-center gap-2">
+                            <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik Emblem" class="w-12 h-12 object-contain drop-shadow-xs">
+                            <div class="font-sans text-[8.5px] sm:text-[9.5px] tracking-[0.2em] text-[#081a33] font-extrabold uppercase leading-tight">
+                                REPUBLIK INDONESIA &bull; STANDAR INTEGRITAS SINTA / ARJUNA
+                            </div>
+                            <h1 class="font-diploma-serif text-base sm:text-lg font-black tracking-wide text-[#081a33] uppercase leading-snug px-1">
+                                SERTIFIKAT AKREDITASI INTEGRITAS AKADEMIK
+                            </h1>
+                            <div class="font-editorial-serif italic text-xs text-[#875c16] font-semibold">
+                                Certificate of Academic Integrity &amp; Originality Attestation
+                            </div>
+                            <div class="mt-1 border border-[#c5a059] bg-[#fffdf8] px-3 py-1.5 rounded text-center shadow-2xs w-full max-w-[280px]">
+                                <div class="text-[8px] font-sans tracking-widest text-[#875c16] uppercase font-bold">Nomor Registrasi</div>
+                                <div class="font-mono-code text-xs font-bold text-[#081a33] tracking-wide break-all">
+                                    <?= esc($code) ?>
+                                </div>
+                                <div class="text-[8px] text-slate-500">Terbit: <?= esc($dateFormatted) ?></div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- 2. TEKS MAKLUMAT PIAGAM (OFFICIAL PROSE) -->
                     <div class="relative z-20 text-center space-y-1 pt-0.5">
-                        <p class="font-editorial-serif italic text-xs sm:text-sm text-slate-700 leading-relaxed max-w-4xl mx-auto">
+                        <p class="font-editorial-serif italic text-xs sm:text-sm text-slate-700 leading-relaxed max-w-4xl mx-auto px-1">
                             Berdasarkan hasil audit komputasi forensik teks menggunakan algoritma sekuensial <em>5-Gram Shingle</em> dan dekomposisi leksikal <em>TF-IDF Cosine</em>, dengan ini Dewan Integritas Akademik AR Tilik menyatakan bahwa naskah karya ilmiah:
                         </p>
 
                         <!-- Judul Naskah Terperiksa (Formal & Elegan) -->
-                        <div class="py-1 border-y border-[#c5a059]/40 bg-[#fffdf8]/60 max-w-4xl mx-auto px-4 my-1">
-                            <h2 class="font-diploma-serif font-black text-sm sm:text-lg text-[#081a33] tracking-tight uppercase leading-snug">
+                        <div class="py-1.5 border-y border-[#c5a059]/40 bg-[#fffdf8]/60 max-w-4xl mx-auto px-2 sm:px-4 my-1">
+                            <h2 class="font-diploma-serif font-black text-xs sm:text-base md:text-lg text-[#081a33] tracking-tight uppercase leading-snug break-words">
                                 &ldquo;<?= esc($document['title'] ?? 'Dokumen Karya Ilmiah') ?>&rdquo;
                             </h2>
                         </div>
 
                         <!-- Data Penulis & Metadata Naskah -->
-                        <div class="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-[11px] text-slate-600 max-w-4xl mx-auto">
+                        <div class="flex flex-wrap items-center justify-center gap-x-3 sm:gap-x-5 gap-y-1 text-[10px] sm:text-[11px] text-slate-600 max-w-4xl mx-auto px-1">
                             <?php if (!empty($document['author'])): ?>
                                 <div>Penulis: <strong class="text-[#081a33]"><?= esc($document['author']) ?></strong></div>
                                 <?php if (!empty($document['uploader_name']) && $document['uploader_name'] !== $document['author']): ?>
@@ -331,67 +390,71 @@
                     </div>
 
                     <!-- 3. DIKTUM KEPUTUSAN AKREDITASI RESMI (GRAND DECREE BANNER) -->
-                    <div class="relative z-20 border-2 <?= $verdictBorder ?> rounded px-4 py-2 text-center shadow-2xs max-w-4xl mx-auto w-full">
-                        <div class="font-diploma-serif text-xs sm:text-sm font-black tracking-widest <?= $verdictColor ?> uppercase">
+                    <div class="relative z-20 border-2 <?= $verdictBorder ?> rounded px-3 sm:px-4 py-2 text-center shadow-2xs max-w-4xl mx-auto w-full">
+                        <div class="font-diploma-serif text-xs sm:text-sm font-black tracking-widest <?= $verdictColor ?> uppercase leading-snug">
                             KEPUTUSAN: <?= esc($verdictTitle) ?>
                         </div>
-                        <div class="text-[11px] text-slate-700 mt-0.5 font-medium">
-                            <?= esc($verdictKriteria) ?> &bull; Indeks Kesepadanan: <strong class="font-mono-code text-xs font-black <?= $verdictColor ?>"><?= number_format($overallSim, 2) ?>%</strong> &bull; Tingkat Orisinalitas: <strong class="font-mono-code text-xs font-black text-emerald-800"><?= number_format($originalityRate, 2) ?>%</strong>
+                        <div class="text-[10px] sm:text-[11px] text-slate-700 mt-1 font-medium flex flex-wrap items-center justify-center gap-x-2 gap-y-0.5">
+                            <span><?= esc($verdictKriteria) ?></span>
+                            <span class="hidden sm:inline">&bull;</span>
+                            <span>Indeks Kesepadanan: <strong class="font-mono-code text-xs font-black <?= $verdictColor ?>"><?= number_format($overallSim, 2) ?>%</strong></span>
+                            <span class="hidden sm:inline">&bull;</span>
+                            <span>Tingkat Orisinalitas: <strong class="font-mono-code text-xs font-black text-emerald-800"><?= number_format($originalityRate, 2) ?>%</strong></span>
                         </div>
-                        <div class="text-[9.5px] text-slate-500 italic mt-0.5">
+                        <div class="text-[9px] sm:text-[9.5px] text-slate-500 italic mt-0.5">
                             <?= esc($report['rationale'] ?? 'Naskah memenuhi kriteria integritas karya ilmiah perguruan tinggi.') ?>
                         </div>
                     </div>
 
                     <!-- 4. CATUR PILAR METRIK INTEGRITAS (HERALDIC 4 PILLARS) -->
-                    <div class="relative z-20 grid grid-cols-2 md:grid-cols-4 gap-2.5 max-w-4xl mx-auto w-full">
+                    <div class="relative z-20 grid grid-cols-2 md:grid-cols-4 print-pillars-grid gap-2 sm:gap-2.5 max-w-4xl mx-auto w-full">
                         <!-- Pilar I -->
-                        <div class="border border-[#c5a059] bg-gradient-to-b from-[#fffdfa] to-[#faf6ec] rounded p-2 text-center shadow-2xs">
-                            <div class="text-[9px] font-bold tracking-widest text-[#875c16] uppercase">Pilar I &bull; Sekuensial</div>
-                            <div class="text-[10.5px] font-bold text-[#081a33] mt-0.5">Kesepadanan Harfiah</div>
-                            <div class="font-mono-code text-sm font-black text-[#081a33] my-0.5"><?= number_format($exactSim, 2) ?>%</div>
-                            <div class="text-[8.5px] text-slate-500">5-Gram Exact Shingle</div>
-                            <div class="inline-block text-[8px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-amber-100/60 text-[#78510a] border border-[#c5a059]/40 mt-1">
+                        <div class="border border-[#c5a059] bg-gradient-to-b from-[#fffdfa] to-[#faf6ec] rounded p-1.5 sm:p-2 text-center shadow-2xs">
+                            <div class="text-[8px] sm:text-[9px] font-bold tracking-widest text-[#875c16] uppercase">Pilar I &bull; Sekuensial</div>
+                            <div class="text-[9.5px] sm:text-[10.5px] font-bold text-[#081a33] mt-0.5 leading-tight">Kesepadanan Harfiah</div>
+                            <div class="font-mono-code text-xs sm:text-sm font-black text-[#081a33] my-0.5"><?= number_format($exactSim, 2) ?>%</div>
+                            <div class="text-[8px] sm:text-[8.5px] text-slate-500">5-Gram Exact Shingle</div>
+                            <div class="inline-block text-[7.5px] sm:text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-100/60 text-[#78510a] border border-[#c5a059]/40 mt-1 max-w-full truncate">
                                 <?= $exactSim <= 5.0 ? 'Sangat Baik' : 'Wajar' ?>
                             </div>
                         </div>
 
                         <!-- Pilar II -->
-                        <div class="border border-[#c5a059] bg-gradient-to-b from-[#fffdfa] to-[#faf6ec] rounded p-2 text-center shadow-2xs">
-                            <div class="text-[9px] font-bold tracking-widest text-[#875c16] uppercase">Pilar II &bull; Orientasi</div>
-                            <div class="text-[10.5px] font-bold text-[#081a33] mt-0.5">Kosinus Leksikal / Topik</div>
-                            <div class="font-mono-code text-sm font-black text-[#081a33] my-0.5"><?= number_format($cosineSim, 2) ?>%</div>
-                            <div class="text-[8.5px] text-slate-500">TF-IDF Vector Cosine</div>
-                            <div class="inline-block text-[8px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-amber-100/60 text-[#78510a] border border-[#c5a059]/40 mt-1">
-                                Korelasi Topikal Wajar
+                        <div class="border border-[#c5a059] bg-gradient-to-b from-[#fffdfa] to-[#faf6ec] rounded p-1.5 sm:p-2 text-center shadow-2xs">
+                            <div class="text-[8px] sm:text-[9px] font-bold tracking-widest text-[#875c16] uppercase">Pilar II &bull; Orientasi</div>
+                            <div class="text-[9.5px] sm:text-[10.5px] font-bold text-[#081a33] mt-0.5 leading-tight">Kosinus Leksikal / Topik</div>
+                            <div class="font-mono-code text-xs sm:text-sm font-black text-[#081a33] my-0.5"><?= number_format($cosineSim, 2) ?>%</div>
+                            <div class="text-[8px] sm:text-[8.5px] text-slate-500">TF-IDF Vector Cosine</div>
+                            <div class="inline-block text-[7.5px] sm:text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-100/60 text-[#78510a] border border-[#c5a059]/40 mt-1 max-w-full truncate">
+                                Korelasi Wajar
                             </div>
                         </div>
 
                         <!-- Pilar III -->
-                        <div class="border border-[#c5a059] bg-gradient-to-b from-[#fffdfa] to-[#faf6ec] rounded p-2 text-center shadow-2xs">
-                            <div class="text-[9px] font-bold tracking-widest text-[#875c16] uppercase">Pilar III &bull; Pasase</div>
-                            <div class="text-[10.5px] font-bold text-[#081a33] mt-0.5">Rangkaian Terpanjang</div>
-                            <div class="font-mono-code text-sm font-black text-[#081a33] my-0.5"><?= $longestRun ?> Kata</div>
-                            <div class="text-[8.5px] text-slate-500">Consecutive Word Span</div>
-                            <div class="inline-block text-[8px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-amber-100/60 text-[#78510a] border border-[#c5a059]/40 mt-1">
+                        <div class="border border-[#c5a059] bg-gradient-to-b from-[#fffdfa] to-[#faf6ec] rounded p-1.5 sm:p-2 text-center shadow-2xs">
+                            <div class="text-[8px] sm:text-[9px] font-bold tracking-widest text-[#875c16] uppercase">Pilar III &bull; Pasase</div>
+                            <div class="text-[9.5px] sm:text-[10.5px] font-bold text-[#081a33] mt-0.5 leading-tight">Rangkaian Terpanjang</div>
+                            <div class="font-mono-code text-xs sm:text-sm font-black text-[#081a33] my-0.5"><?= $longestRun ?> Kata</div>
+                            <div class="text-[8px] sm:text-[8.5px] text-slate-500">Word Span</div>
+                            <div class="inline-block text-[7.5px] sm:text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-100/60 text-[#78510a] border border-[#c5a059]/40 mt-1 max-w-full truncate">
                                 <?= $longestRun < 20 ? 'Bebas Frasa Berulang' : 'Perlu Parafrasa' ?>
                             </div>
                         </div>
 
                         <!-- Pilar IV -->
-                        <div class="border border-[#c5a059] bg-gradient-to-b from-[#fffdfa] to-[#faf6ec] rounded p-2 text-center shadow-2xs">
-                            <div class="text-[9px] font-bold tracking-widest text-[#875c16] uppercase">Pilar IV &bull; Sintesis</div>
-                            <div class="text-[10.5px] font-bold text-[#081a33] mt-0.5">Forensik Sintesis Mesin</div>
-                            <div class="font-mono-code text-sm font-black <?= ($aiScore !== null && $aiScore >= 70) ? 'text-rose-700' : (($aiScore !== null && $aiScore >= 35) ? 'text-amber-700' : 'text-[#081a33]') ?> my-0.5"><?= $aiScore !== null ? number_format($aiScore, 1) . '%' : 'Alami' ?></div>
-                            <div class="text-[8.5px] text-slate-500">Stylometrik &amp; Forensik Cerdas</div>
-                            <div class="inline-block text-[8px] font-bold uppercase tracking-wider px-2 py-0.5 rounded <?= ($aiScore !== null && $aiScore >= 70) ? 'bg-rose-100/90 text-rose-800 border border-rose-300' : (($aiScore !== null && $aiScore >= 35) ? 'bg-amber-100/60 text-[#78510a] border border-[#c5a059]/40' : 'bg-emerald-100/60 text-emerald-800 border border-emerald-300') ?> mt-1">
+                        <div class="border border-[#c5a059] bg-gradient-to-b from-[#fffdfa] to-[#faf6ec] rounded p-1.5 sm:p-2 text-center shadow-2xs">
+                            <div class="text-[8px] sm:text-[9px] font-bold tracking-widest text-[#875c16] uppercase">Pilar IV &bull; Sintesis</div>
+                            <div class="text-[9.5px] sm:text-[10.5px] font-bold text-[#081a33] mt-0.5 leading-tight">Forensik Sintesis Mesin</div>
+                            <div class="font-mono-code text-xs sm:text-sm font-black <?= ($aiScore !== null && $aiScore >= 70) ? 'text-rose-700' : (($aiScore !== null && $aiScore >= 35) ? 'text-amber-700' : 'text-[#081a33]') ?> my-0.5"><?= $aiScore !== null ? number_format($aiScore, 1) . '%' : 'Alami' ?></div>
+                            <div class="text-[8px] sm:text-[8.5px] text-slate-500">Forensik Cerdas</div>
+                            <div class="inline-block text-[7.5px] sm:text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded <?= ($aiScore !== null && $aiScore >= 70) ? 'bg-rose-100/90 text-rose-800 border border-rose-300' : (($aiScore !== null && $aiScore >= 35) ? 'bg-amber-100/60 text-[#78510a] border border-[#c5a059]/40' : 'bg-emerald-100/60 text-emerald-800 border border-emerald-300') ?> mt-1 max-w-full truncate">
                                 <?= esc($aiLabel) ?>
                             </div>
                         </div>
                     </div>
 
                     <!-- 5. KLAUSUL KEDAULATAN PRIVASI DATA -->
-                    <div class="relative z-20 border border-[#c5a059]/50 bg-[#fffdfa] rounded px-3 py-1.5 text-[9.5px] text-slate-600 text-center max-w-4xl mx-auto w-full">
+                    <div class="relative z-20 border border-[#c5a059]/50 bg-[#fffdfa] rounded px-2.5 sm:px-3 py-1.5 text-[8.5px] sm:text-[9.5px] text-slate-600 text-center max-w-4xl mx-auto w-full leading-relaxed">
                         🛡️ <strong>Kedaulatan Privasi Data (Zero-Leakage Guarantee):</strong>
                         <?php if ($isPurged): ?>
                             Berkas fisik naskah asli telah dimusnahkan secara mandiri dari peladen pada <strong><?= esc($purgedDate) ?></strong> (Zero-Leakage Guarantee). Sertifikasi ini sah 100% berbasis sidik jari kriptografis SHA-256.
@@ -401,16 +464,16 @@
                     </div>
 
                     <!-- 6. PENGESAHAN, QR CODE & STEMPEL MEDALI EMAS BERPITA -->
-                    <div class="relative z-20 border-t-2 border-[#081a33]/25 pt-3 flex items-end justify-between gap-4 max-w-4xl mx-auto w-full">
+                    <div class="relative z-20 border-t-2 border-[#081a33]/25 pt-4 pb-2 flex flex-col md:flex-row print-desktop-footer items-center md:items-end justify-between gap-5 md:gap-4 max-w-4xl mx-auto w-full">
                         
                         <!-- Kolom Kiri: QR Code Kriptografis -->
-                        <div class="flex items-center gap-2.5 max-w-[240px]">
-                            <div class="p-1 bg-white border border-[#c5a059] rounded shadow-2xs flex-shrink-0">
-                                <img src="<?= esc($qrApiUrl) ?>" alt="QR Code Verifikasi" class="w-16 h-16 object-contain">
+                        <div class="flex items-center gap-2.5 max-w-[260px] order-2 md:order-1 text-left">
+                            <div class="p-1 bg-white border border-[#c5a059] rounded shadow-2xs shrink-0">
+                                <img src="<?= esc($qrApiUrl) ?>" alt="QR Code Verifikasi" class="w-14 h-14 sm:w-16 sm:h-16 object-contain">
                             </div>
                             <div class="text-[9px] text-slate-600 leading-tight space-y-0.5">
                                 <div class="font-diploma-serif font-bold text-[#081a33] uppercase text-[9.5px]">Validasi Kriptografis</div>
-                                <p>Pindai untuk memvalidasi keabsahan piagam ini secara langsung pada peladen resmi.</p>
+                                <p class="text-[8px] sm:text-[9px]">Pindai untuk memvalidasi keabsahan piagam ini secara langsung pada peladen resmi.</p>
                                 <div class="font-mono-code text-[7.5px] text-slate-400 truncate max-w-[140px]" title="<?= esc($verifyUrl) ?>">
                                     <?= esc($verifyUrl) ?>
                                 </div>
@@ -418,7 +481,7 @@
                         </div>
 
                         <!-- Kolom Tengah: Stempel Medali Emas Bergerigi Timbul 3D dengan Pita Royal Navy -->
-                        <div class="relative flex flex-col items-center justify-center my-0">
+                        <div class="relative flex flex-col items-center justify-center my-0 order-1 md:order-2 shrink-0 mb-4 md:mb-0">
                             <!-- Pita Menjuntai Belakang -->
                             <div class="seal-ribbon-left"></div>
                             <div class="seal-ribbon-right"></div>
@@ -435,16 +498,16 @@
                         </div>
 
                         <!-- Kolom Kanan: Pengesahan Dewan & Digital Checksum -->
-                        <div class="text-right space-y-0.5 max-w-[240px]">
-                            <div class="text-[9px] text-slate-500 font-medium">Ditetapkan secara resmi pada:</div>
+                        <div class="text-center md:text-right space-y-0.5 max-w-[260px] order-3">
+                            <div class="text-[8.5px] sm:text-[9px] text-slate-500 font-medium">Ditetapkan secara resmi pada:</div>
                             <div class="font-bold text-xs text-[#081a33]"><?= esc($dateFormatted) ?></div>
-                            <div class="font-diploma-serif text-[10px] font-extrabold text-[#081a33] uppercase mt-1">
+                            <div class="font-diploma-serif text-[9.5px] sm:text-[10px] font-extrabold text-[#081a33] uppercase mt-0.5 sm:mt-1">
                                 Lembaga Uji Integritas AR Tilik
                             </div>
-                            <div class="font-mono-code text-[8px] text-[#875c16] bg-[#fffdf8] px-2 py-0.5 rounded border border-[#c5a059]/50 inline-block mt-0.5">
+                            <div class="font-mono-code text-[7.5px] sm:text-[8px] text-[#875c16] bg-[#fffdf8] px-2 py-0.5 rounded border border-[#c5a059]/50 inline-block mt-0.5">
                                 SIG: <?= esc($sigPreview) ?>
                             </div>
-                            <div class="text-[8px] text-slate-400 italic">
+                            <div class="text-[7.5px] sm:text-[8px] text-slate-400 italic">
                                 Tanda Tangan Digital Tersertifikasi Sistem Peladen
                             </div>
                         </div>
@@ -518,10 +581,16 @@
             const url = window.location.href;
             navigator.clipboard.writeText(url).then(() => {
                 const btnText = document.getElementById('btnCopyUrlText');
+                const btnTextMobile = document.getElementById('btnCopyUrlTextMobile');
                 if (btnText) {
                     const orig = btnText.innerText;
                     btnText.innerText = 'Tersalin!';
                     setTimeout(() => { btnText.innerText = orig; }, 2000);
+                }
+                if (btnTextMobile) {
+                    const origM = btnTextMobile.innerText;
+                    btnTextMobile.innerText = 'Tersalin!';
+                    setTimeout(() => { btnTextMobile.innerText = origM; }, 2000);
                 }
             }).catch(() => {
                 alert('Tautan disalin ke clipboard: ' + url);
