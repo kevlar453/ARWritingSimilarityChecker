@@ -67,33 +67,33 @@
 
     <!-- Navbar Minimalis -->
     <header class="border-b border-white/10 bg-slate-950/80 backdrop-blur-md sticky top-0 z-50">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-            <a href="<?= base_url() ?>" class="flex items-center gap-2.5 group">
-                <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik Logo" class="w-9 h-9 object-contain drop-shadow-sm group-hover:scale-105 transition-transform duration-200">
+        <div class="max-w-6xl mx-auto px-3 sm:px-6 min-h-[3.75rem] py-2 sm:py-0 sm:h-16 flex items-center justify-between gap-2">
+            <a href="<?= base_url() ?>" class="flex items-center gap-2 group shrink-0">
+                <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik Logo" class="w-8 h-8 sm:w-9 sm:h-9 object-contain drop-shadow-sm group-hover:scale-105 transition-transform duration-200">
                 <div>
                     <span class="font-bold text-sm tracking-tight text-white group-hover:text-indigo-300 transition">AR Tilik</span>
                     <span class="text-[10px] text-amber-400 font-mono block leading-none">Duta Kampus Hub</span>
                 </div>
             </a>
-            <div class="flex items-center gap-2.5 flex-wrap">
-                <a href="<?= base_url() ?>" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-slate-900/90 hover:bg-slate-800 border border-white/15 transition shadow-xs" title="Kembali ke Beranda Utama AR Tilik">
-                    <span>🏠</span> <span>Landing Page</span>
+            <div class="flex items-center gap-1.5 sm:gap-2.5 flex-wrap justify-end">
+                <a href="<?= base_url() ?>" class="inline-flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-slate-900/90 hover:bg-slate-800 border border-white/15 transition shadow-xs" title="Kembali ke Beranda Utama AR Tilik">
+                    <span>🏠</span> <span class="hidden sm:inline">Landing Page</span><span class="sm:hidden">Beranda</span>
                 </a>
                 <?php if (!empty($currentUser)): ?>
-                    <a href="<?= base_url('dashboard') ?>" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-200 hover:text-white bg-slate-900 hover:bg-slate-800 border border-white/15 transition shadow-xs">
-                        <span>&larr;</span> <span>Kembali ke Dashboard</span>
+                    <a href="<?= base_url('dashboard') ?>" class="inline-flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold text-slate-200 hover:text-white bg-slate-900 hover:bg-slate-800 border border-white/15 transition shadow-xs">
+                        <span>&larr;</span> <span class="hidden sm:inline">Kembali ke </span><span>Dashboard</span>
                     </a>
                     <?php if (!empty($activeProfile)): ?>
-                        <a href="<?= base_url('ambassador/dashboard') ?>" class="text-xs px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition flex items-center gap-1.5 shadow-xs">
-                            <span>🎓</span> <span>Portal Duta</span>
+                        <a href="<?= base_url('ambassador/dashboard') ?>" class="text-xs px-2.5 sm:px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition flex items-center gap-1 sm:gap-1.5 shadow-xs">
+                            <span>🎓</span> <span class="hidden sm:inline">Portal </span><span>Duta</span>
                         </a>
                     <?php endif; ?>
                 <?php else: ?>
                     <a href="<?= base_url('/?auth=login') ?>" class="text-xs text-slate-300 hover:text-white font-semibold transition px-2 py-1">
                         Masuk
                     </a>
-                    <a href="<?= base_url('/#langganan') ?>" class="text-xs px-3 py-1.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold hover:bg-amber-500/30 transition">
-                        Paket Pemeriksaan
+                    <a href="<?= base_url('/#langganan') ?>" class="text-xs px-2.5 sm:px-3 py-1.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold hover:bg-amber-500/30 transition">
+                        <span class="hidden sm:inline">Paket </span>Pemeriksaan
                     </a>
                 <?php endif; ?>
             </div>

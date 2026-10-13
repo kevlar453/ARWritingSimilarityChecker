@@ -91,6 +91,14 @@ class GoogleApiKeyModel extends Model
     }
 
     /**
+     * Mengambil seluruh kunci Google API lengkap beserta status kesehatannya (kompatibel dengan CLI/monitoring)
+     */
+    public function getAllKeysWithStatus(): array
+    {
+        return $this->getAllKeys();
+    }
+
+    /**
      * Mengambil satu API Key yang siap digunakan dengan strategi Pool Cerdas (kesehatan & beban terendah)
      */
     public function getNextRoundRobinKey(): ?array

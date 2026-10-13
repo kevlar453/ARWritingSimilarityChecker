@@ -151,9 +151,9 @@ $routes->group('api-keys', ['filter' => 'auth'], function ($routes) {
 });
 
 // Admin Portal & Management Routes (Protected by AdminFilter)
+$routes->get('admin', 'Admin\DashboardController::index', ['filter' => 'admin']);
 $routes->group('admin', ['filter' => 'admin'], function ($routes) {
     $routes->get('/', 'Admin\DashboardController::index');
-    $routes->get('', 'Admin\DashboardController::index');
     $routes->post('users/update', 'Admin\DashboardController::updateUser');
     $routes->post('documents/reprocess', 'Admin\DashboardController::reprocessDocument');
     $routes->post('documents/delete', 'Admin\DashboardController::deleteDocument');

@@ -65,6 +65,7 @@
         html {
             scroll-behavior: smooth;
             scroll-padding-top: var(--header-offset, 130px);
+            overflow-x: hidden;
         }
         body {
             font-family: var(--sans);
@@ -73,6 +74,7 @@
             line-height: 1.65;
             text-rendering: optimizeLegibility;
             -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
         }
         a { color: inherit; text-decoration: none; }
         a:focus-visible, button:focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; }
@@ -978,9 +980,61 @@
             .scoreboard-card { overflow-x: auto; }
             .scoreboard-table { min-width: 600px; }
         }
+
+        /* TopNavBar Mobile Standardization & Fluid Layout */
+        @media (max-width: 768px) {
+            .container { padding: 0 16px; }
+            .navbar { padding: 9px 0; }
+            .nav-inner { gap: 10px; }
+            .brand { gap: 8px; flex-shrink: 0; }
+            .brand-logo { width: 32px; height: 32px; }
+            .brand-title { font-size: 18px; }
+            .brand-badge { display: none !important; }
+            .nav-actions { gap: 8px; flex-shrink: 0; }
+            .btn-nav-back {
+                padding: 6px 11px;
+                font-size: 12px;
+                white-space: nowrap;
+            }
+            .btn-nav-primary {
+                padding: 6px 13px;
+                font-size: 12px;
+                white-space: nowrap;
+            }
+            .btn-nav-prefix { display: none; }
+        }
+
         @media (max-width: 600px) {
             .fit-item { grid-template-columns: 1fr; gap: 8px; }
             .fit-item .score-pill { align-self: flex-start; }
+        }
+
+        @media (max-width: 480px) {
+            .container { padding: 0 14px; }
+            .navbar { padding: 8px 0; }
+            .nav-inner { gap: 8px; }
+            .brand { gap: 7px; }
+            .brand-logo { width: 30px; height: 30px; }
+            .brand-title { font-size: 16.5px; }
+            .nav-actions { gap: 6px; }
+            .btn-nav-back {
+                padding: 5px 9px;
+                font-size: 11.5px;
+                gap: 4px;
+            }
+            .btn-nav-primary {
+                padding: 5px 11px;
+                font-size: 11.5px;
+                gap: 4px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .container { padding: 0 10px; }
+            .brand-title { font-size: 15px; }
+            .btn-nav-back .btn-nav-text { display: none; }
+            .btn-nav-back { padding: 5px 8px; }
+            .btn-nav-primary { padding: 5px 9px; font-size: 11px; }
         }
     </style>
 </head>
@@ -1008,8 +1062,14 @@
             </nav>
 
             <div class="nav-actions">
-                <a href="<?= base_url() ?>" class="btn-nav-back">&larr; Beranda</a>
-                <a href="<?= base_url('dashboard') ?>" class="btn-nav-primary">Buka Dashboard &rarr;</a>
+                <a href="<?= base_url() ?>" class="btn-nav-back" title="Kembali ke Beranda">
+                    <span class="btn-nav-arrow">&larr;</span>
+                    <span class="btn-nav-text">Beranda</span>
+                </a>
+                <a href="<?= base_url('dashboard') ?>" class="btn-nav-primary" title="Buka Dashboard AR Tilik">
+                    <span class="btn-nav-prefix">Buka </span><span>Dashboard</span>
+                    <span class="btn-nav-arrow">&rarr;</span>
+                </a>
             </div>
         </div>
     </header>

@@ -254,6 +254,20 @@
         @media (max-width: 768px) {
             .legal-document { padding: 24px; }
             .legal-title { font-size: 22px; }
+            .container { padding: 0 16px; }
+            .navbar { padding: 10px 0; }
+            .brand { gap: 8px; }
+            .brand-logo { width: 32px; height: 32px; }
+            .brand-title { font-size: 18px; }
+            .btn-back { padding: 6px 12px; font-size: 12px; border-radius: 9999px; }
+            .btn-desktop-text { display: none; }
+        }
+        @media (max-width: 480px) {
+            .container { padding: 0 14px; }
+            .navbar { padding: 8px 0; }
+            .brand-logo { width: 30px; height: 30px; }
+            .brand-title { font-size: 16.5px; }
+            .btn-back { padding: 5px 10px; font-size: 11.5px; }
         }
     </style>
 </head>
@@ -261,11 +275,11 @@
     <header class="navbar">
         <div class="container nav-inner">
             <a href="<?= base_url() ?>" class="brand">
-                <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik" class="brand-logo">
+                <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik Logo" class="brand-logo" width="38" height="38">
                 <span class="brand-title">AR Tilik</span>
             </a>
-            <a href="<?= base_url() ?>" class="btn-back">
-                &larr; Kembali ke Beranda
+            <a href="<?= base_url() ?>" class="btn-back" title="Kembali ke Beranda">
+                &larr; <span class="btn-desktop-text">Kembali ke </span>Beranda
             </a>
         </div>
     </header>
