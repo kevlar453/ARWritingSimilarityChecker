@@ -1487,6 +1487,7 @@
             /* ─── Sub-Navigation & Scroll Offset Handling ─── */
             var subnav = document.querySelector(".subnav");
             var navbar = document.querySelector(".navbar");
+            var subnavInner = document.querySelector(".subnav-inner");
             var subnavLinks = document.querySelectorAll(".subnav-link");
             var sectionIds = ["beda", "bukti", "mesin", "batas", "pilih", "sumber"];
             var sections = sectionIds.map(function (id) { return document.getElementById(id); }).filter(Boolean);
@@ -1518,11 +1519,16 @@
                     var linkId = href.replace(/^#/, "");
                     var isActive = (linkId === cleanId);
                     link.classList.toggle("active", isActive);
-                    if (isActive) {
-                        link.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+                    if (isActive && subnavInner) {
+                        // Scroll ONLY the subnav pill container horizontally, NEVER the main window!
+                        var targetLeft = link.offsetLeft - (subnavInner.clientWidth / 2) + (link.clientWidth / 2);
+                        subnavInner.scrollTo({ left: targetLeft, behavior: "smooth" });
                     }
                 });
             }
+
+            var isProgrammaticScroll = false;
+            var scrollEndTimer = null;
 
             // Smooth Scroll on Subnav Link Click with Exact Dynamic Offset
             subnavLinks.forEach(function (link) {
@@ -1533,48 +1539,64 @@
                         if (target) {
                             e.preventDefault();
                             var offset = getHeaderOffset();
-                            var targetTop = target.getBoundingClientRect().top + window.scrollY - offset;
+                            var rect = target.getBoundingClientRect();
+                            var currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+                            var targetTop = rect.top + currentScroll - offset;
+
+                            isProgrammaticScroll = true;
+                            setActiveSubnav(href);
+
                             window.scrollTo({
                                 top: targetTop,
                                 behavior: "smooth"
                             });
+
                             if (window.history && window.history.pushState) {
                                 window.history.pushState(null, "", href);
                             }
-                            setActiveSubnav(href);
+
+                            clearTimeout(scrollEndTimer);
+                            scrollEndTimer = setTimeout(function () {
+                                isProgrammaticScroll = false;
+                            }, 700);
                         }
                     }
                 });
             });
 
-            // Scroll Spy using IntersectionObserver
-            if ("IntersectionObserver" in window) {
-                var observer = new IntersectionObserver(function (entries) {
-                    entries.forEach(function (entry) {
-                        if (entry.isIntersecting) {
-                            setActiveSubnav(entry.target.id);
-                        }
-                    });
-                }, {
-                    rootMargin: "-20% 0px -60% 0px",
-                    threshold: 0
-                });
+            // Scroll Spy using smooth RAF listener
+            function updateActiveSection() {
+                if (isProgrammaticScroll) return;
+                var offset = getHeaderOffset();
+                var currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+                var scrollPos = currentScroll + offset + 40;
 
-                sections.forEach(function (sec) {
-                    observer.observe(sec);
-                });
-            } else {
-                window.addEventListener("scroll", function () {
-                    var offset = getHeaderOffset();
-                    var scrollY = window.scrollY + offset + 30;
-                    for (var i = sections.length - 1; i >= 0; i--) {
-                        if (scrollY >= sections[i].offsetTop) {
-                            setActiveSubnav(sections[i].id);
-                            break;
-                        }
+                // Check if reached bottom of page -> activate last section
+                var scrollBottom = currentScroll + window.innerHeight;
+                var docHeight = document.documentElement.scrollHeight;
+                if (scrollBottom >= docHeight - 80 && sections.length > 0) {
+                    setActiveSubnav(sections[sections.length - 1].id);
+                    return;
+                }
+
+                for (var i = sections.length - 1; i >= 0; i--) {
+                    if (sections[i] && scrollPos >= sections[i].offsetTop) {
+                        setActiveSubnav(sections[i].id);
+                        return;
                     }
-                }, { passive: true });
+                }
             }
+
+            var isTicking = false;
+            window.addEventListener("scroll", function () {
+                if (!isTicking) {
+                    window.requestAnimationFrame(function () {
+                        updateActiveSection();
+                        isTicking = false;
+                    });
+                    isTicking = true;
+                }
+            }, { passive: true });
 
             // Hash on page load
             if (window.location.hash) {
@@ -1582,11 +1604,13 @@
                     var target = document.querySelector(window.location.hash);
                     if (target) {
                         var offset = getHeaderOffset();
-                        var targetTop = target.getBoundingClientRect().top + window.scrollY - offset;
+                        var rect = target.getBoundingClientRect();
+                        var currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+                        var targetTop = rect.top + currentScroll - offset;
                         window.scrollTo({ top: targetTop, behavior: "smooth" });
                         setActiveSubnav(window.location.hash);
                     }
-                }, 100);
+                }, 120);
             }
         }());
     </script>
