@@ -268,3 +268,22 @@ def test_log_gemini_metric_and_summary(tmp_path):
         assert summary["total_429"] == 2
         assert len(summary["per_key"]) >= 2
 
+
+def test_privacy_preserving_sample_short_and_long():
+    """Memverifikasi invarian privasi: naskah tidak pernah dikirim 100% utuh baik naskah pendek maupun panjang."""
+    from worker.gemini_forensic import create_privacy_preserving_sample
+
+    # 1. Naskah pendek (misal 500 kata / 3.000 karakter)
+    short_text = "Penelitian mengenai dinamika sosial masyarakat adat Dayak di Kalimantan Barat. " * 35
+    sampled_short = create_privacy_preserving_sample(short_text, max_chars=4500)
+    assert sampled_short != short_text
+    assert "[... sebagian teks naskah dilewati oleh sistem AR Tilik demi menjaga privasi & hak cipta karya ilmiah ...]" in sampled_short
+    assert len(sampled_short) < len(short_text)
+
+    # 2. Naskah panjang (misal 15.000 kata / 90.000 karakter)
+    long_text = "Kajian komprehensif tentang transformasi sosial, hukum adat, dan pluralisme keagamaan. " * 1000
+    sampled_long = create_privacy_preserving_sample(long_text, max_chars=4500)
+    assert len(sampled_long) <= 4500
+    assert sampled_long.count("[... sebagian teks naskah dilewati oleh sistem AR Tilik demi menjaga privasi & hak cipta karya ilmiah ...]") == 2
+
+

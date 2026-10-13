@@ -502,6 +502,75 @@ def postprocess_ai_claim(audit: Dict[str, Any], full_text: str, doc_metadata: Op
     return audit
 
 
+def create_privacy_preserving_sample(text: str, max_chars: int = 4500) -> str:
+    """
+    Menghasilkan cuplikan naskah representatif terfragmentasi (maksimal 3.500–5.000 karakter).
+    
+    Invarian Privasi & Hak Cipta (Data Minimization):
+    - Naskah TIDAK PERNAH dikirim 100% utuh, baik naskah panjang maupun naskah pendek.
+    - Untuk naskah pendek (<= max_chars): mengambil ~40% awal dan ~40% akhir, menyisihkan 20% di tengah.
+    - Untuk naskah panjang (> max_chars): mengambil 3 jendela representatif (Pendahuluan, Metodologi, Temuan)
+      masing-masing ~1.200–1.400 karakter dengan pemisah penanda privasi yang eksplisit.
+    """
+    text = (text or "").strip()
+    if not text:
+        return ""
+
+    separator = "\n\n[... sebagian teks naskah dilewati oleh sistem AR Tilik demi menjaga privasi & hak cipta karya ilmiah ...]\n\n"
+    sep_len = len(separator)
+
+    # Kasus naskah pendek (<= max_chars): sisihkan 20% bagian tengah agar tidak pernah 100% utuh
+    if len(text) <= max_chars:
+        part_len = int(len(text) * 0.40)
+        if part_len < 80:
+            return text[:part_len]  # Naskah sangat mikro
+
+        # Ambil jendela awal (~40%) hingga batas kata terdekat
+        p1 = text[:part_len]
+        last_sp1 = p1.rfind(" ")
+        if last_sp1 > 50:
+            p1 = p1[:last_sp1]
+
+        # Ambil jendela akhir (~40%) mulai batas kata terdekat
+        p2_start = int(len(text) * 0.60)
+        p2 = text[p2_start:]
+        first_sp2 = p2.find(" ")
+        if first_sp2 != -1 and first_sp2 < 50:
+            p2 = p2[first_sp2 + 1:]
+
+        return p1 + separator + p2
+
+    # Kasus naskah panjang (> max_chars): Stratified sampling 3 jendela representatif
+    effective_max = max(1000, max_chars - (2 * sep_len))
+    window_size = int(effective_max / 3)  # ~1.200 - 1.400 karakter per jendela
+
+    # Jendela 1: Awal naskah (Latar Belakang / Tujuan)
+    w1 = text[:window_size]
+    last_sp = w1.rfind(" ")
+    if last_sp > int(window_size * 0.7):
+        w1 = w1[:last_sp]
+
+    # Jendela 2: Tengah naskah (Metodologi / Kerangka Berpikir di kisaran ~45%)
+    mid_start = int(len(text) * 0.45)
+    w2 = text[mid_start:mid_start + window_size]
+    first_sp = w2.find(" ")
+    if first_sp != -1 and first_sp < 50:
+        w2 = w2[first_sp + 1:]
+    last_sp = w2.rfind(" ")
+    if last_sp > int(window_size * 0.7):
+        w2 = w2[:last_sp]
+
+    # Jendela 3: Bagian akhir substantif (Hasil / Temuan / Pembahasan di kisaran ~80%)
+    end_start = int(len(text) * 0.80)
+    w3 = text[end_start:end_start + window_size]
+    first_sp = w3.find(" ")
+    if first_sp != -1 and first_sp < 50:
+        w3 = w3[first_sp + 1:]
+
+    sampled = w1 + separator + w2 + separator + w3
+    return sampled[:max_chars]
+
+
 def audit_proposal_with_gemini(
     document_text: str,
     substantive_text: str = "",
@@ -521,9 +590,9 @@ def audit_proposal_with_gemini(
             "is_available": False
         }
 
-    # Persiapkan ekstrak teks naskah (maksimal ~25.000 karakter agar hemat token dan cepat)
-    content_sample = substantive_text if (substantive_text and len(substantive_text.strip()) >= 500) else document_text
-    truncated_content = content_sample[:25000]
+    # Persiapkan ekstrak teks naskah representatif (Data Minimization: plafon maks 4.500 karakter / ~700 kata)
+    content_source = substantive_text if (substantive_text and len(substantive_text.strip()) >= 500) else document_text
+    truncated_content = create_privacy_preserving_sample(content_source, max_chars=4500)
 
     meta = doc_metadata or {}
     if meta.get("created") or meta.get("modified"):
@@ -563,7 +632,7 @@ ATURAN PENILAIAN "tingkat_indikasi_ai" (wajib dipatuhi, untuk mencegah tuduhan k
 
 Judul Dokumen: {title or 'Karya Ilmiah'}
 
-Potongan Naskah:
+Cuplikan Representatif Naskah (Data Minimization: hanya sampel terfragmentasi dari bagian substantif untuk melindungi privasi karya):
 \"\"\"{truncated_content}\"\"\"
 
 Lakukan audit kritis dan kembalikan HANYA format JSON valid dengan struktur persis berikut:
@@ -620,7 +689,13 @@ Lakukan audit kritis dan kembalikan HANYA format JSON valid dengan struktur pers
                     "is_available": True,
                     "model_used": res.get("model_executed") or model_name,
                     "key_used": key_name,
-                    "audit": parsed_audit
+                    "audit": parsed_audit,
+                    "privacy_protection": {
+                        "full_document_transmitted": False,
+                        "sample_char_count": len(truncated_content),
+                        "total_document_chars": len(document_text),
+                        "sampling_method": "stratified_fragmented_window"
+                    }
                 }
             except Exception as json_err:
                 logger.warning(f"[GEMINI] Gagal mengurai JSON respon dari Gemini: {json_err}. Mencoba pemulihan regex...")
@@ -642,7 +717,13 @@ Lakukan audit kritis dan kembalikan HANYA format JSON valid dengan struktur pers
                     "model_used": res.get("model_executed") or model_name,
                     "key_used": key_name,
                     "audit": fallback_audit,
-                    "raw_output": raw_text
+                    "raw_output": raw_text,
+                    "privacy_protection": {
+                        "full_document_transmitted": False,
+                        "sample_char_count": len(truncated_content),
+                        "total_document_chars": len(document_text),
+                        "sampling_method": "stratified_fragmented_window"
+                    }
                 }
 
         else:
