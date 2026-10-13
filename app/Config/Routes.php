@@ -80,6 +80,11 @@ $routes->post('ambassador/proof', 'AmbassadorController::submitProof');
 $routes->post('ambassador/payout', 'AmbassadorController::requestPayout');
 $routes->get('ref/(:segment)', 'AmbassadorController::ref/$1');
 
+// Ambassador Certificate & Public Verification (Fitur 2 - Kelulusan Duta Kampus)
+$routes->match(['get', 'head'], 'ambassador/certificate/(:segment)', 'AmbassadorController::certificate/$1');
+$routes->match(['get', 'head'], 'ambassador/certificate/(:segment)/pdf', 'AmbassadorController::downloadCertificatePdf/$1');
+$routes->match(['get', 'head'], 'ambassador/certificate/(:segment)/preview', 'AmbassadorController::previewCertificatePdf/$1');
+
 // Shortcut / Alias Friendly Routes
 $routes->match(['get', 'head'], 'pricing', static function () {
     return redirect()->to(base_url('/#langganan'));
@@ -203,6 +208,7 @@ $routes->group('admin', ['filter' => 'admin'], function ($routes) {
     $routes->post('ambassador/activate/(:num)', 'Admin\AmbassadorAdminController::activateAmbassador/$1');
     $routes->post('ambassador/proof/approve/(:num)', 'Admin\AmbassadorAdminController::approveProof/$1');
     $routes->post('ambassador/proof/reject/(:num)', 'Admin\AmbassadorAdminController::rejectProof/$1');
+    $routes->post('ambassador/graduate/(:num)', 'Admin\AmbassadorAdminController::graduateAmbassador/$1');
     $routes->get('ambassador/proof/file/(:num)', 'Admin\AmbassadorAdminController::viewProofFile/$1');
     $routes->get('ambassador/ktm/file/(:num)', 'Admin\AmbassadorAdminController::viewKtmFile/$1');
 

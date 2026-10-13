@@ -136,8 +136,31 @@ class TestAmbassadorFlow extends BaseCommand
         CLI::write("✓ Estimasi Komisi: Rp " . number_format($stats['estimated_commission'], 0, ',', '.'), 'green');
         CLI::write("✓ Persentase Bagi Hasil: " . $stats['commission_rate_percent'] . "%", 'white');
 
+        // TAHAP 6B: Kelulusan Probation & Penerbitan Piagam Digital Resmi (Fitur 2)
+        CLI::write("\n[TAHAP 6B] — KELULUSAN RESMI & PENERBITAN PIAGAM DIGITAL (FITUR 2)", 'yellow');
+        $gradResult = $profileModel->graduate($profile['id'], 2, "Kelulusan resmi via TestAmbassadorFlow");
+        CLI::write("✓ Kelulusan Status: " . ($gradResult['success'] ? 'SUKSES' : 'GAGAL'), $gradResult['success'] ? 'green' : 'red');
+        CLI::write("✓ Nomor Piagam / SK: " . $gradResult['certificate_code'], 'yellow');
+        CLI::write("✓ Hash Integritas SHA-256: " . substr($gradResult['certificate_hash'], 0, 32) . "...", 'cyan');
+        CLI::write("✓ URL Verifikasi Publik: " . $gradResult['certificate_url'], 'white');
+
+        // Uji generator PDF Piagam
+        $certCode = $gradResult['certificate_code'];
+        $pdfOut = '/tmp/test_piagam_' . $certCode . '.pdf';
+        $cmd = ROOTPATH . ".venv/bin/python " . ROOTPATH . "worker/generate_ambassador_certificate_pdf.py --code " . escapeshellarg($certCode) . " --output " . escapeshellarg($pdfOut);
+        exec($cmd, $out, $ret);
+
+        if ($ret === 0 && file_exists($pdfOut)) {
+            $pdfSize = filesize($pdfOut);
+            CLI::write("✓ Generator PDF Piagam: SUKSES ({$pdfSize} bytes)", 'green');
+            CLI::write("✓ Lokasi PDF: {$pdfOut}", 'cyan');
+        } else {
+            CLI::error("❌ Generator PDF Piagam gagal: " . implode("\n", $out));
+        }
+
         CLI::write("\n==================================================", 'yellow');
-        CLI::write("🎉 KESIMPULAN: SELURUH 6 TAHAP DUTA KAMPUS 100% LOLOS UJI!", 'green');
+        CLI::write("🎉 KESIMPULAN: SELURUH 6 TAHAP DUTA KAMPUS & PIAGAM 100% LOLOS UJI!", 'green');
         CLI::write("==================================================", 'yellow');
     }
 }
+

@@ -183,9 +183,64 @@ class AmbassadorAdminController extends BaseController
             'status' => 'approved',
         ]);
 
+        // Cek total bukti yang telah disetujui untuk duta ini
+        $ambProfileModel = new \App\Models\AmbassadorProfileModel();
+        $profile = $ambProfileModel->find($proof['ambassador_id']);
+
+        $totalApproved = $proofModel->where('ambassador_id', $proof['ambassador_id'])
+                                   ->where('status', 'approved')
+                                   ->countAllResults();
+
+        $autoGraduated = false;
+        $certCode = null;
+        if ($profile && $profile['status'] === 'probation' && $totalApproved >= 8) {
+            $gradResult = $ambProfileModel->graduate($profile['id'], session()->get('user_id'), 'Otomatis lulus setelah 8 bukti promosi disetujui.');
+            if ($gradResult['success']) {
+                $autoGraduated = true;
+                $certCode = $gradResult['certificate_code'];
+            }
+        }
+
+        $msg = 'Bukti promosi berhasil diverifikasi & disetujui! (Total disetujui: ' . $totalApproved . '/8)';
+        if ($autoGraduated) {
+            $msg .= ' 🎓 Selamat! Duta ini telah mencapai 8 bukti dan resmi LULUS masa probation. Piagam SK #' . $certCode . ' telah diterbitkan.';
+        }
+
         return $this->response->setJSON([
-            'success' => true,
-            'message' => 'Bukti promosi berhasil diverifikasi & disetujui!',
+            'success'        => true,
+            'message'        => $msg,
+            'total_approved' => $totalApproved,
+            'auto_graduated' => $autoGraduated,
+            'certificate_code' => $certCode,
+        ]);
+    }
+
+    /**
+     * Meluluskan Duta Kampus secara Manual & Menerbitkan Piagam Resmi (Admin Action)
+     */
+    public function graduateAmbassador(int $id): ResponseInterface
+    {
+        $profileModel = new \App\Models\AmbassadorProfileModel();
+        $profile = $profileModel->find($id);
+
+        if (!$profile) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Profil Duta Kampus tidak ditemukan.'])->setStatusCode(404);
+        }
+
+        $adminId = session()->get('user_id');
+        $notes = trim((string) $this->request->getPost('admin_notes')) ?: 'Kelulusan Duta Kampus disetujui oleh Administrator.';
+
+        $result = $profileModel->graduate($id, $adminId, $notes);
+
+        if (!$result['success']) {
+            return $this->response->setJSON($result)->setStatusCode(400);
+        }
+
+        return $this->response->setJSON([
+            'success'          => true,
+            'message'          => $result['message'],
+            'certificate_code' => $result['certificate_code'],
+            'certificate_url'  => $result['certificate_url'],
         ]);
     }
 

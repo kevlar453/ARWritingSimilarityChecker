@@ -3088,12 +3088,23 @@
                                             </td>
                                             <td class="py-3 px-3 align-top whitespace-nowrap">
                                                 <div>
-                                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold <?= $prof['status'] === 'probation' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' ?>">
-                                                        <?= strtoupper(esc($prof['status'])) ?>
-                                                    </span>
-                                                </div>
-                                                <div class="text-[10px] text-slate-400 mt-1">
-                                                    s/d <?= date('d M Y', strtotime($prof['probation_end'] ?? '+30 days')) ?>
+                                                    <?php if ($prof['status'] === 'graduated' || !empty($prof['certificate_code'])): ?>
+                                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-400/20 text-amber-300 border border-amber-400/40">
+                                                            <span>🎓</span> <span>LULUS / PURNA</span>
+                                                        </span>
+                                                        <div class="text-[9px] text-amber-300/80 font-mono-code mt-0.5"><?= esc($prof['certificate_code']) ?></div>
+                                                    <?php elseif ($prof['status'] === 'probation'): ?>
+                                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                                                            <span>⏳</span> <span>PROBATION</span>
+                                                        </span>
+                                                        <div class="text-[10px] text-slate-400 mt-1">
+                                                            s/d <?= date('d M Y', strtotime($prof['probation_end'] ?? '+30 days')) ?>
+                                                        </div>
+                                                    <?php else: ?>
+                                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                                                            <span>✓</span> <span><?= strtoupper(esc($prof['status'])) ?></span>
+                                                        </span>
+                                                    <?php endif; ?>
                                                 </div>
                                             </td>
                                             <td class="py-3 px-3 align-top text-center whitespace-nowrap">
@@ -3101,9 +3112,21 @@
                                                     <?= number_format((float)$prof['commission_rate_percent'], 0) ?>%
                                                 </span>
                                             </td>
-                                            <td class="py-3 px-3 align-top text-right whitespace-nowrap">
-                                                <a href="<?= base_url('ref/' . $prof['referral_code']) ?>" target="_blank" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-semibold transition" title="Uji tautan referral">
-                                                    🔗 Tautan
+                                            <td class="py-3 px-3 align-top text-right whitespace-nowrap space-x-1">
+                                                <?php if ($prof['status'] === 'graduated' || !empty($prof['certificate_code'])): ?>
+                                                    <a href="<?= base_url('ambassador/certificate/' . $prof['certificate_code'] . '/preview') ?>" target="_blank" class="px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 text-[11px] font-bold transition shadow-xs inline-flex items-center gap-1" title="Buka Piagam Penghargaan PDF">
+                                                        <span>📜</span> <span>Piagam</span>
+                                                    </a>
+                                                    <a href="<?= base_url('ambassador/certificate/' . $prof['certificate_code']) ?>" target="_blank" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-semibold transition inline-flex items-center gap-1" title="Lihat Halaman Verifikasi Publik">
+                                                        <span>🌐</span>
+                                                    </a>
+                                                <?php else: ?>
+                                                    <button type="button" onclick="adminGraduateAmbassador(<?= (int)$prof['id'] ?>)" class="px-2.5 py-1 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 text-[11px] font-bold transition shadow-xs inline-flex items-center gap-1 cursor-pointer" title="Luluskan Duta & Terbitkan Piagam Penghargaan Resmi">
+                                                        <span>🎓</span> <span>Luluskan</span>
+                                                    </button>
+                                                <?php endif; ?>
+                                                <a href="<?= base_url('ref/' . $prof['referral_code']) ?>" target="_blank" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-semibold transition inline-flex items-center gap-1" title="Uji tautan referral">
+                                                    <span>🔗</span>
                                                 </a>
                                             </td>
                                         </tr>
@@ -3943,6 +3966,21 @@
                     }
                 } else {
                     alert('Gagal: ' + (res.message || 'Terjadi kesalahan.'));
+                }
+            } catch (err) {
+                alert('Terjadi kesalahan koneksi.');
+            }
+        }
+
+        async function adminGraduateAmbassador(id) {
+            if (!confirm('Apakah Anda yakin ingin meluluskan Duta Kampus ini dan menerbitkan Piagam Penghargaan Digital Resmi (PDF ber-QR Code)?')) return;
+            try {
+                const res = await postJson('<?= base_url('admin/ambassador/graduate') ?>/' + id, {});
+                if (res.success) {
+                    alert('✓ ' + res.message);
+                    window.location.reload();
+                } else {
+                    alert('Gagal: ' + (res.message || 'Terjadi kesalahan saat meluluskan duta.'));
                 }
             } catch (err) {
                 alert('Terjadi kesalahan koneksi.');

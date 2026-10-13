@@ -15,6 +15,9 @@ class AmbassadorProfileModel extends Model
         'user_id',
         'referral_code',
         'status',
+        'certificate_code',
+        'certificate_hash',
+        'graduated_at',
         'probation_start',
         'probation_end',
         'probation_target_promos',
@@ -151,24 +154,149 @@ class AmbassadorProfileModel extends Model
             }
         }
 
-        // Hitung total bukti promosi bulan ini
+        // Hitung total bukti promosi bulan ini & bukti yang disetujui
         $currentMonth = date('Y-m');
         $totalPromosThisMonth = $db->table('ambassador_activity_proofs')
             ->where('ambassador_id', $profile['id'])
             ->where('month_period', $currentMonth)
             ->countAllResults();
 
+        $approvedPromosTotal = $db->table('ambassador_activity_proofs')
+            ->where('ambassador_id', $profile['id'])
+            ->where('status', 'approved')
+            ->countAllResults();
+
         // Hitung estimasi komisi
         $commissionRate = (float) $profile['commission_rate_percent'];
         $estimatedCommission = ($totalTurnover * $commissionRate) / 100.0;
 
-        $profile['total_registered']       = $totalRegistered;
-        $profile['total_transactions']     = $totalPaidTransactions;
-        $profile['total_turnover']         = $totalTurnover;
-        $profile['promos_this_month']      = $totalPromosThisMonth;
-        $profile['estimated_commission']   = $estimatedCommission;
-        $profile['referral_url']           = base_url('ref/' . $code);
+        $targetPromos = (int) ($profile['probation_target_promos'] ?? 8);
+        $targetTransactions = (int) ($profile['probation_target_transactions'] ?? 3);
+        $isGraduated = ($profile['status'] === 'graduated') || !empty($profile['certificate_code']);
+        $isEligible = ($approvedPromosTotal >= $targetPromos) || ($totalPaidTransactions >= $targetTransactions);
+
+        $profile['total_registered']         = $totalRegistered;
+        $profile['total_transactions']       = $totalPaidTransactions;
+        $profile['total_turnover']           = $totalTurnover;
+        $profile['promos_this_month']        = $totalPromosThisMonth;
+        $profile['approved_promos_total']    = $approvedPromosTotal;
+        $profile['estimated_commission']     = $estimatedCommission;
+        $profile['referral_url']             = base_url('ref/' . $code);
+        $profile['is_graduated']             = $isGraduated;
+        $profile['is_eligible_graduation']   = $isEligible;
+        $profile['certificate_url']         = !empty($profile['certificate_code']) ? base_url('ambassador/certificate/' . $profile['certificate_code']) : null;
+        $profile['certificate_pdf_url']     = !empty($profile['certificate_code']) ? base_url('ambassador/certificate/' . $profile['certificate_code'] . '/pdf') : null;
 
         return $profile;
     }
+
+    /**
+     * Meluluskan Duta Kampus & Menerbitkan Piagam Digital Resmi (Kelulusan Tahap 5 ke 6)
+     */
+    public function graduate(int $profileId, ?int $adminId = null, string $adminNotes = ''): array
+    {
+        $db = \Config\Database::connect();
+        $profile = $this->find($profileId);
+        if (!$profile) {
+            return ['success' => false, 'message' => 'Profil Duta Kampus tidak ditemukan.'];
+        }
+
+        $now = date('Y-m-d H:i:s');
+        $code = $profile['certificate_code'];
+        if (empty($code)) {
+            // Format kode piagam resmi: ART-AMB-XXXX-XXXX
+            $randomHex = strtoupper(bin2hex(random_bytes(4)));
+            $code = 'ART-AMB-' . substr($randomHex, 0, 4) . '-' . substr($randomHex, 4, 4);
+        }
+
+        // Hitung SHA-256 Hash Keaslian Kriptografis
+        $hashData = "ARTILIK_AMBASSADOR|{$profileId}|{$profile['user_id']}|{$code}|{$now}";
+        $certHash = hash('sha256', $hashData);
+
+        $this->update($profileId, [
+            'status'           => 'graduated',
+            'certificate_code' => $code,
+            'certificate_hash' => $certHash,
+            'graduated_at'     => $now,
+            'updated_at'       => $now,
+        ]);
+
+        // Perpanjang langganan premium Duta Aktif (1 tahun penuh)
+        $db->table('users')->where('id', $profile['user_id'])->update([
+            'subscription_tier'       => 'skripsi',
+            'subscription_expires_at' => date('Y-m-d 23:59:59', strtotime('+365 days')),
+            'updated_at'              => $now,
+        ]);
+
+        // Ambil data untuk notifikasi
+        $user = $db->table('users')->where('id', $profile['user_id'])->get()->getRowArray();
+        $app = $db->table('ambassador_applications')->where('id', $profile['application_id'])->get()->getRowArray();
+        $ambName = $app['full_name'] ?? ($user['name'] ?? 'Duta Kampus');
+        $ambCampus = $app['institution'] ?? ($user['institution'] ?? 'Perguruan Tinggi');
+
+        // Kirim Notifikasi ke Telegram
+        try {
+            $telegram = new \App\Libraries\TelegramNotifier(\App\Libraries\TelegramNotifier::getActivityChatId());
+            $certUrl = base_url('ambassador/certificate/' . $code);
+            $msg = "🎓 <b>KELULUSAN RESMI DUTA KAMPUS AR TILIK</b>\n\n"
+                 . "Selamat kepada:\n"
+                 . "👤 <b>{$ambName}</b>\n"
+                 . "🏛️ <b>{$ambCampus}</b>\n"
+                 . "🏷️ Kode Referral: <code>{$profile['referral_code']}</code>\n"
+                 . "📜 No. Piagam: <code>{$code}</code>\n"
+                 . "🕒 Waktu Lulus: {$now} WIB\n\n"
+                 . "🔗 <a href=\"{$certUrl}\">Lihat Piagam Penghargaan Digital</a>";
+            $telegram->sendMessage($msg);
+        } catch (\Throwable $e) {
+            log_message('warning', 'Gagal kirim notifikasi kelulusan duta ke Telegram: ' . $e->getMessage());
+        }
+
+        return [
+            'success'          => true,
+            'message'          => "Duta Kampus {$ambName} berhasil diluluskan dan Piagam Digital resmi telah diterbitkan!",
+            'certificate_code' => $code,
+            'certificate_hash' => $certHash,
+            'certificate_url'  => base_url('ambassador/certificate/' . $code),
+            'graduated_at'     => $now,
+        ];
+    }
+
+    /**
+     * Mengambil profil duta lengkap berdasarkan kode sertifikat publik
+     */
+    public function getByCertificateCode(string $code): ?array
+    {
+        $db = \Config\Database::connect();
+        $profile = $this->where('certificate_code', $code)->first();
+        if (!$profile) {
+            return null;
+        }
+
+        $app = $db->table('ambassador_applications')->where('id', $profile['application_id'])->get()->getRowArray();
+        $user = $db->table('users')->where('id', $profile['user_id'])->get()->getRowArray();
+
+        $approvedPromosTotal = $db->table('ambassador_activity_proofs')
+            ->where('ambassador_id', $profile['id'])
+            ->where('status', 'approved')
+            ->countAllResults();
+
+        $totalRegistered = $db->table('users')->where('referred_by_code', $profile['referral_code'])->countAllResults();
+
+        return [
+            'profile'               => $profile,
+            'application'           => $app,
+            'user'                  => $user,
+            'ambassador_name'       => $app['full_name'] ?? ($user['name'] ?? 'Duta Kampus'),
+            'institution'           => $app['institution'] ?? ($user['institution'] ?? 'Perguruan Tinggi'),
+            'major'                 => $app['major'] ?? 'Akademik',
+            'semester'              => $app['semester'] ?? '-',
+            'referral_code'         => $profile['referral_code'],
+            'certificate_code'      => $profile['certificate_code'],
+            'certificate_hash'      => $profile['certificate_hash'],
+            'graduated_at'          => $profile['graduated_at'] ?? $profile['updated_at'],
+            'approved_promos_total' => $approvedPromosTotal,
+            'total_registered'      => $totalRegistered,
+        ];
+    }
 }
+

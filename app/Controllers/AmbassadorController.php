@@ -421,7 +421,111 @@ class AmbassadorController extends BaseController
 
         return $this->response->setJSON($result);
     }
+
+    /**
+     * Halaman Web Verifikasi Publik Piagam Penghargaan Duta Kampus (Fitur 2)
+     */
+    public function certificate(string $code)
+    {
+        $profileModel = new AmbassadorProfileModel();
+        $ambData = $profileModel->getByCertificateCode($code);
+
+        // Jika tidak ditemukan via certificate_code, coba cek referral_code
+        if (!$ambData) {
+            $prof = $profileModel->where('referral_code', $code)->first();
+            if ($prof && !empty($prof['certificate_code'])) {
+                $ambData = $profileModel->getByCertificateCode($prof['certificate_code']);
+            }
+        }
+
+        if (!$ambData) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Piagam Penghargaan Duta Kampus dengan kode '{$code}' tidak ditemukan atau belum diterbitkan.");
+        }
+
+        return view('ambassador/certificate_view', [
+            'amb' => $ambData,
+        ]);
+    }
+
+    /**
+     * Mengunduh Piagam Penghargaan Resmi Duta Kampus dalam format PDF (A4 Landscape)
+     */
+    public function downloadCertificatePdf(string $code)
+    {
+        return $this->streamCertificatePdf($code, false);
+    }
+
+    /**
+     * Menampilkan Preview Piagam Penghargaan Resmi Duta Kampus (Inline PDF)
+     */
+    public function previewCertificatePdf(string $code)
+    {
+        return $this->streamCertificatePdf($code, true);
+    }
+
+    /**
+     * Helper stream PDF piagam duta kampus via worker python
+     */
+    protected function streamCertificatePdf(string $code, bool $inline = true)
+    {
+        $profileModel = new AmbassadorProfileModel();
+        $ambData = $profileModel->getByCertificateCode($code);
+
+        if (!$ambData) {
+            $prof = $profileModel->where('referral_code', $code)->first();
+            if ($prof && !empty($prof['certificate_code'])) {
+                $ambData = $profileModel->getByCertificateCode($prof['certificate_code']);
+            }
+        }
+
+        if (!$ambData) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Piagam Penghargaan Duta Kampus tidak ditemukan.");
+        }
+
+        $projectRoot = ROOTPATH;
+        $pythonBin = $projectRoot . '.venv/bin/python';
+        if (!file_exists($pythonBin)) {
+            $pythonBin = 'python3';
+        }
+
+        $cmd = escapeshellcmd($pythonBin) . ' ' . escapeshellarg($projectRoot . 'worker/generate_ambassador_certificate_pdf.py') . ' --code ' . escapeshellarg($ambData['certificate_code']) . ' --stdout';
+
+        $descriptors = [
+            0 => ['pipe', 'r'],
+            1 => ['pipe', 'w'],
+            2 => ['pipe', 'w'],
+        ];
+
+        $process = proc_open($cmd, $descriptors, $pipes, $projectRoot);
+        if (!is_resource($process)) {
+            return $this->response->setStatusCode(500)->setBody("Gagal menginisialisasi proses generator piagam duta.");
+        }
+
+        fclose($pipes[0]);
+        $pdfContent = stream_get_contents($pipes[1]);
+        fclose($pipes[1]);
+        $stderr = stream_get_contents($pipes[2]);
+        fclose($pipes[2]);
+
+        $exitCode = proc_close($process);
+
+        if ($exitCode !== 0 || empty($pdfContent)) {
+            log_message('error', "Ambassador Certificate PDF generation failed: {$stderr}");
+            return $this->response->setStatusCode(500)->setBody("Gagal menghasilkan PDF Piagam Duta Kampus: " . esc($stderr));
+        }
+
+        $cleanFilename = 'Piagam_Duta_ARTilik_' . preg_replace('/[^A-Za-z0-9_\-]/', '_', $ambData['certificate_code']) . '.pdf';
+        $disposition = $inline ? 'inline' : 'attachment';
+
+        return $this->response
+            ->setHeader('Content-Type', 'application/pdf')
+            ->setHeader('Content-Disposition', $disposition . '; filename="' . $cleanFilename . '"')
+            ->setHeader('Content-Length', (string) strlen($pdfContent))
+            ->setHeader('Cache-Control', 'public, max-age=86400, must-revalidate')
+            ->setBody($pdfContent);
+    }
 }
+
 
 
 

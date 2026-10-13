@@ -26,6 +26,7 @@ writable/logs/*
 writable/session/*
 writable/uploads/*
 writable/documents/*
+writable/storage/*
 !writable/cache/.gitkeep
 !writable/debugbar/.gitkeep
 !writable/logs/.gitkeep

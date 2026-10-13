@@ -46,6 +46,11 @@
                 <a href="<?= base_url('ambassador/guide') ?>" class="inline-flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold text-amber-300 hover:text-white bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/30 transition shadow-xs">
                     <span>📖</span> <span class="hidden sm:inline">Panduan </span><span>Promosi</span>
                 </a>
+                <?php if (!empty($profile['is_graduated'])): ?>
+                    <a href="<?= base_url('ambassador/certificate/' . $profile['certificate_code']) ?>" class="inline-flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold text-slate-950 bg-amber-400 hover:bg-amber-300 border border-amber-400 transition shadow-xs">
+                        <span>🎓</span> <span class="hidden sm:inline">Piagam </span><span>Duta</span>
+                    </a>
+                <?php endif; ?>
                 <a href="<?= base_url('dashboard') ?>" class="inline-flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold text-slate-200 hover:text-white bg-slate-900 hover:bg-slate-800 border border-white/15 transition shadow-xs">
                     <span>&larr;</span> <span class="hidden sm:inline">Dashboard </span><span>Pengguna</span>
                 </a>
@@ -59,12 +64,65 @@
     <main class="flex-1 py-8 sm:py-12 px-4 sm:px-6">
         <div class="max-w-5xl mx-auto space-y-8">
 
+            <?php if (!empty($profile['is_graduated'])): ?>
+                <!-- Kartu Prestasi Kelulusan & Piagam Resmi -->
+                <div class="bg-gradient-to-r from-amber-950/70 via-slate-900 to-indigo-950/50 border-2 border-amber-400/50 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+                        <div class="space-y-3">
+                            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                                <span>🎓</span>
+                                <span>PIAGAM PENGHARGAAN RESMI DUTA AKADEMIK</span>
+                            </div>
+                            <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight">
+                                Selamat! Anda Telah Resmi Lulus Masa Orientasi Duta Kampus
+                            </h2>
+                            <p class="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
+                                Piagam digital resmi ber-QR Code validasi, nomor SK konsorsium, dan tanda tangan Dewan Pembina telah diterbitkan. Anda dapat mengunduh berkas PDF formal untuk portofolio CV atau menambahkan lisensi ini ke profil LinkedIn.
+                            </p>
+                            <div class="flex items-center gap-3 pt-1 text-xs font-mono text-amber-400/90 flex-wrap">
+                                <span>No. SK: <strong><?= esc($profile['certificate_code']) ?></strong></span>
+                                <span>&bull;</span>
+                                <span>Predikat: <strong>Sangat Memuaskan</strong></span>
+                                <span>&bull;</span>
+                                <span>Status: <strong class="text-emerald-400">Aktif &amp; Terverifikasi</strong></span>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row md:flex-col gap-2.5 shrink-0 min-w-[210px]">
+                            <a href="<?= base_url('ambassador/certificate/' . $profile['certificate_code'] . '/pdf') ?>" class="px-5 py-3 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-black text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 hover:scale-[1.02] active:scale-95 transition">
+                                <span>📥</span> <span>Unduh Piagam (PDF)</span>
+                            </a>
+                            <a href="<?= base_url('ambassador/certificate/' . $profile['certificate_code']) ?>" target="_blank" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs flex items-center justify-center gap-2 border border-white/10 transition">
+                                <span>🌐</span> <span>Verifikasi Publik</span> &rarr;
+                            </a>
+                            <?php
+                                $certUrl = base_url('ambassador/certificate/' . $profile['certificate_code']);
+                                $lYear = date('Y', strtotime($profile['graduated_at'] ?? 'now'));
+                                $lMonth = date('n', strtotime($profile['graduated_at'] ?? 'now'));
+                                $linkedInUrl = "https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME"
+                                    . "&name=" . urlencode("Collegiate Academic Ambassador & Research Integrity Advocate")
+                                    . "&organizationName=" . urlencode("AR Tilik")
+                                    . "&issueYear=" . $lYear
+                                    . "&issueMonth=" . $lMonth
+                                    . "&certUrl=" . urlencode($certUrl)
+                                    . "&certId=" . urlencode($profile['certificate_code']);
+                            ?>
+                            <a href="<?= $linkedInUrl ?>" target="_blank" class="px-4 py-2.5 rounded-xl bg-[#0077b5] hover:bg-[#006396] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition">
+                                <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                                <span>Tambah ke LinkedIn</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="absolute -right-12 -bottom-12 w-64 h-64 bg-amber-400/10 rounded-full blur-3xl pointer-events-none"></div>
+                </div>
+            <?php endif; ?>
+
             <!-- Banner Sambutan Duta -->
             <div class="bg-gradient-to-r from-indigo-900/60 via-purple-900/40 to-slate-900 border border-indigo-500/30 rounded-3xl p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 shadow-xl">
                 <div class="space-y-2">
                     <div class="flex items-center gap-2 flex-wrap">
-                        <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950 shadow-xs">
-                            <?= $profile['status'] === 'probation' ? 'Masa Percobaan (30 Hari)' : 'Duta Kampus Resmi' ?>
+                        <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full <?= !empty($profile['is_graduated']) ? 'bg-amber-400 text-slate-950' : ($profile['status'] === 'probation' ? 'bg-indigo-400 text-slate-950' : 'bg-emerald-400 text-slate-950') ?> shadow-xs">
+                            <?= !empty($profile['is_graduated']) ? '🎓 Duta Purna Kehormatan' : ($profile['status'] === 'probation' ? 'Masa Percobaan (30 Hari)' : 'Duta Kampus Resmi') ?>
                         </span>
                         <span class="text-xs text-slate-400 font-mono">
                             Periode s/d <?= date('d M Y', strtotime($profile['probation_end'] ?? '+30 days')) ?>
@@ -156,44 +214,69 @@
                 </div>
             </div>
 
-            <!-- Progress Probation 1 Bulan -->
-            <?php if ($profile['status'] === 'probation'): ?>
-                <div class="bg-slate-900 border border-amber-500/30 rounded-3xl p-6 space-y-4">
+            <!-- Progress Probation 1 Bulan & Kelulusan Piagam -->
+            <?php if (empty($profile['is_graduated'])): ?>
+                <div class="bg-slate-900 border <?= !empty($profile['is_eligible_graduation']) ? 'border-emerald-500/40' : 'border-amber-500/30' ?> rounded-3xl p-6 space-y-4">
                     <div class="flex items-center justify-between flex-wrap gap-2">
-                        <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                            <span>🎯</span> <span>Target Kelulusan Masa Percobaan (Bulan 1)</span>
-                        </h3>
-                        <span class="text-xs font-mono text-amber-300">
-                            Cukup penuhi salah satu target
-                        </span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-lg">🎯</span>
+                            <h3 class="text-sm font-bold text-white">
+                                Target Kelulusan Masa Percobaan &amp; Penerbitan Piagam
+                            </h3>
+                        </div>
+                        <?php if (!empty($profile['is_eligible_graduation'])): ?>
+                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                                ✓ Target Tercapai (Menunggu Terbit Piagam)
+                            </span>
+                        <?php else: ?>
+                            <span class="text-xs font-mono text-amber-300">
+                                Cukup penuhi salah satu target di bawah
+                            </span>
+                        <?php endif; ?>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                        <!-- Jalur 1: Bukti Promosi -->
+                        <!-- Jalur 1: Bukti Promosi Disetujui -->
+                        <?php 
+                            $approvedCount = (int)($profile['approved_promos_total'] ?? 0);
+                            $uploadedCount = (int)($profile['promos_this_month'] ?? 0);
+                            $promoPercent = min(100, ($approvedCount / 8) * 100);
+                        ?>
                         <div class="bg-black/30 p-4 rounded-xl border border-white/5 space-y-2">
                             <div class="flex items-center justify-between">
-                                <span class="font-bold text-slate-200">Jalur A: 8 Bukti Promosi</span>
-                                <span class="font-mono text-amber-400 font-bold"><?= (int)($profile['promos_this_month'] ?? 0) ?> / 8</span>
+                                <span class="font-bold text-slate-200">Jalur A: 8 Bukti Promosi Disetujui</span>
+                                <span class="font-mono text-amber-400 font-bold"><?= $approvedCount ?> / 8</span>
                             </div>
-                            <?php $promoPercent = min(100, ((int)($profile['promos_this_month'] ?? 0) / 8) * 100); ?>
                             <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
                                 <div class="bg-amber-400 h-full rounded-full transition-all duration-500" style="width: <?= $promoPercent ?>%"></div>
                             </div>
-                            <p class="text-[11px] text-slate-400">Unggah tangkapan layar Story WA, IG, atau posting grup di bawah.</p>
+                            <p class="text-[11px] text-slate-400">
+                                Total diunggah: <?= $uploadedCount ?> bukti. Unggah bukti Story WA/IG/Grup angkatan di formulir bawah.
+                            </p>
                         </div>
 
                         <!-- Jalur 2: Transaksi Referral -->
+                        <?php 
+                            $txCount = (int)($profile['total_transactions'] ?? 0);
+                            $txPercent = min(100, ($txCount / 3) * 100);
+                        ?>
                         <div class="bg-black/30 p-4 rounded-xl border border-white/5 space-y-2">
                             <div class="flex items-center justify-between">
                                 <span class="font-bold text-slate-200">Jalur B: 3 Transaksi Berbayar</span>
-                                <span class="font-mono text-indigo-400 font-bold"><?= (int)($profile['total_transactions'] ?? 0) ?> / 3</span>
+                                <span class="font-mono text-indigo-400 font-bold"><?= $txCount ?> / 3</span>
                             </div>
-                            <?php $txPercent = min(100, ((int)($profile['total_transactions'] ?? 0) / 3) * 100); ?>
                             <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
                                 <div class="bg-indigo-500 h-full rounded-full transition-all duration-500" style="width: <?= $txPercent ?>%"></div>
                             </div>
-                            <p class="text-[11px] text-slate-400">Pembelian paket apapun oleh teman yang Anda undang.</p>
+                            <p class="text-[11px] text-slate-400">Pembelian paket naskah oleh teman yang Anda undang.</p>
                         </div>
+                    </div>
+
+                    <div class="bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 flex items-center gap-3 text-xs text-amber-200/90">
+                        <span class="text-base">🏆</span>
+                        <span>
+                            <strong>Reward Kelulusan:</strong> Menyelesaikan masa percobaan akan membuka <strong>Piagam Penghargaan Duta Akademik (PDF ber-QR Code)</strong> dan memperpanjang akun Premium 1 tahun penuh.
+                        </span>
                     </div>
                 </div>
             <?php endif; ?>
