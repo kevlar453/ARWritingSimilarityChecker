@@ -191,7 +191,12 @@
                         <span class="text-emerald-400 font-mono-code text-xl font-extrabold"><?= $quotaInfo['total_available'] ?? 3 ?> Submisi Tersedia</span>
                     </h2>
                     <p class="text-xs text-slate-300 leading-relaxed max-w-2xl">
-                        Kuota gratis: <strong class="text-white"><?= $quotaInfo['free_remaining'] ?? 3 ?>/<?= $quotaInfo['free_weekly_limit'] ?? $quotaInfo['free_limit'] ?? 3 ?> submisi</strong> minggu ini (reset otomatis dalam <?= $quotaInfo['days_until_reset'] ?? 7 ?> hari). 
+                        Kuota gratis: <strong class="text-white"><?= $quotaInfo['free_remaining'] ?? 3 ?>/<?= $quotaInfo['free_weekly_limit'] ?? $quotaInfo['free_limit'] ?? 3 ?> submisi</strong> minggu ini 
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-indigo-900/80 hover:bg-indigo-900 border border-indigo-700/60 text-sky-300 text-[11px] font-mono-code font-bold shadow-xs whitespace-nowrap align-middle my-0.5 transition-colors" title="Jadwal reset otomatis: <?= !empty($quotaInfo['reset_date']) ? date('d M Y, H:i', strtotime($quotaInfo['reset_date'])) . ' WIB (Setiap Senin)' : 'Setiap Senin 00:00 WIB' ?>">
+                            <svg class="w-3.5 h-3.5 text-sky-400 shrink-0 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span class="text-slate-300 font-sans font-normal text-[10.5px]">Reset:</span>
+                            <span id="quotaCountdown" data-reset-target="<?= strtotime($quotaInfo['reset_date'] ?? 'next monday') * 1000 ?>"><?= ($quotaInfo['days_until_reset'] ?? 7) ?> hari</span>
+                        </span>. 
                         Bonus & Top-Up: <strong class="text-amber-300">+<?= $quotaInfo['bonus_submissions'] ?? $quotaInfo['bonus_remaining'] ?? 0 ?> submisi</strong>. 
                         Tiap sumbangan <strong class="text-sky-300">3 naskah korpus valid</strong> memberikan reward <strong class="text-emerald-300">+1 submisi gratis</strong>!
                     </p>
@@ -1903,8 +1908,50 @@
             }
         }
 
+        // ==========================================
+        // HITUNGAN MUNDUR RESET KUOTA MINGGUAN (SENIN 00:00 WIB)
+        // ==========================================
+        function initQuotaCountdown() {
+            const el = document.getElementById('quotaCountdown');
+            if (!el) return;
+
+            const targetMs = parseInt(el.getAttribute('data-reset-target'), 10);
+            if (isNaN(targetMs) || targetMs <= 0) return;
+
+            function updateCountdown() {
+                const now = Date.now();
+                const diff = targetMs - now;
+
+                if (diff <= 0) {
+                    el.innerHTML = '<span class="text-emerald-300 font-bold animate-pulse">Sedang Reset...</span>';
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 3000);
+                    return;
+                }
+
+                const totalSeconds = Math.floor(diff / 1000);
+                const days = Math.floor(totalSeconds / 86400);
+                const hours = Math.floor((totalSeconds % 86400) / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                const seconds = totalSeconds % 60;
+
+                const pad = (n) => String(n).padStart(2, '0');
+
+                if (days > 0) {
+                    el.innerText = `${days} hari ${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+                } else {
+                    el.innerText = `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+                }
+            }
+
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             checkAndPollSubmissions();
+            initQuotaCountdown();
             const hashTab = window.location.hash ? window.location.hash.substring(1) : null;
             const savedTab = hashTab || localStorage.getItem('ar_tilik_active_tab');
             if (savedTab && document.getElementById(savedTab)) {
