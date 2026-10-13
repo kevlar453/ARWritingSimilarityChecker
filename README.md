@@ -1,7 +1,7 @@
 # AR Tilik — Academic Writing Similarity & Evidence Checker
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-v1.3.0--Production-indigo.svg" alt="Version">
+  <img src="https://img.shields.io/badge/version-v1.4.0--Production-indigo.svg" alt="Version">
   <img src="https://img.shields.io/badge/status-production--ready-emerald.svg" alt="Status">
   <img src="https://img.shields.io/badge/automated%20tests-120%2B%20passed-brightgreen.svg" alt="Tests">
   <img src="https://img.shields.io/badge/forensic%20engine-Google%20Gemini%20AI-blue.svg" alt="AI Engine">
@@ -107,6 +107,12 @@ AR Tilik dilengkapi utilitas baris perintah praktis:
 
 # 9. Menjalankan modul evaluasi
 ./artilik eval [generate|run|review]
+
+# 10. Simulasi pengujian alur 6 tahap Duta Kampus & generator piagam digital
+php spark ambassador:test
+
+# 11. Simulasi pengujian siklus penuh program referral reguler Member-Get-Member
+php spark referral:test
 ```
 
 ---
@@ -127,6 +133,30 @@ Rilis v1.1.0 telah diaudit dan lulus 100% pada seluruh kriteria rilis:
 | **Gate V11-H** | Human Validation | Reviewer agreement pada 30 kasus | **100.0% (30/30)** | ✅ **PASS** |
 | **Gate V11-I** | Latency SLA Overhead | Parsing sitasi $< 150\text{ ms}$ | **0.2334 ms (p95: 0.186 ms)**| ✅ **PASS** |
 | **Gate V11-J** | Production Readiness | 6 skenario edge cases & anomali | **6 / 6 passed** | ✅ **PASS** |
+
+---
+
+## 🤝 Ekosistem Pertumbuhan &amp; Jejaring Akademik (v1.4.0)
+
+AR Tilik v1.4.0 menghadirkan modul pertumbuhan organik dan kemitraan akademik terpadu:
+
+### 1. Program Kemitraan Duta Kampus Digital (6 Tahap)
+- **Seleksi Asinkron & Verifikasi Identitas**: Verifikasi KTM mahasiswa berprestasi dengan enkripsi berkas privat.
+- **Kode Referral Kampus**: Pelacakan atribusi konversi transparan dengan skema bagi hasil komisi 20%.
+- **Masa Percobaan (Probation)**: Target 8 bukti aktivitas promosi / 3 transaksi afiliasi per periode.
+- **Dashboard Kinerja Real-time**: Metrik omzet, jumlah pendaftar, estimasi komisi, dan riwayat penarikan dana (*payout*).
+
+### 2. Penerbitan Piagam Penghargaan Digital Resmi (Fitur 2)
+- **Generator PDF Standar Arsip**: Layout presisi A4 Landscape WeasyPrint 69.0 dengan bingkai ganda Guilloché klasik, roset sudut emas, lambang resmi AR Tilik (watermark), dan segel timbul emas 3D.
+- **Kriptografi &amp; QR Code Verifikasi**: Dilengkapi `certificate_code` unik, nomor SK resmi, dan sidik jari integritas SHA-256 yang dapat diverifikasi publik di `/ambassador/certificate/{code}`.
+- **Integrasi LinkedIn Profile**: Tombol 1-klik untuk menambahkan kredensial Duta Integritas Akademik langsung ke profil LinkedIn pengguna.
+
+### 3. Program Referral Reguler Member-Get-Member (Fitur 3)
+- **Akses Universal Seluruh Pengguna**: Setiap pengguna terdaftar memiliki kode referral pribadi (`REF-XXXX-YYYY`) dan tautan undangan `/ref/{code}` di dashboard utama.
+- **Insentif Dua Arah Adil**:
+  - **Pengundang**: Menerima **+2 bonus kuota cek naskah gratis** saat rekan mengaktifkan email, dan **+5 kuota gratis** saat rekan melakukan transaksi perdana.
+  - **Sahabat Terundang**: Menerima **+1 bonus kuota cek naskah gratis** dan **diskon langsung 10%** pada pembelian paket langganan perdana di Midtrans.
+- **Privasi Data Etis (*Ethical Masking*)**: Nama dan alamat email rekan pada tabel riwayat undangan disamarkan secara etis untuk melindungi kerahasiaan data pribadi.
 
 ---
 
