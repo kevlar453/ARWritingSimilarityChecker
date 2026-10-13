@@ -117,24 +117,31 @@ class LandingController extends BaseController
      */
     public function downloadBenchmarkDataset(string $dataset = 'targeted_80')
     {
+        $cleanDataset = preg_replace('/\.json$/i', '', strtolower(trim($dataset)));
+
         $fileMap = [
             'targeted_80' => ROOTPATH . 'evaluation_dataset_v1_1_targeted_80/cases.json',
             'v1_500'      => ROOTPATH . 'evaluation_dataset_v1/cases.json',
         ];
 
-        $targetPath = $fileMap[$dataset] ?? $fileMap['targeted_80'];
+        $targetPath = $fileMap[$cleanDataset] ?? $fileMap['targeted_80'];
         if (! file_exists($targetPath)) {
             return $this->response->setStatusCode(404)->setBody('Berkas dataset evaluasi tidak ditemukan.');
         }
 
-        $filename = ($dataset === 'v1_500')
+        $filename = ($cleanDataset === 'v1_500')
             ? 'artilik_indonesia_academic_benchmark_500_cases.json'
             : 'artilik_indonesia_targeted_contextual_80_cases.json';
 
+        $content = file_get_contents($targetPath);
+
         return $this->response
-            ->setHeader('Content-Type', 'application/json')
+            ->setHeader('Content-Type', 'application/json; charset=utf-8')
             ->setHeader('Content-Disposition', 'attachment; filename="' . $filename . '"')
-            ->setBody(file_get_contents($targetPath));
+            ->setHeader('Content-Length', (string) strlen($content))
+            ->setHeader('Cache-Control', 'public, max-age=86400')
+            ->setBody($content);
     }
 }
+
 

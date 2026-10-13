@@ -585,7 +585,7 @@
             </div>
 
             <div class="btn-group">
-                <a href="<?= base_url('benchmark/dataset/targeted_80') ?>" class="btn-primary">
+                <a href="<?= base_url('datasets/artilik_indonesia_targeted_contextual_80_cases.json') ?>" download="artilik_indonesia_targeted_contextual_80_cases.json" target="_blank" class="btn-primary">
                     <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                     <span>Unduh Dataset 80 Kasus (JSON)</span>
                 </a>
@@ -604,13 +604,13 @@
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-num emerald">100.0%</div>
-                <div class="stat-label">Akurasi Konteks Akademik</div>
-                <div class="stat-desc">80 dari 80 kasus sitasi, kutipan langsung, dan blok kutipan terdeteksi presisi.</div>
+                <div class="stat-label">Deteksi Konteks Sitasi (Layer B)</div>
+                <div class="stat-desc">80 dari 80 kasus sitasi, kutipan langsung, dan blok kutipan teratribusi akurat (Gate V11-B1/B2).</div>
             </div>
             <div class="stat-card">
                 <div class="stat-num emerald">100.0%</div>
-                <div class="stat-label">Atribusi Status Sitasi</div>
-                <div class="stat-desc">Pembedaan teks berizin (cited) vs tanpa sitasi (uncited) tanpa kebocoran logika.</div>
+                <div class="stat-label">Atribusi Izin Akademik</div>
+                <div class="stat-desc">Pembedaan teks berizin (cited/quoted) vs tanpa sitasi tanpa kebocoran logika filter.</div>
             </div>
             <div class="stat-card">
                 <div class="stat-num emerald">0.23 ms</div>
@@ -620,7 +620,20 @@
             <div class="stat-card">
                 <div class="stat-num amber">14 Kasus</div>
                 <div class="stat-label">Mismatch Terbuka (17.5%)</div>
-                <div class="stat-desc">10 batas metodologi boilerplate + 4 boundary threshold. Dipublikasikan secara jujur.</div>
+                <div class="stat-desc">Keputusan Layer A (v1.0 string vs ground truth): 10 metodologi boilerplate + 4 boundary threshold.</div>
+            </div>
+        </div>
+
+        <!-- Clarification Banner between Layer B (Context Attribution) vs Layer A (Decision Invariance) -->
+        <div class="callout-box callout-indigo" style="margin-bottom: 32px; border-left: 4px solid var(--primary); background: #f8faff; padding: 18px 22px; border-radius: 8px;">
+            <div class="callout-icon" style="font-size: 24px; margin-right: 14px;">ℹ️</div>
+            <div class="callout-text">
+                <h4 style="margin: 0 0 6px 0; font-size: 15px; color: var(--dark); font-weight: 700;">Catatan Kejujuran Metrik: Memahami Skor 100% vs 14 Mismatch (17,5%)</h4>
+                <p style="margin: 0; font-size: 13.5px; line-height: 1.65; color: var(--text);">
+                    Agar tidak membingungkan pembaca sekilas, kedua metrik di atas menguji dua lapisan yang berbeda:<br>
+                    &bull; <strong>100.0% (80/80 Kasus)</strong> adalah <em>Skor Atribusi Konteks Sitasi (Layer B Engine)</em>: mesin AR Tilik 100% berhasil mengenali tanda kurung sitasi, nama penulis, tahun rilis, dan tanda kutip ganda pada naskah Indonesia tanpa ada yang terlewat (Gate V11-B1 &amp; B2).<br>
+                    &bull; <strong>14 Kasus Mismatch (17.5% / 66 dari 80 lolos kesepakatan keputusan)</strong> adalah <em>Hasil Uji Keputusan Klasifikasi Baseline (Layer A String Matcher v1.0)</em>: mesin lama mencatat 10 kesamaan leksikal pada frasa metodologi baku (seperti <em>&quot;populasi dan sampel penelitian...&quot;</em>) serta 4 variasi parafrasa yang secara kuratorial diizinkan oleh validator manusia (Gate V11-F). Kami menolak menutup-nutupi mismatch ini demi integritas ilmiah.
+                </p>
             </div>
         </div>
 
@@ -1012,24 +1025,24 @@ guna menguji pengaruh variabel independen terhadap variabel dependen dengan tara
                     </thead>
                     <tbody>
                         <tr>
-                            <td><strong>Kebijakan Non-Repository Default</strong></td>
+                            <td><strong>Kebijakan Penyerapan Repositori Default</strong></td>
                             <td><span class="badge badge-pass">✓ Ya, Naskah Tidak Diserap Otomatis</span></td>
-                            <td>Memaksa submisi masuk ke repositori institusi global</td>
+                            <td>Submisi standar masuk ke repositori institusi/global untuk pencocokan silang</td>
                         </tr>
                         <tr>
-                            <td><strong>Hapus Mandiri Fisik File (Purge)</strong></td>
-                            <td><span class="badge badge-pass">✓ Terverifikasi sampai Level Disk Server</span></td>
-                            <td>Proses birokrasi manual via administrator universitas</td>
+                            <td><strong>Mekanisme Penghapusan Repositori</strong></td>
+                            <td><span class="badge badge-pass">✓ Hapus Mandiri Sekali Klik (Self-Service)</span><br><small style="color:var(--muted);">Naskah, berkas sementara, dan sidik jari dihapus seketika hingga level disk server tanpa tiket bantuan.</small></td>
+                            <td><strong>Prosedur Berjenjang Manual</strong><br><small style="color:var(--muted);">Berdasarkan dokumentasi resmi Turnitin, penghapusan permanen dari repositori tidak dapat dilakukan mandiri; memerlukan persetujuan berjenjang: Instruktur &rarr; Administrator Institusi &rarr; Tiket Dukungan Turnitin.</small></td>
                         </tr>
                         <tr>
-                            <td><strong>Pembersihan Jejak Sidik Jari (Fingerprints)</strong></td>
-                            <td><span class="badge badge-pass">✓ Hard-delete chunks &amp; token biner</span></td>
-                            <td>Residu teks tetap tersimpan di kluster cloud</td>
+                            <td><strong>Kedaulatan &amp; Pembersihan Jejak Fisik</strong></td>
+                            <td><span class="badge badge-pass">✓ Hard-delete Disk &amp; Chunks DB</span><br><small style="color:var(--muted);">Terverifikasi end-to-end sampai level berkas fisik dan token biner di server storage lokal.</small></td>
+                            <td><strong>Kebijakan Retensi Akun Institusi</strong><br><small style="color:var(--muted);">Tergantung konfigurasi lisensi institusi; file umumnya diindeks dalam database arsip internal.</small></td>
                         </tr>
                         <tr>
                             <td><strong>Dukungan On-Premise / Private Cloud</strong></td>
                             <td><span class="badge badge-pass">✓ Docker Compose (PHP 8.5 + Python 3.14)</span></td>
-                            <td>SaaS Cloud Only (Server berlokasi di AS / Eropa)</td>
+                            <td>SaaS Cloud Only (Penyimpanan berada pada infrastruktur server global)</td>
                         </tr>
                     </tbody>
                 </table>
@@ -1052,15 +1065,21 @@ docker compose -f docker-compose.yml up -d
                 Seluruh data uji tersimpan dalam format JSON terbuka lengkap dengan metadata provenans, hash integritas konten SHA-256, dan operator mutasi. Silakan unduh dan uji independen.
             </p>
 
-            <div class="btn-group" style="justify-content: center;">
-                <a href="<?= base_url('benchmark/dataset/targeted_80') ?>" class="btn-primary">
+            <div class="btn-group" style="justify-content: center; flex-wrap: wrap; gap: 12px;">
+                <a href="<?= base_url('datasets/artilik_indonesia_targeted_contextual_80_cases.json') ?>" download="artilik_indonesia_targeted_contextual_80_cases.json" target="_blank" class="btn-primary">
                     <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                     <span>Unduh Dataset Terarah 80 Kasus (JSON)</span>
                 </a>
-                <a href="<?= base_url('benchmark/dataset/v1_500') ?>" class="btn-secondary">
+                <a href="<?= base_url('datasets/artilik_indonesia_academic_benchmark_500_cases.json') ?>" download="artilik_indonesia_academic_benchmark_500_cases.json" target="_blank" class="btn-secondary">
                     <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                     <span>Unduh Dataset Baseline 500 Kasus (JSON)</span>
                 </a>
+            </div>
+
+            <div style="margin-top: 14px; font-size: 13px; color: var(--muted);">
+                Tautan alternatif rute controller / API:
+                <a href="<?= base_url('benchmark/dataset/targeted_80') ?>" target="_blank" style="color: var(--primary); text-decoration: underline; margin: 0 6px;">/benchmark/dataset/targeted_80</a> |
+                <a href="<?= base_url('benchmark/dataset/v1_500') ?>" target="_blank" style="color: var(--primary); text-decoration: underline; margin: 0 6px;">/benchmark/dataset/v1_500</a>
             </div>
 
             <div class="code-box" style="max-width: 680px; margin: 24px auto 0 auto; text-align: left;">
