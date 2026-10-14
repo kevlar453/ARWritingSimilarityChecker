@@ -127,7 +127,7 @@ class AuthController extends BaseController
             'status'             => 'success',
             'needs_verification' => true,
             'email_sent'         => $emailSent,
-            'message'            => "Pendaftaran berhasil! Tautan verifikasi aktivasi akun telah dikirimkan ke {$email}. Silakan buka kotak masuk atau spam email Anda untuk mengaktifkan akun sebelum masuk.",
+            'message'            => "Pendaftaran berhasil! Tautan verifikasi aktivasi akun telah dikirimkan ke {$email}. Silakan periksa Kotak Masuk (Inbox) atau folder SPAM / Junk email Anda untuk mengaktifkan akun sebelum masuk.",
             'user'               => [
                 'id'          => $user['id'],
                 'name'        => $user['name'],
@@ -258,7 +258,7 @@ class AuthController extends BaseController
         return $this->response->setJSON([
             'status'     => 'success',
             'email_sent' => $sent,
-            'message'    => "Tautan verifikasi baru berhasil dikirimkan ke {$email}. Silakan periksa kotak masuk atau spam email Anda.",
+            'message'    => "Tautan verifikasi baru berhasil dikirimkan ke {$email}. Silakan periksa Kotak Masuk (Inbox) atau folder SPAM / Junk email Anda.",
         ]);
     }
 
@@ -516,7 +516,7 @@ class AuthController extends BaseController
                 'status'             => 'error',
                 'needs_verification' => true,
                 'email'              => $email,
-                'message'            => 'Alamat email Anda belum diverifikasi. Silakan periksa kotak masuk/spam email aktivasi Anda, atau klik "Kirim Ulang Email Aktivasi".',
+                'message'            => 'Alamat email Anda belum diverifikasi. Silakan periksa Kotak Masuk (Inbox) atau folder SPAM / Junk email aktivasi Anda, atau klik "Kirim Ulang Email Aktivasi".',
             ]);
         }
 

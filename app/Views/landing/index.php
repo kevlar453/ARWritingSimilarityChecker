@@ -4796,8 +4796,8 @@
                     <div class="form-group">
                         <label class="form-label" for="regEmail">Alamat Email Valid</label>
                         <input type="email" id="regEmail" name="email" class="form-control" placeholder="nama@kampus.ac.id" required>
-                        <small style="font-size: 11px; color: var(--text-muted); margin-top: 4px; display: block;">
-                            ✉️ Tautan aktivasi akun akan dikirimkan ke email ini sebelum Anda dapat masuk.
+                        <small style="font-size: 11px; color: var(--text-muted); margin-top: 4px; display: block; line-height: 1.4;">
+                            ✉️ Tautan aktivasi akun akan dikirimkan ke email ini. Periksa folder <strong>Kotak Masuk (Inbox)</strong> maupun <strong>SPAM</strong>.
                         </small>
                     </div>
 
@@ -4811,7 +4811,18 @@
                         <input type="password" id="regPassword" name="password" class="form-control" placeholder="Minimal 6 karakter" minlength="6" required>
                     </div>
 
-                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 8px;">
+                    <!-- Pemberitahuan Khusus: Email Verifikasi & Folder SPAM -->
+                    <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.28); border-radius: 10px; padding: 10px 12px; margin-top: 12px; margin-bottom: 14px; font-size: 11.5px; color: #b45309; line-height: 1.5;">
+                        <div style="display: flex; align-items: flex-start; gap: 8px;">
+                            <span style="font-size: 15px; line-height: 1.1;">📬</span>
+                            <div>
+                                <strong style="color: #92400e;">Penting Terkait Email Verifikasi:</strong><br>
+                                Tautan aktivasi dikirim otomatis ke email Anda sesaat setelah mendaftar. Apabila tidak ditemukan pada folder <strong>Kotak Masuk (Inbox)</strong>, mohon periksa juga folder <strong>SPAM / Junk</strong> atau tab <em>Promosi</em> akun email Anda.
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 4px;">
                         Daftar Gratis (3 Submisi/Minggu)
                     </button>
                 </form>
@@ -5111,8 +5122,10 @@
                     form.reset();
                     showAlert('🎉 <strong>Pendaftaran Berhasil!</strong><br>' + 
                         'Kami telah mengirimkan tautan verifikasi ke <strong>' + userEmail + '</strong>.<br>' +
-                        '<span style="font-size:12px; color:#475569; display:block; margin-top:6px;">Silakan buka kotak masuk atau spam email Anda dan klik tautan aktivasi untuk mengaktifkan akun AR Tilik.</span>' +
-                        '<div style="margin-top:10px;"><button type="button" onclick="resendVerification(\'' + userEmail + '\')" style="background:none; border:none; padding:0; cursor:pointer; font-family:inherit; font-size:12px; color:var(--primary); font-weight:700; text-decoration:underline;">Belum menerima email? Kirim Ulang</button></div>', false);
+                        '<div style="background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:10px 12px; margin-top:10px; font-size:12px; color:#92400e; text-align:left; line-height:1.5;">' +
+                        '📬 <strong>Perhatian:</strong> Apabila email belum muncul di <strong>Kotak Masuk (Inbox)</strong> dalam beberapa menit, mohon periksa juga folder <strong>SPAM / Junk</strong> atau tab <em>Promosi</em>. Tandai sebagai <strong>"Bukan Spam"</strong> agar pengiriman pemberitahuan selanjutnya lancar.' +
+                        '</div>' +
+                        '<div style="margin-top:12px;"><button type="button" onclick="resendVerification(\'' + userEmail + '\')" style="background:none; border:none; padding:0; cursor:pointer; font-family:inherit; font-size:12px; color:var(--primary); font-weight:700; text-decoration:underline;">Belum menerima email? Kirim Ulang</button></div>', false);
                 }
             } catch (err) {
                 showAlert('Kendala koneksi peladen. Silakan coba kembali.', true);

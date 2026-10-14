@@ -138,13 +138,19 @@ class EmailService
 
         $infoBox = match ($reminderNumber) {
             3       => '<div style="background-color: #fff1f2; border-left: 4px solid #e11d48; border-radius: 6px; padding: 14px 16px; margin: 24px 0;">
-                            <p style="font-size: 12px; color: #9f1239; margin: 0; line-height: 1.5;">
+                            <p style="font-size: 12px; color: #9f1239; margin: 0 0 6px 0; line-height: 1.5;">
                                 🚨 <strong>Batas Waktu Terakhir:</strong> Tautan verifikasi ini aktif selama <strong>24 jam</strong>. Jika tidak diverifikasi sebelum batas waktu berakhir, akun pendaftaran Anda akan dihapus secara otomatis dan permanen untuk membebaskan alamat email Anda.
+                            </p>
+                            <p style="font-size: 11px; color: #be123c; margin: 0; line-height: 1.4;">
+                                💡 <em>Tips: Jika email ini masuk ke folder <strong>SPAM / Junk</strong> atau <em>Promosi</em>, tandai sebagai <strong>"Bukan Spam" (Not Spam)</strong> agar pemberitahuan selanjutnya masuk lancar ke Kotak Masuk Anda.</em>
                             </p>
                         </div>',
             default => '<div style="background-color: #f8fafc; border-left: 4px solid #4f46e5; border-radius: 6px; padding: 14px 16px; margin: 24px 0;">
-                            <p style="font-size: 12px; color: #475569; margin: 0; line-height: 1.5;">
+                            <p style="font-size: 12px; color: #475569; margin: 0 0 6px 0; line-height: 1.5;">
                                 ⏱️ <strong>Masa Berlaku:</strong> Tautan verifikasi ini aktif selama <strong>24 jam</strong>. Setelah lewat masa berlaku, Anda dapat mengajukan pengiriman ulang email aktivasi melalui halaman login.
+                            </p>
+                            <p style="font-size: 11px; color: #64748b; margin: 0; line-height: 1.4;">
+                                💡 <em>Tips: Jika email ini diterima pada folder <strong>SPAM / Junk</strong> atau tab <em>Promosi</em>, silakan tandai <strong>"Bukan Spam" (Not Spam)</strong> agar laporan uji kesepadanan naskah Anda selalu masuk ke Kotak Masuk utama.</em>
                             </p>
                         </div>'
         };
