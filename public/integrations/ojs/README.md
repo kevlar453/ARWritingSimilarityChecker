@@ -10,8 +10,8 @@ Modul ini memungkinkan pengelola jurnal ilmiah di lingkungan kampus yang menggun
 
 ## 🚀 Fitur Unggulan Integrasi OJS (Platform v1.3.0)
 
-1. **Pengecekan Otomatis Saat Submisi Naskah**:
-   - Menghubungkan hook `SubmissionFile::upload` atau `EditorAction` di OJS agar setiap artikel yang diunggah langsung dievaluasi tanpa langkah manual.
+1. **Pengecekan Naskah melalui Pustaka Mandiri & REST API**:
+   - Menyediakan pustaka konektor PHP (`ARTilikOJSConnector.php`) dan REST API v1 untuk mengevaluasi naskah artikel jurnal secara terprogram dalam alur penelaahan editor.
 2. **Mesin Evaluasi Dual-Lens Akurat**:
    - **Lensa 1 (5-Gram Exact Matching)**: mendeteksi pasase salin-tempel literal kata-demi-kata.
    - **Lensa 2 (TF-IDF Cosine Vector)**: mendeteksi kemiripan orientasi kosakata, parafrase kalimat, dan istilah topikal ilmiah.
@@ -22,7 +22,7 @@ Modul ini memungkinkan pengelola jurnal ilmiah di lingkungan kampus yang menggun
 5. **Isolasi Teks Substantif (Section-Aware)**:
    - Secara cerdas memisahkan batang tubuh naskah (Pendahuluan s/d Kesimpulan) dan mengecualikan judul/cover, lampiran, serta daftar pustaka agar penilaian adil bagi penulis jurnal.
 6. **Sertifikat Keabsahan Digital Berkode QR**:
-   - Menghasilkan bukti keabsahan ber-hash kriptografis SHA-256 dengan tautan verifikasi publik (`https://tilik.arsetontong.top/verify/ART-...`) yang siap dilampirkan pada arsip akreditasi SINTA & ARJUNA.
+   - Menghasilkan bukti keabsahan ber-hash kriptografis SHA-256 dengan tautan verifikasi publik (`https://tilik.arsetontong.top/verify/ART-...`) sebagai bukti dukung pemenuhan kepatuhan akreditasi ARJUNA & indeksasi SINTA.
 7. **Unduh PDF Laporan Resmi**:
    - Lampirkan sertifikat PDF langsung ke riwayat peninjauan (*Review Discussions*) OJS untuk mitra bestari dan penulis.
 

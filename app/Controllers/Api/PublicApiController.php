@@ -98,11 +98,11 @@ class PublicApiController extends BaseController
                     'message' => 'Format berkas tidak didukung. Hanya file PDF, DOCX, dan TXT yang diperbolehkan.'
                 ]);
             }
-            if ($file->getSize() > 25 * 1024 * 1024) {
+            if ($file->getSize() > 30 * 1024 * 1024) {
                 return $this->response->setStatusCode(413)->setJSON([
                     'status'  => 'error',
                     'code'    => 413,
-                    'message' => 'Ukuran berkas melebihi batas maksimal 25 MB.'
+                    'message' => 'Ukuran berkas melebihi batas maksimal 30 MB.'
                 ]);
             }
 

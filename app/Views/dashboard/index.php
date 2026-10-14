@@ -2597,7 +2597,7 @@
                             </div>
                             <ul class="text-[11px] text-slate-600 space-y-1.5 pt-2 border-t border-slate-100">
                                 <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> 75 submisi dokumen / bulan</li>
-                                <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Prioritas pemrosesan tertinggi</li>
+                                <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Alokasi antrean pemrosesan prioritas</li>
                                 <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Audit Forensik Cerdas &amp; Instrumen Penguji</li>
                                 <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Sintesis Risiko Akademik Berbobot</li>
                                 <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Dukungan berkas hingga 30 MB</li>

@@ -871,7 +871,7 @@ table.data-table tr.highlight-row {
             <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             Pernyataan Manfaat untuk Pengelola Jurnal
         </div>
-        Dengan menghubungkan OJS ke AR Tilik, dewan redaksi tidak perlu lagi mengunduh berkas satu per satu, mengunggah ke aplikasi terpisah, lalu membagikan tangkapan layar kepada reviewer. Seluruh proses pemeriksaan berjalan otomatis saat naskah diunggah oleh penulis, dan hasilnya langsung dapat dilihat di ruang diskusi peninjauan (<em>Review Discussions</em>).
+        Dengan menghubungkan OJS ke AR Tilik, dewan redaksi tidak perlu lagi mengunduh berkas satu per satu, mengunggah ke aplikasi terpisah, lalu membagikan tangkapan layar kepada reviewer. Melalui pustaka konektor PHP mandiri dan REST API v1, proses pemeriksaan naskah dapat diintegrasikan ke dalam alur kerja redaksi, dan hasilnya langsung dapat dilampirkan ke ruang diskusi peninjauan (<em>Review Discussions</em>).
     </div>
 </div>
 

@@ -828,7 +828,7 @@ body {
     <div class="section-tag">Arsitektur Komputasi Unggulan</div>
     <h2 class="section-title">Standar Catur Pilar Metrik Integritas Akademik</h2>
     <p class="section-desc">
-        AR Tilik membedah setiap naskah secara komprehensif melalui 4 pilar metrik independen berstandar akreditasi SINTA &amp; ARJUNA:
+        AR Tilik membedah setiap naskah secara komprehensif melalui 4 pilar metrik independen untuk mendukung kepatuhan akreditasi SINTA &amp; ARJUNA:
     </p>
 
     <div class="grid-2">
@@ -937,13 +937,13 @@ body {
             </tr>
             <tr>
                 <td><strong>Sertifikat Digital Anti-Pemalsuan</strong></td>
-                <td><span class="badge-win">Piagam Akreditasi Standar SINTA/ARJUNA</span><br>Diploma A4, stempel medali emas 3D, QR &amp; SHA-256.</td>
+                <td><span class="badge-win">Sertifikat Verifikasi Standar SINTA/ARJUNA</span><br>Diploma A4, stempel medali emas 3D, QR &amp; SHA-256.</td>
                 <td><span class="badge-neutral">Hanya Lembar PDF Standar</span><br>Rentan dipalsukan / dimanipulasi teksnya.</td>
                 <td><span class="badge-lose">Tidak Ada Sertifikat</span></td>
             </tr>
             <tr>
                 <td><strong>Konektivitas OJS 3.x &amp; Repositori</strong></td>
-                <td><span class="badge-win">Native REST API, CLI, &amp; OAI-PMH</span><br>Plug-and-play ke OJS 3, EPrints, &amp; DSpace.</td>
+                <td><span class="badge-win">Native REST API, CLI, &amp; OAI-PMH</span><br>Konektor PHP OJS 3, siap integrasi repositori institusi.</td>
                 <td><span class="badge-neutral">Integrasi API Kompleks</span><br>Memerlukan biaya lisensi API tambahan.</td>
                 <td><span class="badge-lose">Manual Satu-Satu</span><br>Tidak mendukung otomasi redaksi.</td>
             </tr>
@@ -957,9 +957,9 @@ body {
     </table>
 
     <div class="section-tag emerald">Antarmuka Interaktif &amp; Bukti Keabsahan</div>
-    <h2 class="section-title">Dual-Reader Interaktif &amp; Piagam Akreditasi Standar SINTA</h2>
+    <h2 class="section-title">Dual-Reader Interaktif &amp; Sertifikat Verifikasi Kepatuhan SINTA</h2>
     <p class="section-desc">
-        Memudahkan sivitas memeriksa bukti secara berdampingan serta menerbitkan piagam pengesahan resmi berstandar akreditasi nasional:
+        Memudahkan sivitas memeriksa bukti secara berdampingan serta menerbitkan sertifikat pengesahan resmi berstandar akreditasi nasional:
     </p>
 
     <!-- Visual Mockups: Dual Reader & Piagam Akreditasi -->
@@ -971,15 +971,15 @@ body {
             </div>
         </div>
         <div style="border: 1px solid #cbd5e1; border-radius: 6px; overflow: hidden; background: #020617;">
-            <img src="__PIAGAM_MOCKUP_B64__" alt="Piagam Akreditasi Integritas Resmi AR Tilik" style="width: 100%; height: 31mm; object-fit: cover; display: block;">
+            <img src="__PIAGAM_MOCKUP_B64__" alt="Sertifikat Verifikasi Integritas Resmi AR Tilik" style="width: 100%; height: 31mm; object-fit: cover; display: block;">
             <div style="padding: 2.5px 5px; font-size: 6.6pt; font-weight: 700; color: #875c16; background: #fffdf8; text-align: center; border-top: 1px solid #fef3c7;">
-                Piagam Akreditasi Standar SINTA / ARJUNA (A4)
+                Sertifikat Verifikasi Kepatuhan SINTA / ARJUNA (A4)
             </div>
         </div>
     </div>
 
     <div class="callout-box">
-        <strong>Piagam Akreditasi Integritas Resmi &amp; Jaminan Zero-Leakage:</strong> Setiap pemeriksaan menghasilkan Piagam Akreditasi format Diploma A4 berstempel medali emas timbul 3D, validasi kriptografis SHA-256, dan kode QR publik. Asesor SINTA, ARJUNA, BAN-PT, maupun panitia yudisium dapat memvalidasi keaslian secara instan tanpa perlu akun masuk &mdash; bahkan setelah berkas fisik naskah asli dimusnahkan secara mandiri oleh institusi (Zero-Leakage Guarantee).
+        <strong>Sertifikat Verifikasi Integritas Resmi &amp; Jaminan Zero-Leakage:</strong> Setiap pemeriksaan menghasilkan Sertifikat Verifikasi format Diploma A4 berstempel medali emas timbul 3D, validasi kriptografis SHA-256, dan kode QR publik. Asesor SINTA, ARJUNA, BAN-PT, maupun panitia yudisium dapat memvalidasi keaslian secara instan tanpa perlu akun masuk &mdash; bahkan setelah berkas fisik naskah asli dimusnahkan secara mandiri oleh institusi (Zero-Leakage Guarantee).
     </div>
 </div>
 
@@ -1004,8 +1004,8 @@ body {
                 <li><span class="check">✓</span> <span class="li-txt">Kuota fleksibel untuk 1–10 Jurnal OJS</span></li>
                 <li><span class="check">✓</span> <span class="li-txt">Pustaka Konektor PHP &amp; Skrip Runner CLI</span></li>
                 <li><span class="check">✓</span> <span class="li-txt">REST API Key Jurnal dengan limit terlindungi</span></li>
-                <li><span class="check">✓</span> <span class="li-txt">Piagam Akreditasi Digital ber-QR Code per artikel</span></li>
-                <li><span class="check">✓</span> <span class="li-txt">Standar Bukti Akreditasi ARJUNA / SINTA</span></li>
+                <li><span class="check">✓</span> <span class="li-txt">Sertifikat Verifikasi Digital ber-QR Code per artikel</span></li>
+                <li><span class="check">✓</span> <span class="li-txt">Bukti Dukung Akreditasi ARJUNA / SINTA</span></li>
                 <li><span class="check">✓</span> <span class="li-txt">Jaminan Zero-Leakage (Privasi Blind Review)</span></li>
             </ul>
             <div style="font-size: 7.2pt; color: #64748b; font-weight: 600; text-align: center; border-top: 1px dashed #e2e8f0; padding-top: 5px;">
@@ -1041,8 +1041,8 @@ body {
             </div>
             <ul class="package-list">
                 <li><span class="check">✓</span> <span class="li-txt"><strong>Instalasi Mandiri (On-Premise / Private Cloud)</strong></span></li>
-                <li><span class="check">✓</span> <span class="li-txt">Panen Otomatis Repositori Kampus (OAI-PMH)</span></li>
-                <li><span class="check">✓</span> <span class="li-txt">Integrasi Single Sign-On (SSO / LDAP / Google)</span></li>
+                <li><span class="check">✓</span> <span class="li-txt">Kesiapan Repositori Kampus (Protokol OAI-PMH)</span></li>
+                <li><span class="check">✓</span> <span class="li-txt">Kesiapan Integrasi SSO Kampus (Custom Enterprise)</span></li>
                 <li><span class="check">✓</span> <span class="li-txt">Dasbor Analitik Tren Integritas Universitas</span></li>
                 <li><span class="check">✓</span> <span class="li-txt">Kedaulatan Penuh &amp; Zero-Leakage Guarantee</span></li>
                 <li><span class="check">✓</span> <span class="li-txt">Dedicated Technical Support &amp; SLA 99.9%</span></li>
@@ -1061,7 +1061,7 @@ body {
         </div>
         <h3 class="trial-title">Coba Gratis 14 Hari &mdash; Tanpa Komitmen</h3>
         <p class="trial-desc">
-            Uji AR Tilik dengan naskah riil jurnal Anda: <strong>50 naskah</strong>, semua fitur aktif (<strong>Catur Pilar Integritas</strong>, <strong>forensik Gemini AI</strong>, <strong>Piagam Akreditasi QR</strong>, <strong>fitur Purge Zero-Leakage</strong>, <strong>konektor OJS 3.x</strong>). Tanpa kartu kredit, tanpa sales yang menekan. Akun trial aktif dalam <strong>1x24 jam</strong>.
+            Uji AR Tilik dengan naskah riil jurnal Anda: <strong>50 naskah</strong>, semua fitur aktif (<strong>Catur Pilar Integritas</strong>, <strong>forensik Gemini AI</strong>, <strong>Sertifikat QR SINTA</strong>, <strong>fitur Purge Zero-Leakage</strong>, <strong>konektor OJS 3.x</strong>). Tanpa kartu kredit, tanpa sales yang menekan. Akun trial aktif dalam <strong>1x24 jam</strong>.
         </p>
 
         <div class="trial-features-row">
@@ -1075,7 +1075,7 @@ body {
             </div>
             <div class="trial-feat-item">
                 <span class="feat-check">✓</span>
-                <span><strong>Konektor OJS 3.x</strong> &amp; Piagam QR SINTA</span>
+                <span><strong>Konektor OJS 3.x</strong> &amp; Sertifikat QR SINTA</span>
             </div>
             <div class="trial-feat-item">
                 <span class="feat-check">✓</span>

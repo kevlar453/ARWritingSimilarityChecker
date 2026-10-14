@@ -44,10 +44,10 @@ class DocumentController extends BaseController
             ]);
         }
 
-        if ($file->getSize() > 25 * 1024 * 1024) {
+        if ($file->getSize() > 30 * 1024 * 1024) {
             return $this->response->setStatusCode(413)->setJSON([
                 'status'  => 'error',
-                'message' => 'Ukuran file maksimal adalah 25 MB.'
+                'message' => 'Ukuran file maksimal adalah 30 MB.'
             ]);
         }
 
@@ -173,10 +173,10 @@ class DocumentController extends BaseController
             ]);
         }
 
-        if ($file->getSize() > 25 * 1024 * 1024) {
+        if ($file->getSize() > 30 * 1024 * 1024) {
             return $this->response->setStatusCode(413)->setJSON([
                 'status'  => 'error',
-                'message' => 'Ukuran berkas maksimal adalah 25 MB.'
+                'message' => 'Ukuran berkas maksimal adalah 30 MB.'
             ]);
         }
 
@@ -626,10 +626,10 @@ class DocumentController extends BaseController
             ]);
         }
 
-        if ($file->getSize() > 25 * 1024 * 1024) {
+        if ($file->getSize() > 30 * 1024 * 1024) {
             return $this->response->setStatusCode(413)->setJSON([
                 'status'  => 'error',
-                'message' => 'Ukuran berkas maksimal adalah 25 MB.'
+                'message' => 'Ukuran berkas maksimal adalah 30 MB.'
             ]);
         }
 

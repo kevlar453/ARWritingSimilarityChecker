@@ -3826,13 +3826,13 @@
                         </div>
                         <h3 class="theory-title">Pengelola Jurnal (OJS 3.x)</h3>
                         <p class="theory-desc">
-                            Otomatisasi telaah kemiripan artikel submisi untuk menjaga reputasi dan kepatuhan akreditasi ARJUNA &amp; SINTA.
+                            Pemeriksaan kemiripan naskah terarah untuk mendukung kepatuhan etika publikasi pada persiapan akreditasi ARJUNA &amp; indeksasi SINTA.
                         </p>
 
                         <ul class="persona-list">
-                            <li><span class="check-icon" style="color: #e11d48;">✓</span> <span><strong>Konektor OJS 3.x Plug &amp; Play:</strong> Cukup pasang 1 berkas pustaka PHP.</span></li>
+                            <li><span class="check-icon" style="color: #e11d48;">✓</span> <span><strong>Konektor PHP &amp; REST API OJS 3.x:</strong> Integrasi fleksibel via SDK mandiri.</span></li>
                             <li><span class="check-icon" style="color: #e11d48;">✓</span> <span><strong>Deteksi Lintas Bahasa:</strong> Membongkar artikel terjemahan asing tanpa sitasi.</span></li>
-                            <li><span class="check-icon" style="color: #e11d48;">✓</span> <span><strong>Sertifikat Digital Ber-QR Code:</strong> Bukti verifikasi resmi untuk dewan editor.</span></li>
+                            <li><span class="check-icon" style="color: #e11d48;">✓</span> <span><strong>Sertifikat Digital Ber-QR Code:</strong> Bukti verifikasi digital resmi untuk dewan editor.</span></li>
                             <li><span class="check-icon" style="color: #e11d48;">✓</span> <span><strong>Manajemen Kuota API Jurnal:</strong> Kontrol batas pemakaian per bulan secara presisi.</span></li>
                         </ul>
                     </div>
@@ -3855,9 +3855,9 @@
                         </p>
 
                         <ul class="persona-list">
-                            <li><span class="check-icon">✓</span> <span><strong>Kedaulatan Data Penuh:</strong> Naskah sivitas tidak dijual/diserahkan ke pihak luar.</span></li>
+                            <li><span class="check-icon">✓</span> <span><strong>Kedaulatan Data Mandiri:</strong> Naskah sivitas tetap di server kampus (mendukung prinsip UU PDP).</span></li>
                             <li><span class="check-icon">✓</span> <span><strong>Opsi On-Premise / Private Cloud:</strong> Dipasang di pusat data kampus sendiri.</span></li>
-                            <li><span class="check-icon">✓</span> <span><strong>Sinkronisasi OAI-PMH:</strong> Hubungkan repositori EPrints / DSpace institusi.</span></li>
+                            <li><span class="check-icon">✓</span> <span><strong>Kesiapan Protokol OAI-PMH:</strong> Dapat dikonfigurasikan dengan repositori kampus.</span></li>
                             <li><span class="check-icon">✓</span> <span><strong>Dasbor Integritas Kampus:</strong> Analitik tren kemiripan dan risiko antar fakultas.</span></li>
                         </ul>
                     </div>
@@ -4385,7 +4385,7 @@
                         <ul class="plan-features">
                             <li><strong>20 submisi dokumen</strong> selama masa aktif</li>
                             <li>Prioritas antrean pemrosesan cepat</li>
-                            <li><strong>Audit Forensik Cerdas</strong> & 4 panduan pertanyaan sidang dosen</li>
+                            <li><strong>Audit Forensik Cerdas</strong> & 3 panduan pertanyaan sidang dosen</li>
                             <li>Deteksi fabrikasi sitasi gaib & inkonsistensi metodologi</li>
                             <li>Ekspor PDF laporan resmi lengkap tanpa batas</li>
                             <li>Verifikasi keaslian naskah ber-QR Code</li>
@@ -4420,7 +4420,7 @@
 
                         <ul class="plan-features">
                             <li><strong>75 submisi dokumen</strong> selama masa aktif</li>
-                            <li>Prioritas antrean tertinggi sistem</li>
+                            <li>Alokasi antrean pemrosesan dokumen prioritas</li>
                             <li><strong>Audit Forensik Cerdas</strong> mendalam & instrumen dewan penguji</li>
                             <li>Sintesis risiko akademik berbobot & integritas sitasi</li>
                             <li>Dukungan berkas besar hingga <strong>30 MB</strong></li>
@@ -4450,7 +4450,7 @@
                     </div>
                     <h3 style="font-size: 22px; font-weight: 800; margin-bottom: 8px; color: #ffffff;">Paket Kampus, OJS Jurnal & LPPM (Enterprise)</h3>
                     <p style="font-size: 14px; color: #cbd5e1; line-height: 1.6; margin: 0;">
-                        Butuh integrasi dengan repositori skripsi internal prodi, plugin OJS 3 untuk penerbitan jurnal, atau plugin Moodle LMS kampus? Kami menyediakan instalasi mandiri (on-premise / private cloud), korpus tertutup institusi, serta sinkronisasi OAI-PMH otomatis dengan SLA dukungan teknis dedicated.
+                        Solusi institusi untuk penguatan integritas karya ilmiah perguruan tinggi dan dewan editor jurnal. Mendukung integrasi OJS 3.x berbasis SDK/Konektor PHP &amp; REST API v1, opsi instalasi mandiri (on-premise / private cloud) dengan isolasi korpus institusi, kesiapan integrasi LMS/repositori kampus berbasis OAI-PMH 2.0, serta pendampingan teknis dedicated.
                     </p>
                 </div>
                 <div style="flex-shrink: 0; width: 100%; max-width: 260px; text-align: center;">
@@ -4531,7 +4531,7 @@
                     </button>
                     <div class="faq-content">
                         <p>
-                            Integrasi OJS sangat praktis tanpa perlu mengubah core OJS. Pengelola jurnal cukup mengunduh berkas konektor mandiri <code>ARTilikOJSConnector.php</code> dan mengikuti panduan di Buku Panduan OJS (PDF). Konektor ini memanfaatkan REST API v1 AR Tilik untuk melakukan pemeriksaan submisi naskah secara otomatis saat penulis mengunggah artikel di OJS, serta langsung menyematkan skor kemiripan dan tautan sertifikat QR ke meja editor.
+                            Integrasi OJS dapat dilakukan melalui pustaka konektor PHP mandiri <code>ARTilikOJSConnector.php</code> dan REST API v1 AR Tilik tanpa mengubah core OJS. Pengelola jurnal dapat memanggil konektor ini pada alur kerja peninjauan artikel di OJS untuk mengirimkan naskah submisi dan menerima kembali skor kemiripan Dual-Lens serta tautan sertifikat QR ke meja editor. Panduan lengkap tersedia di Buku Panduan OJS (PDF).
                         </p>
                     </div>
                 </div>

@@ -121,7 +121,7 @@ class MidtransService
                 'description' => '75 Submisi Dokumen / Bulan untuk cek tugas kelas, tesis, & draf jurnal.',
                 'features'    => [
                     '75 submisi dokumen per bulan (Rp 1.000 / cek)',
-                    'Prioritas antrean tertinggi sistem',
+                    'Alokasi antrean pemrosesan dokumen prioritas',
                     'Dukungan file dokumen besar hingga 30 MB',
                     'Masa aktif langganan 30 hari'
                 ]

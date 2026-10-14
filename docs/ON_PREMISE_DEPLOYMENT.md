@@ -10,7 +10,7 @@
 Banyak perguruan tinggi dan pengelola jurnal ilmiah di Indonesia menghadapi risiko hukum dan privasi ketika menyerahkan draf skripsi, tesis, disertasi, atau naskah pra-publikasi ke penyedia cloud multinasional:
 1. **Risiko Data Lock-In:** Naskah yang diunggah ke repositori global milik pihak ketiga tidak dapat ditarik kembali secara mandiri tanpa proses birokrasi manual.
 2. **Kerahasiaan Hak Paten & Kebaruan Riset:** Naskah riset bernilai paten rentan terekspos sebelum publikasi resmi.
-3. **Kepatuhan Regulasi:** UU Perlindungan Data Pribadi (UU PDP No. 27/2022) dan regulasi privasi data institusi mewajibkan data penelitian strategis disimpan di dalam yurisdiksi server lokal kampus.
+3. **Kepatuhan Regulasi:** Mendukung kepatuhan tata kelola data internal dan prinsip pelindungan data pribadi (UU PDP No. 27/2022) melalui penempatan data penelitian strategis di dalam yurisdiksi server lokal kampus tanpa transfer naskah ke pihak luar.
 
 **AR Tilik On-Premise Edition** dirancang agar seluruh data, naskah fisik, sidik jari hash (shingle/fingerprints), serta basis data audit **100% berada di bawah kendali penuh departemen teknologi informasi kampus Anda**.
 
@@ -87,8 +87,8 @@ Gunakan modul konektor yang tersedia di:
 - Dokumen Panduan: `public/integrations/ojs/Panduan_Integrasi_OJS_ARTilik.pdf`
 - Endpoint REST API: `POST /api/v1/check`
 
-### B. Autentikasi & SSO Kampus (LDAP / SAML / OAuth2)
-AR Tilik mendukung otorisasi berbasis API Key terisolasi per fakultas/program studi dan siap dihubungkan ke SSO Sentral Universitas.
+### B. Otorisasi & Kesiapan SSO Kampus
+AR Tilik mendukung otorisasi berbasis API Key terisolasi per fakultas/program studi. Penyesuaian dengan SSO Sentral Universitas (seperti LDAP, SAML, atau OAuth2) dapat diintegrasikan melalui modul adaptor kustom pada paket implementasi Enterprise.
 
 ---
 
