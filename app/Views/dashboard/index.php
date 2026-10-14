@@ -209,6 +209,11 @@
                 </div>
                 
                 <div class="flex flex-wrap sm:flex-nowrap items-center gap-2.5 flex-shrink-0">
+                    <?php if (!empty($pendingPayment) && !empty($pendingPayment['snap_token'])): ?>
+                        <button type="button" onclick="resumePendingPayment('<?= esc($pendingPayment['snap_token'], 'js') ?>')" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-md animate-pulse transition transform hover:-translate-y-0.5 cursor-pointer" title="Lanjutkan transaksi pending">
+                            <span>⏳ Lanjutkan Bayar (<?= esc($pendingPayment['package_name']) ?>)</span>
+                        </button>
+                    <?php endif; ?>
                     <button type="button" onclick="openPaymentModal()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white shadow-md transition transform hover:-translate-y-0.5 cursor-pointer">
                         <span>⚡ Beli Kuota / Top-Up</span>
                     </button>
@@ -2500,6 +2505,23 @@
                     </div>
                 </div>
 
+                <?php if (!empty($pendingPayment) && !empty($pendingPayment['snap_token'])): ?>
+                    <div class="p-4 bg-amber-50 border-2 border-amber-400 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
+                        <div class="flex items-start gap-3">
+                            <span class="text-2xl mt-0.5">⏳</span>
+                            <div>
+                                <h4 class="text-xs font-bold text-amber-950 uppercase tracking-wider">Transaksi Menunggu Pembayaran</h4>
+                                <div class="text-xs text-amber-900 mt-0.5">
+                                    Anda memiliki pesanan aktif: <strong class="font-bold"><?= esc($pendingPayment['package_name']) ?></strong> (Rp <?= number_format($pendingPayment['amount'], 0, ',', '.') ?>) • Order ID: <span class="font-mono-code font-semibold"><?= esc($pendingPayment['order_id']) ?></span>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" onclick="resumePendingPayment('<?= esc($pendingPayment['snap_token'], 'js') ?>')" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs shadow-md transition-colors shrink-0 text-center cursor-pointer">
+                            Lanjutkan Pembayaran Ini &rarr;
+                        </button>
+                    </div>
+                <?php endif; ?>
+
                 <div id="paymentAlert" class="hidden p-3 rounded-xl text-xs"></div>
 
                 <!-- Packages Grid -->
@@ -2688,6 +2710,30 @@
             } finally {
                 btnElement.disabled = false;
                 btnElement.innerHTML = originalText;
+            }
+        }
+
+        function resumePendingPayment(snapToken) {
+            closePaymentModal();
+            if (window.snap) {
+                window.snap.pay(snapToken, {
+                    onSuccess: function(result) {
+                        alert('🎉 Pembayaran Berhasil! Kuota akun Anda telah diperbarui.');
+                        window.location.reload();
+                    },
+                    onPending: function(result) {
+                        alert('⏳ Pembayaran sedang menunggu. Silakan selesaikan pembayaran sesuai instruksi QRIS/Virtual Account.');
+                        window.location.reload();
+                    },
+                    onError: function(result) {
+                        alert('❌ Terjadi kendala pembayaran: ' + (result.status_message || 'Gagal'));
+                    },
+                    onClose: function() {
+                        // User menutup popup
+                    }
+                });
+            } else {
+                alert('Pop-up pembayaran Snap Midtrans sedang dimuat. Silakan coba sesaat lagi.');
             }
         }
     </script>

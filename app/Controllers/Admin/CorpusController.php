@@ -136,11 +136,12 @@ class CorpusController extends BaseController
         }
 
         // Hapus file fisik jika ada
-        if (file_exists($doc['storage_path'])) {
-            unlink($doc['storage_path']);
+        if (! empty($doc['storage_path']) && file_exists($doc['storage_path'])) {
+            @unlink($doc['storage_path']);
         }
 
         $db = db_connect();
+        $db->table('report_sources')->where('source_document_id', $id)->delete();
         $db->table('fingerprints')->where('document_id', $id)->delete();
         $db->table('fingerprint_documents')->where('document_id', $id)->delete();
         $db->table('document_chunks')->where('document_id', $id)->delete();

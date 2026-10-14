@@ -5,6 +5,7 @@ Modul pemanen otomatis karya ilmiah dari repositori nasional Indonesia:
 2. GARUDA / Garba Rujukan Digital Kemdiktisaintek (Portal Jurnal Terakreditasi Nasional)
 """
 
+import html
 import os
 import sys
 import time
@@ -66,11 +67,17 @@ def download_stream(url: str, dest_path: Path, max_bytes: int = 25 * 1024 * 1024
 
 
 def clean_text(text: str) -> str:
-    """Membersihkan tag XML / HTML dan normalisasi spasi."""
+    """Membersihkan tag XML / HTML, entitas HTML, normalisasi spasi, dan memperbaiki mojibake."""
     if not text:
         return ""
+    text = html.unescape(text)
     text = re.sub(r"<[^>]+>", " ", text)
-    return re.sub(r"\s+", " ", text).strip()
+    text = re.sub(r"\s+", " ", text).strip()
+    try:
+        text = text.encode("cp1252").decode("utf-8")
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        pass
+    return text
 
 
 class NationalHarvester:

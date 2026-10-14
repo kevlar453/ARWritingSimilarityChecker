@@ -396,6 +396,29 @@
         <!-- ========================================== -->
         <?php if ($activeTab === 'overview'): ?>
             <div class="space-y-6">
+                <!-- Alerting AI Degradation (Jika Kunci Google Mengalami 503 Massal) -->
+                <?php if (!empty($googleAiDegraded) || (!empty($keys503Count) && $keys503Count >= 3)): ?>
+                    <div class="bg-amber-950/40 border border-amber-500/40 rounded-2xl p-4 shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                        <div class="flex items-start gap-3">
+                            <div class="p-2 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/30 shrink-0 mt-0.5">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-amber-200 flex items-center gap-2">
+                                    Peringatan Kesiapan AI: Upstream Google 503 Terdeteksi
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold font-mono-code"><?= $keys503Count ?> Kunci High-Demand</span>
+                                </h3>
+                                <p class="text-xs text-slate-300 mt-0.5">
+                                    Tercatat <?= $keys503Count ?> dari <?= $activeGoogleKeysCount ?? 8 ?> kunci Google API aktif mendeteksi status High Demand (HTTP 503). Mekanisme round-robin pool otomatis melakukan failover, namun disarankan untuk memeriksa atau menambah kunci cadangan.
+                                </p>
+                            </div>
+                        </div>
+                        <a href="<?= base_url('admin?tab=google_keys') ?>" class="px-3.5 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold shrink-0 transition-colors shadow-sm">
+                            Kelola Pool Kunci AI &rarr;
+                        </a>
+                    </div>
+                <?php endif; ?>
+
                 <!-- KPI Metric Cards Grid -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <!-- Total Users -->
@@ -442,10 +465,16 @@
                         </div>
                         <div class="mt-3 flex items-baseline gap-2">
                             <span class="text-3xl font-extrabold text-white tracking-tight"><?= number_format($metrics['total_corpus']) ?></span>
-                            <span class="text-xs text-purple-400 font-medium">Karya Terindeks</span>
+                            <span class="text-xs text-purple-400 font-medium">Total Naskah</span>
                         </div>
-                        <div class="mt-2 text-xs text-slate-400">
-                            <span>Basis pembanding TF-IDF & Exact Shingle</span>
+                        <div class="mt-2 text-xs text-slate-400 flex items-center justify-between gap-1">
+                            <span class="text-emerald-400 font-medium"><?= number_format($metrics['corpus_completed'] ?? $metrics['total_corpus']) ?> aktif terindeks</span>
+                            <?php if (!empty($metrics['corpus_failed'])): ?>
+                                <span class="text-rose-400 font-medium" title="Gagal ekstraksi/unduh harvester">• <?= $metrics['corpus_failed'] ?> gagal panen</span>
+                            <?php endif; ?>
+                        </div>
+                        <div class="mt-1 text-[11px] text-slate-500">
+                            Basis pembanding TF-IDF &amp; Exact Shingle
                         </div>
                     </div>
 
@@ -618,7 +647,7 @@
                                                 <?php if ($u['status'] === 'active'): ?>
                                                     <span class="px-2 py-0.5 rounded-full text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold">Aktif</span>
                                                 <?php elseif ($u['status'] === 'pending_verification'): ?>
-                                                    <span class="px-2 py-0.5 rounded-full text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 font-semibold" title="Email verifikasi terkirim: <?= (int)($u['verification_emails_sent'] ?? 1) ?>/3">Pending (<?= (int)($u['verification_emails_sent'] ?? 1) ?>/3)</span>
+                                                    <span class="px-2 py-0.5 rounded-full text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 font-semibold" title="Email verifikasi terkirim: <?= (int)($u['verification_emails_sent'] ?? 1) ?>/3. Diberikan masa tenggang 48 jam sebelum pembersihan otomatis.">Pending (<?= (int)($u['verification_emails_sent'] ?? 1) ?>/3)</span>
                                                 <?php else: ?>
                                                     <span class="px-2 py-0.5 rounded-full text-[10px] bg-rose-500/10 text-rose-400 border border-rose-500/20 font-semibold">Nonaktif</span>
                                                 <?php endif; ?>
@@ -727,7 +756,7 @@
                                         <?php if ($u['status'] === 'active'): ?>
                                             <span class="px-2 py-0.5 rounded text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold">Aktif</span>
                                         <?php elseif ($u['status'] === 'pending_verification'): ?>
-                                            <span class="px-2 py-0.5 rounded text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 font-semibold" title="Email verifikasi terkirim: <?= (int)($u['verification_emails_sent'] ?? 1) ?>/3. Maks 3x sebelum data dihapus otomatis.">Pending Email (<?= (int)($u['verification_emails_sent'] ?? 1) ?>/3)</span>
+                                            <span class="px-2 py-0.5 rounded text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 font-semibold" title="Email verifikasi terkirim: <?= (int)($u['verification_emails_sent'] ?? 1) ?>/3. Maks 3x pengingat + masa tenggang 48 jam sebelum akun nonaktif dibersihkan.">Pending Email (<?= (int)($u['verification_emails_sent'] ?? 1) ?>/3)</span>
                                         <?php else: ?>
                                             <span class="px-2 py-0.5 rounded text-[10px] bg-rose-500/10 text-rose-400 border border-rose-500/20 font-semibold">Nonaktif</span>
                                         <?php endif; ?>
@@ -785,7 +814,7 @@
                                             <span>+</span> Tambah Kuota
                                         </button>
 
-                                        <button onclick="handleUserAction(<?= (int) $u['id'] ?>, 'set_role', {role: '<?= $u['role'] === 'admin' ? 'user' : 'admin' ?>'})" class="py-2 px-3 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 text-xs font-medium flex items-center justify-center gap-1.5 transition-colors active:scale-98">
+                                        <button onclick="confirmRoleChange(<?= (int) $u['id'] ?>, '<?= esc($u['name'], 'js') ?>', '<?= $u['role'] === 'admin' ? 'user' : 'admin' ?>')" class="py-2 px-3 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 text-xs font-medium flex items-center justify-center gap-1.5 transition-colors active:scale-98">
                                             <span>👑</span> <?= $u['role'] === 'admin' ? 'Jadikan User' : 'Jadikan Admin' ?>
                                         </button>
 
@@ -843,7 +872,7 @@
                                                     <?php if ($u['status'] === 'active'): ?>
                                                         <span class="px-2 py-0.5 rounded text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold">Aktif</span>
                                                     <?php elseif ($u['status'] === 'pending_verification'): ?>
-                                                        <span class="px-2 py-0.5 rounded text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 font-semibold" title="Email verifikasi terkirim: <?= (int)($u['verification_emails_sent'] ?? 1) ?>/3. Maks 3x sebelum data dihapus otomatis.">Pending Email (<?= (int)($u['verification_emails_sent'] ?? 1) ?>/3)</span>
+                                                        <span class="px-2 py-0.5 rounded text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 font-semibold" title="Email verifikasi terkirim: <?= (int)($u['verification_emails_sent'] ?? 1) ?>/3. Maks 3x pengingat + masa tenggang 48 jam sebelum akun nonaktif dibersihkan.">Pending Email (<?= (int)($u['verification_emails_sent'] ?? 1) ?>/3)</span>
                                                     <?php else: ?>
                                                         <span class="px-2 py-0.5 rounded text-[10px] bg-rose-500/10 text-rose-400 border border-rose-500/20 font-semibold">Nonaktif</span>
                                                     <?php endif; ?>
@@ -887,7 +916,7 @@
                                                     </button>
 
                                                     <!-- Toggle Role -->
-                                                    <button type="button" onclick="handleUserAction(<?= (int) $u['id'] ?>, 'set_role', {role: '<?= $u['role'] === 'admin' ? 'user' : 'admin' ?>'})" class="p-1.5 <?= $u['role'] === 'admin' ? 'text-amber-400 hover:text-amber-200 hover:bg-amber-500/20' : 'text-purple-400 hover:text-purple-200 hover:bg-purple-500/20' ?> rounded-lg transition-colors cursor-pointer" title="<?= $u['role'] === 'admin' ? 'Cabut hak Admin (Jadikan Pengguna Biasa)' : 'Beri hak Admin (Jadikan Administrator)' ?>" aria-label="<?= $u['role'] === 'admin' ? 'Jadikan User' : 'Jadikan Admin' ?>">
+                                                    <button type="button" onclick="confirmRoleChange(<?= (int) $u['id'] ?>, '<?= esc($u['name'], 'js') ?>', '<?= $u['role'] === 'admin' ? 'user' : 'admin' ?>')" class="p-1.5 <?= $u['role'] === 'admin' ? 'text-amber-400 hover:text-amber-200 hover:bg-amber-500/20' : 'text-purple-400 hover:text-purple-200 hover:bg-purple-500/20' ?> rounded-lg transition-colors cursor-pointer" title="<?= $u['role'] === 'admin' ? 'Cabut hak Admin (Jadikan Pengguna Biasa)' : 'Beri hak Admin (Jadikan Administrator)' ?>" aria-label="<?= $u['role'] === 'admin' ? 'Jadikan User' : 'Jadikan Admin' ?>">
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
                                                     </button>
 
@@ -928,7 +957,7 @@
                         </div>
                     <?php else: ?>
                         <?php foreach ($documentsList as $d): ?>
-                            <div class="bg-slate-800/60 hover:bg-slate-800/80 border border-slate-700/70 rounded-xl p-3 shadow-xs space-y-2.5 transition-colors">
+                            <div id="doc-mobile-<?= $d['id'] ?>" class="bg-slate-800/60 hover:bg-slate-800/80 border border-slate-700/70 rounded-xl p-3 shadow-xs space-y-2.5 transition-colors">
                                 <!-- Baris 1: Status Badges di Kiri, Button-Group Aksi di Kanan -->
                                 <div class="flex items-center justify-between gap-2">
                                     <div class="flex items-center gap-1.5 flex-wrap min-w-0">
@@ -964,7 +993,7 @@
                                         <button type="button" onclick="handleDocReprocess(<?= (int) $d['id'] ?>)" class="p-1.5 text-sky-400 hover:text-sky-200 hover:bg-sky-500/20 rounded-md transition-colors cursor-pointer" title="Proses Ulang Dokumen (Re-process)" aria-label="Proses Ulang">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                                         </button>
-                                        <button type="button" onclick="handleDocDelete(<?= (int) $d['id'] ?>)" class="p-1.5 text-rose-400 hover:text-rose-200 hover:bg-rose-500/20 rounded-md transition-colors cursor-pointer" title="Musnahkan / Hapus Dokumen" aria-label="Hapus Dokumen">
+                                        <button type="button" onclick="confirmDeleteDocument(<?= (int) $d['id'] ?>, '<?= esc($d['title'], 'js') ?>', 'doc-mobile-<?= $d['id'] ?>')" class="p-1.5 text-rose-400 hover:text-rose-200 hover:bg-rose-500/20 rounded-md transition-colors cursor-pointer" title="Musnahkan / Hapus Dokumen" aria-label="Hapus Dokumen">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                         </button>
                                     </div>
@@ -999,12 +1028,12 @@
                                         <div class="text-[10px] text-slate-500 font-mono"><?= date('d M Y, H:i', strtotime($d['created_at'])) ?></div>
                                     </div>
                                     <div class="text-right shrink-0">
-                                        <?php if (isset($d['report']['overall_score'])): ?>
-                                            <div class="font-bold font-mono text-xs leading-tight <?= $d['report']['overall_score'] >= 25 ? 'text-rose-400' : 'text-emerald-400' ?>">
-                                                <?= number_format($d['report']['overall_score'], 1) ?>%
+                                        <?php if (isset($d['report']['overall_similarity'])): ?>
+                                            <div class="font-bold font-mono text-xs leading-tight <?= $d['report']['overall_similarity'] >= 25 ? 'text-rose-400' : 'text-emerald-400' ?>">
+                                                <?= number_format($d['report']['overall_similarity'], 1) ?>%
                                             </div>
                                             <div class="text-[9px] text-slate-500 font-mono">
-                                                V:<?= number_format($d['report']['verbatim_score'] ?? 0, 0) ?>% P:<?= number_format($d['report']['paraphrase_score'] ?? 0, 0) ?>%
+                                                Eksak: <?= number_format($d['report']['exact_similarity'] ?? 0, 1) ?>%
                                             </div>
                                         <?php else: ?>
                                             <span class="text-slate-500 text-xs font-mono">-</span>
@@ -1036,7 +1065,7 @@
                                     <tr><td colspan="7" class="py-6 text-center text-slate-500">Tidak ada dokumen ditemukan.</td></tr>
                                 <?php else: ?>
                                     <?php foreach ($documentsList as $d): ?>
-                                        <tr class="hover:bg-slate-800/50 transition-colors">
+                                        <tr id="doc-row-<?= $d['id'] ?>" class="hover:bg-slate-800/50 transition-colors">
                                             <td class="py-3 px-4">
                                                 <div class="font-bold text-slate-200"><?= esc($d['title']) ?></div>
                                                 <div class="text-[11px] text-slate-400 font-mono-code"><?= esc($d['original_filename']) ?></div>
@@ -1072,12 +1101,12 @@
                                                 <?php endif; ?>
                                             </td>
                                             <td class="py-3 px-3 text-center">
-                                                <?php if (isset($d['report']['overall_score'])): ?>
-                                                    <div class="font-bold <?= $d['report']['overall_score'] >= 25 ? 'text-rose-400' : 'text-emerald-400' ?>">
-                                                        <?= number_format($d['report']['overall_score'], 1) ?>%
+                                                <?php if (isset($d['report']['overall_similarity'])): ?>
+                                                    <div class="font-bold <?= $d['report']['overall_similarity'] >= 25 ? 'text-rose-400' : 'text-emerald-400' ?>">
+                                                        <?= number_format($d['report']['overall_similarity'], 1) ?>%
                                                     </div>
                                                     <div class="text-[10px] text-slate-500">
-                                                        V: <?= number_format($d['report']['verbatim_score'] ?? 0, 1) ?>% | P: <?= number_format($d['report']['paraphrase_score'] ?? 0, 1) ?>%
+                                                        Eksak: <?= number_format($d['report']['exact_similarity'] ?? 0, 1) ?>% | Kosinus: <?= number_format($d['report']['cosine_similarity'] ?? 0, 1) ?>%
                                                     </div>
                                                 <?php else: ?>
                                                     <span class="text-slate-500">-</span>
@@ -1096,7 +1125,7 @@
                                                     <button type="button" onclick="handleDocReprocess(<?= (int) $d['id'] ?>)" class="p-1.5 text-sky-400 hover:text-sky-200 hover:bg-sky-500/20 rounded-lg transition-colors cursor-pointer" title="Jalankan ulang analisis dokumen ini (Re-process)" aria-label="Jalankan Ulang">
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                                                     </button>
-                                                    <button type="button" onclick="handleDocDelete(<?= (int) $d['id'] ?>)" class="p-1.5 text-rose-400 hover:text-rose-200 hover:bg-rose-500/20 rounded-lg transition-colors cursor-pointer" title="Musnahkan / Hapus dokumen dari sistem" aria-label="Hapus Dokumen">
+                                                    <button type="button" onclick="confirmDeleteDocument(<?= (int) $d['id'] ?>, '<?= esc($d['title'], 'js') ?>', 'doc-row-<?= $d['id'] ?>')" class="p-1.5 text-rose-400 hover:text-rose-200 hover:bg-rose-500/20 rounded-lg transition-colors cursor-pointer" title="Musnahkan / Hapus dokumen dari sistem" aria-label="Hapus Dokumen">
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                                     </button>
                                                 </div>
@@ -1115,9 +1144,19 @@
         <!-- ========================================== -->
         <?php elseif ($activeTab === 'corpus'): ?>
             <div class="space-y-6">
-                <div>
-                    <h2 class="text-lg font-bold text-white">Manajemen Korpus & Repositori Ilmiah</h2>
-                    <p class="text-xs text-slate-400">Basis data naskah pembanding untuk algoritma pencocokan kemiripan</p>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-lg font-bold text-white">Manajemen Korpus & Repositori Ilmiah</h2>
+                            <span class="px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                                <?= number_format($metrics['total_corpus']) ?> Naskah Total
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-0.5">
+                            Basis data naskah pembanding algoritma pencocokan (<?= number_format($metrics['corpus_completed'] ?? $metrics['total_corpus']) ?> aktif terindeks<?php if (!empty($metrics['corpus_failed'])): ?>, <span class="text-rose-400"><?= $metrics['corpus_failed'] ?> gagal panen</span><?php endif; ?>).
+                            <span class="text-slate-500">Catatan: Laporan audit menyimpan snapshot jumlah korpus saat pengujian dijalankan (mis. 864 dokumen pada naskah lampau).</span>
+                        </p>
+                    </div>
                 </div>
 
                 <!-- Auto-Harvester Berkala: Neliti & GARUDA Dikti (Opsi C) -->
@@ -1260,7 +1299,7 @@
                         </div>
                     <?php else: ?>
                         <?php foreach ($corpusList as $c): ?>
-                            <div class="bg-slate-800/60 border border-slate-700/70 rounded-2xl p-4 shadow-sm space-y-3">
+                            <div id="corpus-mobile-<?= $c['id'] ?>" class="bg-slate-800/60 border border-slate-700/70 rounded-2xl p-4 shadow-sm space-y-3">
                                 <!-- Header Judul Korpus -->
                                 <div class="space-y-1">
                                     <div class="flex items-start justify-between gap-2">
@@ -1298,7 +1337,7 @@
                                             <option value="private" <?= $c['corpus_visibility'] === 'private' ? 'selected' : '' ?>>Privat</option>
                                         </select>
                                     </div>
-                                    <button onclick="handleDocDelete(<?= (int) $c['id'] ?>)" class="py-1.5 px-3 rounded-lg bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 text-xs font-medium transition-colors shrink-0" title="Hapus Korpus">
+                                    <button onclick="confirmDeleteDocument(<?= (int) $c['id'] ?>, '<?= esc($c['title'], 'js') ?>', 'corpus-mobile-<?= $c['id'] ?>')" class="py-1.5 px-3 rounded-lg bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 text-xs font-medium transition-colors shrink-0 cursor-pointer" title="Hapus Korpus">
                                         ✕ Hapus
                                     </button>
                                 </div>
@@ -1327,7 +1366,7 @@
                                     <tr><td colspan="7" class="py-6 text-center text-slate-500">Belum ada korpus terdaftar.</td></tr>
                                 <?php else: ?>
                                     <?php foreach ($corpusList as $c): ?>
-                                        <tr class="hover:bg-slate-800/50 transition-colors">
+                                        <tr id="corpus-row-<?= $c['id'] ?>" class="hover:bg-slate-800/50 transition-colors">
                                             <td class="py-3 px-4">
                                                 <div class="font-bold text-slate-200"><?= esc($c['title']) ?></div>
                                                 <div class="text-[11px] text-slate-400 font-mono-code"><?= esc($c['original_filename']) ?></div>
@@ -1356,7 +1395,7 @@
                                                 <?= date('d M Y', strtotime($c['created_at'])) ?>
                                             </td>
                                             <td class="py-3 px-4 text-right whitespace-nowrap">
-                                                <button onclick="handleDocDelete(<?= (int) $c['id'] ?>)" class="px-2.5 py-1 rounded-lg bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 text-[11px] transition-colors" title="Hapus korpus">
+                                                <button onclick="confirmDeleteDocument(<?= (int) $c['id'] ?>, '<?= esc($c['title'], 'js') ?>', 'corpus-row-<?= $c['id'] ?>')" class="px-2.5 py-1 rounded-lg bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 text-[11px] transition-colors cursor-pointer" title="Hapus korpus">
                                                     Hapus
                                                 </button>
                                             </td>
@@ -1380,7 +1419,7 @@
                         <p class="text-xs text-slate-400">Pantau upaya serangan brute-force login, spammer honeypot, dan buka blokir (Unblock)</p>
                     </div>
                     <?php if (!empty($securityLogs)): ?>
-                        <button onclick="handleClearAllLocks()" class="px-3 py-1.5 rounded-xl bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 text-xs font-semibold flex items-center gap-1.5 transition-colors">
+                        <button onclick="confirmClearAllLocks()" class="px-3 py-1.5 rounded-xl bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                             Reset Semua Penguncian
                         </button>
@@ -1727,7 +1766,10 @@
                                             <?php if (in_array($pay['transaction_status'], ['settlement', 'capture'])): ?>
                                                 <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">LUNAS</span>
                                             <?php elseif ($pay['transaction_status'] === 'pending'): ?>
-                                                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">PENDING</span>
+                                                <div class="flex flex-col items-end gap-1">
+                                                    <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">PENDING</span>
+                                                    <a href="<?= base_url('payment/status/' . esc($pay['order_id'])) ?>" target="_blank" class="text-[10px] text-amber-400 hover:text-amber-300 underline font-medium">Cek Status &rarr;</a>
+                                                </div>
                                             <?php else: ?>
                                                 <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30"><?= strtoupper(esc($pay['transaction_status'])) ?></span>
                                             <?php endif; ?>
@@ -1798,7 +1840,10 @@
                                                 <?php if (in_array($pay['transaction_status'], ['settlement', 'capture'])): ?>
                                                     <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">LUNAS</span>
                                                 <?php elseif ($pay['transaction_status'] === 'pending'): ?>
-                                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">PENDING</span>
+                                                    <div class="flex items-center gap-1.5 flex-wrap">
+                                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">PENDING</span>
+                                                        <a href="<?= base_url('payment/status/' . esc($pay['order_id'])) ?>" target="_blank" class="text-[10px] text-amber-400 hover:text-amber-300 underline font-medium" title="Periksa status transaksi ke Midtrans">Cek Status</a>
+                                                    </div>
                                                 <?php else: ?>
                                                     <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30"><?= strtoupper(esc($pay['transaction_status'])) ?></span>
                                                 <?php endif; ?>
@@ -1859,17 +1904,17 @@
                     <!-- Total Naskah Terverifikasi -->
                     <div class="bg-slate-800/60 border border-slate-700/60 rounded-2xl p-5 shadow-sm">
                         <div class="flex items-center justify-between">
-                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Naskah Diaudit</span>
+                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Laporan Selesai Diaudit</span>
                             <div class="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                             </div>
                         </div>
                         <div class="mt-3 flex items-baseline gap-2">
                             <span class="text-3xl font-extrabold text-white tracking-tight"><?= number_format($integrityAnalytics['total_audited']) ?></span>
-                            <span class="text-xs text-emerald-400 font-medium">Sertifikat Resmi</span>
+                            <span class="text-xs text-emerald-400 font-medium">Laporan Tuntas</span>
                         </div>
                         <div class="mt-2 text-[11px] text-slate-400">
-                            Tersebar di skripsi, tesis & artikel jurnal
+                            Dari <strong class="text-slate-300 font-mono-code"><?= number_format($metrics['total_submissions']) ?></strong> total submisi naskah (skripsi, tesis &amp; artikel)
                         </div>
                     </div>
 
@@ -2280,6 +2325,26 @@
         <!-- ========================================== -->
         <?php elseif ($activeTab === 'google_keys'): ?>
             <div class="space-y-6">
+                <!-- Alerting AI Degradation (Jika Kunci Google Mengalami 503 Massal) -->
+                <?php if (!empty($googleAiDegraded) || (!empty($keys503Count) && $keys503Count >= 3)): ?>
+                    <div class="bg-amber-950/40 border border-amber-500/40 rounded-2xl p-4 shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                        <div class="flex items-start gap-3">
+                            <div class="p-2 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/30 shrink-0 mt-0.5">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-amber-200 flex items-center gap-2">
+                                    Peringatan Operasional: Upstream Google 503 High Demand
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold font-mono-code"><?= $keys503Count ?> Kunci Terdampak</span>
+                                </h3>
+                                <p class="text-xs text-slate-300 mt-0.5">
+                                    Tercatat <?= $keys503Count ?> kunci aktif menerima pesan kesalahan <code>503: This model is currently experiencing high demand</code> dari Google AI Studio. Antrean worker tetap memproses kemiripan heuristik TF-IDF &amp; Levenshtein secara independen, dan mencoba kunci lain secara rotasi round-robin. Disarankan menambah kunci cadangan dari project Google Cloud berbeda.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
                 <!-- Header -->
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div>
@@ -2863,7 +2928,7 @@
                                                 <button type="button" onclick="adminRejectTestimonial(<?= (int)$t['id'] ?>)" class="px-2 py-1 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-300 text-[11px] transition cursor-pointer" title="Tolak">
                                                     Tolak
                                                 </button>
-                                                <button type="button" onclick="adminDeleteTestimonial(<?= (int)$t['id'] ?>)" class="px-2 py-1 rounded-lg bg-rose-900/60 hover:bg-rose-800 text-rose-200 text-[11px] transition cursor-pointer" title="Hapus permanen">
+                                                <button type="button" onclick="confirmDeleteTestimonial(<?= (int)$t['id'] ?>, '<?= esc($t['author_name'], 'js') ?>')" class="px-2 py-1 rounded-lg bg-rose-900/60 hover:bg-rose-800 text-rose-200 text-[11px] transition cursor-pointer" title="Hapus permanen">
                                                     Hapus
                                                 </button>
                                             </td>
@@ -3531,14 +3596,7 @@
         }
 
         async function handleDocDelete(docId) {
-            if (!confirm('Apakah Anda yakin ingin menghapus dokumen ini beserta semua riwayat kemiripannya? Tindakan ini tidak dapat dibatalkan.')) return;
-            try {
-                const res = await postJson('<?= base_url('admin/documents/delete') ?>', { document_id: docId });
-                alert(res.message);
-                window.location.reload();
-            } catch (err) {
-                alert('Terjadi kesalahan koneksi.');
-            }
+            confirmDeleteDocument(docId, 'Dokumen #' + docId, 'doc-row-' + docId);
         }
 
         async function handleCorpusVisibility(docId, visibility) {
@@ -3846,18 +3904,7 @@
         }
 
         async function adminDeleteTestimonial(id) {
-            if (!confirm('Apakah Anda yakin ingin menghapus testimoni ini secara permanen?')) return;
-            try {
-                const res = await postJson('<?= base_url('admin/testimonials/delete') ?>/' + id, {});
-                if (res.status === 'success') {
-                    const row = document.getElementById('testi-row-' + id);
-                    if (row) row.remove();
-                } else {
-                    alert('Gagal: ' + res.message);
-                }
-            } catch (err) {
-                alert('Terjadi kesalahan koneksi.');
-            }
+            confirmDeleteTestimonial(id);
         }
 
         async function adminAcceptAmbassador(id) {
@@ -4437,10 +4484,227 @@
             });
         }
 
+        // ==========================================
+        // Explicit Action Confirmation Modal Engine
+        // ==========================================
+        let adminActionCallback = null;
+
+        function showAdminToast(message, isError = false) {
+            const toast = document.getElementById('adminToast');
+            const toastMsg = document.getElementById('adminToastMsg');
+            const toastIcon = document.getElementById('adminToastIcon');
+            if (!toast) return;
+
+            toastMsg.textContent = message;
+            toastIcon.textContent = isError ? '❌' : '✅';
+            toast.className = 'fixed bottom-5 right-5 z-50 transform translate-y-0 opacity-100 transition-all duration-300 flex items-center gap-2.5 px-4 py-3 rounded-xl shadow-xl text-xs font-semibold ' + 
+                (isError ? 'bg-rose-950 border border-rose-500/50 text-rose-200' : 'bg-slate-900 border border-emerald-500/50 text-emerald-200');
+
+            setTimeout(() => {
+                toast.className = 'fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 pointer-events-none transition-all duration-300 flex items-center gap-2.5 px-4 py-3 rounded-xl shadow-xl text-xs font-semibold bg-slate-900 border border-slate-700 text-white';
+            }, 3500);
+        }
+
+        function openAdminActionModal({ title, subtitle, message, icon = '⚠️', type = 'danger', confirmText = 'Lanjutkan', onConfirm }) {
+            const modal = document.getElementById('adminActionModal');
+            const titleEl = document.getElementById('modalTitle');
+            const subEl = document.getElementById('modalSubtitle');
+            const msgEl = document.getElementById('modalMessage');
+            const iconEl = document.getElementById('modalIcon');
+            const iconContainer = document.getElementById('modalIconContainer');
+            const confirmBtn = document.getElementById('modalConfirmBtn');
+
+            if (!modal) return;
+
+            titleEl.textContent = title;
+            subEl.textContent = subtitle || 'Tindakan ini membutuhkan verifikasi eksplisit';
+            msgEl.innerHTML = message;
+            iconEl.textContent = icon;
+
+            // Styling based on type
+            if (type === 'danger') {
+                iconContainer.className = 'w-11 h-11 rounded-xl flex items-center justify-center shrink-0 bg-rose-500/20 text-rose-400 border border-rose-500/30';
+                confirmBtn.className = 'px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold shadow-md transition-all cursor-pointer';
+            } else if (type === 'purple') {
+                iconContainer.className = 'w-11 h-11 rounded-xl flex items-center justify-center shrink-0 bg-purple-500/20 text-purple-400 border border-purple-500/30';
+                confirmBtn.className = 'px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold shadow-md transition-all cursor-pointer';
+            } else if (type === 'warning') {
+                iconContainer.className = 'w-11 h-11 rounded-xl flex items-center justify-center shrink-0 bg-amber-500/20 text-amber-400 border border-amber-500/30';
+                confirmBtn.className = 'px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold shadow-md transition-all cursor-pointer';
+            } else {
+                iconContainer.className = 'w-11 h-11 rounded-xl flex items-center justify-center shrink-0 bg-indigo-500/20 text-indigo-400 border border-indigo-500/30';
+                confirmBtn.className = 'px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-md transition-all cursor-pointer';
+            }
+            confirmBtn.textContent = confirmText;
+
+            adminActionCallback = onConfirm;
+            confirmBtn.onclick = async () => {
+                confirmBtn.disabled = true;
+                const origText = confirmBtn.textContent;
+                confirmBtn.textContent = 'Memproses...';
+                try {
+                    if (adminActionCallback) await adminActionCallback();
+                } catch (e) {
+                    console.error(e);
+                    showAdminToast('Terjadi kesalahan saat mengeksekusi aksi.', true);
+                } finally {
+                    confirmBtn.disabled = false;
+                    confirmBtn.textContent = origText;
+                    closeAdminActionModal();
+                }
+            };
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeAdminActionModal() {
+            const modal = document.getElementById('adminActionModal');
+            if (modal) modal.classList.add('hidden');
+            adminActionCallback = null;
+        }
+
+        function confirmDeleteDocument(docId, title, rowId) {
+            openAdminActionModal({
+                title: 'Musnahkan Dokumen?',
+                subtitle: 'Aksi destruktif permanen sistem',
+                icon: '🗑️',
+                type: 'danger',
+                confirmText: 'Ya, Musnahkan Dokumen',
+                message: 'Apakah Anda yakin ingin memusnahkan dokumen <strong class="text-rose-300">"' + (title || '#' + docId) + '"</strong> beserta seluruh riwayat analisis kemiripan dan sitasinya? Berkas dan rekaman audit akan dihapus permanen.',
+                onConfirm: async () => {
+                    const res = await postJson('<?= base_url('admin/documents/delete') ?>', { document_id: docId });
+                    if (res.status === 'success') {
+                        showAdminToast(res.message || 'Dokumen berhasil dihapus.');
+                        if (rowId) {
+                            const el = document.getElementById(rowId);
+                            if (el) {
+                                el.style.transition = 'all 0.3s ease';
+                                el.style.opacity = '0';
+                                el.style.transform = 'scale(0.95)';
+                                setTimeout(() => el.remove(), 300);
+                            }
+                        } else {
+                            setTimeout(() => window.location.reload(), 600);
+                        }
+                    } else {
+                        showAdminToast(res.message || 'Gagal menghapus dokumen.', true);
+                    }
+                }
+            });
+        }
+
+        function confirmRoleChange(userId, userName, targetRole) {
+            const isEscalation = (targetRole === 'admin');
+            openAdminActionModal({
+                title: isEscalation ? 'Eskalasi Hak Akses Admin' : 'Cabut Hak Akses Administrator',
+                subtitle: isEscalation ? 'Pemberian wewenang level tertinggi' : 'Penurunan peran ke pengguna biasa',
+                icon: isEscalation ? '👑' : '👤',
+                type: isEscalation ? 'purple' : 'warning',
+                confirmText: isEscalation ? 'Ya, Jadikan Administrator' : 'Ya, Jadikan User Biasa',
+                message: isEscalation 
+                    ? 'Pengguna <strong class="text-purple-300">"' + userName + '"</strong> akan mendapatkan hak akses penuh ke seluruh menu Admin (manajemen korpus, kuota, kunci Google AI, transaksi, dan data keamanan). Pastikan pengguna ini tepercaya.' 
+                    : 'Pengguna <strong class="text-amber-300">"' + userName + '"</strong> akan dicabut hak akses administrasinya dan kembali menjadi pengguna biasa.',
+                onConfirm: async () => {
+                    const res = await postJson('<?= base_url('admin/users/update') ?>', {
+                        user_id: userId,
+                        action: 'set_role',
+                        role: targetRole
+                    });
+                    if (res.status === 'success') {
+                        showAdminToast(res.message || 'Peran pengguna berhasil diperbarui.');
+                        setTimeout(() => window.location.reload(), 700);
+                    } else {
+                        showAdminToast(res.message || 'Gagal mengubah peran.', true);
+                    }
+                }
+            });
+        }
+
+        function confirmClearAllLocks() {
+            openAdminActionModal({
+                title: 'Reset Semua Penguncian Keamanan?',
+                subtitle: 'Aksi massal log keamanan & rate limit',
+                icon: '🔓',
+                type: 'danger',
+                confirmText: 'Ya, Buka Semua Kuncian',
+                message: 'Seluruh catatan pemblokiran IP, proteksi brute-force login, dan pembatasan frekuensi (rate limit) akan direset bersih. Seluruh IP yang sebelumnya dicekal akan dapat mengakses kembali.',
+                onConfirm: async () => {
+                    const res = await postJson('<?= base_url('admin/security/clear-all') ?>', {});
+                    if (res.status === 'success') {
+                        showAdminToast(res.message || 'Semua penguncian keamanan berhasil direset.');
+                        setTimeout(() => window.location.reload(), 700);
+                    } else {
+                        showAdminToast(res.message || 'Gagal mereset penguncian.', true);
+                    }
+                }
+            });
+        }
+
+        function confirmDeleteTestimonial(id, authorName) {
+            openAdminActionModal({
+                title: 'Hapus Testimoni Permanen?',
+                subtitle: 'Penghapusan ulasan pengguna',
+                icon: '💬',
+                type: 'danger',
+                confirmText: 'Ya, Hapus Testimoni',
+                message: 'Ulasan dari <strong class="text-rose-300">"' + (authorName || 'Pengguna #' + id) + '"</strong> akan dihapus permanen dari basis data dan tidak akan ditampilkan lagi di halaman publik.',
+                onConfirm: async () => {
+                    const res = await postJson('<?= base_url('admin/testimonials/delete') ?>/' + id, {});
+                    if (res.status === 'success') {
+                        showAdminToast(res.message || 'Testimoni berhasil dihapus.');
+                        const row = document.getElementById('testi-row-' + id);
+                        if (row) {
+                            row.style.transition = 'all 0.3s ease';
+                            row.style.opacity = '0';
+                            setTimeout(() => row.remove(), 300);
+                        }
+                    } else {
+                        showAdminToast(res.message || 'Gagal menghapus testimoni.', true);
+                    }
+                }
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             initVisitorRealtimePolling();
             initSidebarRealtimePolling();
         });
     </script>
+
+    <!-- ======================================================== -->
+    <!-- MODAL KONFIRMASI EKSPLISIT AKSI DESTRUKTIF & ESKALASI   -->
+    <!-- ======================================================== -->
+    <div id="adminActionModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-700/80 rounded-2xl max-w-md w-full shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div class="p-6 space-y-4">
+                <div class="flex items-center gap-3">
+                    <div id="modalIconContainer" class="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 bg-rose-500/20 text-rose-400 border border-rose-500/30">
+                        <span id="modalIcon" class="text-xl">🗑️</span>
+                    </div>
+                    <div>
+                        <h3 id="modalTitle" class="text-base font-bold text-white leading-tight">Konfirmasi Tindakan</h3>
+                        <p id="modalSubtitle" class="text-xs text-slate-400 mt-0.5">Tindakan ini membutuhkan verifikasi eksplisit</p>
+                    </div>
+                </div>
+                <div id="modalMessage" class="text-xs text-slate-300 bg-slate-950/70 p-3.5 rounded-xl border border-slate-800 leading-relaxed font-sans">
+                    <!-- Dynamic message -->
+                </div>
+                <div class="flex items-center justify-end gap-2.5 pt-2">
+                    <button type="button" onclick="closeAdminActionModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition-colors cursor-pointer">
+                        Batal
+                    </button>
+                    <button type="button" id="modalConfirmBtn" class="px-4 py-2 rounded-xl text-white text-xs font-bold shadow-md transition-all cursor-pointer">
+                        Lanjutkan
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Toast Notification -->
+    <div id="adminToast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 pointer-events-none transition-all duration-300 flex items-center gap-2.5 px-4 py-3 rounded-xl shadow-xl text-xs font-semibold bg-slate-900 border border-slate-700 text-white">
+        <span id="adminToastIcon">✅</span>
+        <span id="adminToastMsg">Berhasil</span>
+    </div>
 </body>
 </html>

@@ -82,6 +82,28 @@ class PaymentController extends BaseController
         }
         $finalAmount = max(1000, $originalAmount - $discountAmount);
 
+        // Periksa apakah pengguna memiliki transaksi pending untuk paket ini dalam 60 menit terakhir
+        $existingPending = $this->transModel
+            ->where('user_id', (int) $user['id'])
+            ->where('package_id', $package['id'])
+            ->where('transaction_status', 'pending')
+            ->where('created_at >=', date('Y-m-d H:i:s', strtotime('-60 minutes')))
+            ->where('snap_token IS NOT NULL', null, false)
+            ->orderBy('id', 'DESC')
+            ->first();
+
+        if ($existingPending && !empty($existingPending['snap_token'])) {
+            return $this->response->setJSON([
+                'status'       => 'success',
+                'order_id'     => $existingPending['order_id'],
+                'snap_token'   => $existingPending['snap_token'],
+                'redirect_url' => $existingPending['snap_redirect_url'] ?? '',
+                'package'      => $package,
+                'resumed'      => true,
+                'order_detail' => "Melanjutkan pembayaran pesanan pending {$existingPending['order_id']}",
+            ]);
+        }
+
         // Buat Order ID unik dengan entropi tinggi AR Tilik: TILIK-{timestamp}-{random12hex}
         $orderId = 'TILIK-' . date('YmdHis') . '-' . strtoupper(bin2hex(random_bytes(6)));
 

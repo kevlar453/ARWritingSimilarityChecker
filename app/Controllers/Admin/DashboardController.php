@@ -37,6 +37,8 @@ class DashboardController extends BaseController
         // 2. Metrik Dokumen & Antrean Worker (Document Queue Metrics)
         $totalSubmissions = $docModel->where('document_type', 'submission')->countAllResults();
         $totalCorpus = $docModel->where('document_type', 'corpus')->countAllResults();
+        $corpusCompleted = $docModel->where('document_type', 'corpus')->where('status', 'completed')->countAllResults();
+        $corpusFailed = $docModel->where('document_type', 'corpus')->where('status', 'failed')->countAllResults();
 
         $queueUploaded = $docModel->where('status', 'uploaded')->countAllResults();
         $queueProcessing = $docModel->where('status', 'processing')->countAllResults();
@@ -100,6 +102,7 @@ class DashboardController extends BaseController
             }
         }
         foreach ($documentsList as &$doc) {
+            $doc['title'] = $this->cleanMojibake($doc['title'] ?? '');
             $doc['report'] = $reportsMap[$doc['id']] ?? null;
         }
         unset($doc);
@@ -108,6 +111,10 @@ class DashboardController extends BaseController
         $corpusList = $docModel->where('document_type', 'corpus')
                                ->orderBy('id', 'DESC')
                                ->findAll(100);
+        foreach ($corpusList as &$c) {
+            $c['title'] = $this->cleanMojibake($c['title'] ?? '');
+        }
+        unset($c);
 
         // 8. Data List: Keamanan (Auth Rate Limits)
         $securityLogs = $db->table('auth_rate_limits')
@@ -165,6 +172,13 @@ class DashboardController extends BaseController
         $googleKeyModel = new \App\Models\GoogleApiKeyModel();
         $googleKeysList = $googleKeyModel->getAllKeys();
         $activeGoogleKeysCount = count(array_filter($googleKeysList, fn($k) => $k['status'] === 'active'));
+        $keys503Count = 0;
+        foreach ($googleKeysList as $gk) {
+            if ($gk['status'] === 'active' && !empty($gk['last_error_message']) && (strpos($gk['last_error_message'], '503') !== false || stripos($gk['last_error_message'], 'high demand') !== false)) {
+                $keys503Count++;
+            }
+        }
+        $googleAiDegraded = ($activeGoogleKeysCount > 0 && ($keys503Count / $activeGoogleKeysCount) >= 0.5);
 
         // 14. Data Analitik Integritas Institusi (Opsi D)
         $avgSimRow = $db->table('reports')
@@ -292,6 +306,8 @@ class DashboardController extends BaseController
                 'total_submissions'     => $totalSubmissions,
                 'submissions_this_week' => $submissionsThisWeek,
                 'total_corpus'          => $totalCorpus,
+                'corpus_completed'      => $corpusCompleted,
+                'corpus_failed'         => $corpusFailed,
                 'queue_uploaded'        => $queueUploaded,
                 'queue_processing'      => $queueProcessing,
                 'queue_completed'       => $queueCompleted,
@@ -313,6 +329,8 @@ class DashboardController extends BaseController
             'apiKeysList'          => $apiKeysList,
             'googleKeysList'       => $googleKeysList,
             'activeGoogleKeysCount'=> $activeGoogleKeysCount,
+            'googleAiDegraded'     => $googleAiDegraded,
+            'keys503Count'         => $keys503Count,
             'integrityAnalytics'   => [
                 'avg_similarity'          => $avgSimilarity,
                 'total_audited'           => $totalReportsCompleted,
@@ -609,7 +627,8 @@ class DashboardController extends BaseController
             $reportModel->delete($r['id']);
         }
 
-        // Hapus chunks & pages
+        // Hapus chunks & pages & sources
+        $db->table('report_sources')->where('source_document_id', $documentId)->delete();
         $db->table('document_chunks')->where('document_id', $documentId)->delete();
         $db->table('document_pages')->where('document_id', $documentId)->delete();
         $db->table('fingerprints')->where('document_id', $documentId)->delete();
@@ -943,6 +962,23 @@ class DashboardController extends BaseController
                 'visitors_today'     => (int) ($visitorStats['today_unique'] ?? 0),
             ]
         ]);
+    }
+
+    /**
+     * Memperbaiki string dengan encoding rusak / mojibake (misal cp1252/latin1 yang terbaca sebagai UTF-8)
+     */
+    private function cleanMojibake(?string $str): string
+    {
+        if (empty($str)) {
+            return '';
+        }
+        if (strpos($str, 'Ã') !== false || strpos($str, 'â') !== false) {
+            $converted = @iconv('UTF-8', 'Windows-1252//IGNORE', $str);
+            if ($converted !== false && mb_check_encoding($converted, 'UTF-8')) {
+                return $converted;
+            }
+        }
+        return $str;
     }
 }
 

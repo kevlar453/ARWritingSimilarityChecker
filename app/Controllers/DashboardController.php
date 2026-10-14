@@ -128,6 +128,17 @@ class DashboardController extends BaseController
         $referralModel = new \App\Models\ReferralModel();
         $referralStats = $referralModel->getReferralStats((int) $userId);
 
+        // Ambil transaksi pending terkini jika ada dalam 24 jam terakhir
+        $pendingPayment = null;
+        if ($userId) {
+            $paymentModel = new \App\Models\PaymentTransactionModel();
+            $pendingPayment = $paymentModel->where('user_id', (int) $userId)
+                                           ->where('transaction_status', 'pending')
+                                           ->where('created_at >=', date('Y-m-d H:i:s', strtotime('-24 hours')))
+                                           ->orderBy('created_at', 'DESC')
+                                           ->first();
+        }
+
         return view('dashboard/index', [
             'submissions'         => $submissions,
             'sharedDocuments'     => $sharedDocuments,
@@ -145,6 +156,7 @@ class DashboardController extends BaseController
             'quotaInfo'           => $quotaInfo,
             'ambProfile'          => $ambProfile,
             'referralStats'       => $referralStats,
+            'pendingPayment'      => $pendingPayment,
         ]);
     }
 

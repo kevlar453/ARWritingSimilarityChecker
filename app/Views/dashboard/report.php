@@ -244,7 +244,7 @@ $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evi
                     <?php endif; ?>
                     <?php if ($corpusCount > 0): ?>
                         <span>•</span>
-                        <span>Basis Pembanding: <strong class="text-indigo-700 font-semibold"><?= number_format($corpusCount, 0, ',', '.') ?> Dokumen Korpus</strong></span>
+                        <span>Basis Pembanding: <strong class="text-indigo-700 font-semibold" title="Snapshot basis naskah pembanding terindeks saat audit ini dijalankan"><?= number_format($corpusCount, 0, ',', '.') ?> Dokumen Korpus (Snapshot Audit)</strong></span>
                     <?php endif; ?>
                     <?php if (!empty($document['faculty']) || !empty($document['department'])): ?>
                         <span>•</span>

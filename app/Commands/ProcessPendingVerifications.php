@@ -128,12 +128,27 @@ class ProcessPendingVerifications extends BaseCommand
                 }
 
             } else {
-                // SUDAH 3x TERKIRIM TETAPI TIDAK DIVERIFIKASI -> HAPUS DATA PENDAFTAR
+                // SUDAH 3x TERKIRIM TETAPI TIDAK DIVERIFIKASI -> CEK GRACE PERIOD SEBELUM PEMUSNAHAN
+                // Berikan masa tenggang (grace period) minimal 48 jam (2 hari) sejak email peringatan ke-3 terkirim
+                $gracePeriodSeconds = 48 * 3600; // 48 jam masa tenggang
+                $timeSinceLastEmail = $now - $lastSentTimestamp;
+
+                if ($timeSinceLastEmail < $gracePeriodSeconds && ! $forceHour) {
+                    $hoursRemaining = (int) ceil(($gracePeriodSeconds - $timeSinceLastEmail) / 3600);
+                    CLI::write("----------------------------------------------------------------", 'white');
+                    CLI::write("[⏳ GRACE PERIOD] Akun dalam Masa Tenggang: #{$userId} - {$email}", 'yellow');
+                    CLI::write("    Email Terkirim  : {$emailsSent} kali (Peringatan terakhir)", 'white');
+                    CLI::write("    Email Terakhir  : {$lastSentAt}", 'white');
+                    CLI::write("    Sisa Masa Tenggang: ~{$hoursRemaining} jam sebelum dibersihkan.", 'cyan');
+                    $skippedCount++;
+                    continue;
+                }
+
                 CLI::write("----------------------------------------------------------------", 'white');
-                CLI::write("[!] Target Pemusnahan Data: #{$userId} - {$email}", 'red');
+                CLI::write("[!] Target Pemusnahan Data (Pasca Grace Period): #{$userId} - {$email}", 'red');
                 CLI::write("    Terdaftar       : {$createdAt} (Jam {$regHour}:xx WIB)", 'white');
-                CLI::write("    Email Terkirim  : {$emailsSent} kali (Maksimum 3x tercapai)", 'white');
-                CLI::write("    Status          : Tetap tidak diverifikasi setelah batas pengingat.", 'white');
+                CLI::write("    Email Terkirim  : {$emailsSent} kali (Maksimum 3x + Grace Period 48 Jam telah terlampaui)", 'white');
+                CLI::write("    Status          : Tetap tidak diverifikasi setelah seluruh masa tenggang.", 'white');
 
                 if ($dryRun) {
                     CLI::write("    -> [DRY-RUN] Akun pendaftar disimulasikan dihapus secara permanen.", 'yellow');
