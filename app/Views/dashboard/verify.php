@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $status === 'valid' ? 'Sertifikat Akreditasi Integritas Akademik #' . esc($code) . ' — AR Tilik' : 'Verifikasi Sertifikat Resmi — AR Tilik | Portal Validasi QR Ilmiah' ?></title>
-    <meta name="description" content="Portal Verifikasi Resmi Sertifikat Keaslian Hasil Telaah Kesepadanan Naskah AR Tilik. Dokumen akreditasi integritas karya ilmiah berstandar perguruan tinggi berstempel digital kriptografis.">
+    <title><?= $status === 'valid' ? 'Sertifikat Hasil Uji Kemiripan #' . esc($code) . ' — AR Tilik' : 'Verifikasi Sertifikat Resmi — AR Tilik | Portal Validasi QR Ilmiah' ?></title>
+    <meta name="description" content="Portal Verifikasi Resmi Sertifikat Keaslian Hasil Telaah Kesepadanan Naskah AR Tilik. Dokumen verifikasi integritas karya ilmiah berstandar perguruan tinggi berstempel digital kriptografis.">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="<?= base_url('verify' . (!empty($code) ? '/' . esc($code) : '')) ?>">
     <meta name="theme-color" content="#081a33">
@@ -13,8 +13,8 @@
     <meta property="og:type" content="website">
     <meta property="og:locale" content="id_ID">
     <meta property="og:site_name" content="AR Tilik">
-    <meta property="og:title" content="<?= $status === 'valid' ? 'Sertifikat Akreditasi Integritas Akademik #' . esc($code) . ' — AR Tilik' : 'Verifikasi Sertifikat Resmi — AR Tilik' ?>">
-    <meta property="og:description" content="Lembar Piagam Resmi Akreditasi Integritas dan Keaslian Karya Ilmiah AR Tilik.">
+    <meta property="og:title" content="<?= $status === 'valid' ? 'Sertifikat Hasil Uji Kemiripan #' . esc($code) . ' — AR Tilik' : 'Verifikasi Sertifikat Resmi — AR Tilik' ?>">
+    <meta property="og:description" content="Lembar Piagam Hasil Uji Kemiripan dan Orisinalitas Naskah AR Tilik.">
     <meta property="og:url" content="<?= base_url('verify' . (!empty($code) ? '/' . esc($code) : '')) ?>">
 
     <!-- Favicon & Brand Icons -->
@@ -52,7 +52,7 @@
                 radial-gradient(circle at 90% 90%, rgba(197, 160, 89, 0.04) 0%, transparent 50%);
         }
 
-        /* Bingkai Klasik Ganda Akreditasi (Double Guilloche Frame) */
+        /* Bingkai Klasik Ganda Verifikasi (Double Guilloche Frame) */
         .diploma-border-outer {
             border: 4.5px solid #081a33;
             outline: 2px solid #c5a059;
@@ -235,19 +235,19 @@
                 $verifyUrl = base_url('verify/' . $code);
                 $qrApiUrl = "https://api.qrserver.com/v1/create-qr-code/?size=180x180&color=081a33&data=" . urlencode($verifyUrl);
 
-                // Klasifikasi Akreditasi Formal
+                // Klasifikasi Hasil Evaluasi Komputasi
                 if ($dec === 'match') {
-                    $verdictTitle = 'TIDAK MEMENUHI SYARAT';
+                    $verdictTitle = 'TIDAK MEMENUHI AMBANG BATAS';
                     $verdictKriteria = 'KEMIRIPAN TINGGI • PERLU PERBAIKAN & PARAFRASA';
                     $verdictColor = 'text-rose-800';
                     $verdictBorder = 'border-rose-400 bg-rose-50/80';
                 } elseif ($dec === 'review') {
-                    $verdictTitle = 'MEMENUHI SYARAT BERSYARAT';
+                    $verdictTitle = 'PERLU PENELAAHAN LEBIH LANJUT';
                     $verdictKriteria = 'DALAM AMBANG BATAS TOLERANSI REVIEW AKADEMIK';
                     $verdictColor = 'text-amber-800';
                     $verdictBorder = 'border-amber-400 bg-amber-50/80';
                 } else {
-                    $verdictTitle = 'TERAKREDITASI SANGAT BAIK';
+                    $verdictTitle = 'TERVERIFIKASI MEMENUHI AMBANG BATAS';
                     $verdictKriteria = 'LOLOS AMBANG BATAS ORISINALITAS ILMIAH';
                     $verdictColor = 'text-emerald-800';
                     $verdictBorder = 'border-emerald-500 bg-emerald-50/80';
@@ -266,7 +266,7 @@
                 $sigPreview = substr($docSignature, 0, 8) . '-' . substr($docSignature, 8, 8) . '-' . substr($docSignature, 16, 8) . '...' . substr($docSignature, -8);
             ?>
 
-            <!-- LEMBAR PIAGAM RESMI AKREDITASI (DIPLOMA-GRADE CANVAS LANDSCAPE A4) -->
+            <!-- LEMBAR PIAGAM RESMI SERTIFIKAT HASIL UJI (DIPLOMA-GRADE CANVAS LANDSCAPE A4) -->
             <div class="print-certificate-canvas diploma-parchment diploma-border-outer p-3.5 sm:p-7 w-full max-w-[1140px] relative rounded-lg text-slate-900 select-text shadow-2xl overflow-hidden">
                 
                 <!-- Inner Fine-Line Decorative Frame -->
@@ -299,7 +299,7 @@
                         <img src="<?= base_url('images/logo.png') ?>" alt="" class="w-80 h-80 object-contain">
                     </div>
 
-                    <!-- 1. KOP RESMI PIAGAM AKREDITASI -->
+                    <!-- 1. KOP RESMI SERTIFIKAT HASIL UJI -->
                     <div class="relative z-20 text-center border-b border-[#c5a059] pb-3">
                         <!-- Desktop Layout (md and up): 3 Columns -->
                         <div class="hidden md:flex print-desktop-kop items-center justify-between gap-4">
@@ -311,13 +311,13 @@
                             <!-- Teks Judul Piagam Utama -->
                             <div class="flex-1 space-y-0.5 text-center">
                                 <div class="font-sans text-[11px] tracking-[0.28em] text-[#081a33] font-extrabold uppercase">
-                                    REPUBLIK INDONESIA &bull; STANDAR INTEGRITAS SINTA / ARJUNA
+                                    SISTEM PEMERIKSAAN KARYA ILMIAH &bull; AR TILIK FORENSIC ENGINE
                                 </div>
                                 <h1 class="font-diploma-serif text-2xl font-black tracking-wider text-[#081a33] uppercase">
-                                    SERTIFIKAT AKREDITASI INTEGRITAS AKADEMIK
+                                    SERTIFIKAT HASIL UJI KEMIRIPAN & ORISINALITAS NASKAH
                                 </h1>
                                 <div class="font-editorial-serif italic text-sm text-[#875c16] font-semibold">
-                                    Certificate of Academic Integrity &amp; Originality Attestation
+                                    Certificate of Similarity &amp; Originality Forensic Attestation
                                 </div>
                             </div>
 
@@ -337,13 +337,13 @@
                         <div class="md:hidden print-mobile-kop flex flex-col items-center gap-2">
                             <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik Emblem" class="w-12 h-12 object-contain drop-shadow-xs">
                             <div class="font-sans text-[8.5px] sm:text-[9.5px] tracking-[0.2em] text-[#081a33] font-extrabold uppercase leading-tight">
-                                REPUBLIK INDONESIA &bull; STANDAR INTEGRITAS SINTA / ARJUNA
+                                SISTEM PEMERIKSAAN KARYA ILMIAH &bull; AR TILIK FORENSIC ENGINE
                             </div>
                             <h1 class="font-diploma-serif text-base sm:text-lg font-black tracking-wide text-[#081a33] uppercase leading-snug px-1">
-                                SERTIFIKAT AKREDITASI INTEGRITAS AKADEMIK
+                                SERTIFIKAT HASIL UJI KEMIRIPAN & ORISINALITAS NASKAH
                             </h1>
                             <div class="font-editorial-serif italic text-xs text-[#875c16] font-semibold">
-                                Certificate of Academic Integrity &amp; Originality Attestation
+                                Certificate of Similarity &amp; Originality Forensic Attestation
                             </div>
                             <div class="mt-1 border border-[#c5a059] bg-[#fffdf8] px-3 py-1.5 rounded text-center shadow-2xs w-full max-w-[280px]">
                                 <div class="text-[8px] font-sans tracking-widest text-[#875c16] uppercase font-bold">Nomor Registrasi</div>
@@ -355,10 +355,10 @@
                         </div>
                     </div>
 
-                    <!-- 2. TEKS MAKLUMAT PIAGAM (OFFICIAL PROSE) -->
+                    <!-- 2. TEKS MAKLUMAT RESMI (OFFICIAL PROSE) -->
                     <div class="relative z-20 text-center space-y-1 pt-0.5">
                         <p class="font-editorial-serif italic text-xs sm:text-sm text-slate-700 leading-relaxed max-w-4xl mx-auto px-1">
-                            Berdasarkan hasil audit komputasi forensik teks menggunakan algoritma sekuensial <em>5-Gram Shingle</em> dan dekomposisi leksikal <em>TF-IDF Cosine</em>, dengan ini Dewan Integritas Akademik AR Tilik menyatakan bahwa naskah karya ilmiah:
+                            Berdasarkan hasil audit komputasi forensik teks menggunakan algoritma sekuensial <em>5-Gram Shingle</em> dan dekomposisi leksikal <em>TF-IDF Cosine</em>, Sistem Verifikasi AR Tilik menerbitkan atestasi komputasi untuk naskah karya ilmiah:
                         </p>
 
                         <!-- Judul Naskah Terperiksa (Formal & Elegan) -->
@@ -389,10 +389,10 @@
                         </div>
                     </div>
 
-                    <!-- 3. DIKTUM KEPUTUSAN AKREDITASI RESMI (GRAND DECREE BANNER) -->
+                    <!-- 3. DIKTUM HASIL EVALUASI KOMPUTASI RESMI (GRAND DECREE BANNER) -->
                     <div class="relative z-20 border-2 <?= $verdictBorder ?> rounded px-3 sm:px-4 py-2 text-center shadow-2xs max-w-4xl mx-auto w-full">
                         <div class="font-diploma-serif text-xs sm:text-sm font-black tracking-widest <?= $verdictColor ?> uppercase leading-snug">
-                            KEPUTUSAN: <?= esc($verdictTitle) ?>
+                            HASIL EVALUASI KOMPUTASI: <?= esc($verdictTitle) ?>
                         </div>
                         <div class="text-[10px] sm:text-[11px] text-slate-700 mt-1 font-medium flex flex-wrap items-center justify-center gap-x-2 gap-y-0.5">
                             <span><?= esc($verdictKriteria) ?></span>
@@ -490,19 +490,19 @@
                             <div class="w-20 h-20 rounded-full gold-seal-medallion flex items-center justify-center text-center p-1.5 relative z-10">
                                 <div class="w-full h-full rounded-full border border-[#fef3c7]/80 flex flex-col items-center justify-center text-[#78350f]">
                                     <div class="text-[6.5px] font-black tracking-tighter uppercase font-diploma-serif leading-none">★ AR TILIK ★</div>
-                                    <div class="text-[8.5px] font-black tracking-tight uppercase font-diploma-serif leading-none my-0.5 text-[#451a03]">AKREDITASI</div>
-                                    <div class="text-[6px] font-extrabold uppercase tracking-widest text-[#78350f] leading-none">INTEGRITAS</div>
+                                    <div class="text-[8.5px] font-black tracking-tight uppercase font-diploma-serif leading-none my-0.5 text-[#451a03]">VERIFIKASI</div>
+                                    <div class="text-[6px] font-extrabold uppercase tracking-widest text-[#78350f] leading-none">FORENSIK RESMI</div>
                                     <div class="text-[5.5px] font-mono-code font-bold text-[#92400e] leading-none mt-0.5">★ ★ ★ ★ ★</div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Kolom Kanan: Pengesahan Dewan & Digital Checksum -->
+                        <!-- Kolom Kanan: Pengesahan Sistem & Digital Checksum -->
                         <div class="text-center md:text-right space-y-0.5 max-w-[260px] order-3">
                             <div class="text-[8.5px] sm:text-[9px] text-slate-500 font-medium">Ditetapkan secara resmi pada:</div>
                             <div class="font-bold text-xs text-[#081a33]"><?= esc($dateFormatted) ?></div>
                             <div class="font-diploma-serif text-[9.5px] sm:text-[10px] font-extrabold text-[#081a33] uppercase mt-0.5 sm:mt-1">
-                                Lembaga Uji Integritas AR Tilik
+                                Sistem Peladen Forensik & Verifikasi AR Tilik
                             </div>
                             <div class="font-mono-code text-[7.5px] sm:text-[8px] text-[#875c16] bg-[#fffdf8] px-2 py-0.5 rounded border border-[#c5a059]/50 inline-block mt-0.5">
                                 SIG: <?= esc($sigPreview) ?>
@@ -545,7 +545,7 @@
                     </div>
                     <h1 class="text-xl sm:text-2xl font-black text-slate-900 font-diploma-serif">Validasi Sertifikat Akademik</h1>
                     <p class="text-xs text-slate-500 leading-relaxed">
-                        Masukkan nomor registrasi sertifikat (contoh: <code class="bg-slate-100 px-1.5 py-0.5 rounded font-mono-code text-indigo-700 font-bold">ART-BFF9-774A-2C68</code>) yang tertera pada lembar dokumen atau piagam akreditasi.
+                        Masukkan nomor registrasi sertifikat (contoh: <code class="bg-slate-100 px-1.5 py-0.5 rounded font-mono-code text-indigo-700 font-bold">ART-BFF9-774A-2C68</code>) yang tertera pada lembar dokumen sertifikat hasil uji.
                     </p>
                 </div>
 

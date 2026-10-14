@@ -197,16 +197,11 @@ class DashboardController extends BaseController
                 $forensicLevel = strtoupper(trim((string) $gAudit['tingkat_indikasi_ai']));
             }
             $isVerifiedAi = !empty($gAudit['bukti_ai_terverifikasi']);
-            $isMetaPromptLeak = !empty($gAudit['meta_prompt_leak_terverifikasi']);
-        }
 
-        // Deteksi apakah terdapat bukti kebocoran instruksi/percakapan prompt AI mentah
-        if (!$isMetaPromptLeak && is_array($gemini)) {
-            $combinedEv = strtolower(json_encode($gemini));
-            $isMetaPromptLeak = (bool) preg_match(
-                '/(kebocoran instruksi|meta-prompt|prompt leak|disalin-tempel secara langsung|copy-paste mentah|bisa\. saya akan buat|sebagai model bahasa)/i', 
-                $combinedEv
-            );
+            // Kebocoran instruksi mentah HANYA jika terverifikasi oleh audit dan tingkat indikasi TINGGI
+            if ($forensicLevel === 'TINGGI' && !empty($gAudit['meta_prompt_leak_terverifikasi']) && (!empty($gAudit['meta_prompt_leak_cuplikan']) || $isVerifiedAi)) {
+                $isMetaPromptLeak = true;
+            }
         }
 
         // Temuan forensik hanya advisory jika: naskah pra-LLM, atau bukti AI belum terverifikasi,
@@ -219,31 +214,17 @@ class DashboardController extends BaseController
         }
 
         // Hitung skor komposit secara dinamis dan berjenjang berdasarkan derajat bukti forensik
-        if ($isMetaPromptLeak) {
-            $compositeScore = 98.0;
-        } elseif ($isAdvisory) {
+        if ($forensicLevel === 'RENDAH' || $isPreLlm) {
             $compositeScore = $stylometricsScore !== null ? $stylometricsScore : 0.0;
-        } elseif ($forensicLevel !== null && is_array($gemini) && ($gemini['status'] ?? '') === 'completed') {
-            $compositeScore = self::calculateDynamicAiScore($gemini, $stylometricsScore);
-        } else {
-            $compositeScore = $stylometricsScore;
-        }
-
-        if ($compositeScore === null) {
-            return null;
-        }
-
-        // Menandai apakah skor komposit dinaikkan oleh temuan mendalam Audit Forensik Cerdas yang terverifikasi
-        $isForensicElevated = !$isAdvisory && !$isMetaPromptLeak && (
-            ($forensicLevel === 'TINGGI' && ($stylometricsScore === null || $stylometricsScore < 65.0)) ||
-            ($forensicLevel === 'SEDANG' && ($stylometricsScore === null || $stylometricsScore < 35.0))
-        );
-
-        // Selaraskan label status dengan hasil akhir skor komposit dan Audit Forensik Cerdas
-        if ($isMetaPromptLeak) {
+            $label = 'Otentik Alami (Bebas AI)';
+            $level = 'LOW';
+            $isMetaPromptLeak = false;
+        } elseif ($isMetaPromptLeak) {
+            $compositeScore = 98.0;
             $label = 'Indikasi Ekstrem (Kebocoran Prompt AI)';
             $level = 'EXTREME';
         } elseif ($isAdvisory) {
+            $compositeScore = $stylometricsScore !== null ? $stylometricsScore : 0.0;
             if ($compositeScore >= 70.0) {
                 $label = 'Indikasi AI: Tinggi';
                 $level = 'HIGH';
@@ -254,16 +235,41 @@ class DashboardController extends BaseController
                 $label = 'Otentik Alami (Bebas AI)';
                 $level = 'LOW';
             }
-        } elseif ($compositeScore >= 70.0 || $forensicLevel === 'TINGGI') {
-            $label = 'Indikasi AI: Tinggi';
-            $level = 'HIGH';
-        } elseif ($compositeScore >= 35.0 || $forensicLevel === 'SEDANG') {
-            $label = 'Indikasi AI: Sedang';
-            $level = 'MODERATE';
+        } elseif ($forensicLevel !== null && is_array($gemini) && ($gemini['status'] ?? '') === 'completed') {
+            $compositeScore = self::calculateDynamicAiScore($gemini, $stylometricsScore);
+            if ($compositeScore >= 70.0 || $forensicLevel === 'TINGGI') {
+                $label = 'Indikasi AI: Tinggi';
+                $level = 'HIGH';
+            } elseif ($compositeScore >= 35.0 || $forensicLevel === 'SEDANG') {
+                $label = 'Indikasi AI: Sedang';
+                $level = 'MODERATE';
+            } else {
+                $label = 'Otentik Alami (Bebas AI)';
+                $level = 'LOW';
+            }
         } else {
-            $label = 'Otentik Alami (Bebas AI)';
-            $level = 'LOW';
+            $compositeScore = $stylometricsScore !== null ? $stylometricsScore : 0.0;
+            if ($compositeScore >= 70.0) {
+                $label = 'Indikasi AI: Tinggi';
+                $level = 'HIGH';
+            } elseif ($compositeScore >= 35.0) {
+                $label = 'Indikasi AI: Sedang';
+                $level = 'MODERATE';
+            } else {
+                $label = 'Otentik Alami (Bebas AI)';
+                $level = 'LOW';
+            }
         }
+
+        if ($compositeScore === null) {
+            return null;
+        }
+
+        // Menandai apakah skor komposit dinaikkan oleh temuan mendalam Audit Forensik Cerdas yang terverifikasi
+        $isForensicElevated = !$isAdvisory && !$isMetaPromptLeak && $forensicLevel !== 'RENDAH' && (
+            ($forensicLevel === 'TINGGI' && ($stylometricsScore === null || $stylometricsScore < 65.0)) ||
+            ($forensicLevel === 'SEDANG' && ($stylometricsScore === null || $stylometricsScore < 35.0))
+        );
 
         return [
             'score'                => $compositeScore,
@@ -306,32 +312,22 @@ class DashboardController extends BaseController
         }
 
         $level = strtoupper(trim((string) ($audit['tingkat_indikasi_ai'] ?? 'RENDAH')));
-        $reason = (string) ($audit['alasan_indikasi_ai'] ?? '');
-        $contra = (array) ($audit['inkonsistensi_metodologi_dan_logika'] ?? []);
-        $citations = (array) ($audit['integritas_sitasi'] ?? []);
-
-        $evidenceText = strtolower($reason . ' ' . implode(' ', $contra) . ' ' . implode(' ', $citations));
-
-        // Cek penanda kebocoran instruksi
-        $isMetaPromptLeak = !empty($audit['meta_prompt_leak_terverifikasi']) || (bool) preg_match(
-            '/(kebocoran instruksi|meta-prompt|prompt leak|disalin-tempel secara langsung|copy-paste mentah|percakapan ai|chat ai|instruksi percakapan|bisa\. saya akan buat|tentu, berikut|sebagai model bahasa ai)/i',
-            $evidenceText
-        );
-        if ($isMetaPromptLeak) {
-            return 98.0;
-        }
-
         $isPreLlm = !empty($audit['metadata_pra_llm']);
         $isVerified = !empty($audit['bukti_ai_terverifikasi']);
 
-        // Naskah era pra-LLM atau klaim tidak lolos verifikasi kutipan naskah
-        if ($isPreLlm || (isset($audit['bukti_ai_terverifikasi']) && !$isVerified)) {
+        // Naskah era pra-LLM atau tingkat indikasi RENDAH (Otentik Alami)
+        if ($level === 'RENDAH' || $isPreLlm) {
             return $stylometricsScore !== null ? $stylometricsScore : 0.0;
         }
 
-        if ($level === 'RENDAH') {
+        // Naskah dengan klaim tidak lolos verifikasi kutipan naskah
+        if (isset($audit['bukti_ai_terverifikasi']) && !$isVerified) {
             return $stylometricsScore !== null ? $stylometricsScore : 0.0;
         }
+
+        $reason = (string) ($audit['alasan_indikasi_ai'] ?? '');
+        $contra = (array) ($audit['inkonsistensi_metodologi_dan_logika'] ?? []);
+        $citations = (array) ($audit['integritas_sitasi'] ?? []);
 
         if ($level === 'SEDANG') {
             if (!$isVerified && $stylometricsScore !== null && $stylometricsScore < 30.0) {
@@ -347,19 +343,27 @@ class DashboardController extends BaseController
             return round($score, 1);
         }
 
-
         // --- LEVEL TINGGI: Evaluasi Berjenjang Berbasis Bukti Nyata ---
 
         // Tingkat Ekstrem (95% - 98%): Kebocoran Instruksi / Percakapan Chatbot (Meta-Prompt Leak)
-        // Penulis menyalin langsung teks obrolan AI (misal: "Bisa. Saya akan buat Bab IV...", "Tentu, ini draf...")
-        $isMetaPromptLeak = (bool) preg_match(
-            '/(kebocoran instruksi|meta-prompt|prompt leak|disalin-tempel secara langsung|copy-paste mentah|percakapan ai|chat ai|instruksi percakapan|bisa\. saya akan buat|tentu, berikut|sebagai model bahasa ai)/i',
-            $evidenceText
-        );
+        // HANYA dipicu jika terverifikasi secara eksplisit dan terdapat cuplikan instruksi obrolan AI nyata
+        $isMetaPromptLeak = false;
+        if (!empty($audit['meta_prompt_leak_terverifikasi']) && (!empty($audit['meta_prompt_leak_cuplikan']) || $isVerified)) {
+            $isMetaPromptLeak = true;
+        } elseif (!empty($audit['meta_prompt_leak_cuplikan'])) {
+            $leakSnippets = is_array($audit['meta_prompt_leak_cuplikan'])
+                ? implode(' ', $audit['meta_prompt_leak_cuplikan'])
+                : (string) $audit['meta_prompt_leak_cuplikan'];
+            if (preg_match('/(bisa\. saya akan buat|tentu, berikut|sebagai model bahasa ai|saya adalah ai|as an ai language model)/i', $leakSnippets)) {
+                $isMetaPromptLeak = true;
+            }
+        }
 
         if ($isMetaPromptLeak) {
             return 98.0;
         }
+
+        $evidenceText = strtolower($reason . ' ' . implode(' ', $contra) . ' ' . implode(' ', $citations));
 
         // Tingkat Berat (80% - 88%): Halusinasi Sitasi & Tokoh/Jurnal Fiktif
         $hasCitationFabrication = (bool) preg_match(
@@ -1986,7 +1990,7 @@ class DashboardController extends BaseController
     }
 
     /**
-     * Mengunduh Berkas PDF Piagam Akreditasi Integritas Akademik Resmi (Format A4 Landscape Vektor)
+     * Mengunduh Berkas PDF Sertifikat Hasil Uji Kemiripan Naskah Resmi (Format A4 Landscape Vektor)
      * Dihasilkan langsung dari peladen via Python & WeasyPrint
      */
     public function downloadCertificatePdf(?string $code = null)
@@ -2026,7 +2030,7 @@ class DashboardController extends BaseController
 
         $process = proc_open($cmd, $descriptors, $pipes, $projectRoot);
         if (! is_resource($process)) {
-            return $this->response->setStatusCode(500)->setBody("Gagal menginisialisasi proses generator piagam.");
+            return $this->response->setStatusCode(500)->setBody("Gagal menginisialisasi proses generator sertifikat.");
         }
 
         fclose($pipes[0]);
@@ -2039,10 +2043,10 @@ class DashboardController extends BaseController
 
         if ($exitCode !== 0 || empty($pdfContent)) {
             log_message('error', "Certificate PDF export failed: {$stderr}");
-            return $this->response->setStatusCode(500)->setBody("Gagal menghasilkan PDF Piagam Akreditasi: " . esc($stderr));
+            return $this->response->setStatusCode(500)->setBody("Gagal menghasilkan PDF Sertifikat Hasil Uji: " . esc($stderr));
         }
 
-        $filename = "Piagam_Akreditasi_ARTilik_{$code}.pdf";
+        $filename = "Sertifikat_Uji_ARTilik_{$code}.pdf";
 
         return $this->response
             ->setHeader('Content-Type', 'application/pdf')
@@ -2053,7 +2057,7 @@ class DashboardController extends BaseController
     }
 
     /**
-     * Mengunduh Berkas PDF Piagam Akreditasi berdasarkan Report ID
+     * Mengunduh Berkas PDF Sertifikat Hasil Uji berdasarkan Report ID
      */
     public function downloadCertificatePdfByReportId(int $reportId)
     {
@@ -2089,7 +2093,7 @@ class DashboardController extends BaseController
 
         $process = proc_open($cmd, $descriptors, $pipes, $projectRoot);
         if (! is_resource($process)) {
-            return $this->response->setStatusCode(500)->setBody("Gagal menginisialisasi proses generator piagam.");
+            return $this->response->setStatusCode(500)->setBody("Gagal menginisialisasi proses generator sertifikat.");
         }
 
         fclose($pipes[0]);
@@ -2102,10 +2106,10 @@ class DashboardController extends BaseController
 
         if ($exitCode !== 0 || empty($pdfContent)) {
             log_message('error', "Certificate PDF export failed: {$stderr}");
-            return $this->response->setStatusCode(500)->setBody("Gagal menghasilkan PDF Piagam Akreditasi: " . esc($stderr));
+            return $this->response->setStatusCode(500)->setBody("Gagal menghasilkan PDF Sertifikat Hasil Uji: " . esc($stderr));
         }
 
-        $filename = "Piagam_Akreditasi_ARTilik_Report_{$reportId}.pdf";
+        $filename = "Sertifikat_Uji_ARTilik_Report_{$reportId}.pdf";
 
         return $this->response
             ->setHeader('Content-Type', 'application/pdf')

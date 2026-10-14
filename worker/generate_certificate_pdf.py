@@ -85,20 +85,16 @@ def calculate_dynamic_ai_score(gemini: dict, stylometrics_score: float = None) -
         if m3:
             audit["skor_indikasi_persen"] = float(m3.group(1))
 
-    reason = str(audit.get("alasan_indikasi_ai") or "")
-    contra = audit.get("inkonsistensi_metodologi_dan_logika") or []
-    citations = audit.get("integritas_sitasi") or []
-    ev_text = (reason + " " + " ".join([str(c) for c in contra]) + " " + " ".join([str(ci) for ci in citations])).lower()
-
-    # Cek kebocoran percakapan prompt AI mentah
-    is_meta = bool(audit.get("meta_prompt_leak_terverifikasi")) or bool(re.search(r"(kebocoran instruksi|meta-prompt|prompt leak|disalin-tempel secara langsung|copy-paste mentah|percakapan ai|chat ai|instruksi percakapan|bisa\. saya akan buat|tentu, berikut|sebagai model bahasa ai)", ev_text))
-    if is_meta:
-        return 98.0
-
-    # Naskah pra-LLM atau bukti AI tidak terverifikasi konkret pada naskah
+    level = str(audit.get("tingkat_indikasi_ai") or "RENDAH").strip().upper()
     is_pre_llm = bool(audit.get("metadata_pra_llm"))
     is_verified = bool(audit.get("bukti_ai_terverifikasi"))
-    if is_pre_llm or ("bukti_ai_terverifikasi" in audit and not is_verified):
+
+    # Naskah pra-LLM atau vonis audit menyatakan RENDAH / Bersih Alami
+    if level == "RENDAH" or is_pre_llm:
+        return stylometrics_score if stylometrics_score is not None else 0.0
+
+    # Naskah dengan klaim tidak lolos verifikasi kutipan naskah
+    if "bukti_ai_terverifikasi" in audit and not is_verified:
         return stylometrics_score if stylometrics_score is not None else 0.0
 
     if "skor_indikasi_persen" in audit and audit["skor_indikasi_persen"] is not None:
@@ -109,16 +105,30 @@ def calculate_dynamic_ai_score(gemini: dict, stylometrics_score: float = None) -
         except (ValueError, TypeError):
             pass
 
-    level = str(audit.get("tingkat_indikasi_ai") or "RENDAH").strip().upper()
-
-    if level == "RENDAH":
-        return stylometrics_score if stylometrics_score is not None else 0.0
+    contra = audit.get("inkonsistensi_metodologi_dan_logika") or []
+    citations = audit.get("integritas_sitasi") or []
 
     if level == "SEDANG":
         if not is_verified and stylometrics_score is not None and stylometrics_score < 30.0:
             return stylometrics_score
         score = 50.0 + (5.0 if len(contra) > 1 or len(citations) > 1 else 0.0)
         return round(max(score, stylometrics_score or 0.0), 1)
+
+    # Level TINGGI: Cek kebocoran instruksi/chat obrolan AI
+    is_meta = False
+    if audit.get("meta_prompt_leak_terverifikasi") and (audit.get("meta_prompt_leak_cuplikan") or is_verified):
+        is_meta = True
+    elif audit.get("meta_prompt_leak_cuplikan"):
+        cuplikan = audit["meta_prompt_leak_cuplikan"]
+        cuplikan_str = " ".join(cuplikan) if isinstance(cuplikan, list) else str(cuplikan)
+        if re.search(r"(bisa\. saya akan buat|tentu, berikut|sebagai model bahasa ai|saya adalah ai|as an ai language model)", cuplikan_str, re.IGNORECASE):
+            is_meta = True
+
+    if is_meta:
+        return 98.0
+
+    reason = str(audit.get("alasan_indikasi_ai") or "")
+    ev_text = (reason + " " + " ".join([str(c) for c in contra]) + " " + " ".join([str(ci) for ci in citations])).lower()
 
     has_cit = bool(re.search(r"(halusinasi|tokoh fiktif|nama jurnal .* diperlakukan sebagai|nama paroki .* diperlakukan sebagai|sitasi palsu|penulis fiktif|fabrikasi)", ev_text))
     base = 80.0 if has_cit else 74.0
@@ -170,46 +180,53 @@ def extract_ai_assessment(evidence_data) -> tuple[float | None, str]:
         if g_audit.get("tingkat_indikasi_ai"):
             forensic_level = str(g_audit["tingkat_indikasi_ai"]).strip().upper()
         is_verified_ai = bool(g_audit.get("bukti_ai_terverifikasi"))
-        is_meta = bool(g_audit.get("meta_prompt_leak_terverifikasi"))
+        if forensic_level == "TINGGI":
+            if g_audit.get("meta_prompt_leak_terverifikasi") and (g_audit.get("meta_prompt_leak_cuplikan") or is_verified_ai):
+                is_meta = True
+            elif g_audit.get("meta_prompt_leak_cuplikan"):
+                cuplikan = g_audit["meta_prompt_leak_cuplikan"]
+                cuplikan_str = " ".join(cuplikan) if isinstance(cuplikan, list) else str(cuplikan)
+                if re.search(r"(bisa\. saya akan buat|tentu, berikut|sebagai model bahasa ai|saya adalah ai|as an ai language model)", cuplikan_str, re.IGNORECASE):
+                    is_meta = True
 
-    if not is_meta and isinstance(gemini, dict):
-        comb = json.dumps(gemini).lower()
-        is_meta = bool(re.search(r"(kebocoran instruksi|meta-prompt|prompt leak|disalin-tempel secara langsung|copy-paste mentah|bisa\. saya akan buat)", comb))
+    # Naskah pra-LLM atau tingkat indikasi RENDAH (Otentik Alami)
+    if forensic_level == "RENDAH" or is_pre_llm:
+        composite_score = stylometrics_score if stylometrics_score is not None else 0.0
+        return composite_score, "Otentik Alami (Bebas AI)"
 
     # Advisory jika era pra-LLM atau tidak terverifikasi dan stylometri rendah
     is_advisory = False
     if forensic_level in ("SEDANG", "TINGGI") and not is_meta:
-        if is_pre_llm or not is_verified_ai or (stylometrics_score is not None and stylometrics_score < 30.0):
+        if not is_verified_ai or (stylometrics_score is not None and stylometrics_score < 30.0):
             is_advisory = True
 
     if is_meta:
         composite_score = 98.0
+        label = "Indikasi Ekstrem (Kebocoran Prompt AI)"
     elif is_advisory:
         composite_score = stylometrics_score if stylometrics_score is not None else 0.0
-    elif forensic_level is not None and isinstance(gemini, dict) and gemini.get("status") == "completed":
-        composite_score = calculate_dynamic_ai_score(gemini, stylometrics_score)
-    else:
-        composite_score = stylometrics_score
-
-    if composite_score is None:
-        return None, "Otentik Alami"
-
-    if is_meta:
-        label = "Indikasi Ekstrem (Prompt Leak)"
-    elif is_advisory:
         if composite_score >= 70.0:
             label = "Indikasi AI: Tinggi"
         elif composite_score >= 35.0:
             label = "Indikasi AI: Sedang"
         else:
-            label = "Otentik Alami"
-    elif composite_score >= 70.0 or forensic_level == "TINGGI":
-        label = "Indikasi AI: Tinggi"
-    elif composite_score >= 35.0 or forensic_level == "SEDANG":
-        label = "Indikasi AI: Sedang"
+            label = "Otentik Alami (Bebas AI)"
+    elif forensic_level is not None and isinstance(gemini, dict) and gemini.get("status") == "completed":
+        composite_score = calculate_dynamic_ai_score(gemini, stylometrics_score)
+        if composite_score >= 70.0 or forensic_level == "TINGGI":
+            label = "Indikasi AI: Tinggi"
+        elif composite_score >= 35.0 or forensic_level == "SEDANG":
+            label = "Indikasi AI: Sedang"
+        else:
+            label = "Otentik Alami (Bebas AI)"
     else:
-        label = "Otentik Alami"
-
+        composite_score = stylometrics_score if stylometrics_score is not None else 0.0
+        if composite_score >= 70.0:
+            label = "Indikasi AI: Tinggi"
+        elif composite_score >= 35.0:
+            label = "Indikasi AI: Sedang"
+        else:
+            label = "Otentik Alami (Bebas AI)"
 
     return composite_score, label
 
@@ -265,21 +282,21 @@ def build_certificate_html(report: dict, document: dict, override_ai_score: floa
 
     # Verdict Classification
     if decision in ["no_match", "clean"]:
-        verdict_badge = "TERAKREDITASI SANGAT BAIK"
+        verdict_badge = "TERVERIFIKASI MEMENUHI AMBANG BATAS"
         verdict_status = "LOLOS AMBANG BATAS ORISINALITAS ILMIAH"
         verdict_border = "#059669"
         verdict_bg = "#f0fdf4"
         verdict_color = "#065f46"
         badge_border = "#10b981"
     elif decision == "match":
-        verdict_badge = "TIDAK MEMENUHI SYARAT"
+        verdict_badge = "TIDAK MEMENUHI AMBANG BATAS"
         verdict_status = "KEMIRIPAN TINGGI • PERLU PERBAIKAN & PARAFRASA"
         verdict_border = "#dc2626"
         verdict_bg = "#fef2f2"
         verdict_color = "#991b1b"
         badge_border = "#ef4444"
     else:
-        verdict_badge = "MEMENUHI SYARAT BERSYARAT"
+        verdict_badge = "PERLU PENELAAHAN LEBIH LANJUT"
         verdict_status = "DALAM AMBANG BATAS TOLERANSI REVIEW AKADEMIK"
         verdict_border = "#d97706"
         verdict_bg = "#fffbeb"
@@ -300,7 +317,7 @@ def build_certificate_html(report: dict, document: dict, override_ai_score: floa
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Sertifikat Akreditasi #{code} — AR Tilik</title>
+    <title>Sertifikat Hasil Uji Kemiripan #{code} — AR Tilik</title>
     <style>
         @page {{
             size: A4 landscape;
@@ -847,7 +864,7 @@ def build_certificate_html(report: dict, document: dict, override_ai_score: floa
             margin-top: 0.2mm;
         }}
 
-        /* Pengesahan Dewan Kanan */
+        /* Pengesahan Sistem Kanan */
         .auth-right-text {{
             font-size: 6.8pt;
             color: #475569;
@@ -923,16 +940,16 @@ def build_certificate_html(report: dict, document: dict, override_ai_score: floa
                 <polygon points="100,25 120,75 175,75 130,110 150,165 100,130 50,165 70,110 25,75 80,75" stroke="#c5a059" stroke-width="1"/>
             </svg>
 
-            <!-- 1. KOP RESMI PIAGAM AKREDITASI -->
+            <!-- 1. KOP RESMI SERTIFIKAT HASIL UJI -->
             <div class="cert-header">
                 <div class="header-grid">
                     <div class="header-cell-left">
                         {f'<img src="data:image/png;base64,{logo_b64}" class="logo-emblem" alt="AR Tilik">' if logo_b64 else '<div style="width:20mm;height:20mm;border:1pt solid #c5a059;border-radius:50%;text-align:center;line-height:20mm;font-weight:bold;color:#081a33;">ART</div>'}
                     </div>
                     <div class="header-cell-center">
-                        <div class="republic-text">REPUBLIK INDONESIA &bull; STANDAR INTEGRITAS SINTA / ARJUNA</div>
-                        <h1 class="cert-main-title">SERTIFIKAT AKREDITASI INTEGRITAS AKADEMIK</h1>
-                        <div class="cert-subtitle">Certificate of Academic Integrity &amp; Originality Attestation</div>
+                        <div class="republic-text">SISTEM PEMERIKSAAN KARYA ILMIAH &bull; AR TILIK FORENSIC ENGINE</div>
+                        <h1 class="cert-main-title">SERTIFIKAT HASIL UJI KEMIRIPAN &amp; ORISINALITAS NASKAH</h1>
+                        <div class="cert-subtitle">Certificate of Similarity &amp; Originality Forensic Attestation</div>
                     </div>
                     <div class="header-cell-right">
                         <div class="reg-cartouche">
@@ -947,7 +964,7 @@ def build_certificate_html(report: dict, document: dict, override_ai_score: floa
             <!-- 2. NASKAH MAKLUMAT RESMI (OFFICIAL PROSE) -->
             <div class="prose-section">
                 <p class="prose-lead">
-                    Berdasarkan hasil audit komputasi forensik teks menggunakan algoritma sekuensial <em>5-Gram Shingle</em> dan dekomposisi leksikal <em>TF-IDF Cosine</em>, dengan ini Dewan Integritas Akademik AR Tilik menyatakan bahwa naskah karya ilmiah:
+                    Berdasarkan hasil audit komputasi forensik teks menggunakan algoritma sekuensial <em>5-Gram Shingle</em> dan dekomposisi leksikal <em>TF-IDF Cosine</em>, Sistem Verifikasi AR Tilik menerbitkan atestasi komputasi untuk naskah karya ilmiah:
                 </p>
 
                 <div class="doc-title-box">
@@ -967,9 +984,9 @@ def build_certificate_html(report: dict, document: dict, override_ai_score: floa
                 </div>
             </div>
 
-            <!-- 3. DIKTUM KEPUTUSAN AKREDITASI (GRAND DECREE BANNER) -->
+            <!-- 3. DIKTUM HASIL EVALUASI KOMPUTASI (GRAND DECREE BANNER) -->
             <div class="decree-banner">
-                <div class="decree-title">KEPUTUSAN: {verdict_badge}</div>
+                <div class="decree-title">HASIL EVALUASI KOMPUTASI: {verdict_badge}</div>
                 <div class="decree-metrics">
                     {verdict_status} &bull; Indeks Kesepadanan: <strong>{overall_sim:.2f}%</strong> &bull; Tingkat Orisinalitas: <strong>{originality_rate:.2f}%</strong>
                 </div>
@@ -1050,20 +1067,20 @@ def build_certificate_html(report: dict, document: dict, override_ai_score: floa
                         <div class="gold-seal-disc">
                             <div class="seal-inner-ring">
                                 <div class="seal-text-top">★ AR TILIK ★</div>
-                                <div class="seal-text-main">AKREDITASI</div>
-                                <div class="seal-text-sub">INTEGRITAS RESMI</div>
+                                <div class="seal-text-main">VERIFIKASI</div>
+                                <div class="seal-text-sub">FORENSIK RESMI</div>
                                 <div class="seal-stars">★ ★ ★ ★ ★</div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Kolom Kanan: Pengesahan Dewan & Tanda Tangan Digital -->
+                <!-- Kolom Kanan: Pengesahan Sistem & Tanda Tangan Digital -->
                 <div class="auth-cell-right">
                     <div class="auth-right-text">
                         <div>Ditetapkan secara resmi pada:</div>
                         <div class="auth-date">{date_formatted}</div>
-                        <div class="auth-council">Lembaga Uji Integritas AR Tilik</div>
+                        <div class="auth-council">Sistem Peladen Forensik &amp; Verifikasi AR Tilik</div>
                         <div class="auth-sig-badge">SIG: {sig_preview}</div>
                         <div class="auth-disclaimer">Tanda Tangan Digital Tersertifikasi Sistem Peladen</div>
                     </div>
@@ -1206,7 +1223,7 @@ def generate_certificate_pdf(code: str = None, report_id: int = None, output_pat
                 pass
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Generator PDF Piagam Akreditasi AR Tilik (WeasyPrint)")
+    parser = argparse.ArgumentParser(description="Generator PDF Sertifikat Hasil Uji AR Tilik (WeasyPrint)")
     parser.add_argument("--code", type=str, default=None, help="Kode Verifikasi Sertifikat (misal: ART-BFF9-774A-2C68)")
     parser.add_argument("--report", type=int, default=None, help="ID Laporan (opsional jika kode tidak diisi)")
     parser.add_argument("--ai-score", type=float, default=None, help="Override skor metrik AI (0-100)")
@@ -1229,12 +1246,12 @@ if __name__ == "__main__":
         if args.stdout:
             sys.stdout.buffer.write(pdf_bytes)
         elif args.output:
-            print(f"[✓] Piagam PDF berhasil disimpan ke: {args.output} ({len(pdf_bytes):,} bytes)")
+            print(f"[✓] Sertifikat PDF berhasil disimpan ke: {args.output} ({len(pdf_bytes):,} bytes)")
         else:
-            default_out = f"Piagam_Akreditasi_{args.code or args.report}.pdf"
+            default_out = f"Sertifikat_Uji_{args.code or args.report}.pdf"
             with open(default_out, "wb") as f:
                 f.write(pdf_bytes)
-            print(f"[✓] Piagam PDF berhasil disimpan ke: {default_out} ({len(pdf_bytes):,} bytes)")
+            print(f"[✓] Sertifikat PDF berhasil disimpan ke: {default_out} ({len(pdf_bytes):,} bytes)")
     except Exception as e:
         print(f"[!] Gagal menghasilkan PDF Piagam: {e}", file=sys.stderr)
         sys.exit(1)
