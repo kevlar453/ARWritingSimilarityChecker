@@ -134,24 +134,41 @@ def run_scheduler_pipeline(
     else:
         print("\n[3/4] Autonomous Discovery dilewati (CORPUS_DISCOVERY_TOPICS belum dikonfigurasi di .env).")
 
-    # 4. Hitung total korpus aktif di database
-    print("\n[4/4] Menghitung status korpus aktif...")
+    # 4. Jalankan Pemanenan Terjadwal Neliti & GARUDA Dikti
+    print("\n[4/5] Memeriksa pemanenan korpus nasional (Neliti & GARUDA Dikti)...")
+    indexed_national = 0
+    try:
+        from worker.national_harvester import NationalHarvester
+        nat_harvester = NationalHarvester()
+        nat_results = nat_harvester.run_scheduled_harvests()
+        for res in nat_results:
+            if isinstance(res, dict):
+                indexed_national += res.get("indexed", 0)
+                for itm in res.get("items", []):
+                    if itm.get("status") == "indexed":
+                        new_titles.append(itm.get("title", "Publikasi Nasional"))
+        print(f"      Diindeks dari portal nasional: {indexed_national}")
+    except Exception as nat_err:
+        print(f"[!] Kendala pemanenan portal nasional: {nat_err}")
+
+    # 5. Hitung total korpus aktif di database
+    print("\n[5/5] Menghitung status korpus aktif...")
     conn = get_connection()
     try:
         total_corpus = get_total_active_corpus_count(conn)
     finally:
         conn.close()
 
-    total_new = indexed_dropzone + indexed_oai + indexed_discovery
+    total_new = indexed_dropzone + indexed_oai + indexed_discovery + indexed_national
     print(f"      Total naskah korpus aktif saat ini: {total_corpus} dokumen.")
 
-    # 5. Kirim notifikasi Telegram jika ada berkas baru atau dipaksa
+    # 6. Kirim notifikasi Telegram jika ada berkas baru atau dipaksa
     if notify_telegram and (total_new > 0 or force_notify):
         print("\n[*] Mengirimkan laporan panen ke Telegram bot...")
         notif_sent = notify_corpus_harvest_completed(
             new_docs_count=total_new,
             dropzone_count=indexed_dropzone,
-            oai_count=indexed_oai + indexed_discovery,
+            oai_count=indexed_oai + indexed_discovery + indexed_national,
             total_corpus_count=total_corpus,
             details=new_titles
         )
@@ -169,7 +186,7 @@ def run_scheduler_pipeline(
         log_dir.mkdir(parents=True, exist_ok=True)
         log_file = log_dir / "harvester_cron.log"
         with open(log_file, "a", encoding="utf-8") as f:
-            f.write(f"[{start_time.strftime('%Y-%m-%d %H:%M:%S')}] DURATION={duration:.2f}s NEW=+{total_new} (Dropzone={indexed_dropzone}, OAI/Reg={indexed_oai}, Discovery={indexed_discovery}) TOTAL_ACTIVE={total_corpus}\n")
+            f.write(f"[{start_time.strftime('%Y-%m-%d %H:%M:%S')}] DURATION={duration:.2f}s NEW=+{total_new} (Dropzone={indexed_dropzone}, OAI/Reg={indexed_oai}, Discovery={indexed_discovery}, National={indexed_national}) TOTAL_ACTIVE={total_corpus}\n")
     except Exception:
         pass
 

@@ -12,6 +12,7 @@ import urllib.parse
 import hashlib
 import re
 from pathlib import Path
+from datetime import datetime
 from typing import Optional, List, Dict, Any, Tuple
 
 # Pastikan PROJECT_ROOT berada di urutan teratas sys.path dan script_dir tidak membayangi package worker
@@ -91,7 +92,8 @@ def reconstruct_abstract(inverted_index: Optional[Dict[str, List[int]]]) -> str:
 def search_openalex_works(
     query: str,
     limit: int = 10,
-    open_access_only: bool = True
+    open_access_only: bool = True,
+    page: int = 1
 ) -> List[Dict[str, Any]]:
     """
     Mencari karya ilmiah terpublikasi via OpenAlex API yang relevan dengan topik target.
@@ -99,6 +101,7 @@ def search_openalex_works(
     params = {
         "search": query.strip(),
         "per-page": min(max(1, limit), 50),
+        "page": max(1, page),
         "mailto": POLITE_MAILTO,
         "sort": "relevance_score:desc"
     }
@@ -287,13 +290,18 @@ def auto_discover_by_query(
     query: str,
     limit: int = 10,
     open_access_only: bool = True,
-    corpus_dir: Path = DEFAULT_CORPUS_STORAGE
+    corpus_dir: Path = DEFAULT_CORPUS_STORAGE,
+    page: Optional[int] = None
 ) -> Dict[str, Any]:
     """
     Alur terpadu: mencari karya ilmiah berdasarkan topik, mengunduh, dan mengindeksnya secara otomatis.
     """
-    print(f"[*] Mencari karya ilmiah dengan topik: '{query}'...")
-    candidates = search_openalex_works(query=query, limit=limit, open_access_only=open_access_only)
+    if page is None:
+        # Rotasi halaman berdasarkan hari (1 - 10) agar setiap hari menemukan naskah baru yang berbeda
+        page = (int(datetime.now().strftime("%j")) % 10) + 1
+
+    print(f"[*] Mencari karya ilmiah dengan topik: '{query}' (halaman {page})...")
+    candidates = search_openalex_works(query=query, limit=limit, open_access_only=open_access_only, page=page)
     print(f"[*] Ditemukan {len(candidates)} kandidat naskah terbuka.")
 
     summary = {

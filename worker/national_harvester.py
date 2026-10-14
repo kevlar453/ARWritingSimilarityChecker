@@ -257,7 +257,7 @@ class NationalHarvester:
                 "duration": round(duration, 2)
             }
 
-    def harvest_garuda(self, query: str = "informatika", limit: int = 15) -> Dict[str, Any]:
+    def harvest_garuda(self, query: str = "informatika", limit: int = 15, page: Optional[int] = None) -> Dict[str, Any]:
         """
         Memanen jurnal terakreditasi dari GARUDA Kemdiktisaintek.
         """
@@ -269,9 +269,13 @@ class NationalHarvester:
         failed_count = 0
         results = []
 
+        if page is None:
+            # Rotasi halaman 1 - 5 agar tiap hari memanen artikel baru
+            page = (int(datetime.now().strftime("%j")) % 5) + 1
+
         try:
             encoded_query = urllib.parse.quote_plus(query if query else "penelitian")
-            url = f"{GARUDA_BASE_URL}/documents?q={encoded_query}"
+            url = f"{GARUDA_BASE_URL}/documents?q={encoded_query}&page={page}"
             req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
 
             with urllib.request.urlopen(req, timeout=30) as resp:
@@ -496,10 +500,12 @@ class NationalHarvester:
         for sched in schedules:
             source = sched["source"]
             keywords = [k.strip() for k in sched.get("keywords", "").split(",") if k.strip()]
-            chosen_kw = keywords[0] if keywords else "pendidikan"
+            # Rotasi kata kunci otomatis berdasarkan hari (day of year) agar dinamis & tidak mentok di satu topik
+            day_offset = int(datetime.now().strftime("%j"))
+            chosen_kw = keywords[day_offset % len(keywords)] if keywords else "pendidikan"
             limit = int(sched.get("limit_per_run") or 10)
 
-            print(f"[HARVEST CRON] Memulai pemanenan '{sched['name']}' ({source}) keyword: '{chosen_kw}' limit: {limit}...")
+            print(f"[HARVEST CRON] Memulai pemanenan '{sched['name']}' ({source}) keyword: '{chosen_kw}' (rotasi #{day_offset % len(keywords) + 1}/{len(keywords)}) limit: {limit}...")
 
             if source == "neliti":
                 res = self.harvest_neliti(query=chosen_kw, limit=limit)
