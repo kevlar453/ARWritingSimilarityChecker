@@ -97,6 +97,8 @@ class AuthController extends BaseController
             'status'                          => 'pending_verification',
             'verification_token'              => $token,
             'verification_token_expires_at'   => $tokenExpiresAt,
+            'verification_emails_sent'        => 1,
+            'last_verification_email_sent_at' => $now,
             'email_verified_at'               => null,
             'free_submissions_used_this_week' => 0,
             'week_reset_at'                   => $resetAt,
@@ -238,11 +240,15 @@ class AuthController extends BaseController
         // Buat token baru berlaku 24 jam ke depan
         $token = bin2hex(random_bytes(32));
         $tokenExpiresAt = date('Y-m-d H:i:s', strtotime('+24 hours'));
+        $nowStr = date('Y-m-d H:i:s');
+        $emailsSent = max(1, (int)($user['verification_emails_sent'] ?? 1)) + 1;
 
         $userModel->update($user['id'], [
-            'verification_token'            => $token,
-            'verification_token_expires_at' => $tokenExpiresAt,
-            'updated_at'                    => date('Y-m-d H:i:s'),
+            'verification_token'              => $token,
+            'verification_token_expires_at'   => $tokenExpiresAt,
+            'verification_emails_sent'        => $emailsSent,
+            'last_verification_email_sent_at' => $nowStr,
+            'updated_at'                      => $nowStr,
         ]);
 
         $user['verification_token'] = $token;

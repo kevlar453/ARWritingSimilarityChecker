@@ -19,6 +19,8 @@ class UserModel extends Model
         'status',
         'verification_token',
         'verification_token_expires_at',
+        'verification_emails_sent',
+        'last_verification_email_sent_at',
         'email_verified_at',
         'reset_password_token',
         'reset_password_expires_at',
@@ -371,6 +373,52 @@ class UserModel extends Model
         }
 
         return $this->where('referral_code', $code)->first();
+    }
+
+    /**
+     * Memusnahkan akun pendaftar yang tidak memverifikasi email setelah batas pengingat tercapai
+     * Membersihkan seluruh data terkait secara aman tanpa meninggalkan data yatim (orphaned records).
+     */
+    public function purgeUnverifiedUser(int $userId): bool
+    {
+        $db = \Config\Database::connect();
+        $db->transStart();
+
+        $user = $this->find($userId);
+        if (!$user || $user['status'] !== 'pending_verification') {
+            $db->transRollback();
+            return false;
+        }
+
+        // 1. Hapus relasi otorisasi & keamanan
+        $db->table('auth_rate_limits')->where('identifier', (string) $userId)->delete();
+        $db->table('auth_rate_limits')->where('identifier', $user['email'])->delete();
+        $db->table('api_keys')->where('user_id', $userId)->delete();
+        $db->table('document_shares')->where('shared_by_user_id', $userId)->orWhere('shared_with_user_id', $userId)->delete();
+        $db->table('payment_transactions')->where('user_id', $userId)->delete();
+        $db->table('ambassador_applications')->where('user_id', $userId)->delete();
+        $db->table('ambassador_profiles')->where('user_id', $userId)->delete();
+        $db->table('testimonials')->where('user_id', $userId)->delete();
+        $db->table('feature_votes')->where('user_id', $userId)->delete();
+
+        // 2. Hapus berkas fisik dan dokumen jika ada
+        $docs = $db->table('documents')->where('user_id', $userId)->get()->getResultArray();
+        foreach ($docs as $d) {
+            if (!empty($d['storage_path']) && file_exists($d['storage_path']) && $d['storage_path'] !== '[PURGED]') {
+                @unlink($d['storage_path']);
+            }
+            $db->table('reports')->where('document_id', $d['id'])->delete();
+            $db->table('document_chunks')->where('document_id', $d['id'])->delete();
+            $db->table('document_pages')->where('document_id', $d['id'])->delete();
+        }
+        $db->table('documents')->where('user_id', $userId)->delete();
+
+        // 3. Hapus entitas pengguna
+        $db->table($this->table)->where('id', $userId)->where('status', 'pending_verification')->delete();
+
+        $db->transComplete();
+
+        return $db->transStatus();
     }
 }
 

@@ -7,9 +7,9 @@ use Config\Services;
 class EmailService
 {
     /**
-     * Mengirimkan email verifikasi aktivasi akun ke pengguna baru
+     * Mengirimkan email verifikasi aktivasi akun ke pengguna baru atau pengingat berkala
      */
-    public function sendVerificationEmail(array $user, string $token): bool
+    public function sendVerificationEmail(array $user, string $token, int $reminderNumber = 1): bool
     {
         $email = Services::email();
 
@@ -17,8 +17,13 @@ class EmailService
         $userName = esc($user['name'] ?? 'Pengguna');
         $userEmail = $user['email'];
 
-        $subject = 'Verifikasi Alamat Email Anda — AR Tilik';
-        $htmlMessage = $this->buildVerificationTemplate($userName, $userEmail, $verifyUrl);
+        $subject = match ($reminderNumber) {
+            2       => '[Pengingat] Verifikasi Alamat Email Anda — AR Tilik',
+            3       => '[Peringatan Terakhir] Konfirmasi Email Sebelum Akun Dihapus — AR Tilik',
+            default => 'Verifikasi Alamat Email Anda — AR Tilik'
+        };
+
+        $htmlMessage = $this->buildVerificationTemplate($userName, $userEmail, $verifyUrl, $reminderNumber);
 
         $email->setTo($userEmail);
         $email->setSubject($subject);
@@ -26,13 +31,18 @@ class EmailService
         $email->setMailType('html');
 
         // Plain text version fallback
+        $altIntro = match ($reminderNumber) {
+            2       => "Kami mengingatkan kembali bahwa akun AR Tilik Anda belum diverifikasi.\n\nSilakan buka tautan berikut untuk mengaktifkan akun Anda:",
+            3       => "Ini adalah pengingat terakhir (ke-3) dari AR Tilik. Jika Anda tidak memverifikasi alamat email Anda dalam waktu 24 jam ke depan, akun pendaftaran Anda akan dihapus secara otomatis dari sistem.\n\nTautan verifikasi akun Anda:",
+            default => "Terima kasih telah mendaftar di AR Tilik (Sistem Penelaah Kesepadanan Naskah Akademik Mandiri & Keadilan Bukti).\n\nSilakan buka tautan berikut untuk memverifikasi alamat email Anda:"
+        };
+
         $email->setAltMessage(
             "Yth. {$userName},\n\n" .
-            "Terima kasih telah mendaftar di AR Tilik (Sistem Penelaah Kesepadanan Naskah Akademik Mandiri & Keadilan Bukti).\n\n" .
-            "Silakan buka tautan berikut untuk memverifikasi alamat email Anda:\n" .
+            "{$altIntro}\n" .
             "{$verifyUrl}\n\n" .
             "Tautan ini berlaku selama 24 jam.\n\n" .
-            "Jika Anda tidak merasa mendaftar, silakan abaikan email ini.\n\n" .
+            "Jika Anda tidak merasa mendaftar di AR Tilik, silakan abaikan email ini.\n\n" .
             "— Tim AR Tilik"
         );
 
@@ -91,11 +101,53 @@ class EmailService
     }
 
     /**
-     * Menyusun template email HTML modern bertema akademis
+     * Menyusun template email HTML modern bertema akademis untuk aktivasi dan pengingat
      */
-    protected function buildVerificationTemplate(string $name, string $recipientEmail, string $verifyUrl): string
+    protected function buildVerificationTemplate(string $name, string $recipientEmail, string $verifyUrl, int $reminderNumber = 1): string
     {
         $logoUrl = base_url('images/logo.png');
+
+        $badgeHtml = match ($reminderNumber) {
+            2       => '<div style="display: inline-block; padding: 6px 14px; background-color: #fef3c7; color: #b45309; border-radius: 20px; font-size: 12px; font-weight: 700; margin-bottom: 16px; border: 1px solid #fde68a;">🔔 Pengingat Aktivasi Akun (Email 2 dari 3)</div>',
+            3       => '<div style="display: inline-block; padding: 6px 14px; background-color: #fee2e2; color: #b91c1c; border-radius: 20px; font-size: 12px; font-weight: 700; margin-bottom: 16px; border: 1px solid #fecaca;">⚠️ Peringatan Terakhir (Email 3 dari 3)</div>',
+            default => '<div style="display: inline-block; padding: 6px 14px; background-color: #e0e7ff; color: #4338ca; border-radius: 20px; font-size: 12px; font-weight: 700; margin-bottom: 16px; border: 1px solid #c7d2fe;">✨ Pendaftaran Akun Baru</div>'
+        };
+
+        $heading = match ($reminderNumber) {
+            2       => 'Pengingat: Verifikasi & Aktivasi Akun Anda',
+            3       => 'Segera Konfirmasi Email Sebelum Akun Dihapus Otomatis',
+            default => 'Konfirmasi & Aktivasi Akun Anda'
+        };
+
+        $bodyIntro = match ($reminderNumber) {
+            2       => 'Kami melihat bahwa Anda telah mendaftarkan akun di platform <strong>AR Tilik</strong>, namun hingga saat ini alamat email Anda belum diverifikasi. Agar akun Anda dapat aktif dan mendapatkan kuota gratis submisi karya ilmiah, silakan klik tombol verifikasi di bawah ini:',
+            3       => 'Ini adalah <strong>email pengingat terakhir (ke-3)</strong> dari sistem AR Tilik untuk akun Anda. Sesuai kebijakan kebersihan data dan pencegahan akun pasif, <strong>pendaftar yang tidak mengonfirmasi email setelah 3 kali pengiriman email akan dihapus datanya secara permanen</strong> dari basis data kami.<br><br>Jika Anda masih ingin menggunakan akun ini, silakan konfirmasi sebelum batas waktu berakhir:',
+            default => 'Terima kasih telah mendaftarkan akun di platform <strong>AR Tilik</strong>. Untuk memastikan keabsahan akun dan mengaktifkan akses submisi gratis serta fitur analisis kesepadanan karya ilmiah, silakan klik tombol verifikasi di bawah ini:'
+        };
+
+        $buttonText = match ($reminderNumber) {
+            2       => 'Verifikasi Akun Sekarang',
+            3       => 'Verifikasi & Pertahankan Akun Saya',
+            default => 'Aktifkan Akun & Verifikasi Email'
+        };
+
+        $btnColor = match ($reminderNumber) {
+            3       => 'linear-gradient(135deg, #e11d48 0%, #be123c 100%)',
+            default => 'linear-gradient(135deg, #4338ca 0%, #4f46e5 100%)'
+        };
+
+        $infoBox = match ($reminderNumber) {
+            3       => '<div style="background-color: #fff1f2; border-left: 4px solid #e11d48; border-radius: 6px; padding: 14px 16px; margin: 24px 0;">
+                            <p style="font-size: 12px; color: #9f1239; margin: 0; line-height: 1.5;">
+                                🚨 <strong>Batas Waktu Terakhir:</strong> Tautan verifikasi ini aktif selama <strong>24 jam</strong>. Jika tidak diverifikasi sebelum batas waktu berakhir, akun pendaftaran Anda akan dihapus secara otomatis dan permanen untuk membebaskan alamat email Anda.
+                            </p>
+                        </div>',
+            default => '<div style="background-color: #f8fafc; border-left: 4px solid #4f46e5; border-radius: 6px; padding: 14px 16px; margin: 24px 0;">
+                            <p style="font-size: 12px; color: #475569; margin: 0; line-height: 1.5;">
+                                ⏱️ <strong>Masa Berlaku:</strong> Tautan verifikasi ini aktif selama <strong>24 jam</strong>. Setelah lewat masa berlaku, Anda dapat mengajukan pengiriman ulang email aktivasi melalui halaman login.
+                            </p>
+                        </div>'
+        };
 
         return <<<HTML
 <!DOCTYPE html>
@@ -103,7 +155,7 @@ class EmailService
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verifikasi Alamat Email — AR Tilik</title>
+    <title>{$heading} — AR Tilik</title>
 </head>
 <body style="margin:0; padding:0; background-color:#f1f5f9; font-family:'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color:#1e293b; -webkit-font-smoothing:antialiased;">
     <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:#f1f5f9; padding: 40px 15px;">
@@ -122,29 +174,26 @@ class EmailService
                     <!-- Body Content -->
                     <tr>
                         <td style="padding: 36px 32px;">
+                            {$badgeHtml}
                             <h2 style="font-size: 18px; font-weight: 700; color: #0f172a; margin: 0 0 16px 0;">
-                                Konfirmasi & Aktivasi Akun Anda
+                                {$heading}
                             </h2>
                             <p style="font-size: 14px; line-height: 1.6; color: #334155; margin: 0 0 16px 0;">
                                 Yth. <strong>{$name}</strong>,
                             </p>
                             <p style="font-size: 14px; line-height: 1.6; color: #334155; margin: 0 0 24px 0;">
-                                Terima kasih telah mendaftarkan akun di platform <strong>AR Tilik</strong>. Untuk memastikan keabsahan akun dan mengaktifkan akses submisi gratis serta fitur analisis kesepadanan karya ilmiah, silakan klik tombol verifikasi di bawah ini:
+                                {$bodyIntro}
                             </p>
 
                             <!-- CTA Button -->
                             <div style="text-align: center; margin: 32px 0;">
-                                <a href="{$verifyUrl}" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #4338ca 0%, #4f46e5 100%); color: #ffffff; font-size: 15px; font-weight: 700; text-decoration: none; padding: 14px 36px; border-radius: 12px; box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35); letter-spacing: 0.2px;">
-                                    Aktifkan Akun & Verifikasi Email
+                                <a href="{$verifyUrl}" target="_blank" style="display: inline-block; background: {$btnColor}; color: #ffffff; font-size: 15px; font-weight: 700; text-decoration: none; padding: 14px 36px; border-radius: 12px; box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35); letter-spacing: 0.2px;">
+                                    {$buttonText}
                                 </a>
                             </div>
 
-                            <!-- Info Box -->
-                            <div style="background-color: #f8fafc; border-left: 4px solid #4f46e5; border-radius: 6px; padding: 14px 16px; margin: 24px 0;">
-                                <p style="font-size: 12px; color: #475569; margin: 0; line-height: 1.5;">
-                                    ⏱️ <strong>Masa Berlaku:</strong> Tautan verifikasi ini aktif selama <strong>24 jam</strong>. Setelah lewat masa berlaku, Anda dapat mengajukan pengiriman ulang email aktivasi melalui halaman login.
-                                </p>
-                            </div>
+                            <!-- Info / Warning Box -->
+                            {$infoBox}
 
                             <!-- Direct Link Fallback -->
                             <p style="font-size: 12px; line-height: 1.5; color: #64748b; margin: 24px 0 0 0; word-break: break-all;">

@@ -618,7 +618,7 @@
                                                 <?php if ($u['status'] === 'active'): ?>
                                                     <span class="px-2 py-0.5 rounded-full text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold">Aktif</span>
                                                 <?php elseif ($u['status'] === 'pending_verification'): ?>
-                                                    <span class="px-2 py-0.5 rounded-full text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 font-semibold">Pending</span>
+                                                    <span class="px-2 py-0.5 rounded-full text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 font-semibold" title="Email verifikasi terkirim: <?= (int)($u['verification_emails_sent'] ?? 1) ?>/3">Pending (<?= (int)($u['verification_emails_sent'] ?? 1) ?>/3)</span>
                                                 <?php else: ?>
                                                     <span class="px-2 py-0.5 rounded-full text-[10px] bg-rose-500/10 text-rose-400 border border-rose-500/20 font-semibold">Nonaktif</span>
                                                 <?php endif; ?>
@@ -657,7 +657,7 @@
                                                     <?php if ($u['status'] === 'active'): ?>
                                                         <span class="px-2 py-0.5 rounded-full text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold">Aktif</span>
                                                     <?php elseif ($u['status'] === 'pending_verification'): ?>
-                                                        <span class="px-2 py-0.5 rounded-full text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 font-semibold">Pending</span>
+                                                        <span class="px-2 py-0.5 rounded-full text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 font-semibold" title="Email verifikasi terkirim: <?= (int)($u['verification_emails_sent'] ?? 1) ?>/3">Pending (<?= (int)($u['verification_emails_sent'] ?? 1) ?>/3)</span>
                                                     <?php else: ?>
                                                         <span class="px-2 py-0.5 rounded-full text-[10px] bg-rose-500/10 text-rose-400 border border-rose-500/20 font-semibold">Nonaktif</span>
                                                     <?php endif; ?>
@@ -727,7 +727,7 @@
                                         <?php if ($u['status'] === 'active'): ?>
                                             <span class="px-2 py-0.5 rounded text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold">Aktif</span>
                                         <?php elseif ($u['status'] === 'pending_verification'): ?>
-                                            <span class="px-2 py-0.5 rounded text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 font-semibold">Pending Email</span>
+                                            <span class="px-2 py-0.5 rounded text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 font-semibold" title="Email verifikasi terkirim: <?= (int)($u['verification_emails_sent'] ?? 1) ?>/3. Maks 3x sebelum data dihapus otomatis.">Pending Email (<?= (int)($u['verification_emails_sent'] ?? 1) ?>/3)</span>
                                         <?php else: ?>
                                             <span class="px-2 py-0.5 rounded text-[10px] bg-rose-500/10 text-rose-400 border border-rose-500/20 font-semibold">Nonaktif</span>
                                         <?php endif; ?>
@@ -843,7 +843,7 @@
                                                     <?php if ($u['status'] === 'active'): ?>
                                                         <span class="px-2 py-0.5 rounded text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold">Aktif</span>
                                                     <?php elseif ($u['status'] === 'pending_verification'): ?>
-                                                        <span class="px-2 py-0.5 rounded text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 font-semibold">Pending Email</span>
+                                                        <span class="px-2 py-0.5 rounded text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 font-semibold" title="Email verifikasi terkirim: <?= (int)($u['verification_emails_sent'] ?? 1) ?>/3. Maks 3x sebelum data dihapus otomatis.">Pending Email (<?= (int)($u['verification_emails_sent'] ?? 1) ?>/3)</span>
                                                     <?php else: ?>
                                                         <span class="px-2 py-0.5 rounded text-[10px] bg-rose-500/10 text-rose-400 border border-rose-500/20 font-semibold">Nonaktif</span>
                                                     <?php endif; ?>
