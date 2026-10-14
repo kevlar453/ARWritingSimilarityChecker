@@ -3580,7 +3580,7 @@
                     <div class="card-icon-badge badge-cyan">📤</div>
                     <h3 class="step-title">Unggah Dokumen Karya Ilmiah</h3>
                     <p class="step-desc">
-                        Kirimkan naskah dalam format PDF, DOCX, atau TXT (maks. 25 MB). Sistem secara otomatis mengekstrak teks, menormalisasi tanda baca, dan menghitung shingle sekuensial.
+                        Kirimkan naskah dalam format PDF, DOCX, atau TXT (maks. 30 MB). Sistem secara otomatis mengekstrak teks, menormalisasi tanda baca, dan menghitung shingle sekuensial.
                     </p>
                 </div>
 
@@ -4349,7 +4349,7 @@
                         <ul class="plan-features">
                             <li><strong>Aktif selamanya</strong> (kuota tanpa masa kedaluwarsa)</li>
                             <li>Pilihan paket isi ulang 3 cek atau 10 cek</li>
-                            <li>Prioritas pemrosesan antrean dokumen cepat</li>
+                            <li>Analisis Dual-Lens n-gram &amp; TF-IDF Cosine</li>
                             <li><strong>Audit Forensik Cerdas</strong> & instrumen ujian sidang aktif</li>
                             <li>Semua fitur deteksi kecerdasan buatan & stylometri aktif</li>
                             <li>Ekspor PDF laporan resmi lengkap ber-QR</li>
@@ -4384,7 +4384,7 @@
 
                         <ul class="plan-features">
                             <li><strong>20 submisi dokumen</strong> selama masa aktif</li>
-                            <li>Prioritas antrean pemrosesan cepat</li>
+                            <li>Analisis Dual-Lens n-gram &amp; TF-IDF Cosine</li>
                             <li><strong>Audit Forensik Cerdas</strong> & 3 panduan pertanyaan sidang dosen</li>
                             <li>Deteksi fabrikasi sitasi gaib & inkonsistensi metodologi</li>
                             <li>Ekspor PDF laporan resmi lengkap tanpa batas</li>
@@ -4420,7 +4420,7 @@
 
                         <ul class="plan-features">
                             <li><strong>75 submisi dokumen</strong> selama masa aktif</li>
-                            <li>Alokasi antrean pemrosesan dokumen prioritas</li>
+                            <li>Dukungan format naskah lengkap (PDF, DOCX, TXT)</li>
                             <li><strong>Audit Forensik Cerdas</strong> mendalam & instrumen dewan penguji</li>
                             <li>Sintesis risiko akademik berbobot & integritas sitasi</li>
                             <li>Dukungan berkas besar hingga <strong>30 MB</strong></li>

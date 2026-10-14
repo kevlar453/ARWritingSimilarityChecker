@@ -1388,7 +1388,7 @@ curl -X POST https://tilik.arsetontong.top/api/v1/check \\
             <tr>
                 <td><span class="tag-badge tag-red">400</span></td>
                 <td>Bad Request</td>
-                <td>Berkas kosong, format tidak didukung (gunakan PDF, DOCX, TXT), atau berkas melebihi batas 25 MB.</td>
+                <td>Berkas kosong, format tidak didukung (gunakan PDF, DOCX, TXT), atau berkas melebihi batas 30 MB.</td>
             </tr>
         </tbody>
     </table>

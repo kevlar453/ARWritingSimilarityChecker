@@ -372,7 +372,7 @@
                             📤
                         </div>
                         <p id="submissionFileLabel" class="text-xs sm:text-sm font-semibold text-slate-700">Klik atau geser (drag &amp; drop) berkas naskah di sini</p>
-                        <p class="text-[11px] text-slate-400 mt-1">Mendukung Batch Upload sekaligus (PDF, DOCX, TXT) • Maksimal 25 MB per berkas</p>
+                        <p class="text-[11px] text-slate-400 mt-1">Mendukung Batch Upload sekaligus (PDF, DOCX, TXT) • Maksimal 30 MB per berkas</p>
                     </div>
 
                     <!-- Selected Files Preview Container (Batch List) -->
@@ -1066,7 +1066,7 @@
                             📚
                         </div>
                         <p id="corpusFileLabel" class="text-xs sm:text-sm font-semibold text-slate-700">Pilih file naskah rujukan (Skripsi/Tesis/Jurnal)</p>
-                        <p class="text-[11px] text-slate-400 mt-1">PDF, DOCX, TXT hingga 25 MB</p>
+                        <p class="text-[11px] text-slate-400 mt-1">PDF, DOCX, TXT hingga 30 MB</p>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1701,7 +1701,7 @@
 
         function addSubmissionFiles(newFiles) {
             const allowedExts = ['pdf', 'docx', 'txt'];
-            const maxSizeBytes = 25 * 1024 * 1024; // 25 MB
+            const maxSizeBytes = 30 * 1024 * 1024; // 30 MB
 
             Array.from(newFiles).forEach(file => {
                 const ext = file.name.split('.').pop().toLowerCase();
@@ -1710,7 +1710,7 @@
                     return;
                 }
                 if (file.size > maxSizeBytes) {
-                    alert(`Berkas "${file.name}" melebihi batas maksimal 25 MB.`);
+                    alert(`Berkas "${file.name}" melebihi batas maksimal 30 MB.`);
                     return;
                 }
                 // Cegah duplikasi file berdasarkan nama & ukuran
@@ -2457,7 +2457,7 @@
                 <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1">Pilih Berkas Naskah (PDF, DOCX, TXT):</label>
                     <input type="file" name="corpus_document" id="contributeFileInput" accept=".pdf,.docx,.txt" required class="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer">
-                    <p class="text-[10px] text-slate-400 mt-1">Maksimal 25 MB per berkas. Sistem memverifikasi konten tanpa duplikasi.</p>
+                    <p class="text-[10px] text-slate-400 mt-1">Maksimal 30 MB per berkas. Sistem memverifikasi konten tanpa duplikasi.</p>
                 </div>
 
                 <div id="contributeAlert" class="hidden p-3 rounded-xl text-xs"></div>
@@ -2545,7 +2545,7 @@
                             <ul class="text-[11px] text-slate-600 space-y-1.5 pt-2 border-t border-amber-100">
                                 <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> +10 submisi dokumen</li>
                                 <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Aktif selamanya (tanpa batas)</li>
-                                <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Prioritas pemrosesan dokumen</li>
+                                <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Analisis Dual-Lens n-gram &amp; TF-IDF Cosine</li>
                                 <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Audit Forensik Cerdas &amp; Panduan Sidang</li>
                             </ul>
                         </div>
@@ -2570,7 +2570,7 @@
                             </div>
                             <ul class="text-[11px] text-slate-600 space-y-1.5 pt-2 border-t border-slate-100">
                                 <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> 20 submisi dokumen / bulan</li>
-                                <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Prioritas antrean cepat</li>
+                                <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Analisis Dual-Lens n-gram &amp; TF-IDF Cosine</li>
                                 <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Audit Forensik Cerdas &amp; Panduan Ujian Sidang</li>
                                 <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Deteksi Fabrikasi Sitasi &amp; Metodologi</li>
                                 <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Masa aktif paket 30 hari</li>
@@ -2597,7 +2597,7 @@
                             </div>
                             <ul class="text-[11px] text-slate-600 space-y-1.5 pt-2 border-t border-slate-100">
                                 <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> 75 submisi dokumen / bulan</li>
-                                <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Alokasi antrean pemrosesan prioritas</li>
+                                <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Dukungan format naskah lengkap (PDF, DOCX, TXT)</li>
                                 <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Audit Forensik Cerdas &amp; Instrumen Penguji</li>
                                 <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Sintesis Risiko Akademik Berbobot</li>
                                 <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Dukungan berkas hingga 30 MB</li>
