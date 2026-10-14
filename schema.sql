@@ -282,6 +282,22 @@ CREATE TABLE IF NOT EXISTS landing_visitors (
     INDEX idx_visitor_hash (visitor_hash)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE OR REPLACE VIEW visitor_daily AS
+SELECT 
+    ROW_NUMBER() OVER (ORDER BY visit_date ASC) AS id,
+    visit_date,
+    COUNT(DISTINCT visitor_hash) AS unique_visitors,
+    COUNT(DISTINCT visitor_hash) AS total_visitors,
+    COALESCE(SUM(hits), 0) AS total_hits,
+    COALESCE(SUM(hits), 0) AS hits,
+    COUNT(DISTINCT ip_address) AS unique_ips,
+    MIN(created_at) AS created_at,
+    MAX(updated_at) AS updated_at
+FROM landing_visitors
+GROUP BY visit_date
+ORDER BY visit_date DESC;
+
+
 CREATE TABLE IF NOT EXISTS payment_transactions (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT UNSIGNED NOT NULL,
