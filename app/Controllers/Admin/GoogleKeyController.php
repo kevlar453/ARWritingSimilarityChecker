@@ -42,6 +42,9 @@ class GoogleKeyController extends BaseController
         }
 
         $allowedModels = [
+            'gemini-flash-lite-latest',
+            'gemini-3.5-flash-lite',
+            'gemini-3.5-flash',
             'gemini-3.6-flash',
             'gemini-3.0-flash',
             'gemini-2.0-flash',
@@ -49,7 +52,7 @@ class GoogleKeyController extends BaseController
             'gemini-1.5-pro',
         ];
         if (! in_array($modelName, $allowedModels, true)) {
-            $modelName = 'gemini-3.6-flash';
+            $modelName = 'gemini-flash-lite-latest';
         }
 
         $keyModel->insert([
@@ -131,7 +134,7 @@ class GoogleKeyController extends BaseController
         }
 
         $apiKey = $key['api_key'];
-        $model = $key['model_name'] ?: 'gemini-3.6-flash';
+        $model = $key['model_name'] ?: 'gemini-flash-lite-latest';
 
         // 1. Verifikasi Otentikasi & Izin Model via Metadata Endpoint (Cepat ~0.1s, tidak membuang kuota token)
         $metaUrl = 'https://generativelanguage.googleapis.com/v1beta/models/' . urlencode($model) . '?key=' . urlencode($apiKey);

@@ -414,7 +414,7 @@ if ($dec === 'match') {
             <td class="meta-label">Arsitektur Mesin</td>
             <td class="meta-val">AR Tilik Dual-Lens Hybrid v1.3</td>
             <td class="meta-label">Cakupan Korpus</td>
-            <td class="meta-val"><?= $corpus_docs_count > 0 ? number_format($corpus_docs_count, 0, ',', '.') . ' dokumen pembanding' : 'Seluruh repositori aktif' ?></td>
+            <td class="meta-val"><?= $corpus_docs_count > 0 ? number_format($corpus_docs_count, 0, ',', '.') . ' dokumen pembanding (snapshot audit)' : 'Seluruh repositori aktif' ?></td>
         </tr>
         <?php if (!empty($document['faculty']) || !empty($document['department'])): ?>
         <tr>

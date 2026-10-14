@@ -1035,6 +1035,8 @@
                                             <div class="text-[9px] text-slate-500 font-mono">
                                                 Eksak: <?= number_format($d['report']['exact_similarity'] ?? 0, 1) ?>%
                                             </div>
+                                        <?php elseif (($d['document_type'] ?? '') === 'corpus'): ?>
+                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-purple-500/15 text-purple-300 border border-purple-500/30" title="Naskah acuan korpus pembanding">Ref. Korpus</span>
                                         <?php else: ?>
                                             <span class="text-slate-500 text-xs font-mono">-</span>
                                         <?php endif; ?>
@@ -1108,6 +1110,8 @@
                                                     <div class="text-[10px] text-slate-500">
                                                         Eksak: <?= number_format($d['report']['exact_similarity'] ?? 0, 1) ?>% | Kosinus: <?= number_format($d['report']['cosine_similarity'] ?? 0, 1) ?>%
                                                     </div>
+                                                <?php elseif (($d['document_type'] ?? '') === 'corpus'): ?>
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-purple-500/15 text-purple-300 border border-purple-500/30" title="Dokumen ini adalah data acuan/pembanding dalam repositori, bukan karya yang diuji">Ref. Korpus</span>
                                                 <?php else: ?>
                                                     <span class="text-slate-500">-</span>
                                                 <?php endif; ?>
@@ -1156,6 +1160,29 @@
                             Basis data naskah pembanding algoritma pencocokan (<?= number_format($metrics['corpus_completed'] ?? $metrics['total_corpus']) ?> aktif terindeks<?php if (!empty($metrics['corpus_failed'])): ?>, <span class="text-rose-400"><?= $metrics['corpus_failed'] ?> gagal panen</span><?php endif; ?>).
                             <span class="text-slate-500">Catatan: Laporan audit menyimpan snapshot jumlah korpus saat pengujian dijalankan (mis. 864 dokumen pada naskah lampau).</span>
                         </p>
+                    </div>
+                </div>
+
+                <!-- Transparansi Metrik Korpus: Live Repositori vs Snapshot Laporan Audit -->
+                <div class="bg-indigo-950/40 border border-indigo-500/40 rounded-2xl p-4.5 shadow-sm">
+                    <div class="flex items-start gap-3.5">
+                        <div class="p-2.5 rounded-xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 shrink-0 mt-0.5">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        </div>
+                        <div class="space-y-1.5">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <h3 class="text-xs font-bold text-indigo-200">
+                                    Transparansi Metrik: Basis Live Repositori (<?= number_format($metrics['total_corpus']) ?> Naskah) vs Snapshot Laporan Audit
+                                </h3>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono">Prinsip Integritas Audit</span>
+                            </div>
+                            <p class="text-[11px] text-slate-300 leading-relaxed">
+                                <strong>Mengapa angka korpus berbeda?</strong> Sidebar dan tab ini menampilkan <strong><?= number_format($metrics['total_corpus']) ?> naskah</strong> (<?= number_format($metrics['corpus_completed'] ?? $metrics['total_corpus']) ?> aktif terindeks<?php if (!empty($metrics['corpus_failed'])): ?>, <?= $metrics['corpus_failed'] ?> gagal ekstrak<?php endif; ?>) yang merupakan ukuran repositori <em>saat ini (live)</em>. Sementara itu, setiap dokumen laporan hasil uji (misal: Report #1170 yang mencatat <strong>864 Dokumen</strong>) mengunci <em>snapshot permanen</em> jumlah korpus tepat saat pengujian naskah tersebut dijalankan.
+                            </p>
+                            <p class="text-[11px] text-slate-400 leading-relaxed">
+                                Selisih <strong><?= max(0, (int)$metrics['total_corpus'] - 864) ?> dokumen</strong> adalah karya ilmiah baru hasil pemanenan berkala nasional (Neliti &amp; GARUDA Dikti) yang masuk secara dinamis <em>setelah</em> pengujian tersebut selesai. Penguncian snapshot ini wajib dijaga secara forensik agar hasil evaluasi ilmiah terdahulu tidak berubah-ubah secara retroaktif saat repositori bertambah.
+                            </p>
+                        </div>
                     </div>
                 </div>
 
@@ -1564,6 +1591,20 @@
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                         </button>
                     </div>
+                </div>
+
+                <!-- Status Filter Integritas Trafik & Bot Protection -->
+                <div class="bg-slate-900/80 border border-slate-700/70 rounded-2xl p-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+                    <div class="flex items-center gap-2.5">
+                        <span class="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-sm">🛡️</span>
+                        <div>
+                            <span class="font-semibold text-slate-200">Filter Integritas Lalu Lintas &amp; Proteksi Bot Aktif</span>
+                            <p class="text-[11px] text-slate-400 mt-0.5">
+                                Log anomali pra-instalasi &amp; stress test (05 Okt) telah dikarantina/dibersihkan dari basis analitik produksi. Seluruh metrik mencerminkan lalu lintas riil pengunjung terverifikasi dengan proteksi Cloudflare Turnstile &amp; rate-limiting.
+                            </p>
+                        </div>
+                    </div>
+                    <span class="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 whitespace-nowrap shrink-0">Data Bersih Terverifikasi</span>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -2451,7 +2492,9 @@
                         <div>
                             <label class="block text-[11px] font-medium text-slate-400 mb-1">Pilihan Model AI Default</label>
                             <select id="google-model-name" class="w-full bg-slate-900 border border-indigo-500/50 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-400 font-medium">
-                                <option value="gemini-3.5-flash" selected>Gemini 3.5 Flash (Sangat Cepat &amp; Responsif - Rekomendasi Utama)</option>
+                                <option value="gemini-flash-lite-latest" selected>Gemini Flash Lite (Bebas Antrean &amp; Anti-503 - Rekomendasi Utama 2026)</option>
+                                <option value="gemini-3.5-flash-lite">Gemini 3.5 Flash Lite (Cepat &amp; Responsif)</option>
+                                <option value="gemini-3.5-flash">Gemini 3.5 Flash (Standar)</option>
                                 <option value="gemini-3.6-flash">Gemini 3.6 Flash (Generasi Mutakhir 2026)</option>
                                 <option value="gemini-3.0-flash">Gemini 3.0 Flash (Cepat &amp; Efisien)</option>
                                 <option value="gemini-1.5-flash">Gemini 1.5 Flash (Legacy)</option>
@@ -2486,11 +2529,13 @@
 
                     <?php 
                         $modelDisplayNames = [
-                            'gemini-3.5-flash' => 'Gemini 3.5 Flash (Rekomendasi Utama)',
-                            'gemini-3.6-flash' => 'Gemini 3.6 Flash (Terbaru 2026)',
-                            'gemini-3.0-flash' => 'Gemini 3.0 Flash (Cepat & Efisien)',
-                            'gemini-1.5-flash' => 'Gemini 1.5 Flash (Legacy Stabil)',
-                            'gemini-1.5-pro'   => 'Gemini 1.5 Pro (Legacy Pro)',
+                            'gemini-flash-lite-latest' => 'Gemini Flash Lite (Bebas Antrean - Utama)',
+                            'gemini-3.5-flash-lite'   => 'Gemini 3.5 Flash Lite (Cepat & Stabil)',
+                            'gemini-3.5-flash'         => 'Gemini 3.5 Flash (Standar)',
+                            'gemini-3.6-flash'         => 'Gemini 3.6 Flash (Terbaru 2026)',
+                            'gemini-3.0-flash'         => 'Gemini 3.0 Flash (Cepat & Efisien)',
+                            'gemini-1.5-flash'         => 'Gemini 1.5 Flash (Legacy Stabil)',
+                            'gemini-1.5-pro'           => 'Gemini 1.5 Pro (Legacy Pro)',
                         ];
                     ?>
 

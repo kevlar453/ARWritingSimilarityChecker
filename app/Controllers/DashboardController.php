@@ -738,6 +738,7 @@ class DashboardController extends BaseController
             'evasionDetection'    => $evasionDetection,
             'geminiForensic'      => $geminiForensic,
             'corpusCount'         => $corpusCount,
+            'liveCorpusCount'     => $fallbackCorpus,
             'isOwner'             => $isOwner,
             'isSharedAccess'      => $isSharedToUser,
             'userVotes'           => $userVotes,
@@ -1761,6 +1762,7 @@ class DashboardController extends BaseController
             'sources'      => $sources,
             'matches'      => $matches,
             'corpusCount'  => $corpusCount,
+            'liveCorpusCount' => $fallbackCorpus,
         ]);
     }
 
