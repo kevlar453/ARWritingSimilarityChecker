@@ -4457,7 +4457,7 @@
                     <button type="button" onclick="openContactModal('Konsultasi Institusi & Lisensi Kampus')" class="btn" style="background: #ffffff; color: #0f172a; font-weight: 800; width: 100%; border: none; padding: 14px 20px; display: inline-block; text-decoration: none; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); cursor: pointer;">
                         Konsultasi Institusi →
                     </button>
-                    <div style="font-size: 11px; color: #94a3b8; margin-top: 8px;">Mulai Rp 250.000 / bln untuk pengelolaan jurnal</div>
+                    <div style="font-size: 11px; color: #94a3b8; margin-top: 8px;">Mulai Rp 450.000 / bln untuk pengelolaan jurnal</div>
                 </div>
             </div>
 
