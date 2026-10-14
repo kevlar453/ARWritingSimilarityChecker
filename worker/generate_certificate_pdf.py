@@ -424,7 +424,7 @@ def build_certificate_html(report: dict, document: dict, override_ai_score: floa
         }}
         .header-cell-left {{
             display: table-cell;
-            width: 25mm;
+            width: 22mm;
             vertical-align: middle;
             text-align: left;
         }}
@@ -435,42 +435,45 @@ def build_certificate_html(report: dict, document: dict, override_ai_score: floa
         }}
         .header-cell-right {{
             display: table-cell;
-            width: 52mm;
+            width: 48mm;
             vertical-align: middle;
             text-align: right;
         }}
 
         .logo-emblem {{
-            width: 21mm;
-            height: 21mm;
+            width: 19mm;
+            height: 19mm;
             object-fit: contain;
         }}
 
         .republic-text {{
             font-family: 'Liberation Sans', 'DejaVu Sans', Arial, sans-serif;
-            font-size: 7.2pt;
+            font-size: 6.8pt;
             font-weight: 800;
-            letter-spacing: 0.28em;
+            letter-spacing: 0.22em;
             color: #081a33;
             text-transform: uppercase;
             margin-bottom: 0.8mm;
+            white-space: nowrap;
         }}
         .cert-main-title {{
             font-family: 'Cinzel', 'Liberation Serif', 'Times New Roman', serif;
-            font-size: 17.5pt;
+            font-size: 13.5pt;
             font-weight: 900;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.04em;
             color: #081a33;
             text-transform: uppercase;
-            line-height: 1.1;
+            line-height: 1.15;
             margin-bottom: 0.6mm;
+            white-space: nowrap;
         }}
         .cert-subtitle {{
             font-style: italic;
-            font-size: 8.5pt;
+            font-size: 8pt;
             color: #875c16;
             font-weight: 600;
-            letter-spacing: 0.03em;
+            letter-spacing: 0.02em;
+            white-space: nowrap;
         }}
 
         .reg-cartouche {{

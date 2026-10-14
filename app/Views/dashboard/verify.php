@@ -150,6 +150,11 @@
             .print-desktop-kop {
                 display: flex !important;
             }
+            .print-desktop-kop h1 {
+                font-size: 13.5pt !important;
+                letter-spacing: 0.04em !important;
+                white-space: nowrap !important;
+            }
             .print-mobile-kop {
                 display: none !important;
             }
@@ -185,7 +190,7 @@
                 <div class="flex items-center gap-2">
                     <span class="font-bold text-sm sm:text-base text-white tracking-tight">AR Tilik</span>
                     <span class="hidden md:inline-block text-[10px] font-bold uppercase tracking-wider text-amber-300 bg-amber-950/60 px-2.5 py-0.5 rounded-full border border-amber-600/40">
-                        Portal Verifikasi Piagam Resmi
+                        Portal Verifikasi Sertifikat Resmi
                     </span>
                 </div>
             </a>
@@ -193,7 +198,7 @@
                 <?php if ($status === 'valid'): ?>
                 <a href="<?= base_url('verify/' . esc($code) . '/pdf') ?>" download class="px-2.5 sm:px-3.5 py-1.5 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 text-xs font-black rounded-lg shadow-sm hover:shadow transition flex items-center gap-1 sm:gap-1.5 cursor-pointer border border-amber-300 whitespace-nowrap">
                     <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-950 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                    <span class="hidden md:inline">Unduh Piagam PDF Resmi (A4)</span>
+                    <span class="hidden md:inline">Unduh Sertifikat PDF Resmi (A4)</span>
                     <span class="hidden sm:inline md:hidden">Unduh PDF A4</span>
                     <span class="sm:hidden font-bold">Unduh PDF</span>
                 </a>
@@ -302,55 +307,55 @@
                     <!-- 1. KOP RESMI SERTIFIKAT HASIL UJI -->
                     <div class="relative z-20 text-center border-b border-[#c5a059] pb-3">
                         <!-- Desktop Layout (md and up): 3 Columns -->
-                        <div class="hidden md:flex print-desktop-kop items-center justify-between gap-4">
+                        <div class="hidden md:flex print-desktop-kop items-center justify-between gap-3 lg:gap-4">
                             <!-- Logo Lambang Kiri -->
-                            <div class="w-16 h-16 flex items-center justify-center shrink-0">
-                                <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik Emblem" class="w-14 h-14 object-contain drop-shadow-xs">
+                            <div class="w-14 h-14 lg:w-16 lg:h-16 flex items-center justify-center shrink-0">
+                                <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik Emblem" class="w-12 h-12 lg:w-14 lg:h-14 object-contain drop-shadow-xs">
                             </div>
 
                             <!-- Teks Judul Piagam Utama -->
-                            <div class="flex-1 space-y-0.5 text-center">
-                                <div class="font-sans text-[11px] tracking-[0.28em] text-[#081a33] font-extrabold uppercase">
+                            <div class="flex-1 space-y-0.5 text-center min-w-0 px-2">
+                                <div class="font-sans text-[9.5px] lg:text-[10.5px] xl:text-[11px] tracking-[0.22em] text-[#081a33] font-extrabold uppercase whitespace-nowrap">
                                     SISTEM PEMERIKSAAN KARYA ILMIAH &bull; AR TILIK FORENSIC ENGINE
                                 </div>
-                                <h1 class="font-diploma-serif text-2xl font-black tracking-wider text-[#081a33] uppercase">
+                                <h1 class="font-diploma-serif text-[15px] md:text-[16px] lg:text-[18px] xl:text-[19px] font-black tracking-normal text-[#081a33] uppercase whitespace-nowrap">
                                     SERTIFIKAT HASIL UJI KEMIRIPAN & ORISINALITAS NASKAH
                                 </h1>
-                                <div class="font-editorial-serif italic text-sm text-[#875c16] font-semibold">
+                                <div class="font-editorial-serif italic text-xs lg:text-sm text-[#875c16] font-semibold whitespace-nowrap">
                                     Certificate of Similarity &amp; Originality Forensic Attestation
                                 </div>
                             </div>
 
                             <!-- Nomor Registrasi Piagam Kanan -->
                             <div class="w-auto shrink-0 text-right">
-                                <div class="border border-[#c5a059] bg-[#fffdf8] px-3.5 py-1.5 rounded text-right shadow-2xs">
-                                    <div class="text-[9px] font-sans tracking-widest text-[#875c16] uppercase font-bold">Nomor Registrasi:</div>
-                                    <div class="font-mono-code text-sm font-bold text-[#081a33] whitespace-nowrap tracking-wider">
+                                <div class="border border-[#c5a059] bg-[#fffdf8] px-3 py-1.5 rounded text-right shadow-2xs">
+                                    <div class="text-[8.5px] lg:text-[9px] font-sans tracking-widest text-[#875c16] uppercase font-bold">Nomor Registrasi:</div>
+                                    <div class="font-mono-code text-xs lg:text-sm font-bold text-[#081a33] whitespace-nowrap tracking-wider">
                                         <?= esc($code) ?>
                                     </div>
-                                    <div class="text-[8.5px] text-slate-500">Terbit: <?= esc($dateFormatted) ?></div>
+                                    <div class="text-[8px] lg:text-[8.5px] text-slate-500">Terbit: <?= esc($dateFormatted) ?></div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Mobile Layout (< md): Clean Vertical Stack -->
-                        <div class="md:hidden print-mobile-kop flex flex-col items-center gap-2">
-                            <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik Emblem" class="w-12 h-12 object-contain drop-shadow-xs">
-                            <div class="font-sans text-[8.5px] sm:text-[9.5px] tracking-[0.2em] text-[#081a33] font-extrabold uppercase leading-tight">
+                        <div class="md:hidden print-mobile-kop flex flex-col items-center gap-1.5">
+                            <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik Emblem" class="w-11 h-11 object-contain drop-shadow-xs">
+                            <div class="font-sans text-[8px] sm:text-[9px] tracking-[0.18em] text-[#081a33] font-extrabold uppercase leading-tight text-center">
                                 SISTEM PEMERIKSAAN KARYA ILMIAH &bull; AR TILIK FORENSIC ENGINE
                             </div>
-                            <h1 class="font-diploma-serif text-base sm:text-lg font-black tracking-wide text-[#081a33] uppercase leading-snug px-1">
+                            <h1 class="font-diploma-serif text-[13px] sm:text-base font-black tracking-normal text-[#081a33] uppercase leading-snug px-1 text-center whitespace-normal sm:whitespace-nowrap">
                                 SERTIFIKAT HASIL UJI KEMIRIPAN & ORISINALITAS NASKAH
                             </h1>
-                            <div class="font-editorial-serif italic text-xs text-[#875c16] font-semibold">
+                            <div class="font-editorial-serif italic text-[11px] sm:text-xs text-[#875c16] font-semibold text-center">
                                 Certificate of Similarity &amp; Originality Forensic Attestation
                             </div>
-                            <div class="mt-1 border border-[#c5a059] bg-[#fffdf8] px-3 py-1.5 rounded text-center shadow-2xs w-full max-w-[280px]">
-                                <div class="text-[8px] font-sans tracking-widest text-[#875c16] uppercase font-bold">Nomor Registrasi</div>
+                            <div class="mt-1 border border-[#c5a059] bg-[#fffdf8] px-3 py-1 rounded text-center shadow-2xs w-full max-w-[280px]">
+                                <div class="text-[7.5px] font-sans tracking-widest text-[#875c16] uppercase font-bold">Nomor Registrasi</div>
                                 <div class="font-mono-code text-xs font-bold text-[#081a33] tracking-wide break-all">
                                     <?= esc($code) ?>
                                 </div>
-                                <div class="text-[8px] text-slate-500">Terbit: <?= esc($dateFormatted) ?></div>
+                                <div class="text-[7.5px] text-slate-500">Terbit: <?= esc($dateFormatted) ?></div>
                             </div>
                         </div>
                     </div>
