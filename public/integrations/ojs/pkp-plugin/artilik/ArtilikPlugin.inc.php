@@ -44,6 +44,84 @@ class ArtilikPlugin extends GenericPlugin {
     }
 
     /**
+     * Tampilkan tombol 'Settings' pada daftar Installed Plugins
+     */
+    public function getActions($request, $actionArgs) {
+        $actions = parent::getActions($request, $actionArgs);
+        if (! $this->getEnabled()) {
+            return $actions;
+        }
+
+        $router = $request->getRouter();
+        import('lib.pkp.classes.linkAction.request.AjaxModal');
+
+        $linkAction = new \LinkAction(
+            'settings',
+            new \AjaxModal(
+                $router->url(
+                    $request,
+                    null,
+                    null,
+                    'manage',
+                    null,
+                    [
+                        'verb'     => 'settings',
+                        'plugin'   => $this->getName(),
+                        'category' => 'generic'
+                    ]
+                ),
+                $this->getDisplayName()
+            ),
+            __('manager.plugins.settings'),
+            null
+        );
+
+        array_unshift($actions, $linkAction);
+        return $actions;
+    }
+
+    /**
+     * Kelola request pengaturan plugin (form settings & simpan data)
+     */
+    public function manage($args, $request) {
+        switch ($request->getUserVar('verb')) {
+            case 'settings':
+                $context = $request->getContext();
+                $contextId = $context ? $context->getId() : 0;
+
+                require_once(__DIR__ . '/ArtilikSettingsForm.inc.php');
+                $form = new \ArtilikSettingsForm($this, $contextId);
+
+                import('lib.pkp.classes.core.JSONMessage');
+
+                if ($request->getUserVar('save')) {
+                    $form->readInputData();
+                    if ($form->validate()) {
+                        $form->execute();
+
+                        // Buat notifikasi sukses di antarmuka OJS
+                        $notificationManager = new \NotificationManager();
+                        $user = $request->getUser();
+                        if ($user) {
+                            $notificationManager->createTrivialNotification(
+                                $user->getId(),
+                                NOTIFICATION_TYPE_SUCCESS,
+                                ['contents' => __('common.changesSaved')]
+                            );
+                        }
+
+                        return new \JSONMessage(true);
+                    }
+                }
+
+                $form->initData();
+                return new \JSONMessage(true, $form->fetch($request));
+        }
+
+        return parent::manage($args, $request);
+    }
+
+    /**
      * Inisialisasi instance konektor SDK
      */
     public function getConnector($contextId = null) {

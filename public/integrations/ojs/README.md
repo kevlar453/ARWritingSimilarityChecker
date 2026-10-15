@@ -143,16 +143,22 @@ try {
 }
 ```
 
-#### Opsi B: Memakai PKP Generic Plugin Boilerplate (`HookRegistry`)
-Bagi tim yang ingin menyusun plugin formal berstruktur PKP OJS 3.x:
+#### Opsi B: Memakai PKP Generic Plugin Boilerplate (`HookRegistry` & GUI Settings)
+Bagi tim yang ingin menyusun plugin formal berstruktur PKP OJS 3.x lengkap dengan formulir pengaturan GUI:
 1. Unduh paket `artilik-ojs-plugin.zip` dari portal AR Tilik atau ekstrak folder `pkp-plugin/artilik`.
 2. Letakkan di direktori OJS: `/var/www/ojs/plugins/generic/artilik/`.
 3. Struktur berkas yang terpasang:
    * `plugins/generic/artilik/version.xml` (Metadata deskriptor plugin PKP)
    * `plugins/generic/artilik/index.php` (Entry point bootstrap)
-   * `plugins/generic/artilik/ArtilikPlugin.inc.php` (Kelas turunan `GenericPlugin` & registrasi hook)
+   * `plugins/generic/artilik/ArtilikPlugin.inc.php` (Kelas turunan `GenericPlugin`, aksi GUI, dan hook)
+   * `plugins/generic/artilik/ArtilikSettingsForm.inc.php` (Form validasi dan penyimpanan pengaturan)
+   * `plugins/generic/artilik/templates/settings.tpl` (Template antarmuka GUI pengaturan API Key)
    * `plugins/generic/artilik/ARTilikOJSConnector.php` (SDK klien koneksi)
-4. Daftarkan hook event editorial decision di `ArtilikPlugin.inc.php`:
+4. Masuk ke antarmuka web OJS sebagai Journal Manager/Administrator:
+   * Buka **Settings > Website > Plugins > Installed Plugins**.
+   * Cari **AR Tilik Writing Similarity & AI Forensic Checker**, lalu centang kotak untuk mengaktifkannya.
+   * Klik tombol **Settings** (Pengaturan) di bawah nama plugin, masukkan API Key Anda (`artilik_ojs_...`), lalu klik **Simpan**.
+5. Daftarkan hook event editorial decision di `ArtilikPlugin.inc.php`:
    ```php
    HookRegistry::register('EditorAction::recordDecision', function($hookName, $args) {
        $submission = $args[0];
@@ -161,6 +167,60 @@ Bagi tim yang ingin menyusun plugin formal berstruktur PKP OJS 3.x:
        return false;
    });
    ```
+
+### 3. Pengujian Mandiri dengan Docker Compose (PKP OJS Containers)
+Bagi pengembang yang ingin mensimulasikan instalasi OJS 3.3.x lokal secara cepat dan terisolasi:
+
+> [!NOTE]
+> **Catatan Docker PKP:** OJS memerlukan basis data relasional (MariaDB/MySQL) untuk dapat berjalan. Gunakan image resmi PKP `pkpofficial/ojs:stable-3_3_0` bersama container MariaDB menggunakan **Docker Compose**.
+
+Contoh berkas `docker-compose.yml` siap pakai (tersedia pada berkas `docker-compose.example.yml`):
+```yaml
+version: '3.8'
+
+services:
+  ojs-db:
+    image: mariadb:10.5
+    container_name: ojs-mariadb
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ojspassword
+      MYSQL_DATABASE: ojs
+      MYSQL_USER: ojs
+      MYSQL_PASSWORD: ojspassword
+    volumes:
+      - ojs-db-data:/var/lib/mysql
+
+  ojs-app:
+    image: pkpofficial/ojs:stable-3_3_0
+    container_name: ojs-web
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      OJS_DB_HOST: ojs-db
+      OJS_DB_USER: ojs
+      OJS_DB_PASSWORD: ojspassword
+      OJS_DB_NAME: ojs
+    volumes:
+      - ojs-files-data:/var/www/files
+      - ./pkp-plugin/artilik:/var/www/html/plugins/generic/artilik
+    depends_on:
+      - ojs-db
+
+volumes:
+  ojs-db-data:
+  ojs-files-data:
+```
+
+Langkah pengujian:
+```bash
+# 1. Jalankan container OJS + MariaDB
+docker compose up -d
+
+# 2. Buka browser pada http://localhost:8080
+# 3. Masuk ke Settings -> Website -> Plugins -> Installed Plugins -> Aktifkan AR Tilik -> Buka Settings Form!
+```
 
 ---
 

@@ -1,0 +1,39 @@
+version: '3.8'
+
+# Docker Compose untuk Uji Coba PKP OJS 3.3.x dengan Plugin AR Tilik
+# Dijalankan dengan perintah: docker compose up -d
+
+services:
+  ojs-db:
+    image: mariadb:10.5
+    container_name: ojs-mariadb
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ojspassword
+      MYSQL_DATABASE: ojs
+      MYSQL_USER: ojs
+      MYSQL_PASSWORD: ojspassword
+    volumes:
+      - ojs-db-data:/var/lib/mysql
+
+  ojs-app:
+    image: pkpofficial/ojs:stable-3_3_0
+    container_name: ojs-web
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      OJS_DB_HOST: ojs-db
+      OJS_DB_USER: ojs
+      OJS_DB_PASSWORD: ojspassword
+      OJS_DB_NAME: ojs
+    volumes:
+      - ojs-files-data:/var/www/files
+      # Mount langsung plugin AR Tilik (opsional)
+      - ./pkp-plugin/artilik:/var/www/html/plugins/generic/artilik
+    depends_on:
+      - ojs-db
+
+volumes:
+  ojs-db-data:
+  ojs-files-data:
