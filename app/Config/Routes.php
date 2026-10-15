@@ -48,6 +48,9 @@ $routes->match(['get', 'head'], 'integrations/ojs/ARTilikOJSConnector.php', 'Das
 $routes->match(['get', 'head'], 'integrations/ojs/runner', 'DashboardController::downloadOjsRunner');
 $routes->match(['get', 'head'], 'docs/ojs/runner', 'DashboardController::downloadOjsRunner');
 $routes->match(['get', 'head'], 'integrations/ojs/artilik_ojs_runner.php', 'DashboardController::downloadOjsRunner');
+$routes->match(['get', 'head'], 'integrations/ojs/plugin', 'DashboardController::downloadOjsPluginZip');
+$routes->match(['get', 'head'], 'docs/ojs/plugin', 'DashboardController::downloadOjsPluginZip');
+$routes->match(['get', 'head'], 'integrations/ojs/artilik-ojs-plugin.zip', 'DashboardController::downloadOjsPluginZip');
 
 // Media Promosi & Prospektus Eksekutif Institusi (PDF)
 $routes->match(['get', 'head'], 'docs/brosur', 'DashboardController::downloadPromoBrochure');

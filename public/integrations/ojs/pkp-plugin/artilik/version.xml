@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE version SYSTEM "../../../lib/pkp/dtd/pluginVersion.dtd">
+<!--
+  * plugins/generic/artilik/version.xml
+  *
+  * Metadata Versi Plugin Generic PKP OJS 3.x untuk AR Tilik
+-->
+<version>
+    <application>artilik</application>
+    <type>plugins.generic</type>
+    <release>1.3.0.0</release>
+    <date>2026-10-15</date>
+    <lazy-load>0</lazy-load>
+    <class>ArtilikPlugin</class>
+</version>

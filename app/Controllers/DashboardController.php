@@ -2215,6 +2215,31 @@ class DashboardController extends BaseController
     }
 
     /**
+     * Mengunduh Berkas Paket Plugin PKP OJS 3.x Generic Plugin (artilik-ojs-plugin.zip)
+     */
+    public function downloadOjsPluginZip()
+    {
+        $filePath = FCPATH . 'integrations/ojs/artilik-ojs-plugin.zip';
+        if (! file_exists($filePath)) {
+            $filePath = ROOTPATH . 'public/integrations/ojs/artilik-ojs-plugin.zip';
+        }
+
+        if (! file_exists($filePath)) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Berkas plugin ZIP OJS 3.x belum tersedia.");
+        }
+
+        $content  = file_get_contents($filePath);
+        $filename = 'artilik-ojs-plugin.zip';
+
+        return $this->response
+            ->setHeader('Content-Type', 'application/zip')
+            ->setHeader('Content-Disposition', 'attachment; filename="' . $filename . '"')
+            ->setHeader('Content-Length', (string) strlen($content))
+            ->setHeader('Cache-Control', 'public, max-age=86400')
+            ->setBody($content);
+    }
+
+    /**
      * Mengunduh Berkas PDF Brosur & Prospektus Eksekutif Institusi AR Tilik
      */
     public function downloadPromoBrochure()

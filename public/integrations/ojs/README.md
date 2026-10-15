@@ -4,7 +4,13 @@
 > Buku panduan lengkap berformat PDF visual resolusi tinggi (8 Halaman) edisi v1.3.0 Production kini telah tersedia. Dilengkapi dengan **diagram alur kerja end-to-end, konsep komputasi Dual-Lens, modul Audit Forensik Cerdas AI, Panduan Pertanyaan Telaah Redaksi, tangkapan layar langkah-demi-langkah, contoh kode PHP siap pakai (`artilik_ojs_runner.php`), spesifikasi REST API publik v1, serta informasi keunggulan & kemitraan institusi AR Tilik**.  
 > 👉 **[Unduh Panduan Integrasi OJS 3.x (PDF)](Panduan_Integrasi_OJS_ARTilik.pdf)** *(atau buka via browser: `/integrations/ojs/pdf`)*
 
-Modul ini memungkinkan pengelola jurnal ilmiah di lingkungan kampus yang menggunakan **PKP Open Journal Systems (OJS 3.x)** untuk melakukan pengecekan orisinalitas naskah secara otomatis menggunakan mesin **Dual-Lens Academic Writing Similarity Checker (AR Tilik)** yang dilengkapi penalaran semantik **Audit Forensik Cerdas AI**.
+> [!NOTE]
+> **Karakteristik Arsitektur & Prinsip Kejujuran Teknis:**  
+> Paket integrasi ini secara bawaan berwujud **PHP Client SDK & Integration Library** dengan eksekutor CLI mandiri (`artilik_ojs_runner.php`), bukan plugin visual PKP (*native GUI plugin*) yang otomatis aktif begitu file disalin ke sembarang folder.  
+> Agar terintegrasi ke dalam alur kerja editorial OJS, developer atau pengelola teknis jurnal perlu melakukan pengkabelan (*wiring*) — baik melalui pemanggilan skrip dari *cron/daemon*, penyematan pada formulir keputusan editor, maupun pendaftaran hook PKP OJS (`HookRegistry`).  
+> *(Bagi pengembang yang membutuhkan kerangka PKP Generic Plugin siap pakai dengan `version.xml` dan `HookRegistry`, kami juga menyediakan boilerplate pada folder `pkp-plugin/` atau unduhan paket ZIP).*
+
+Modul ini memungkinkan pengelola jurnal ilmiah di lingkungan kampus yang menggunakan **PKP Open Journal Systems (OJS 3.x)** untuk melakukan pengecekan orisinalitas naskah secara terprogram menggunakan mesin **Dual-Lens Academic Writing Similarity Checker (AR Tilik)** yang dilengkapi penalaran semantik **Audit Forensik Cerdas AI**.
 
 ---
 
@@ -28,7 +34,50 @@ Modul ini memungkinkan pengelola jurnal ilmiah di lingkungan kampus yang menggun
 
 ---
 
-## 🛠️ Langkah Instalasi di Server OJS
+## 🔄 Dua Mode Komunikasi: Polling vs Webhook Callback
+
+Saat mengintegrasikan naskah OJS ke AR Tilik, terdapat dua metode pemantauan hasil:
+
+| Fitur | Mode 1: Outbound Polling (`waitForCompletion`) | Mode 2: Inbound Webhook (`callback_url`) |
+| :--- | :--- | :--- |
+| **Arah Koneksi** | **Outbound murni** (Server OJS / Laptop $\rightarrow$ AR Tilik) | **Inbound callback** (AR Tilik $\rightarrow$ Server OJS) |
+| **Kebutuhan Jaringan** | **Tanpa Public IP / Tanpa Port Forwarding / Tanpa Tunnel** | Memerlukan URL publik yang dapat dijangkau server cloud |
+| **Uji di Localhost / Docker** | **Langsung jalan 100% tanpa konfigurasi tambahan** | Butuh Tunnel publik (Cloudflare Tunnel / ngrok) |
+| **Kesesuaian Lingkungan** | **Rekomendasi Utama** untuk Laptop pengembang, PKP containers, intranet kampus | Cocok untuk server OJS produksi dengan domain FQDN aktif |
+
+> [!TIP]
+> **Rekomendasi Pengujian:** Gunakan **Mode Polling (`waitForCompletion()`)** untuk seluruh pengujian awal dan server intranet kampus. Anda tidak perlu menyetel port forwarding, firewall, ataupun tunnel publik.
+
+---
+
+## 🧪 Rencana Uji Termurah & Paling Praktis (End-to-End Test)
+
+Sebelum menghabiskan waktu memasang dan mengonfigurasi OJS secara penuh, Anda dapat menguji seluruh alur kerja integrasi (*end-to-end*) hanya dalam waktu < 40 detik:
+
+### Langkah 1: Jalankan Script Runner Mandiri
+```bash
+# 1. Unduh konektor dan skrip runner
+curl -sO https://tilik.arsetontong.top/integrations/ojs/ARTilikOJSConnector.php
+curl -sO https://tilik.arsetontong.top/integrations/ojs/artilik_ojs_runner.php
+
+# 2. Pasang API Key Anda (dibuat di dashboard AR Tilik)
+export ARTILIK_API_KEY="artilik_ojs_YOUR_SECRET_API_KEY_HERE"
+
+# 3. Jalankan pengujian pada satu berkas PDF naskah
+php artilik_ojs_runner.php /path/to/manuscript.pdf "Judul Artikel Jurnal" "Dr. Nama Penulis" "sub_101"
+```
+
+Skrip ini akan secara otomatis:
+1. Mengunggah berkas PDF naskah ke mesin evaluasi AR Tilik melalui REST API v1.
+2. Memantau antrean komputasi secara asinkron hingga selesai (Mode Polling).
+3. Mengembalikan skor kemiripan terpadu, dekomposisi Dual-Lens (Lensa 1 & 2), putusan redaksi, tautan laporan web, hasil Audit Forensik AI, panduan pertanyaan telaah reviewer, dan tautan sertifikat QR SHA-256.
+
+### Langkah 2: Lanjutkan ke Wiring OJS
+Setelah siklus pada Langkah 1 terbukti sukses 100%, Anda siap menghubungkan pustaka konektor ke alur kerja OJS yang sebenarnya.
+
+---
+
+## 🛠️ Langkah Integrasi & Wiring di Server OJS
 
 ### 1. Buat API Key di AR Tilik
 1. Masuk ke Dashboard AR Tilik (`https://tilik.arsetontong.top/dashboard`).
@@ -36,25 +85,20 @@ Modul ini memungkinkan pengelola jurnal ilmiah di lingkungan kampus yang menggun
 3. Klik **Buat API Key Baru**, beri nama jurnal Anda (contoh: `Jurnal Teknologi Informasi SINTA 2`).
 4. Salin API Key yang dihasilkan (format: `artilik_ojs_...`).
 
-### 2. Salin Library Konektor & Runner
-Salin file `ARTilikOJSConnector.php` dan `artilik_ojs_runner.php` ke folder plugins atau direktori custom library OJS Anda:
+### 2. Pilihan Model Integrasi
+
+#### Opsi A: Sebagai Custom Library / Script Automation (Paling Fleksibel)
+Salin pustaka konektor ke direktori script/library OJS Anda:
 ```bash
-cp ARTilikOJSConnector.php /var/www/ojs/plugins/generic/artilik/
-cp artilik_ojs_runner.php /var/www/ojs/plugins/generic/artilik/
-chmod 644 /var/www/ojs/plugins/generic/artilik/*.php
+mkdir -p /var/www/ojs/tools/artilik/
+cp ARTilikOJSConnector.php /var/www/ojs/tools/artilik/
+cp artilik_ojs_runner.php /var/www/ojs/tools/artilik/
+chmod 644 /var/www/ojs/tools/artilik/*.php
 ```
 
-### 3. Menguji Eksekusi dengan Script Runner Mandiri
-Anda dapat langsung menguji koneksi dan alur penelaahan naskah melalui baris perintah:
-```bash
-export ARTILIK_API_KEY="artilik_ojs_YOUR_SECRET_API_KEY_HERE"
-php artilik_ojs_runner.php /path/to/manuscript.pdf "Judul Naskah" "Dr. Penulis" "sub_101"
-```
-
-### 4. Contoh Penggunaan dalam Script / Hook OJS
-
+Contoh pemanggilan dalam kode PHP penelaahan naskah:
 ```php
-require_once __DIR__ . '/ARTilikOJSConnector.php';
+require_once '/var/www/ojs/tools/artilik/ARTilikOJSConnector.php';
 
 // Inisialisasi konektor dengan API Key Anda
 $connector = new ARTilikOJSConnector(
@@ -76,8 +120,8 @@ try {
     $reportId = $response['data']['report_id'];
     echo "Naskah berhasil diterima! Doc ID: #{$docId}\n";
 
-    // 2. Tunggu hasil komputasi selesai (polling otomatis)
-    $result = $connector->waitForCompletion($docId, 60, 3);
+    // 2. Tunggu hasil komputasi selesai (Polling otomatis tanpa butuh tunnel)
+    $result = $connector->waitForCompletion($docId, 90, 3);
     
     $similarity   = $result['data']['overall_similarity'];
     $webReportUrl = $result['data']['web_report_url'];
@@ -87,18 +131,36 @@ try {
     echo "Tautan Laporan: {$webReportUrl}\n";
     echo "Unduh PDF Sertifikat: {$pdfExportUrl}\n";
 
-    // 3. Ambil ringkasan Audit Forensik Cerdas AI & Pertanyaan Telaah (v1.3.0)
+    // 3. Ambil ringkasan Audit Forensik Cerdas AI & Pertanyaan Telaah
     $forensicAudit = $connector->getForensicAudit($reportId);
     if ($forensicAudit) {
-        echo "Status Audit Forensik: " . $forensicAudit['verdict'] . "\n";
         $questions = $connector->getEditorialQuestions($reportId);
-        // Pertanyaan ini dapat otomatis disisipkan ke form tanggapan Reviewer OJS
+        // Pertanyaan telaah ini dapat disisipkan ke formulir tanggapan Review Discussions OJS
     }
 
 } catch (Exception $e) {
     echo "Terjadi kendala: " . $e->getMessage() . "\n";
 }
 ```
+
+#### Opsi B: Memakai PKP Generic Plugin Boilerplate (`HookRegistry`)
+Bagi tim yang ingin menyusun plugin formal berstruktur PKP OJS 3.x:
+1. Unduh paket `artilik-ojs-plugin.zip` dari portal AR Tilik atau ekstrak folder `pkp-plugin/artilik`.
+2. Letakkan di direktori OJS: `/var/www/ojs/plugins/generic/artilik/`.
+3. Struktur berkas yang terpasang:
+   * `plugins/generic/artilik/version.xml` (Metadata deskriptor plugin PKP)
+   * `plugins/generic/artilik/index.php` (Entry point bootstrap)
+   * `plugins/generic/artilik/ArtilikPlugin.inc.php` (Kelas turunan `GenericPlugin` & registrasi hook)
+   * `plugins/generic/artilik/ARTilikOJSConnector.php` (SDK klien koneksi)
+4. Daftarkan hook event editorial decision di `ArtilikPlugin.inc.php`:
+   ```php
+   HookRegistry::register('EditorAction::recordDecision', function($hookName, $args) {
+       $submission = $args[0];
+       $decision   = $args[1];
+       // Panggil ARTilikOJSConnector untuk memproses naskah artikel utama
+       return false;
+   });
+   ```
 
 ---
 
@@ -133,7 +195,7 @@ Contoh Payload Data Respon Laporan (`GET /api/v1/report/{id}`):
     },
     "forensic_audit": {
       "verdict": "VERIFIED_AUTHENTIC",
-      "model": "gemini-3.6-flash",
+      "model": "gemini-flash-lite-latest",
       "confidence_score": 92.5,
       "oral_defense_questions": [
         "Bagaimana Anda memverifikasi konsistensi parameter model pada bab 3 terhadap temuan tabel 4?",

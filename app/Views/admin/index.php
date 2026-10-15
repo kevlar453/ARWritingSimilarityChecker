@@ -2132,22 +2132,30 @@
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div>
                         <h2 class="text-lg font-bold text-white flex items-center gap-2">
-                            Integrasi REST API Publik & Plugin OJS (Open Journal Systems)
+                            Integrasi REST API Publik &amp; SDK Konektor OJS (Open Journal Systems)
                             <span class="px-2 py-0.5 rounded text-[10px] bg-sky-500/20 text-sky-300 border border-sky-500/30">OJS 3.x Ready</span>
                         </h2>
-                        <p class="text-xs text-slate-400">Hubungkan jurnal ilmiah kampus ke AR Tilik untuk verifikasi otomatis artikel dan penerbitan sertifikat digital</p>
+                        <p class="text-xs text-slate-400">Pustaka PHP (SDK), skrip runner CLI, dan API publik untuk menghubungkan alur penelaahan naskah jurnal ilmiah kampus ke AR Tilik</p>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <a href="<?= base_url('integrations/ojs/connector') ?>" download="ARTilikOJSConnector.php" class="px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold shadow transition-colors flex items-center gap-1.5">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                            Unduh Konektor OJS (PHP)
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <a href="<?= base_url('integrations/ojs/connector') ?>" download="ARTilikOJSConnector.php" class="px-2.5 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold shadow transition-colors flex items-center gap-1.5" title="Pustaka PHP Client SDK">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            PHP SDK
                         </a>
-                        <a href="<?= base_url('integrations/ojs/Panduan_Integrasi_OJS_ARTilik.pdf') ?>" target="_blank" download="Panduan_Integrasi_OJS_ARTilik.pdf" class="px-3 py-1.5 rounded-lg bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white text-xs font-semibold shadow transition-all flex items-center gap-1.5 border border-rose-500/40">
-                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
-                            Dokumentasi OJS (PDF)
+                        <a href="<?= base_url('integrations/ojs/runner') ?>" download="artilik_ojs_runner.php" class="px-2.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow transition-colors flex items-center gap-1.5" title="Skrip Runner Mandiri CLI">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            CLI Runner
                         </a>
-                        <a href="<?= base_url('integrations/ojs/README.md') ?>" target="_blank" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 border border-slate-700 text-xs font-medium transition-colors" title="Buka Dokumentasi Markdown Online">
-                            Markdown
+                        <a href="<?= base_url('integrations/ojs/plugin') ?>" download="artilik-ojs-plugin.zip" class="px-2.5 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold shadow transition-colors flex items-center gap-1.5" title="Paket Plugin Generic PKP OJS (ZIP)">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
+                            PKP Plugin (ZIP)
+                        </a>
+                        <a href="<?= base_url('integrations/ojs/Panduan_Integrasi_OJS_ARTilik.pdf') ?>" target="_blank" download="Panduan_Integrasi_OJS_ARTilik.pdf" class="px-2.5 py-1.5 rounded-lg bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white text-xs font-semibold shadow transition-all flex items-center gap-1.5 border border-rose-500/40">
+                            <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                            Panduan PDF
+                        </a>
+                        <a href="<?= base_url('integrations/ojs/README.md') ?>" target="_blank" class="px-2 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 border border-slate-700 text-xs font-medium transition-colors" title="Buka Dokumentasi Markdown Online">
+                            Docs
                         </a>
                     </div>
                 </div>
@@ -2350,14 +2358,34 @@
                 </div>
 
                 <!-- Card Spesifikasi REST API & Quick Start -->
-                <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-5 space-y-3">
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 border-b border-slate-700/60 pb-2">Contoh Request cURL Integrasi OJS</h3>
-                    <pre class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-[11px] font-mono-code text-sky-300 overflow-x-auto">curl -X POST https://tilik.arsetontong.top/api/v1/check \
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-5 space-y-3">
+                        <div class="flex items-center justify-between border-b border-slate-700/60 pb-2">
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">Contoh Request cURL REST API v1</h3>
+                            <span class="text-[10px] text-sky-400 font-mono-code">POST /api/v1/check</span>
+                        </div>
+                        <pre class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-[11px] font-mono-code text-sky-300 overflow-x-auto leading-relaxed">curl -X POST https://tilik.arsetontong.top/api/v1/check \
   -H "X-API-Key: artilik_ojs_YOUR_KEY" \
   -F "document=@/path/to/manuscript.pdf" \
   -F "title=Judul Naskah Ilmiah" \
   -F "author=Nama Penulis" \
   -F "ojs_submission_id=1240"</pre>
+                        <p class="text-[11px] text-slate-400 leading-normal">
+                            Endpoint menerima berkas PDF/DOCX maksimal 30 MB. Autentikasi menggunakan header <code>X-API-Key</code> atau <code>Authorization: Bearer &lt;key&gt;</code>.
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-5 space-y-3">
+                        <div class="flex items-center justify-between border-b border-slate-700/60 pb-2">
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">Uji End-to-End Termurah (Tanpa OJS)</h3>
+                            <span class="px-2 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold">Mode Polling</span>
+                        </div>
+                        <pre class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-[11px] font-mono-code text-emerald-300 overflow-x-auto leading-relaxed">export ARTILIK_API_KEY="artilik_ojs_YOUR_KEY"
+php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pre>
+                        <p class="text-[11px] text-slate-400 leading-normal">
+                            <strong>Localhost Friendly:</strong> Skrip runner menggunakan <em>outbound client polling</em> (<code>waitForCompletion</code>), sehingga <strong>100% tidak memerlukan Public IP, Port Forwarding, atau Tunnel</strong>. Sangat ideal untuk pengujian lokal di laptop atau container Docker PKP.
+                        </p>
+                    </div>
                 </div>
             </div>
 
