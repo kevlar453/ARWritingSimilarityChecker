@@ -195,6 +195,10 @@
                     <h2 class="text-lg font-bold text-white flex items-center gap-2 flex-wrap">
                         <span>🎯 Status Kuota Submisi:</span>
                         <span class="text-emerald-400 font-mono-code text-xl font-extrabold"><?= $quotaInfo['total_available'] ?? 3 ?> Submisi Tersedia</span>
+                        <button type="button" onclick="openQuotaDisclosureModal()" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-indigo-500/30 hover:bg-indigo-500/50 text-indigo-200 border border-indigo-400/40 text-[11px] font-semibold transition cursor-pointer shadow-xs active:scale-95" title="Lihat Ketentuan Penggunaan & Pengurangan Kuota">
+                            <svg class="w-3.5 h-3.5 text-sky-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span>Ketentuan Kuota</span>
+                        </button>
                     </h2>
                     <p class="text-xs text-slate-300 leading-relaxed max-w-2xl">
                         Kuota gratis: <strong class="text-white"><?= $quotaInfo['free_remaining'] ?? 3 ?>/<?= $quotaInfo['free_weekly_limit'] ?? $quotaInfo['free_limit'] ?? 3 ?> submisi</strong> minggu ini 
@@ -206,6 +210,12 @@
                         Bonus & Top-Up: <strong class="text-amber-300">+<?= $quotaInfo['bonus_submissions'] ?? $quotaInfo['bonus_remaining'] ?? 0 ?> submisi</strong>. 
                         Tiap sumbangan <strong class="text-sky-300">3 naskah korpus valid</strong> memberikan reward <strong class="text-emerald-300">+1 submisi gratis</strong>!
                     </p>
+                    <div class="mt-2.5 flex items-start gap-2 bg-indigo-950/70 border border-indigo-400/30 rounded-xl px-3 py-2 text-[11px] text-slate-200 leading-relaxed shadow-xs">
+                        <svg class="w-4 h-4 text-sky-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <div>
+                            <strong class="text-sky-300 font-semibold">Ketentuan Kuota:</strong> Kuota akan berkurang ketika pengguna mengunggah submisi dan proses pengecekan berjalan dengan baik. Kuota tidak dapat dikembalikan dengan alasan apapun.
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="flex flex-wrap sm:flex-nowrap items-center gap-2.5 flex-shrink-0">
@@ -475,7 +485,12 @@
                         </div>
                     </div>
 
-                    <div class="flex justify-end pt-2">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-slate-100">
+                        <div class="flex items-center gap-1.5 text-[11px] text-slate-500 leading-tight">
+                            <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span>Kuota berkurang ketika proses pengecekan berjalan baik dan tidak dapat dikembalikan.</span>
+                            <button type="button" onclick="openQuotaDisclosureModal()" class="text-indigo-600 hover:text-indigo-800 underline font-medium cursor-pointer ml-0.5">Info Ketentuan</button>
+                        </div>
                         <button type="submit" id="btnUploadSubmit" class="w-full sm:w-auto px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-semibold rounded-xl text-xs sm:text-sm shadow-sm transition flex items-center justify-center gap-2 cursor-pointer">
                             <span id="btnUploadSubmitText">Unggah &amp; Periksa Similarity</span>
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
@@ -2424,7 +2439,62 @@
                 btn.innerHTML = '<span>📤 Unggah & Tambah Kuota</span>';
             }
         }
+
+        function openQuotaDisclosureModal() {
+            const modal = document.getElementById('quotaDisclosureModal');
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeQuotaDisclosureModal() {
+            const modal = document.getElementById('quotaDisclosureModal');
+            if (modal) modal.classList.add('hidden');
+        }
     </script>
+
+    <!-- Modal Ketentuan Penggunaan & Pengurangan Kuota -->
+    <div id="quotaDisclosureModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div class="px-6 py-4 bg-slate-900 border-b border-slate-800 flex items-center justify-between text-white">
+                <div class="flex items-center gap-2.5">
+                    <span class="p-1.5 rounded-lg bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 text-sm">ℹ️</span>
+                    <div>
+                        <h3 class="text-sm font-bold text-white">Ketentuan Penggunaan Kuota</h3>
+                        <p class="text-[10px] text-slate-400">Kebijakan Pemakaian &amp; Alokasi Komputasi</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeQuotaDisclosureModal()" class="text-slate-400 hover:text-white text-xl font-bold p-1 leading-none transition cursor-pointer">&times;</button>
+            </div>
+            <div class="p-6 space-y-4 text-xs text-slate-600">
+                <div class="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-950 space-y-1">
+                    <div class="font-bold flex items-center gap-1.5 text-amber-900 text-[11px] uppercase tracking-wider">
+                        <span>⚠️</span> <span>Ketentuan Resmi Submisi:</span>
+                    </div>
+                    <p class="text-xs leading-relaxed font-semibold text-amber-950">
+                        &ldquo;Kuota akan berkurang ketika pengguna mengunggah submisi dan proses pengecekan berjalan dengan baik. Kuota tidak dapat dikembalikan dengan alasan apapun.&rdquo;
+                    </p>
+                </div>
+                <div class="space-y-2.5 text-[11.5px] leading-relaxed text-slate-600">
+                    <div class="flex items-start gap-2">
+                        <span class="text-emerald-600 font-bold mt-0.5">✓</span>
+                        <div><strong>Kapan kuota terpotong:</strong> Tepat saat sistem berhasil mengekstraksi teks naskah, membentuk indeks shingle 5-gram, dan menjalankan analisis kesamaan naskah.</div>
+                    </div>
+                    <div class="flex items-start gap-2">
+                        <span class="text-indigo-600 font-bold mt-0.5">✓</span>
+                        <div><strong>Alokasi Sumber Daya:</strong> Setiap submisi sukses mengonsumsi daya komputasi Lensa Ganda (5-Gram + TF-IDF) dan token kuota AI Google Gemini untuk audit forensik semantik.</div>
+                    </div>
+                    <div class="flex items-start gap-2">
+                        <span class="text-sky-600 font-bold mt-0.5">✓</span>
+                        <div><strong>Proteksi Galat Teknis:</strong> Jika berkas gagal diekstrak karena file rusak/unsupported atau sistem mengalami kendala sebelum analisis dimulai, kuota Anda aman dan tidak terpotong.</div>
+                    </div>
+                </div>
+                <div class="pt-2 flex justify-end">
+                    <button type="button" onclick="closeQuotaDisclosureModal()" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-sm transition-colors cursor-pointer text-center">
+                        Saya Mengerti
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Contribute Corpus Modal (+3 Korpus = +1 Submisi) -->
     <div id="contributeCorpusModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center hidden p-4">
@@ -2498,10 +2568,14 @@
             <!-- Modal Body -->
             <div class="p-6 space-y-6">
                 <!-- Info Alert -->
-                <div class="p-3 bg-indigo-50 border border-indigo-200 rounded-xl flex items-center justify-between gap-3 text-indigo-900 text-xs">
+                <div class="p-3.5 bg-indigo-50 border border-indigo-200 rounded-xl space-y-1.5 text-indigo-900 text-xs">
                     <div class="flex items-center gap-2">
                         <span class="text-base">⚡</span>
                         <span>Kuota Anda saat ini: <strong class="text-indigo-950 font-bold"><?= $quotaInfo['total_available'] ?? 3 ?> Submisi</strong>. Pembayaran sukses akan langsung mengkreditkan kuota secara instan ke akun Anda tanpa perlu konfirmasi manual.</span>
+                    </div>
+                    <div class="pt-1.5 border-t border-indigo-100 flex items-start gap-1.5 text-[11px] text-indigo-800 font-medium">
+                        <span class="text-sky-600">ℹ️</span>
+                        <span><strong>Ketentuan Kuota:</strong> Kuota akan berkurang ketika pengguna mengunggah submisi dan proses pengecekan berjalan dengan baik. Kuota tidak dapat dikembalikan dengan alasan apapun.</span>
                     </div>
                 </div>
 
