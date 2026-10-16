@@ -943,17 +943,372 @@
         <!-- TAB 3: DOKUMEN & ANTREAN                   -->
         <!-- ========================================== -->
         <?php elseif ($activeTab === 'documents'): ?>
+            <?php
+            // Helper URL builder untuk filter & paginasi dokumen
+            $docFilterUrl = function(array $changes = []) use ($docFilter) {
+                $merged = array_merge([
+                    'tab'        => 'documents',
+                    'doc_q'      => $docFilter['q'] ?? '',
+                    'doc_type'   => $docFilter['type'] ?? 'all',
+                    'doc_status' => $docFilter['status'] ?? 'all',
+                    'doc_score'  => $docFilter['score'] ?? 'all',
+                    'doc_date'   => $docFilter['date'] ?? 'all',
+                    'doc_sort'   => $docFilter['sort'] ?? 'newest',
+                    'doc_limit'  => $docFilter['limit'] ?? 50,
+                    'doc_page'   => 1,
+                ], $changes);
+
+                $clean = ['tab' => 'documents'];
+                if (!empty($merged['doc_q'])) $clean['doc_q'] = $merged['doc_q'];
+                if (!empty($merged['doc_type']) && $merged['doc_type'] !== 'all') $clean['doc_type'] = $merged['doc_type'];
+                if (!empty($merged['doc_status']) && $merged['doc_status'] !== 'all') $clean['doc_status'] = $merged['doc_status'];
+                if (!empty($merged['doc_score']) && $merged['doc_score'] !== 'all') $clean['doc_score'] = $merged['doc_score'];
+                if (!empty($merged['doc_date']) && $merged['doc_date'] !== 'all') $clean['doc_date'] = $merged['doc_date'];
+                if (!empty($merged['doc_sort']) && $merged['doc_sort'] !== 'newest') $clean['doc_sort'] = $merged['doc_sort'];
+                if (!empty($merged['doc_limit']) && (int)$merged['doc_limit'] !== 50) $clean['doc_limit'] = (int)$merged['doc_limit'];
+                if (!empty($merged['doc_page']) && (int)$merged['doc_page'] > 1) $clean['doc_page'] = (int)$merged['doc_page'];
+
+                return base_url('admin?' . http_build_query($clean));
+            };
+            ?>
             <div class="space-y-6">
-                <div>
-                    <h2 class="text-lg font-bold text-white">Monitoring Antrean & Audit Dokumen</h2>
-                    <p class="text-xs text-slate-400">Seluruh dokumen yang diuji kemiripan dan status eksekusi worker analisis</p>
+                <!-- Judul Tab & Ringkasan Metrik Singkat -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <div class="flex items-center gap-2.5">
+                            <h2 class="text-lg font-bold text-white">Monitoring Antrean &amp; Audit Dokumen</h2>
+                            <span class="px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                                <?= number_format($docFilter['total_filtered']) ?> Naskah
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-0.5">Seluruh dokumen yang diuji kemiripan dan status eksekusi worker analisis</p>
+                    </div>
+
+                    <?php if ($docFilter['is_active']): ?>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs text-slate-400 font-medium">
+                                <?= $docFilter['active_count'] ?> Filter Diterapkan
+                            </span>
+                            <a href="<?= base_url('admin?tab=documents') ?>" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-rose-300 hover:text-rose-200 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 transition-colors">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                <span>Reset Filter</span>
+                            </a>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Panel Penyaringan dan Pencarian Dokumen (Filter & Search Panel) -->
+                <div class="bg-slate-800/50 border border-slate-700/70 rounded-2xl p-4 sm:p-5 shadow-sm space-y-4">
+                    <!-- Baris Header Panel & Status Hasil -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-700/60">
+                        <div class="flex items-center gap-2.5">
+                            <div class="p-2 rounded-xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 shrink-0">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-white leading-tight">Panel Penyaringan &amp; Pencarian</h3>
+                                <p class="text-[11px] text-slate-400">Temukan dokumen berdasarkan kata kunci, tipe naskah, status worker, skor kemiripan, dan waktu</p>
+                            </div>
+                        </div>
+
+                        <!-- Status Ringkasan Hasil -->
+                        <div class="flex items-center gap-2 text-xs text-slate-300">
+                            <span class="px-2.5 py-1 rounded-lg bg-slate-900/90 border border-slate-700/80 font-mono-code text-[11px]">
+                                Menampilkan <strong class="text-indigo-300"><?= number_format($docFilter['start_item']) ?>-<?= number_format($docFilter['end_item']) ?></strong> dari <strong class="text-white"><?= number_format($docFilter['total_filtered']) ?></strong> data
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Shortcut Tombol Saring Cepat (Quick Filter Pills) -->
+                    <div class="flex items-center gap-1.5 overflow-x-auto pb-1 admin-sidebar-scroll text-xs">
+                        <!-- 1. Semua -->
+                        <?php 
+                        $isAllActive = ($docFilter['type'] === 'all' && $docFilter['status'] === 'all' && $docFilter['score'] === 'all' && empty($docFilter['q']) && $docFilter['date'] === 'all');
+                        ?>
+                        <a href="<?= $docFilterUrl(['doc_type' => 'all', 'doc_status' => 'all', 'doc_score' => 'all', 'doc_date' => 'all', 'doc_q' => '']) ?>" 
+                           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-medium transition-all whitespace-nowrap shrink-0 <?= $isAllActive ? 'bg-indigo-600 text-white shadow-xs' : 'bg-slate-900/70 hover:bg-slate-900 text-slate-300 border border-slate-700/80' ?>">
+                            <span>Semua Naskah</span>
+                            <span class="px-1.5 py-0.2 rounded-md text-[10px] <?= $isAllActive ? 'bg-white/20 text-white' : 'bg-slate-800 text-slate-400' ?>"><?= number_format($metrics['total_submissions'] + $metrics['total_corpus']) ?></span>
+                        </a>
+
+                        <!-- 2. Submisi -->
+                        <?php $isSubActive = ($docFilter['type'] === 'submission' && $docFilter['status'] === 'all' && $docFilter['score'] === 'all'); ?>
+                        <a href="<?= $docFilterUrl(['doc_type' => 'submission', 'doc_status' => 'all', 'doc_score' => 'all']) ?>" 
+                           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-medium transition-all whitespace-nowrap shrink-0 <?= $isSubActive ? 'bg-sky-600 text-white shadow-xs' : 'bg-slate-900/70 hover:bg-slate-900 text-slate-300 border border-slate-700/80' ?>">
+                            <span>Naskah Submisi</span>
+                            <span class="px-1.5 py-0.2 rounded-md text-[10px] <?= $isSubActive ? 'bg-white/20 text-white' : 'bg-sky-500/20 text-sky-300' ?>"><?= number_format($metrics['total_submissions']) ?></span>
+                        </a>
+
+                        <!-- 3. Korpus -->
+                        <?php $isCorpusActive = ($docFilter['type'] === 'corpus' && $docFilter['status'] === 'all' && $docFilter['score'] === 'all'); ?>
+                        <a href="<?= $docFilterUrl(['doc_type' => 'corpus', 'doc_status' => 'all', 'doc_score' => 'all']) ?>" 
+                           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-medium transition-all whitespace-nowrap shrink-0 <?= $isCorpusActive ? 'bg-purple-600 text-white shadow-xs' : 'bg-slate-900/70 hover:bg-slate-900 text-slate-300 border border-slate-700/80' ?>">
+                            <span>Korpus Acuan</span>
+                            <span class="px-1.5 py-0.2 rounded-md text-[10px] <?= $isCorpusActive ? 'bg-white/20 text-white' : 'bg-purple-500/20 text-purple-300' ?>"><?= number_format($metrics['total_corpus']) ?></span>
+                        </a>
+
+                        <!-- 4. Antre / Proses -->
+                        <a href="<?= $docFilterUrl(['doc_status' => 'uploaded']) ?>" 
+                           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-medium transition-all whitespace-nowrap shrink-0 <?= ($docFilter['status'] === 'uploaded') ? 'bg-amber-600 text-white shadow-xs' : 'bg-slate-900/70 hover:bg-slate-900 text-slate-300 border border-slate-700/80' ?>">
+                            <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+                            <span>Antre</span>
+                            <span class="px-1.5 py-0.2 rounded-md text-[10px] bg-amber-500/20 text-amber-300"><?= number_format($metrics['queue_uploaded']) ?></span>
+                        </a>
+
+                        <a href="<?= $docFilterUrl(['doc_status' => 'processing']) ?>" 
+                           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-medium transition-all whitespace-nowrap shrink-0 <?= ($docFilter['status'] === 'processing') ? 'bg-sky-600 text-white shadow-xs' : 'bg-slate-900/70 hover:bg-slate-900 text-slate-300 border border-slate-700/80' ?>">
+                            <span class="w-1.5 h-1.5 rounded-full bg-sky-400 animate-ping"></span>
+                            <span>Sedang Proses</span>
+                            <span class="px-1.5 py-0.2 rounded-md text-[10px] bg-sky-500/20 text-sky-300"><?= number_format($metrics['queue_processing']) ?></span>
+                        </a>
+
+                        <!-- 5. Selesai -->
+                        <?php $isCompletedActive = ($docFilter['status'] === 'completed'); ?>
+                        <a href="<?= $docFilterUrl(['doc_status' => 'completed']) ?>" 
+                           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-medium transition-all whitespace-nowrap shrink-0 <?= $isCompletedActive ? 'bg-emerald-600 text-white shadow-xs' : 'bg-slate-900/70 hover:bg-slate-900 text-slate-300 border border-slate-700/80' ?>">
+                            <span>Selesai</span>
+                            <span class="px-1.5 py-0.2 rounded-md text-[10px] <?= $isCompletedActive ? 'bg-white/20 text-white' : 'bg-emerald-500/20 text-emerald-300' ?>"><?= number_format($metrics['queue_completed']) ?></span>
+                        </a>
+
+                        <!-- 6. Skor Tinggi (>= 25%) -->
+                        <?php $isHighActive = ($docFilter['score'] === 'high'); ?>
+                        <a href="<?= $docFilterUrl(['doc_score' => 'high']) ?>" 
+                           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-medium transition-all whitespace-nowrap shrink-0 <?= $isHighActive ? 'bg-rose-600 text-white shadow-xs' : 'bg-slate-900/70 hover:bg-slate-900 text-slate-300 border border-slate-700/80' ?>">
+                            <span>Kemiripan Tinggi (≥25%)</span>
+                            <span class="px-1.5 py-0.2 rounded-md text-[10px] bg-rose-500/20 text-rose-300">Waspada</span>
+                        </a>
+
+                        <!-- 7. Gagal -->
+                        <?php if (!empty($metrics['queue_failed'])): ?>
+                            <?php $isFailedActive = ($docFilter['status'] === 'failed'); ?>
+                            <a href="<?= $docFilterUrl(['doc_status' => 'failed']) ?>" 
+                               class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-medium transition-all whitespace-nowrap shrink-0 <?= $isFailedActive ? 'bg-rose-600 text-white shadow-xs' : 'bg-slate-900/70 hover:bg-slate-900 text-slate-300 border border-slate-700/80' ?>">
+                                <span>Gagal</span>
+                                <span class="px-1.5 py-0.2 rounded-md text-[10px] bg-rose-500/20 text-rose-300"><?= number_format($metrics['queue_failed']) ?></span>
+                            </a>
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- Formulir Penyaringan Lengkap (Form Search & Dropdown Filters) -->
+                    <form action="<?= base_url('admin') ?>" method="get" id="docFilterPanelForm" class="space-y-3.5">
+                        <input type="hidden" name="tab" value="documents">
+
+                        <!-- Baris Input Pencarian & Tombol Aksi -->
+                        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+                            <div class="relative flex-1">
+                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                </div>
+                                <input type="text" 
+                                       id="docSearchKeywordInput"
+                                       name="doc_q" 
+                                       value="<?= esc($docFilter['q'] ?? '') ?>" 
+                                       placeholder="Cari judul naskah, nama berkas, nama pengunggah, email, fakultas, prodi..." 
+                                       class="w-full pl-10 pr-9 py-2.5 bg-slate-900/90 border border-slate-700/80 rounded-xl text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors">
+                                <?php if (!empty($docFilter['q'])): ?>
+                                    <a href="<?= $docFilterUrl(['doc_q' => '']) ?>" 
+                                       class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-slate-300 transition-colors" 
+                                       title="Hapus kata kunci pencarian">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                    </a>
+                                <?php endif; ?>
+                            </div>
+
+                            <div class="flex items-center gap-2 shrink-0">
+                                <button type="submit" class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow-sm transition-all active:scale-95 cursor-pointer">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                    <span>Terapkan Filter</span>
+                                </button>
+                                <?php if ($docFilter['is_active']): ?>
+                                    <a href="<?= base_url('admin?tab=documents') ?>" class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 rounded-xl text-xs font-semibold transition-all cursor-pointer" title="Kembalikan semua filter ke kondisi awal">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                        <span>Reset</span>
+                                    </a>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+
+                        <!-- Baris Grid Filter Dropdown 6 Kolom -->
+                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 pt-1">
+                            <!-- 1. Tipe Dokumen -->
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Tipe Naskah</label>
+                                <select name="doc_type" onchange="this.form.submit()" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 cursor-pointer">
+                                    <option value="all" <?= ($docFilter['type'] === 'all') ? 'selected' : '' ?>>Semua Tipe</option>
+                                    <option value="submission" <?= ($docFilter['type'] === 'submission') ? 'selected' : '' ?>>Submisi (Uji)</option>
+                                    <option value="corpus" <?= ($docFilter['type'] === 'corpus') ? 'selected' : '' ?>>Korpus Acuan</option>
+                                </select>
+                            </div>
+
+                            <!-- 2. Status Worker -->
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Status Worker</label>
+                                <select name="doc_status" onchange="this.form.submit()" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 cursor-pointer">
+                                    <option value="all" <?= ($docFilter['status'] === 'all') ? 'selected' : '' ?>>Semua Status</option>
+                                    <option value="uploaded" <?= ($docFilter['status'] === 'uploaded') ? 'selected' : '' ?>>Antre (Uploaded)</option>
+                                    <option value="processing" <?= ($docFilter['status'] === 'processing') ? 'selected' : '' ?>>Sedang Proses</option>
+                                    <option value="completed" <?= ($docFilter['status'] === 'completed') ? 'selected' : '' ?>>Selesai</option>
+                                    <option value="failed" <?= ($docFilter['status'] === 'failed') ? 'selected' : '' ?>>Gagal Eksekusi</option>
+                                </select>
+                            </div>
+
+                            <!-- 3. Skor Kemiripan -->
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Skor Kemiripan</label>
+                                <select name="doc_score" onchange="this.form.submit()" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 cursor-pointer">
+                                    <option value="all" <?= ($docFilter['score'] === 'all') ? 'selected' : '' ?>>Semua Skor</option>
+                                    <option value="clean" <?= ($docFilter['score'] === 'clean') ? 'selected' : '' ?>>Bersih (&lt; 15%)</option>
+                                    <option value="moderate" <?= ($docFilter['score'] === 'moderate') ? 'selected' : '' ?>>Sedang (15 - 24.9%)</option>
+                                    <option value="high" <?= ($docFilter['score'] === 'high') ? 'selected' : '' ?>>Tinggi (≥ 25%)</option>
+                                    <option value="corpus_ref" <?= ($docFilter['score'] === 'corpus_ref') ? 'selected' : '' ?>>Ref. Korpus</option>
+                                </select>
+                            </div>
+
+                            <!-- 4. Periode Waktu -->
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Periode Waktu</label>
+                                <select name="doc_date" onchange="this.form.submit()" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 cursor-pointer">
+                                    <option value="all" <?= ($docFilter['date'] === 'all') ? 'selected' : '' ?>>Semua Waktu</option>
+                                    <option value="today" <?= ($docFilter['date'] === 'today') ? 'selected' : '' ?>>Hari Ini</option>
+                                    <option value="yesterday" <?= ($docFilter['date'] === 'yesterday') ? 'selected' : '' ?>>Kemarin</option>
+                                    <option value="7days" <?= ($docFilter['date'] === '7days') ? 'selected' : '' ?>>7 Hari Terakhir</option>
+                                    <option value="30days" <?= ($docFilter['date'] === '30days') ? 'selected' : '' ?>>30 Hari Terakhir</option>
+                                    <option value="this_month" <?= ($docFilter['date'] === 'this_month') ? 'selected' : '' ?>>Bulan Ini</option>
+                                </select>
+                            </div>
+
+                            <!-- 5. Urutan Data -->
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Urutan Data</label>
+                                <select name="doc_sort" onchange="this.form.submit()" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 cursor-pointer">
+                                    <option value="newest" <?= ($docFilter['sort'] === 'newest') ? 'selected' : '' ?>>Terbaru (Waktu ↓)</option>
+                                    <option value="oldest" <?= ($docFilter['sort'] === 'oldest') ? 'selected' : '' ?>>Terlama (Waktu ↑)</option>
+                                    <option value="score_desc" <?= ($docFilter['sort'] === 'score_desc') ? 'selected' : '' ?>>Skor Tertinggi ↓</option>
+                                    <option value="score_asc" <?= ($docFilter['sort'] === 'score_asc') ? 'selected' : '' ?>>Skor Terendah ↑</option>
+                                    <option value="title_asc" <?= ($docFilter['sort'] === 'title_asc') ? 'selected' : '' ?>>Judul (A - Z)</option>
+                                    <option value="title_desc" <?= ($docFilter['sort'] === 'title_desc') ? 'selected' : '' ?>>Judul (Z - A)</option>
+                                </select>
+                            </div>
+
+                            <!-- 6. Baris per Halaman -->
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Per Halaman</label>
+                                <select name="doc_limit" onchange="this.form.submit()" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 cursor-pointer">
+                                    <option value="25" <?= ($docFilter['limit'] == 25) ? 'selected' : '' ?>>25 Baris</option>
+                                    <option value="50" <?= ($docFilter['limit'] == 50) ? 'selected' : '' ?>>50 Baris</option>
+                                    <option value="100" <?= ($docFilter['limit'] == 100) ? 'selected' : '' ?>>100 Baris</option>
+                                    <option value="200" <?= ($docFilter['limit'] == 200) ? 'selected' : '' ?>>200 Baris</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Baris Tag/Chip Filter Aktif -->
+                    <?php if ($docFilter['is_active']): ?>
+                        <div class="pt-3 border-t border-slate-700/60 flex items-center gap-1.5 flex-wrap text-xs">
+                            <span class="text-[11px] text-slate-400 font-semibold mr-1">Filter Aktif:</span>
+
+                            <?php if (!empty($docFilter['q'])): ?>
+                                <a href="<?= $docFilterUrl(['doc_q' => '']) ?>" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 hover:bg-indigo-500/25 transition-colors text-[11px]" title="Klik untuk menghapus filter ini">
+                                    <span>Pencarian: "<strong><?= esc($docFilter['q']) ?></strong>"</span>
+                                    <span class="text-indigo-400 font-bold hover:text-white">✕</span>
+                                </a>
+                            <?php endif; ?>
+
+                            <?php if ($docFilter['type'] !== 'all'): ?>
+                                <a href="<?= $docFilterUrl(['doc_type' => 'all']) ?>" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-sky-500/15 text-sky-300 border border-sky-500/30 hover:bg-sky-500/25 transition-colors text-[11px]" title="Klik untuk menghapus filter ini">
+                                    <span>Tipe: <strong><?= $docFilter['type'] === 'submission' ? 'Submisi' : 'Korpus' ?></strong></span>
+                                    <span class="text-sky-400 font-bold hover:text-white">✕</span>
+                                </a>
+                            <?php endif; ?>
+
+                            <?php if ($docFilter['status'] !== 'all'): ?>
+                                <?php
+                                $statusNames = [
+                                    'uploaded'   => 'Antre (Uploaded)',
+                                    'processing' => 'Sedang Diproses',
+                                    'completed'  => 'Selesai',
+                                    'failed'     => 'Gagal',
+                                ];
+                                ?>
+                                <a href="<?= $docFilterUrl(['doc_status' => 'all']) ?>" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/25 transition-colors text-[11px]" title="Klik untuk menghapus filter ini">
+                                    <span>Status: <strong><?= $statusNames[$docFilter['status']] ?? esc($docFilter['status']) ?></strong></span>
+                                    <span class="text-emerald-400 font-bold hover:text-white">✕</span>
+                                </a>
+                            <?php endif; ?>
+
+                            <?php if ($docFilter['score'] !== 'all'): ?>
+                                <?php
+                                $scoreNames = [
+                                    'clean'      => 'Bersih (< 15%)',
+                                    'moderate'   => 'Sedang (15 - 24.9%)',
+                                    'high'       => 'Tinggi (≥ 25%)',
+                                    'corpus_ref' => 'Ref. Korpus',
+                                ];
+                                ?>
+                                <a href="<?= $docFilterUrl(['doc_score' => 'all']) ?>" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-500/15 text-amber-300 border border-amber-500/30 hover:bg-amber-500/25 transition-colors text-[11px]" title="Klik untuk menghapus filter ini">
+                                    <span>Skor: <strong><?= $scoreNames[$docFilter['score']] ?? esc($docFilter['score']) ?></strong></span>
+                                    <span class="text-amber-400 font-bold hover:text-white">✕</span>
+                                </a>
+                            <?php endif; ?>
+
+                            <?php if ($docFilter['date'] !== 'all'): ?>
+                                <?php
+                                $dateNames = [
+                                    'today'      => 'Hari Ini',
+                                    'yesterday'  => 'Kemarin',
+                                    '7days'      => '7 Hari Terakhir',
+                                    '30days'     => '30 Hari Terakhir',
+                                    'this_month' => 'Bulan Ini',
+                                ];
+                                ?>
+                                <a href="<?= $docFilterUrl(['doc_date' => 'all']) ?>" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-purple-500/15 text-purple-300 border border-purple-500/30 hover:bg-purple-500/25 transition-colors text-[11px]" title="Klik untuk menghapus filter ini">
+                                    <span>Periode: <strong><?= $dateNames[$docFilter['date']] ?? esc($docFilter['date']) ?></strong></span>
+                                    <span class="text-purple-400 font-bold hover:text-white">✕</span>
+                                </a>
+                            <?php endif; ?>
+
+                            <?php if ($docFilter['sort'] !== 'newest'): ?>
+                                <?php
+                                $sortNames = [
+                                    'oldest'     => 'Terlama',
+                                    'score_desc' => 'Skor Tertinggi',
+                                    'score_asc'  => 'Skor Terendah',
+                                    'title_asc'  => 'Judul (A-Z)',
+                                    'title_desc' => 'Judul (Z-A)',
+                                ];
+                                ?>
+                                <a href="<?= $docFilterUrl(['doc_sort' => 'newest']) ?>" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-700/60 text-slate-300 border border-slate-600/60 hover:bg-slate-700 transition-colors text-[11px]" title="Klik untuk mengembalikan urutan ke Terbaru">
+                                    <span>Urutan: <strong><?= $sortNames[$docFilter['sort']] ?? esc($docFilter['sort']) ?></strong></span>
+                                    <span class="text-slate-400 font-bold hover:text-white">✕</span>
+                                </a>
+                            <?php endif; ?>
+
+                            <a href="<?= base_url('admin?tab=documents') ?>" class="text-[11px] text-rose-400 hover:text-rose-300 underline font-semibold ml-auto transition-colors">
+                                Hapus Semua Filter
+                            </a>
+                        </div>
+                    <?php endif; ?>
                 </div>
 
                 <!-- Mobile List: Tampilan Kartu Responsif & Ringkas Dokumen (Layar Ponsel) -->
                 <div class="space-y-2.5 md:hidden">
                     <?php if (empty($documentsList)): ?>
-                        <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-6 text-center text-xs text-slate-500">
-                            Tidak ada dokumen ditemukan.
+                        <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-8 text-center space-y-3">
+                            <div class="w-12 h-12 rounded-2xl bg-slate-900 border border-slate-700 flex items-center justify-center text-xl mx-auto text-slate-400">
+                                🔍
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-semibold text-slate-200">Tidak ada dokumen ditemukan</h4>
+                                <p class="text-xs text-slate-400 mt-1">Tidak ada dokumen yang cocok dengan kriteria pencarian atau penyaringan saat ini.</p>
+                            </div>
+                            <?php if ($docFilter['is_active']): ?>
+                                <div>
+                                    <a href="<?= base_url('admin?tab=documents') ?>" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 transition-colors">
+                                        ↺ Hapus Semua Filter
+                                    </a>
+                                </div>
+                            <?php endif; ?>
                         </div>
                     <?php else: ?>
                         <?php foreach ($documentsList as $d): ?>
@@ -1053,18 +1408,47 @@
                         <table class="w-full text-xs text-left">
                             <thead class="bg-slate-900/80 text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-700/60">
                                 <tr>
-                                    <th class="py-3 px-4">Judul & File</th>
+                                    <th class="py-3 px-4">
+                                        <a href="<?= $docFilterUrl(['doc_sort' => ($docFilter['sort'] === 'title_asc' ? 'title_desc' : 'title_asc')]) ?>" class="hover:text-white inline-flex items-center gap-1 transition-colors" title="Klik untuk mengurutkan berdasarkan Judul Dokumen">
+                                            <span>Judul &amp; File</span>
+                                            <span class="text-[9px] text-indigo-400"><?= $docFilter['sort'] === 'title_asc' ? '▲' : ($docFilter['sort'] === 'title_desc' ? '▼' : '↕') ?></span>
+                                        </a>
+                                    </th>
                                     <th class="py-3 px-3">Pengunggah</th>
                                     <th class="py-3 px-3">Tipe</th>
                                     <th class="py-3 px-3">Status Worker</th>
-                                    <th class="py-3 px-3 text-center">Skor Kemiripan</th>
-                                    <th class="py-3 px-3">Waktu Masuk</th>
+                                    <th class="py-3 px-3 text-center">
+                                        <a href="<?= $docFilterUrl(['doc_sort' => ($docFilter['sort'] === 'score_desc' ? 'score_asc' : 'score_desc')]) ?>" class="hover:text-white inline-flex items-center justify-center gap-1 transition-colors" title="Klik untuk mengurutkan berdasarkan Skor Kemiripan">
+                                            <span>Skor Kemiripan</span>
+                                            <span class="text-[9px] text-indigo-400"><?= $docFilter['sort'] === 'score_desc' ? '▼' : ($docFilter['sort'] === 'score_asc' ? '▲' : '↕') ?></span>
+                                        </a>
+                                    </th>
+                                    <th class="py-3 px-3">
+                                        <a href="<?= $docFilterUrl(['doc_sort' => ($docFilter['sort'] === 'newest' ? 'oldest' : 'newest')]) ?>" class="hover:text-white inline-flex items-center gap-1 transition-colors" title="Klik untuk mengurutkan berdasarkan Waktu Masuk">
+                                            <span>Waktu Masuk</span>
+                                            <span class="text-[9px] text-indigo-400"><?= $docFilter['sort'] === 'newest' ? '▼' : ($docFilter['sort'] === 'oldest' ? '▲' : '↕') ?></span>
+                                        </a>
+                                    </th>
                                     <th class="py-3 px-4 text-right w-28">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-800/80">
                                 <?php if (empty($documentsList)): ?>
-                                    <tr><td colspan="7" class="py-6 text-center text-slate-500">Tidak ada dokumen ditemukan.</td></tr>
+                                    <tr>
+                                        <td colspan="7" class="py-10 text-center">
+                                            <div class="space-y-2">
+                                                <div class="text-2xl text-slate-500">🔍</div>
+                                                <div class="text-slate-300 font-medium text-xs">Tidak ada dokumen yang cocok dengan kriteria penyaringan.</div>
+                                                <?php if ($docFilter['is_active']): ?>
+                                                    <div class="pt-1">
+                                                        <a href="<?= base_url('admin?tab=documents') ?>" class="inline-flex items-center gap-1 text-[11px] text-indigo-400 hover:text-indigo-300 underline font-semibold">
+                                                            Hapus Semua Filter &amp; Tampilkan Seluruh Data
+                                                        </a>
+                                                    </div>
+                                                <?php endif; ?>
+                                            </div>
+                                        </td>
+                                    </tr>
                                 <?php else: ?>
                                     <?php foreach ($documentsList as $d): ?>
                                         <tr id="doc-row-<?= $d['id'] ?>" class="hover:bg-slate-800/50 transition-colors">
@@ -1140,6 +1524,68 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
+
+                <!-- Baris Paginasi & Kontrol Halaman Bawah -->
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-800/40 border border-slate-700/60 rounded-2xl p-4 shadow-sm">
+                    <div class="text-xs text-slate-400">
+                        Menampilkan <strong class="text-slate-200"><?= number_format($docFilter['start_item']) ?></strong> - <strong class="text-slate-200"><?= number_format($docFilter['end_item']) ?></strong> dari <strong class="text-white"><?= number_format($docFilter['total_filtered']) ?></strong> dokumen
+                        <?php if ($docFilter['is_active']): ?>
+                            <span class="text-indigo-400 font-medium">(Hasil Difilter)</span>
+                        <?php endif; ?>
+                    </div>
+
+                    <?php if ($docFilter['total_pages'] > 1): ?>
+                        <div class="flex items-center gap-1.5 flex-wrap justify-center">
+                            <!-- Tombol Halaman Pertama -->
+                            <?php if ($docFilter['page'] > 1): ?>
+                                <a href="<?= $docFilterUrl(['doc_page' => 1]) ?>" class="p-1.5 rounded-lg bg-slate-900 border border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800 transition-colors" title="Halaman Pertama">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/></svg>
+                                </a>
+                                <a href="<?= $docFilterUrl(['doc_page' => $docFilter['page'] - 1]) ?>" class="px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs text-slate-300 hover:text-white hover:bg-slate-800 transition-colors">
+                                    Sebelumnya
+                                </a>
+                            <?php else: ?>
+                                <span class="px-2.5 py-1.5 rounded-lg bg-slate-900/40 border border-slate-800/80 text-xs text-slate-600 cursor-not-allowed">
+                                    Sebelumnya
+                                </span>
+                            <?php endif; ?>
+
+                            <!-- Halaman Berurutan -->
+                            <?php
+                            $startPage = max(1, $docFilter['page'] - 2);
+                            $endPage   = min($docFilter['total_pages'], $startPage + 4);
+                            if ($endPage - $startPage < 4) {
+                                $startPage = max(1, $endPage - 4);
+                            }
+                            ?>
+                            <?php for ($p = $startPage; $p <= $endPage; $p++): ?>
+                                <?php if ($p === $docFilter['page']): ?>
+                                    <span class="px-3 py-1 rounded-lg bg-indigo-600 text-white font-bold text-xs shadow-xs">
+                                        <?= $p ?>
+                                    </span>
+                                <?php else: ?>
+                                    <a href="<?= $docFilterUrl(['doc_page' => $p]) ?>" class="px-3 py-1 rounded-lg bg-slate-900 border border-slate-700 text-xs text-slate-300 hover:text-white hover:bg-slate-800 transition-colors">
+                                        <?= $p ?>
+                                    </a>
+                                <?php endif; ?>
+                            <?php endfor; ?>
+
+                            <!-- Tombol Halaman Berikutnya -->
+                            <?php if ($docFilter['page'] < $docFilter['total_pages']): ?>
+                                <a href="<?= $docFilterUrl(['doc_page' => $docFilter['page'] + 1]) ?>" class="px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs text-slate-300 hover:text-white hover:bg-slate-800 transition-colors">
+                                    Berikutnya
+                                </a>
+                                <a href="<?= $docFilterUrl(['doc_page' => $docFilter['total_pages']]) ?>" class="p-1.5 rounded-lg bg-slate-900 border border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800 transition-colors" title="Halaman Terakhir">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"/></svg>
+                                </a>
+                            <?php else: ?>
+                                <span class="px-2.5 py-1.5 rounded-lg bg-slate-900/40 border border-slate-800/80 text-xs text-slate-600 cursor-not-allowed">
+                                    Berikutnya
+                                </span>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
 

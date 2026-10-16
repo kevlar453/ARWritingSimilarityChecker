@@ -72,40 +72,146 @@ class DashboardController extends BaseController
         }
         $usersList = $userBuilder->findAll(100);
 
-        // 6. Data List: Dokumen Submisi & Laporan
-        $docBuilder = $docModel->select('documents.*, users.name as user_name, users.email as user_email')
-                               ->join('users', 'users.id = documents.user_id', 'left')
-                               ->orderBy('documents.id', 'DESC');
-        if ($searchQuery !== '') {
+        // 6. Data List: Dokumen Submisi & Laporan (Dukungan Panel Penyaringan & Pencarian Komprehensif)
+        $docSearch = trim((string) ($this->request->getGet('doc_q') ?? ($activeTab === 'documents' ? $searchQuery : '')));
+        $docType = trim((string) ($this->request->getGet('doc_type') ?? 'all'));
+        $docStatus = trim((string) ($this->request->getGet('doc_status') ?? 'all'));
+        $docScore = trim((string) ($this->request->getGet('doc_score') ?? 'all'));
+        $docDate = trim((string) ($this->request->getGet('doc_date') ?? 'all'));
+        $docSort = trim((string) ($this->request->getGet('doc_sort') ?? 'newest'));
+        $docLimit = (int) ($this->request->getGet('doc_limit') ?? 50);
+        if (! in_array($docLimit, [25, 50, 100, 200], true)) {
+            $docLimit = 50;
+        }
+        $docPage = max(1, (int) ($this->request->getGet('doc_page') ?? 1));
+
+        $isFilterActive = ($docSearch !== '' || $docType !== 'all' || $docStatus !== 'all' || $docScore !== 'all' || $docDate !== 'all' || $docSort !== 'newest');
+        $activeFilterCount = 0;
+        if ($docSearch !== '') $activeFilterCount++;
+        if ($docType !== 'all') $activeFilterCount++;
+        if ($docStatus !== 'all') $activeFilterCount++;
+        if ($docScore !== 'all') $activeFilterCount++;
+        if ($docDate !== 'all') $activeFilterCount++;
+        if ($docSort !== 'newest') $activeFilterCount++;
+
+        $docBuilder = $db->table('documents d')
+                         ->select('d.*, u.name as user_name, u.email as user_email, lr.latest_report_id, rep.overall_similarity, rep.exact_similarity, rep.cosine_similarity, rep.status as report_status')
+                         ->join('users u', 'u.id = d.user_id', 'left')
+                         ->join('(SELECT document_id, MAX(id) as latest_report_id FROM reports GROUP BY document_id) lr', 'lr.document_id = d.id', 'left', false)
+                         ->join('reports rep', 'rep.id = lr.latest_report_id', 'left');
+
+        // Filter Pencarian Teks
+        if ($docSearch !== '') {
             $docBuilder->groupStart()
-                       ->like('documents.title', $searchQuery)
-                       ->orLike('documents.original_filename', $searchQuery)
-                       ->orLike('documents.faculty', $searchQuery)
-                       ->orLike('documents.department', $searchQuery)
-                       ->orLike('users.name', $searchQuery)
-                       ->orLike('users.email', $searchQuery)
+                       ->like('d.title', $docSearch)
+                       ->orLike('d.original_filename', $docSearch)
+                       ->orLike('d.faculty', $docSearch)
+                       ->orLike('d.department', $docSearch)
+                       ->orLike('u.name', $docSearch)
+                       ->orLike('u.email', $docSearch)
                        ->groupEnd();
         }
-        $documentsList = $docBuilder->findAll(100);
 
-        // Ambil laporan terbaru untuk masing-masing dokumen
-        $docIds = array_column($documentsList, 'id');
-        $reportsMap = [];
-        if (! empty($docIds)) {
-            $reports = $reportModel->whereIn('document_id', $docIds)
-                                   ->orderBy('id', 'DESC')
-                                   ->findAll();
-            foreach ($reports as $r) {
-                if (! isset($reportsMap[$r['document_id']])) {
-                    $reportsMap[$r['document_id']] = $r;
-                }
-            }
+        // Filter Tipe Dokumen
+        if (in_array($docType, ['submission', 'corpus'], true)) {
+            $docBuilder->where('d.document_type', $docType);
         }
+
+        // Filter Status Worker
+        if (in_array($docStatus, ['uploaded', 'processing', 'completed', 'failed'], true)) {
+            $docBuilder->where('d.status', $docStatus);
+        }
+
+        // Filter Rentang Skor Kemiripan
+        if ($docScore === 'clean') {
+            $docBuilder->where('rep.overall_similarity <', 15)
+                       ->where('rep.overall_similarity IS NOT NULL', null, false);
+        } elseif ($docScore === 'moderate') {
+            $docBuilder->where('rep.overall_similarity >=', 15)
+                       ->where('rep.overall_similarity <', 25);
+        } elseif ($docScore === 'high') {
+            $docBuilder->where('rep.overall_similarity >=', 25);
+        } elseif ($docScore === 'corpus_ref') {
+            $docBuilder->where('d.document_type', 'corpus');
+        }
+
+        // Filter Periode Waktu Masuk
+        if ($docDate === 'today') {
+            $docBuilder->where('d.created_at >=', date('Y-m-d 00:00:00'));
+        } elseif ($docDate === 'yesterday') {
+            $docBuilder->where('d.created_at >=', date('Y-m-d 00:00:00', strtotime('-1 day')))
+                       ->where('d.created_at <', date('Y-m-d 00:00:00'));
+        } elseif ($docDate === '7days') {
+            $docBuilder->where('d.created_at >=', date('Y-m-d H:i:s', strtotime('-7 days')));
+        } elseif ($docDate === '30days') {
+            $docBuilder->where('d.created_at >=', date('Y-m-d H:i:s', strtotime('-30 days')));
+        } elseif ($docDate === 'this_month') {
+            $docBuilder->where('d.created_at >=', date('Y-m-01 00:00:00'));
+        }
+
+        // Hitung total hasil yang cocok dengan filter untuk paginasi
+        $countBuilder = clone $docBuilder;
+        $totalFilteredDocs = $countBuilder->countAllResults();
+
+        // Urutan Data
+        if ($docSort === 'oldest') {
+            $docBuilder->orderBy('d.id', 'ASC');
+        } elseif ($docSort === 'score_desc') {
+            $docBuilder->orderBy('rep.overall_similarity', 'DESC')
+                       ->orderBy('d.id', 'DESC');
+        } elseif ($docSort === 'score_asc') {
+            $docBuilder->orderBy('(rep.overall_similarity IS NULL)', 'ASC', false)
+                       ->orderBy('rep.overall_similarity', 'ASC')
+                       ->orderBy('d.id', 'DESC');
+        } elseif ($docSort === 'title_asc') {
+            $docBuilder->orderBy('d.title', 'ASC');
+        } elseif ($docSort === 'title_desc') {
+            $docBuilder->orderBy('d.title', 'DESC');
+        } else {
+            $docBuilder->orderBy('d.id', 'DESC');
+        }
+
+        // Kalkulasi Paginasi
+        $totalPages = max(1, (int) ceil($totalFilteredDocs / $docLimit));
+        if ($docPage > $totalPages) {
+            $docPage = $totalPages;
+        }
+        $offset = ($docPage - 1) * $docLimit;
+
+        $documentsList = $docBuilder->limit($docLimit, $offset)->get()->getResultArray();
+
         foreach ($documentsList as &$doc) {
             $doc['title'] = $this->cleanMojibake($doc['title'] ?? '');
-            $doc['report'] = $reportsMap[$doc['id']] ?? null;
+            if (! empty($doc['latest_report_id'])) {
+                $doc['report'] = [
+                    'id'                 => $doc['latest_report_id'],
+                    'overall_similarity' => (float) ($doc['overall_similarity'] ?? 0),
+                    'exact_similarity'   => (float) ($doc['exact_similarity'] ?? 0),
+                    'cosine_similarity'  => (float) ($doc['cosine_similarity'] ?? 0),
+                    'status'             => $doc['report_status'] ?? 'completed',
+                ];
+            } else {
+                $doc['report'] = null;
+            }
         }
         unset($doc);
+
+        $docFilter = [
+            'q'              => $docSearch,
+            'type'           => $docType,
+            'status'         => $docStatus,
+            'score'          => $docScore,
+            'date'           => $docDate,
+            'sort'           => $docSort,
+            'limit'          => $docLimit,
+            'page'           => $docPage,
+            'is_active'      => $isFilterActive,
+            'active_count'   => $activeFilterCount,
+            'total_filtered' => $totalFilteredDocs,
+            'total_pages'    => $totalPages,
+            'start_item'     => $totalFilteredDocs > 0 ? $offset + 1 : 0,
+            'end_item'       => min($offset + $docLimit, $totalFilteredDocs),
+        ];
 
         // 7. Data List: Korpus Dokumen
         $corpusList = $docModel->where('document_type', 'corpus')
@@ -319,6 +425,7 @@ class DashboardController extends BaseController
             ],
             'usersList'            => $usersList,
             'documentsList'        => $documentsList,
+            'docFilter'            => $docFilter,
             'corpusList'           => $corpusList,
             'securityLogs'         => $securityLogs,
             'dailyVisitors'        => $dailyVisitors,
