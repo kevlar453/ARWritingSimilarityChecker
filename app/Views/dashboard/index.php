@@ -353,6 +353,37 @@
 
         <!-- TAB 1: Submisi & Pemeriksaan -->
         <div id="tab-submission" class="tab-content space-y-6">
+            <?php
+            // Helper URL builder untuk filter & paginasi submisi pengguna
+            $subFilterUrl = function(array $changes = []) use ($subFilter) {
+                $params = [
+                    'sub_q'        => $subFilter['q'] ?? '',
+                    'sub_status'   => $subFilter['status'] ?? 'all',
+                    'sub_decision' => $subFilter['decision'] ?? 'all',
+                    'sub_engine'   => $subFilter['engine'] ?? 'all',
+                    'sub_date'     => $subFilter['date'] ?? 'all',
+                    'sub_sort'     => $subFilter['sort'] ?? 'newest',
+                    'sub_limit'    => $subFilter['limit'] ?? 15,
+                    'sub_page'     => $subFilter['page'] ?? 1,
+                ];
+                $merged = array_merge($params, $changes);
+                if (!isset($changes['sub_page'])) {
+                    $merged['sub_page'] = 1;
+                }
+                $clean = [];
+                if (!empty($merged['sub_q'])) $clean['sub_q'] = $merged['sub_q'];
+                if (($merged['sub_status'] ?? 'all') !== 'all') $clean['sub_status'] = $merged['sub_status'];
+                if (($merged['sub_decision'] ?? 'all') !== 'all') $clean['sub_decision'] = $merged['sub_decision'];
+                if (($merged['sub_engine'] ?? 'all') !== 'all') $clean['sub_engine'] = $merged['sub_engine'];
+                if (($merged['sub_date'] ?? 'all') !== 'all') $clean['sub_date'] = $merged['sub_date'];
+                if (($merged['sub_sort'] ?? 'newest') !== 'newest') $clean['sub_sort'] = $merged['sub_sort'];
+                if ((int)($merged['sub_limit'] ?? 15) !== 15) $clean['sub_limit'] = (int)$merged['sub_limit'];
+                if ((int)($merged['sub_page'] ?? 1) > 1) $clean['sub_page'] = (int)$merged['sub_page'];
+
+                $queryString = !empty($clean) ? '?' . http_build_query($clean) : '';
+                return base_url('dashboard') . $queryString . '#tab-submission';
+            };
+            ?>
             <!-- Referral Program Mini Banner -->
             <div class="rounded-xl bg-gradient-to-r from-emerald-50 via-teal-50 to-indigo-50 border border-emerald-200/80 p-3.5 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
                 <div class="flex items-center gap-3">
@@ -528,41 +559,528 @@
                 </div>
             </div>
 
+            <!-- Panel Penyaringan & Pencarian Submisi -->
+            <div class="bg-white rounded-xl border border-slate-200 shadow-xs p-4 sm:p-5 space-y-4">
+                <!-- Baris Header Panel & Status Hasil -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                    <div class="flex items-center gap-2.5">
+                        <div class="p-2 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100 shrink-0">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-slate-800 leading-tight">Penyaringan &amp; Pencarian Submisi</h3>
+                            <p class="text-[11px] text-slate-500">Temukan karya ilmiah berdasarkan kata kunci, status pemeriksaan, hasil keputusan, engine, dan tanggal</p>
+                        </div>
+                    </div>
+
+                    <!-- Status Ringkasan Hasil -->
+                    <div class="flex items-center gap-2 text-xs text-slate-600">
+                        <span class="px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200 font-mono text-[11px]">
+                            Menampilkan <strong class="text-indigo-600"><?= number_format($subFilter['start_item']) ?>-<?= number_format($subFilter['end_item']) ?></strong> dari <strong class="text-slate-800"><?= number_format($subFilter['total_filtered']) ?></strong> data
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Shortcut Tombol Saring Cepat (Quick Filter Pills) -->
+                <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs no-scrollbar">
+                    <!-- 1. Semua Submisi -->
+                    <?php 
+                    $isAllSubActive = ($subFilter['status'] === 'all' && $subFilter['decision'] === 'all' && $subFilter['engine'] === 'all' && empty($subFilter['q']) && $subFilter['date'] === 'all');
+                    ?>
+                    <a href="<?= $subFilterUrl(['sub_status' => 'all', 'sub_decision' => 'all', 'sub_engine' => 'all', 'sub_date' => 'all', 'sub_q' => '']) ?>" 
+                       class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-medium transition-all whitespace-nowrap shrink-0 <?= $isAllSubActive ? 'bg-indigo-600 text-white shadow-xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200' ?>">
+                        <span>Semua Submisi</span>
+                        <span class="px-1.5 py-0.2 rounded-md text-[10px] <?= $isAllSubActive ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700' ?>"><?= number_format($subFilter['pill_stats']['total_all'] ?? 0) ?></span>
+                    </a>
+
+                    <!-- 2. Selesai Diperiksa -->
+                    <?php $isCompletedSubActive = ($subFilter['status'] === 'completed' && $subFilter['decision'] === 'all'); ?>
+                    <a href="<?= $subFilterUrl(['sub_status' => 'completed', 'sub_decision' => 'all']) ?>" 
+                       class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-medium transition-all whitespace-nowrap shrink-0 <?= $isCompletedSubActive ? 'bg-emerald-600 text-white shadow-xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200' ?>">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        <span>Selesai Diperiksa</span>
+                        <span class="px-1.5 py-0.2 rounded-md text-[10px] <?= $isCompletedSubActive ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-800' ?>"><?= number_format($subFilter['pill_stats']['total_completed'] ?? 0) ?></span>
+                    </a>
+
+                    <!-- 3. Sedang Proses -->
+                    <?php $isProcessingSubActive = ($subFilter['status'] === 'processing'); ?>
+                    <a href="<?= $subFilterUrl(['sub_status' => 'processing', 'sub_decision' => 'all']) ?>" 
+                       class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-medium transition-all whitespace-nowrap shrink-0 <?= $isProcessingSubActive ? 'bg-blue-600 text-white shadow-xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200' ?>">
+                        <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-ping"></span>
+                        <span>Sedang Proses</span>
+                        <span class="px-1.5 py-0.2 rounded-md text-[10px] <?= $isProcessingSubActive ? 'bg-white/20 text-white' : 'bg-blue-100 text-blue-800' ?>"><?= number_format($subFilter['pill_stats']['total_processing'] ?? 0) ?></span>
+                    </a>
+
+                    <!-- 4. Kemiripan Kuat (Match) -->
+                    <?php $isMatchSubActive = ($subFilter['decision'] === 'match'); ?>
+                    <a href="<?= $subFilterUrl(['sub_status' => 'completed', 'sub_decision' => 'match']) ?>" 
+                       class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-medium transition-all whitespace-nowrap shrink-0 <?= $isMatchSubActive ? 'bg-rose-600 text-white shadow-xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200' ?>">
+                        <span>Match (Kuat)</span>
+                        <span class="px-1.5 py-0.2 rounded-md text-[10px] <?= $isMatchSubActive ? 'bg-white/20 text-white' : 'bg-rose-100 text-rose-800' ?>"><?= number_format($subFilter['pill_stats']['total_match'] ?? 0) ?></span>
+                    </a>
+
+                    <!-- 5. Perlu Ditelaah (Review) -->
+                    <?php $isReviewSubActive = ($subFilter['decision'] === 'review'); ?>
+                    <a href="<?= $subFilterUrl(['sub_status' => 'completed', 'sub_decision' => 'review']) ?>" 
+                       class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-medium transition-all whitespace-nowrap shrink-0 <?= $isReviewSubActive ? 'bg-amber-600 text-white shadow-xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200' ?>">
+                        <span>Review (Telaah)</span>
+                        <span class="px-1.5 py-0.2 rounded-md text-[10px] <?= $isReviewSubActive ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-800' ?>"><?= number_format($subFilter['pill_stats']['total_review'] ?? 0) ?></span>
+                    </a>
+
+                    <!-- 6. Aman (No Match) -->
+                    <?php $isNoMatchSubActive = ($subFilter['decision'] === 'no_match'); ?>
+                    <a href="<?= $subFilterUrl(['sub_status' => 'completed', 'sub_decision' => 'no_match']) ?>" 
+                       class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-medium transition-all whitespace-nowrap shrink-0 <?= $isNoMatchSubActive ? 'bg-emerald-600 text-white shadow-xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200' ?>">
+                        <span>No Match (Aman)</span>
+                        <span class="px-1.5 py-0.2 rounded-md text-[10px] <?= $isNoMatchSubActive ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-800' ?>"><?= number_format($subFilter['pill_stats']['total_no_match'] ?? 0) ?></span>
+                    </a>
+                </div>
+
+                <!-- Formulir Pencarian & Dropdown Lengkap -->
+                <form action="<?= base_url('dashboard') ?>" method="get" id="subFilterForm" class="space-y-3">
+                    <input type="hidden" name="tab" value="tab-submission">
+
+                    <!-- Baris Pencarian Keyword & Tombol -->
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+                        <div class="relative flex-1">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                            </div>
+                            <input type="text" 
+                                   name="sub_q" 
+                                   value="<?= esc($subFilter['q'] ?? '') ?>" 
+                                   placeholder="Cari judul karya ilmiah, nama berkas, fakultas, program studi..." 
+                                   class="w-full pl-10 pr-9 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:bg-white transition-colors">
+                            <?php if (!empty($subFilter['q'])): ?>
+                                <a href="<?= $subFilterUrl(['sub_q' => '']) ?>" 
+                                   class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 transition-colors" 
+                                   title="Hapus kata kunci pencarian">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                </a>
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="flex items-center gap-2 shrink-0">
+                            <button type="submit" class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white rounded-xl text-xs font-semibold shadow-xs transition-all active:scale-95 cursor-pointer">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                <span>Terapkan Filter</span>
+                            </button>
+                            <?php if ($subFilter['is_active']): ?>
+                                <a href="<?= base_url('dashboard#tab-submission') ?>" class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-xs font-semibold transition-all cursor-pointer" title="Kembalikan semua filter ke kondisi awal">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                    <span>Reset</span>
+                                </a>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
+                    <!-- Baris Grid Dropdown Filters -->
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 pt-1">
+                        <!-- 1. Status Pekerjaan -->
+                        <div>
+                            <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Status Pemeriksaan</label>
+                            <select name="sub_status" onchange="this.form.submit()" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-indigo-500 focus:bg-white cursor-pointer">
+                                <option value="all" <?= ($subFilter['status'] === 'all') ? 'selected' : '' ?>>Semua Status</option>
+                                <option value="completed" <?= ($subFilter['status'] === 'completed') ? 'selected' : '' ?>>Selesai Diperiksa</option>
+                                <option value="processing" <?= ($subFilter['status'] === 'processing') ? 'selected' : '' ?>>Sedang Memproses</option>
+                                <option value="uploaded" <?= ($subFilter['status'] === 'uploaded') ? 'selected' : '' ?>>Antrean (Pending)</option>
+                                <option value="failed" <?= ($subFilter['status'] === 'failed') ? 'selected' : '' ?>>Gagal</option>
+                            </select>
+                        </div>
+
+                        <!-- 2. Keputusan & Ambang -->
+                        <div>
+                            <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Hasil &amp; Ambang</label>
+                            <select name="sub_decision" onchange="this.form.submit()" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-indigo-500 focus:bg-white cursor-pointer">
+                                <option value="all" <?= ($subFilter['decision'] === 'all') ? 'selected' : '' ?>>Semua Keputusan</option>
+                                <option value="no_match" <?= ($subFilter['decision'] === 'no_match') ? 'selected' : '' ?>>Aman (No Match)</option>
+                                <option value="review" <?= ($subFilter['decision'] === 'review') ? 'selected' : '' ?>>Perlu Ditelaah (Review)</option>
+                                <option value="match" <?= ($subFilter['decision'] === 'match') ? 'selected' : '' ?>>Kemiripan Kuat (Match)</option>
+                            </select>
+                        </div>
+
+                        <!-- 3. Engine Analisis -->
+                        <div>
+                            <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Engine Analisis</label>
+                            <select name="sub_engine" onchange="this.form.submit()" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-indigo-500 focus:bg-white cursor-pointer">
+                                <option value="all" <?= ($subFilter['engine'] === 'all') ? 'selected' : '' ?>>Semua Engine</option>
+                                <option value="hybrid" <?= ($subFilter['engine'] === 'hybrid') ? 'selected' : '' ?>>Hybrid Engine</option>
+                                <option value="tfidf" <?= ($subFilter['engine'] === 'tfidf') ? 'selected' : '' ?>>TF-IDF Cosine</option>
+                                <option value="exact_idf" <?= ($subFilter['engine'] === 'exact_idf') ? 'selected' : '' ?>>Exact Match + IDF</option>
+                                <option value="exact" <?= ($subFilter['engine'] === 'exact') ? 'selected' : '' ?>>Exact Match</option>
+                            </select>
+                        </div>
+
+                        <!-- 4. Periode Waktu -->
+                        <div>
+                            <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Periode Waktu</label>
+                            <select name="sub_date" onchange="this.form.submit()" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-indigo-500 focus:bg-white cursor-pointer">
+                                <option value="all" <?= ($subFilter['date'] === 'all') ? 'selected' : '' ?>>Semua Waktu</option>
+                                <option value="today" <?= ($subFilter['date'] === 'today') ? 'selected' : '' ?>>Hari Ini</option>
+                                <option value="yesterday" <?= ($subFilter['date'] === 'yesterday') ? 'selected' : '' ?>>Kemarin</option>
+                                <option value="7days" <?= ($subFilter['date'] === '7days') ? 'selected' : '' ?>>7 Hari Terakhir</option>
+                                <option value="30days" <?= ($subFilter['date'] === '30days') ? 'selected' : '' ?>>30 Hari Terakhir</option>
+                                <option value="this_month" <?= ($subFilter['date'] === 'this_month') ? 'selected' : '' ?>>Bulan Ini</option>
+                            </select>
+                        </div>
+
+                        <!-- 5. Urutan Data -->
+                        <div>
+                            <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Urutan Data</label>
+                            <select name="sub_sort" onchange="this.form.submit()" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-indigo-500 focus:bg-white cursor-pointer">
+                                <option value="newest" <?= ($subFilter['sort'] === 'newest') ? 'selected' : '' ?>>Terbaru Masuk (↓)</option>
+                                <option value="oldest" <?= ($subFilter['sort'] === 'oldest') ? 'selected' : '' ?>>Terlama Masuk (↑)</option>
+                                <option value="score_desc" <?= ($subFilter['sort'] === 'score_desc') ? 'selected' : '' ?>>Skor Tertinggi (↓)</option>
+                                <option value="score_asc" <?= ($subFilter['sort'] === 'score_asc') ? 'selected' : '' ?>>Skor Terendah (↑)</option>
+                                <option value="title_asc" <?= ($subFilter['sort'] === 'title_asc') ? 'selected' : '' ?>>Judul (A - Z)</option>
+                                <option value="title_desc" <?= ($subFilter['sort'] === 'title_desc') ? 'selected' : '' ?>>Judul (Z - A)</option>
+                            </select>
+                        </div>
+
+                        <!-- 6. Baris per Halaman -->
+                        <div>
+                            <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Per Halaman</label>
+                            <select name="sub_limit" onchange="this.form.submit()" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-indigo-500 focus:bg-white cursor-pointer">
+                                <option value="15" <?= ($subFilter['limit'] == 15) ? 'selected' : '' ?>>15 Baris</option>
+                                <option value="25" <?= ($subFilter['limit'] == 25) ? 'selected' : '' ?>>25 Baris</option>
+                                <option value="50" <?= ($subFilter['limit'] == 50) ? 'selected' : '' ?>>50 Baris</option>
+                                <option value="100" <?= ($subFilter['limit'] == 100) ? 'selected' : '' ?>>100 Baris</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Baris Tag/Chip Filter Aktif -->
+                <?php if ($subFilter['is_active']): ?>
+                    <div class="pt-3 border-t border-slate-100 flex items-center gap-1.5 flex-wrap text-xs">
+                        <span class="text-[11px] text-slate-500 font-semibold mr-1">Filter Aktif:</span>
+
+                        <?php if (!empty($subFilter['q'])): ?>
+                            <a href="<?= $subFilterUrl(['sub_q' => '']) ?>" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 transition-colors text-[11px]" title="Hapus pencarian kata kunci">
+                                <span>Pencarian: "<strong><?= esc($subFilter['q']) ?></strong>"</span>
+                                <span class="text-indigo-500 font-bold hover:text-indigo-900">✕</span>
+                            </a>
+                        <?php endif; ?>
+
+                        <?php if ($subFilter['status'] !== 'all'): ?>
+                            <?php
+                            $subStatusLabels = [
+                                'completed'  => 'Selesai Diperiksa',
+                                'processing' => 'Sedang Memproses',
+                                'uploaded'   => 'Antrean (Pending)',
+                                'failed'     => 'Gagal',
+                            ];
+                            ?>
+                            <a href="<?= $subFilterUrl(['sub_status' => 'all']) ?>" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition-colors text-[11px]" title="Hapus filter status">
+                                <span>Status: <strong><?= $subStatusLabels[$subFilter['status']] ?? esc($subFilter['status']) ?></strong></span>
+                                <span class="text-emerald-500 font-bold hover:text-emerald-900">✕</span>
+                            </a>
+                        <?php endif; ?>
+
+                        <?php if ($subFilter['decision'] !== 'all'): ?>
+                            <?php
+                            $subDecisionLabels = [
+                                'no_match' => 'Aman (No Match)',
+                                'review'   => 'Perlu Ditelaah (Review)',
+                                'match'    => 'Kemiripan Kuat (Match)',
+                            ];
+                            ?>
+                            <a href="<?= $subFilterUrl(['sub_decision' => 'all']) ?>" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100 transition-colors text-[11px]" title="Hapus filter keputusan">
+                                <span>Keputusan: <strong><?= $subDecisionLabels[$subFilter['decision']] ?? esc($subFilter['decision']) ?></strong></span>
+                                <span class="text-amber-600 font-bold hover:text-amber-900">✕</span>
+                            </a>
+                        <?php endif; ?>
+
+                        <?php if ($subFilter['engine'] !== 'all'): ?>
+                            <?php
+                            $subEngineLabels = [
+                                'hybrid'    => 'Hybrid Engine',
+                                'tfidf'     => 'TF-IDF Cosine',
+                                'exact_idf' => 'Exact Match + IDF',
+                                'exact'     => 'Exact Match',
+                            ];
+                            ?>
+                            <a href="<?= $subFilterUrl(['sub_engine' => 'all']) ?>" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-sky-50 text-sky-700 border border-sky-200 hover:bg-sky-100 transition-colors text-[11px]" title="Hapus filter engine">
+                                <span>Engine: <strong><?= $subEngineLabels[$subFilter['engine']] ?? esc($subFilter['engine']) ?></strong></span>
+                                <span class="text-sky-500 font-bold hover:text-sky-900">✕</span>
+                            </a>
+                        <?php endif; ?>
+
+                        <?php if ($subFilter['date'] !== 'all'): ?>
+                            <?php
+                            $subDateLabels = [
+                                'today'      => 'Hari Ini',
+                                'yesterday'  => 'Kemarin',
+                                '7days'      => '7 Hari Terakhir',
+                                '30days'     => '30 Hari Terakhir',
+                                'this_month' => 'Bulan Ini',
+                            ];
+                            ?>
+                            <a href="<?= $subFilterUrl(['sub_date' => 'all']) ?>" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100 transition-colors text-[11px]" title="Hapus filter waktu">
+                                <span>Periode: <strong><?= $subDateLabels[$subFilter['date']] ?? esc($subFilter['date']) ?></strong></span>
+                                <span class="text-purple-500 font-bold hover:text-purple-900">✕</span>
+                            </a>
+                        <?php endif; ?>
+
+                        <?php if ($subFilter['sort'] !== 'newest'): ?>
+                            <?php
+                            $subSortLabels = [
+                                'oldest'     => 'Terlama Masuk',
+                                'score_desc' => 'Skor Tertinggi',
+                                'score_asc'  => 'Skor Terendah',
+                                'title_asc'  => 'Judul (A-Z)',
+                                'title_desc' => 'Judul (Z-A)',
+                            ];
+                            ?>
+                            <a href="<?= $subFilterUrl(['sub_sort' => 'newest']) ?>" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200 transition-colors text-[11px]" title="Kembalikan urutan ke Terbaru">
+                                <span>Urutan: <strong><?= $subSortLabels[$subFilter['sort']] ?? esc($subFilter['sort']) ?></strong></span>
+                                <span class="text-slate-500 font-bold hover:text-slate-900">✕</span>
+                            </a>
+                        <?php endif; ?>
+
+                        <a href="<?= base_url('dashboard#tab-submission') ?>" class="text-[11px] text-rose-600 hover:text-rose-800 underline font-semibold ml-auto transition-colors">
+                            Hapus Semua Filter
+                        </a>
+                    </div>
+                <?php endif; ?>
+            </div>
+
             <!-- Submissions Table Card -->
             <div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
                 <div class="p-4 sm:p-5 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4">
                     <div>
-                        <h2 class="text-base sm:text-lg font-bold text-slate-800">Daftar Karya Ilmiah yang Diajukan</h2>
-                        <p class="text-xs text-slate-500">Memantau status pemeriksaan, engine yang digunakan, dan dekomposisi bukti akademis.</p>
+                        <div class="flex items-center gap-2.5">
+                            <h2 class="text-base sm:text-lg font-bold text-slate-800">Daftar Karya Ilmiah yang Diajukan</h2>
+                            <span class="px-2 py-0.5 rounded-full text-xs font-mono font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                <?= number_format($subFilter['total_filtered']) ?> Naskah
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-0.5">Memantau status pemeriksaan, engine yang digunakan, dan dekomposisi bukti akademis.</p>
                     </div>
                     <div class="flex items-center gap-2 self-end sm:self-auto">
                         <span class="text-[11px] text-slate-400 hidden sm:inline">Geser tabel jika terpotong →</span>
-                        <a href="<?= base_url('dashboard') ?>" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100 transition flex items-center gap-1">
+                        <a href="<?= $subFilterUrl() ?>" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100 transition flex items-center gap-1" title="Segarkan data submisi">
                             ↻ Refresh
                         </a>
                     </div>
                 </div>
 
                 <!-- Table Container with Horizontal Scroll -->
-                <div id="submissionsTableContainer" class="overflow-x-auto">
-                    <table class="min-w-[850px] sm:min-w-full w-full text-left border-collapse text-sm">
-                        <thead class="bg-slate-50 text-slate-500 uppercase text-[11px] font-bold border-b border-slate-200">
-                            <tr>
-                                <th class="p-3.5 sm:p-4 min-w-[200px]">Dokumen</th>
-                                <th class="p-3.5 sm:p-4 text-center w-20">Format</th>
-                                <th class="p-3.5 sm:p-4 min-w-[170px]">Engine & Keputusan</th>
-                                <th class="p-3.5 sm:p-4 min-w-[120px]">Similarity</th>
-                                <th class="p-3.5 sm:p-4 min-w-[135px]">Indikasi AI</th>
-                                <th class="p-3.5 sm:p-4 min-w-[130px] whitespace-nowrap">Tanggal Unggah</th>
-                                <th class="p-3.5 sm:p-4 text-right min-w-[175px] whitespace-nowrap">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100">
-                            <?php if (empty($submissions)): ?>
+                <div id="submissionsTableContainer">
+                    <!-- Mobile List View: Tampilan Kartu Responsif Khusus Smartphone (md:hidden) -->
+                    <div class="space-y-3 p-3 sm:p-4 md:hidden border-b border-slate-100">
+                        <?php if (empty($submissions)): ?>
+                            <div class="py-8 text-center text-slate-500 text-xs">
+                                <div class="text-2xl text-slate-400 mb-1">🔍</div>
+                                <div class="font-medium text-slate-600"><?= $subFilter['is_active'] ? 'Tidak ada karya ilmiah yang cocok dengan filter.' : 'Belum ada karya ilmiah yang diajukan.' ?></div>
+                                <?php if ($subFilter['is_active']): ?>
+                                    <div class="mt-2">
+                                        <a href="<?= base_url('dashboard#tab-submission') ?>" class="text-indigo-600 font-semibold underline">Reset Semua Filter</a>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        <?php else: ?>
+                            <?php foreach ($submissions as $sub): 
+                                $rep = $sub['latest_report'] ?? null;
+                                $isProcessing = $rep && in_array($rep['status'] ?? '', ['processing', 'pending'], true);
+                                $isPurged = !empty($sub['file_purged_at']) || ($sub['storage_path'] ?? '') === '[PURGED]';
+                            ?>
+                                <div class="submission-row <?= $isProcessing ? 'submission-processing' : '' ?> bg-slate-50/70 hover:bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2.5 transition-colors">
+                                    <!-- Baris 1: Format & Keputusan di Kiri, Aksi Cepat di Kanan -->
+                                    <div class="flex items-center justify-between gap-2">
+                                        <div class="flex items-center gap-1.5 flex-wrap min-w-0">
+                                            <span class="px-1.5 py-0.5 rounded text-[10px] bg-slate-200 text-slate-700 font-mono font-bold">
+                                                <?= strtoupper(pathinfo($sub['original_filename'], PATHINFO_EXTENSION)) ?>
+                                            </span>
+                                            <?php if ($rep): ?>
+                                                <span class="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-slate-200/80 text-slate-600">
+                                                    <?= strtoupper(esc($rep['engine'] ?? 'hybrid')) ?>
+                                                </span>
+                                                <?php 
+                                                    $dec = $rep['predicted_decision'] ?? 'no_match';
+                                                    $status = $rep['status'] ?? 'pending';
+                                                ?>
+                                                <?php if ($status === 'completed'): ?>
+                                                    <?php if ($dec === 'match'): ?>
+                                                        <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 border border-rose-200">MATCH</span>
+                                                    <?php elseif ($dec === 'review'): ?>
+                                                        <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200">REVIEW</span>
+                                                    <?php else: ?>
+                                                        <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">NO MATCH</span>
+                                                    <?php endif; ?>
+                                                <?php elseif ($status === 'processing'): ?>
+                                                    <span class="inline-flex items-center gap-1 text-[9px] font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 border border-blue-200 animate-pulse">
+                                                        <span class="w-1.5 h-1.5 rounded-full bg-blue-600 animate-ping"></span>
+                                                        Proses
+                                                    </span>
+                                                <?php else: ?>
+                                                    <span class="text-[9px] font-medium px-2 py-0.5 rounded-full bg-slate-200 text-slate-600">Antre</span>
+                                                <?php endif; ?>
+                                            <?php else: ?>
+                                                <span class="text-[10px] text-slate-400">Belum diperiksa</span>
+                                            <?php endif; ?>
+                                        </div>
+
+                                        <!-- Tombol Aksi di Mobile -->
+                                        <div class="flex items-center gap-1 shrink-0">
+                                            <?php if ($rep && ($rep['status'] ?? '') === 'completed'): ?>
+                                                <a href="<?= base_url('dashboard/report/' . $rep['id']) ?>" class="px-2 py-1 bg-indigo-600 text-white rounded-lg text-[11px] font-semibold shadow-2xs hover:bg-indigo-700 transition">
+                                                    Laporan
+                                                </a>
+                                            <?php elseif (! $isPurged): ?>
+                                                <button type="button" onclick="triggerCheck(<?= $sub['id'] ?>)" class="px-2 py-1 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded-lg text-[11px] font-semibold transition cursor-pointer">
+                                                    Cek
+                                                </button>
+                                            <?php endif; ?>
+
+                                            <button type="button" onclick="openShareModal(<?= $sub['id'] ?>, <?= htmlspecialchars(json_encode($sub['title']), ENT_QUOTES, 'UTF-8') ?>)" class="p-1 text-sky-600 hover:bg-sky-50 rounded-lg border border-sky-200 transition cursor-pointer" title="Bagikan">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+                                            </button>
+
+                                            <!-- Dropdown Menu Aksi Lainnya Mobile -->
+                                            <div class="relative inline-block text-left action-dropdown-container">
+                                                <button type="button" onclick="toggleActionDropdown(this, event)" class="p-1 text-slate-500 hover:bg-slate-100 rounded-lg border border-slate-200 transition cursor-pointer">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/></svg>
+                                                </button>
+                                                <div class="action-dropdown-menu hidden bg-white rounded-xl shadow-xl border border-slate-100 py-1.5 w-48 text-left text-xs divide-y divide-slate-100">
+                                                    <div class="py-1">
+                                                        <?php if (! $isPurged): ?>
+                                                        <button type="button" onclick="closeAllActionDropdowns(); triggerCheck(<?= $sub['id'] ?>)" class="w-full text-left px-3 py-1.5 text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 flex items-center gap-2 transition cursor-pointer">
+                                                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                                            <span>Ulangi Pemeriksaan</span>
+                                                        </button>
+                                                        <button type="button" onclick="closeAllActionDropdowns(); openPurgeFileModal(<?= $sub['id'] ?>, <?= htmlspecialchars(json_encode($sub['title']), ENT_QUOTES, 'UTF-8') ?>)" class="w-full text-left px-3 py-1.5 text-rose-700 hover:bg-rose-50 flex items-center gap-2 transition cursor-pointer">
+                                                            <span class="text-sm">🛡️</span>
+                                                            <span>Musnahkan Berkas</span>
+                                                        </button>
+                                                        <?php endif; ?>
+                                                        <a href="<?= base_url('api/documents/' . $sub['id']) ?>" target="_blank" onclick="closeAllActionDropdowns()" class="w-full text-left px-3 py-1.5 text-slate-700 hover:bg-slate-50 flex items-center gap-2 transition">
+                                                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                                                            <span>Lihat Data (JSON)</span>
+                                                        </a>
+                                                    </div>
+                                                    <div class="py-1">
+                                                        <button type="button" onclick="closeAllActionDropdowns(); openDeleteDocModal(<?= $sub['id'] ?>, <?= htmlspecialchars(json_encode($sub['title']), ENT_QUOTES, 'UTF-8') ?>)" class="w-full text-left px-3 py-1.5 text-rose-600 hover:bg-rose-50 flex items-center gap-2 transition cursor-pointer">
+                                                            <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                            <span>Hapus Submisi</span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Baris 2: Judul & Berkas -->
+                                    <div>
+                                        <div class="font-bold text-slate-900 text-xs sm:text-sm line-clamp-2" title="<?= esc($sub['title']) ?>">
+                                            <?= esc($sub['title']) ?>
+                                        </div>
+                                        <div class="text-[11px] text-slate-400 truncate mt-0.5">
+                                            <?= esc($sub['original_filename']) ?>
+                                            <?php if ($isPurged): ?>
+                                                <span class="ml-1 text-[10px] text-emerald-700 font-semibold bg-emerald-50 px-1 rounded border border-emerald-200">🛡️ Dimusnahkan</span>
+                                            <?php endif; ?>
+                                        </div>
+                                        <?php if (!empty($sub['faculty']) || !empty($sub['department'])): ?>
+                                            <div class="mt-1 flex items-center gap-1.5 flex-wrap text-[10px]">
+                                                <?php if (!empty($sub['faculty'])): ?>
+                                                    <span class="px-1.5 py-0.5 rounded bg-slate-200/60 text-slate-700">🏛️ <?= esc($sub['faculty']) ?></span>
+                                                <?php endif; ?>
+                                                <?php if (!empty($sub['department'])): ?>
+                                                    <span class="px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-100">🎓 <?= esc($sub['department']) ?></span>
+                                                <?php endif; ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+
+                                    <!-- Baris 3: Similarity, AI & Tanggal -->
+                                    <div class="pt-2 border-t border-slate-200/80 flex items-center justify-between text-xs gap-2">
+                                        <div class="flex items-center gap-3">
+                                            <div>
+                                                <span class="text-[10px] text-slate-400 block">Similarity</span>
+                                                <?php if ($rep && ($rep['status'] ?? '') === 'completed'): ?>
+                                                    <span class="font-black text-xs <?= $rep['overall_similarity'] >= 70 ? 'text-rose-600' : ($rep['overall_similarity'] >= 10 ? 'text-amber-600' : 'text-slate-800') ?>">
+                                                        <?= number_format($rep['overall_similarity'], 1) ?>%
+                                                    </span>
+                                                <?php else: ?>
+                                                    <span class="text-slate-400 text-xs">-</span>
+                                                <?php endif; ?>
+                                            </div>
+
+                                            <div>
+                                                <span class="text-[10px] text-slate-400 block">Indikasi AI</span>
+                                                <?php 
+                                                    $aiData = $sub['latest_report']['ai_assessment'] ?? \App\Controllers\DashboardController::extractAiMetrics($rep);
+                                                ?>
+                                                <?php if ($rep && ($rep['status'] ?? '') === 'completed' && $aiData !== null): ?>
+                                                    <span class="font-bold text-xs <?= in_array($aiData['level'] ?? '', ['HIGH', 'EXTREME'], true) ? 'text-rose-600' : (($aiData['level'] ?? '') === 'MODERATE' ? 'text-amber-600' : 'text-emerald-600') ?>">
+                                                        <?= number_format($aiData['score'], 1) ?>%
+                                                    </span>
+                                                <?php else: ?>
+                                                    <span class="text-slate-400 text-xs">-</span>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+
+                                        <div class="text-right">
+                                            <span class="text-[10px] text-slate-400 block">Tanggal</span>
+                                            <span class="text-[11px] text-slate-600 font-medium"><?= date('d M Y', strtotime($sub['created_at'])) ?></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- Desktop Table View: Terlihat di Layar md ke Atas -->
+                    <div class="hidden md:block overflow-x-auto">
+                        <table class="min-w-[850px] sm:min-w-full w-full text-left border-collapse text-sm">
+                            <thead class="bg-slate-50 text-slate-500 uppercase text-[11px] font-bold border-b border-slate-200">
                                 <tr>
-                                    <td colspan="7" class="p-8 text-center text-slate-400 text-xs sm:text-sm">Belum ada karya ilmiah yang diunggah.</td>
+                                    <th class="p-3.5 sm:p-4 min-w-[200px]">
+                                        <a href="<?= $subFilterUrl(['sub_sort' => ($subFilter['sort'] === 'title_asc' ? 'title_desc' : 'title_asc')]) ?>" class="hover:text-slate-900 inline-flex items-center gap-1 transition-colors" title="Klik untuk mengurutkan berdasarkan Judul Dokumen">
+                                            <span>Dokumen</span>
+                                            <span class="text-[10px] text-indigo-500"><?= $subFilter['sort'] === 'title_asc' ? '▲' : ($subFilter['sort'] === 'title_desc' ? '▼' : '↕') ?></span>
+                                        </a>
+                                    </th>
+                                    <th class="p-3.5 sm:p-4 text-center w-20">Format</th>
+                                    <th class="p-3.5 sm:p-4 min-w-[170px]">Engine & Keputusan</th>
+                                    <th class="p-3.5 sm:p-4 min-w-[120px]">
+                                        <a href="<?= $subFilterUrl(['sub_sort' => ($subFilter['sort'] === 'score_desc' ? 'score_asc' : 'score_desc')]) ?>" class="hover:text-slate-900 inline-flex items-center gap-1 transition-colors" title="Klik untuk mengurutkan berdasarkan Skor Kemiripan">
+                                            <span>Similarity</span>
+                                            <span class="text-[10px] text-indigo-500"><?= $subFilter['sort'] === 'score_desc' ? '▼' : ($subFilter['sort'] === 'score_asc' ? '▲' : '↕') ?></span>
+                                        </a>
+                                    </th>
+                                    <th class="p-3.5 sm:p-4 min-w-[135px]">Indikasi AI</th>
+                                    <th class="p-3.5 sm:p-4 min-w-[130px] whitespace-nowrap">
+                                        <a href="<?= $subFilterUrl(['sub_sort' => ($subFilter['sort'] === 'newest' ? 'oldest' : 'newest')]) ?>" class="hover:text-slate-900 inline-flex items-center gap-1 transition-colors" title="Klik untuk mengurutkan berdasarkan Tanggal Unggah">
+                                            <span>Tanggal Unggah</span>
+                                            <span class="text-[10px] text-indigo-500"><?= $subFilter['sort'] === 'newest' ? '▼' : ($subFilter['sort'] === 'oldest' ? '▲' : '↕') ?></span>
+                                        </a>
+                                    </th>
+                                    <th class="p-3.5 sm:p-4 text-right min-w-[175px] whitespace-nowrap">Aksi</th>
                                 </tr>
-                            <?php else: ?>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                <?php if (empty($submissions)): ?>
+                                    <tr>
+                                        <td colspan="7" class="p-10 text-center text-slate-500 text-xs sm:text-sm">
+                                            <div class="space-y-2">
+                                                <div class="text-2xl text-slate-400">🔍</div>
+                                                <div class="font-medium text-slate-600">
+                                                    <?= $subFilter['is_active'] ? 'Tidak ada karya ilmiah yang cocok dengan kriteria penyaringan saat ini.' : 'Belum ada karya ilmiah yang diajukan.' ?>
+                                                </div>
+                                                <?php if ($subFilter['is_active']): ?>
+                                                    <div class="pt-1">
+                                                        <a href="<?= base_url('dashboard#tab-submission') ?>" class="inline-flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-800 font-semibold underline">
+                                                            Hapus Semua Filter &amp; Tampilkan Seluruh Data
+                                                        </a>
+                                                    </div>
+                                                <?php endif; ?>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php else: ?>
                                 <?php foreach ($submissions as $sub): 
                                     $rep = $sub['latest_report'] ?? null;
                                     $isProcessing = $rep && in_array($rep['status'] ?? '', ['processing', 'pending'], true);
@@ -796,6 +1314,68 @@
                         </tbody>
                     </table>
                 </div>
+            </div>
+
+            <!-- Baris Paginasi & Kontrol Halaman Bawah -->
+            <div class="p-4 sm:p-5 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-50/60">
+                <div class="text-xs text-slate-600">
+                    Menampilkan <strong class="text-slate-800"><?= number_format($subFilter['start_item']) ?></strong> - <strong class="text-slate-800"><?= number_format($subFilter['end_item']) ?></strong> dari <strong class="text-indigo-600"><?= number_format($subFilter['total_filtered']) ?></strong> karya ilmiah
+                    <?php if ($subFilter['is_active']): ?>
+                        <span class="text-indigo-500 font-semibold">(Hasil Difilter)</span>
+                    <?php endif; ?>
+                </div>
+
+                <?php if ($subFilter['total_pages'] > 1): ?>
+                    <div class="flex items-center gap-1.5 flex-wrap justify-center">
+                        <!-- Tombol Halaman Pertama & Sebelumnya -->
+                        <?php if ($subFilter['page'] > 1): ?>
+                            <a href="<?= $subFilterUrl(['sub_page' => 1]) ?>" class="p-1.5 rounded-lg bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition shadow-2xs" title="Halaman Pertama">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/></svg>
+                            </a>
+                            <a href="<?= $subFilterUrl(['sub_page' => $subFilter['page'] - 1]) ?>" class="px-2.5 py-1.5 rounded-lg bg-white border border-slate-200 text-xs font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition shadow-2xs">
+                                Sebelumnya
+                            </a>
+                        <?php else: ?>
+                            <span class="px-2.5 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-xs text-slate-400 cursor-not-allowed">
+                                Sebelumnya
+                            </span>
+                        <?php endif; ?>
+
+                        <!-- Angka Halaman Berurutan -->
+                        <?php
+                        $startSubPage = max(1, $subFilter['page'] - 2);
+                        $endSubPage   = min($subFilter['total_pages'], $startSubPage + 4);
+                        if ($endSubPage - $startSubPage < 4) {
+                            $startSubPage = max(1, $endSubPage - 4);
+                        }
+                        ?>
+                        <?php for ($sp = $startSubPage; $sp <= $endSubPage; $sp++): ?>
+                            <?php if ($sp === $subFilter['page']): ?>
+                                <span class="px-3 py-1 rounded-lg bg-indigo-600 text-white font-bold text-xs shadow-xs">
+                                    <?= $sp ?>
+                                </span>
+                            <?php else: ?>
+                                <a href="<?= $subFilterUrl(['sub_page' => $sp]) ?>" class="px-3 py-1 rounded-lg bg-white border border-slate-200 text-xs font-medium text-slate-700 hover:text-indigo-600 hover:bg-slate-100 transition shadow-2xs">
+                                    <?= $sp ?>
+                                </a>
+                            <?php endif; ?>
+                        <?php endfor; ?>
+
+                        <!-- Tombol Halaman Berikutnya & Terakhir -->
+                        <?php if ($subFilter['page'] < $subFilter['total_pages']): ?>
+                            <a href="<?= $subFilterUrl(['sub_page' => $subFilter['page'] + 1]) ?>" class="px-2.5 py-1.5 rounded-lg bg-white border border-slate-200 text-xs font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition shadow-2xs">
+                                Berikutnya
+                            </a>
+                            <a href="<?= $subFilterUrl(['sub_page' => $subFilter['total_pages']]) ?>" class="p-1.5 rounded-lg bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition shadow-2xs" title="Halaman Terakhir">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"/></svg>
+                            </a>
+                        <?php else: ?>
+                            <span class="px-2.5 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-xs text-slate-400 cursor-not-allowed">
+                                Berikutnya
+                            </span>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
 
@@ -2235,7 +2815,7 @@
 
         async function fetchSubmissionsTableSilently() {
             try {
-                const res = await fetch('<?= base_url('dashboard') ?>', {
+                const res = await fetch(window.location.href, {
                     headers: { 'X-Requested-With': 'XMLHttpRequest' }
                 });
                 if (!res.ok) return;
@@ -2297,10 +2877,17 @@
         document.addEventListener('DOMContentLoaded', function() {
             checkAndPollSubmissions();
             initQuotaCountdown();
-            const hashTab = window.location.hash ? window.location.hash.substring(1) : null;
-            const savedTab = hashTab || localStorage.getItem('ar_tilik_active_tab');
-            if (savedTab && document.getElementById(savedTab)) {
-                switchTab(savedTab);
+            const urlParams = new URLSearchParams(window.location.search);
+            let targetTab = null;
+            if (urlParams.has('sub_q') || urlParams.has('sub_status') || urlParams.has('sub_decision') || urlParams.has('sub_engine') || urlParams.has('sub_date') || urlParams.has('sub_sort') || urlParams.has('sub_page')) {
+                targetTab = 'tab-submission';
+            } else if (urlParams.has('corpus_search') || urlParams.has('corpus_page')) {
+                targetTab = 'tab-corpus';
+            } else {
+                targetTab = (window.location.hash ? window.location.hash.substring(1) : null) || localStorage.getItem('ar_tilik_active_tab');
+            }
+            if (targetTab && document.getElementById(targetTab)) {
+                switchTab(targetTab);
             }
         });
 

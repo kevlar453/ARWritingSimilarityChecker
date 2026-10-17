@@ -28,23 +28,184 @@ class DashboardController extends BaseController
         $reportModel = new ReportModel();
         $db = db_connect();
 
-        // Dokumen submisi: hanya tampilkan submisi milik user yang sedang login (kecuali admin)
-        $subBuilder = $docModel->where('document_type', 'submission')
-                               ->where('benchmark_run_id IS NULL', null, false);
-
-        if (($currentUser['role'] ?? 'user') !== 'admin') {
-            $subBuilder->where('user_id', $userId);
-        }
-
-        $submissions = $subBuilder->orderBy('id', 'DESC')->findAll(20);
-
         // Hitung total korpus aktif untuk fallback metrik pembanding
         $totalCorpus = $docModel->where('document_type', 'corpus')->where('benchmark_run_id IS NULL', null, false)->countAllResults();
 
+        // Parameter Filter & Pencarian Submisi Pengguna
+        $subSearch   = trim((string) ($this->request->getGet('sub_q') ?? ''));
+        $subStatus   = trim((string) ($this->request->getGet('sub_status') ?? 'all'));
+        $subDecision = trim((string) ($this->request->getGet('sub_decision') ?? 'all'));
+        $subEngine   = trim((string) ($this->request->getGet('sub_engine') ?? 'all'));
+        $subDate     = trim((string) ($this->request->getGet('sub_date') ?? 'all'));
+        $subSort     = trim((string) ($this->request->getGet('sub_sort') ?? 'newest'));
+        $subLimit    = (int) ($this->request->getGet('sub_limit') ?? 15);
+        if (! in_array($subLimit, [15, 25, 50, 100], true)) {
+            $subLimit = 15;
+        }
+        $subPage = max(1, (int) ($this->request->getGet('sub_page') ?? 1));
+
+        // Validasi nilai parameter agar aman & terprediksi
+        if (! in_array($subStatus, ['all', 'completed', 'processing', 'uploaded', 'failed'], true)) {
+            $subStatus = 'all';
+        }
+        if (! in_array($subDecision, ['all', 'no_match', 'review', 'match'], true)) {
+            $subDecision = 'all';
+        }
+        if (! in_array($subEngine, ['all', 'hybrid', 'tfidf', 'exact_idf', 'exact'], true)) {
+            $subEngine = 'all';
+        }
+        if (! in_array($subDate, ['all', 'today', 'yesterday', '7days', '30days', 'this_month'], true)) {
+            $subDate = 'all';
+        }
+        if (! in_array($subSort, ['newest', 'oldest', 'score_desc', 'score_asc', 'title_asc', 'title_desc'], true)) {
+            $subSort = 'newest';
+        }
+
+        $isFilterActive = ($subSearch !== '' || $subStatus !== 'all' || $subDecision !== 'all' || $subEngine !== 'all' || $subDate !== 'all' || $subSort !== 'newest');
+        $activeFilterCount = 0;
+        if ($subSearch !== '') $activeFilterCount++;
+        if ($subStatus !== 'all') $activeFilterCount++;
+        if ($subDecision !== 'all') $activeFilterCount++;
+        if ($subEngine !== 'all') $activeFilterCount++;
+        if ($subDate !== 'all') $activeFilterCount++;
+        if ($subSort !== 'newest') $activeFilterCount++;
+
+        // Base Builder untuk submisi user (hanya tampilkan submisi milik user yang login, kecuali admin)
+        $subBuilder = $db->table('documents d')
+                         ->join('(SELECT document_id, MAX(id) as latest_report_id FROM reports GROUP BY document_id) lr', 'lr.document_id = d.id', 'left', false)
+                         ->join('reports rep', 'rep.id = lr.latest_report_id', 'left')
+                         ->where('d.document_type', 'submission')
+                         ->where('d.benchmark_run_id IS NULL', null, false);
+
+        if (($currentUser['role'] ?? 'user') !== 'admin') {
+            $subBuilder->where('d.user_id', $userId);
+        }
+
+        // Statistik Saring Cepat (Quick Pill Counters)
+        $basePillBuilder = clone $subBuilder;
+        $pillStats = $basePillBuilder
+            ->select("
+                COUNT(d.id) as total_all,
+                SUM(CASE WHEN rep.status = 'completed' THEN 1 ELSE 0 END) as total_completed,
+                SUM(CASE WHEN rep.status IN ('processing', 'pending') OR d.status IN ('uploaded', 'processing') THEN 1 ELSE 0 END) as total_processing,
+                SUM(CASE WHEN rep.status = 'completed' AND rep.predicted_decision = 'match' THEN 1 ELSE 0 END) as total_match,
+                SUM(CASE WHEN rep.status = 'completed' AND rep.predicted_decision = 'review' THEN 1 ELSE 0 END) as total_review,
+                SUM(CASE WHEN rep.status = 'completed' AND (rep.predicted_decision = 'no_match' OR rep.predicted_decision IS NULL) THEN 1 ELSE 0 END) as total_no_match
+            ", false)
+            ->get()
+            ->getRowArray();
+
+        $subBuilder->select('d.*, lr.latest_report_id, rep.status as rep_status, rep.predicted_decision as rep_predicted_decision, rep.engine as rep_engine, rep.overall_similarity as rep_overall_similarity');
+
+        // Terapkan Filter Pencarian Kata Kunci
+        if ($subSearch !== '') {
+            $subBuilder->groupStart()
+                       ->like('d.title', $subSearch)
+                       ->orLike('d.original_filename', $subSearch)
+                       ->orLike('d.faculty', $subSearch)
+                       ->orLike('d.department', $subSearch)
+                       ->groupEnd();
+        }
+
+        // Terapkan Filter Status Pekerjaan / Pemeriksaan
+        if ($subStatus === 'completed') {
+            $subBuilder->where('rep.status', 'completed');
+        } elseif ($subStatus === 'processing') {
+            $subBuilder->groupStart()
+                       ->whereIn('rep.status', ['processing', 'pending'])
+                       ->orWhereIn('d.status', ['uploaded', 'processing'])
+                       ->groupEnd();
+        } elseif ($subStatus === 'uploaded') {
+            $subBuilder->where('d.status', 'uploaded')
+                       ->groupStart()
+                           ->where('rep.status IS NULL', null, false)
+                           ->orWhere('rep.status', 'pending')
+                       ->groupEnd();
+        } elseif ($subStatus === 'failed') {
+            $subBuilder->groupStart()
+                       ->where('rep.status', 'failed')
+                       ->orWhere('d.status', 'failed')
+                       ->groupEnd();
+        }
+
+        // Terapkan Filter Keputusan / Ambang Batas
+        if ($subDecision === 'match') {
+            $subBuilder->where('rep.status', 'completed')
+                       ->where('rep.predicted_decision', 'match');
+        } elseif ($subDecision === 'review') {
+            $subBuilder->where('rep.status', 'completed')
+                       ->where('rep.predicted_decision', 'review');
+        } elseif ($subDecision === 'no_match') {
+            $subBuilder->where('rep.status', 'completed')
+                       ->groupStart()
+                           ->where('rep.predicted_decision', 'no_match')
+                           ->orWhere('rep.predicted_decision IS NULL', null, false)
+                       ->groupEnd();
+        }
+
+        // Terapkan Filter Engine Analisis
+        if (in_array($subEngine, ['hybrid', 'tfidf', 'exact_idf', 'exact'], true)) {
+            $subBuilder->where('rep.engine', $subEngine);
+        }
+
+        // Terapkan Filter Periode Waktu
+        if ($subDate === 'today') {
+            $subBuilder->where('d.created_at >=', date('Y-m-d 00:00:00'));
+        } elseif ($subDate === 'yesterday') {
+            $subBuilder->where('d.created_at >=', date('Y-m-d 00:00:00', strtotime('-1 day')))
+                       ->where('d.created_at <', date('Y-m-d 00:00:00'));
+        } elseif ($subDate === '7days') {
+            $subBuilder->where('d.created_at >=', date('Y-m-d H:i:s', strtotime('-7 days')));
+        } elseif ($subDate === '30days') {
+            $subBuilder->where('d.created_at >=', date('Y-m-d H:i:s', strtotime('-30 days')));
+        } elseif ($subDate === 'this_month') {
+            $subBuilder->where('d.created_at >=', date('Y-m-01 00:00:00'));
+        }
+
+        // Hitung total hasil yang cocok dengan filter untuk paginasi
+        $countBuilder = clone $subBuilder;
+        $totalFilteredSubmissions = $countBuilder->countAllResults();
+
+        // Urutan Data
+        if ($subSort === 'oldest') {
+            $subBuilder->orderBy('d.id', 'ASC');
+        } elseif ($subSort === 'score_desc') {
+            $subBuilder->orderBy('rep.overall_similarity', 'DESC')
+                       ->orderBy('d.id', 'DESC');
+        } elseif ($subSort === 'score_asc') {
+            $subBuilder->orderBy('(rep.overall_similarity IS NULL)', 'ASC', false)
+                       ->orderBy('rep.overall_similarity', 'ASC')
+                       ->orderBy('d.id', 'DESC');
+        } elseif ($subSort === 'title_asc') {
+            $subBuilder->orderBy('d.title', 'ASC');
+        } elseif ($subSort === 'title_desc') {
+            $subBuilder->orderBy('d.title', 'DESC');
+        } else {
+            $subBuilder->orderBy('d.id', 'DESC');
+        }
+
+        // Kalkulasi Paginasi
+        $totalPages = max(1, (int) ceil($totalFilteredSubmissions / $subLimit));
+        if ($subPage > $totalPages && $totalFilteredSubmissions > 0) {
+            $subPage = $totalPages;
+        }
+        $offset = ($subPage - 1) * $subLimit;
+
+        $submissions = $subBuilder->limit($subLimit, $offset)->get()->getResultArray();
+
+        // Hidrasi data laporan lengkap (batch query)
+        $reportIds = array_filter(array_column($submissions, 'latest_report_id'));
+        $reportsById = [];
+        if (!empty($reportIds)) {
+            $reportsList = $reportModel->whereIn('id', $reportIds)->findAll();
+            foreach ($reportsList as $r) {
+                $reportsById[$r['id']] = $r;
+            }
+        }
+
         foreach ($submissions as &$sub) {
-            $latestReport = (new ReportModel())->where('document_id', $sub['id'])
-                                               ->orderBy('id', 'DESC')
-                                               ->first();
+            $repId = $sub['latest_report_id'] ?? null;
+            $latestReport = ($repId && isset($reportsById[$repId])) ? $reportsById[$repId] : null;
             if ($latestReport) {
                 $latestReport['ai_assessment'] = self::extractAiMetrics($latestReport);
                 $latestReport['corpus_docs_count'] = self::extractCorpusCount($latestReport, $totalCorpus);
@@ -52,6 +213,31 @@ class DashboardController extends BaseController
             $sub['latest_report'] = $latestReport;
         }
         unset($sub);
+
+        $subFilter = [
+            'q'              => $subSearch,
+            'status'         => $subStatus,
+            'decision'       => $subDecision,
+            'engine'         => $subEngine,
+            'date'           => $subDate,
+            'sort'           => $subSort,
+            'limit'          => $subLimit,
+            'page'           => $subPage,
+            'is_active'      => $isFilterActive,
+            'active_count'   => $activeFilterCount,
+            'total_filtered' => $totalFilteredSubmissions,
+            'total_pages'    => $totalPages,
+            'start_item'     => $totalFilteredSubmissions > 0 ? $offset + 1 : 0,
+            'end_item'       => min($offset + $subLimit, $totalFilteredSubmissions),
+            'pill_stats'     => [
+                'total_all'        => (int) ($pillStats['total_all'] ?? 0),
+                'total_completed'  => (int) ($pillStats['total_completed'] ?? 0),
+                'total_processing' => (int) ($pillStats['total_processing'] ?? 0),
+                'total_match'      => (int) ($pillStats['total_match'] ?? 0),
+                'total_review'     => (int) ($pillStats['total_review'] ?? 0),
+                'total_no_match'   => (int) ($pillStats['total_no_match'] ?? 0),
+            ],
+        ];
 
         // Dokumen korpus dengan pencarian dan paginasi
         $corpusSearch = trim((string) ($this->request->getGet('corpus_search') ?? ''));
@@ -141,6 +327,7 @@ class DashboardController extends BaseController
 
         return view('dashboard/index', [
             'submissions'         => $submissions,
+            'subFilter'           => $subFilter,
             'sharedDocuments'     => $sharedDocuments,
             'corpusDocs'          => $corpusDocs,
             'corpusSearch'        => $corpusSearch,
