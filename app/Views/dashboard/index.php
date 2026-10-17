@@ -1378,6 +1378,7 @@
                 <?php endif; ?>
             </div>
         </div>
+    </div>
 
         <!-- TAB: Dibagikan dengan Saya -->
         <div id="tab-shared" class="tab-content space-y-6 hidden">
