@@ -39,11 +39,12 @@ class SystemSpecs
         try {
             $totalCorpus = (int) $db->table('documents')
                 ->where('document_type', 'corpus')
-                ->where('status', 'completed')
+                ->where('benchmark_run_id IS NULL', null, false)
                 ->countAllResults();
 
             $totalSubmissions = (int) $db->table('documents')
                 ->where('document_type', 'submission')
+                ->where('benchmark_run_id IS NULL', null, false)
                 ->countAllResults();
 
             $totalReports = (int) $db->table('reports')

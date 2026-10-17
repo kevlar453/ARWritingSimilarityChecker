@@ -14,14 +14,15 @@ class LandingController extends BaseController
     {
         $db = db_connect();
 
-        // Ambil statistik riil sistem untuk transparansi ilmiah
+        // Ambil statistik riil sistem untuk transparansi ilmiah (selaras dengan dashboard produksi)
         $totalCorpus = $db->table('documents')
             ->where('document_type', 'corpus')
-            ->where('status', 'completed')
+            ->where('benchmark_run_id IS NULL', null, false)
             ->countAllResults();
 
         $totalSubmissions = $db->table('documents')
             ->where('document_type', 'submission')
+            ->where('benchmark_run_id IS NULL', null, false)
             ->countAllResults();
 
         $totalReports = $db->table('reports')
