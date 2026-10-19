@@ -276,7 +276,7 @@
                     <a href="<?= base_url('admin?tab=google_keys') ?>" class="group flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 <?= $activeTab === 'google_keys' ? 'bg-indigo-600/15 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent' ?>">
                         <div class="flex items-center gap-2.5">
                             <svg class="w-4 h-4 <?= $activeTab === 'google_keys' ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                            <span>Google AI Keys (Pool)</span>
+                            <span>AI Gateway (Groq &amp; Gemini)</span>
                         </div>
                         <span id="sidebar-badge-google_keys" class="px-2 py-0.5 rounded-full text-[10px] font-semibold transition-all duration-300 <?= ($activeGoogleKeysCount ?? 0) > 0 ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-slate-800 text-slate-400' ?>">
                             <?= (int) ($activeGoogleKeysCount ?? 0) ?> aktif
@@ -2864,10 +2864,10 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div>
                         <h2 class="text-lg font-bold text-white flex items-center gap-2">
-                            Kumpulan Kunci Google Gemini API (Pool &amp; Round-Robin)
+                            Kumpulan Kunci AI Gateway (Groq L1 &amp; Gemini L2)
                             <span class="px-2 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Free Tier Ready</span>
                         </h2>
-                        <p class="text-xs text-slate-400">Rotasi otomatis multi-kunci untuk audit forensik semantik, pencegahan rate-limit (15 RPM / 1.500 RPD), dan auto-failover saat kuota habis</p>
+                        <p class="text-xs text-slate-400">Rotasi otomatis multi-lapis: Groq Cloud L1 (Utama, latensi ultra-cepat) auto-failover ke Google Gemini L2 saat kuota habis atau rate-limited</p>
                     </div>
                 </div>
 
@@ -2886,7 +2886,7 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                             <span class="text-xs text-slate-400 font-medium">akun pool</span>
                         </div>
                         <div class="mt-2 text-xs text-slate-400">
-                            <span>Mendukung multi-kunci Google AI Studio</span>
+                            <span>Mendukung Groq Cloud &amp; Google AI Studio</span>
                         </div>
                     </div>
 
@@ -2948,31 +2948,34 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                     </div>
                 </div>
 
-                <!-- Form Tambah Google Key Baru -->
+                <!-- Form Tambah Kunci AI Baru (Groq L1 & Google Gemini L2) -->
                 <div class="bg-gradient-to-r from-slate-900/90 via-slate-800/80 to-slate-900/90 border border-emerald-500/30 rounded-2xl p-5 shadow-lg space-y-4">
                     <h3 class="text-sm font-bold text-white flex items-center gap-2">
                         <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                        Daftarkan Google Gemini API Key Baru ke Kumpulan Rotasi
+                        Daftarkan Kunci API Baru ke Kumpulan Rotasi AI Gateway (Groq &amp; Gemini)
                     </h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
                         <div>
-                            <label class="block text-[11px] font-medium text-slate-400 mb-1">Label Akun / Nama Kunci</label>
-                            <input type="text" id="google-key-name" placeholder="mis: Akun Google 1 (Pribadi)" class="w-full bg-slate-900 border border-slate-700/80 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500">
+                            <label class="block text-[11px] font-medium text-slate-400 mb-1">Penyedia AI (Provider)</label>
+                            <select id="google-provider" onchange="handleProviderChange()" class="w-full bg-slate-900 border border-indigo-500/50 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-400 font-medium">
+                                <option value="groq" selected>⚡ Groq Cloud (Lapis 1 Utama)</option>
+                                <option value="gemini">✨ Google Gemini (Lapis 2 Fallback)</option>
+                            </select>
                         </div>
                         <div>
-                            <label class="block text-[11px] font-medium text-slate-400 mb-1">Google API Key (AI Studio)</label>
-                            <input type="password" id="google-api-key" placeholder="AIzaSy..." class="w-full bg-slate-900 border border-slate-700/80 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 font-mono-code">
+                            <label class="block text-[11px] font-medium text-slate-400 mb-1">Label Akun / Nama Kunci</label>
+                            <input type="text" id="google-key-name" placeholder="mis: Groq Primer (Akun 1)" class="w-full bg-slate-900 border border-slate-700/80 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-medium text-slate-400 mb-1">API Key</label>
+                            <input type="password" id="google-api-key" placeholder="gsk_... atau AIzaSy..." oninput="handleKeyInputAutoDetect()" class="w-full bg-slate-900 border border-slate-700/80 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 font-mono-code">
                         </div>
                         <div>
                             <label class="block text-[11px] font-medium text-slate-400 mb-1">Pilihan Model AI Default</label>
                             <select id="google-model-name" class="w-full bg-slate-900 border border-indigo-500/50 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-400 font-medium">
-                                <option value="gemini-flash-lite-latest" selected>Gemini Flash Lite (Bebas Antrean &amp; Anti-503 - Rekomendasi Utama 2026)</option>
-                                <option value="gemini-3.5-flash-lite">Gemini 3.5 Flash Lite (Cepat &amp; Responsif)</option>
-                                <option value="gemini-3.5-flash">Gemini 3.5 Flash (Standar)</option>
-                                <option value="gemini-3.6-flash">Gemini 3.6 Flash (Generasi Mutakhir 2026)</option>
-                                <option value="gemini-3.0-flash">Gemini 3.0 Flash (Cepat &amp; Efisien)</option>
-                                <option value="gemini-1.5-flash">Gemini 1.5 Flash (Legacy)</option>
-                                <option value="gemini-1.5-pro">Gemini 1.5 Pro (Legacy Pro)</option>
+                                <option value="llama-3.3-70b-versatile" selected>Llama 3.3 70B Versatile (Groq - Rekomendasi Utama L1)</option>
+                                <option value="llama-3.1-8b-instant">Llama 3.1 8B Instant (Groq - Cepat &amp; Volume Tinggi)</option>
+                                <option value="mixtral-8x7b-32768">Mixtral 8x7B (Groq)</option>
                             </select>
                         </div>
                     </div>
@@ -2996,14 +2999,19 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                     <div class="flex items-center justify-between">
                         <h3 class="text-sm font-bold text-white flex items-center gap-2">
                             <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-                            Daftar Kunci Google Gemini Terdaftar
+                            Daftar Kunci AI Terdaftar (Groq L1 &amp; Gemini L2)
                         </h3>
                         <span class="text-xs text-slate-400">Total: <strong class="text-slate-200"><?= count($googleKeysList ?? []) ?></strong> kunci</span>
                     </div>
 
                     <?php 
                         $modelDisplayNames = [
-                            'gemini-flash-lite-latest' => 'Gemini Flash Lite (Bebas Antrean - Utama)',
+                            'llama-3.3-70b-versatile' => 'Llama 3.3 70B (Groq - Rekomendasi L1)',
+                            'llama-3.1-8b-instant'     => 'Llama 3.1 8B (Groq - Volume Tinggi)',
+                            'mixtral-8x7b-32768'       => 'Mixtral 8x7B (Groq)',
+                            'gemma2-9b-it'             => 'Gemma 2 9B (Groq)',
+                            'qwen-qwq-32b'             => 'Qwen QWQ 32B (Groq)',
+                            'gemini-flash-lite-latest' => 'Gemini Flash Lite (Bebas Antrean - Utama L2)',
                             'gemini-3.5-flash-lite'   => 'Gemini 3.5 Flash Lite (Cepat & Stabil)',
                             'gemini-3.5-flash'         => 'Gemini 3.5 Flash (Standar)',
                             'gemini-3.6-flash'         => 'Gemini 3.6 Flash (Terbaru 2026)',
@@ -3017,7 +3025,7 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                     <div class="space-y-3.5 md:hidden">
                         <?php if (empty($googleKeysList)): ?>
                             <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-6 text-center text-xs text-slate-500">
-                                Belum ada Google API Key terdaftar. Silakan tambahkan API Key dari Google AI Studio melalui formulir di atas.
+                                Belum ada Kunci API terdaftar. Silakan tambahkan Kunci Groq atau Gemini melalui formulir di atas.
                             </div>
                         <?php else: ?>
                             <?php foreach ($googleKeysList as $k): ?>
@@ -3025,7 +3033,14 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                                     <!-- Top Row: Name, Status Pill & Model -->
                                     <div class="flex items-start justify-between gap-2">
                                         <div class="min-w-0 flex-1">
-                                            <div class="font-bold text-white text-sm truncate"><?= esc($k['key_name']) ?></div>
+                                            <div class="flex items-center gap-1.5">
+                                                <div class="font-bold text-white text-sm truncate"><?= esc($k['key_name']) ?></div>
+                                                <?php if (($k['provider'] ?? 'gemini') === 'groq'): ?>
+                                                    <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30 shrink-0">Groq L1</span>
+                                                <?php else: ?>
+                                                    <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30 shrink-0">Gemini L2</span>
+                                                <?php endif; ?>
+                                            </div>
                                             <div class="text-[11px] text-indigo-300 font-mono-code mt-0.5 truncate">
                                                 <?= esc($modelDisplayNames[$k['model_name']] ?? $k['model_name']) ?>
                                             </div>
@@ -3123,14 +3138,21 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                                 <?php if (empty($googleKeysList)): ?>
                                     <tr>
                                         <td colspan="6" class="py-8 text-center text-slate-500">
-                                            Belum ada Google API Key terdaftar. Silakan tambahkan API Key dari Google AI Studio melalui formulir di atas.
+                                            Belum ada Kunci API terdaftar. Silakan tambahkan Kunci Groq (Lapis 1) atau Gemini (Lapis 2) melalui formulir di atas.
                                         </td>
                                     </tr>
                                 <?php else: ?>
                                     <?php foreach ($googleKeysList as $k): ?>
                                         <tr class="hover:bg-slate-800/40 transition-colors">
                                             <td class="py-3 px-3">
-                                                <div class="font-semibold text-white"><?= esc($k['key_name']) ?></div>
+                                                <div class="flex items-center gap-1.5">
+                                                    <span class="font-semibold text-white"><?= esc($k['key_name']) ?></span>
+                                                    <?php if (($k['provider'] ?? 'gemini') === 'groq'): ?>
+                                                        <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">Groq L1</span>
+                                                    <?php else: ?>
+                                                        <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30">Gemini L2</span>
+                                                    <?php endif; ?>
+                                                </div>
                                                 <div class="text-[10px] text-indigo-300 font-mono-code"><?= esc($modelDisplayNames[$k['model_name']] ?? $k['model_name']) ?></div>
                                             </td>
                                             <td class="py-3 px-3">
@@ -4278,15 +4300,80 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
             }
         }
 
-        // Google Gemini API Key Handlers (Pool Round-Robin)
+        // Provider & Model Dynamic Switcher (Groq L1 vs Gemini L2)
+        const AI_MODELS = {
+            groq: [
+                { value: 'llama-3.3-70b-versatile', text: 'Llama 3.3 70B Versatile (Groq - Rekomendasi Utama L1)' },
+                { value: 'llama-3.1-8b-instant', text: 'Llama 3.1 8B Instant (Groq - Cepat & Volume Tinggi)' },
+                { value: 'mixtral-8x7b-32768', text: 'Mixtral 8x7B (Groq)' },
+                { value: 'gemma2-9b-it', text: 'Gemma 2 9B (Groq)' },
+                { value: 'qwen-qwq-32b', text: 'Qwen QWQ 32B (Groq)' }
+            ],
+            gemini: [
+                { value: 'gemini-flash-lite-latest', text: 'Gemini Flash Lite (Bebas Antrean - Rekomendasi Utama L2)' },
+                { value: 'gemini-3.5-flash-lite', text: 'Gemini 3.5 Flash Lite (Cepat & Responsif)' },
+                { value: 'gemini-3.5-flash', text: 'Gemini 3.5 Flash (Standar)' },
+                { value: 'gemini-3.6-flash', text: 'Gemini 3.6 Flash (Generasi Mutakhir 2026)' },
+                { value: 'gemini-3.0-flash', text: 'Gemini 3.0 Flash (Cepat & Efisien)' },
+                { value: 'gemini-1.5-flash', text: 'Gemini 1.5 Flash (Legacy)' },
+                { value: 'gemini-1.5-pro', text: 'Gemini 1.5 Pro (Legacy Pro)' }
+            ]
+        };
+
+        function handleProviderChange() {
+            const providerSel = document.getElementById('google-provider');
+            const modelSel = document.getElementById('google-model-name');
+            const nameInput = document.getElementById('google-key-name');
+            const keyInput = document.getElementById('google-api-key');
+            if (!providerSel || !modelSel) return;
+
+            const provider = providerSel.value;
+            const models = AI_MODELS[provider] || AI_MODELS.groq;
+
+            // Simpan model yang sedang dipilih jika masih valid di provider baru
+            const currentVal = modelSel.value;
+            modelSel.innerHTML = '';
+            models.forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m.value;
+                opt.textContent = m.text;
+                if (m.value === currentVal) opt.selected = true;
+                modelSel.appendChild(opt);
+            });
+
+            if (nameInput && !nameInput.value) {
+                nameInput.placeholder = (provider === 'groq') ? 'mis: Groq Primer (Akun 1)' : 'mis: Gemini Cadangan (Akun 2)';
+            }
+            if (keyInput) {
+                keyInput.placeholder = (provider === 'groq') ? 'gsk_...' : 'AIzaSy...';
+            }
+        }
+
+        function handleKeyInputAutoDetect() {
+            const keyInput = document.getElementById('google-api-key');
+            const providerSel = document.getElementById('google-provider');
+            if (!keyInput || !providerSel) return;
+
+            const val = keyInput.value.trim();
+            if (val.startsWith('gsk_') && providerSel.value !== 'groq') {
+                providerSel.value = 'groq';
+                handleProviderChange();
+            } else if (val.startsWith('AIza') && providerSel.value !== 'gemini') {
+                providerSel.value = 'gemini';
+                handleProviderChange();
+            }
+        }
+
+        // Google Gemini & Groq Cloud API Key Handlers (Pool Round-Robin)
         async function handleCreateGoogleKey() {
+            const provider = document.getElementById('google-provider')?.value || 'groq';
             const keyName = document.getElementById('google-key-name').value.trim();
             const apiKey = document.getElementById('google-api-key').value.trim();
             const modelName = document.getElementById('google-model-name').value;
             const btn = document.getElementById('btn-add-google-key');
 
             if (!keyName || !apiKey) {
-                alert('Silakan lengkapi label nama dan Google API Key.');
+                alert('Silakan lengkapi label nama dan API Key.');
                 return;
             }
 
@@ -4294,6 +4381,7 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
 
             try {
                 const res = await postJson('<?= base_url('admin/google-keys/create') ?>', {
+                    provider: provider,
                     key_name: keyName,
                     api_key: apiKey,
                     model_name: modelName
@@ -4350,10 +4438,10 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
             try {
                 const res = await postJson('<?= base_url('admin/google-keys/test') ?>/' + keyId, {});
                 if (res.status === 'success') {
-                    alert('✅ Uji Koneksi Sukses!\nModel: ' + res.model + '\nRespon Google Gemini: "' + res.reply + '"');
+                    alert('✅ ' + (res.message || 'Uji Koneksi Sukses!') + (res.reply ? '\nRespon Uji: "' + res.reply + '"' : ''));
                     window.location.reload();
                 } else {
-                    alert('❌ Uji Koneksi Gagal:\n' + (res.message || 'Tidak dapat terhubung ke Google API'));
+                    alert('❌ Uji Koneksi Gagal:\n' + (res.message || 'Tidak dapat terhubung ke penyedia AI'));
                 }
             } catch (err) {
                 alert('Terjadi kesalahan koneksi saat pengujian API.');

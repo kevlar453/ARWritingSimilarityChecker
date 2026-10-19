@@ -17,16 +17,26 @@ class GoogleKeyController extends BaseController
 
         $keyName = trim((string) ($this->request->getPost('key_name') ?? ''));
         $apiKey = trim((string) ($this->request->getPost('api_key') ?? ''));
-        $modelName = trim((string) ($this->request->getPost('model_name') ?? 'gemini-3.6-flash'));
+        $provider = strtolower(trim((string) ($this->request->getPost('provider') ?? '')));
+        $modelName = trim((string) ($this->request->getPost('model_name') ?? ''));
 
         if ($keyName === '' || $apiKey === '') {
             if ($this->request->isAJAX() || $this->request->getHeaderLine('Accept') === 'application/json') {
                 return $this->response->setStatusCode(400)->setJSON([
                     'status'  => 'error',
-                    'message' => 'Label nama dan Google API Key wajib diisi.',
+                    'message' => 'Label nama dan API Key wajib diisi.',
                 ]);
             }
             return redirect()->to(base_url('admin?tab=google_keys'))->with('error', 'Label dan API Key wajib diisi.');
+        }
+
+        // Auto-detect provider jika tidak ditentukan secara eksplisit
+        if (empty($provider) || !in_array($provider, ['groq', 'gemini'], true)) {
+            if (str_starts_with($apiKey, 'gsk_')) {
+                $provider = 'groq';
+            } else {
+                $provider = 'gemini';
+            }
         }
 
         // Cek duplikasi API Key
@@ -41,36 +51,51 @@ class GoogleKeyController extends BaseController
             return redirect()->to(base_url('admin?tab=google_keys'))->with('error', 'API Key tersebut sudah terdaftar.');
         }
 
-        $allowedModels = [
-            'gemini-flash-lite-latest',
-            'gemini-3.5-flash-lite',
-            'gemini-3.5-flash',
-            'gemini-3.6-flash',
-            'gemini-3.0-flash',
-            'gemini-2.0-flash',
-            'gemini-1.5-flash',
-            'gemini-1.5-pro',
-        ];
-        if (! in_array($modelName, $allowedModels, true)) {
-            $modelName = 'gemini-flash-lite-latest';
+        if ($provider === 'groq') {
+            $allowedModels = [
+                'llama-3.3-70b-versatile',
+                'llama-3.1-8b-instant',
+                'mixtral-8x7b-32768',
+                'gemma2-9b-it',
+                'qwen-qwq-32b',
+            ];
+            if (! in_array($modelName, $allowedModels, true)) {
+                $modelName = 'llama-3.3-70b-versatile';
+            }
+        } else {
+            $allowedModels = [
+                'gemini-flash-lite-latest',
+                'gemini-3.5-flash-lite',
+                'gemini-3.5-flash',
+                'gemini-3.6-flash',
+                'gemini-3.0-flash',
+                'gemini-2.0-flash',
+                'gemini-1.5-flash',
+                'gemini-1.5-pro',
+            ];
+            if (! in_array($modelName, $allowedModels, true)) {
+                $modelName = 'gemini-flash-lite-latest';
+            }
         }
 
         $keyModel->insert([
             'key_name'   => $keyName,
             'api_key'    => $apiKey,
-            'provider'   => 'gemini',
+            'provider'   => $provider,
             'model_name' => $modelName,
             'status'     => 'active',
         ]);
 
+        $providerLabel = ($provider === 'groq') ? 'Groq Cloud (L1)' : 'Google Gemini (L2)';
         if ($this->request->isAJAX() || $this->request->getHeaderLine('Accept') === 'application/json') {
             return $this->response->setJSON([
-                'status'  => 'success',
-                'message' => 'Kunci Google API berhasil ditambahkan ke rotasi pool.',
+                'status'   => 'success',
+                'provider' => $provider,
+                'message'  => "Kunci {$providerLabel} berhasil ditambahkan ke rotasi pool.",
             ]);
         }
 
-        return redirect()->to(base_url('admin?tab=google_keys'))->with('message', 'Kunci Google API berhasil didaftarkan.');
+        return redirect()->to(base_url('admin?tab=google_keys'))->with('message', "Kunci {$providerLabel} berhasil didaftarkan.");
     }
 
     /**
@@ -134,6 +159,85 @@ class GoogleKeyController extends BaseController
         }
 
         $apiKey = $key['api_key'];
+        $provider = $key['provider'] ?? 'gemini';
+
+        // ── PENGUJIAN PROVIDER GROQ (LAPIS 1) ──
+        if ($provider === 'groq') {
+            $model = $key['model_name'] ?: 'llama-3.3-70b-versatile';
+            $url = 'https://api.groq.com/openai/v1/chat/completions';
+            $payload = json_encode([
+                'model' => $model,
+                'messages' => [
+                    ['role' => 'user', 'content' => 'Halo. Jawab hanya 1 kata: Pong.']
+                ],
+                'max_tokens' => 10,
+                'temperature' => 0.1
+            ]);
+
+            $chG = curl_init($url);
+            curl_setopt($chG, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($chG, CURLOPT_POST, true);
+            curl_setopt($chG, CURLOPT_POSTFIELDS, $payload);
+            curl_setopt($chG, CURLOPT_HTTPHEADER, [
+                'Authorization: Bearer ' . $apiKey,
+                'Content-Type: application/json',
+                'User-Agent: ARTilik-Admin/2.0'
+            ]);
+            curl_setopt($chG, CURLOPT_TIMEOUT, 15);
+            $response = curl_exec($chG);
+            $httpCode = curl_getinfo($chG, CURLINFO_HTTP_CODE);
+            $curlError = curl_error($chG);
+            curl_close($chG);
+
+            if ($curlError) {
+                $keyModel->update($id, [
+                    'error_count'        => (int) $key['error_count'] + 1,
+                    'last_error_message' => 'cURL Error: ' . $curlError,
+                ]);
+                return $this->response->setStatusCode(500)->setJSON([
+                    'status'  => 'error',
+                    'message' => 'Koneksi ke Groq Cloud gagal: ' . $curlError,
+                ]);
+            }
+
+            if ($httpCode === 200) {
+                $resData = json_decode((string) $response, true);
+                $reply = $resData['choices'][0]['message']['content'] ?? 'Pong';
+                $keyModel->update($id, [
+                    'status'             => 'active',
+                    'error_count'        => 0,
+                    'last_error_message' => null,
+                    'rate_limited_until' => null,
+                ]);
+                return $this->response->setJSON([
+                    'status'    => 'success',
+                    'http_code' => 200,
+                    'reply'     => trim($reply),
+                    'model'     => $model,
+                    'message'   => "Koneksi sukses! Kunci Groq Cloud ({$model}) terverifikasi aktif & siap digunakan sebagai Lapis 1.",
+                ]);
+            } else {
+                $errJson = json_decode((string) $response, true);
+                $errMsg = $errJson['error']['message'] ?? ('HTTP ' . $httpCode);
+                $isQuota = ($httpCode === 429);
+                $newStatus = $isQuota ? 'rate_limited' : ($httpCode === 401 ? 'inactive' : $key['status']);
+
+                $keyModel->update($id, [
+                    'error_count'        => (int) $key['error_count'] + 1,
+                    'last_error_message' => $errMsg,
+                    'status'             => $newStatus,
+                    'rate_limited_until' => $isQuota ? date('Y-m-d H:i:s', time() + 120) : null,
+                ]);
+
+                return $this->response->setStatusCode($httpCode >= 400 && $httpCode < 600 ? $httpCode : 500)->setJSON([
+                    'status'    => 'error',
+                    'http_code' => $httpCode,
+                    'message'   => 'Groq API Error: ' . $errMsg,
+                ]);
+            }
+        }
+
+        // ── PENGUJIAN PROVIDER GOOGLE GEMINI (LAPIS 2) ──
         $model = $key['model_name'] ?: 'gemini-flash-lite-latest';
 
         // 1. Verifikasi Otentikasi & Izin Model via Metadata Endpoint (Cepat ~0.1s, tidak membuang kuota token)
