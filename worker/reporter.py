@@ -307,24 +307,35 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
                 print(f"  [METADATA WARNING] Gagal membaca metadata berkas Doc #{document_id}: {meta_err}")
             result["document_metadata"] = doc_meta
 
-            # 8. Google Gemini AI Semantic Forensic Auditor (Pool Round-Robin)
+            # 8. AI Semantic Forensic Auditor (AI Gateway: Caching, Antrean, dan Multi-Provider)
             gemini_forensic_res = None
             try:
-                from worker.gemini_forensic import audit_proposal_with_gemini
-                gemini_forensic_res = audit_proposal_with_gemini(
+                from worker.ai_gateway import enqueue_narrative_job
+                enqueue_res = enqueue_narrative_job(
+                    conn=connection,
+                    submission_id=document_id,
+                    report_id=report_id,
                     document_text=submission_text,
                     substantive_text=subst_body_text,
                     title=document.get("title", ""),
-                    connection=connection,
                     doc_metadata=doc_meta
                 )
+                if enqueue_res.get("cache_hit"):
+                    gemini_forensic_res = enqueue_res.get("result")
+                else:
+                    gemini_forensic_res = {
+                        "status": enqueue_res.get("status", "queued"),
+                        "job_id": enqueue_res.get("job_id"),
+                        "is_available": False,
+                        "message": "Analisis narasi AI sedang dalam antrean pemrosesan."
+                    }
                 result["gemini_forensic"] = gemini_forensic_res
-            except Exception as gem_err:
-                print(f"  [GEMINI FORENSIC WARNING] Gagal menjalankan audit Gemini untuk Doc #{document_id}: {gem_err}")
+            except Exception as ai_err:
+                print(f"  [AI GATEWAY WARNING] Gagal mendaftarkan antrean narasi untuk Doc #{document_id}: {ai_err}")
                 result["gemini_forensic"] = {
-                    "status": "skipped",
+                    "status": "deferred",
                     "is_available": False,
-                    "message": f"Audit semantik Google Gemini dilewati: {gem_err}"
+                    "message": f"Analisis narasi AI tertunda: {ai_err}"
                 }
 
             # 9. Self-Collision & Revision Protection Telemetry

@@ -398,4 +398,35 @@ CREATE TABLE IF NOT EXISTS google_api_keys (
     INDEX idx_google_keys_cooldown (rate_limited_until)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS ai_narrative_jobs (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    submission_id BIGINT NOT NULL,
+    report_id BIGINT NULL,
+    payload_hash CHAR(64) NOT NULL,
+    payload MEDIUMTEXT NOT NULL,
+    status ENUM('queued', 'processing', 'done', 'deferred', 'failed') DEFAULT 'queued',
+    attempts LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT '[]' CHECK (json_valid(attempts)),
+    result MEDIUMTEXT NULL,
+    error_note VARCHAR(255) NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_status_created (status, created_at),
+    INDEX idx_payload_hash (payload_hash),
+    INDEX idx_submission (submission_id),
+    INDEX idx_report (report_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS ai_provider_usage (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    provider VARCHAR(50) NOT NULL,
+    usage_date DATE NOT NULL,
+    tokens_in INT UNSIGNED NOT NULL DEFAULT 0,
+    tokens_out INT UNSIGNED NOT NULL DEFAULT 0,
+    requests INT UNSIGNED NOT NULL DEFAULT 0,
+    rate_limit_hits INT UNSIGNED NOT NULL DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_provider_date (provider, usage_date)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 SET FOREIGN_KEY_CHECKS = 1;

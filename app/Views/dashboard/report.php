@@ -1922,7 +1922,12 @@ $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evi
             </div>
         </div>
         <?php else: ?>
-        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4">
+        <?php
+            $gfStatus = $geminiForensic['status'] ?? 'idle';
+            $isQueuedOrProcessing = in_array($gfStatus, ['queued', 'processing'], true);
+            $isDeferred = ($gfStatus === 'deferred');
+        ?>
+        <div id="auditQueueContainer" data-report-id="<?= (int)$report['id'] ?>" data-status="<?= esc($gfStatus) ?>" class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
                 <div class="flex items-center gap-2.5">
                     <span class="text-2xl">✨</span>
@@ -1935,11 +1940,57 @@ $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evi
                     </div>
                 </div>
                 <div class="flex items-center gap-2 self-start sm:self-auto">
+                    <?php if ($isQueuedOrProcessing): ?>
+                    <span class="text-xs font-mono-code font-bold px-3 py-1 rounded-full border shadow-2xs bg-indigo-50 text-indigo-700 border-indigo-200 animate-pulse flex items-center gap-1.5">
+                        <span class="inline-block w-2 h-2 rounded-full bg-indigo-600 animate-ping"></span>
+                        Status: <?= $gfStatus === 'processing' ? 'Sedang Menganalisis...' : 'Dalam Antrean AI Gateway' ?>
+                    </span>
+                    <?php elseif ($isDeferred): ?>
                     <span class="text-xs font-mono-code font-bold px-3 py-1 rounded-full border shadow-2xs bg-amber-50 text-amber-700 border-amber-200">
+                        Status: Narasi Tertunda (Kapasitas Harian)
+                    </span>
+                    <?php else: ?>
+                    <span class="text-xs font-mono-code font-bold px-3 py-1 rounded-full border shadow-2xs bg-slate-50 text-slate-700 border-slate-200">
                         Status: Siaga Evaluasi
                     </span>
+                    <?php endif; ?>
                 </div>
             </div>
+
+            <?php if ($isQueuedOrProcessing): ?>
+            <div class="p-4 rounded-xl bg-indigo-50/50 border border-indigo-100 text-xs text-slate-700 space-y-3">
+                <div class="flex items-center justify-between">
+                    <div class="font-bold text-indigo-900 flex items-center gap-2">
+                        <span class="animate-spin">⏳</span>
+                        <span><?= $gfStatus === 'processing' ? 'AI sedang merangkum narasi forensik & panduan sidang...' : 'Menunggu alokasi kapasitas LLM (FIFO Queue)...' ?></span>
+                    </div>
+                    <span class="text-[11px] font-mono-code text-indigo-600 bg-indigo-100/70 px-2 py-0.5 rounded">Auto-refresh aktif</span>
+                </div>
+                <p class="text-slate-600 text-[11px] leading-relaxed">
+                    Sistem AR Tilik memproses narasi forensik secara asinkron agar tidak memperlambat komputasi utama. <strong>Skor angka similaritas XGBoost dan rujukan naskah di atas tetap 100% valid.</strong> Analisis narasi akan muncul otomatis di sini begitu proses selesai.
+                </p>
+                <!-- Skeleton Loading Preview -->
+                <div class="space-y-2 pt-1 animate-pulse">
+                    <div class="h-3.5 bg-indigo-200/50 rounded w-3/4"></div>
+                    <div class="h-3 bg-indigo-100/60 rounded w-5/6"></div>
+                    <div class="h-3 bg-indigo-100/40 rounded w-2/3"></div>
+                </div>
+            </div>
+            <?php elseif ($isDeferred): ?>
+            <div class="p-4 rounded-xl bg-amber-50 border border-amber-200 text-xs text-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="space-y-1">
+                    <div class="font-bold text-amber-900 flex items-center gap-1.5">
+                        <span>⚠️</span> Analisis Narasi AI Tertunda Sementara
+                    </div>
+                    <p class="text-amber-800 text-[11px] leading-relaxed">
+                        Analisis narasi AI tertunda karena antrean kapasitas harian LLM. <strong>Hasil angka similaritas XGBoost &amp; sumber rujukan di atas tetap valid.</strong> Antrean akan dicoba kembali secara otomatis.
+                    </p>
+                </div>
+                <button onclick="runAuditForensik(<?= (int)$report['id'] ?>)" id="btnRunAuditForensik" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold text-xs shadow-xs transition flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer">
+                    <span>⚡ Coba Jalankan Ulang</span>
+                </button>
+            </div>
+            <?php else: ?>
             <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div class="space-y-1">
                     <div class="font-bold text-slate-800 flex items-center gap-1.5">
@@ -1953,6 +2004,7 @@ $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evi
                     <span>⚡ Jalankan Audit Forensik Cerdas</span>
                 </button>
             </div>
+            <?php endif; ?>
         </div>
         <?php endif; ?>
 
@@ -4799,6 +4851,32 @@ $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evi
                 btn.innerHTML = originalHtml;
             }
         }
+
+        // ── AUTO-POLLING STATUS ANTREAN NARASI AI GATEWAY ──
+        (function initAuditQueuePolling() {
+            const queueBox = document.getElementById('auditQueueContainer');
+            if (!queueBox) return;
+
+            const repId = queueBox.getAttribute('data-report-id');
+            const initialStatus = queueBox.getAttribute('data-status');
+
+            if (initialStatus === 'queued' || initialStatus === 'processing') {
+                const pollTimer = setInterval(async () => {
+                    try {
+                        const res = await fetch('<?= base_url('dashboard/audit/status') ?>/' + repId, {
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                        });
+                        const data = await res.json();
+                        if (data.is_done || data.status === 'done' || data.status === 'deferred' || data.status === 'failed') {
+                            clearInterval(pollTimer);
+                            window.location.reload();
+                        }
+                    } catch (e) {
+                        // Toleran kendala jaringan sementara
+                    }
+                }, 5000);
+            }
+        })();
 
         // ── KELOLA VOTING SKOR FITUR (MICRO-VOTING) ──
         async function submitFeatureVote(reportId, featureName, voteValue) {

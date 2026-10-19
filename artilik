@@ -16,6 +16,10 @@ case "$1" in
         shift
         exec "$PYTHON_BIN" -m worker.worker "$@"
         ;;
+    ai:worker)
+        shift
+        exec "$PYTHON_BIN" worker/narrative_worker.py "$@"
+        ;;
     test)
         shift
         exec "$PYTHON_BIN" -m pytest -v tests/ "$@"

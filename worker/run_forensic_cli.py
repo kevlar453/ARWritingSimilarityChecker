@@ -18,7 +18,7 @@ if BASE_DIR in sys.path:
 sys.path.insert(0, BASE_DIR)
 
 from worker.database import get_connection
-from worker.gemini_forensic import audit_proposal_with_gemini
+from worker.ai_gateway import enqueue_narrative_job, execute_job_with_gateway
 from worker.section_parser import parse_document_sections, get_substantive_including_methodology
 from worker.extractor import extract_document_metadata
 from worker.citation_auditor import audit_citations_and_bibliography
@@ -82,14 +82,26 @@ def main():
             except Exception:
                 doc_meta = None
 
-        # Jalankan audit dengan fallback dan metadata era dokumen
-        audit_res = audit_proposal_with_gemini(
+        # Jalankan audit melalui AI Gateway (Cache -> L1 Groq -> L2 Gemini -> L3 Degradasi Jujur)
+        enq = enqueue_narrative_job(
+            conn=conn,
+            submission_id=doc_id,
+            report_id=report_id,
             document_text=submission_text,
             substantive_text=substantive_body,
             title=doc.get("title", ""),
-            connection=conn,
             doc_metadata=doc_meta
         )
+        if enq.get("cache_hit"):
+            audit_res = enq.get("result")
+        else:
+            job_id = enq["job_id"]
+            cursor.execute("SELECT * FROM ai_narrative_jobs WHERE id = %s", (job_id,))
+            job_row = cursor.fetchone()
+            if job_row:
+                audit_res = execute_job_with_gateway(job_row, conn)
+            else:
+                audit_res = {"status": "deferred", "is_available": False, "message": "Pekerjaan tidak ditemukan"}
 
         # Update evidence_data di reports
         evidence = {}

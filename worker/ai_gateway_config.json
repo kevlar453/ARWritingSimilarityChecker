@@ -1,0 +1,27 @@
+{
+  "max_concurrent": 2,
+  "poll_interval_sec": 5,
+  "backoff_sec": [5, 15, 45],
+  "circuit_breaker": {
+    "failures": 3,
+    "cooldown_min": 10
+  },
+  "cache_ttl_days": 30,
+  "deferred_retry_max": 12,
+  "providers": [
+    {
+      "name": "groq",
+      "enabled": true,
+      "model": "llama-3.3-70b-versatile",
+      "daily_token_cap": 90000,
+      "rpm_cap": 25,
+      "endpoint": "https://api.groq.com/openai/v1/chat/completions"
+    },
+    {
+      "name": "gemini",
+      "enabled": true,
+      "model": "gemini-flash-lite-latest",
+      "keys_round_robin": true
+    }
+  ]
+}

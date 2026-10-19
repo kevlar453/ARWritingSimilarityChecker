@@ -868,8 +868,39 @@ class DashboardController extends BaseController
             $evasionDetection = $this->computeFallbackEvasionDetection($submissionText);
         }
 
-        // Resolusi Audit Forensik Cerdas Google Gemini (Semantik & Pertanyaan Ujian Lisan)
+        // Resolusi Audit Forensik Cerdas (Semantik & Pertanyaan Ujian Lisan melalui AI Gateway & Antrean)
         $geminiForensic = $evidenceData['gemini_forensic'] ?? $evidenceData['v1_1_presentation']['v1_2_evolution']['gemini_forensic'] ?? null;
+        if (!$geminiForensic || !in_array($geminiForensic['status'] ?? '', ['completed', 'queued', 'processing', 'deferred'])) {
+            try {
+                $db = \Config\Database::connect();
+                $jobRow = $db->table('ai_narrative_jobs')
+                    ->where('report_id', (int) $reportId)
+                    ->orWhere('submission_id', (int) $report['document_id'])
+                    ->orderBy('id', 'DESC')
+                    ->get()
+                    ->getFirstRow('array');
+                if ($jobRow) {
+                    if ($jobRow['status'] === 'done' && !empty($jobRow['result'])) {
+                        $geminiForensic = json_decode($jobRow['result'], true);
+                    } else {
+                        $geminiForensic = [
+                            'status'       => $jobRow['status'],
+                            'job_id'       => (int) $jobRow['id'],
+                            'is_available' => false,
+                            'message'      => match ($jobRow['status']) {
+                                'processing' => 'AI sedang menyusun analisis forensik semantik...',
+                                'queued'     => 'Menunggu giliran antrean kapasitas LLM...',
+                                'deferred'   => 'Kapasitas harian LLM sedang padat. Narasi ditunda sementara, hasil angka tetap valid.',
+                                'failed'     => 'Antrean narasi gagal diproses. Hasil angka tetap valid.',
+                                default      => 'Status: ' . $jobRow['status']
+                            }
+                        ];
+                    }
+                }
+            } catch (\Throwable $e) {
+                // Failsafe jika tabel belum ada atau koneksi gagal
+            }
+        }
 
         // Feedback & Testimoni Akademik (Fase 1)
         $voteModel = new \App\Models\FeatureVoteModel();
@@ -995,6 +1026,93 @@ class DashboardController extends BaseController
         return $this->response->setJSON([
             'success' => false,
             'message' => $errMsg,
+        ]);
+    }
+
+    /**
+     * Mengecek status antrean Audit Forensik Cerdas untuk polling antarmuka (UX).
+     */
+    public function auditStatus($reportId)
+    {
+        $session = session();
+        $userId  = $session->get('user_id');
+        $isAdmin = ($session->get('user_role') === 'admin');
+
+        $reportModel = new \App\Models\ReportModel();
+        $docModel    = new \App\Models\DocumentModel();
+
+        $report = $reportModel->find($reportId);
+        if (!$report) {
+            return $this->response->setStatusCode(404)->setJSON(['status' => 'not_found', 'message' => 'Laporan tidak ditemukan.']);
+        }
+
+        $document = $docModel->find($report['document_id']);
+        if (!$document) {
+            return $this->response->setStatusCode(404)->setJSON(['status' => 'not_found', 'message' => 'Dokumen tidak ditemukan.']);
+        }
+
+        $isOwner   = $userId && ((int) $document['user_id'] === (int) $userId);
+        $shareModel = new \App\Models\DocumentShareModel();
+        $isShared  = $userId ? $shareModel->userHasAccess((int) $document['id'], (int) $userId, 'view_report') : false;
+
+        $token = $this->request->getGet('token') ?: $this->request->getGet('code');
+        $hasVerificationCode = (!empty($token) && $token === ($report['verification_code'] ?? null));
+        $shareToken = $this->request->getGet('share_token');
+        $hasValidShareToken = (!empty($shareToken) && !empty($document['share_token']) && $shareToken === $document['share_token']);
+
+        if (!$isOwner && !$isAdmin && !$isShared && !$hasVerificationCode && !$hasValidShareToken) {
+            return $this->response->setStatusCode(403)->setJSON(['status' => 'forbidden', 'message' => 'Akses tidak diizinkan.']);
+        }
+
+        // 1. Cek evidence_data terlebih dahulu
+        $ev = json_decode($report['evidence_data'] ?? '{}', true) ?: [];
+        $forensic = $ev['gemini_forensic'] ?? $ev['v1_1_presentation']['v1_2_evolution']['gemini_forensic'] ?? null;
+        if ($forensic && ($forensic['status'] ?? '') === 'completed') {
+            return $this->response->setJSON([
+                'status'     => 'done',
+                'is_done'    => true,
+                'data'       => $forensic,
+                'message'    => 'Audit forensik cerdas selesai.',
+            ]);
+        }
+
+        // 2. Cek tabel ai_narrative_jobs
+        $db = \Config\Database::connect();
+        $job = $db->table('ai_narrative_jobs')
+            ->where('report_id', (int) $reportId)
+            ->orWhere('submission_id', (int) $report['document_id'])
+            ->orderBy('id', 'DESC')
+            ->get()
+            ->getFirstRow('array');
+
+        if (!$job) {
+            return $this->response->setJSON([
+                'status'  => 'idle',
+                'is_done' => false,
+                'message' => 'Belum ada antrean narasi untuk laporan ini.',
+            ]);
+        }
+
+        $jobStatus = $job['status'] ?? 'queued';
+        $resultData = null;
+        if ($jobStatus === 'done' && !empty($job['result'])) {
+            $resultData = json_decode($job['result'], true);
+        }
+
+        return $this->response->setJSON([
+            'status'     => $jobStatus,
+            'is_done'    => ($jobStatus === 'done'),
+            'job_id'     => (int) $job['id'],
+            'created_at' => $job['created_at'],
+            'data'       => $resultData,
+            'message'    => match ($jobStatus) {
+                'processing' => 'AI sedang menyusun analisis forensik semantik...',
+                'queued'     => 'Menunggu giliran antrean kapasitas LLM...',
+                'deferred'   => 'Kapasitas harian LLM sedang padat. Narasi ditunda sementara, hasil angka tetap valid.',
+                'failed'     => 'Antrean narasi gagal diproses. Hasil angka tetap valid.',
+                'done'       => 'Audit forensik cerdas selesai.',
+                default      => 'Status: ' . $jobStatus
+            }
         ]);
     }
 

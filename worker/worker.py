@@ -179,6 +179,14 @@ def run_worker(daemon: bool = True):
                 conn.close()
 
             if not job:
+                # Periksa apakah ada antrean narasi AI yang tertunda
+                try:
+                    from worker.narrative_worker import run_single_pass as run_narrative_pass
+                    if run_narrative_pass():
+                        continue
+                except Exception:
+                    pass
+
                 if not daemon:
                     print("[✓] Semua antrean jobs selesai diproses.")
                     break

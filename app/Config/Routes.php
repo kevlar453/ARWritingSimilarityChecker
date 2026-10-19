@@ -27,6 +27,8 @@ $routes->get('dashboard/report/(:num)/preview', 'DashboardController::previewPdf
 $routes->get('dashboard/reports/(:num)/preview', 'DashboardController::previewPdf/$1');
 $routes->post('dashboard/audit/run/(:num)', 'DashboardController::runAudit/$1');
 $routes->post('audit/run/(:num)', 'DashboardController::runAudit/$1');
+$routes->get('dashboard/audit/status/(:num)', 'DashboardController::auditStatus/$1');
+$routes->get('audit/status/(:num)', 'DashboardController::auditStatus/$1');
 $routes->match(['get', 'head'], 'documents/(:num)/preview', 'DashboardController::previewDocument/$1');
 $routes->match(['get', 'head'], 'dashboard/documents/(:num)/preview', 'DashboardController::previewDocument/$1');
 $routes->match(['get', 'head'], 'documents/shared/(:segment)', 'DashboardController::sharedAccess/$1');
