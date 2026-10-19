@@ -54,7 +54,7 @@ def load_gateway_config() -> Dict[str, Any]:
             {
                 "name": "groq",
                 "enabled": True,
-                "model": "llama-3.3-70b-versatile",
+                "model": "qwen/qwen3.8-27b",
                 "daily_token_cap": 90000,
                 "rpm_cap": 25,
                 "endpoint": "https://api.groq.com/openai/v1/chat/completions"
@@ -240,7 +240,7 @@ def call_groq_api(api_key: str, model_name: str, prompt: str, timeout: int = 40)
         "User-Agent": "ARTilik-ForensicGateway/2.0"
     }
     payload = {
-        "model": model_name or "llama-3.3-70b-versatile",
+        "model": model_name or "qwen/qwen3.8-27b",
         "messages": [
             {
                 "role": "system",
@@ -513,8 +513,9 @@ def execute_job_with_gateway(job: Dict[str, Any], conn) -> Dict[str, Any]:
 
     # ── LAPIS 1: GROQ ──
     groq_keys = get_available_groq_keys(conn)
-    groq_model = "llama-3.3-70b-versatile"
-    groq_cap = 90000
+    cfg_prov = {p.get("name"): p for p in config.get("providers", [])}
+    groq_model = cfg_prov.get("groq", {}).get("model", "qwen/qwen3.8-27b")
+    groq_cap = int(cfg_prov.get("groq", {}).get("daily_token_cap", 90000))
     groq_used = get_provider_daily_tokens(conn, "groq")
 
     can_use_groq = bool(groq_keys) and (groq_used < groq_cap) and not is_circuit_breaker_active("groq")

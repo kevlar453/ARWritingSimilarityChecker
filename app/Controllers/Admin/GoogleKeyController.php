@@ -53,6 +53,10 @@ class GoogleKeyController extends BaseController
 
         if ($provider === 'groq') {
             $allowedModels = [
+                'qwen/qwen3.8-27b',
+                'openai/gpt-oss-120b',
+                'openai/gpt-oss-20b',
+                'allam-2-7b',
                 'llama-3.3-70b-versatile',
                 'llama-3.1-8b-instant',
                 'mixtral-8x7b-32768',
@@ -60,7 +64,7 @@ class GoogleKeyController extends BaseController
                 'qwen-qwq-32b',
             ];
             if (! in_array($modelName, $allowedModels, true)) {
-                $modelName = 'llama-3.3-70b-versatile';
+                $modelName = 'qwen/qwen3.8-27b';
             }
         } else {
             $allowedModels = [
@@ -163,14 +167,14 @@ class GoogleKeyController extends BaseController
 
         // ── PENGUJIAN PROVIDER GROQ (LAPIS 1) ──
         if ($provider === 'groq') {
-            $model = $key['model_name'] ?: 'llama-3.3-70b-versatile';
+            $model = $key['model_name'] ?: 'qwen/qwen3.8-27b';
             $url = 'https://api.groq.com/openai/v1/chat/completions';
             $payload = json_encode([
                 'model' => $model,
                 'messages' => [
-                    ['role' => 'user', 'content' => 'Halo. Jawab hanya 1 kata: Pong.']
+                    ['role' => 'user', 'content' => 'Halo. Jawab singkat: Pong']
                 ],
-                'max_tokens' => 10,
+                'max_tokens' => 60,
                 'temperature' => 0.1
             ]);
 
@@ -202,7 +206,8 @@ class GoogleKeyController extends BaseController
 
             if ($httpCode === 200) {
                 $resData = json_decode((string) $response, true);
-                $reply = $resData['choices'][0]['message']['content'] ?? 'Pong';
+                $msgObj = $resData['choices'][0]['message'] ?? [];
+                $reply = !empty($msgObj['content']) ? $msgObj['content'] : ($msgObj['reasoning'] ?? 'Pong');
                 $keyModel->update($id, [
                     'status'             => 'active',
                     'error_count'        => 0,
@@ -212,7 +217,7 @@ class GoogleKeyController extends BaseController
                 return $this->response->setJSON([
                     'status'    => 'success',
                     'http_code' => 200,
-                    'reply'     => trim($reply),
+                    'reply'     => trim((string) $reply),
                     'model'     => $model,
                     'message'   => "Koneksi sukses! Kunci Groq Cloud ({$model}) terverifikasi aktif & siap digunakan sebagai Lapis 1.",
                 ]);

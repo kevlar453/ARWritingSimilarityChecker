@@ -12,7 +12,7 @@
     {
       "name": "groq",
       "enabled": true,
-      "model": "llama-3.3-70b-versatile",
+      "model": "qwen/qwen3.8-27b",
       "daily_token_cap": 90000,
       "rpm_cap": 25,
       "endpoint": "https://api.groq.com/openai/v1/chat/completions"

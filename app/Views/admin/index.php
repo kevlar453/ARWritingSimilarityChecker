@@ -2973,9 +2973,10 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                         <div>
                             <label class="block text-[11px] font-medium text-slate-400 mb-1">Pilihan Model AI Default</label>
                             <select id="google-model-name" class="w-full bg-slate-900 border border-indigo-500/50 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-400 font-medium">
-                                <option value="llama-3.3-70b-versatile" selected>Llama 3.3 70B Versatile (Groq - Rekomendasi Utama L1)</option>
-                                <option value="llama-3.1-8b-instant">Llama 3.1 8B Instant (Groq - Cepat &amp; Volume Tinggi)</option>
-                                <option value="mixtral-8x7b-32768">Mixtral 8x7B (Groq)</option>
+                                <option value="qwen/qwen3.8-27b" selected>Qwen 3.8 27B (Groq - Rekomendasi Utama L1)</option>
+                                <option value="openai/gpt-oss-120b">OpenAI GPT-OSS 120B (Groq - Deep Reasoning)</option>
+                                <option value="openai/gpt-oss-20b">OpenAI GPT-OSS 20B (Groq - Fast Reasoning)</option>
+                                <option value="allam-2-7b">ALLaM 2 7B (Groq)</option>
                             </select>
                         </div>
                     </div>
@@ -3006,8 +3007,12 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
 
                     <?php 
                         $modelDisplayNames = [
-                            'llama-3.3-70b-versatile' => 'Llama 3.3 70B (Groq - Rekomendasi L1)',
-                            'llama-3.1-8b-instant'     => 'Llama 3.1 8B (Groq - Volume Tinggi)',
+                            'qwen/qwen3.8-27b'         => 'Qwen 3.8 27B (Groq - Rekomendasi Utama L1)',
+                            'openai/gpt-oss-120b'      => 'OpenAI GPT-OSS 120B (Groq - Deep Reasoning)',
+                            'openai/gpt-oss-20b'       => 'OpenAI GPT-OSS 20B (Groq - Fast Reasoning)',
+                            'allam-2-7b'               => 'ALLaM 2 7B (Groq)',
+                            'llama-3.3-70b-versatile'  => 'Llama 3.3 70B (Legacy Groq)',
+                            'llama-3.1-8b-instant'     => 'Llama 3.1 8B (Legacy Groq)',
                             'mixtral-8x7b-32768'       => 'Mixtral 8x7B (Groq)',
                             'gemma2-9b-it'             => 'Gemma 2 9B (Groq)',
                             'qwen-qwq-32b'             => 'Qwen QWQ 32B (Groq)',
@@ -4303,11 +4308,10 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
         // Provider & Model Dynamic Switcher (Groq L1 vs Gemini L2)
         const AI_MODELS = {
             groq: [
-                { value: 'llama-3.3-70b-versatile', text: 'Llama 3.3 70B Versatile (Groq - Rekomendasi Utama L1)' },
-                { value: 'llama-3.1-8b-instant', text: 'Llama 3.1 8B Instant (Groq - Cepat & Volume Tinggi)' },
-                { value: 'mixtral-8x7b-32768', text: 'Mixtral 8x7B (Groq)' },
-                { value: 'gemma2-9b-it', text: 'Gemma 2 9B (Groq)' },
-                { value: 'qwen-qwq-32b', text: 'Qwen QWQ 32B (Groq)' }
+                { value: 'qwen/qwen3.8-27b', text: 'Qwen 3.8 27B (Groq - Rekomendasi Utama L1)' },
+                { value: 'openai/gpt-oss-120b', text: 'OpenAI GPT-OSS 120B (Groq - Deep Reasoning)' },
+                { value: 'openai/gpt-oss-20b', text: 'OpenAI GPT-OSS 20B (Groq - Fast Reasoning)' },
+                { value: 'allam-2-7b', text: 'ALLaM 2 7B (Groq)' }
             ],
             gemini: [
                 { value: 'gemini-flash-lite-latest', text: 'Gemini Flash Lite (Bebas Antrean - Rekomendasi Utama L2)' },
