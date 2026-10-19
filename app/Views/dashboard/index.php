@@ -972,7 +972,7 @@
 
                                     <!-- Baris 2: Judul & Berkas -->
                                     <div>
-                                        <div class="font-bold text-slate-900 text-xs sm:text-sm line-clamp-2" title="<?= esc($sub['title']) ?>">
+                                        <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug break-words" title="<?= esc($sub['title']) ?>">
                                             <?= esc($sub['title']) ?>
                                         </div>
                                         <div class="text-[11px] text-slate-400 truncate mt-0.5">
@@ -1037,7 +1037,7 @@
                         <table class="min-w-[850px] sm:min-w-full w-full text-left border-collapse text-sm">
                             <thead class="bg-slate-50 text-slate-500 uppercase text-[11px] font-bold border-b border-slate-200">
                                 <tr>
-                                    <th class="p-3.5 sm:p-4 min-w-[200px]">
+                                    <th class="p-3.5 sm:p-4 min-w-[240px] max-w-[450px]">
                                         <a href="<?= $subFilterUrl(['sub_sort' => ($subFilter['sort'] === 'title_asc' ? 'title_desc' : 'title_asc')]) ?>" class="hover:text-slate-900 inline-flex items-center gap-1 transition-colors" title="Klik untuk mengurutkan berdasarkan Judul Dokumen">
                                             <span>Dokumen</span>
                                             <span class="text-[10px] text-indigo-500"><?= $subFilter['sort'] === 'title_asc' ? '▲' : ($subFilter['sort'] === 'title_desc' ? '▼' : '↕') ?></span>
@@ -1087,8 +1087,8 @@
                                     $isPurged = !empty($sub['file_purged_at']) || ($sub['storage_path'] ?? '') === '[PURGED]';
                                 ?>
                                     <tr class="submission-row <?= $isProcessing ? 'submission-processing' : '' ?> hover:bg-slate-50/70 transition-colors">
-                                        <td class="p-3.5 sm:p-4 font-medium text-slate-800">
-                                            <div class="font-semibold text-slate-900 line-clamp-1" title="<?= esc($sub['title']) ?>"><?= esc($sub['title']) ?></div>
+                                        <td class="p-3.5 sm:p-4 font-medium text-slate-800 min-w-[240px] max-w-[450px]">
+                                            <div class="font-semibold text-slate-900 leading-snug break-words" title="<?= esc($sub['title']) ?>"><?= esc($sub['title']) ?></div>
                                             <div class="flex items-center gap-1.5 flex-wrap mt-0.5">
                                                 <span class="text-[11px] text-slate-400 truncate max-w-[200px]" title="<?= esc($sub['original_filename']) ?>"><?= esc($sub['original_filename']) ?></span>
                                                 <?php if ($isPurged): ?>
@@ -1432,8 +1432,8 @@
                                     $rep = $item['latest_report'] ?? null;
                                 ?>
                                     <tr class="hover:bg-slate-50/70 transition-colors">
-                                        <td class="p-3.5 sm:p-4 font-medium text-slate-800">
-                                            <div class="font-semibold text-slate-900 line-clamp-1" title="<?= esc($item['title']) ?>"><?= esc($item['title']) ?></div>
+                                        <td class="p-3.5 sm:p-4 font-medium text-slate-800 min-w-[240px] max-w-[450px]">
+                                            <div class="font-semibold text-slate-900 leading-snug break-words" title="<?= esc($item['title']) ?>"><?= esc($item['title']) ?></div>
                                             <div class="text-[11px] text-slate-400 truncate max-w-[220px]" title="<?= esc($item['original_filename']) ?>"><?= esc($item['original_filename']) ?></div>
                                             <?php if (!empty($item['faculty']) || !empty($item['department'])): ?>
                                                 <div class="mt-1 flex items-center gap-1.5 flex-wrap">
@@ -1758,8 +1758,8 @@
                             <?php else: ?>
                                 <?php foreach ($corpusDocs as $doc): ?>
                                     <tr class="hover:bg-slate-50/70 transition-colors">
-                                        <td class="p-3.5 sm:p-4 font-medium text-slate-800">
-                                            <div class="font-semibold text-slate-900 line-clamp-1" title="<?= esc($doc['title']) ?>"><?= esc($doc['title']) ?></div>
+                                        <td class="p-3.5 sm:p-4 font-medium text-slate-800 min-w-[240px] max-w-[450px]">
+                                            <div class="font-semibold text-slate-900 leading-snug break-words" title="<?= esc($doc['title']) ?>"><?= esc($doc['title']) ?></div>
                                             <div class="text-[11px] text-slate-400 truncate max-w-[220px]" title="<?= esc($doc['original_filename']) ?>"><?= esc($doc['original_filename']) ?></div>
                                             <?php if (!empty($doc['faculty']) || !empty($doc['department'])): ?>
                                                 <div class="mt-1 flex items-center gap-1.5 flex-wrap">
@@ -3409,7 +3409,7 @@
                     <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-100 mb-1">
                         <span>🤝 Bagikan Karya Ilmiah</span>
                     </div>
-                    <h3 id="shareModalDocTitle" class="text-base sm:text-lg font-bold text-slate-800 line-clamp-1">Judul Dokumen</h3>
+                    <h3 id="shareModalDocTitle" class="text-base sm:text-lg font-bold text-slate-800 break-words leading-snug">Judul Dokumen</h3>
                     <p class="text-xs text-slate-400">Bagikan naskah ini kepada rekan peneliti, dosen, atau pengguna AR Tilik lainnya.</p>
                 </div>
                 <button type="button" onclick="closeShareModal()" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition cursor-pointer">
