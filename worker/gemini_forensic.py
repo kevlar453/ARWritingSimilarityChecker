@@ -150,11 +150,13 @@ def get_available_gemini_keys(conn=None) -> List[Dict[str, Any]]:
 
         conn.commit()
 
-        # 3. Ambil kunci aktif diurutkan: error paling sedikit, penggunaan terendah, waktu pakai terlama
+        # 3. Ambil kunci aktif diurutkan: error paling sedikit, penggunaan terendah, waktu pakai terlama (hanya provider Gemini)
         cursor.execute("""
             SELECT id, key_name, api_key, model_name, usage_count, error_count, rate_limited_until
             FROM google_api_keys
-            WHERE status = 'active' AND (rate_limited_until IS NULL OR rate_limited_until <= NOW())
+            WHERE (provider = 'gemini' OR provider IS NULL OR provider = '')
+              AND status = 'active' 
+              AND (rate_limited_until IS NULL OR rate_limited_until <= NOW())
             ORDER BY error_count ASC, usage_count ASC, COALESCE(last_used_at, '2000-01-01 00:00:00') ASC, id ASC
         """)
         keys = cursor.fetchall() or []

@@ -185,16 +185,21 @@ def record_circuit_success(provider: str):
     _CIRCUIT_BREAKER_STATE[provider] = {"failures": 0, "cooldown_until": 0.0}
 
 
-def get_available_groq_keys(conn=None) -> List[str]:
+def get_available_groq_keys(conn=None) -> List[Any]:
     """Mengambil daftar kunci API Groq aktif dari environment variable dan basis data."""
-    keys: List[str] = []
+    keys: List[Any] = []
     # 1. Dari Environment
     env_keys = os.environ.get("GROQ_API_KEYS") or os.environ.get("GROQ_API_KEY", "")
     if env_keys.strip():
         for k in env_keys.split(","):
             clean_k = k.strip()
-            if clean_k and clean_k not in keys:
-                keys.append(clean_k)
+            if clean_k and not any((isinstance(x, dict) and x.get("api_key") == clean_k) or x == clean_k for x in keys):
+                keys.append({
+                    "id": None,
+                    "key_name": "GroqEnv",
+                    "api_key": clean_k,
+                    "model_name": None
+                })
 
     # 2. Dari Tabel google_api_keys (provider = 'groq')
     close_after = False
@@ -209,16 +214,18 @@ def get_available_groq_keys(conn=None) -> List[str]:
         try:
             cursor = conn.cursor(dictionary=True)
             cursor.execute("""
-                SELECT api_key FROM google_api_keys 
+                SELECT id, key_name, api_key, model_name, usage_count, error_count, rate_limited_until
+                FROM google_api_keys 
                 WHERE provider = 'groq' AND status = 'active'
-                ORDER BY error_count ASC, usage_count ASC
+                  AND (rate_limited_until IS NULL OR rate_limited_until <= NOW())
+                ORDER BY error_count ASC, usage_count ASC, COALESCE(last_used_at, '2000-01-01 00:00:00') ASC, id ASC
             """)
             rows = cursor.fetchall() or []
             cursor.close()
             for r in rows:
                 ak = r.get("api_key", "").strip()
-                if ak and ak not in keys:
-                    keys.append(ak)
+                if ak and not any((isinstance(x, dict) and x.get("api_key") == ak) or x == ak for x in keys):
+                    keys.append(r)
         except Exception as e:
             logger.warning(f"[AI GATEWAY] Gagal membaca kunci Groq dari basis data: {e}")
         finally:
@@ -252,7 +259,8 @@ def call_groq_api(api_key: str, model_name: str, prompt: str, timeout: int = 40)
             }
         ],
         "response_format": {"type": "json_object"},
-        "temperature": 0.2
+        "temperature": 0.2,
+        "max_tokens": 950
     }
 
     req_data = json.dumps(payload).encode("utf-8")
@@ -514,25 +522,35 @@ def execute_job_with_gateway(job: Dict[str, Any], conn) -> Dict[str, Any]:
     # ── LAPIS 1: GROQ ──
     groq_keys = get_available_groq_keys(conn)
     cfg_prov = {p.get("name"): p for p in config.get("providers", [])}
-    groq_model = cfg_prov.get("groq", {}).get("model", "qwen/qwen3.8-27b")
+    groq_model_default = cfg_prov.get("groq", {}).get("model", "qwen/qwen3.8-27b")
     groq_cap = int(cfg_prov.get("groq", {}).get("daily_token_cap", 90000))
     groq_used = get_provider_daily_tokens(conn, "groq")
 
     can_use_groq = bool(groq_keys) and (groq_used < groq_cap) and not is_circuit_breaker_active("groq")
 
     if can_use_groq:
-        logger.info(f"[AI GATEWAY] [Job #{job_id}] Mencoba Lapis 1: Groq ({groq_model})...")
-        for g_key in groq_keys:
+        logger.info(f"[AI GATEWAY] [Job #{job_id}] Mencoba Lapis 1: Groq ({len(groq_keys)} kunci tersedia)...")
+        for gk in groq_keys:
+            g_key = gk["api_key"] if isinstance(gk, dict) else gk
+            key_id = gk.get("id") if isinstance(gk, dict) else None
+            key_name = gk.get("key_name", "GroqKey") if isinstance(gk, dict) else "GroqEnv"
+            groq_model = (gk.get("model_name") if isinstance(gk, dict) else None) or groq_model_default
+
+            t0 = time.time()
             res_groq = call_groq_api(g_key, groq_model, prompt)
+            latency_ms = res_groq.get("latency_ms") or int((time.time() - t0) * 1000)
             attempt_rec = {
                 "provider": "groq",
+                "key_name": key_name,
                 "at": time.strftime("%Y-%m-%dT%H:%M:%S"),
-                "ms": res_groq.get("latency_ms", 0),
+                "ms": latency_ms,
                 "code": res_groq.get("status_code", 500)
             }
             attempts.append(attempt_rec)
 
             if res_groq.get("success"):
+                if key_id:
+                    mark_key_success(key_id, conn)
                 record_provider_usage(conn, "groq", res_groq.get("tokens_in", 0), res_groq.get("tokens_out", 0))
                 record_circuit_success("groq")
                 clean_text = res_groq.get("raw_text", "").strip()
@@ -545,6 +563,7 @@ def execute_job_with_gateway(job: Dict[str, Any], conn) -> Dict[str, Any]:
                         "is_available": True,
                         "provider_used": "groq",
                         "model_used": groq_model,
+                        "key_used": key_name,
                         "audit": parsed_audit,
                         "privacy_protection": {
                             "full_document_transmitted": False,
@@ -557,12 +576,14 @@ def execute_job_with_gateway(job: Dict[str, Any], conn) -> Dict[str, Any]:
                 except Exception as parse_err:
                     logger.warning(f"[AI GATEWAY] Gagal mengurai JSON respon Groq: {parse_err}")
             else:
-                record_provider_usage(conn, "groq", rate_limit_hit=res_groq.get("is_quota", False))
+                is_quota = res_groq.get("is_quota", False)
+                record_provider_usage(conn, "groq", rate_limit_hit=is_quota)
                 record_circuit_failure("groq", config)
-                logger.warning(f"[AI GATEWAY] Groq gagal ({res_groq.get('status_code')}): {res_groq.get('error')}. Melanjutkan ke L2...")
-                # Backoff singkat sebelum failover ke Gemini
-                time.sleep(1.0)
-                break
+                err_msg = res_groq.get("error", "Error")
+                if key_id and is_quota:
+                    mark_key_rate_limited(key_id, err_msg, cooldown_seconds=res_groq.get("retry_after_sec") or 60, conn=conn)
+                logger.warning(f"[AI GATEWAY] Groq [{key_name}] gagal ({res_groq.get('status_code')}): {err_msg}. Melanjutkan...")
+                time.sleep(0.5)
     else:
         logger.info(f"[AI GATEWAY] [Job #{job_id}] Lapis 1 (Groq) dilewati (kunci: {len(groq_keys)}, used: {groq_used}/{groq_cap}, circuit_active: {is_circuit_breaker_active('groq')}).")
 
