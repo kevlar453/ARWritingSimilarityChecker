@@ -320,31 +320,27 @@ class DashboardController extends BaseController
                                    ->get()
                                    ->getResultArray();
 
-        // Metrik Anti-Cheat & Keadilan Akademik
-        $reportsSample = $db->table('reports')
-                            ->select('id, evidence_data')
-                            ->where('status', 'completed')
-                            ->orderBy('id', 'DESC')
-                            ->limit(100)
-                            ->get()
-                            ->getResultArray();
-
+        // Metrik Anti-Cheat & Keadilan Akademik (Optimalisasi SQL JSON Extract untuk efisiensi memori)
         $evasionCount = 0;
         $phantomCount = 0;
         $crossLingualCount = 0;
-        foreach ($reportsSample as $rep) {
-            if (! empty($rep['evidence_data'])) {
-                $evData = json_decode($rep['evidence_data'], true);
-                if (! empty($evData['evasion']['is_manipulated'])) {
-                    $evasionCount++;
-                }
-                if (! empty($evData['citation_audit']['phantom_citations_count']) && $evData['citation_audit']['phantom_citations_count'] > 0) {
-                    $phantomCount++;
-                }
-                if (! empty($evData['cross_lingual']['is_cross_lingual_match'])) {
-                    $crossLingualCount++;
-                }
-            }
+
+        try {
+            $metricRow = $db->query("
+                SELECT 
+                    COUNT(CASE WHEN JSON_EXTRACT(evidence_data, '$.evasion.is_manipulated') = true OR JSON_EXTRACT(evidence_data, '$.evasion.is_manipulated') = 'true' OR JSON_EXTRACT(evidence_data, '$.evasion.is_manipulated') = 1 THEN 1 END) as evasion_cnt,
+                    COUNT(CASE WHEN CAST(JSON_EXTRACT(evidence_data, '$.citation_audit.phantom_citations_count') AS UNSIGNED) > 0 THEN 1 END) as phantom_cnt,
+                    COUNT(CASE WHEN JSON_EXTRACT(evidence_data, '$.cross_lingual.is_cross_lingual_match') = true OR JSON_EXTRACT(evidence_data, '$.cross_lingual.is_cross_lingual_match') = 'true' OR JSON_EXTRACT(evidence_data, '$.cross_lingual.is_cross_lingual_match') = 1 THEN 1 END) as cross_lingual_cnt
+                FROM (
+                    SELECT evidence_data FROM reports WHERE status = 'completed' AND evidence_data IS NOT NULL ORDER BY id DESC LIMIT 100
+                ) sub
+            ")->getRowArray();
+
+            $evasionCount = (int) ($metricRow['evasion_cnt'] ?? 0);
+            $phantomCount = (int) ($metricRow['phantom_cnt'] ?? 0);
+            $crossLingualCount = (int) ($metricRow['cross_lingual_cnt'] ?? 0);
+        } catch (\Throwable $e) {
+            log_message('error', 'DashboardController JSON extraction fallback: ' . $e->getMessage());
         }
 
         // 14. Data Evaluasi Fitur & Testimoni Publik (Fase 1)
@@ -727,7 +723,7 @@ class DashboardController extends BaseController
 
         // Hapus laporan dan detail kemiripan
         $db = db_connect();
-        $reports = $reportModel->where('document_id', $documentId)->findAll();
+        $reports = $reportModel->select('id')->where('document_id', $documentId)->findAll();
         foreach ($reports as $r) {
             $db->table('report_matches')->where('report_id', $r['id'])->delete();
             $db->table('report_sources')->where('report_id', $r['id'])->delete();
