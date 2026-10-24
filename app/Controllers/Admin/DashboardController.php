@@ -1041,6 +1041,7 @@ class DashboardController extends BaseController
         $totalAudited = $db->table('reports')->where('status', 'completed')->countAllResults();
         $totalApiKeys = $db->table('api_keys')->countAllResults();
         $activeGoogleKeys = $db->table('google_api_keys')->where('status', 'active')->countAllResults();
+        $troubledGoogleKeys = $db->table('google_api_keys')->where('status !=', 'active')->countAllResults();
         $paymentStats = $paymentModel->getPaymentStats();
         $testimonialStats = (new \App\Models\TestimonialModel())->getStats();
         $ambStats = $ambAppModel->getAdminStats();
@@ -1051,18 +1052,21 @@ class DashboardController extends BaseController
             'status'    => 'success',
             'synced_at' => date('H:i:s'),
             'badges'    => [
-                'users'              => (int) $totalUsers,
-                'queue'              => (int) $queueCount,
-                'corpus'             => (int) $totalCorpus,
-                'analytics'          => (int) $totalAudited,
-                'api_keys'           => (int) $totalApiKeys,
-                'google_keys_active' => (int) $activeGoogleKeys,
-                'payments_settled'   => (int) ($paymentStats['settled_count'] ?? 0),
-                'testimonials'       => (int) ($testimonialStats['total_reviews'] ?? 0),
-                'ambassador_pending' => (int) ($ambStats['pending_review'] ?? 0),
-                'ambassador_active'  => (int) ($ambStats['active_ambassadors'] ?? 0),
-                'security_locks'     => (int) $activeLocks,
-                'visitors_today'     => (int) ($visitorStats['today_unique'] ?? 0),
+                'users'                => (int) $totalUsers,
+                'queue'                => (int) $queueCount,
+                'corpus'               => (int) $totalCorpus,
+                'analytics'            => (int) $totalAudited,
+                'api_keys'             => (int) $totalApiKeys,
+                'google_keys_active'   => (int) $activeGoogleKeys,
+                'google_keys_troubled' => (int) $troubledGoogleKeys,
+                'payments_settled'     => (int) ($paymentStats['settled_count'] ?? 0),
+                'payments_pending'     => (int) ($paymentStats['pending_count'] ?? 0),
+                'testimonials'         => (int) ($testimonialStats['total_reviews'] ?? 0),
+                'testimonials_pending' => (int) ($testimonialStats['count_pending'] ?? 0),
+                'ambassador_pending'   => (int) ($ambStats['pending_review'] ?? 0),
+                'ambassador_active'    => (int) ($ambStats['active_ambassadors'] ?? 0),
+                'security_locks'       => (int) $activeLocks,
+                'visitors_today'       => (int) ($visitorStats['today_unique'] ?? 0),
             ]
         ]);
     }

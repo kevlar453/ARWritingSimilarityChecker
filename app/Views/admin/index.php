@@ -225,9 +225,6 @@
                             <svg class="w-4 h-4 <?= $activeTab === 'users' ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                             <span>Pengguna & Kuota</span>
                         </div>
-                        <span id="sidebar-badge-users" class="px-2 py-0.5 rounded-full text-[10px] font-semibold transition-all duration-300 <?= $activeTab === 'users' ? 'bg-indigo-500/20 text-indigo-300' : 'bg-slate-800 text-slate-300' ?>">
-                            <?= (int) $metrics['total_users'] ?>
-                        </span>
                     </a>
                     <a href="<?= base_url('admin?tab=documents') ?>" class="group flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 <?= $activeTab === 'documents' ? 'bg-indigo-600/15 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent' ?>">
                         <div class="flex items-center gap-2.5">
@@ -244,9 +241,6 @@
                             <svg class="w-4 h-4 <?= $activeTab === 'corpus' ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
                             <span>Korpus Repositori</span>
                         </div>
-                        <span id="sidebar-badge-corpus" class="px-2 py-0.5 rounded-full text-[10px] font-semibold transition-all duration-300 <?= $activeTab === 'corpus' ? 'bg-indigo-500/20 text-indigo-300' : 'bg-slate-800 text-slate-300' ?>">
-                            <?= (int) $metrics['total_corpus'] ?>
-                        </span>
                     </a>
                 </div>
 
@@ -260,68 +254,63 @@
                             <svg class="w-4 h-4 <?= $activeTab === 'analytics' ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                             <span>Analitik Institusi</span>
                         </div>
-                        <span id="sidebar-badge-analytics" class="px-2 py-0.5 rounded-full text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold transition-all duration-300">
-                            <?= (int) ($integrityAnalytics['total_audited'] ?? 0) ?>
-                        </span>
                     </a>
                     <a href="<?= base_url('admin?tab=api_keys') ?>" class="group flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 <?= $activeTab === 'api_keys' ? 'bg-indigo-600/15 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent' ?>">
                         <div class="flex items-center gap-2.5">
                             <svg class="w-4 h-4 <?= $activeTab === 'api_keys' ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
                             <span>Integrasi API & OJS</span>
                         </div>
-                        <span id="sidebar-badge-api_keys" class="px-2 py-0.5 rounded-full text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-semibold transition-all duration-300">
-                            <?= count($apiKeysList ?? []) ?>
-                        </span>
                     </a>
+                    <?php
+                    $gActive = (int) ($activeGoogleKeysCount ?? 0);
+                    $gTroubled = count(array_filter($googleKeysList ?? [], fn($k) => ($k['status'] ?? '') !== 'active'));
+                    $gBadgeClass = 'hidden';
+                    $gBadgeText = '';
+                    if ($gActive === 0) {
+                        $gBadgeClass = 'bg-rose-500/20 text-rose-300 border border-rose-500/30 animate-pulse';
+                        $gBadgeText = '0 aktif';
+                    } elseif ($gTroubled > 0) {
+                        $gBadgeClass = 'bg-amber-500/20 text-amber-300 border border-amber-500/30';
+                        $gBadgeText = $gTroubled . ' limit';
+                    }
+                    ?>
                     <a href="<?= base_url('admin?tab=google_keys') ?>" class="group flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 <?= $activeTab === 'google_keys' ? 'bg-indigo-600/15 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent' ?>">
                         <div class="flex items-center gap-2.5">
                             <svg class="w-4 h-4 <?= $activeTab === 'google_keys' ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                             <span>AI Gateway (Groq &amp; Gemini)</span>
                         </div>
-                        <span id="sidebar-badge-google_keys" class="px-2 py-0.5 rounded-full text-[10px] font-semibold transition-all duration-300 <?= ($activeGoogleKeysCount ?? 0) > 0 ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-slate-800 text-slate-400' ?>">
-                            <?= (int) ($activeGoogleKeysCount ?? 0) ?> aktif
+                        <span id="sidebar-badge-google_keys" class="px-2 py-0.5 rounded-full text-[10px] font-semibold transition-all duration-300 <?= $gBadgeClass ?>">
+                            <?= $gBadgeText ?>
                         </span>
                     </a>
+                    <?php $pendingPayCount = (int) ($metrics['payment_stats']['pending_count'] ?? 0); ?>
                     <a href="<?= base_url('admin?tab=payments') ?>" class="group flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 <?= $activeTab === 'payments' ? 'bg-indigo-600/15 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent' ?>">
                         <div class="flex items-center gap-2.5">
                             <svg class="w-4 h-4 <?= $activeTab === 'payments' ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
                             <span>Transaksi & Pembayaran</span>
                         </div>
-                        <?php $settledCount = (int) ($metrics['payment_stats']['settled_count'] ?? 0); ?>
-                        <span id="sidebar-badge-payments" class="px-2 py-0.5 rounded-full text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold transition-all duration-300 <?= $settledCount > 0 ? '' : 'hidden' ?>">
-                            <?= $settledCount > 0 ? ($settledCount . ' lunas') : '' ?>
+                        <span id="sidebar-badge-payments" class="px-2 py-0.5 rounded-full text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold transition-all duration-300 <?= $pendingPayCount > 0 ? '' : 'hidden' ?>">
+                            <?= $pendingPayCount > 0 ? ($pendingPayCount . ' pending') : '' ?>
                         </span>
                     </a>
+                    <?php $pendingReviews = (int) ($testimonialStats['count_pending'] ?? 0); ?>
                     <a href="<?= base_url('admin?tab=feedback') ?>" class="group flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 <?= $activeTab === 'feedback' ? 'bg-indigo-600/15 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent' ?>">
                         <div class="flex items-center gap-2.5">
                             <svg class="w-4 h-4 <?= $activeTab === 'feedback' ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
                             <span>Feedback &amp; Testimoni</span>
                         </div>
-                        <?php $totalReviews = (int) ($testimonialStats['total_reviews'] ?? 0); ?>
-                        <span id="sidebar-badge-feedback" class="px-2 py-0.5 rounded-full text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold transition-all duration-300 <?= $totalReviews > 0 ? '' : 'hidden' ?>">
-                            <?= $totalReviews > 0 ? $totalReviews : '' ?>
+                        <span id="sidebar-badge-feedback" class="px-2 py-0.5 rounded-full text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold transition-all duration-300 <?= $pendingReviews > 0 ? '' : 'hidden' ?>">
+                            <?= $pendingReviews > 0 ? ($pendingReviews . ' baru') : '' ?>
                         </span>
                     </a>
+                    <?php $ambPending = (int) ($ambStats['pending_review'] ?? 0); ?>
                     <a href="<?= base_url('admin?tab=ambassador') ?>" class="group flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 <?= $activeTab === 'ambassador' ? 'bg-indigo-600/15 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent' ?>">
                         <div class="flex items-center gap-2.5">
                             <span class="text-sm">🎓</span>
                             <span>Duta Kampus (Afiliasi)</span>
                         </div>
-                        <?php
-                        $ambPending = (int) ($ambStats['pending_review'] ?? 0);
-                        $ambActive = (int) ($ambStats['active_ambassadors'] ?? 0);
-                        $ambText = '';
-                        $ambClass = 'hidden';
-                        if ($ambPending > 0) {
-                            $ambClass = 'bg-amber-500/20 text-amber-300 border border-amber-500/30';
-                            $ambText = $ambPending . ' baru';
-                        } elseif ($ambActive > 0) {
-                            $ambClass = 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
-                            $ambText = $ambActive . ' aktif';
-                        }
-                        ?>
-                        <span id="sidebar-badge-ambassador" class="px-2 py-0.5 rounded-full text-[10px] font-semibold transition-all duration-300 <?= $ambClass ?>">
-                            <?= $ambText ?>
+                        <span id="sidebar-badge-ambassador" class="px-2 py-0.5 rounded-full text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold transition-all duration-300 <?= $ambPending > 0 ? '' : 'hidden' ?>">
+                            <?= $ambPending > 0 ? ($ambPending . ' baru') : '' ?>
                         </span>
                     </a>
                 </div>
@@ -5007,59 +4996,39 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                 if (data && data.status === 'success' && data.badges) {
                     const b = data.badges;
 
-                    // 1. Pengguna & Kuota
-                    updateBadgeWithHighlight(document.getElementById('sidebar-badge-users'), b.users);
-
-                    // 2. Dokumen & Antrean
+                    // 1. Dokumen & Antrean (Hanya muncul jika ada antrean proses)
                     const queueCount = Number(b.queue || 0);
                     updateBadgeWithHighlight(document.getElementById('sidebar-badge-documents'), queueCount + ' proses', queueCount > 0);
 
-                    // 3. Korpus Repositori
-                    updateBadgeWithHighlight(document.getElementById('sidebar-badge-corpus'), b.corpus);
-
-                    // 4. Analitik Institusi
-                    updateBadgeWithHighlight(document.getElementById('sidebar-badge-analytics'), b.analytics);
-
-                    // 5. Integrasi API & OJS
-                    updateBadgeWithHighlight(document.getElementById('sidebar-badge-api_keys'), b.api_keys);
-
-                    // 6. Google AI Keys (Pool)
-                    const gKeys = Number(b.google_keys_active || 0);
+                    // 2. Google AI Keys (Pool) - Hanya tampil jika ada kendala / 0 aktif
+                    const gActive = Number(b.google_keys_active || 0);
+                    const gTroubled = Number(b.google_keys_troubled || 0);
                     const elGKeys = document.getElementById('sidebar-badge-google_keys');
                     if (elGKeys) {
-                        if (gKeys > 0) {
-                            elGKeys.className = 'px-2 py-0.5 rounded-full text-[10px] font-semibold transition-all duration-300 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+                        if (gActive === 0) {
+                            elGKeys.className = 'px-2 py-0.5 rounded-full text-[10px] font-semibold transition-all duration-300 bg-rose-500/20 text-rose-300 border border-rose-500/30 animate-pulse';
+                            updateBadgeWithHighlight(elGKeys, '0 aktif', true);
+                        } else if (gTroubled > 0) {
+                            elGKeys.className = 'px-2 py-0.5 rounded-full text-[10px] font-semibold transition-all duration-300 bg-amber-500/20 text-amber-300 border border-amber-500/30';
+                            updateBadgeWithHighlight(elGKeys, gTroubled + ' limit', true);
                         } else {
-                            elGKeys.className = 'px-2 py-0.5 rounded-full text-[10px] font-semibold transition-all duration-300 bg-slate-800 text-slate-400';
+                            elGKeys.classList.add('hidden');
                         }
                     }
-                    updateBadgeWithHighlight(elGKeys, gKeys + ' aktif');
 
-                    // 7. Transaksi & Pembayaran
-                    const settled = Number(b.payments_settled || 0);
-                    updateBadgeWithHighlight(document.getElementById('sidebar-badge-payments'), settled + ' lunas', settled > 0);
+                    // 3. Transaksi & Pembayaran - Hanya tampil jika ada pembayaran pending
+                    const pendingPay = Number(b.payments_pending || 0);
+                    updateBadgeWithHighlight(document.getElementById('sidebar-badge-payments'), pendingPay + ' pending', pendingPay > 0);
 
-                    // 8. Feedback & Testimoni
-                    const testims = Number(b.testimonials || 0);
-                    updateBadgeWithHighlight(document.getElementById('sidebar-badge-feedback'), testims, testims > 0);
+                    // 4. Feedback & Testimoni - Hanya tampil jika ada ulasan menunggu moderasi
+                    const pendingTestims = Number(b.testimonials_pending || 0);
+                    updateBadgeWithHighlight(document.getElementById('sidebar-badge-feedback'), pendingTestims + ' baru', pendingTestims > 0);
 
-                    // 9. Duta Kampus (Afiliasi)
+                    // 5. Duta Kampus (Afiliasi) - Hanya tampil jika ada pendaftar menunggu review
                     const ambPending = Number(b.ambassador_pending || 0);
-                    const ambActive = Number(b.ambassador_active || 0);
-                    const elAmb = document.getElementById('sidebar-badge-ambassador');
-                    if (elAmb) {
-                        if (ambPending > 0) {
-                            elAmb.className = 'px-2 py-0.5 rounded-full text-[10px] font-semibold transition-all duration-300 bg-amber-500/20 text-amber-300 border border-amber-500/30';
-                            updateBadgeWithHighlight(elAmb, ambPending + ' baru', true);
-                        } else if (ambActive > 0) {
-                            elAmb.className = 'px-2 py-0.5 rounded-full text-[10px] font-semibold transition-all duration-300 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
-                            updateBadgeWithHighlight(elAmb, ambActive + ' aktif', true);
-                        } else {
-                            elAmb.classList.add('hidden');
-                        }
-                    }
+                    updateBadgeWithHighlight(document.getElementById('sidebar-badge-ambassador'), ambPending + ' baru', ambPending > 0);
 
-                    // 10. Keamanan & Limit
+                    // 6. Keamanan & Limit - Hanya tampil jika ada lock akun/IP
                     const secLocks = Number(b.security_locks || 0);
                     updateBadgeWithHighlight(document.getElementById('sidebar-badge-security'), secLocks + ' lock', secLocks > 0);
 
