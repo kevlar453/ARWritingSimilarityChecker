@@ -220,26 +220,26 @@
                     <div class="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500">
                         Konten & Pengguna
                     </div>
-                    <a href="<?= base_url('admin?tab=users') ?>" class="group flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 <?= $activeTab === 'users' ? 'bg-indigo-600/15 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent' ?>">
-                        <div class="flex items-center gap-2.5">
-                            <svg class="w-4 h-4 <?= $activeTab === 'users' ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                            <span>Pengguna & Kuota</span>
+                    <a href="<?= base_url('admin?tab=users') ?>" class="group flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 <?= $activeTab === 'users' ? 'bg-indigo-600/15 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent' ?>">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <svg class="w-4 h-4 flex-shrink-0 <?= $activeTab === 'users' ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                            <span class="truncate">Pengguna & Kuota</span>
                         </div>
                     </a>
-                    <a href="<?= base_url('admin?tab=documents') ?>" class="group flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 <?= $activeTab === 'documents' ? 'bg-indigo-600/15 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent' ?>">
-                        <div class="flex items-center gap-2.5">
-                            <svg class="w-4 h-4 <?= $activeTab === 'documents' ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                            <span>Dokumen & Antrean</span>
+                    <a href="<?= base_url('admin?tab=documents') ?>" class="group flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 <?= $activeTab === 'documents' ? 'bg-indigo-600/15 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent' ?>">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <svg class="w-4 h-4 flex-shrink-0 <?= $activeTab === 'documents' ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            <span class="truncate">Dokumen & Antrean</span>
                         </div>
                         <?php $totalQueue = (int)($metrics['queue_uploaded'] ?? 0) + (int)($metrics['queue_processing'] ?? 0); ?>
-                        <span id="sidebar-badge-documents" class="px-2 py-0.5 rounded-full text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold animate-pulse transition-all duration-300 <?= $totalQueue > 0 ? '' : 'hidden' ?>">
-                            <?= $totalQueue > 0 ? ($totalQueue . ' proses') : '' ?>
+                        <span id="sidebar-badge-documents" title="<?= $totalQueue ?> dokumen dalam antrean proses" class="flex-shrink-0 min-w-5 h-5 px-1.5 inline-flex items-center justify-center rounded-full text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold animate-pulse transition-all duration-300 <?= $totalQueue > 0 ? '' : 'hidden' ?>">
+                            <?= $totalQueue > 0 ? $totalQueue : '' ?>
                         </span>
                     </a>
-                    <a href="<?= base_url('admin?tab=corpus') ?>" class="group flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 <?= $activeTab === 'corpus' ? 'bg-indigo-600/15 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent' ?>">
-                        <div class="flex items-center gap-2.5">
-                            <svg class="w-4 h-4 <?= $activeTab === 'corpus' ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-                            <span>Korpus Repositori</span>
+                    <a href="<?= base_url('admin?tab=corpus') ?>" class="group flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 <?= $activeTab === 'corpus' ? 'bg-indigo-600/15 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent' ?>">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <svg class="w-4 h-4 flex-shrink-0 <?= $activeTab === 'corpus' ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                            <span class="truncate">Korpus Repositori</span>
                         </div>
                     </a>
                 </div>
@@ -249,16 +249,16 @@
                     <div class="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500">
                         Analisis & Ekosistem
                     </div>
-                    <a href="<?= base_url('admin?tab=analytics') ?>" class="group flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 <?= $activeTab === 'analytics' ? 'bg-indigo-600/15 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent' ?>">
-                        <div class="flex items-center gap-2.5">
-                            <svg class="w-4 h-4 <?= $activeTab === 'analytics' ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                            <span>Analitik Institusi</span>
+                    <a href="<?= base_url('admin?tab=analytics') ?>" class="group flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 <?= $activeTab === 'analytics' ? 'bg-indigo-600/15 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent' ?>">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <svg class="w-4 h-4 flex-shrink-0 <?= $activeTab === 'analytics' ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                            <span class="truncate">Analitik Institusi</span>
                         </div>
                     </a>
-                    <a href="<?= base_url('admin?tab=api_keys') ?>" class="group flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 <?= $activeTab === 'api_keys' ? 'bg-indigo-600/15 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent' ?>">
-                        <div class="flex items-center gap-2.5">
-                            <svg class="w-4 h-4 <?= $activeTab === 'api_keys' ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
-                            <span>Integrasi API & OJS</span>
+                    <a href="<?= base_url('admin?tab=api_keys') ?>" class="group flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 <?= $activeTab === 'api_keys' ? 'bg-indigo-600/15 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent' ?>">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <svg class="w-4 h-4 flex-shrink-0 <?= $activeTab === 'api_keys' ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
+                            <span class="truncate">Integrasi API & OJS</span>
                         </div>
                     </a>
                     <?php
@@ -266,51 +266,54 @@
                     $gTroubled = count(array_filter($googleKeysList ?? [], fn($k) => ($k['status'] ?? '') !== 'active'));
                     $gBadgeClass = 'hidden';
                     $gBadgeText = '';
+                    $gBadgeTitle = '';
                     if ($gActive === 0) {
                         $gBadgeClass = 'bg-rose-500/20 text-rose-300 border border-rose-500/30 animate-pulse';
-                        $gBadgeText = '0 aktif';
+                        $gBadgeText = '0';
+                        $gBadgeTitle = '0 kunci Google AI aktif (Darurat)';
                     } elseif ($gTroubled > 0) {
                         $gBadgeClass = 'bg-amber-500/20 text-amber-300 border border-amber-500/30';
-                        $gBadgeText = $gTroubled . ' limit';
+                        $gBadgeText = (string) $gTroubled;
+                        $gBadgeTitle = $gTroubled . ' kunci Google AI berstatus limit/bermasalah';
                     }
                     ?>
-                    <a href="<?= base_url('admin?tab=google_keys') ?>" class="group flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 <?= $activeTab === 'google_keys' ? 'bg-indigo-600/15 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent' ?>">
-                        <div class="flex items-center gap-2.5">
-                            <svg class="w-4 h-4 <?= $activeTab === 'google_keys' ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                            <span>AI Gateway (Groq &amp; Gemini)</span>
+                    <a href="<?= base_url('admin?tab=google_keys') ?>" class="group flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 <?= $activeTab === 'google_keys' ? 'bg-indigo-600/15 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent' ?>">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <svg class="w-4 h-4 flex-shrink-0 <?= $activeTab === 'google_keys' ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            <span class="truncate">AI Gateway (Groq &amp; Gemini)</span>
                         </div>
-                        <span id="sidebar-badge-google_keys" class="px-2 py-0.5 rounded-full text-[10px] font-semibold transition-all duration-300 <?= $gBadgeClass ?>">
+                        <span id="sidebar-badge-google_keys" title="<?= esc($gBadgeTitle) ?>" class="flex-shrink-0 min-w-5 h-5 px-1.5 inline-flex items-center justify-center rounded-full text-[10px] font-bold transition-all duration-300 <?= $gBadgeClass ?>">
                             <?= $gBadgeText ?>
                         </span>
                     </a>
                     <?php $pendingPayCount = (int) ($metrics['payment_stats']['pending_count'] ?? 0); ?>
-                    <a href="<?= base_url('admin?tab=payments') ?>" class="group flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 <?= $activeTab === 'payments' ? 'bg-indigo-600/15 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent' ?>">
-                        <div class="flex items-center gap-2.5">
-                            <svg class="w-4 h-4 <?= $activeTab === 'payments' ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
-                            <span>Transaksi & Pembayaran</span>
+                    <a href="<?= base_url('admin?tab=payments') ?>" class="group flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 <?= $activeTab === 'payments' ? 'bg-indigo-600/15 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent' ?>">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <svg class="w-4 h-4 flex-shrink-0 <?= $activeTab === 'payments' ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                            <span class="truncate">Transaksi & Pembayaran</span>
                         </div>
-                        <span id="sidebar-badge-payments" class="px-2 py-0.5 rounded-full text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold transition-all duration-300 <?= $pendingPayCount > 0 ? '' : 'hidden' ?>">
-                            <?= $pendingPayCount > 0 ? ($pendingPayCount . ' pending') : '' ?>
+                        <span id="sidebar-badge-payments" title="<?= $pendingPayCount ?> transaksi pending menunggu konfirmasi" class="flex-shrink-0 min-w-5 h-5 px-1.5 inline-flex items-center justify-center rounded-full text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold transition-all duration-300 <?= $pendingPayCount > 0 ? '' : 'hidden' ?>">
+                            <?= $pendingPayCount > 0 ? $pendingPayCount : '' ?>
                         </span>
                     </a>
                     <?php $pendingReviews = (int) ($testimonialStats['count_pending'] ?? 0); ?>
-                    <a href="<?= base_url('admin?tab=feedback') ?>" class="group flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 <?= $activeTab === 'feedback' ? 'bg-indigo-600/15 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent' ?>">
-                        <div class="flex items-center gap-2.5">
-                            <svg class="w-4 h-4 <?= $activeTab === 'feedback' ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
-                            <span>Feedback &amp; Testimoni</span>
+                    <a href="<?= base_url('admin?tab=feedback') ?>" class="group flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 <?= $activeTab === 'feedback' ? 'bg-indigo-600/15 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent' ?>">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <svg class="w-4 h-4 flex-shrink-0 <?= $activeTab === 'feedback' ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+                            <span class="truncate">Feedback &amp; Testimoni</span>
                         </div>
-                        <span id="sidebar-badge-feedback" class="px-2 py-0.5 rounded-full text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold transition-all duration-300 <?= $pendingReviews > 0 ? '' : 'hidden' ?>">
-                            <?= $pendingReviews > 0 ? ($pendingReviews . ' baru') : '' ?>
+                        <span id="sidebar-badge-feedback" title="<?= $pendingReviews ?> ulasan baru menunggu moderasi" class="flex-shrink-0 min-w-5 h-5 px-1.5 inline-flex items-center justify-center rounded-full text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold transition-all duration-300 <?= $pendingReviews > 0 ? '' : 'hidden' ?>">
+                            <?= $pendingReviews > 0 ? $pendingReviews : '' ?>
                         </span>
                     </a>
                     <?php $ambPending = (int) ($ambStats['pending_review'] ?? 0); ?>
-                    <a href="<?= base_url('admin?tab=ambassador') ?>" class="group flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 <?= $activeTab === 'ambassador' ? 'bg-indigo-600/15 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent' ?>">
-                        <div class="flex items-center gap-2.5">
-                            <span class="text-sm">🎓</span>
-                            <span>Duta Kampus (Afiliasi)</span>
+                    <a href="<?= base_url('admin?tab=ambassador') ?>" class="group flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 <?= $activeTab === 'ambassador' ? 'bg-indigo-600/15 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent' ?>">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <span class="text-sm flex-shrink-0">🎓</span>
+                            <span class="truncate">Duta Kampus (Afiliasi)</span>
                         </div>
-                        <span id="sidebar-badge-ambassador" class="px-2 py-0.5 rounded-full text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold transition-all duration-300 <?= $ambPending > 0 ? '' : 'hidden' ?>">
-                            <?= $ambPending > 0 ? ($ambPending . ' baru') : '' ?>
+                        <span id="sidebar-badge-ambassador" title="<?= $ambPending ?> pendaftaran duta baru menunggu review" class="flex-shrink-0 min-w-5 h-5 px-1.5 inline-flex items-center justify-center rounded-full text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold transition-all duration-300 <?= $ambPending > 0 ? '' : 'hidden' ?>">
+                            <?= $ambPending > 0 ? $ambPending : '' ?>
                         </span>
                     </a>
                 </div>
@@ -320,26 +323,26 @@
                     <div class="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500">
                         Sistem & Keamanan
                     </div>
-                    <a href="<?= base_url('admin?tab=security') ?>" class="group flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 <?= $activeTab === 'security' ? 'bg-indigo-600/15 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent' ?>">
-                        <div class="flex items-center gap-2.5">
-                            <svg class="w-4 h-4 <?= $activeTab === 'security' ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-                            <span>Keamanan & Limit</span>
+                    <a href="<?= base_url('admin?tab=security') ?>" class="group flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 <?= $activeTab === 'security' ? 'bg-indigo-600/15 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent' ?>">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <svg class="w-4 h-4 flex-shrink-0 <?= $activeTab === 'security' ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                            <span class="truncate">Keamanan & Limit</span>
                         </div>
                         <?php $locksCount = (int) ($metrics['active_locks_count'] ?? 0); ?>
-                        <span id="sidebar-badge-security" class="px-2 py-0.5 rounded-full text-[10px] bg-rose-500/20 text-rose-300 border border-rose-500/30 font-semibold transition-all duration-300 <?= $locksCount > 0 ? '' : 'hidden' ?>">
-                            <?= $locksCount > 0 ? ($locksCount . ' lock') : '' ?>
+                        <span id="sidebar-badge-security" title="<?= $locksCount ?> akun / IP terkunci" class="flex-shrink-0 min-w-5 h-5 px-1.5 inline-flex items-center justify-center rounded-full text-[10px] bg-rose-500/20 text-rose-300 border border-rose-500/30 font-bold transition-all duration-300 <?= $locksCount > 0 ? '' : 'hidden' ?>">
+                            <?= $locksCount > 0 ? $locksCount : '' ?>
                         </span>
                     </a>
-                    <a href="<?= base_url('admin?tab=visitors') ?>" class="group flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 <?= $activeTab === 'visitors' ? 'bg-indigo-600/15 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent' ?>">
-                        <div class="flex items-center gap-2.5">
-                            <svg class="w-4 h-4 <?= $activeTab === 'visitors' ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                            <span>Pengunjung</span>
+                    <a href="<?= base_url('admin?tab=visitors') ?>" class="group flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 <?= $activeTab === 'visitors' ? 'bg-indigo-600/15 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent' ?>">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <svg class="w-4 h-4 flex-shrink-0 <?= $activeTab === 'visitors' ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                            <span class="truncate">Pengunjung</span>
                         </div>
                     </a>
-                    <a href="<?= base_url('admin?tab=system') ?>" class="group flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 <?= $activeTab === 'system' ? 'bg-indigo-600/15 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent' ?>">
-                        <div class="flex items-center gap-2.5">
-                            <svg class="w-4 h-4 <?= $activeTab === 'system' ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                            <span>Sistem Server</span>
+                    <a href="<?= base_url('admin?tab=system') ?>" class="group flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 <?= $activeTab === 'system' ? 'bg-indigo-600/15 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent' ?>">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <svg class="w-4 h-4 flex-shrink-0 <?= $activeTab === 'system' ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200' ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            <span class="truncate">Sistem Server</span>
                         </div>
                     </a>
                 </div>
@@ -4998,7 +5001,11 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
 
                     // 1. Dokumen & Antrean (Hanya muncul jika ada antrean proses)
                     const queueCount = Number(b.queue || 0);
-                    updateBadgeWithHighlight(document.getElementById('sidebar-badge-documents'), queueCount + ' proses', queueCount > 0);
+                    const elDoc = document.getElementById('sidebar-badge-documents');
+                    if (elDoc) {
+                        elDoc.setAttribute('title', queueCount + ' dokumen dalam antrean proses');
+                        updateBadgeWithHighlight(elDoc, queueCount, queueCount > 0);
+                    }
 
                     // 2. Google AI Keys (Pool) - Hanya tampil jika ada kendala / 0 aktif
                     const gActive = Number(b.google_keys_active || 0);
@@ -5006,11 +5013,13 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                     const elGKeys = document.getElementById('sidebar-badge-google_keys');
                     if (elGKeys) {
                         if (gActive === 0) {
-                            elGKeys.className = 'px-2 py-0.5 rounded-full text-[10px] font-semibold transition-all duration-300 bg-rose-500/20 text-rose-300 border border-rose-500/30 animate-pulse';
-                            updateBadgeWithHighlight(elGKeys, '0 aktif', true);
+                            elGKeys.className = 'flex-shrink-0 min-w-5 h-5 px-1.5 inline-flex items-center justify-center rounded-full text-[10px] font-bold transition-all duration-300 bg-rose-500/20 text-rose-300 border border-rose-500/30 animate-pulse';
+                            elGKeys.setAttribute('title', '0 kunci Google AI aktif (Darurat)');
+                            updateBadgeWithHighlight(elGKeys, '0', true);
                         } else if (gTroubled > 0) {
-                            elGKeys.className = 'px-2 py-0.5 rounded-full text-[10px] font-semibold transition-all duration-300 bg-amber-500/20 text-amber-300 border border-amber-500/30';
-                            updateBadgeWithHighlight(elGKeys, gTroubled + ' limit', true);
+                            elGKeys.className = 'flex-shrink-0 min-w-5 h-5 px-1.5 inline-flex items-center justify-center rounded-full text-[10px] font-bold transition-all duration-300 bg-amber-500/20 text-amber-300 border border-amber-500/30';
+                            elGKeys.setAttribute('title', gTroubled + ' kunci Google AI berstatus limit/bermasalah');
+                            updateBadgeWithHighlight(elGKeys, gTroubled, true);
                         } else {
                             elGKeys.classList.add('hidden');
                         }
@@ -5018,19 +5027,35 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
 
                     // 3. Transaksi & Pembayaran - Hanya tampil jika ada pembayaran pending
                     const pendingPay = Number(b.payments_pending || 0);
-                    updateBadgeWithHighlight(document.getElementById('sidebar-badge-payments'), pendingPay + ' pending', pendingPay > 0);
+                    const elPay = document.getElementById('sidebar-badge-payments');
+                    if (elPay) {
+                        elPay.setAttribute('title', pendingPay + ' transaksi pending menunggu konfirmasi');
+                        updateBadgeWithHighlight(elPay, pendingPay, pendingPay > 0);
+                    }
 
                     // 4. Feedback & Testimoni - Hanya tampil jika ada ulasan menunggu moderasi
                     const pendingTestims = Number(b.testimonials_pending || 0);
-                    updateBadgeWithHighlight(document.getElementById('sidebar-badge-feedback'), pendingTestims + ' baru', pendingTestims > 0);
+                    const elFeed = document.getElementById('sidebar-badge-feedback');
+                    if (elFeed) {
+                        elFeed.setAttribute('title', pendingTestims + ' ulasan baru menunggu moderasi');
+                        updateBadgeWithHighlight(elFeed, pendingTestims, pendingTestims > 0);
+                    }
 
                     // 5. Duta Kampus (Afiliasi) - Hanya tampil jika ada pendaftar menunggu review
                     const ambPending = Number(b.ambassador_pending || 0);
-                    updateBadgeWithHighlight(document.getElementById('sidebar-badge-ambassador'), ambPending + ' baru', ambPending > 0);
+                    const elAmb = document.getElementById('sidebar-badge-ambassador');
+                    if (elAmb) {
+                        elAmb.setAttribute('title', ambPending + ' pendaftar baru menunggu review');
+                        updateBadgeWithHighlight(elAmb, ambPending, ambPending > 0);
+                    }
 
                     // 6. Keamanan & Limit - Hanya tampil jika ada lock akun/IP
                     const secLocks = Number(b.security_locks || 0);
-                    updateBadgeWithHighlight(document.getElementById('sidebar-badge-security'), secLocks + ' lock', secLocks > 0);
+                    const elSec = document.getElementById('sidebar-badge-security');
+                    if (elSec) {
+                        elSec.setAttribute('title', secLocks + ' akun/IP terkunci');
+                        updateBadgeWithHighlight(elSec, secLocks, secLocks > 0);
+                    }
 
                     // Update timestamp indicator
                     if (syncEl && data.synced_at) {
