@@ -4661,9 +4661,29 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
 
         function formatChartDate(dateStr) {
             if (!dateStr) return '';
+            const parts = String(dateStr).split('-');
+            if (parts.length === 3) {
+                const day = parseInt(parts[2], 10);
+                const mIdx = parseInt(parts[1], 10) - 1;
+                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+                return `${day} ${months[mIdx] || ''}`;
+            }
             const d = new Date(dateStr);
             const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
             return `${d.getDate()} ${months[d.getMonth()]}`;
+        }
+
+        function formatFullIndonesianDate(dateStr) {
+            if (!dateStr) return '';
+            const parts = String(dateStr).split('-');
+            if (parts.length === 3) {
+                const day = parseInt(parts[2], 10);
+                const mIdx = parseInt(parts[1], 10) - 1;
+                const year = parts[0];
+                const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+                return `${day.toString().padStart(2, '0')} ${months[mIdx] || ''} ${year}`;
+            }
+            return dateStr;
         }
 
         function initVisitorChart() {
@@ -4690,6 +4710,7 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                 type: 'line',
                 data: {
                     labels: labels,
+                    _activeSlice: sliced,
                     datasets: [
                         {
                             label: 'Total Tayangan (Hits)',
@@ -4751,8 +4772,14 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                                 title: function(items) {
                                     if (!items.length) return '';
                                     const idx = items[0].dataIndex;
-                                    const d = sliced[idx];
-                                    return d ? d.full_date || d.visit_date : items[0].label;
+                                    const currentSlice = (visitorChart && visitorChart.data && visitorChart.data._activeSlice)
+                                        ? visitorChart.data._activeSlice
+                                        : rawDailyData.slice(-currentRangeDays);
+                                    const d = currentSlice[idx];
+                                    if (d) {
+                                        return formatFullIndonesianDate(d.visit_date) || d.full_date || d.visit_date;
+                                    }
+                                    return items[0].label;
                                 },
                                 label: function(item) {
                                     return ` ${item.dataset.label}: ${item.raw.toLocaleString('id-ID')}`;
@@ -4760,7 +4787,10 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                                 afterBody: function(items) {
                                     if (!items.length) return '';
                                     const idx = items[0].dataIndex;
-                                    const d = sliced[idx];
+                                    const currentSlice = (visitorChart && visitorChart.data && visitorChart.data._activeSlice)
+                                        ? visitorChart.data._activeSlice
+                                        : rawDailyData.slice(-currentRangeDays);
+                                    const d = currentSlice[idx];
                                     if (d && Number(d.unique_visitors) > 0) {
                                         const avg = (Number(d.total_hits) / Number(d.unique_visitors)).toFixed(2);
                                         return ` Rasio: ${avg} hits / pengunjung`;
@@ -4810,6 +4840,7 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                 return;
             }
             const sliced = rawDailyData.slice(-currentRangeDays);
+            visitorChart.data._activeSlice = sliced;
             visitorChart.data.labels = sliced.map(d => formatChartDate(d.visit_date));
             visitorChart.data.datasets[0].data = sliced.map(d => Number(d.total_hits));
             visitorChart.data.datasets[1].data = sliced.map(d => Number(d.unique_visitors));
