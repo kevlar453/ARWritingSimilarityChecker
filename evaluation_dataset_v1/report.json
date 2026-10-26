@@ -1,7 +1,7 @@
 {
   "evaluation_title": "AR TILIK EVALUATION v1",
   "system_version": "v1.0.0",
-  "elapsed_seconds": 3.92,
+  "elapsed_seconds": 9.54,
   "seed": {
     "total": 50,
     "pass": 40,
@@ -10,15 +10,15 @@
   },
   "mutation": {
     "total": 250,
-    "pass": 205,
-    "fail": 45,
-    "pass_rate": 82.0
+    "pass": 211,
+    "fail": 39,
+    "pass_rate": 84.4
   },
   "boundary": {
     "total": 100,
-    "pass": 95,
-    "fail": 5,
-    "pass_rate": 95.0
+    "pass": 90,
+    "fail": 10,
+    "pass_rate": 90.0
   },
   "adversarial": {
     "total": 100,
@@ -29,13 +29,13 @@
   "unexpected_match_adversarial": 0,
   "synthetic_summary": {
     "total": 450,
-    "pass": 400,
-    "fail": 50,
-    "pass_rate": 88.89
+    "pass": 401,
+    "fail": 49,
+    "pass_rate": 89.11
   },
   "failure_taxonomy_distribution": {
     "ENGINE_DEFECT": 10,
-    "BOUNDARY_BEHAVIOR:THRESHOLD_TRANSITION": 50
+    "BOUNDARY_BEHAVIOR:THRESHOLD_TRANSITION": 49
   },
   "confirmed_engine_defects": 10,
   "quality_gates": {

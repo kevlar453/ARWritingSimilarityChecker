@@ -676,11 +676,11 @@ HTML;
                         </td>
                     </tr>
 
-                    <!-- Footer Unsubscribe -->
+                    <!-- Footer Unsubscribe & Pengaturan -->
                     <tr>
-                        <td style="background-color: #f8fafc; border-top: 1px solid #e2e8f0; padding: 16px 28px; text-align: center; font-size: 11px; color: #94a3b8; line-height: 1.6;">
-                            Surel ini dikirimkan berkala sebagai ringkasan penggunaan akun AR Tilik Anda.<br>
-                            Jika tidak ingin menerima ringkasan mingguan lagi, Anda dapat <a href="{$unsubscribeUrl}" style="color: #6366f1; text-decoration: underline;">berhenti berlangganan di sini</a>.
+                        <td style="background-color: #f8fafc; border-top: 1px solid #e2e8f0; padding: 20px 28px; text-align: center; font-size: 11px; color: #64748b; line-height: 1.6;">
+                            Surel ini dikirimkan secara otomatis setiap awal pekan sebagai ringkasan penggunaan akun AR Tilik Anda.<br>
+                            Jika tidak ingin menerima ringkasan mingguan lagi, Anda dapat <a href="{$unsubscribeUrl}" target="_blank" rel="noopener noreferrer" style="color: #4f46e5; font-weight: 600; text-decoration: underline;">berhenti berlangganan di sini</a> atau <a href="{$unsubscribeUrl}" target="_blank" rel="noopener noreferrer" style="color: #4f46e5; text-decoration: underline;">atur preferensi komunikasi surel Anda</a>.
                         </td>
                     </tr>
                 </table>
@@ -758,7 +758,10 @@ HTML;
         $text .= "Kalau ada laporan yang hasilnya membingungkan, balas saja email ini dan ceritakan bagian mana yang meragukan. Kami akan membantu membaca hasilnya bersama Anda.\n\n";
         $text .= "Terima kasih sudah mempercayakan pemeriksaan naskah Anda kepada AR Tilik.\n\n";
         $text .= "Salam,\nMakarius Yuwono — AR Tilik\nhttps://tilik.arsetontong.top\n\n";
-        $text .= "---\nUntuk berhenti berlangganan ringkasan mingguan: {$unsubscribeUrl}\n";
+        $text .= "---\n";
+        $text .= "Surel ini dikirimkan secara otomatis setiap awal pekan sebagai ringkasan penggunaan akun AR Tilik Anda.\n";
+        $text .= "Untuk berhenti berlangganan ringkasan mingguan atau mengatur preferensi surel, kunjungi tautan berikut:\n";
+        $text .= "{$unsubscribeUrl}\n";
 
         return $text;
     }
