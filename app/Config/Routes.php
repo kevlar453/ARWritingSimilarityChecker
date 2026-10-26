@@ -63,6 +63,10 @@ $routes->match(['get', 'head'], 'promosi/Brosur_Eksekutif_ARTilik.pdf', 'Dashboa
 
 $routes->match(['get', 'head'], 'sitemap.xml', 'SitemapController::index');
 
+// Preferensi Surel & Berhenti Berlangganan (RFC 8058 Unsubscribe)
+$routes->match(['get', 'post', 'head'], 'email/unsubscribe', 'EmailPreferenceController::unsubscribe');
+$routes->match(['get', 'post', 'head'], 'unsubscribe', 'EmailPreferenceController::unsubscribe');
+
 // Legal & Contact Routes
 $routes->match(['get', 'head'], 'privacy', 'LegalController::privacy');
 $routes->match(['get', 'head'], 'terms', 'LegalController::terms');

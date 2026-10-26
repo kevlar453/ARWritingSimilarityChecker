@@ -15,6 +15,10 @@ CREATE TABLE IF NOT EXISTS users (
     verification_token VARCHAR(128) NULL,
     verification_token_expires_at DATETIME NULL,
     email_verified_at DATETIME NULL,
+    unsubscribe_token VARCHAR(64) NULL DEFAULT NULL,
+    email_notifications_enabled TINYINT(1) NOT NULL DEFAULT 1,
+    email_weekly_summary TINYINT(1) NOT NULL DEFAULT 1,
+    last_weekly_summary_sent_at DATETIME NULL DEFAULT NULL,
     reset_password_token VARCHAR(128) NULL,
     reset_password_expires_at DATETIME NULL,
     free_submissions_used_this_week INT UNSIGNED NOT NULL DEFAULT 0,
@@ -27,7 +31,8 @@ CREATE TABLE IF NOT EXISTS users (
     INDEX idx_users_email (email),
     INDEX idx_users_status (status),
     INDEX idx_users_token (verification_token),
-    INDEX idx_users_reset_token (reset_password_token)
+    INDEX idx_users_reset_token (reset_password_token),
+    INDEX idx_users_unsub_token (unsubscribe_token)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS auth_rate_limits (

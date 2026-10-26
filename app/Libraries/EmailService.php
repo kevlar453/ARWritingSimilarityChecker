@@ -477,4 +477,289 @@ HTML;
 </html>
 HTML;
     }
+
+    /**
+     * Mengirimkan email Ringkasan Mingguan AR Tilik sesuai template dan aturan redaksional
+     */
+    public function sendWeeklySummaryEmail(array $user, array $summaryData): bool
+    {
+        $email = Services::email();
+
+        $userModel = new \App\Models\UserModel();
+        $unsubToken = !empty($user['unsubscribe_token']) ? $user['unsubscribe_token'] : $userModel->getOrCreateUnsubscribeToken((int)$user['id']);
+        $unsubUrl = base_url("email/unsubscribe?token=" . urlencode($unsubToken) . "&type=weekly");
+
+        $jumlahDokumen = (int) ($summaryData['jumlah_dokumen'] ?? 0);
+        $subject = ($jumlahDokumen > 0)
+            ? "Sepekan bersama AR Tilik: {$jumlahDokumen} dokumen diperiksa"
+            : "Sepekan bersama AR Tilik: Ringkasan & Kuota Anda";
+
+        $htmlMessage = $this->buildWeeklySummaryTemplate($user, $summaryData, $unsubUrl);
+        $altMessage  = $this->buildWeeklySummaryAltText($user, $summaryData, $unsubUrl);
+
+        $recipientEmail = $user['email'];
+
+        $email->setTo($recipientEmail);
+        $email->setSubject($subject);
+        $email->setMessage($htmlMessage);
+        $email->setMailType('html');
+        $email->setAltMessage($altMessage);
+
+        // Header RFC 8058 One-Click Unsubscribe
+        $email->setHeader('List-Unsubscribe', "<{$unsubUrl}>");
+        $email->setHeader('List-Unsubscribe-Post', 'List-Unsubscribe=One-Click');
+
+        try {
+            $sent = $email->send();
+            if (!$sent) {
+                log_message('error', "Gagal mengirim ringkasan mingguan ke {$recipientEmail}: " . $email->printDebugger(['headers']));
+            } else {
+                // Catat waktu pengiriman terakhir
+                $userModel->update($user['id'], [
+                    'last_weekly_summary_sent_at' => date('Y-m-d H:i:s'),
+                ]);
+            }
+            return (bool) $sent;
+        } catch (\Throwable $e) {
+            log_message('error', "Exception saat mengirim ringkasan mingguan ke {$recipientEmail}: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Menyusun templat HTML Ringkasan Mingguan AR Tilik
+     */
+    protected function buildWeeklySummaryTemplate(array $user, array $summaryData, string $unsubscribeUrl): string
+    {
+        $hour = (int) date('H');
+        if ($hour >= 5 && $hour < 11) {
+            $sapaanWaktu = 'pagi';
+        } elseif ($hour >= 11 && $hour < 15) {
+            $sapaanWaktu = 'siang';
+        } elseif ($hour >= 15 && $hour < 18) {
+            $sapaanWaktu = 'sore';
+        } else {
+            $sapaanWaktu = 'pagi';
+        }
+
+        $nama = esc($user['name'] ?? 'Pengguna AR Tilik');
+        $tanggalMulai = esc($summaryData['tanggal_mulai'] ?? date('d M Y', strtotime('-7 days')));
+        $tanggalSelesai = esc($summaryData['tanggal_selesai'] ?? date('d M Y'));
+
+        $jumlahDokumen = (int) ($summaryData['jumlah_dokumen'] ?? 0);
+        $rataRataSkor = number_format((float) ($summaryData['rata_rata_skor'] ?? 0), 1);
+        $sitasiTerverifikasi = (int) ($summaryData['sitasi_terverifikasi'] ?? 0);
+        $sitasiMencurigakan = (int) ($summaryData['sitasi_mencurigakan'] ?? 0);
+        $kuotaTerpakai = (int) ($summaryData['kuota_terpakai'] ?? 0);
+        $kuotaTotal = (int) ($summaryData['kuota_total'] ?? 3);
+        $sisaKuota = esc($summaryData['sisa_kuota'] ?? '3 dokumen');
+
+        $dokumenTerakhir = $summaryData['dokumen_terakhir'] ?? null;
+        $judulTrik = esc($summaryData['judul_trik'] ?? 'Periksa sitasi, bukan hanya kemiripan');
+        $isiTrik = esc($summaryData['isi_trik'] ?? 'AR Tilik memeriksa rujukan Anda ke basis data eksternal seperti OpenAlex dan Crossref.');
+
+        $linkPeriksa = base_url('dashboard?tab=upload');
+        $linkLaporan = base_url('dashboard?tab=documents');
+
+        // Blok Bagian Ringkasan
+        if ($jumlahDokumen > 0) {
+            $ringkasanHtml = <<<HTML
+            <div style="background-color: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; padding: 18px 22px; margin-bottom: 22px;">
+                <div style="font-size: 14px; font-weight: 700; color: #0f172a; margin-bottom: 12px;">Ringkasan Anda minggu ini:</div>
+                <ul style="margin: 0; padding-left: 20px; font-size: 13px; color: #334155; line-height: 1.8;">
+                    <li><strong>Dokumen diperiksa:</strong> {$jumlahDokumen} dokumen</li>
+                    <li><strong>Rata-rata skor kemiripan:</strong> {$rataRataSkor}%</li>
+                    <li><strong>Sitasi yang terverifikasi:</strong> {$sitasiTerverifikasi} sitasi</li>
+                    <li><strong>Sitasi mencurigakan yang ditandai:</strong> {$sitasiMencurigakan} sitasi</li>
+                    <li><strong>Kuota terpakai minggu ini:</strong> {$kuotaTerpakai} dari {$kuotaTotal}</li>
+                    <li><strong>Sisa kuota Anda:</strong> {$sisaKuota}</li>
+                </ul>
+            </div>
+HTML;
+        } else {
+            $ringkasanHtml = <<<HTML
+            <div style="background-color: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; padding: 18px 22px; margin-bottom: 22px;">
+                <div style="font-size: 14px; font-weight: 700; color: #0f172a; margin-bottom: 8px;">Ringkasan Anda minggu ini:</div>
+                <p style="font-size: 13px; color: #475569; line-height: 1.6; margin: 0;">
+                    Minggu ini Anda belum memeriksa dokumen. Kuota Anda sebesar <strong>{$sisaKuota}</strong> masih tersedia dan siap dipakai kapan saja.
+                </p>
+            </div>
+HTML;
+        }
+
+        // Blok Dokumen Terakhir
+        $dokumenTerakhirHtml = '';
+        if (!empty($dokumenTerakhir) && !empty($dokumenTerakhir['title'])) {
+            $judulDoc = esc($dokumenTerakhir['title']);
+            $tglDoc   = esc($dokumenTerakhir['date'] ?? date('d M Y'));
+            $skorDoc  = number_format((float)($dokumenTerakhir['score'] ?? 0), 1);
+            $dokumenTerakhirHtml = <<<HTML
+            <p style="font-size: 13px; color: #334155; line-height: 1.6; margin: 0 0 20px 0; padding: 12px 16px; background-color: #f1f5f9; border-radius: 8px;">
+                Dokumen terakhir Anda: <strong>"{$judulDoc}"</strong>, diperiksa pada {$tglDoc}, dengan skor kemiripan <strong>{$skorDoc}%</strong>.
+            </p>
+HTML;
+        }
+
+        return <<<HTML
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ringkasan Mingguan AR Tilik</title>
+</head>
+<body style="margin:0; padding:0; background-color:#f8fafc; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color:#1e293b; line-height: 1.6;">
+    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:#f8fafc; padding: 30px 15px;">
+        <tr>
+            <td align="center">
+                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #ffffff; border-radius: 14px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);">
+                    <!-- Header -->
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); padding: 24px 28px; text-align: left;">
+                            <div style="font-size: 20px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px;">⚖️ AR Tilik</div>
+                            <div style="font-size: 11px; color: #c7d2fe; margin-top: 2px;">Sistem Pemeriksa Kesamaan Naskah &amp; Integritas Akademik</div>
+                        </td>
+                    </tr>
+
+                    <!-- Body -->
+                    <tr>
+                        <td style="padding: 28px 28px 20px 28px;">
+                            <p style="font-size: 14px; color: #0f172a; margin: 0 0 16px 0;">
+                                Selamat {$sapaanWaktu}, <strong>{$nama}</strong>,
+                            </p>
+                            <p style="font-size: 13px; color: #475569; margin: 0 0 20px 0;">
+                                Berikut ringkasan penggunaan AR Tilik Anda selama sepekan terakhir, {$tanggalMulai} – {$tanggalSelesai}.
+                            </p>
+
+                            {$ringkasanHtml}
+                            {$dokumenTerakhirHtml}
+
+                            <!-- Catatan Jujur Soal Skor -->
+                            <div style="background-color: #fffbeb; border-left: 3px solid #f59e0b; padding: 12px 16px; border-radius: 6px; margin-bottom: 22px;">
+                                <div style="font-size: 12px; font-weight: 700; color: #92400e; margin-bottom: 4px;">Catatan jujur soal skor:</div>
+                                <p style="font-size: 12px; color: #78350f; margin: 0; line-height: 1.5;">
+                                    Skor kemiripan adalah ukuran kesamaan teks, bukan vonis plagiarisme. Dokumen dengan skor rendah tetap bisa mengandung sitasi yang bermasalah, dan dokumen dengan skor tinggi belum tentu menjiplak. Karena itu, selalu baca bagian yang ditandai di laporan, bukan hanya angkanya.
+                                </p>
+                            </div>
+
+                            <!-- Trik Minggu Ini -->
+                            <div style="background-color: #eef2ff; border: 1px solid #c7d2fe; border-radius: 10px; padding: 16px 18px; margin-bottom: 24px;">
+                                <div style="font-size: 13px; font-weight: 800; color: #3730a3; margin-bottom: 6px;">
+                                    💡 Trik minggu ini: {$judulTrik}
+                                </div>
+                                <p style="font-size: 12px; color: #312e81; margin: 0; line-height: 1.6;">
+                                    {$isiTrik}
+                                </p>
+                            </div>
+
+                            <!-- Lanjutkan dari sini -->
+                            <div style="margin-bottom: 24px;">
+                                <div style="font-size: 13px; font-weight: 700; color: #0f172a; margin-bottom: 8px;">Lanjutkan dari sini:</div>
+                                <div style="font-size: 13px;">
+                                    • <a href="{$linkPeriksa}" style="color: #4338ca; font-weight: 600; text-decoration: underline;">Periksa dokumen baru</a><br>
+                                    • <a href="{$linkLaporan}" style="color: #4338ca; font-weight: 600; text-decoration: underline;">Lihat laporan saya</a>
+                                </div>
+                            </div>
+
+                            <p style="font-size: 13px; color: #475569; margin: 0 0 16px 0; line-height: 1.6;">
+                                Kalau ada laporan yang hasilnya membingungkan, balas saja email ini dan ceritakan bagian mana yang meragukan. Kami akan membantu membaca hasilnya bersama Anda.
+                            </p>
+                            <p style="font-size: 13px; color: #475569; margin: 0 0 20px 0;">
+                                Terima kasih sudah mempercayakan pemeriksaan naskah Anda kepada AR Tilik.
+                            </p>
+
+                            <p style="font-size: 13px; color: #0f172a; margin: 0; line-height: 1.5;">
+                                Salam,<br>
+                                <strong>Makarius Yuwono — AR Tilik</strong><br>
+                                <a href="https://tilik.arsetontong.top" style="color: #4338ca; text-decoration: none;">https://tilik.arsetontong.top</a>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- Footer Unsubscribe -->
+                    <tr>
+                        <td style="background-color: #f8fafc; border-top: 1px solid #e2e8f0; padding: 16px 28px; text-align: center; font-size: 11px; color: #94a3b8; line-height: 1.6;">
+                            Surel ini dikirimkan berkala sebagai ringkasan penggunaan akun AR Tilik Anda.<br>
+                            Jika tidak ingin menerima ringkasan mingguan lagi, Anda dapat <a href="{$unsubscribeUrl}" style="color: #6366f1; text-decoration: underline;">berhenti berlangganan di sini</a>.
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+HTML;
+    }
+
+    /**
+     * Menyusun versi teks polos (AltText) untuk email ringkasan mingguan
+     */
+    protected function buildWeeklySummaryAltText(array $user, array $summaryData, string $unsubscribeUrl): string
+    {
+        $hour = (int) date('H');
+        if ($hour >= 5 && $hour < 11) {
+            $sapaanWaktu = 'pagi';
+        } elseif ($hour >= 11 && $hour < 15) {
+            $sapaanWaktu = 'siang';
+        } elseif ($hour >= 15 && $hour < 18) {
+            $sapaanWaktu = 'sore';
+        } else {
+            $sapaanWaktu = 'pagi';
+        }
+
+        $nama = $user['name'] ?? 'Pengguna';
+        $tanggalMulai = $summaryData['tanggal_mulai'] ?? date('d M Y', strtotime('-7 days'));
+        $tanggalSelesai = $summaryData['tanggal_selesai'] ?? date('d M Y');
+        $jumlahDokumen = (int) ($summaryData['jumlah_dokumen'] ?? 0);
+        $sisaKuota = $summaryData['sisa_kuota'] ?? '3 dokumen';
+
+        $text = "Selamat {$sapaanWaktu}, {$nama},\n\n";
+        $text .= "Berikut ringkasan penggunaan AR Tilik Anda selama sepekan terakhir, {$tanggalMulai} – {$tanggalSelesai}.\n\n";
+
+        if ($jumlahDokumen > 0) {
+            $rataRataSkor = number_format((float) ($summaryData['rata_rata_skor'] ?? 0), 1);
+            $sitasiTerverifikasi = (int) ($summaryData['sitasi_terverifikasi'] ?? 0);
+            $sitasiMencurigakan = (int) ($summaryData['sitasi_mencurigakan'] ?? 0);
+            $kuotaTerpakai = (int) ($summaryData['kuota_terpakai'] ?? 0);
+            $kuotaTotal = (int) ($summaryData['kuota_total'] ?? 3);
+
+            $text .= "Ringkasan Anda minggu ini\n";
+            $text .= "• Dokumen diperiksa: {$jumlahDokumen} dokumen\n";
+            $text .= "• Rata-rata skor kemiripan: {$rataRataSkor}%\n";
+            $text .= "• Sitasi yang terverifikasi: {$sitasiTerverifikasi} sitasi\n";
+            $text .= "• Sitasi mencurigakan yang ditandai: {$sitasiMencurigakan} sitasi\n";
+            $text .= "• Kuota terpakai minggu ini: {$kuotaTerpakai} dari {$kuotaTotal}\n";
+            $text .= "• Sisa kuota Anda: {$sisaKuota}\n\n";
+
+            $dokumenTerakhir = $summaryData['dokumen_terakhir'] ?? null;
+            if (!empty($dokumenTerakhir) && !empty($dokumenTerakhir['title'])) {
+                $judulDoc = $dokumenTerakhir['title'];
+                $tglDoc   = $dokumenTerakhir['date'] ?? date('d M Y');
+                $skorDoc  = number_format((float)($dokumenTerakhir['score'] ?? 0), 1);
+                $text .= "Dokumen terakhir Anda: \"{$judulDoc}\", diperiksa pada {$tglDoc}, dengan skor kemiripan {$skorDoc}%.\n\n";
+            }
+        } else {
+            $text .= "Ringkasan Anda minggu ini:\n";
+            $text .= "Minggu ini Anda belum memeriksa dokumen. Kuota Anda sebesar {$sisaKuota} masih tersedia dan siap dipakai kapan saja.\n\n";
+        }
+
+        $text .= "Catatan jujur soal skor: skor kemiripan adalah ukuran kesamaan teks, bukan vonis plagiarisme. Dokumen dengan skor rendah tetap bisa mengandung sitasi yang bermasalah, dan dokumen dengan skor tinggi belum tentu menjiplak. Karena itu, selalu baca bagian yang ditandai di laporan, bukan hanya angkanya.\n\n";
+
+        $judulTrik = $summaryData['judul_trik'] ?? '';
+        $isiTrik = $summaryData['isi_trik'] ?? '';
+        $text .= "Trik minggu ini: {$judulTrik}\n";
+        $text .= "{$isiTrik}\n\n";
+
+        $text .= "Lanjutkan dari sini:\n";
+        $text .= "• Periksa dokumen baru: " . base_url('dashboard?tab=upload') . "\n";
+        $text .= "• Lihat laporan saya: " . base_url('dashboard?tab=documents') . "\n\n";
+
+        $text .= "Kalau ada laporan yang hasilnya membingungkan, balas saja email ini dan ceritakan bagian mana yang meragukan. Kami akan membantu membaca hasilnya bersama Anda.\n\n";
+        $text .= "Terima kasih sudah mempercayakan pemeriksaan naskah Anda kepada AR Tilik.\n\n";
+        $text .= "Salam,\nMakarius Yuwono — AR Tilik\nhttps://tilik.arsetontong.top\n\n";
+        $text .= "---\nUntuk berhenti berlangganan ringkasan mingguan: {$unsubscribeUrl}\n";
+
+        return $text;
+    }
 }

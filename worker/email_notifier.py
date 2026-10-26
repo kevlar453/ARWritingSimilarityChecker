@@ -33,7 +33,8 @@ def notify_user_report_completed(
         conn = get_connection()
         cursor = conn.cursor(dictionary=True)
         cursor.execute("""
-            SELECT u.id AS user_id, u.email, u.name AS full_name
+            SELECT u.id AS user_id, u.email, u.name AS full_name, 
+                   u.email_notifications_enabled, u.unsubscribe_token
             FROM documents d
             JOIN users u ON d.user_id = u.id
             WHERE d.id = %s
@@ -44,8 +45,24 @@ def notify_user_report_completed(
         if not user or not user.get("email"):
             return False
 
+        # Periksa preferensi berhenti berlangganan (unsubscribe)
+        if user.get("email_notifications_enabled") == 0:
+            print(f"  [EMAIL NOTIFIER] Pengguna #{user.get('user_id')} ({user.get('email')}) menonaktifkan notifikasi surel laporan. Pengiriman dilewati.")
+            return False
+
         recipient_email = user["email"].strip()
         recipient_name = user.get("full_name") or "Pengguna AR Tilik"
+        unsub_token = user.get("unsubscribe_token") or ""
+        if not unsub_token:
+            import hashlib, time
+            unsub_token = hashlib.sha256(f"{user['user_id']}|{recipient_email}|{time.time()}".encode()).hexdigest()
+            try:
+                cur_tok = conn.cursor()
+                cur_tok.execute("UPDATE users SET unsubscribe_token = %s WHERE id = %s", (unsub_token, user["user_id"]))
+                conn.commit()
+                cur_tok.close()
+            except Exception:
+                pass
 
         # Tentukan label keputusan dan warna badge
         dec_lower = decision.lower()
@@ -118,6 +135,7 @@ def notify_user_report_completed(
             """
 
         report_url = f"https://tilik.arsetontong.top/reports/{report_id}"
+        unsub_url = f"https://tilik.arsetontong.top/email/unsubscribe?token={unsub_token}&type=report"
 
         # Template Email HTML
         html_content = f"""<!DOCTYPE html>
@@ -208,9 +226,12 @@ def notify_user_report_completed(
 
                     <!-- Footer -->
                     <tr>
-                        <td style="background-color: #f1f5f9; padding: 18px 30px; text-align: center; font-size: 11px; color: #64748b; border-top: 1px solid #e2e8f0;">
+                        <td style="background-color: #f1f5f9; padding: 18px 30px; text-align: center; font-size: 11px; color: #64748b; border-top: 1px solid #e2e8f0; line-height: 1.6;">
                             AR Tilik • Platform Pemeriksa Kesamaan Naskah &amp; Integritas Akademik<br>
-                            Surel ini dikirim otomatis oleh sistem. Jangan membalas surel ini secara langsung.
+                            Surel ini dikirim otomatis oleh sistem. Jangan membalas surel ini secara langsung.<br>
+                            <span style="display: inline-block; margin-top: 6px;">
+                                Tidak ingin menerima notifikasi naskah? <a href="{unsub_url}" style="color: #4f46e5; text-decoration: underline;">Berhenti berlangganan di sini</a>.
+                            </span>
                         </td>
                     </tr>
                 </table>
@@ -225,7 +246,15 @@ def notify_user_report_completed(
         msg["Subject"] = f"[AR Tilik] Laporan Selesai: {document_title} ({overall_similarity:.1f}%)"
         msg["From"] = "AR Tilik <tilik@arsetontong.top>"
         msg["To"] = recipient_email
-        msg.set_content(f"Halo {recipient_name},\n\nPemeriksaan naskah '{document_title}' telah selesai dengan skor kemiripan {overall_similarity:.2f}%.\n\nBuka laporan lengkap di: {report_url}\n\nSalam,\nAR Tilik")
+        msg["List-Unsubscribe"] = f"<{unsub_url}>"
+        msg["List-Unsubscribe-Post"] = "List-Unsubscribe=One-Click"
+        msg.set_content(
+            f"Halo {recipient_name},\n\n"
+            f"Pemeriksaan naskah '{document_title}' telah selesai dengan skor kemiripan {overall_similarity:.2f}%.\n\n"
+            f"Buka laporan lengkap di: {report_url}\n\n"
+            f"Berhenti berlangganan notifikasi surel laporan: {unsub_url}\n\n"
+            f"Salam,\nAR Tilik"
+        )
         msg.add_alternative(html_content, subtype="html")
 
         # Kirim melalui SMTP Postfix lokal di 127.0.0.1:25

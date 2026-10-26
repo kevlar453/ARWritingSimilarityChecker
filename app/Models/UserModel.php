@@ -22,6 +22,10 @@ class UserModel extends Model
         'verification_emails_sent',
         'last_verification_email_sent_at',
         'email_verified_at',
+        'unsubscribe_token',
+        'email_notifications_enabled',
+        'email_weekly_summary',
+        'last_weekly_summary_sent_at',
         'reset_password_token',
         'reset_password_expires_at',
         'free_submissions_used_this_week',
@@ -419,6 +423,54 @@ class UserModel extends Model
         $db->transComplete();
 
         return $db->transStatus();
+    }
+
+    /**
+     * Mendapatkan atau membuat token unsubscribe unik untuk pengguna
+     */
+    public function getOrCreateUnsubscribeToken(int $userId): string
+    {
+        $user = $this->find($userId);
+        if (!$user) {
+            return '';
+        }
+
+        if (!empty($user['unsubscribe_token'])) {
+            return $user['unsubscribe_token'];
+        }
+
+        $token = hash('sha256', $userId . '|' . $user['email'] . '|' . microtime(true) . '|' . bin2hex(random_bytes(16)));
+        $this->update($userId, [
+            'unsubscribe_token' => $token,
+            'updated_at'        => date('Y-m-d H:i:s'),
+        ]);
+
+        return $token;
+    }
+
+    /**
+     * Mencari pengguna berdasarkan token unsubscribe
+     */
+    public function findByUnsubscribeToken(string $token): ?array
+    {
+        $token = trim($token);
+        if ($token === '') {
+            return null;
+        }
+
+        return $this->where('unsubscribe_token', $token)->first();
+    }
+
+    /**
+     * Memperbarui preferensi pengiriman email pengguna
+     */
+    public function updateEmailPreferences(int $userId, bool $reportNotification, bool $weeklySummary): bool
+    {
+        return (bool) $this->update($userId, [
+            'email_notifications_enabled' => $reportNotification ? 1 : 0,
+            'email_weekly_summary'        => $weeklySummary ? 1 : 0,
+            'updated_at'                  => date('Y-m-d H:i:s'),
+        ]);
     }
 }
 
