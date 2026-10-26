@@ -3,25 +3,37 @@
 
 User-agent: *
 Allow: /
-Allow: /privacy
-Allow: /terms
+Allow: /benchmark
+Allow: /riset/
 Allow: /verify
 Allow: /ambassador
 Allow: /docs/
 Allow: /integrations/
 Allow: /images/
+Allow: /privacy
+Allow: /terms
 Allow: /sitemap.xml
 
 # Disallow crawl of administrative, internal API, payment, and private user areas
+Disallow: /admin
 Disallow: /admin/
+Disallow: /auth
 Disallow: /auth/
+Disallow: /api
 Disallow: /api/
+Disallow: /api-keys
 Disallow: /api-keys/
+Disallow: /evaluation
 Disallow: /evaluation/
+Disallow: /payment
 Disallow: /payment/
+Disallow: /contact
 Disallow: /contact/
+Disallow: /dashboard
 Disallow: /dashboard/
+Disallow: /report
 Disallow: /report/
+Disallow: /reports
 Disallow: /reports/
 
 # XML Sitemap Location
