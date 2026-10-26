@@ -499,6 +499,11 @@ HTML;
 
         $recipientEmail = $user['email'];
 
+        $configEmail = config('Email');
+        $fromEmail = !empty($configEmail->fromEmail) ? $configEmail->fromEmail : 'tilik@arsetontong.top';
+        $email->setFrom($fromEmail, 'Makarius Yuwono — AR Tilik');
+        $email->setReplyTo($fromEmail, 'Makarius Yuwono — AR Tilik');
+
         $email->setTo($recipientEmail);
         $email->setSubject($subject);
         $email->setMessage($htmlMessage);
