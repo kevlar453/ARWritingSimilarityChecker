@@ -240,6 +240,14 @@ class DashboardController extends BaseController
 
         // 10. Data Transaksi & Pembayaran Midtrans
         $paymentModel = new PaymentTransactionModel();
+
+        // Pembersihan otomatis transaksi pending kedaluwarsa (> 24 jam) agar tidak menumpuk di log
+        try {
+            $paymentModel->autoExpirePendingTransactions(24);
+        } catch (\Throwable $e) {
+            log_message('error', 'Auto-expire pending payments error in admin overview: ' . $e->getMessage());
+        }
+
         $paymentStats = $paymentModel->getPaymentStats();
         $paymentsList = $paymentModel->getAllTransactions(50);
 

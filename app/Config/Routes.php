@@ -128,7 +128,9 @@ $routes->group('payment', function ($routes) {
     $routes->get('packages', 'PaymentController::packages');
     $routes->post('create-snap', 'PaymentController::createSnapToken');
     $routes->post('webhook', 'PaymentController::webhook');
-    $routes->get('status/(:segment)', 'PaymentController::checkStatus/$1');
+    $routes->match(['get', 'post', 'head'], 'status/(:segment)', 'PaymentController::checkStatus/$1');
+    $routes->post('cancel/(:segment)', 'PaymentController::cancel/$1');
+    $routes->post('auto-expire', 'PaymentController::autoExpire');
     $routes->get('history', 'PaymentController::history');
 });
 

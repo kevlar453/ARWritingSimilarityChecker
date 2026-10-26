@@ -225,4 +225,68 @@ class MidtransService
 
         return json_decode($response, true);
     }
+
+    /**
+     * Membatalkan transaksi di Midtrans via API v2/cancel
+     */
+    public function cancelTransaction(string $orderId): ?array
+    {
+        $ch = curl_init();
+        $url = $this->statusApiUrl . '/' . rawurlencode($orderId) . '/cancel';
+
+        curl_setopt_array($ch, [
+            CURLOPT_URL            => $url,
+            CURLOPT_POST           => true,
+            CURLOPT_HTTPHEADER     => [
+                'Content-Type: application/json',
+                'Accept: application/json',
+                'Authorization: Basic ' . base64_encode($this->serverKey . ':'),
+            ],
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CONNECTTIMEOUT => 5,
+            CURLOPT_TIMEOUT        => 10,
+        ]);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($response === false || $httpCode >= 400) {
+            return null;
+        }
+
+        return json_decode($response, true);
+    }
+
+    /**
+     * Mengatur status kedaluwarsa transaksi di Midtrans via API v2/expire
+     */
+    public function expireTransaction(string $orderId): ?array
+    {
+        $ch = curl_init();
+        $url = $this->statusApiUrl . '/' . rawurlencode($orderId) . '/expire';
+
+        curl_setopt_array($ch, [
+            CURLOPT_URL            => $url,
+            CURLOPT_POST           => true,
+            CURLOPT_HTTPHEADER     => [
+                'Content-Type: application/json',
+                'Accept: application/json',
+                'Authorization: Basic ' . base64_encode($this->serverKey . ':'),
+            ],
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CONNECTTIMEOUT => 5,
+            CURLOPT_TIMEOUT        => 10,
+        ]);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($response === false || $httpCode >= 400) {
+            return null;
+        }
+
+        return json_decode($response, true);
+    }
 }

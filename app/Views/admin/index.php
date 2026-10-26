@@ -2222,9 +2222,17 @@
 
                 <!-- Payments Table -->
                 <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl overflow-hidden shadow-xs">
-                    <div class="px-5 py-3 border-b border-slate-700/60 flex items-center justify-between">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Log Transaksi Terkini</h3>
-                        <span class="text-[11px] text-slate-500">Maks. 50 transaksi terakhir</span>
+                    <div class="px-5 py-3 border-b border-slate-700/60 flex flex-wrap items-center justify-between gap-3">
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Log Transaksi Terkini</h3>
+                            <span class="text-[11px] text-slate-500">Maks. 50 transaksi terakhir</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button type="button" id="btnAutoExpirePayments" onclick="cleanExpiredPayments(this)" class="px-3 py-1.5 bg-slate-700/80 hover:bg-slate-600 text-slate-200 hover:text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition border border-slate-600/60 shadow-xs cursor-pointer" title="Periksa status ke Midtrans dan otomatis batalkan transaksi pending yang melewati batas 24 jam">
+                                <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                <span>Batalkan Pending Usang (&gt; 24 Jam)</span>
+                            </button>
+                        </div>
                     </div>
                     <!-- Mobile List: Tampilan Kartu Responsif Transaksi Midtrans (Layar Ponsel) -->
                     <div class="p-4 space-y-3 md:hidden">
@@ -2245,10 +2253,18 @@
                                             <?php if (in_array($pay['transaction_status'], ['settlement', 'capture'])): ?>
                                                 <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">LUNAS</span>
                                             <?php elseif ($pay['transaction_status'] === 'pending'): ?>
-                                                <div class="flex flex-col items-end gap-1">
+                                                <div class="flex flex-col items-end gap-1.5" id="pay-action-m-<?= esc($pay['order_id']) ?>">
                                                     <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">PENDING</span>
-                                                    <a href="<?= base_url('payment/status/' . esc($pay['order_id'])) ?>" target="_blank" class="text-[10px] text-amber-400 hover:text-amber-300 underline font-medium">Cek Status &rarr;</a>
+                                                    <div class="flex items-center gap-1.5">
+                                                        <button type="button" onclick="checkPaymentStatus('<?= esc($pay['order_id']) ?>', this)" class="text-[10px] text-amber-400 hover:text-amber-300 underline font-medium cursor-pointer">Cek Status</button>
+                                                        <span class="text-slate-600 text-[10px]">•</span>
+                                                        <button type="button" onclick="cancelPaymentOrder('<?= esc($pay['order_id']) ?>', this)" class="text-[10px] text-rose-400 hover:text-rose-300 underline font-medium cursor-pointer">Batalkan</button>
+                                                    </div>
                                                 </div>
+                                            <?php elseif ($pay['transaction_status'] === 'expire'): ?>
+                                                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-700/50 text-slate-400 border border-slate-600/50" title="Kedaluwarsa otomatis">KEDALUWARSA</span>
+                                            <?php elseif ($pay['transaction_status'] === 'cancel'): ?>
+                                                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30" title="Pesanan dibatalkan">DIBATALKAN</span>
                                             <?php else: ?>
                                                 <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30"><?= strtoupper(esc($pay['transaction_status'])) ?></span>
                                             <?php endif; ?>
@@ -2315,14 +2331,20 @@
                                             <td class="p-3 text-slate-300 uppercase text-[10px] font-semibold">
                                                 <?= esc($pay['payment_type'] ?? 'Midtrans') ?>
                                             </td>
-                                            <td class="p-3">
+                                            <td class="p-3" id="pay-col-<?= esc($pay['order_id']) ?>">
                                                 <?php if (in_array($pay['transaction_status'], ['settlement', 'capture'])): ?>
                                                     <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">LUNAS</span>
                                                 <?php elseif ($pay['transaction_status'] === 'pending'): ?>
-                                                    <div class="flex items-center gap-1.5 flex-wrap">
+                                                    <div class="flex items-center gap-1.5 flex-wrap" id="pay-action-<?= esc($pay['order_id']) ?>">
                                                         <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">PENDING</span>
-                                                        <a href="<?= base_url('payment/status/' . esc($pay['order_id'])) ?>" target="_blank" class="text-[10px] text-amber-400 hover:text-amber-300 underline font-medium" title="Periksa status transaksi ke Midtrans">Cek Status</a>
+                                                        <button type="button" onclick="checkPaymentStatus('<?= esc($pay['order_id']) ?>', this)" class="text-[10px] text-amber-400 hover:text-amber-300 underline font-medium cursor-pointer" title="Sinkronkan status real-time ke Midtrans">Cek Status</button>
+                                                        <span class="text-slate-600 text-[10px]">•</span>
+                                                        <button type="button" onclick="cancelPaymentOrder('<?= esc($pay['order_id']) ?>', this)" class="text-[10px] text-rose-400 hover:text-rose-300 underline font-medium cursor-pointer" title="Batalkan pesanan pending ini">Batalkan</button>
                                                     </div>
+                                                <?php elseif ($pay['transaction_status'] === 'expire'): ?>
+                                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700/50 text-slate-400 border border-slate-600/50" title="Kedaluwarsa otomatis">KEDALUWARSA</span>
+                                                <?php elseif ($pay['transaction_status'] === 'cancel'): ?>
+                                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30" title="Pesanan dibatalkan">DIBATALKAN</span>
                                                 <?php else: ?>
                                                     <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30"><?= strtoupper(esc($pay['transaction_status'])) ?></span>
                                                 <?php endif; ?>
@@ -2333,6 +2355,10 @@
                                         </tr>
                                     <?php endforeach; ?>
                                 <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
                             </tbody>
                         </table>
                     </div>
@@ -4063,6 +4089,104 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                 }
             });
             return await res.json();
+        }
+
+        // ==========================================
+        // MANAJEMEN PEMBAYARAN & PEMBATALAN TRANSAKSI
+        // ==========================================
+        async function checkPaymentStatus(orderId, btn) {
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="animate-pulse">Memeriksa...</span>';
+
+            try {
+                const res = await postJson(`<?= base_url('payment/status') ?>/${encodeURIComponent(orderId)}`, {});
+                if (res.status === 'success') {
+                    showAdminToast(res.message || `Status: ${res.status_label}`);
+                    if (res.transaction_status !== 'pending') {
+                        updatePaymentStatusBadge(orderId, res.transaction_status, res.status_label);
+                    }
+                } else {
+                    alert('Gagal memeriksa status: ' + (res.message || 'Kendala jaringan'));
+                }
+            } catch (err) {
+                alert('Kesalahan saat memeriksa status: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        }
+
+        async function cancelPaymentOrder(orderId, btn) {
+            if (!confirm(`Batalkan transaksi "${orderId}"?\n\nTransaksi akan diubah menjadi status DIBATALKAN dan tidak dapat dibayar lagi.`)) {
+                return;
+            }
+
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="animate-pulse">Membatalkan...</span>';
+
+            try {
+                const res = await postJson(`<?= base_url('payment/cancel') ?>/${encodeURIComponent(orderId)}`, {});
+                if (res.status === 'success') {
+                    showAdminToast(res.message || 'Transaksi berhasil dibatalkan');
+                    updatePaymentStatusBadge(orderId, 'cancel', 'DIBATALKAN');
+                } else {
+                    alert('Gagal membatalkan transaksi: ' + (res.message || 'Kendala jaringan'));
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                }
+            } catch (err) {
+                alert('Kesalahan saat membatalkan transaksi: ' + err.message);
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        }
+
+        async function cleanExpiredPayments(btn) {
+            if (!confirm("Jalankan pembersihan otomatis untuk semua transaksi pending yang berusia lebih dari 24 jam?\n\nSistem akan memeriksa status ke Midtrans. Transaksi tanpa pembayaran akan otomatis ditandai KEDALUWARSA.")) {
+                return;
+            }
+
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<svg class="w-3.5 h-3.5 animate-spin inline-block mr-1 text-amber-300" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><span>Memproses Pembersihan...</span>';
+
+            try {
+                const res = await postJson('<?= base_url('payment/auto-expire') ?>', { hours: 24 });
+                if (res.status === 'success') {
+                    showAdminToast(res.message);
+                    setTimeout(() => window.location.reload(), 1200);
+                } else {
+                    alert('Gagal membersihkan transaksi: ' + (res.message || 'Kendala jaringan'));
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                }
+            } catch (err) {
+                alert('Kesalahan saat pembersihan transaksi: ' + err.message);
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        }
+
+        function updatePaymentStatusBadge(orderId, status, label) {
+            let badgeClass = 'bg-rose-500/20 text-rose-300 border border-rose-500/30';
+            if (status === 'settlement' || status === 'capture') {
+                badgeClass = 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+            } else if (status === 'expire') {
+                badgeClass = 'bg-slate-700/50 text-slate-400 border border-slate-600/50';
+            }
+
+            const badgeHtml = `<span class="px-2 py-0.5 rounded text-[10px] font-bold ${badgeClass}">${label}</span>`;
+            const badgeHtmlM = `<span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${badgeClass}">${label}</span>`;
+
+            const desktopContainer = document.getElementById(`pay-col-${orderId}`);
+            if (desktopContainer) desktopContainer.innerHTML = badgeHtml;
+
+            const mobileContainer = document.getElementById(`pay-action-m-${orderId}`);
+            if (mobileContainer && mobileContainer.parentElement) {
+                mobileContainer.parentElement.innerHTML = badgeHtmlM;
+            }
         }
 
         async function activateTrialKampus(userId, userName) {

@@ -437,7 +437,7 @@ class PaymentController extends BaseController
     }
 
     /**
-     * Cek status transaksi oleh frontend pengguna
+     * Cek status transaksi oleh frontend pengguna atau admin (real-time sync ke Midtrans)
      */
     public function checkStatus(string $orderId): ResponseInterface
     {
@@ -460,18 +460,120 @@ class PaymentController extends BaseController
             ]);
         }
 
+        // Sinkronisasi status secara real-time ke Midtrans jika masih pending
+        $syncMessage = 'Status transaksi sesuai catatan sistem.';
+        if ($transaction['transaction_status'] === 'pending') {
+            $syncResult = $this->transModel->syncTransactionStatus($orderId);
+            $syncMessage = $syncResult['message'] ?? $syncMessage;
+            $transaction = $this->transModel->findByOrderId($orderId) ?: $transaction;
+        }
+
         $user = $this->userModel->find($userId);
         $quotaInfo = $user ? $this->userModel->getQuotaInfo($user) : null;
+
+        // Jika dibuka langsung di browser oleh admin (bukan AJAX), arahkan kembali dengan notifikasi
+        if (!$this->request->isAJAX() && $this->request->getHeaderLine('Accept') !== 'application/json' && $isAdmin) {
+            session()->setFlashdata('message', "Status transaksi {$orderId}: " . strtoupper($transaction['transaction_status']) . " ({$syncMessage})");
+            return redirect()->to(base_url('admin?tab=overview'));
+        }
+
+        $statusLabel = match ($transaction['transaction_status']) {
+            'settlement', 'capture' => 'LUNAS',
+            'pending'               => 'PENDING',
+            'expire'                => 'KEDALUWARSA',
+            'cancel'                => 'DIBATALKAN',
+            default                 => strtoupper($transaction['transaction_status']),
+        };
 
         return $this->response->setJSON([
             'status'             => 'success',
             'order_id'           => $transaction['order_id'],
             'transaction_status' => $transaction['transaction_status'],
+            'status_label'       => $statusLabel,
+            'message'            => $syncMessage,
             'is_paid'            => in_array($transaction['transaction_status'], ['settlement', 'capture'], true),
             'package_name'       => $transaction['package_name'],
             'amount'             => (float) $transaction['amount'],
             'paid_at'            => $transaction['paid_at'],
             'quota_info'         => $quotaInfo,
+        ]);
+    }
+
+    /**
+     * Membatalkan transaksi pending secara eksplisit oleh admin atau pengguna
+     */
+    public function cancel(string $orderId): ResponseInterface
+    {
+        $userId = session()->get('user_id');
+        $isAdmin = (session()->get('user_role') === 'admin');
+
+        if (!$userId) {
+            return $this->response->setStatusCode(401)->setJSON([
+                'status'  => 'error',
+                'message' => 'Silakan login terlebih dahulu.',
+            ]);
+        }
+
+        $transaction = $this->transModel->findByOrderId($orderId);
+        if (!$transaction) {
+            return $this->response->setStatusCode(404)->setJSON([
+                'status'  => 'error',
+                'message' => 'Transaksi tidak ditemukan.',
+            ]);
+        }
+
+        // Hanya pemilik atau admin yang boleh membatalkan
+        if ((int)$transaction['user_id'] !== (int)$userId && !$isAdmin) {
+            return $this->response->setStatusCode(403)->setJSON([
+                'status'  => 'error',
+                'message' => 'Anda tidak memiliki hak untuk membatalkan transaksi ini.',
+            ]);
+        }
+
+        $cancelledBy = $isAdmin ? 'admin' : "user_{$userId}";
+        $result = $this->transModel->cancelPendingTransaction($orderId, $cancelledBy);
+
+        if (!$result['success']) {
+            return $this->response->setStatusCode(400)->setJSON([
+                'status'  => 'error',
+                'message' => $result['message'],
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'status'             => 'success',
+            'order_id'           => $orderId,
+            'transaction_status' => 'cancel',
+            'status_label'       => 'DIBATALKAN',
+            'message'            => $result['message'],
+        ]);
+    }
+
+    /**
+     * Endpoint pembersihan massal transaksi pending yang kedaluwarsa (> 24 jam)
+     * Khusus Administrator
+     */
+    public function autoExpire(): ResponseInterface
+    {
+        $isAdmin = (session()->get('user_role') === 'admin');
+        if (!$isAdmin) {
+            return $this->response->setStatusCode(403)->setJSON([
+                'status'  => 'error',
+                'message' => 'Akses khusus administrator.',
+            ]);
+        }
+
+        $olderThanHours = (int) ($this->request->getPost('hours') ?? 24);
+        if ($olderThanHours < 1) {
+            $olderThanHours = 24;
+        }
+
+        $summary = $this->transModel->autoExpirePendingTransactions($olderThanHours);
+
+        return $this->response->setJSON([
+            'status'  => 'success',
+            'message' => "Pembersihan selesai: {$summary['expired_count']} transaksi kedaluwarsa dibatalkan, {$summary['settled_count']} transaksi lunas diselesaikan.",
+            'data'    => $summary,
         ]);
     }
 
