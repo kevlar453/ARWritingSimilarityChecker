@@ -75,6 +75,7 @@ class PublicApiController extends BaseController
             mkdir($storagePath, 0775, true);
         }
 
+        $userModel = new \App\Models\UserModel();
         $savedFile = null;
         $mimeType = 'text/plain';
         $fileSize = 0;
