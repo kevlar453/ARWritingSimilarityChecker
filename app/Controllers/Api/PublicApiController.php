@@ -80,6 +80,7 @@ class PublicApiController extends BaseController
         $mimeType = 'text/plain';
         $fileSize = 0;
         $clientFilename = '';
+        $quotaDeducted = false;
 
         // 1. Dukungan Unggah Berkas File (PDF, DOCX, TXT, TEX)
         $file = $this->request->getFile('document') ?: $this->request->getFile('file');
@@ -121,15 +122,15 @@ class PublicApiController extends BaseController
             }
 
             // Periksa & potong kuota submisi akun pengguna pemilik kunci
-            $userModel = new \App\Models\UserModel();
-            $quotaDeducted = $userModel->deductSubmissionQuota($userId);
-            if (! $quotaDeducted) {
+            $deducted = $userModel->deductSubmissionQuota($userId);
+            if (! $deducted) {
                 return $this->response->setStatusCode(403)->setJSON([
                     'status'  => 'error',
                     'code'    => 403,
                     'message' => 'Kuota submisi akun Anda tidak mencukupi untuk memproses naskah ini.'
                 ]);
             }
+            $quotaDeducted = true;
 
             $clientFilename = $file->getClientName();
             if (empty($title)) {
@@ -145,15 +146,15 @@ class PublicApiController extends BaseController
             $rawText = $this->request->getPost('text') ?: $this->request->getPost('content');
             if (! empty($rawText)) {
                 // Periksa & potong kuota submisi akun pengguna pemilik kunci
-                $userModel = new \App\Models\UserModel();
-                $quotaDeducted = $userModel->deductSubmissionQuota($userId);
-                if (! $quotaDeducted) {
+                $deducted = $userModel->deductSubmissionQuota($userId);
+                if (! $deducted) {
                     return $this->response->setStatusCode(403)->setJSON([
                         'status'  => 'error',
                         'code'    => 403,
                         'message' => 'Kuota submisi akun Anda tidak mencukupi untuk memproses naskah ini.'
                     ]);
                 }
+                $quotaDeducted = true;
 
                 if (empty($title)) {
                     $title = 'Naskah Integrasi API ' . date('Y-m-d H:i');
@@ -167,11 +168,13 @@ class PublicApiController extends BaseController
         }
 
         if (! $savedFile || ! file_exists($savedFile)) {
-            $userModel->refundSubmissionQuota($userId);
+            if ($quotaDeducted) {
+                $userModel->refundSubmissionQuota($userId);
+            }
             return $this->response->setStatusCode(400)->setJSON([
                 'status'  => 'error',
                 'code'    => 400,
-                'message' => 'Naskah tidak ditemukan. Sertakan berkas file (multipart/form-data "document") atau teks (POST "text"). Kuota submisi telah dipulihkan.'
+                'message' => 'Naskah tidak ditemukan. Sertakan berkas file (multipart/form-data "document") atau teks (POST "text").' . ($quotaDeducted ? ' Kuota submisi telah dipulihkan.' : '')
             ]);
         }
 
