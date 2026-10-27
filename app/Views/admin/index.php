@@ -2642,24 +2642,37 @@
                     <!-- 4 Kartu KPI Prediksi Cerdas -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         <!-- Card 1: Proyeksi Penjualan -->
+                        <?php $hasRealSales = !empty($salesFc['has_real_sales']); ?>
                         <div class="bg-slate-800/60 border border-slate-700/60 rounded-2xl p-5 shadow-sm relative overflow-hidden group hover:border-indigo-500/40 transition-colors">
                             <div class="flex items-center justify-between">
-                                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Proyeksi Omzet 30 Hari</span>
+                                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Status Omzet &amp; Penjualan</span>
                                 <div class="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                 </div>
                             </div>
                             <div class="mt-3 flex items-baseline gap-2">
-                                <span id="kpi-sales-proj" class="text-2xl lg:text-3xl font-extrabold text-white tracking-tight">Rp <?= number_format($salesProjTotal, 0, ',', '.') ?></span>
+                                <span id="kpi-sales-proj" class="text-2xl lg:text-3xl font-extrabold text-white tracking-tight">
+                                    Rp <?= number_format($salesFc['historical_30d_total'] ?? 0, 0, ',', '.') ?>
+                                </span>
                             </div>
                             <div class="mt-2 flex items-center gap-1.5 text-xs">
-                                <span id="kpi-sales-growth" class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-bold <?= $salesGrowth >= 0 ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300' ?>">
-                                    <?= $salesGrowth >= 0 ? '+' : '' ?><?= $salesGrowth ?>%
-                                </span>
-                                <span class="text-slate-400 text-[11px]">vs 30 hari historis</span>
+                                <?php if ($hasRealSales): ?>
+                                    <span id="kpi-sales-growth" class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-bold <?= $salesGrowth >= 0 ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300' ?>">
+                                        <?= $salesGrowth >= 0 ? '+' : '' ?><?= $salesGrowth ?>% Proyeksi
+                                    </span>
+                                    <span class="text-slate-400 text-[11px]">vs 30 hari historis</span>
+                                <?php else: ?>
+                                    <span id="kpi-sales-growth" class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                                        Fase Pra-Pendapatan (Zero Revenue)
+                                    </span>
+                                <?php endif; ?>
                             </div>
-                            <div class="mt-2 text-[11px] text-slate-400 truncate">
-                                Terlaris: <strong class="text-slate-200"><?= esc($topPkg['name']) ?></strong> (<?= (int)$topPkg['sold'] ?> unit)
+                            <div class="mt-2 text-[11px] text-slate-400 truncate" id="kpi-sales-subtitle">
+                                <?php if ($hasRealSales): ?>
+                                    Terlaris: <strong class="text-slate-200"><?= esc($topPkg['name']) ?></strong> (<?= (int)$topPkg['sold'] ?> unit)
+                                <?php else: ?>
+                                    Potensi Belum Termonetisasi: <strong class="text-emerald-400 font-mono">Rp <?= number_format((float)($salesFc['untapped_potential'] ?? 0), 0, ',', '.') ?></strong>
+                                <?php endif; ?>
                             </div>
                         </div>
 
@@ -2754,30 +2767,41 @@
                             <div class="space-y-2">
                                 <div class="flex items-center justify-between text-[11px] text-slate-400 font-mono">
                                     <span>Rentang Hari: T+1 s.d T+30</span>
-                                    <span id="chart-active-stat" class="text-indigo-400 font-bold">Total Proyeksi: Rp <?= number_format($salesProjTotal, 0, ',', '.') ?></span>
+                                    <span id="chart-active-stat" class="text-indigo-400 font-bold"><?= $hasRealSales ? 'Total Proyeksi: Rp ' . number_format($salesProjTotal, 0, ',', '.') : 'Status: Fase Pra-Pendapatan (Rp 0)' ?></span>
                                 </div>
                                 
                                 <!-- Bar Chart Container -->
                                 <div class="w-full bg-slate-900/90 rounded-xl p-3 border border-slate-800/80">
                                     <div id="forecast-bars-container" class="h-44 flex items-end gap-1 sm:gap-1.5 overflow-x-auto pb-1 pt-6 px-1">
-                                        <?php 
-                                            $salesPoints = $salesFc['future_predictions'] ?? [];
-                                            $maxSales = max(1.0, (float) max(array_column($salesPoints, 'value') ?: [1.0]));
-                                            foreach ($salesPoints as $idx => $sp): 
-                                                $val = (float) $sp['value'];
-                                                $heightPct = max(6, min(100, round(($val / $maxSales) * 100)));
-                                                $dayNum = date('d', strtotime($sp['date']));
-                                        ?>
-                                            <div class="flex-1 min-w-[14px] flex flex-col items-center group relative h-full justify-end cursor-pointer">
-                                                <!-- Tooltip -->
-                                                <div class="absolute -top-8 bg-slate-800 text-white text-[10px] py-1 px-2 rounded shadow-lg border border-slate-700 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20 font-mono">
-                                                    <?= esc($sp['date']) ?>: Rp <?= number_format($val, 0, ',', '.') ?>
+                                        <?php if (!$hasRealSales): ?>
+                                            <div class="w-full h-full flex flex-col items-center justify-center text-center p-4">
+                                                <div class="w-10 h-10 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center text-xl mb-2">💡</div>
+                                                <h5 class="text-xs font-bold text-white mb-1">Fase Pra-Pendapatan (Zero Real Sales)</h5>
+                                                <p class="text-[11px] text-slate-400 max-w-md">Belum ada transaksi riil masuk. Silakan beralih ke tab <strong class="text-cyan-400 cursor-pointer" onclick="switchForecastView('usage')">"Penggunaan (Submisi)"</strong> untuk melihat proyeksi beban naskah hasil model XGBoost.</p>
+                                                <div class="mt-2 text-[11px] bg-slate-800/80 px-3 py-1 rounded-lg border border-slate-700 text-slate-300">
+                                                    Potensi Kuota Belum Termonetisasi: <strong class="text-emerald-400 font-mono">Rp <?= number_format((float)($salesFc['untapped_potential'] ?? 0), 0, ',', '.') ?></strong>
                                                 </div>
-                                                <!-- Bar Element -->
-                                                <div class="w-full rounded-t bg-gradient-to-t from-emerald-600 to-indigo-500 group-hover:from-emerald-400 group-hover:to-indigo-300 transition-all duration-300 shadow-xs" style="height: <?= $heightPct ?>%;"></div>
-                                                <span class="text-[9px] text-slate-500 font-mono mt-1 select-none"><?= $dayNum ?></span>
                                             </div>
-                                        <?php endforeach; ?>
+                                        <?php else: ?>
+                                            <?php 
+                                                $salesPoints = $salesFc['future_predictions'] ?? [];
+                                                $maxSales = max(1.0, (float) max(array_column($salesPoints, 'value') ?: [1.0]));
+                                                foreach ($salesPoints as $idx => $sp): 
+                                                    $val = (float) $sp['value'];
+                                                    $heightPct = max(6, min(100, round(($val / $maxSales) * 100)));
+                                                    $dayNum = date('d', strtotime($sp['date']));
+                                            ?>
+                                                <div class="flex-1 min-w-[14px] flex flex-col items-center group relative h-full justify-end cursor-pointer">
+                                                    <!-- Tooltip -->
+                                                    <div class="absolute -top-8 bg-slate-800 text-white text-[10px] py-1 px-2 rounded shadow-lg border border-slate-700 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20 font-mono">
+                                                        <?= esc($sp['date']) ?>: Rp <?= number_format($val, 0, ',', '.') ?>
+                                                    </div>
+                                                    <!-- Bar Element -->
+                                                    <div class="w-full rounded-t bg-gradient-to-t from-emerald-600 to-indigo-500 group-hover:from-emerald-400 group-hover:to-indigo-300 transition-all duration-300 shadow-xs" style="height: <?= $heightPct ?>%;"></div>
+                                                    <span class="text-[9px] text-slate-500 font-mono mt-1 select-none"><?= $dayNum ?></span>
+                                                </div>
+                                            <?php endforeach; ?>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                                 <div class="flex items-center justify-between text-[10px] text-slate-500">
@@ -4455,10 +4479,14 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                 if (titleEl) titleEl.textContent = 'Visualisasi Tren Prediksi Penjualan (30 Hari)';
                 if (iconEl) iconEl.textContent = '💰';
                 if (activeStatEl) {
-                    const tot = Number(sFc.projected_30d_total || 0).toLocaleString('id-ID');
-                    activeStatEl.textContent = `Total Proyeksi: Rp ${tot}`;
+                    if (sFc.has_real_sales) {
+                        const tot = Number(sFc.projected_30d_total || 0).toLocaleString('id-ID');
+                        activeStatEl.textContent = `Total Proyeksi: Rp ${tot}`;
+                    } else {
+                        activeStatEl.textContent = 'Status: Fase Pra-Pendapatan (Rp 0)';
+                    }
                 }
-                renderForecastBars(sFc.future_predictions || [], 'sales');
+                renderForecastBars(sFc.future_predictions || [], 'sales', sFc.has_real_sales, Number(sFc.untapped_potential || 0));
                 renderFeatureImportances(sFc.feature_importances || []);
             } else {
                 if (btnUsage) {
@@ -4473,14 +4501,29 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                     const tot = Number(uFc.projected_30d_total || 0).toLocaleString('id-ID');
                     activeStatEl.textContent = `Total Proyeksi: ${tot} Naskah`;
                 }
-                renderForecastBars(uFc.future_predictions || [], 'usage');
+                renderForecastBars(uFc.future_predictions || [], 'usage', true, 0);
                 renderFeatureImportances(uFc.feature_importances || []);
             }
         }
 
-        function renderForecastBars(points, mode) {
+        function renderForecastBars(points, mode, hasRealSales = true, untappedPotential = 0) {
             const container = document.getElementById('forecast-bars-container');
             if (!container) return;
+
+            if (mode === 'sales' && !hasRealSales) {
+                const potFmt = Number(untappedPotential || 0).toLocaleString('id-ID');
+                container.innerHTML = `
+                    <div class="w-full h-full flex flex-col items-center justify-center text-center p-4">
+                        <div class="w-10 h-10 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center text-xl mb-2">💡</div>
+                        <h5 class="text-xs font-bold text-white mb-1">Fase Pra-Pendapatan (Zero Real Sales)</h5>
+                        <p class="text-[11px] text-slate-400 max-w-md">Belum ada transaksi riil masuk. Silakan beralih ke tab <strong class="text-cyan-400 cursor-pointer" onclick="switchForecastView('usage')">"Penggunaan (Submisi)"</strong> untuk melihat proyeksi beban naskah hasil model XGBoost.</p>
+                        <div class="mt-2 text-[11px] bg-slate-800/80 px-3 py-1 rounded-lg border border-slate-700 text-slate-300">
+                            Potensi Kuota Belum Termonetisasi: <strong class="text-emerald-400 font-mono">Rp ${potFmt}</strong>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
 
             if (!points || points.length === 0) {
                 container.innerHTML = '<div class="w-full text-center text-xs text-slate-500 py-8">Belum ada titik prediksi.</div>';
@@ -4564,13 +4607,33 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                     const sFc = res.sales_forecast || {};
                     const kpiSales = document.getElementById('kpi-sales-proj');
                     if (kpiSales) {
-                        kpiSales.textContent = `Rp ${Number(sFc.projected_30d_total || 0).toLocaleString('id-ID')}`;
+                        if (sFc.has_real_sales) {
+                            kpiSales.textContent = `Rp ${Number(sFc.projected_30d_total || 0).toLocaleString('id-ID')}`;
+                        } else {
+                            kpiSales.textContent = `Rp ${Number(sFc.historical_30d_total || 0).toLocaleString('id-ID')}`;
+                        }
                     }
                     const kpiGrowth = document.getElementById('kpi-sales-growth');
                     if (kpiGrowth) {
-                        const g = Number(sFc.growth_pct || 0);
-                        kpiGrowth.textContent = `${g >= 0 ? '+' : ''}${g}%`;
-                        kpiGrowth.className = `inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-bold ${g >= 0 ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'}`;
+                        if (sFc.has_real_sales) {
+                            const g = Number(sFc.growth_pct || 0);
+                            kpiGrowth.textContent = `${g >= 0 ? '+' : ''}${g}% Proyeksi`;
+                            kpiGrowth.className = `inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-bold ${g >= 0 ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'}`;
+                        } else {
+                            kpiGrowth.textContent = 'Fase Pra-Pendapatan (Zero Revenue)';
+                            kpiGrowth.className = 'inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30';
+                        }
+                    }
+                    const kpiSubtitle = document.getElementById('kpi-sales-subtitle');
+                    if (kpiSubtitle) {
+                        if (sFc.has_real_sales) {
+                            const pkgName = res.top_package_name || '-';
+                            const pkgSold = res.top_package_sold || 0;
+                            kpiSubtitle.innerHTML = `Terlaris: <strong class="text-slate-200">${pkgName}</strong> (${pkgSold} unit)`;
+                        } else {
+                            const potFmt = Number(sFc.untapped_potential || 0).toLocaleString('id-ID');
+                            kpiSubtitle.innerHTML = `Potensi Belum Termonetisasi: <strong class="text-emerald-400 font-mono">Rp ${potFmt}</strong>`;
+                        }
                     }
 
                     const uFc = res.usage_forecast || {};
