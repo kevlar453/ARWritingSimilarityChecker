@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $status === 'valid' ? 'Sertifikat Hasil Uji Kemiripan #' . esc($code) . ' — AR Tilik' : 'Verifikasi Sertifikat Resmi — AR Tilik | Portal Validasi QR Ilmiah' ?></title>
     <meta name="description" content="Portal Verifikasi Resmi Sertifikat Keaslian Hasil Telaah Kesepadanan Naskah AR Tilik. Dokumen verifikasi integritas karya ilmiah berstandar perguruan tinggi berstempel digital kriptografis.">
-    <meta name="robots" content="index, follow">
+    <meta name="robots" content="<?= $status === 'valid' ? 'noindex, follow' : 'index, follow' ?>">
     <link rel="canonical" href="<?= base_url('verify' . (!empty($code) ? '/' . esc($code) : '')) ?>">
     <meta name="theme-color" content="#081a33">
 
@@ -16,6 +16,15 @@
     <meta property="og:title" content="<?= $status === 'valid' ? 'Sertifikat Hasil Uji Kemiripan #' . esc($code) . ' — AR Tilik' : 'Verifikasi Sertifikat Resmi — AR Tilik' ?>">
     <meta property="og:description" content="Lembar Piagam Hasil Uji Kemiripan dan Orisinalitas Naskah AR Tilik.">
     <meta property="og:url" content="<?= base_url('verify' . (!empty($code) ? '/' . esc($code) : '')) ?>">
+    <meta property="og:image" content="<?= base_url('images/og-artilik.png') ?>">
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@ARSetontong">
+    <meta name="twitter:creator" content="@ARSetontong">
+    <meta name="twitter:title" content="<?= $status === 'valid' ? 'Sertifikat Hasil Uji Kemiripan #' . esc($code) . ' — AR Tilik' : 'Verifikasi Sertifikat Resmi — AR Tilik' ?>">
+    <meta name="twitter:description" content="Lembar Piagam Hasil Uji Kemiripan dan Orisinalitas Naskah AR Tilik.">
+    <meta name="twitter:image" content="<?= base_url('images/og-artilik.png') ?>">
 
     <!-- Favicon & Brand Icons -->
     <link rel="icon" type="image/x-icon" href="<?= base_url('favicon.ico?v=20261008') ?>">

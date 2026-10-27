@@ -20,6 +20,60 @@
     <meta property="og:url" content="<?= base_url('ambassador/guide') ?>">
     <meta property="og:image" content="<?= base_url('images/og-artilik.png') ?>">
 
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@ARSetontong">
+    <meta name="twitter:creator" content="@ARSetontong">
+    <meta name="twitter:title" content="Panduan &amp; Welcome Kit Duta Kampus — AR Tilik">
+    <meta name="twitter:description" content="Pedoman resmi perwakilan kampus AR Tilik untuk sosialisasi kesadaran integritas akademik dan program kemitraan mahasiswa.">
+    <meta name="twitter:image" content="<?= base_url('images/og-artilik.png') ?>">
+
+    <!-- Schema.org JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebPage",
+          "@id": "<?= base_url('ambassador/guide#webpage') ?>",
+          "url": "<?= base_url('ambassador/guide') ?>",
+          "name": "Panduan & Welcome Kit Duta Kampus — AR Tilik",
+          "description": "Buku Panduan Resmi & Welcome Kit Duta Kampus AR Tilik: Pedoman edukasi etika integritas karya ilmiah, materi promosi resmi, dan tata cara klaim insentif.",
+          "inLanguage": "id-ID",
+          "publisher": {
+            "@type": "Organization",
+            "name": "ARSetontong",
+            "url": "https://www.arsetontong.top"
+          }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "@id": "<?= base_url('ambassador/guide#breadcrumb') ?>",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Beranda",
+              "item": "<?= base_url() ?>"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Duta Kampus",
+              "item": "<?= base_url('ambassador') ?>"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Panduan & Kit",
+              "item": "<?= base_url('ambassador/guide') ?>"
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+
     <!-- Favicon & Brand Icons -->
     <link rel="icon" type="image/x-icon" href="<?= base_url('favicon.ico?v=20261008') ?>">
     <link rel="icon" type="image/png" sizes="32x32" href="<?= base_url('favicon-32x32.png?v=20261008') ?>">

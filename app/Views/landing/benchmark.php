@@ -17,6 +17,78 @@
     <meta property="og:description" content="Publikasi hasil uji empiris, matriks konfusi, dan transparansi 14 kasus titik kegagalan mesin pada korpus akademik Indonesia.">
     <meta property="og:url" content="<?= base_url('benchmark') ?>">
     <meta property="og:image" content="<?= base_url('images/og-artilik.png') ?>">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Benchmark Terbuka AR Tilik">
+
+    <!-- Twitter / X Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@ARSetontong">
+    <meta name="twitter:creator" content="@ARSetontong">
+    <meta name="twitter:title" content="Benchmark Terbuka Naskah Akademik Indonesia — AR Tilik">
+    <meta name="twitter:description" content="Publikasi hasil uji empiris terbuka, matriks akurasi, dan transparansi 14 kasus titik kegagalan pada korpus akademik Indonesia.">
+    <meta name="twitter:image" content="<?= base_url('images/og-artilik.png') ?>">
+
+    <!-- Schema.org JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "TechArticle",
+          "@id": "<?= base_url('benchmark#article') ?>",
+          "headline": "Benchmark Terbuka Naskah Akademik Bahasa Indonesia — Evaluasi Empiris AR Tilik",
+          "alternativeHeadline": "Publikasi Hasil Evaluasi Empiris, Matriks Konfusi, dan 14 Titik Kegagalan Mesin pada Korpus Naskah Akademik Indonesia",
+          "description": "Hasil evaluasi empiris terbuka AR Tilik pada korpus naskah akademik Bahasa Indonesia. Transparansi penuh: akurasi kemiripan tekstual, deteksi konteks sitasi, indikator stylometri, dan publikasi 14 kasus mismatch apa adanya.",
+          "inLanguage": "id-ID",
+          "mainEntityOfPage": "<?= base_url('benchmark') ?>",
+          "url": "<?= base_url('benchmark') ?>",
+          "image": "<?= base_url('images/og-artilik.png') ?>",
+          "datePublished": "2026-10-08T08:00:00+07:00",
+          "dateModified": "<?= date('c') ?>",
+          "author": {
+            "@type": "Organization",
+            "name": "Laboratorium Evaluasi AI AR Tilik",
+            "url": "<?= base_url() ?>"
+          },
+          "publisher": {
+            "@type": "Organization",
+            "name": "ARSetontong",
+            "url": "https://www.arsetontong.top",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "<?= base_url('android-chrome-512x512.png') ?>"
+            }
+          },
+          "about": [
+            "Benchmark Plagiarisme Indonesia",
+            "Evaluasi Empiris Similarity Checker",
+            "Akurasi Deteksi Plagiasi",
+            "Stylometri Forensik Teks",
+            "AR Tilik"
+          ]
+        },
+        {
+          "@type": "BreadcrumbList",
+          "@id": "<?= base_url('benchmark#breadcrumb') ?>",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Beranda",
+              "item": "<?= base_url() ?>"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Benchmark Terbuka",
+              "item": "<?= base_url('benchmark') ?>"
+            }
+          ]
+        }
+      ]
+    }
+    </script>
 
     <!-- Favicon & Icons -->
     <link rel="icon" type="image/x-icon" href="<?= base_url('favicon.ico?v=20261008') ?>">

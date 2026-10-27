@@ -23,9 +23,51 @@
 
     <!-- Twitter Cards -->
     <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@ARSetontong">
+    <meta name="twitter:creator" content="@ARSetontong">
     <meta name="twitter:title" content="Duta Kampus AR Tilik — Kemitraan Akademik &amp; Afiliasi">
     <meta name="twitter:description" content="Program Duta Kampus AR Tilik: Akses naskah gratis 30 hari, piagam kepemimpinan resmi, dan komisi kemitraan 20%.">
     <meta name="twitter:image" content="<?= base_url('images/og-artilik.png') ?>">
+
+    <!-- Schema.org JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebPage",
+          "@id": "<?= base_url('ambassador#webpage') ?>",
+          "url": "<?= base_url('ambassador') ?>",
+          "name": "Duta Kampus AR Tilik — Program Kemitraan Akademik & Afiliasi",
+          "description": "Program Duta Kampus AR Tilik: Raih akses naskah gratis 30 hari, piagam kepemimpinan integritas akademik, dan komisi kemitraan 20% di universitas Anda.",
+          "inLanguage": "id-ID",
+          "publisher": {
+            "@type": "Organization",
+            "name": "ARSetontong",
+            "url": "https://www.arsetontong.top"
+          }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "@id": "<?= base_url('ambassador#breadcrumb') ?>",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Beranda",
+              "item": "<?= base_url() ?>"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Duta Kampus",
+              "item": "<?= base_url('ambassador') ?>"
+            }
+          ]
+        }
+      ]
+    }
+    </script>
 
     <!-- Favicon & Brand Icons -->
     <link rel="icon" type="image/x-icon" href="<?= base_url('favicon.ico?v=20261008') ?>">

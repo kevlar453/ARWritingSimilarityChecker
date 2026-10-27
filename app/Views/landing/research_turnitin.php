@@ -17,6 +17,84 @@
     <meta property="og:description" content="Turnitin unggul pada skala korpus global; AR Tilik berfokus pada verifikasi rujukan nyata, transparansi audit, dan alur jurnal Indonesia.">
     <meta property="og:url" content="<?= base_url('riset/ar-tilik-vs-turnitin') ?>">
     <meta property="og:image" content="<?= base_url('images/og-artilik.png') ?>">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Whitepaper AR Tilik vs Turnitin">
+
+    <!-- Twitter / X Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@ARSetontong">
+    <meta name="twitter:creator" content="@ARSetontong">
+    <meta name="twitter:title" content="AR Tilik vs Turnitin: Analisis Objektif untuk Jurnal & Kampus Indonesia">
+    <meta name="twitter:description" content="Turnitin unggul pada skala korpus global; AR Tilik berfokus pada verifikasi rujukan nyata, transparansi audit, dan alur jurnal Indonesia.">
+    <meta name="twitter:image" content="<?= base_url('images/og-artilik.png') ?>">
+
+    <!-- Schema.org JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "TechArticle",
+          "@id": "<?= base_url('riset/ar-tilik-vs-turnitin#article') ?>",
+          "headline": "AR Tilik vs Turnitin: Analisis Objektif untuk Jurnal & Kampus Indonesia",
+          "alternativeHeadline": "Whitepaper Komparatif: Membedah Keunggulan Korpus Global vs Verifikasi Sitasi Empiris & Integrasi OJS",
+          "description": "Analisis komparatif berbasis riset: Turnitin unggul mutlak pada skala korpus global, sementara AR Tilik menawarkan verifikasi sitasi empiris, transparansi laporan per-komponen, integrasi OJS, dan efisiensi biaya untuk jurnal Indonesia.",
+          "inLanguage": "id-ID",
+          "mainEntityOfPage": "<?= base_url('riset/ar-tilik-vs-turnitin') ?>",
+          "url": "<?= base_url('riset/ar-tilik-vs-turnitin') ?>",
+          "image": "<?= base_url('images/og-artilik.png') ?>",
+          "datePublished": "2026-10-13T08:00:00+07:00",
+          "dateModified": "<?= date('c') ?>",
+          "author": {
+            "@type": "Organization",
+            "name": "Dewan Riset Integritas Akademik AR Tilik",
+            "url": "<?= base_url() ?>"
+          },
+          "publisher": {
+            "@type": "Organization",
+            "name": "ARSetontong",
+            "url": "https://www.arsetontong.top",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "<?= base_url('android-chrome-512x512.png') ?>"
+            }
+          },
+          "about": [
+            "Turnitin Alternative",
+            "Academic Integrity",
+            "Open Journal Systems",
+            "Citation Verification",
+            "AR Tilik"
+          ]
+        },
+        {
+          "@type": "BreadcrumbList",
+          "@id": "<?= base_url('riset/ar-tilik-vs-turnitin#breadcrumb') ?>",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Beranda",
+              "item": "<?= base_url() ?>"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Riset & Komparasi",
+              "item": "<?= base_url('#riset-komparasi') ?>"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "AR Tilik vs Turnitin",
+              "item": "<?= base_url('riset/ar-tilik-vs-turnitin') ?>"
+            }
+          ]
+        }
+      ]
+    }
+    </script>
 
     <!-- Favicon & Brand Icons -->
     <link rel="icon" type="image/x-icon" href="<?= base_url('favicon.ico?v=20261008') ?>">
