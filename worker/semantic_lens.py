@@ -293,23 +293,36 @@ class SemanticLens:
             )
 
         try:
-            results = self.client.search(
-                collection_name=COLLECTION_NAME,
-                query_vector=query_vec,
-                query_filter=query_filter,
-                limit=top_k,
-                score_threshold=score_threshold
-            )
+            if hasattr(self.client, "query_points"):
+                results = self.client.query_points(
+                    collection_name=COLLECTION_NAME,
+                    query=query_vec,
+                    query_filter=query_filter,
+                    limit=top_k,
+                    score_threshold=score_threshold
+                )
+                points = results.points
+            elif hasattr(self.client, "search"):
+                points = self.client.search(
+                    collection_name=COLLECTION_NAME,
+                    query_vector=query_vec,
+                    query_filter=query_filter,
+                    limit=top_k,
+                    score_threshold=score_threshold
+                )
+            else:
+                points = []
 
             hits = []
-            for r in results:
+            for r in points:
                 hits.append({
                     "score": round(float(r.score), 4),
                     "document_id": r.payload.get("document_id"),
-                    "page_number": r.payload.get("page_number"),
-                    "chunk_index": r.payload.get("chunk_index"),
+                    "page_number": r.payload.get("page_number", 1),
+                    "chunk_index": r.payload.get("chunk_index", 0),
                     "preview": r.payload.get("preview", "")
                 })
             return hits
-        except Exception:
+        except Exception as e:
+            print(f"[SEMANTIC SEARCH ERROR] {e}")
             return []

@@ -184,6 +184,7 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
         try:
             submission_text = ""
             sub_tokens = []
+            pages = []
             cursor.execute(
                 "SELECT text, normalized_text FROM document_chunks WHERE document_id = %s ORDER BY chunk_index ASC",
                 (document_id,)
@@ -193,11 +194,18 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
                 submission_text = " ".join(c["text"] for c in chunks if c.get("text"))
                 norm_combined = " ".join(c["normalized_text"] for c in chunks if c.get("normalized_text"))
                 sub_tokens = norm_combined.split() if norm_combined else submission_text.split()
+                for idx, c in enumerate(chunks):
+                    pages.append({
+                        "page_number": idx + 1,
+                        "text": c.get("text", "")
+                    })
             elif document.get("storage_path") and os.path.exists(document["storage_path"]):
                 from worker.extractor import extract_document
                 pages = extract_document(document["storage_path"], document.get("mime_type"))
                 submission_text = " ".join(p["text"] for p in pages if p.get("text"))
                 sub_tokens = submission_text.split()
+            else:
+                pages = [{"page_number": 1, "text": submission_text}]
 
             t_cite_start = time.perf_counter()
             context_res = detect_citation_context(submission_text)
@@ -532,14 +540,29 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
             try:
                 from worker.semantic_verifier import SemanticVerifier
                 sem_verifier = SemanticVerifier()
-                sem_eval = sem_verifier.verify_submission(
+                sem_eval_75 = sem_verifier.verify_submission(
                     submission_pages=pages,
                     lexical_similarity=overall_sim,
                     evasion_data=evasion_res,
                     exclude_doc_id=document_id,
-                    similarity_threshold=0.75
+                    similarity_threshold=0.75,
+                    force_check=True
                 )
-                result["semantic_lens"] = sem_eval
+                sem_eval_70 = sem_verifier.verify_submission(
+                    submission_pages=pages,
+                    lexical_similarity=overall_sim,
+                    evasion_data=evasion_res,
+                    exclude_doc_id=document_id,
+                    similarity_threshold=0.70,
+                    force_check=True
+                )
+                sem_payload = dict(sem_eval_75)
+                sem_payload["evaluated"] = True
+                sem_payload["threshold_variants"] = {
+                    "0.75": sem_eval_75,
+                    "0.70": sem_eval_70
+                }
+                result["semantic_lens"] = sem_payload
             except Exception as sem_err:
                 result["semantic_lens"] = {
                     "is_evaluated": False,

@@ -854,6 +854,52 @@ class DashboardController extends BaseController
         $semanticLens = $evidenceData['semantic_lens'] ?? $evidenceData['v1_1_presentation']['v1_2_evolution']['semantic_lens'] ?? null;
         if (!$semanticLens) {
             $semanticLens = $this->computeFallbackSemanticLens($report, $submissionText);
+        } else {
+            // Lengkapi judul sumber rujukan jika belum terisi
+            $collectDocIds = [];
+            if (!empty($semanticLens['top_matches'])) {
+                foreach ($semanticLens['top_matches'] as $tm) {
+                    $dId = (int)($tm['source_document_id'] ?? $tm['matched_document_id'] ?? 0);
+                    if ($dId > 0) $collectDocIds[] = $dId;
+                }
+            }
+            if (!empty($semanticLens['threshold_variants'])) {
+                foreach ($semanticLens['threshold_variants'] as $tv) {
+                    if (!empty($tv['top_matches'])) {
+                        foreach ($tv['top_matches'] as $tm) {
+                            $dId = (int)($tm['source_document_id'] ?? $tm['matched_document_id'] ?? 0);
+                            if ($dId > 0) $collectDocIds[] = $dId;
+                        }
+                    }
+                }
+            }
+            if ($collectDocIds) {
+                $docRows = $db->table('documents')->select('id, title')->whereIn('id', array_unique($collectDocIds))->get()->getResultArray();
+                $titleMap = array_column($docRows, 'title', 'id');
+                if (!empty($semanticLens['top_matches'])) {
+                    foreach ($semanticLens['top_matches'] as &$tm) {
+                        $dId = (int)($tm['source_document_id'] ?? $tm['matched_document_id'] ?? 0);
+                        if (empty($tm['source_title']) && isset($titleMap[$dId])) {
+                            $tm['source_title'] = $titleMap[$dId];
+                        }
+                    }
+                    unset($tm);
+                }
+                if (!empty($semanticLens['threshold_variants'])) {
+                    foreach ($semanticLens['threshold_variants'] as &$tv) {
+                        if (!empty($tv['top_matches'])) {
+                            foreach ($tv['top_matches'] as &$tm) {
+                                $dId = (int)($tm['source_document_id'] ?? $tm['matched_document_id'] ?? 0);
+                                if (empty($tm['source_title']) && isset($titleMap[$dId])) {
+                                    $tm['source_title'] = $titleMap[$dId];
+                                }
+                            }
+                            unset($tm);
+                        }
+                    }
+                    unset($tv);
+                }
+            }
         }
 
         // Resolusi XGBoost Academic Risk Synthesizer

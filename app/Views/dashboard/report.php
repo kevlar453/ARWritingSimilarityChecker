@@ -2388,19 +2388,26 @@ $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evi
                 </div>
             </div>
 
-            <!-- Top Semantic Matches (Snippets) ATAU Status Bersih -->
-            <?php if (empty($semTopMatches)): ?>
-            <div id="semEmptyState" class="p-4 rounded-xl bg-emerald-50/70 border border-emerald-200 text-xs text-emerald-900 flex items-start gap-3">
-                <span class="text-xl">✅</span>
-                <div class="space-y-1">
-                    <strong class="font-bold text-emerald-800">Naskah Bersih: Tidak Ditemukan Indikasi Parafrase Makna</strong>
-                    <p class="text-emerald-700 leading-relaxed">
-                        Seluruh potongan naskah telah diproyeksikan ke ruang vektor 384-dimensi dan dicocokkan terhadap <strong>13.573 vektor korpus akademik</strong>. Tidak ditemukan pasase yang melewati batas kemiripan makna baik pada Ambang Standar (0,75) maupun Mode Penyelidikan (0,70). Naskah ini memiliki struktur gagasan yang orisinal terhadap korpus AR Tilik.
-                    </p>
-                </div>
-            </div>
-            <?php else: ?>
-            <div id="semMatchesContainer" class="space-y-3 pt-2">
+            <!-- Top Semantic Matches (Snippets) ATAU Status Bersih Multi-Ambang -->
+            <?php
+                // Kumpulkan semua pasase dari varian 0.75 dan 0.70
+                $allVariantMatches = [];
+                foreach (['0.75', '0.70'] as $vk) {
+                    if (!empty($semVariants[$vk]['top_matches'])) {
+                        foreach ($semVariants[$vk]['top_matches'] as $m) {
+                            $mDocId = (int)($m['source_document_id'] ?? ($m['matched_document_id'] ?? 0));
+                            $mPage = (int)($m['page_number'] ?? ($m['submission_page'] ?? 1));
+                            $uKey = $mDocId . '_' . $mPage;
+                            if (!isset($allVariantMatches[$uKey])) {
+                                $allVariantMatches[$uKey] = $m;
+                            }
+                        }
+                    }
+                }
+                $hasAnyMatches = !empty($allVariantMatches);
+            ?>
+
+            <div id="semMatchesContainer" class="space-y-3 pt-2 <?= $hasAnyMatches ? '' : 'hidden' ?>">
                 <div class="flex items-center justify-between">
                     <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider">
                         Pasase Terindikasi Parafrase Semantik Teratas
@@ -2411,7 +2418,8 @@ $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evi
                 </div>
 
                 <div class="space-y-3" id="semMatchesList">
-                    <?php foreach (array_slice($semTopMatches, 0, 5) as $smIdx => $sm): ?>
+                    <?php $smIdx = 0; ?>
+                    <?php foreach ($allVariantMatches as $sm): ?>
                     <?php
                         $matchScore = (float)($sm['semantic_score'] ?? (($sm['cosine_similarity'] ?? 0.0) * 100));
                         $srcDocTitle = $sm['source_title'] ?? ('Dokumen Korpus #' . ($sm['source_document_id'] ?? ($sm['matched_document_id'] ?? '?')));
@@ -2420,12 +2428,13 @@ $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evi
                         $srcSnippet = $sm['matched_corpus_preview'] ?? ($sm['matched_preview'] ?? '');
                         $pageNum = (int)($sm['page_number'] ?? ($sm['submission_page'] ?? 1));
                         $isTransitionZone = ($matchScore >= 70.0 && $matchScore < 75.0);
+                        $initHidden = ($matchScore < 75.0);
                     ?>
-                    <div class="sem-match-card p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-3" data-match-score="<?= $matchScore ?>">
+                    <div class="sem-match-card p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-3 <?= $initHidden ? 'hidden' : '' ?>" data-match-score="<?= $matchScore ?>">
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/60 pb-2">
                             <div class="flex items-center gap-2">
                                 <span class="w-5 h-5 rounded-full bg-indigo-100 text-indigo-700 text-[10px] font-bold flex items-center justify-center font-mono-code">
-                                    <?= $smIdx + 1 ?>
+                                    <?= ++$smIdx ?>
                                 </span>
                                 <span class="text-xs font-bold text-slate-800">
                                     <?= esc($srcDocTitle) ?>
@@ -2469,7 +2478,21 @@ $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evi
                     <?php endforeach; ?>
                 </div>
             </div>
-            <?php endif; ?>
+
+            <!-- Status Bersih (Empty State) -->
+            <div id="semEmptyState" class="p-4 rounded-xl bg-emerald-50/70 border border-emerald-200 text-xs text-emerald-900 flex items-start gap-3 <?= empty($semTopMatches) ? '' : 'hidden' ?>">
+                <span class="text-xl">✅</span>
+                <div class="space-y-1">
+                    <strong class="font-bold text-emerald-800" id="semEmptyTitle">Naskah Bersih di Ambang Standar (0,75)</strong>
+                    <p class="text-emerald-700 leading-relaxed" id="semEmptyDesc">
+                        <?php if ($hasAnyMatches): ?>
+                            Pada ambang standar ketat (0,75), tidak ada pasase yang melampaui batas toleransi. Beralihlah ke <strong>Mode Penyelidikan (0,70)</strong> untuk melihat pasase pada zona transisi sensitif.
+                        <?php else: ?>
+                            Seluruh potongan naskah telah diproyeksikan ke ruang vektor 384-dimensi dan dicocokkan terhadap <strong>13.573+ vektor korpus akademik</strong>. Tidak ditemukan pasase yang melewati batas kemiripan makna baik pada Ambang Standar (0,75) maupun Mode Penyelidikan (0,70). Naskah ini memiliki struktur gagasan yang orisinal.
+                        <?php endif; ?>
+                    </p>
+                </div>
+            </div>
         </div>
 
         <script>
@@ -2530,24 +2553,48 @@ $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evi
             if (kpiScore) {
                 kpiScore.textContent = score.toFixed(1) + '%';
             }
+            const kpiCosine = document.getElementById('semKpiCosine');
+            if (kpiCosine && activeData.semantic_cosine !== undefined) {
+                kpiCosine.textContent = 'Kosinus: ' + parseFloat(activeData.semantic_cosine).toFixed(4);
+            }
             const kpiMatchesCount = document.getElementById('semKpiMatchesCount');
             if (kpiMatchesCount) {
                 kpiMatchesCount.textContent = matchesCount + ' Pasase Terkorelasi';
             }
 
-            // Highlight atau filter baris pasase jika ada kartu zona transisi
+            // Sembunyikan atau tampilkan kartu pasase sesuai ambang
+            let visibleCards = 0;
             document.querySelectorAll('.sem-match-card').forEach(card => {
                 const sc = parseFloat(card.dataset.matchScore || 0);
-                if (sc >= 70.0 && sc < 75.0) {
-                    if (mode === '0.70') {
-                        card.classList.remove('opacity-40');
-                        card.classList.add('border-amber-300', 'bg-amber-50/40');
-                    } else {
-                        card.classList.add('opacity-40');
-                        card.classList.remove('border-amber-300', 'bg-amber-50/40');
-                    }
+                const th = (mode === '0.70') ? 70.0 : 75.0;
+                if (sc >= th) {
+                    card.classList.remove('hidden');
+                    visibleCards++;
+                } else {
+                    card.classList.add('hidden');
                 }
             });
+
+            const emptyState = document.getElementById('semEmptyState');
+            const emptyTitle = document.getElementById('semEmptyTitle');
+            const emptyDesc = document.getElementById('semEmptyDesc');
+            const matchesContainer = document.getElementById('semMatchesContainer');
+
+            if (visibleCards > 0) {
+                if (emptyState) emptyState.classList.add('hidden');
+                if (matchesContainer) matchesContainer.classList.remove('hidden');
+            } else {
+                if (emptyState) {
+                    emptyState.classList.remove('hidden');
+                    if (mode === '0.70') {
+                        emptyTitle.textContent = 'Naskah Bersih: Bebas Indikasi Parafrase (Mode 0,70)';
+                        emptyDesc.innerHTML = 'Bahkan pada Mode Penyelidikan (0,70), seluruh potongan naskah tidak melampaui batas sensitivitas terhadap <strong>13.573+ vektor korpus akademik</strong>.';
+                    } else {
+                        emptyTitle.textContent = 'Naskah Aman di Ambang Standar (0,75)';
+                        emptyDesc.innerHTML = 'Pada ambang standar ketat (0,75), tidak ada pasase yang melampaui batas toleransi. Jika Anda mencurigai adanya parafrase terstruktur, beralihlah ke <strong>Mode Penyelidikan (0,70)</strong>.';
+                    }
+                }
+            }
         }
         </script>
         <?php endif; ?>

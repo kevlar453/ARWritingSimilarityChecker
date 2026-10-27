@@ -31,16 +31,15 @@ class SemanticVerifier:
         if force_check:
             return True, "manual_force_check"
 
-        # 1. Zona Abu-Abu Leksikal: Kemiripan leksikal moderat di mana parafrase sering terselubung
-        if 5.0 <= lexical_similarity < 25.0:
-            return True, "gray_zone_lexical_range"
+        # Kemiripan leksikal di bawah 25% (termasuk 0.0% parafrase murni/agresif)
+        # adalah zona utama di mana parafrase terselubung lolos dari mesin leksikal.
+        if lexical_similarity < 25.0:
+            return True, "gray_zone_or_low_lexical_range"
 
-        # 2. Indikasi Evasif Aktif: Pelaku manipulasi teks/font sering memparafrasekan naskah
+        # Indikasi Evasif Aktif
         if evasion_data and evasion_data.get("is_manipulated", False):
             return True, "evasion_anomaly_detected"
 
-        # Jika skor sangat tinggi (>= 25%), bukti leksikal sudah sangat kuat dan tidak ambigu
-        # Jika skor sangat bersih (< 5%) dan tanpa anomali, lewati komputasi untuk efisiensi
         return False, "outside_gray_zone"
 
     def verify_submission(
@@ -65,6 +64,8 @@ class SemanticVerifier:
             "is_evaluated": False,
             "evaluation_reason": reason,
             "semantic_score": 0.0,
+            "semantic_cosine": 0.0,
+            "paraphrase_detected": False,
             "matched_chunks_count": 0,
             "top_matches": [],
             "model": "paraphrase-multilingual-MiniLM-L12-v2",
@@ -100,16 +101,17 @@ class SemanticVerifier:
                     "matched_document_id": best_hit["document_id"],
                     "matched_page": best_hit["page_number"],
                     "matched_preview": best_hit["preview"],
-                    "cosine_similarity": best_hit["score"]
+                    "cosine_similarity": best_hit["score"],
+                    "semantic_score": round(best_hit["score"] * 100.0, 1)
                 })
                 scores.append(best_hit["score"])
 
         # Kalkulasi skor semantik agregat
         semantic_score = 0.0
+        max_cosine = 0.0
         if scores:
-            # Rata-rata kemiripan dari potongan-potongan yang melampaui ambang batas
+            max_cosine = max(scores)
             avg_score = sum(scores) / len(scores)
-            # Proporsi potongan yang cocok terhadap total potongan naskah
             coverage = min(1.0, len(scores) / max(1, len(chunks)))
             semantic_score = round(float(avg_score * 100.0 * coverage), 2)
 
@@ -117,6 +119,8 @@ class SemanticVerifier:
             "is_evaluated": True,
             "evaluation_reason": reason,
             "semantic_score": semantic_score,
+            "semantic_cosine": round(float(max_cosine), 4),
+            "paraphrase_detected": bool(len(matched_chunks) > 0),
             "matched_chunks_count": len(matched_chunks),
             "top_matches": matched_chunks[:10],
             "total_chunks_audited": len(chunks),
