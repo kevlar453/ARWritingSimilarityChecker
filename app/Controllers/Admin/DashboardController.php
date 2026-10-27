@@ -35,19 +35,26 @@ class DashboardController extends BaseController
         $adminUsers = $userModel->where('role', 'admin')->countAllResults();
 
         // 2. Metrik Dokumen & Antrean Worker (Document Queue Metrics)
-        $totalSubmissions = $docModel->where('document_type', 'submission')->countAllResults();
-        $totalCorpus = $docModel->where('document_type', 'corpus')->countAllResults();
+        // Hitung submisi secara transparan & jujur: pisahkan antara pengguna terdaftar, anonim/tamu, dan uji benchmark
+        $submissionsRegistered   = $docModel->where('document_type', 'submission')->where('user_id IS NOT NULL', null, false)->countAllResults();
+        $submissionsAnonymous    = $docModel->where('document_type', 'submission')->where('user_id IS NULL', null, false)->where('benchmark_run_id IS NULL', null, false)->countAllResults();
+        $submissionsBenchmark    = $docModel->where('document_type', 'submission')->where('benchmark_run_id IS NOT NULL', null, false)->countAllResults();
+        $totalOrganicSubmissions = $submissionsRegistered + $submissionsAnonymous;
+        $totalSubmissions        = $submissionsRegistered; // Metrik submisi berintegritas tinggi (prioritas pengguna terdaftar)
+
+        $totalCorpus     = $docModel->where('document_type', 'corpus')->countAllResults();
         $corpusCompleted = $docModel->where('document_type', 'corpus')->where('status', 'completed')->countAllResults();
-        $corpusFailed = $docModel->where('document_type', 'corpus')->where('status', 'failed')->countAllResults();
+        $corpusFailed    = $docModel->where('document_type', 'corpus')->where('status', 'failed')->countAllResults();
 
-        $queueUploaded = $docModel->where('status', 'uploaded')->countAllResults();
+        $queueUploaded   = $docModel->where('status', 'uploaded')->countAllResults();
         $queueProcessing = $docModel->where('status', 'processing')->countAllResults();
-        $queueCompleted = $docModel->where('status', 'completed')->countAllResults();
-        $queueFailed = $docModel->where('status', 'failed')->countAllResults();
+        $queueCompleted  = $docModel->where('status', 'completed')->countAllResults();
+        $queueFailed     = $docModel->where('status', 'failed')->countAllResults();
 
-        // Submisi minggu ini
+        // Submisi minggu ini (prioritaskan pengguna terdaftar)
         $oneWeekAgo = date('Y-m-d H:i:s', strtotime('-7 days'));
         $submissionsThisWeek = $docModel->where('document_type', 'submission')
+                                       ->where('user_id IS NOT NULL', null, false)
                                        ->where('created_at >=', $oneWeekAgo)
                                        ->countAllResults();
 
@@ -318,13 +325,15 @@ class DashboardController extends BaseController
                             ->get()
                             ->getResultArray();
 
-        // Sumber Teratas yang Sering Menjadi Rujukan Kemiripan
+        // Sumber Teratas yang Sering Menjadi Rujukan Kemiripan (Tampilkan Judul & Asal Naskah Valid)
         $topReferencedSources = $db->table('report_sources rs')
-                                   ->select('rs.source_document_id, d.title, d.source_type, COUNT(rs.id) as match_occurrences, AVG(rs.similarity) as avg_similarity')
-                                   ->join('documents d', 'd.id = rs.source_document_id', 'left')
-                                   ->groupBy('rs.source_document_id, d.title, d.source_type')
+                                   ->select('rs.source_document_id, d.title, d.original_filename, d.author, d.source_type, d.corpus_visibility, d.faculty, d.department, COUNT(rs.id) as match_occurrences, AVG(rs.similarity) as avg_similarity')
+                                   ->join('documents d', 'd.id = rs.source_document_id', 'inner')
+                                   ->where('d.title IS NOT NULL')
+                                   ->where('d.title !=', '')
+                                   ->groupBy('rs.source_document_id, d.title, d.original_filename, d.author, d.source_type, d.corpus_visibility, d.faculty, d.department')
                                    ->orderBy('match_occurrences', 'DESC')
-                                   ->limit(8)
+                                   ->limit(10)
                                    ->get()
                                    ->getResultArray();
 
@@ -411,16 +420,20 @@ class DashboardController extends BaseController
             'activeTab'            => $activeTab,
             'searchQuery'          => $searchQuery,
             'metrics'              => [
-                'total_users'           => $totalUsers,
-                'active_users'          => $activeUsers,
-                'pending_users'         => $pendingUsers,
-                'inactive_users'        => $inactiveUsers,
-                'admin_users'           => $adminUsers,
-                'total_submissions'     => $totalSubmissions,
-                'submissions_this_week' => $submissionsThisWeek,
-                'total_corpus'          => $totalCorpus,
-                'corpus_completed'      => $corpusCompleted,
-                'corpus_failed'         => $corpusFailed,
+                'total_users'               => $totalUsers,
+                'active_users'              => $activeUsers,
+                'pending_users'             => $pendingUsers,
+                'inactive_users'            => $inactiveUsers,
+                'admin_users'               => $adminUsers,
+                'total_submissions'         => $totalSubmissions,
+                'submissions_registered'    => $submissionsRegistered,
+                'submissions_anonymous'     => $submissionsAnonymous,
+                'submissions_benchmark'     => $submissionsBenchmark,
+                'total_organic_submissions' => $totalOrganicSubmissions,
+                'submissions_this_week'     => $submissionsThisWeek,
+                'total_corpus'              => $totalCorpus,
+                'corpus_completed'          => $corpusCompleted,
+                'corpus_failed'             => $corpusFailed,
                 'queue_uploaded'        => $queueUploaded,
                 'queue_processing'      => $queueProcessing,
                 'queue_completed'       => $queueCompleted,

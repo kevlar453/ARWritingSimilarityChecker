@@ -75,14 +75,18 @@ def fetch_historical_series(conn) -> pd.DataFrame:
     """)
     sales_rows = cursor.fetchall() or []
 
-    # 2. Agregasi Penggunaan Dokumen Harian
+    # 2. Agregasi Penggunaan Dokumen Harian (Hanya Naskah Submisi Riil, Bukan Korpus Acuan)
     cursor.execute("""
         SELECT 
             DATE(created_at) as doc_date,
             COUNT(id) as doc_count,
+            COUNT(CASE WHEN user_id IS NOT NULL THEN 1 END) as registered_doc_count,
+            COUNT(CASE WHEN user_id IS NULL AND benchmark_run_id IS NULL THEN 1 END) as anon_doc_count,
             COALESCE(SUM(page_count), 0) as total_pages,
             COALESCE(SUM(file_size), 0) as total_bytes
         FROM documents
+        WHERE document_type = 'submission'
+          AND benchmark_run_id IS NULL
         GROUP BY DATE(created_at)
         ORDER BY doc_date ASC
     """)
@@ -156,6 +160,15 @@ def fetch_historical_series(conn) -> pd.DataFrame:
     merged_df["tx_count"] = merged_df["tx_count"].astype(int)
     merged_df["doc_count"] = merged_df["doc_count"].astype(int)
     merged_df["audit_count"] = merged_df["audit_count"].astype(int)
+    if "registered_doc_count" in merged_df.columns:
+        merged_df["registered_doc_count"] = merged_df["registered_doc_count"].astype(int)
+    else:
+        merged_df["registered_doc_count"] = 0
+
+    if "anon_doc_count" in merged_df.columns:
+        merged_df["anon_doc_count"] = merged_df["anon_doc_count"].astype(int)
+    else:
+        merged_df["anon_doc_count"] = 0
 
     # Hitung pendapatan riil organik (tanpa data sintetis)
     real_revenue_total = float(merged_df["daily_revenue"].sum())
@@ -165,15 +178,20 @@ def fetch_historical_series(conn) -> pd.DataFrame:
     # Kriteria apakah sudah ada data penjualan nyata yang mencukupi untuk regresi deret waktu
     has_real_sales = bool(real_tx_total >= 3 and real_revenue_total > 0 and non_zero_days >= 3)
     
-    # Hitung potensi monetisasi yang belum tergarap (3.000+ dokumen diperiksa secara gratis)
-    untapped_potential = float(merged_df["doc_count"].sum() * 2500)
+    # Hitung volume submisi organik riil
+    registered_docs_total = int(merged_df["registered_doc_count"].sum())
+    anon_docs_total = int(merged_df["anon_doc_count"].sum())
+    organic_docs_total = int(merged_df["doc_count"].sum())
+
+    # Hitung potensi monetisasi yang belum tergarap (dokumen submisi organik yang diperiksa gratis)
+    untapped_potential = float(organic_docs_total * 2500)
 
     if not pkg_rows:
         pkg_rows = [
             {"package_id": "-", "package_name": "Belum ada paket terjual", "total_sold": 0, "total_revenue": 0}
         ]
 
-    return merged_df, pkg_rows, has_real_sales, real_revenue_total, untapped_potential
+    return merged_df, pkg_rows, has_real_sales, real_revenue_total, untapped_potential, registered_docs_total, anon_docs_total, organic_docs_total
 
 
 def train_xgboost_forecast(
@@ -367,8 +385,10 @@ Tugas Anda adalah menelaah data faktual platform dan proyeksi beban naskah XGBoo
 DATA FAKTUAL & PROYEKSI XGBOOST:
 {sales_section}
 
-2. PENGGUNAAN & BEBAN SISTEM (DATA AKTUAL):
-   - Total Submisi 30 Hari Terakhir: {total_docs:,} naskah (Fakta Riil Terindeks)
+2. PENGGUNAAN & BEBAN SISTEM (DATA SUBMISI RIIL):
+   - Total Submisi Naskah Organik 30 Hari Terakhir: {total_docs:,} naskah
+     * Dari Pengguna Terdaftar: {metrics_summary.get('registered_docs_total', 0):,} naskah
+     * Dari Pengunjung Anonim / Tamu: {metrics_summary.get('anon_docs_total', 0):,} naskah
    - Proyeksi Submisi 30 Hari Ke Depan (XGBoost Regressor): {proj_docs:,} naskah
    - Pertumbuhan Volume Submisi: {metrics_summary['usage']['growth_pct']:+.1f}%
    - Tanggal Beban Puncak (Peak Day Diproyeksikan): {peak_date} ({peak_val} naskah/hari)
@@ -379,7 +399,7 @@ DATA FAKTUAL & PROYEKSI XGBOOST:
    - Total Pengguna Terdaftar: {metrics_summary['total_users']} pengguna
 
 PETUNJUK ANALISIS GEMINI:
-{"Karena platform saat ini belum memiliki omzet masuk (Rp 0), fokuskan seluruh analisis penjualan Anda pada STRATEGI MONETISASI AWAL (First Monetization Strategy): bagaimana mengonversi ribuan pengguna gratis ini menjadi pembeli kuota berbayar pertama, menerapkan batas kuota freemium, memasang QRIS saat unduh sertifikat, dan menjual paket institusi B2B." if not has_sales else "Fokuskan analisis pada optimalisasi tier paket dan scaling omzet."}
+{"Karena platform saat ini belum memiliki omzet masuk (Rp 0), telaah kesenjangan antara submisi akun terdaftar (" + str(metrics_summary.get('registered_docs_total', 0)) + ") dan lonjakan uji coba pengguna anonim/tamu (" + str(metrics_summary.get('anon_docs_total', 0)) + "). Fokuskan seluruh analisis penjualan Anda pada STRATEGI MONETISASI AWAL (First Monetization Strategy): bagaimana mengonversi pengunjung anonim ini menjadi pengguna terdaftar berbayar, menerapkan batas kuota freemium (misal maksimal 2 naskah gratis), memasang gerbang bayar QRIS mikro saat unduh sertifikat, dan menjual paket institusi B2B." if not has_sales else "Fokuskan analisis pada optimalisasi tier paket dan scaling omzet."}
 
 PETUNJUK FORMAT JAWABAN:
 Berikan output HANYA berupa JSON valid (tanpa markdown tambahan) dengan struktur:
@@ -524,7 +544,7 @@ def run_full_pipeline(force_live: bool = False) -> Dict[str, Any]:
     conn = get_connection()
 
     try:
-        df, pkg_rows, has_real_sales, real_revenue_total, untapped_potential = fetch_historical_series(conn)
+        df, pkg_rows, has_real_sales, real_revenue_total, untapped_potential, registered_docs_total, anon_docs_total, organic_docs_total = fetch_historical_series(conn)
 
         # 1. XGBoost Forecast untuk Penjualan (Revenue)
         sales_result = train_xgboost_forecast(
@@ -560,6 +580,9 @@ def run_full_pipeline(force_live: bool = False) -> Dict[str, Any]:
             "has_real_sales": has_real_sales,
             "real_revenue_total": real_revenue_total,
             "untapped_potential": untapped_potential,
+            "registered_docs_total": registered_docs_total,
+            "anon_docs_total": anon_docs_total,
+            "organic_docs_total": organic_docs_total,
             "top_package_name": top_pkg_name,
             "top_package_sold": int(top_pkg_sold),
             "peak_usage_date": peak_entry["date"],
@@ -579,6 +602,9 @@ def run_full_pipeline(force_live: bool = False) -> Dict[str, Any]:
             "has_real_sales": has_real_sales,
             "real_revenue_total": real_revenue_total if has_real_sales else 0.0,
             "untapped_potential": untapped_potential,
+            "registered_docs_total": registered_docs_total,
+            "anon_docs_total": anon_docs_total,
+            "organic_docs_total": organic_docs_total,
             "sales_forecast": sales_result,
             "usage_forecast": usage_result,
             "peak_usage": {
@@ -593,7 +619,9 @@ def run_full_pipeline(force_live: bool = False) -> Dict[str, Any]:
             "historical_snapshot": {
                 "total_days_observed": len(df),
                 "total_past_revenue": real_revenue_total if has_real_sales else 0.0,
-                "total_past_documents": int(df["doc_count"].sum())
+                "total_past_documents": organic_docs_total,
+                "total_registered_submissions": registered_docs_total,
+                "total_anonymous_submissions": anon_docs_total
             }
         }
 

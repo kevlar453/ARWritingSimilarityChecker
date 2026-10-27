@@ -439,11 +439,12 @@
                             </div>
                         </div>
                         <div class="mt-3 flex items-baseline gap-2">
-                            <span class="text-3xl font-extrabold text-white tracking-tight"><?= number_format($metrics['total_submissions']) ?></span>
-                            <span class="text-xs text-sky-400 font-medium">+<?= $metrics['submissions_this_week'] ?> minggu ini</span>
+                            <span class="text-3xl font-extrabold text-white tracking-tight"><?= number_format($metrics['submissions_registered']) ?></span>
+                            <span class="text-xs text-emerald-400 font-semibold px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20">User Terdaftar</span>
                         </div>
-                        <div class="mt-2 text-xs text-slate-400">
-                            <span>Total naskah ilmiah yang diuji plagiarisme</span>
+                        <div class="mt-2 text-xs text-slate-400 flex items-center justify-between flex-wrap gap-1">
+                            <span><?= number_format($metrics['submissions_anonymous']) ?> anonim / tamu</span>
+                            <span class="text-slate-400 text-[11px] font-mono">Total Organik: <?= number_format($metrics['total_organic_submissions']) ?></span>
                         </div>
                     </div>
 
@@ -1020,15 +1021,18 @@
                         <a href="<?= $docFilterUrl(['doc_type' => 'all', 'doc_status' => 'all', 'doc_score' => 'all', 'doc_date' => 'all', 'doc_q' => '']) ?>" 
                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-medium transition-all whitespace-nowrap shrink-0 <?= $isAllActive ? 'bg-indigo-600 text-white shadow-xs' : 'bg-slate-900/70 hover:bg-slate-900 text-slate-300 border border-slate-700/80' ?>">
                             <span>Semua Naskah</span>
-                            <span class="px-1.5 py-0.2 rounded-md text-[10px] <?= $isAllActive ? 'bg-white/20 text-white' : 'bg-slate-800 text-slate-400' ?>"><?= number_format($metrics['total_submissions'] + $metrics['total_corpus']) ?></span>
+                            <span class="px-1.5 py-0.2 rounded-md text-[10px] <?= $isAllActive ? 'bg-white/20 text-white' : 'bg-slate-800 text-slate-400' ?>"><?= number_format($metrics['total_organic_submissions'] + $metrics['total_corpus']) ?></span>
                         </a>
 
                         <!-- 2. Submisi -->
                         <?php $isSubActive = ($docFilter['type'] === 'submission' && $docFilter['status'] === 'all' && $docFilter['score'] === 'all'); ?>
                         <a href="<?= $docFilterUrl(['doc_type' => 'submission', 'doc_status' => 'all', 'doc_score' => 'all']) ?>" 
-                           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-medium transition-all whitespace-nowrap shrink-0 <?= $isSubActive ? 'bg-sky-600 text-white shadow-xs' : 'bg-slate-900/70 hover:bg-slate-900 text-slate-300 border border-slate-700/80' ?>">
+                           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-medium transition-all whitespace-nowrap shrink-0 <?= $isSubActive ? 'bg-sky-600 text-white shadow-xs' : 'bg-slate-900/70 hover:bg-slate-900 text-slate-300 border border-slate-700/80' ?>"
+                           title="Submisi Terdaftar: <?= number_format($metrics['submissions_registered']) ?> | Anonim/Tamu: <?= number_format($metrics['submissions_anonymous']) ?>">
                             <span>Naskah Submisi</span>
-                            <span class="px-1.5 py-0.2 rounded-md text-[10px] <?= $isSubActive ? 'bg-white/20 text-white' : 'bg-sky-500/20 text-sky-300' ?>"><?= number_format($metrics['total_submissions']) ?></span>
+                            <span class="px-1.5 py-0.2 rounded-md text-[10px] <?= $isSubActive ? 'bg-white/20 text-white' : 'bg-sky-500/20 text-sky-300' ?>">
+                                <?= number_format($metrics['submissions_registered']) ?> terdaftar <span class="opacity-75">(+<?= number_format($metrics['submissions_anonymous']) ?> anonim)</span>
+                            </span>
                         </a>
 
                         <!-- 3. Korpus -->
@@ -2419,7 +2423,7 @@
                             <span class="text-xs text-emerald-400 font-medium">Laporan Tuntas</span>
                         </div>
                         <div class="mt-2 text-[11px] text-slate-400">
-                            Dari <strong class="text-slate-300 font-mono-code"><?= number_format($metrics['total_submissions']) ?></strong> total submisi naskah (skripsi, tesis &amp; artikel)
+                            Dari <strong class="text-emerald-400 font-mono-code"><?= number_format($metrics['submissions_registered']) ?></strong> submisi user terdaftar (<span class="text-slate-400"><?= number_format($metrics['submissions_anonymous']) ?> naskah anonim/tamu</span>)
                         </div>
                     </div>
 
@@ -2543,41 +2547,93 @@
                     </div>
                 </div>
 
-                <!-- Sumber Korpus Teratas yang Menjadi Rujukan Kemiripan -->
+                <!-- Sumber Korpus Teratas yang Menjadi Rujukan Kemiripan (Tampilkan Judul & Asal Naskah) -->
+                <?php
+                    $sourceTypeMeta = [
+                        'journal'    => ['label' => 'Jurnal Ilmiah', 'color' => 'bg-sky-500/20 text-sky-300 border-sky-500/30', 'icon' => '📘'],
+                        'thesis'     => ['label' => 'Skripsi / Tesis', 'color' => 'bg-purple-500/20 text-purple-300 border-purple-500/30', 'icon' => '🎓'],
+                        'repository' => ['label' => 'Repositori Kampus', 'color' => 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30', 'icon' => '🏛️'],
+                        'student'    => ['label' => 'Karya Mahasiswa', 'color' => 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30', 'icon' => '📝'],
+                        'book'       => ['label' => 'Buku / Monograf', 'color' => 'bg-amber-500/20 text-amber-300 border-amber-500/30', 'icon' => '📚'],
+                        'website'    => ['label' => 'Sumber Web', 'color' => 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30', 'icon' => '🌐'],
+                        'other'      => ['label' => 'Korpus Referensi', 'color' => 'bg-slate-700/60 text-slate-300 border-slate-600', 'icon' => '📑'],
+                    ];
+                ?>
                 <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl overflow-hidden shadow-sm">
                     <div class="px-5 py-3 border-b border-slate-700/60 flex items-center justify-between bg-slate-900/60">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">Sumber Rujukan Teratas yang Sering Beririsan</h3>
-                        <span class="text-[11px] text-slate-400">Analisis Klaster Korpus Kampus</span>
+                        <div>
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-200 flex items-center gap-2">
+                                <span>📚</span>
+                                Sumber Rujukan Teratas yang Sering Beririsan
+                            </h3>
+                            <p class="text-[11px] text-slate-400 mt-0.5">Analisis naskah korpus yang paling kerap terdeteksi sebagai rujukan kemiripan mahasiswa</p>
+                        </div>
+                        <span class="text-[11px] text-slate-400 font-mono">Top <?= count($integrityAnalytics['top_sources'] ?? []) ?> Rujukan</span>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-xs text-left">
                             <thead class="bg-slate-900/80 text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-700/60">
                                 <tr>
-                                    <th class="py-2.5 px-4">Judul Dokumen Korpus</th>
+                                    <th class="py-2.5 px-4 w-1/2">Judul &amp; Asal Naskah</th>
                                     <th class="py-2.5 px-3">Tipe Sumber</th>
                                     <th class="py-2.5 px-3 text-center">Frekuensi Terdeteksi</th>
-                                    <th class="py-2.5 px-3 text-right">Rata-rata Kemiripan</th>
+                                    <th class="py-2.5 px-4 text-right">Rata-rata Kemiripan</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-800/80">
                                 <?php if (empty($integrityAnalytics['top_sources'])): ?>
-                                    <tr><td colspan="4" class="py-4 text-center text-slate-500">Belum ada data irisan naskah yang terakumulasi.</td></tr>
+                                    <tr><td colspan="4" class="py-6 text-center text-slate-500">Belum ada data irisan naskah yang terakumulasi.</td></tr>
                                 <?php else: ?>
                                     <?php foreach ($integrityAnalytics['top_sources'] as $ts): ?>
-                                        <tr class="hover:bg-slate-800/40">
-                                            <td class="py-2.5 px-4 font-medium text-slate-200">
-                                                <?= esc($ts['title'] ?? ('Rujukan #' . $ts['source_document_id'])) ?>
+                                        <tr class="hover:bg-slate-800/40 transition-colors">
+                                            <td class="py-3 px-4">
+                                                <div class="font-bold text-slate-100 text-xs sm:text-sm leading-snug line-clamp-2">
+                                                    <?= esc($ts['title'] ?? ('Rujukan #' . $ts['source_document_id'])) ?>
+                                                </div>
+                                                <div class="mt-1.5 flex items-center gap-2 flex-wrap text-[11px] text-slate-400">
+                                                    <?php if (!empty($ts['author'])): ?>
+                                                        <span class="inline-flex items-center gap-1 text-slate-300 font-medium">
+                                                            <svg class="w-3 h-3 text-indigo-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                                                            <?= esc($ts['author']) ?>
+                                                        </span>
+                                                        <span class="text-slate-600">&bull;</span>
+                                                    <?php endif; ?>
+                                                    <?php if (!empty($ts['faculty']) || !empty($ts['department'])): ?>
+                                                        <span class="text-slate-300">
+                                                            <?= esc($ts['faculty'] ?? '') ?><?= (!empty($ts['faculty']) && !empty($ts['department'])) ? ' / ' : '' ?><?= esc($ts['department'] ?? '') ?>
+                                                        </span>
+                                                        <span class="text-slate-600">&bull;</span>
+                                                    <?php endif; ?>
+                                                    <?php if (!empty($ts['original_filename'])): ?>
+                                                        <span class="font-mono text-[10px] text-slate-400 bg-slate-900/90 px-1.5 py-0.5 rounded border border-slate-700/60 truncate max-w-xs" title="Nama Berkas: <?= esc($ts['original_filename']) ?>">
+                                                            📁 <?= esc($ts['original_filename']) ?>
+                                                        </span>
+                                                    <?php endif; ?>
+                                                </div>
                                             </td>
-                                            <td class="py-2.5 px-3 text-slate-400">
-                                                <span class="px-2 py-0.5 rounded text-[10px] bg-slate-800 border border-slate-700/60">
-                                                    <?= esc($ts['source_type'] ?: 'corpus') ?>
+                                            <td class="py-3 px-3">
+                                                <?php 
+                                                    $stKey = strtolower($ts['source_type'] ?? 'other');
+                                                    $stInfo = $sourceTypeMeta[$stKey] ?? $sourceTypeMeta['other'];
+                                                ?>
+                                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-semibold border <?= $stInfo['color'] ?>">
+                                                    <span><?= $stInfo['icon'] ?></span>
+                                                    <span><?= $stInfo['label'] ?></span>
                                                 </span>
                                             </td>
-                                            <td class="py-2.5 px-3 text-center text-indigo-400 font-bold font-mono-code">
-                                                <?= (int) $ts['match_occurrences'] ?> kali
+                                            <td class="py-3 px-3 text-center">
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold font-mono-code bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">
+                                                    <?= number_format((int) $ts['match_occurrences']) ?> kali
+                                                </span>
                                             </td>
-                                            <td class="py-2.5 px-3 text-right text-slate-300 font-mono-code">
-                                                <?= number_format((float) ($ts['avg_similarity'] ?? 0), 1) ?>%
+                                            <td class="py-3 px-4 text-right">
+                                                <?php $avgSim = (float) ($ts['avg_similarity'] ?? 0); ?>
+                                                <div class="flex items-center justify-end gap-2">
+                                                    <div class="w-16 bg-slate-900 rounded-full h-1.5 overflow-hidden hidden sm:block">
+                                                        <div class="h-1.5 rounded-full <?= $avgSim < 15 ? 'bg-emerald-500' : ($avgSim < 25 ? 'bg-sky-500' : 'bg-amber-500') ?>" style="width: <?= min(100, $avgSim * 3) ?>%"></div>
+                                                    </div>
+                                                    <span class="font-bold font-mono-code text-slate-200"><?= number_format($avgSim, 1) ?>%</span>
+                                                </div>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>

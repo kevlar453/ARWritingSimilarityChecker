@@ -20,10 +20,19 @@ class LandingController extends BaseController
             ->where('benchmark_run_id IS NULL', null, false)
             ->countAllResults();
 
-        $totalSubmissions = $db->table('documents')
+        $submissionsRegistered = $db->table('documents')
             ->where('document_type', 'submission')
+            ->where('user_id IS NOT NULL', null, false)
+            ->countAllResults();
+
+        $submissionsAnonymous = $db->table('documents')
+            ->where('document_type', 'submission')
+            ->where('user_id IS NULL', null, false)
             ->where('benchmark_run_id IS NULL', null, false)
             ->countAllResults();
+
+        $totalOrganicSubmissions = $submissionsRegistered + $submissionsAnonymous;
+        $totalSubmissions = $submissionsRegistered;
 
         $totalReports = $db->table('reports')
             ->where('status', 'completed')
@@ -56,15 +65,18 @@ class LandingController extends BaseController
         $testimonialStats = $testimonialModel->getStats();
 
         return view('landing/index', [
-            'currentUser'          => $currentUser,
-            'quotaInfo'            => $quotaInfo,
-            'totalCorpus'          => $totalCorpus,
-            'totalSubmissions'     => $totalSubmissions,
-            'totalReports'         => $totalReports,
-            'visitorStats'         => $visitorStats,
-            'authSecurityToken'    => $authSecurityToken,
-            'approvedTestimonials' => $approvedTestimonials,
-            'testimonialStats'     => $testimonialStats,
+            'currentUser'              => $currentUser,
+            'quotaInfo'                => $quotaInfo,
+            'totalCorpus'              => $totalCorpus,
+            'totalSubmissions'         => $totalSubmissions,
+            'submissionsRegistered'    => $submissionsRegistered,
+            'submissionsAnonymous'     => $submissionsAnonymous,
+            'totalOrganicSubmissions'  => $totalOrganicSubmissions,
+            'totalReports'             => $totalReports,
+            'visitorStats'             => $visitorStats,
+            'authSecurityToken'        => $authSecurityToken,
+            'approvedTestimonials'     => $approvedTestimonials,
+            'testimonialStats'         => $testimonialStats,
         ]);
     }
 

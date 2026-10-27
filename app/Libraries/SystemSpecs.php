@@ -42,10 +42,19 @@ class SystemSpecs
                 ->where('benchmark_run_id IS NULL', null, false)
                 ->countAllResults();
 
-            $totalSubmissions = (int) $db->table('documents')
+            $submissionsRegistered = (int) $db->table('documents')
                 ->where('document_type', 'submission')
+                ->where('user_id IS NOT NULL', null, false)
+                ->countAllResults();
+
+            $submissionsAnonymous = (int) $db->table('documents')
+                ->where('document_type', 'submission')
+                ->where('user_id IS NULL', null, false)
                 ->where('benchmark_run_id IS NULL', null, false)
                 ->countAllResults();
+
+            $totalOrganicSubmissions = $submissionsRegistered + $submissionsAnonymous;
+            $totalSubmissions = $submissionsRegistered;
 
             $totalReports = (int) $db->table('reports')
                 ->where('status', 'completed')
@@ -54,17 +63,23 @@ class SystemSpecs
             // Fallback aman jika query database mengalami kendala
             $totalCorpus = 0;
             $totalSubmissions = 0;
+            $submissionsRegistered = 0;
+            $submissionsAnonymous = 0;
+            $totalOrganicSubmissions = 0;
             $totalReports = 0;
         }
 
         return [
-            'total_corpus'      => $totalCorpus,
-            'total_submissions' => $totalSubmissions,
-            'total_reports'     => $totalReports,
-            'engine_version'    => self::ENGINE_VERSION,
-            'edition_name'      => self::EDITION_NAME,
-            'price_label'       => self::SUBSCRIPTION_PRICE . '/' . self::SUBSCRIPTION_UNIT,
-            'last_sync_date'    => date('d F Y'),
+            'total_corpus'              => $totalCorpus,
+            'total_submissions'         => $totalSubmissions,
+            'submissions_registered'    => $submissionsRegistered,
+            'submissions_anonymous'     => $submissionsAnonymous,
+            'total_organic_submissions' => $totalOrganicSubmissions,
+            'total_reports'             => $totalReports,
+            'engine_version'            => self::ENGINE_VERSION,
+            'edition_name'              => self::EDITION_NAME,
+            'price_label'               => self::SUBSCRIPTION_PRICE . '/' . self::SUBSCRIPTION_UNIT,
+            'last_sync_date'            => date('d F Y'),
         ];
     }
 

@@ -144,8 +144,8 @@
                 </p>
                 <div class="grid grid-cols-3 gap-2 sm:gap-4 border-t border-indigo-700/50 pt-4 sm:pt-5">
                     <div class="p-2 sm:p-0">
-                        <div class="text-xl sm:text-3xl font-extrabold text-white"><?= number_format($totalSubmissions) ?></div>
-                        <div class="text-[10px] sm:text-xs text-indigo-300 font-medium">Submisi Diperiksa</div>
+                        <div class="text-xl sm:text-3xl font-extrabold text-white"><?= number_format($submissionsRegistered ?? $totalSubmissions) ?></div>
+                        <div class="text-[10px] sm:text-xs text-indigo-300 font-medium">Submisi Akun Terdaftar</div>
                     </div>
                     <div class="p-2 sm:p-0 border-x border-indigo-700/30 sm:border-0 px-2 sm:px-0">
                         <div class="text-xl sm:text-3xl font-extrabold text-white"><?= number_format($totalCorpus) ?></div>

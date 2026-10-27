@@ -277,10 +277,18 @@ class DashboardController extends BaseController
         $benchmarkRuns = $db->table('benchmark_runs')->orderBy('id', 'DESC')->get(10)->getResultArray();
 
         // Statistik Keseluruhan (Stabil & Konsisten terhadap status selesai)
-        $totalSubmissions = $db->table('documents')
-                               ->where('document_type', 'submission')
-                               ->where('benchmark_run_id IS NULL', null, false)
-                               ->countAllResults();
+        $submissionsRegistered = $db->table('documents')
+                                    ->where('document_type', 'submission')
+                                    ->where('user_id IS NOT NULL', null, false)
+                                    ->countAllResults();
+        $submissionsAnonymous  = $db->table('documents')
+                                    ->where('document_type', 'submission')
+                                    ->where('user_id IS NULL', null, false)
+                                    ->where('benchmark_run_id IS NULL', null, false)
+                                    ->countAllResults();
+        $totalOrganicSubmissions = $submissionsRegistered + $submissionsAnonymous;
+        $totalSubmissions        = $submissionsRegistered; // Submisi resmi pengguna terdaftar
+
         $totalCorpus = $db->table('documents')
                           ->where('document_type', 'corpus')
                           ->where('benchmark_run_id IS NULL', null, false)
@@ -336,8 +344,11 @@ class DashboardController extends BaseController
             'corpusTotalPages'    => $corpusTotalPages,
             'filteredCorpusTotal' => $filteredCorpusTotal,
             'benchmarkRuns'       => $benchmarkRuns,
-            'totalSubmissions'    => $totalSubmissions,
-            'totalCorpus'         => $totalCorpus,
+            'totalSubmissions'         => $totalSubmissions,
+            'submissionsRegistered'    => $submissionsRegistered,
+            'submissionsAnonymous'     => $submissionsAnonymous,
+            'totalOrganicSubmissions'  => $totalOrganicSubmissions,
+            'totalCorpus'              => $totalCorpus,
             'totalReports'        => $totalReports,
             'currentUser'         => $currentUser,
             'quotaInfo'           => $quotaInfo,
