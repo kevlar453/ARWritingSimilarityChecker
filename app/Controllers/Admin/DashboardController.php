@@ -18,6 +18,9 @@ class DashboardController extends BaseController
      */
     public function index()
     {
+        // Alokasi batas memori aman untuk mencegah memory exhaustion saat menangani kueri analitik dan daftar data besar
+        @ini_set('memory_limit', '512M');
+
         $db = db_connect();
         $userModel = new UserModel();
         $docModel = new DocumentModel();
@@ -27,20 +30,19 @@ class DashboardController extends BaseController
         $activeTab = $this->request->getGet('tab') ?? 'overview';
         $searchQuery = trim((string) ($this->request->getGet('q') ?? ''));
 
-        // 1. Metrik Pengguna (User Metrics)
+        // 1. Metrik Pengguna (User Metrics - Hitungan Ringkas / Count Only)
         $totalUsers = $userModel->countAllResults();
         $activeUsers = $userModel->where('status', 'active')->countAllResults();
         $pendingUsers = $userModel->where('status', 'pending_verification')->countAllResults();
         $inactiveUsers = $userModel->where('status', 'inactive')->countAllResults();
         $adminUsers = $userModel->where('role', 'admin')->countAllResults();
 
-        // 2. Metrik Dokumen & Antrean Worker (Document Queue Metrics)
-        // Hitung submisi secara transparan & jujur: pisahkan antara pengguna terdaftar, anonim/tamu, dan uji benchmark
+        // 2. Metrik Dokumen & Antrean Worker (Document Queue Metrics - Hitungan Ringkas / Count Only)
         $submissionsRegistered   = $docModel->where('document_type', 'submission')->where('user_id IS NOT NULL', null, false)->countAllResults();
         $submissionsAnonymous    = $docModel->where('document_type', 'submission')->where('user_id IS NULL', null, false)->where('benchmark_run_id IS NULL', null, false)->countAllResults();
         $submissionsBenchmark    = $docModel->where('document_type', 'submission')->where('benchmark_run_id IS NOT NULL', null, false)->countAllResults();
         $totalOrganicSubmissions = $submissionsRegistered + $submissionsAnonymous;
-        $totalSubmissions        = $submissionsRegistered; // Metrik submisi berintegritas tinggi (prioritas pengguna terdaftar)
+        $totalSubmissions        = $submissionsRegistered;
 
         $totalCorpus     = $docModel->where('document_type', 'corpus')->countAllResults();
         $corpusCompleted = $docModel->where('document_type', 'corpus')->where('status', 'completed')->countAllResults();
@@ -51,212 +53,274 @@ class DashboardController extends BaseController
         $queueCompleted  = $docModel->where('status', 'completed')->countAllResults();
         $queueFailed     = $docModel->where('status', 'failed')->countAllResults();
 
-        // Submisi minggu ini (prioritaskan pengguna terdaftar)
+        // Submisi minggu ini
         $oneWeekAgo = date('Y-m-d H:i:s', strtotime('-7 days'));
         $submissionsThisWeek = $docModel->where('document_type', 'submission')
                                        ->where('user_id IS NOT NULL', null, false)
                                        ->where('created_at >=', $oneWeekAgo)
                                        ->countAllResults();
 
-        // 3. Metrik Keamanan & Rate Limits
+        // 3. Metrik Keamanan & Rate Limits (Hitungan Ringkas)
         $now = date('Y-m-d H:i:s');
         $activeLocksCount = $db->table('auth_rate_limits')
                                ->where('locked_until >', $now)
                                ->countAllResults();
         $totalSecurityEvents = $db->table('auth_rate_limits')->countAllResults();
 
-        // 4. Metrik Pengunjung (Visitor Metrics)
+        // 4. Metrik Pengunjung (Visitor Metrics - Hitungan Ringkas)
         $visitorStats = $visitorModel->getStats();
 
-        // 5. Data List: Pengguna
-        $userBuilder = $userModel->orderBy('id', 'DESC');
-        if ($searchQuery !== '') {
-            $userBuilder->groupStart()
-                        ->like('name', $searchQuery)
-                        ->orLike('email', $searchQuery)
-                        ->orLike('institution', $searchQuery)
-                        ->groupEnd();
-        }
-        $usersList = $userBuilder->findAll(100);
+        // Model Pendukung untuk Statistik Ringkas
+        $paymentModel = new PaymentTransactionModel();
+        $testimonialModel = new \App\Models\TestimonialModel();
+        $ambAppModel = new \App\Models\AmbassadorApplicationModel();
+        $googleKeyModel = new \App\Models\GoogleApiKeyModel();
 
-        // 6. Data List: Dokumen Submisi & Laporan (Dukungan Panel Penyaringan & Pencarian Komprehensif)
-        $docSearch = trim((string) ($this->request->getGet('doc_q') ?? ($activeTab === 'documents' ? $searchQuery : '')));
-        $docType = trim((string) ($this->request->getGet('doc_type') ?? 'all'));
-        $docStatus = trim((string) ($this->request->getGet('doc_status') ?? 'all'));
-        $docScore = trim((string) ($this->request->getGet('doc_score') ?? 'all'));
-        $docDate = trim((string) ($this->request->getGet('doc_date') ?? 'all'));
-        $docSort = trim((string) ($this->request->getGet('doc_sort') ?? 'newest'));
-        $docLimit = (int) ($this->request->getGet('doc_limit') ?? 50);
-        if (! in_array($docLimit, [25, 50, 100, 200], true)) {
-            $docLimit = 50;
-        }
-        $docPage = max(1, (int) ($this->request->getGet('doc_page') ?? 1));
+        // Metrik Ringkas untuk Sidebar Badge
+        $paymentStats = $paymentModel->getPaymentStats();
+        $testimonialStats = $testimonialModel->getStats();
+        $ambStats = $ambAppModel->getAdminStats();
 
-        $isFilterActive = ($docSearch !== '' || $docType !== 'all' || $docStatus !== 'all' || $docScore !== 'all' || $docDate !== 'all' || $docSort !== 'newest');
-        $activeFilterCount = 0;
-        if ($docSearch !== '') $activeFilterCount++;
-        if ($docType !== 'all') $activeFilterCount++;
-        if ($docStatus !== 'all') $activeFilterCount++;
-        if ($docScore !== 'all') $activeFilterCount++;
-        if ($docDate !== 'all') $activeFilterCount++;
-        if ($docSort !== 'newest') $activeFilterCount++;
-
-        $docBuilder = $db->table('documents d')
-                         ->select('d.*, u.name as user_name, u.email as user_email, lr.latest_report_id, rep.overall_similarity, rep.exact_similarity, rep.cosine_similarity, rep.status as report_status')
-                         ->join('users u', 'u.id = d.user_id', 'left')
-                         ->join('(SELECT document_id, MAX(id) as latest_report_id FROM reports GROUP BY document_id) lr', 'lr.document_id = d.id', 'left', false)
-                         ->join('reports rep', 'rep.id = lr.latest_report_id', 'left');
-
-        // Filter Pencarian Teks
-        if ($docSearch !== '') {
-            $docBuilder->groupStart()
-                       ->like('d.title', $docSearch)
-                       ->orLike('d.original_filename', $docSearch)
-                       ->orLike('d.faculty', $docSearch)
-                       ->orLike('d.department', $docSearch)
-                       ->orLike('u.name', $docSearch)
-                       ->orLike('u.email', $docSearch)
-                       ->groupEnd();
-        }
-
-        // Filter Tipe Dokumen
-        if (in_array($docType, ['submission', 'corpus'], true)) {
-            $docBuilder->where('d.document_type', $docType);
-        }
-
-        // Filter Status Worker
-        if (in_array($docStatus, ['uploaded', 'processing', 'completed', 'failed'], true)) {
-            $docBuilder->where('d.status', $docStatus);
-        }
-
-        // Filter Rentang Skor Kemiripan
-        if ($docScore === 'clean') {
-            $docBuilder->where('rep.overall_similarity <', 15)
-                       ->where('rep.overall_similarity IS NOT NULL', null, false);
-        } elseif ($docScore === 'moderate') {
-            $docBuilder->where('rep.overall_similarity >=', 15)
-                       ->where('rep.overall_similarity <', 25);
-        } elseif ($docScore === 'high') {
-            $docBuilder->where('rep.overall_similarity >=', 25);
-        } elseif ($docScore === 'corpus_ref') {
-            $docBuilder->where('d.document_type', 'corpus');
-        }
-
-        // Filter Periode Waktu Masuk
-        if ($docDate === 'today') {
-            $docBuilder->where('d.created_at >=', date('Y-m-d 00:00:00'));
-        } elseif ($docDate === 'yesterday') {
-            $docBuilder->where('d.created_at >=', date('Y-m-d 00:00:00', strtotime('-1 day')))
-                       ->where('d.created_at <', date('Y-m-d 00:00:00'));
-        } elseif ($docDate === '7days') {
-            $docBuilder->where('d.created_at >=', date('Y-m-d H:i:s', strtotime('-7 days')));
-        } elseif ($docDate === '30days') {
-            $docBuilder->where('d.created_at >=', date('Y-m-d H:i:s', strtotime('-30 days')));
-        } elseif ($docDate === 'this_month') {
-            $docBuilder->where('d.created_at >=', date('Y-m-01 00:00:00'));
-        }
-
-        // Hitung total hasil yang cocok dengan filter untuk paginasi
-        $countBuilder = clone $docBuilder;
-        $totalFilteredDocs = $countBuilder->countAllResults();
-
-        // Urutan Data
-        if ($docSort === 'oldest') {
-            $docBuilder->orderBy('d.id', 'ASC');
-        } elseif ($docSort === 'score_desc') {
-            $docBuilder->orderBy('rep.overall_similarity', 'DESC')
-                       ->orderBy('d.id', 'DESC');
-        } elseif ($docSort === 'score_asc') {
-            $docBuilder->orderBy('(rep.overall_similarity IS NULL)', 'ASC', false)
-                       ->orderBy('rep.overall_similarity', 'ASC')
-                       ->orderBy('d.id', 'DESC');
-        } elseif ($docSort === 'title_asc') {
-            $docBuilder->orderBy('d.title', 'ASC');
-        } elseif ($docSort === 'title_desc') {
-            $docBuilder->orderBy('d.title', 'DESC');
-        } else {
-            $docBuilder->orderBy('d.id', 'DESC');
-        }
-
-        // Kalkulasi Paginasi
-        $totalPages = max(1, (int) ceil($totalFilteredDocs / $docLimit));
-        if ($docPage > $totalPages) {
-            $docPage = $totalPages;
-        }
-        $offset = ($docPage - 1) * $docLimit;
-
-        $documentsList = $docBuilder->limit($docLimit, $offset)->get()->getResultArray();
-
-        foreach ($documentsList as &$doc) {
-            $doc['title'] = $this->cleanMojibake($doc['title'] ?? '');
-            if (! empty($doc['latest_report_id'])) {
-                $doc['report'] = [
-                    'id'                 => $doc['latest_report_id'],
-                    'overall_similarity' => (float) ($doc['overall_similarity'] ?? 0),
-                    'exact_similarity'   => (float) ($doc['exact_similarity'] ?? 0),
-                    'cosine_similarity'  => (float) ($doc['cosine_similarity'] ?? 0),
-                    'status'             => $doc['report_status'] ?? 'completed',
-                ];
-            } else {
-                $doc['report'] = null;
+        // Status Pool Kunci Google AI (Ringan, diperlukan sidebar badge)
+        $googleKeysList = $googleKeyModel->getAllKeys();
+        $activeGoogleKeysCount = count(array_filter($googleKeysList, fn($k) => ($k['status'] ?? '') === 'active'));
+        $keys503Count = 0;
+        foreach ($googleKeysList as $gk) {
+            if (($gk['status'] ?? '') === 'active' && !empty($gk['last_error_message']) && (strpos($gk['last_error_message'], '503') !== false || stripos($gk['last_error_message'], 'high demand') !== false)) {
+                $keys503Count++;
             }
         }
-        unset($doc);
+        $googleAiDegraded = ($activeGoogleKeysCount > 0 && ($keys503Count / $activeGoogleKeysCount) >= 0.5);
 
+        // =========================================================================
+        // TAB-AWARE SELECTIVE DATA LOADING (Mencegah Pemborosan Memori & CPU)
+        // =========================================================================
+
+        // 5. Data List: Pengguna
+        $usersList = [];
+        if ($activeTab === 'users') {
+            $userBuilder = $userModel->orderBy('id', 'DESC');
+            if ($searchQuery !== '') {
+                $userBuilder->groupStart()
+                            ->like('name', $searchQuery)
+                            ->orLike('email', $searchQuery)
+                            ->orLike('institution', $searchQuery)
+                            ->groupEnd();
+            }
+            $usersList = $userBuilder->findAll(100);
+        } elseif ($activeTab === 'overview') {
+            $usersList = $userModel->orderBy('id', 'DESC')->findAll(7);
+        }
+
+        // 6. Data List: Dokumen Submisi & Laporan
+        $documentsList = [];
         $docFilter = [
-            'q'              => $docSearch,
-            'type'           => $docType,
-            'status'         => $docStatus,
-            'score'          => $docScore,
-            'date'           => $docDate,
-            'sort'           => $docSort,
-            'limit'          => $docLimit,
-            'page'           => $docPage,
-            'is_active'      => $isFilterActive,
-            'active_count'   => $activeFilterCount,
-            'total_filtered' => $totalFilteredDocs,
-            'total_pages'    => $totalPages,
-            'start_item'     => $totalFilteredDocs > 0 ? $offset + 1 : 0,
-            'end_item'       => min($offset + $docLimit, $totalFilteredDocs),
+            'q'              => '',
+            'type'           => 'all',
+            'status'         => 'all',
+            'score'          => 'all',
+            'date'           => 'all',
+            'sort'           => 'newest',
+            'limit'          => 50,
+            'page'           => 1,
+            'is_active'      => false,
+            'active_count'   => 0,
+            'total_filtered' => 0,
+            'total_pages'    => 1,
+            'start_item'     => 0,
+            'end_item'       => 0,
         ];
 
-        // 7. Data List: Korpus Dokumen
-        $corpusList = $docModel->where('document_type', 'corpus')
-                               ->orderBy('id', 'DESC')
-                               ->findAll(100);
-        foreach ($corpusList as &$c) {
-            $c['title'] = $this->cleanMojibake($c['title'] ?? '');
+        if ($activeTab === 'documents' || $activeTab === 'overview') {
+            $docSearch = trim((string) ($this->request->getGet('doc_q') ?? ($activeTab === 'documents' ? $searchQuery : '')));
+            $docType = trim((string) ($this->request->getGet('doc_type') ?? 'all'));
+            $docStatus = trim((string) ($this->request->getGet('doc_status') ?? 'all'));
+            $docScore = trim((string) ($this->request->getGet('doc_score') ?? 'all'));
+            $docDate = trim((string) ($this->request->getGet('doc_date') ?? 'all'));
+            $docSort = trim((string) ($this->request->getGet('doc_sort') ?? 'newest'));
+            $docLimit = ($activeTab === 'overview') ? 7 : (int) ($this->request->getGet('doc_limit') ?? 50);
+            if (! in_array($docLimit, [7, 25, 50, 100, 200], true)) {
+                $docLimit = 50;
+            }
+            $docPage = ($activeTab === 'overview') ? 1 : max(1, (int) ($this->request->getGet('doc_page') ?? 1));
+
+            $isFilterActive = ($docSearch !== '' || $docType !== 'all' || $docStatus !== 'all' || $docScore !== 'all' || $docDate !== 'all' || $docSort !== 'newest');
+            $activeFilterCount = 0;
+            if ($docSearch !== '') $activeFilterCount++;
+            if ($docType !== 'all') $activeFilterCount++;
+            if ($docStatus !== 'all') $activeFilterCount++;
+            if ($docScore !== 'all') $activeFilterCount++;
+            if ($docDate !== 'all') $activeFilterCount++;
+            if ($docSort !== 'newest') $activeFilterCount++;
+
+            $docBuilder = $db->table('documents d')
+                             ->select('d.*, u.name as user_name, u.email as user_email, lr.latest_report_id, rep.overall_similarity, rep.exact_similarity, rep.cosine_similarity, rep.status as report_status')
+                             ->join('users u', 'u.id = d.user_id', 'left')
+                             ->join('(SELECT document_id, MAX(id) as latest_report_id FROM reports GROUP BY document_id) lr', 'lr.document_id = d.id', 'left', false)
+                             ->join('reports rep', 'rep.id = lr.latest_report_id', 'left');
+
+            if ($docSearch !== '') {
+                $docBuilder->groupStart()
+                           ->like('d.title', $docSearch)
+                           ->orLike('d.original_filename', $docSearch)
+                           ->orLike('d.faculty', $docSearch)
+                           ->orLike('d.department', $docSearch)
+                           ->orLike('u.name', $docSearch)
+                           ->orLike('u.email', $docSearch)
+                           ->groupEnd();
+            }
+
+            if (in_array($docType, ['submission', 'corpus'], true)) {
+                $docBuilder->where('d.document_type', $docType);
+            }
+
+            if (in_array($docStatus, ['uploaded', 'processing', 'completed', 'failed'], true)) {
+                $docBuilder->where('d.status', $docStatus);
+            }
+
+            if ($docScore === 'clean') {
+                $docBuilder->where('rep.overall_similarity <', 15)
+                           ->where('rep.overall_similarity IS NOT NULL', null, false);
+            } elseif ($docScore === 'moderate') {
+                $docBuilder->where('rep.overall_similarity >=', 15)
+                           ->where('rep.overall_similarity <', 25);
+            } elseif ($docScore === 'high') {
+                $docBuilder->where('rep.overall_similarity >=', 25);
+            } elseif ($docScore === 'corpus_ref') {
+                $docBuilder->where('d.document_type', 'corpus');
+            }
+
+            if ($docDate === 'today') {
+                $docBuilder->where('d.created_at >=', date('Y-m-d 00:00:00'));
+            } elseif ($docDate === 'yesterday') {
+                $docBuilder->where('d.created_at >=', date('Y-m-d 00:00:00', strtotime('-1 day')))
+                           ->where('d.created_at <', date('Y-m-d 00:00:00'));
+            } elseif ($docDate === '7days') {
+                $docBuilder->where('d.created_at >=', date('Y-m-d H:i:s', strtotime('-7 days')));
+            } elseif ($docDate === '30days') {
+                $docBuilder->where('d.created_at >=', date('Y-m-d H:i:s', strtotime('-30 days')));
+            } elseif ($docDate === 'this_month') {
+                $docBuilder->where('d.created_at >=', date('Y-m-01 00:00:00'));
+            }
+
+            $countBuilder = clone $docBuilder;
+            $totalFilteredDocs = ($activeTab === 'overview') ? 7 : $countBuilder->countAllResults();
+
+            if ($docSort === 'oldest') {
+                $docBuilder->orderBy('d.id', 'ASC');
+            } elseif ($docSort === 'score_desc') {
+                $docBuilder->orderBy('rep.overall_similarity', 'DESC')
+                           ->orderBy('d.id', 'DESC');
+            } elseif ($docSort === 'score_asc') {
+                $docBuilder->orderBy('(rep.overall_similarity IS NULL)', 'ASC', false)
+                           ->orderBy('rep.overall_similarity', 'ASC')
+                           ->orderBy('d.id', 'DESC');
+            } elseif ($docSort === 'title_asc') {
+                $docBuilder->orderBy('d.title', 'ASC');
+            } elseif ($docSort === 'title_desc') {
+                $docBuilder->orderBy('d.title', 'DESC');
+            } else {
+                $docBuilder->orderBy('d.id', 'DESC');
+            }
+
+            $totalPages = max(1, (int) ceil($totalFilteredDocs / $docLimit));
+            if ($docPage > $totalPages) {
+                $docPage = $totalPages;
+            }
+            $offset = ($docPage - 1) * $docLimit;
+
+            $documentsList = $docBuilder->limit($docLimit, $offset)->get()->getResultArray();
+
+            foreach ($documentsList as &$doc) {
+                $doc['title'] = $this->cleanMojibake($doc['title'] ?? '');
+                if (! empty($doc['latest_report_id'])) {
+                    $doc['report'] = [
+                        'id'                 => $doc['latest_report_id'],
+                        'overall_similarity' => (float) ($doc['overall_similarity'] ?? 0),
+                        'exact_similarity'   => (float) ($doc['exact_similarity'] ?? 0),
+                        'cosine_similarity'  => (float) ($doc['cosine_similarity'] ?? 0),
+                        'status'             => $doc['report_status'] ?? 'completed',
+                    ];
+                } else {
+                    $doc['report'] = null;
+                }
+            }
+            unset($doc);
+
+            $docFilter = [
+                'q'              => $docSearch,
+                'type'           => $docType,
+                'status'         => $docStatus,
+                'score'          => $docScore,
+                'date'           => $docDate,
+                'sort'           => $docSort,
+                'limit'          => $docLimit,
+                'page'           => $docPage,
+                'is_active'      => $isFilterActive,
+                'active_count'   => $activeFilterCount,
+                'total_filtered' => $totalFilteredDocs,
+                'total_pages'    => $totalPages,
+                'start_item'     => $totalFilteredDocs > 0 ? $offset + 1 : 0,
+                'end_item'       => min($offset + $docLimit, $totalFilteredDocs),
+            ];
         }
-        unset($c);
+
+        // 7. Data List: Korpus Dokumen & Pemanen
+        $corpusList = [];
+        $harvestLogs = [];
+        $harvestSchedules = [];
+        if ($activeTab === 'corpus') {
+            $corpusList = $docModel->where('document_type', 'corpus')
+                                   ->orderBy('id', 'DESC')
+                                   ->findAll(100);
+            foreach ($corpusList as &$c) {
+                $c['title'] = $this->cleanMojibake($c['title'] ?? '');
+            }
+            unset($c);
+
+            $harvestLogs = $db->table('harvest_logs')
+                              ->orderBy('id', 'DESC')
+                              ->limit(20)
+                              ->get()
+                              ->getResultArray();
+            $harvestSchedules = $db->table('harvest_schedules')
+                                   ->orderBy('id', 'ASC')
+                                   ->get()
+                                   ->getResultArray();
+        }
 
         // 8. Data List: Keamanan (Auth Rate Limits)
-        $securityLogs = $db->table('auth_rate_limits')
-                           ->orderBy('id', 'DESC')
-                           ->limit(100)
-                           ->get()
-                           ->getResultArray();
-
-        // 9. Data List: Pengunjung Harian (30 Hari Terakhir)
-        $dailyVisitors = $db->table('landing_visitors')
-                            ->select('visit_date, COUNT(DISTINCT visitor_hash) as unique_visitors, SUM(hits) as total_hits')
-                            ->groupBy('visit_date')
-                            ->orderBy('visit_date', 'DESC')
-                            ->limit(30)
-                            ->get()
-                            ->getResultArray();
-
-        // 10. Data Transaksi & Pembayaran Midtrans
-        $paymentModel = new PaymentTransactionModel();
-
-        // Pembersihan otomatis transaksi pending kedaluwarsa (> 24 jam) agar tidak menumpuk di log
-        try {
-            $paymentModel->autoExpirePendingTransactions(24);
-        } catch (\Throwable $e) {
-            log_message('error', 'Auto-expire pending payments error in admin overview: ' . $e->getMessage());
+        $securityLogs = [];
+        if ($activeTab === 'security') {
+            $securityLogs = $db->table('auth_rate_limits')
+                               ->orderBy('id', 'DESC')
+                               ->limit(100)
+                               ->get()
+                               ->getResultArray();
         }
 
-        $paymentStats = $paymentModel->getPaymentStats();
-        $paymentsList = $paymentModel->getAllTransactions(50);
+        // 9. Data List: Pengunjung Harian
+        $dailyVisitors = [];
+        if ($activeTab === 'visitors') {
+            $dailyVisitors = $db->table('landing_visitors')
+                                ->select('visit_date, COUNT(DISTINCT visitor_hash) as unique_visitors, SUM(hits) as total_hits')
+                                ->groupBy('visit_date')
+                                ->orderBy('visit_date', 'DESC')
+                                ->limit(30)
+                                ->get()
+                                ->getResultArray();
+        }
+
+        // 10. Data Transaksi & Pembayaran Midtrans
+        $paymentsList = [];
+        if ($activeTab === 'payments') {
+            try {
+                $paymentModel->autoExpirePendingTransactions(24);
+            } catch (\Throwable $e) {
+                log_message('error', 'Auto-expire pending payments error in admin payments tab: ' . $e->getMessage());
+            }
+            $paymentsList = $paymentModel->getAllTransactions(50);
+        }
 
         // 11. Data Lingkungan Sistem
         $systemInfo = [
@@ -269,152 +333,145 @@ class DashboardController extends BaseController
             'server_time'         => date('d M Y, H:i:s T'),
         ];
 
-        // 12. Data Pemanen Korpus Nasional (Neliti & GARUDA)
-        $harvestLogs = $db->table('harvest_logs')
-                          ->orderBy('id', 'DESC')
-                          ->limit(20)
-                          ->get()
-                          ->getResultArray();
-        $harvestSchedules = $db->table('harvest_schedules')
-                               ->orderBy('id', 'ASC')
-                               ->get()
-                               ->getResultArray();
-
-        // 13. Data Kunci Integrasi API & OJS
-        $apiKeysList = $db->table('api_keys ak')
-                          ->select('ak.*, u.name as user_name, u.email as user_email')
-                          ->join('users u', 'u.id = ak.user_id', 'left')
-                          ->orderBy('ak.id', 'DESC')
-                          ->limit(50)
-                          ->get()
-                          ->getResultArray();
-
-        // 13b. Data Kunci Google AI / Gemini API Keys (Round-Robin Pool)
-        $googleKeyModel = new \App\Models\GoogleApiKeyModel();
-        $googleKeysList = $googleKeyModel->getAllKeys();
-        $activeGoogleKeysCount = count(array_filter($googleKeysList, fn($k) => $k['status'] === 'active'));
-        $keys503Count = 0;
-        foreach ($googleKeysList as $gk) {
-            if ($gk['status'] === 'active' && !empty($gk['last_error_message']) && (strpos($gk['last_error_message'], '503') !== false || stripos($gk['last_error_message'], 'high demand') !== false)) {
-                $keys503Count++;
-            }
+        // 12. Data Kunci Integrasi API & OJS
+        $apiKeysList = [];
+        if ($activeTab === 'api_keys') {
+            $apiKeysList = $db->table('api_keys ak')
+                              ->select('ak.*, u.name as user_name, u.email as user_email')
+                              ->join('users u', 'u.id = ak.user_id', 'left')
+                              ->orderBy('ak.id', 'DESC')
+                              ->limit(50)
+                              ->get()
+                              ->getResultArray();
         }
-        $googleAiDegraded = ($activeGoogleKeysCount > 0 && ($keys503Count / $activeGoogleKeysCount) >= 0.5);
 
-        // 14. Data Analitik Integritas Institusi (Opsi D)
-        $avgSimRow = $db->table('reports')
-                        ->select('AVG(overall_similarity) as avg_similarity, COUNT(id) as total_reports')
-                        ->where('status', 'completed')
-                        ->get()
-                        ->getRowArray();
-        $avgSimilarity = (float) ($avgSimRow['avg_similarity'] ?? 0);
-        $totalReportsCompleted = (int) ($avgSimRow['total_reports'] ?? 0);
-
-        // Distribusi Kategori Integritas
-        $cleanCount = $db->table('reports')->where('status', 'completed')->where('overall_similarity <', 15)->countAllResults();
-        $moderateCount = $db->table('reports')->where('status', 'completed')->where('overall_similarity >=', 15)->where('overall_similarity <', 25)->countAllResults();
-        $substantialCount = $db->table('reports')->where('status', 'completed')->where('overall_similarity >=', 25)->where('overall_similarity <', 40)->countAllResults();
-        $criticalCount = $db->table('reports')->where('status', 'completed')->where('overall_similarity >=', 40)->countAllResults();
-
-        // Tren Bulanan (6 Bulan Terakhir)
-        $monthlyTrends = $db->table('reports')
-                            ->select("DATE_FORMAT(created_at, '%Y-%m') as period, COUNT(id) as total_submissions, AVG(overall_similarity) as avg_sim")
-                            ->where('created_at >=', date('Y-m-d', strtotime('-6 months')))
-                            ->groupBy('period')
-                            ->orderBy('period', 'ASC')
-                            ->get()
-                            ->getResultArray();
-
-        // Sumber Teratas yang Sering Menjadi Rujukan Kemiripan (Tampilkan Judul & Asal Naskah Valid)
-        $topReferencedSources = $db->table('report_sources rs')
-                                   ->select('rs.source_document_id, d.title, d.original_filename, d.author, d.source_type, d.corpus_visibility, d.faculty, d.department, COUNT(rs.id) as match_occurrences, AVG(rs.similarity) as avg_similarity')
-                                   ->join('documents d', 'd.id = rs.source_document_id', 'inner')
-                                   ->where('d.title IS NOT NULL')
-                                   ->where('d.title !=', '')
-                                   ->groupBy('rs.source_document_id, d.title, d.original_filename, d.author, d.source_type, d.corpus_visibility, d.faculty, d.department')
-                                   ->orderBy('match_occurrences', 'DESC')
-                                   ->limit(10)
-                                   ->get()
-                                   ->getResultArray();
-
-        // Metrik Anti-Cheat & Keadilan Akademik (Optimalisasi SQL JSON Extract untuk efisiensi memori)
+        // 13. Data Analitik Integritas Institusi & Analitik Prediktif
+        $avgSimilarity = 0.0;
+        $totalReportsCompleted = 0;
+        $cleanCount = 0;
+        $moderateCount = 0;
+        $substantialCount = 0;
+        $criticalCount = 0;
+        $monthlyTrends = [];
+        $topReferencedSources = [];
         $evasionCount = 0;
         $phantomCount = 0;
         $crossLingualCount = 0;
+        $predictiveAnalytics = [];
 
-        try {
-            $metricRow = $db->query("
-                SELECT 
-                    COUNT(CASE WHEN JSON_EXTRACT(evidence_data, '$.evasion.is_manipulated') = true OR JSON_EXTRACT(evidence_data, '$.evasion.is_manipulated') = 'true' OR JSON_EXTRACT(evidence_data, '$.evasion.is_manipulated') = 1 THEN 1 END) as evasion_cnt,
-                    COUNT(CASE WHEN CAST(JSON_EXTRACT(evidence_data, '$.citation_audit.phantom_citations_count') AS UNSIGNED) > 0 THEN 1 END) as phantom_cnt,
-                    COUNT(CASE WHEN JSON_EXTRACT(evidence_data, '$.cross_lingual.is_cross_lingual_match') = true OR JSON_EXTRACT(evidence_data, '$.cross_lingual.is_cross_lingual_match') = 'true' OR JSON_EXTRACT(evidence_data, '$.cross_lingual.is_cross_lingual_match') = 1 THEN 1 END) as cross_lingual_cnt
-                FROM (
-                    SELECT evidence_data FROM reports WHERE status = 'completed' AND evidence_data IS NOT NULL ORDER BY id DESC LIMIT 100
-                ) sub
-            ")->getRowArray();
+        if ($activeTab === 'analytics') {
+            $avgSimRow = $db->table('reports')
+                            ->select('AVG(overall_similarity) as avg_similarity, COUNT(id) as total_reports')
+                            ->where('status', 'completed')
+                            ->get()
+                            ->getRowArray();
+            $avgSimilarity = (float) ($avgSimRow['avg_similarity'] ?? 0);
+            $totalReportsCompleted = (int) ($avgSimRow['total_reports'] ?? 0);
 
-            $evasionCount = (int) ($metricRow['evasion_cnt'] ?? 0);
-            $phantomCount = (int) ($metricRow['phantom_cnt'] ?? 0);
-            $crossLingualCount = (int) ($metricRow['cross_lingual_cnt'] ?? 0);
-        } catch (\Throwable $e) {
-            log_message('error', 'DashboardController JSON extraction fallback: ' . $e->getMessage());
+            $cleanCount = $db->table('reports')->where('status', 'completed')->where('overall_similarity <', 15)->countAllResults();
+            $moderateCount = $db->table('reports')->where('status', 'completed')->where('overall_similarity >=', 15)->where('overall_similarity <', 25)->countAllResults();
+            $substantialCount = $db->table('reports')->where('status', 'completed')->where('overall_similarity >=', 25)->where('overall_similarity <', 40)->countAllResults();
+            $criticalCount = $db->table('reports')->where('status', 'completed')->where('overall_similarity >=', 40)->countAllResults();
+
+            $monthlyTrends = $db->table('reports')
+                                ->select("DATE_FORMAT(created_at, '%Y-%m') as period, COUNT(id) as total_submissions, AVG(overall_similarity) as avg_sim")
+                                ->where('created_at >=', date('Y-m-d', strtotime('-6 months')))
+                                ->groupBy('period')
+                                ->orderBy('period', 'ASC')
+                                ->get()
+                                ->getResultArray();
+
+            $topReferencedSources = $db->table('report_sources rs')
+                                       ->select('rs.source_document_id, d.title, d.original_filename, d.author, d.source_type, d.corpus_visibility, d.faculty, d.department, COUNT(rs.id) as match_occurrences, AVG(rs.similarity) as avg_similarity')
+                                       ->join('documents d', 'd.id = rs.source_document_id', 'inner')
+                                       ->where('d.title IS NOT NULL')
+                                       ->where('d.title !=', '')
+                                       ->groupBy('rs.source_document_id, d.title, d.original_filename, d.author, d.source_type, d.corpus_visibility, d.faculty, d.department')
+                                       ->orderBy('match_occurrences', 'DESC')
+                                       ->limit(10)
+                                       ->get()
+                                       ->getResultArray();
+
+            try {
+                $metricRow = $db->query("
+                    SELECT 
+                        COUNT(CASE WHEN JSON_EXTRACT(evidence_data, '$.evasion.is_manipulated') = true OR JSON_EXTRACT(evidence_data, '$.evasion.is_manipulated') = 'true' OR JSON_EXTRACT(evidence_data, '$.evasion.is_manipulated') = 1 THEN 1 END) as evasion_cnt,
+                        COUNT(CASE WHEN CAST(JSON_EXTRACT(evidence_data, '$.citation_audit.phantom_citations_count') AS UNSIGNED) > 0 THEN 1 END) as phantom_cnt,
+                        COUNT(CASE WHEN JSON_EXTRACT(evidence_data, '$.cross_lingual.is_cross_lingual_match') = true OR JSON_EXTRACT(evidence_data, '$.cross_lingual.is_cross_lingual_match') = 'true' OR JSON_EXTRACT(evidence_data, '$.cross_lingual.is_cross_lingual_match') = 1 THEN 1 END) as cross_lingual_cnt
+                    FROM (
+                        SELECT evidence_data FROM reports WHERE status = 'completed' AND evidence_data IS NOT NULL ORDER BY id DESC LIMIT 100
+                    ) sub
+                ")->getRowArray();
+
+                $evasionCount = (int) ($metricRow['evasion_cnt'] ?? 0);
+                $phantomCount = (int) ($metricRow['phantom_cnt'] ?? 0);
+                $crossLingualCount = (int) ($metricRow['cross_lingual_cnt'] ?? 0);
+            } catch (\Throwable $e) {
+                log_message('error', 'DashboardController JSON extraction fallback: ' . $e->getMessage());
+            }
+
+            // Peramalan Prediktif hanya dipanggil pada tab analytics
+            $predictiveAnalytics = $this->getPredictiveAnalyticsData();
         }
 
-        // 14. Data Evaluasi Fitur & Testimoni Publik (Fase 1)
-        $voteModel = new \App\Models\FeatureVoteModel();
-        $testimonialModel = new \App\Models\TestimonialModel();
-        $featureStats = $voteModel->getFeatureStats();
-        $recentFeedback = $voteModel->getRecentFeedback(25);
-        $testimonialStats = $testimonialModel->getStats();
+        // 14. Data Evaluasi Fitur & Testimoni Publik
+        $featureStats = [];
+        $recentFeedback = [];
+        $testimonialsList = [];
+        if ($activeTab === 'feedback') {
+            $voteModel = new \App\Models\FeatureVoteModel();
+            $featureStats = $voteModel->getFeatureStats();
+            $recentFeedback = $voteModel->getRecentFeedback(25);
 
-        // Ambil daftar user_id yang pernah membeli paket apa saja
-        $paidUserRows = $db->table('payment_transactions')
-                           ->distinct()
-                           ->select('user_id')
-                           ->whereIn('transaction_status', ['settlement', 'capture'])
-                           ->get()
-                           ->getResultArray();
-        $paidUserMap = array_column($paidUserRows, 'user_id', 'user_id');
-
-        $testimonialsList = $db->table('testimonials t')
-                               ->select('t.*, u.name as user_name, u.email as user_email, u.subscription_tier, d.title as document_title')
-                               ->join('users u', 'u.id = t.user_id', 'left')
-                               ->join('reports r', 'r.id = t.report_id', 'left')
-                               ->join('documents d', 'd.id = r.document_id', 'left')
-                               ->orderBy('t.id', 'DESC')
-                               ->limit(100)
+            $paidUserRows = $db->table('payment_transactions')
+                               ->distinct()
+                               ->select('user_id')
+                               ->whereIn('transaction_status', ['settlement', 'capture'])
                                ->get()
                                ->getResultArray();
+            $paidUserMap = array_column($paidUserRows, 'user_id', 'user_id');
 
-        foreach ($testimonialsList as &$item) {
-            $uId = $item['user_id'];
-            $tier = $item['subscription_tier'] ?? 'free';
-            $item['has_purchased'] = ($uId && (isset($paidUserMap[$uId]) || $tier !== 'free'));
+            $testimonialsList = $db->table('testimonials t')
+                                   ->select('t.*, u.name as user_name, u.email as user_email, u.subscription_tier, d.title as document_title')
+                                   ->join('users u', 'u.id = t.user_id', 'left')
+                                   ->join('reports r', 'r.id = t.report_id', 'left')
+                                   ->join('documents d', 'd.id = r.document_id', 'left')
+                                   ->orderBy('t.id', 'DESC')
+                                   ->limit(100)
+                                   ->get()
+                                   ->getResultArray();
+
+            foreach ($testimonialsList as &$item) {
+                $uId = $item['user_id'];
+                $tier = $item['subscription_tier'] ?? 'free';
+                $item['has_purchased'] = ($uId && (isset($paidUserMap[$uId]) || $tier !== 'free'));
+            }
+            unset($item);
         }
-        // 15. Data Program Duta Kampus & Seleksi Asinkron (Tahap 2, 3, 4, 5, 6)
-        $ambAppModel = new \App\Models\AmbassadorApplicationModel();
-        $ambProfileModel = new \App\Models\AmbassadorProfileModel();
-        $ambStats = $ambAppModel->getAdminStats();
-        $ambApplications = $ambAppModel->orderBy('id', 'DESC')->findAll(100);
-        $ambProfiles = $db->table('ambassador_profiles ap')
-                          ->select('ap.*, u.name as user_name, u.email as user_email, u.institution as user_institution')
-                          ->join('users u', 'u.id = ap.user_id', 'left')
-                          ->orderBy('ap.id', 'DESC')
-                          ->limit(50)
-                          ->get()
-                          ->getResultArray();
 
-        $ambProofs = $db->table('ambassador_activity_proofs ap')
-                        ->select('ap.*, prof.referral_code, u.name as ambassador_name, u.email as ambassador_email, u.institution as ambassador_institution')
-                        ->join('ambassador_profiles prof', 'prof.id = ap.ambassador_id', 'left')
-                        ->join('users u', 'u.id = prof.user_id', 'left')
-                        ->orderBy('ap.id', 'DESC')
-                        ->limit(100)
-                        ->get()
-                        ->getResultArray();
+        // 15. Data Program Duta Kampus & Seleksi Asinkron
+        $ambApplications = [];
+        $ambProfiles = [];
+        $ambProofs = [];
+        if ($activeTab === 'ambassador') {
+            $ambApplications = $ambAppModel->orderBy('id', 'DESC')->findAll(100);
+            $ambProfiles = $db->table('ambassador_profiles ap')
+                              ->select('ap.*, u.name as user_name, u.email as user_email, u.institution as user_institution')
+                              ->join('users u', 'u.id = ap.user_id', 'left')
+                              ->orderBy('ap.id', 'DESC')
+                              ->limit(50)
+                              ->get()
+                              ->getResultArray();
 
-        // 16. Data Analitik Prediktif XGBoost + Gemini AI
-        $predictiveAnalytics = $this->getPredictiveAnalyticsData();
+            $ambProofs = $db->table('ambassador_activity_proofs ap')
+                            ->select('ap.*, prof.referral_code, u.name as ambassador_name, u.email as ambassador_email, u.institution as ambassador_institution')
+                            ->join('ambassador_profiles prof', 'prof.id = ap.ambassador_id', 'left')
+                            ->join('users u', 'u.id = prof.user_id', 'left')
+                            ->orderBy('ap.id', 'DESC')
+                            ->limit(100)
+                            ->get()
+                            ->getResultArray();
+        }
 
         return view('admin/index', [
             'activeTab'            => $activeTab,

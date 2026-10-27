@@ -30,24 +30,35 @@ class DocumentController extends BaseController
 
         $ext = strtolower($file->getClientExtension());
         $mime = $file->getMimeType();
-        $allowedExts = ['pdf', 'docx', 'txt'];
+        $allowedExts = ['pdf', 'docx', 'txt', 'tex'];
         $allowedMimes = [
             'pdf'  => ['application/pdf', 'application/x-pdf'],
             'docx' => ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/zip', 'application/octet-stream'],
-            'txt'  => ['text/plain']
+            'txt'  => ['text/plain'],
+            'tex'  => ['text/x-tex', 'application/x-tex', 'text/plain', 'application/octet-stream']
         ];
 
         if (! in_array($ext, $allowedExts, true) || ! isset($allowedMimes[$ext]) || ! in_array($mime, $allowedMimes[$ext], true)) {
             return $this->response->setStatusCode(415)->setJSON([
                 'status'  => 'error',
-                'message' => 'Hanya format PDF, DOCX, dan TXT yang didukung.'
+                'message' => 'Hanya format PDF, DOCX, TXT, dan LaTeX (.TEX) yang didukung.'
             ]);
         }
 
-        if ($file->getSize() > 30 * 1024 * 1024) {
+        // Proteksi Ruang Penyimpanan Peladen (Minimal sisa 2 GB bebas)
+        $freeDisk = @disk_free_space(WRITEPATH);
+        if ($freeDisk !== false && $freeDisk < 2 * 1024 * 1024 * 1024) {
+            log_message('critical', "Kapasitas disk peladen hampir habis! Sisa ruang: " . round($freeDisk / (1024 * 1024), 2) . " MB");
+            return $this->response->setStatusCode(507)->setJSON([
+                'status'  => 'error',
+                'message' => 'Penyimpanan server sementara penuh untuk memproses berkas baru. Silakan hubungi administrator.'
+            ]);
+        }
+
+        if ($file->getSize() > 64 * 1024 * 1024) {
             return $this->response->setStatusCode(413)->setJSON([
                 'status'  => 'error',
-                'message' => 'Ukuran file maksimal adalah 30 MB.'
+                'message' => 'Ukuran file maksimal adalah 64 MB.'
             ]);
         }
 
@@ -155,14 +166,27 @@ class DocumentController extends BaseController
         $allowed = [
             'application/pdf',
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'text/plain'
+            'text/plain',
+            'text/x-tex',
+            'application/x-tex',
+            'application/octet-stream'
         ];
 
         $mime = $file->getMimeType();
-        if (! in_array($mime, $allowed, true) && ! in_array($file->getClientExtension(), ['pdf', 'docx', 'txt'], true)) {
+        if (! in_array($mime, $allowed, true) && ! in_array($file->getClientExtension(), ['pdf', 'docx', 'txt', 'tex'], true)) {
             return $this->response->setStatusCode(415)->setJSON([
                 'status'  => 'error',
-                'message' => 'Hanya berkas format PDF, DOCX, dan TXT yang didukung.'
+                'message' => 'Hanya berkas format PDF, DOCX, TXT, dan LaTeX (.TEX) yang didukung.'
+            ]);
+        }
+
+        // Proteksi Ruang Penyimpanan Peladen (Minimal sisa 2 GB bebas)
+        $freeDisk = @disk_free_space(WRITEPATH);
+        if ($freeDisk !== false && $freeDisk < 2 * 1024 * 1024 * 1024) {
+            log_message('critical', "Kapasitas disk peladen hampir habis! Sisa ruang: " . round($freeDisk / (1024 * 1024), 2) . " MB");
+            return $this->response->setStatusCode(507)->setJSON([
+                'status'  => 'error',
+                'message' => 'Penyimpanan server sementara penuh untuk memproses berkas baru. Silakan hubungi administrator.'
             ]);
         }
 
@@ -173,10 +197,10 @@ class DocumentController extends BaseController
             ]);
         }
 
-        if ($file->getSize() > 30 * 1024 * 1024) {
+        if ($file->getSize() > 64 * 1024 * 1024) {
             return $this->response->setStatusCode(413)->setJSON([
                 'status'  => 'error',
-                'message' => 'Ukuran berkas maksimal adalah 30 MB.'
+                'message' => 'Ukuran berkas maksimal adalah 64 MB.'
             ]);
         }
 
@@ -612,24 +636,35 @@ class DocumentController extends BaseController
 
         $ext = strtolower($file->getClientExtension());
         $mime = $file->getMimeType();
-        $allowedExts = ['pdf', 'docx', 'txt'];
+        $allowedExts = ['pdf', 'docx', 'txt', 'tex'];
         $allowedMimes = [
             'pdf'  => ['application/pdf', 'application/x-pdf'],
             'docx' => ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/zip', 'application/octet-stream'],
-            'txt'  => ['text/plain']
+            'txt'  => ['text/plain'],
+            'tex'  => ['text/x-tex', 'application/x-tex', 'text/plain', 'application/octet-stream']
         ];
 
         if (! in_array($ext, $allowedExts, true) || ! isset($allowedMimes[$ext]) || ! in_array($mime, $allowedMimes[$ext], true)) {
             return $this->response->setStatusCode(415)->setJSON([
                 'status'  => 'error',
-                'message' => 'Hanya format PDF, DOCX, dan TXT yang didukung.'
+                'message' => 'Hanya format PDF, DOCX, TXT, dan LaTeX (.TEX) yang didukung.'
             ]);
         }
 
-        if ($file->getSize() > 30 * 1024 * 1024) {
+        // Proteksi Ruang Penyimpanan Peladen (Minimal sisa 2 GB bebas)
+        $freeDisk = @disk_free_space(WRITEPATH);
+        if ($freeDisk !== false && $freeDisk < 2 * 1024 * 1024 * 1024) {
+            log_message('critical', "Kapasitas disk peladen hampir habis! Sisa ruang: " . round($freeDisk / (1024 * 1024), 2) . " MB");
+            return $this->response->setStatusCode(507)->setJSON([
+                'status'  => 'error',
+                'message' => 'Penyimpanan server sementara penuh untuk memproses berkas baru. Silakan hubungi administrator.'
+            ]);
+        }
+
+        if ($file->getSize() > 64 * 1024 * 1024) {
             return $this->response->setStatusCode(413)->setJSON([
                 'status'  => 'error',
-                'message' => 'Ukuran berkas maksimal adalah 30 MB.'
+                'message' => 'Ukuran berkas maksimal adalah 64 MB.'
             ]);
         }
 

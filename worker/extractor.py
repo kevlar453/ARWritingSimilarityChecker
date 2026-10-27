@@ -44,6 +44,98 @@ PUA_SYMBOL_MAP = {
     0xF057: 'Ω',   # Omega
 }
 
+def detect_and_normalize_code_blocks(text: str) -> str:
+    """
+    Mendeteksi dan mengisolasi blok kode pemrograman (Java, Python, C++, PHP, SQL, HTML/JS)
+    agar tidak memicu false positive kemiripan leksikal n-gram pada karya ilmiah.
+    """
+    if not text:
+        return ""
+
+    # 1. Tangani blok kode berpagar (Fenced Code Blocks: ```lang ... ``` atau ~~~ ... ~~~)
+    fenced_pattern = re.compile(
+        r'```([a-zA-Z0-9_\-\+\#]*)\s*\n(.*?)```',
+        re.DOTALL
+    )
+    def _replace_fenced(m):
+        lang = m.group(1).strip()
+        lang_label = f" ({lang})" if lang else ""
+        return f"\n\n[💻 Blok Kode Program{lang_label}]\n\n"
+    text = fenced_pattern.sub(_replace_fenced, text)
+
+    # 2. Tangani blok tag HTML <pre><code> ... </code></pre>
+    html_code_pattern = re.compile(
+        r'<pre[^>]*><code[^>]*>(.*?)</code></pre>',
+        re.DOTALL | re.IGNORECASE
+    )
+    text = html_code_pattern.sub("\n\n[💻 Blok Kode Program]\n\n", text)
+
+    # 3. Deteksi blok kode mentah multi-baris (Raw Multi-line Code Listings)
+    code_indicators = [
+        r'^\s*(?:public|private|protected|static|final|abstract|class|interface|enum)\b',
+        r'^\s*(?:def|async\s+def|class|lambda)\b.*:$',
+        r'^\s*#(?:include|define|pragma|ifndef|endif)\b',
+        r'^\s*(?:import\s+[a-zA-Z0-9_\.]+|from\s+[a-zA-Z0-9_\.]+\s+import)\b',
+        r'^\s*(?:package\s+[a-zA-Z0-9_\.]+|using\s+[a-zA-Z0-9_\.]+;)',
+        r'^\s*<\?php\b',
+        r'^\s*(?:SELECT|INSERT\s+INTO|UPDATE|DELETE\s+FROM|CREATE\s+TABLE|ALTER\s+TABLE|DROP\s+TABLE)\b',
+        r'^\s*(?:function\s+[a-zA-Z0-9_]+\s*\(|const\s+[a-zA-Z0-9_]+\s*=|let\s+[a-zA-Z0-9_]+\s*=|var\s+[a-zA-Z0-9_]+\s*=)',
+        r'^\s*(?:for|while|foreach)\s*\(.*?\)\s*\{?$',
+        r'^\s*(?:if|else\s+if|elif)\s*\(.*?\)\s*\{?$',
+        r'^\s*(?:return|echo|print|System\.out\.println|console\.log)\b.*[;\)]\s*$',
+        r'^\s*[\{\}]\s*$',
+        r'[;\{\}]\s*$',
+    ]
+    compiled_indicators = [re.compile(p, re.IGNORECASE) for p in code_indicators]
+
+    def is_code_line(line: str) -> bool:
+        s = line.strip()
+        if not s:
+            return False
+        # Komentar kode
+        if s.startswith('//') or s.startswith('/*') or s.startswith('* ') or (s.startswith('#') and not s.startswith('# ')):
+            return True
+        for ci in compiled_indicators:
+            if ci.search(line):
+                return True
+        return False
+
+    lines = text.split('\n')
+    new_lines = []
+    code_buffer = []
+
+    for line in lines:
+        if is_code_line(line):
+            code_buffer.append(line)
+        else:
+            if len(code_buffer) >= 4:
+                first_few = " ".join(code_buffer[:2])
+                lang_guess = ""
+                if "def " in first_few or ("import " in first_few and ":" in "".join(code_buffer)):
+                    lang_guess = "Python"
+                elif "public class" in first_few or "System.out" in "".join(code_buffer):
+                    lang_guess = "Java"
+                elif "<?php" in first_few or "->" in first_few or "$" in first_few:
+                    lang_guess = "PHP"
+                elif "SELECT " in first_few.upper() or "CREATE TABLE" in first_few.upper():
+                    lang_guess = "SQL"
+                elif "#include" in first_few:
+                    lang_guess = "C/C++"
+                
+                label = f" ({lang_guess})" if lang_guess else ""
+                new_lines.append(f"\n[💻 Blok Kode Program{label}]\n")
+            elif code_buffer:
+                new_lines.extend(code_buffer)
+            code_buffer = []
+            new_lines.append(line)
+
+    if len(code_buffer) >= 4:
+        new_lines.append("\n[💻 Blok Kode Program]\n")
+    elif code_buffer:
+        new_lines.extend(code_buffer)
+
+    return '\n'.join(new_lines)
+
 def clean_extracted_text(text: str) -> str:
     """
     Membersihkan teks hasil ekstraksi dari karakter PUA (Private Use Area),
@@ -127,6 +219,9 @@ def clean_extracted_text(text: str) -> str:
         return '\n\n[📐 Rumus: ' + raw.replace('\n', ' ') + ']\n\n'
 
     result = math_pattern.sub(_replace_math_formula, result)
+
+    # Deteksi dan isolasi blok kode pemrograman agar tidak memicu false positive
+    result = detect_and_normalize_code_blocks(result)
 
     # Rapikan spasi vertikal berlebih dari pecahan/notasi rumus matematika
     result = re.sub(r'[ \t]*\n[ \t]*\n(?:[ \t]*\n)+', '\n\n', result)
@@ -384,6 +479,37 @@ def extract_pdf(path: str) -> list[dict]:
             "page_number": index + 1,
             "text": clean_extracted_text(text)
         })
+
+    # Deteksi dan tangani naskah PDF hasil pindaian (scanned image) tanpa lapisan teks
+    total_words = sum(len(p["text"].split()) for p in pages)
+    if total_words < 15 and len(doc) > 0:
+        try:
+            import io
+            import pytesseract
+            from PIL import Image
+
+            if os.path.exists('/usr/bin/tesseract'):
+                pytesseract.pytesseract.tesseract_cmd = '/usr/bin/tesseract'
+
+            ocr_pages = []
+            for idx, p in enumerate(doc):
+                pix = p.get_pixmap(dpi=150)
+                img_bytes = pix.tobytes("png")
+                pil_img = Image.open(io.BytesIO(img_bytes))
+                ocr_raw = pytesseract.image_to_string(pil_img, lang="ind+eng")
+                ocr_clean = clean_extracted_text(ocr_raw)
+                ocr_pages.append({
+                    "page_number": idx + 1,
+                    "text": ocr_clean
+                })
+
+            ocr_words = sum(len(p["text"].split()) for p in ocr_pages)
+            if ocr_words >= 15:
+                pages = ocr_pages
+        except Exception:
+            # Fallback jika Tesseract OCR gagal dieksekusi
+            pass
+
     doc.close()
     return pages
 
@@ -488,6 +614,110 @@ def extract_text_file(path: str) -> list[dict]:
         "text": clean_extracted_text(text)
     }]
 
+def extract_tex(path: str) -> list[dict]:
+    """
+    Mengekstrak dan membersihkan naskah karya ilmiah dari berkas LaTeX (.tex).
+    Menghilangkan baris komentar, preamble, macro penataan letak, serta mengisolasi
+    blok kode pemrograman dan rumus matematika agar tidak memicu false positive.
+    """
+    with open(path, "rb") as f:
+        raw_bytes = f.read()
+
+    encodings = ["utf-8-sig", "utf-8", "cp1252", "latin-1"]
+    text = ""
+    for enc in encodings:
+        try:
+            text = raw_bytes.decode(enc)
+            break
+        except (UnicodeDecodeError, LookupError):
+            continue
+    else:
+        text = raw_bytes.decode("utf-8", errors="replace")
+
+    # 1. Hapus komentar LaTeX (% komentar, tetapi bukan \% tanda persen)
+    text = re.sub(r'(?<!\\)%.*$', '', text, flags=re.MULTILINE)
+
+    # 2. Potong preamble sebelum \begin{document} jika ada
+    doc_start = text.find(r'\begin{document}')
+    if doc_start != -1:
+        text = text[doc_start + len(r'\begin{document}'):]
+
+    # Potong setelah \end{document} jika ada
+    doc_end = text.find(r'\end{document}')
+    if doc_end != -1:
+        text = text[:doc_end]
+
+    # 3. Tangani blok kode program pada LaTeX (lstlisting, minted, verbatim)
+    text = re.sub(r'\\begin\{(?:lstlisting|minted|verbatim)\*?\}(?:\[.*?\])?(?:\{.*?\})?(.*?)\\end\{(?:lstlisting|minted|verbatim)\*?\}',
+                  r'\n\n[💻 Blok Kode Program]\n\n', text, flags=re.DOTALL)
+
+    # 4. Tangani blok rumus matematika multi-baris (equation, align, gather, flalign, dsb.)
+    text = re.sub(r'\\begin\{(?:equation|align|gather|flalign|multline|bmatrix|pmatrix|matrix)\*?\}(?:\[.*?\])?(.*?)\\end\{(?:equation|align|gather|flalign|multline|bmatrix|pmatrix|matrix)\*?\}',
+                  r'\n\n[📐 Rumus: Equation]\n\n', text, flags=re.DOTALL)
+    text = re.sub(r'\\\[(.*?)\\\]', r'\n\n[📐 Rumus: Equation]\n\n', text, flags=re.DOTALL)
+    text = re.sub(r'\$\$(.*?)\$\$', r'\n\n[📐 Rumus: Equation]\n\n', text, flags=re.DOTALL)
+
+    # 5. Tangani tabel LaTeX (tabular) menjadi tabel markdown
+    def _convert_tabular(m):
+        raw_tab = m.group(1)
+        clean_tab = re.sub(r'\\(?:hline|toprule|midrule|bottomrule|cline\{.*?\})', '', raw_tab)
+        rows = [r.strip() for r in clean_tab.split(r'\\') if r.strip()]
+        table_lines = []
+        header_done = False
+        for r in rows:
+            cells = [re.sub(r'\\[a-zA-Z]+', '', c).strip() for c in r.split('&')]
+            if any(cells):
+                table_lines.append('| ' + ' | '.join(cells) + ' |')
+                if not header_done:
+                    table_lines.append('| ' + ' | '.join(['---'] * len(cells)) + ' |')
+                    header_done = True
+        return '\n\n' + '\n'.join(table_lines) + '\n\n' if table_lines else '\n'
+
+    text = re.sub(r'\\begin\{tabular\*?\}(?:\{.*?\})?(.*?)\\end\{tabular\*?\}', _convert_tabular, text, flags=re.DOTALL)
+
+    # 6. Tangani sitasi dan rujukan silang
+    text = re.sub(r'\\(?:cite|citep|citet|parencite|textcite)(?:\[.*?\])?\{([^}]+)\}', r'(\1)', text)
+    text = re.sub(r'\\(?:ref|pageref|autoref|eqref)\{([^}]+)\}', r'[\1]', text)
+
+    # 7. Tangani heading hierarkis (\chapter, \section, \subsection, dsb.)
+    text = re.sub(r'\\(?:chapter|section|subsection|subsubsection|paragraph)\*?\{([^}]+)\}', r'\n\n\1\n', text)
+
+    # 8. Tangani formatting font (\textbf, \textit, \emph, \underline, dll.)
+    text = re.sub(r'\\(?:textbf|textit|emph|underline|text|mathrm|textsf)\{([^}]+)\}', r'\1', text)
+
+    # 9. Tangani keterangan gambar/tabel dan bersihkan kontrol struktural
+    text = re.sub(r'\\caption\{([^}]+)\}', r'\nKeterangan: \1\n', text)
+    text = re.sub(r'\\label\{[^}]+\}', '', text)
+    text = re.sub(r'\\(?:newpage|clearpage|cleardoublepage|noindent|centering|raggedright|raggedleft|bigskip|medskip|smallskip|tableofcontents|listoffigures|listoftables)\b', '', text)
+    text = re.sub(r'\\vspace\*?\{[^}]+\}', '', text)
+    text = re.sub(r'\\hspace\*?\{[^}]+\}', '', text)
+
+    # 10. Normalisasi karakter escape khas LaTeX
+    latex_escapes = {
+        r'\%': '%',
+        r'\&': '&',
+        r'\$': '$',
+        r'\#': '#',
+        r'\_': '_',
+        r'\{': '{',
+        r'\}': '}',
+        r'~': ' ',
+    }
+    for esc, rep in latex_escapes.items():
+        text = text.replace(esc, rep)
+
+    # 11. Hapus macro sisa yang belum tertangani
+    text = re.sub(r'\\[a-zA-Z]+\*?', '', text)
+
+    # 12. Rapikan spasi berlebih
+    text = re.sub(r'[ \t]+', ' ', text)
+    text = re.sub(r'\n\s*\n\s*\n+', '\n\n', text)
+
+    return [{
+        "page_number": 1,
+        "text": clean_extracted_text(text)
+    }]
+
 def extract_document(path: str, mime_type: str | None = None) -> list[dict]:
     ext = os.path.splitext(path)[1].lower()
     if ext == ".pdf" or mime_type == "application/pdf":
@@ -496,6 +726,8 @@ def extract_document(path: str, mime_type: str | None = None) -> list[dict]:
         return extract_docx(path)
     elif ext == ".txt" or mime_type == "text/plain":
         return extract_text_file(path)
+    elif ext in [".tex", ".latex"] or (mime_type and ("tex" in mime_type or "latex" in mime_type)):
+        return extract_tex(path)
     else:
         raise ValueError(f"Format dokumen tidak didukung: {ext} ({mime_type})")
 
@@ -531,7 +763,7 @@ def _parse_pdf_date(value):
 
 def extract_document_metadata(path: str, mime_type: str | None = None) -> dict:
     """
-    Membaca tanggal dibuat/diubah dari metadata berkas (docx / pdf).
+    Membaca tanggal dibuat/diubah dari metadata berkas (docx / pdf / tex / txt).
     Metadata dapat diubah atau terbawa dari templat, jadi hasilnya HANYA bersifat pendukung:
     dipakai untuk membatalkan klaim indikasi-AI berbasis LLM, bukan untuk membuktikan keaslian.
     """
@@ -551,6 +783,11 @@ def extract_document_metadata(path: str, mime_type: str | None = None) -> dict:
             created, modified = _parse_pdf_date(md.get("creationDate")), _parse_pdf_date(md.get("modDate"))
             author = md.get("author")
             doc.close()
+        elif ext in [".tex", ".latex", ".txt"] or (mime_type and ("tex" in mime_type or "text" in mime_type)):
+            mtime = os.path.getmtime(path)
+            ctime = os.path.getctime(path)
+            modified = datetime.fromtimestamp(mtime, tz=timezone.utc)
+            created = datetime.fromtimestamp(ctime, tz=timezone.utc)
     except Exception:
         pass
 

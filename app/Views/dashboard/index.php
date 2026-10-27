@@ -409,16 +409,25 @@
             <!-- Upload Box -->
             <div class="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-xs">
                 <h2 class="text-base sm:text-lg font-bold text-slate-800 mb-1.5">Unggah Karya Ilmiah</h2>
-                <p class="text-xs sm:text-sm text-slate-500 mb-4">Pilih file naskah skripsi, jurnal, tesis, atau makalah (PDF, DOCX, TXT) untuk diuji terhadap korpus rujukan institusi.</p>
+                <p class="text-xs sm:text-sm text-slate-500 mb-4">Pilih file naskah skripsi, jurnal, tesis, atau makalah (PDF, DOCX, TXT, TEX) untuk diuji terhadap korpus rujukan institusi.</p>
                 
                 <form id="uploadSubmissionForm" class="space-y-4" enctype="multipart/form-data">
                     <div id="submissionDropZone" class="border-2 border-dashed border-slate-300 hover:border-indigo-400 transition-colors rounded-xl p-5 sm:p-6 text-center cursor-pointer bg-slate-50/50" onclick="document.getElementById('submissionFileInput').click()">
-                        <input type="file" id="submissionFileInput" name="document" multiple accept=".pdf,.docx,.txt" class="hidden" onchange="handleSubmissionFilesSelect(this)">
+                        <input type="file" id="submissionFileInput" name="document" multiple accept=".pdf,.docx,.txt,.tex" class="hidden" onchange="handleSubmissionFilesSelect(this)">
                         <div class="w-12 h-12 mx-auto mb-2 sm:mb-3 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-2xl">
                             📤
                         </div>
                         <p id="submissionFileLabel" class="text-xs sm:text-sm font-semibold text-slate-700">Klik atau geser (drag &amp; drop) berkas naskah di sini</p>
-                        <p class="text-[11px] text-slate-400 mt-1">Mendukung Batch Upload sekaligus (PDF, DOCX, TXT) • Maksimal 30 MB per berkas</p>
+                        <p class="text-[11px] text-slate-400 mt-1">Mendukung Batch Upload sekaligus (PDF, DOCX, TXT, LaTeX .TEX) • Maksimal 64 MB per berkas</p>
+                    </div>
+
+                    <!-- Panduan Cerdas untuk Mahasiswa Rumpun Teknik & Sosial -->
+                    <div class="bg-indigo-50/70 border border-indigo-100 rounded-xl p-3 text-[11px] text-indigo-950 flex items-start gap-2.5">
+                        <span class="text-base leading-none">💡</span>
+                        <div class="space-y-0.5 leading-relaxed">
+                            <span class="font-bold text-indigo-900">Tips untuk Mahasiswa Teknik, MIPA, &amp; Sosial:</span>
+                            <p class="text-slate-600">Gambar, skema rangkaian, grafik data, dan diagram alur dapat tetap disertakan dalam naskah tanpa perlu dihapus. Blok kode pemrograman, rumus matematika, dan seksi lampiran akan otomatis dinormalisasi oleh sistem agar tidak memicu kemiripan semu (*false positive*).</p>
+                        </div>
                     </div>
 
                     <!-- Selected Files Preview Container (Batch List) -->
@@ -1662,12 +1671,12 @@
                 
                 <form id="uploadCorpusForm" class="space-y-4" enctype="multipart/form-data">
                     <div class="border-2 border-dashed border-slate-300 hover:border-emerald-400 transition-colors rounded-xl p-5 sm:p-6 text-center cursor-pointer bg-slate-50/50" onclick="document.getElementById('corpusFileInput').click()">
-                        <input type="file" id="corpusFileInput" name="document" accept=".pdf,.docx,.txt" class="hidden" onchange="handleFileSelect(this, 'corpusFileLabel')">
+                        <input type="file" id="corpusFileInput" name="document" accept=".pdf,.docx,.txt,.tex" class="hidden" onchange="handleFileSelect(this, 'corpusFileLabel')">
                         <div class="w-12 h-12 mx-auto mb-2 sm:mb-3 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl">
                             📚
                         </div>
-                        <p id="corpusFileLabel" class="text-xs sm:text-sm font-semibold text-slate-700">Pilih file naskah rujukan (Skripsi/Tesis/Jurnal)</p>
-                        <p class="text-[11px] text-slate-400 mt-1">PDF, DOCX, TXT hingga 30 MB</p>
+                        <p id="corpusFileLabel" class="text-xs sm:text-sm font-semibold text-slate-700">Pilih file naskah rujukan (Skripsi/Tesis/Jurnal/LaTeX)</p>
+                        <p class="text-[11px] text-slate-400 mt-1">PDF, DOCX, TXT, TEX hingga 64 MB</p>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -3118,9 +3127,9 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Pilih Berkas Naskah (PDF, DOCX, TXT):</label>
-                    <input type="file" name="corpus_document" id="contributeFileInput" accept=".pdf,.docx,.txt" required class="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer">
-                    <p class="text-[10px] text-slate-400 mt-1">Maksimal 30 MB per berkas. Sistem memverifikasi konten tanpa duplikasi.</p>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Pilih Berkas Naskah (PDF, DOCX, TXT, TEX):</label>
+                    <input type="file" name="corpus_document" id="contributeFileInput" accept=".pdf,.docx,.txt,.tex" required class="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer">
+                    <p class="text-[10px] text-slate-400 mt-1">Maksimal 64 MB per berkas. Sistem memverifikasi konten tanpa duplikasi.</p>
                 </div>
 
                 <div id="contributeAlert" class="hidden p-3 rounded-xl text-xs"></div>
