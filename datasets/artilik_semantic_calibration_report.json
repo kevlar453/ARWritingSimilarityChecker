@@ -1,0 +1,2515 @@
+{
+  "summary": {
+    "benchmark_name": "AR Tilik Semantic Paraphrase Calibration Suite",
+    "timestamp": "2026-10-28 02:11:46",
+    "total_cases": 80,
+    "thresholds_evaluated": [
+      0.7,
+      0.75,
+      0.8
+    ],
+    "group_counts": {
+      "LIGHT_PARAPHRASE": 15,
+      "MODERATE_PARAPHRASE": 15,
+      "AGGRESSIVE_PARAPHRASE": 15,
+      "CLEAN_NEGATIVE_CONTROL": 20,
+      "CROSS_LINGUAL": 15
+    },
+    "threshold_metrics": {
+      "0.7": {
+        "threshold": 0.7,
+        "TP": 44,
+        "FP": 0,
+        "FN": 16,
+        "TN": 20,
+        "accuracy_pct": 80.0,
+        "precision_pct": 100.0,
+        "recall_pct": 73.33,
+        "f1_score": 0.8462,
+        "clean_false_positive_rate_pct": 0.0
+      },
+      "0.75": {
+        "threshold": 0.75,
+        "TP": 37,
+        "FP": 0,
+        "FN": 23,
+        "TN": 20,
+        "accuracy_pct": 71.25,
+        "precision_pct": 100.0,
+        "recall_pct": 61.67,
+        "f1_score": 0.7629,
+        "clean_false_positive_rate_pct": 0.0
+      },
+      "0.8": {
+        "threshold": 0.8,
+        "TP": 32,
+        "FP": 0,
+        "FN": 28,
+        "TN": 20,
+        "accuracy_pct": 65.0,
+        "precision_pct": 100.0,
+        "recall_pct": 53.33,
+        "f1_score": 0.6957,
+        "clean_false_positive_rate_pct": 0.0
+      }
+    },
+    "group_breakdown": {
+      "LIGHT_PARAPHRASE": {
+        "count": 15,
+        "avg_lexical_similarity_pct": 0.24,
+        "avg_semantic_similarity_pct": 88.9,
+        "detection_rate_at_0_70": 93.3,
+        "detection_rate_at_0_75": 93.3,
+        "detection_rate_at_0_80": 93.3
+      },
+      "MODERATE_PARAPHRASE": {
+        "count": 15,
+        "avg_lexical_similarity_pct": 0.0,
+        "avg_semantic_similarity_pct": 75.95,
+        "detection_rate_at_0_70": 73.3,
+        "detection_rate_at_0_75": 53.3,
+        "detection_rate_at_0_80": 26.7
+      },
+      "AGGRESSIVE_PARAPHRASE": {
+        "count": 15,
+        "avg_lexical_similarity_pct": 0.0,
+        "avg_semantic_similarity_pct": 67.18,
+        "detection_rate_at_0_70": 33.3,
+        "detection_rate_at_0_75": 6.7,
+        "detection_rate_at_0_80": 6.7
+      },
+      "CLEAN_NEGATIVE_CONTROL": {
+        "count": 20,
+        "avg_lexical_similarity_pct": 0.0,
+        "avg_semantic_similarity_pct": 30.68,
+        "detection_rate_at_0_70": 0.0,
+        "detection_rate_at_0_75": 0.0,
+        "detection_rate_at_0_80": 0.0
+      },
+      "CROSS_LINGUAL": {
+        "count": 15,
+        "avg_lexical_similarity_pct": 0.0,
+        "avg_semantic_similarity_pct": 85.28,
+        "detection_rate_at_0_70": 93.3,
+        "detection_rate_at_0_75": 93.3,
+        "detection_rate_at_0_80": 86.7
+      }
+    },
+    "cross_lingual_metrics": {
+      "ID-EN": {
+        "count": 3,
+        "avg_cosine": 0.8009,
+        "avg_similarity_pct": 80.09,
+        "passed_at_0_75": "2/3",
+        "status": "VALIDATED"
+      },
+      "ID-AR": {
+        "count": 3,
+        "avg_cosine": 0.883,
+        "avg_similarity_pct": 88.3,
+        "passed_at_0_75": "3/3",
+        "status": "VALIDATED"
+      },
+      "ID-ZH": {
+        "count": 3,
+        "avg_cosine": 0.909,
+        "avg_similarity_pct": 90.9,
+        "passed_at_0_75": "3/3",
+        "status": "VALIDATED"
+      },
+      "ID-NL": {
+        "count": 3,
+        "avg_cosine": 0.805,
+        "avg_similarity_pct": 80.5,
+        "passed_at_0_75": "3/3",
+        "status": "VALIDATED"
+      },
+      "ID-DE": {
+        "count": 3,
+        "avg_cosine": 0.8661,
+        "avg_similarity_pct": 86.61,
+        "passed_at_0_75": "3/3",
+        "status": "VALIDATED"
+      }
+    },
+    "mismatches_and_failures": [
+      {
+        "case_id": "SEM-LGT-014",
+        "group": "LIGHT_PARAPHRASE",
+        "domain": "Psikologi Sosial",
+        "is_plagiarized": true,
+        "semantic_cosine": 0.6147000193595886,
+        "lexical_similarity_pct": 0.0,
+        "fp_thresholds": [],
+        "fn_thresholds": [
+          "0.7",
+          "0.75",
+          "0.8"
+        ]
+      },
+      {
+        "case_id": "SEM-MOD-001",
+        "group": "MODERATE_PARAPHRASE",
+        "domain": "Kecerdasan Buatan",
+        "is_plagiarized": true,
+        "semantic_cosine": 0.7882999777793884,
+        "lexical_similarity_pct": 0.0,
+        "fp_thresholds": [],
+        "fn_thresholds": [
+          "0.8"
+        ]
+      },
+      {
+        "case_id": "SEM-MOD-003",
+        "group": "MODERATE_PARAPHRASE",
+        "domain": "Sains Data",
+        "is_plagiarized": true,
+        "semantic_cosine": 0.6762999892234802,
+        "lexical_similarity_pct": 0.0,
+        "fp_thresholds": [],
+        "fn_thresholds": [
+          "0.7",
+          "0.75",
+          "0.8"
+        ]
+      },
+      {
+        "case_id": "SEM-MOD-006",
+        "group": "MODERATE_PARAPHRASE",
+        "domain": "Hukum Bisnis",
+        "is_plagiarized": true,
+        "semantic_cosine": 0.5684999823570251,
+        "lexical_similarity_pct": 0.0,
+        "fp_thresholds": [],
+        "fn_thresholds": [
+          "0.7",
+          "0.75",
+          "0.8"
+        ]
+      },
+      {
+        "case_id": "SEM-MOD-007",
+        "group": "MODERATE_PARAPHRASE",
+        "domain": "Sosiologi Agama",
+        "is_plagiarized": true,
+        "semantic_cosine": 0.7300000190734863,
+        "lexical_similarity_pct": 0.0,
+        "fp_thresholds": [],
+        "fn_thresholds": [
+          "0.75",
+          "0.8"
+        ]
+      },
+      {
+        "case_id": "SEM-MOD-008",
+        "group": "MODERATE_PARAPHRASE",
+        "domain": "Teknik Kimia",
+        "is_plagiarized": true,
+        "semantic_cosine": 0.7954999804496765,
+        "lexical_similarity_pct": 0.0,
+        "fp_thresholds": [],
+        "fn_thresholds": [
+          "0.8"
+        ]
+      },
+      {
+        "case_id": "SEM-MOD-010",
+        "group": "MODERATE_PARAPHRASE",
+        "domain": "Hubungan Internasional",
+        "is_plagiarized": true,
+        "semantic_cosine": 0.7290999889373779,
+        "lexical_similarity_pct": 0.0,
+        "fp_thresholds": [],
+        "fn_thresholds": [
+          "0.75",
+          "0.8"
+        ]
+      },
+      {
+        "case_id": "SEM-MOD-011",
+        "group": "MODERATE_PARAPHRASE",
+        "domain": "Manajemen Rantai Pasok",
+        "is_plagiarized": true,
+        "semantic_cosine": 0.7998999953269958,
+        "lexical_similarity_pct": 0.0,
+        "fp_thresholds": [],
+        "fn_thresholds": [
+          "0.8"
+        ]
+      },
+      {
+        "case_id": "SEM-MOD-012",
+        "group": "MODERATE_PARAPHRASE",
+        "domain": "Linguistik Komputasional",
+        "is_plagiarized": true,
+        "semantic_cosine": 0.6409000158309937,
+        "lexical_similarity_pct": 0.0,
+        "fp_thresholds": [],
+        "fn_thresholds": [
+          "0.7",
+          "0.75",
+          "0.8"
+        ]
+      },
+      {
+        "case_id": "SEM-MOD-013",
+        "group": "MODERATE_PARAPHRASE",
+        "domain": "Teknik Sipil",
+        "is_plagiarized": true,
+        "semantic_cosine": 0.6705999970436096,
+        "lexical_similarity_pct": 0.0,
+        "fp_thresholds": [],
+        "fn_thresholds": [
+          "0.7",
+          "0.75",
+          "0.8"
+        ]
+      },
+      {
+        "case_id": "SEM-MOD-014",
+        "group": "MODERATE_PARAPHRASE",
+        "domain": "Psikologi Perkembangan",
+        "is_plagiarized": true,
+        "semantic_cosine": 0.7924000024795532,
+        "lexical_similarity_pct": 0.0,
+        "fp_thresholds": [],
+        "fn_thresholds": [
+          "0.8"
+        ]
+      },
+      {
+        "case_id": "SEM-MOD-015",
+        "group": "MODERATE_PARAPHRASE",
+        "domain": "Arkeologi Maritim",
+        "is_plagiarized": true,
+        "semantic_cosine": 0.733299970626831,
+        "lexical_similarity_pct": 0.0,
+        "fp_thresholds": [],
+        "fn_thresholds": [
+          "0.75",
+          "0.8"
+        ]
+      },
+      {
+        "case_id": "SEM-AGR-001",
+        "group": "AGGRESSIVE_PARAPHRASE",
+        "domain": "Ilmu Lingkungan / Ekologi",
+        "is_plagiarized": true,
+        "semantic_cosine": 0.6937999725341797,
+        "lexical_similarity_pct": 0.0,
+        "fp_thresholds": [],
+        "fn_thresholds": [
+          "0.7",
+          "0.75",
+          "0.8"
+        ]
+      },
+      {
+        "case_id": "SEM-AGR-002",
+        "group": "AGGRESSIVE_PARAPHRASE",
+        "domain": "Ekonomi Publik",
+        "is_plagiarized": true,
+        "semantic_cosine": 0.6503999829292297,
+        "lexical_similarity_pct": 0.0,
+        "fp_thresholds": [],
+        "fn_thresholds": [
+          "0.7",
+          "0.75",
+          "0.8"
+        ]
+      },
+      {
+        "case_id": "SEM-AGR-003",
+        "group": "AGGRESSIVE_PARAPHRASE",
+        "domain": "Kriptografi & Keamanan",
+        "is_plagiarized": true,
+        "semantic_cosine": 0.694599986076355,
+        "lexical_similarity_pct": 0.0,
+        "fp_thresholds": [],
+        "fn_thresholds": [
+          "0.7",
+          "0.75",
+          "0.8"
+        ]
+      },
+      {
+        "case_id": "SEM-AGR-004",
+        "group": "AGGRESSIVE_PARAPHRASE",
+        "domain": "Gizi & Imunologi",
+        "is_plagiarized": true,
+        "semantic_cosine": 0.7024999856948853,
+        "lexical_similarity_pct": 0.0,
+        "fp_thresholds": [],
+        "fn_thresholds": [
+          "0.75",
+          "0.8"
+        ]
+      },
+      {
+        "case_id": "SEM-AGR-005",
+        "group": "AGGRESSIVE_PARAPHRASE",
+        "domain": "Ilmu Politik",
+        "is_plagiarized": true,
+        "semantic_cosine": 0.6409000158309937,
+        "lexical_similarity_pct": 0.0,
+        "fp_thresholds": [],
+        "fn_thresholds": [
+          "0.7",
+          "0.75",
+          "0.8"
+        ]
+      },
+      {
+        "case_id": "SEM-AGR-006",
+        "group": "AGGRESSIVE_PARAPHRASE",
+        "domain": "Teknologi Bahan",
+        "is_plagiarized": true,
+        "semantic_cosine": 0.5705000162124634,
+        "lexical_similarity_pct": 0.0,
+        "fp_thresholds": [],
+        "fn_thresholds": [
+          "0.7",
+          "0.75",
+          "0.8"
+        ]
+      },
+      {
+        "case_id": "SEM-AGR-007",
+        "group": "AGGRESSIVE_PARAPHRASE",
+        "domain": "Hukum Perlindungan Data",
+        "is_plagiarized": true,
+        "semantic_cosine": 0.6299999952316284,
+        "lexical_similarity_pct": 0.0,
+        "fp_thresholds": [],
+        "fn_thresholds": [
+          "0.7",
+          "0.75",
+          "0.8"
+        ]
+      },
+      {
+        "case_id": "SEM-AGR-008",
+        "group": "AGGRESSIVE_PARAPHRASE",
+        "domain": "Farmakologi Onkologi",
+        "is_plagiarized": true,
+        "semantic_cosine": 0.5120000243186951,
+        "lexical_similarity_pct": 0.0,
+        "fp_thresholds": [],
+        "fn_thresholds": [
+          "0.7",
+          "0.75",
+          "0.8"
+        ]
+      },
+      {
+        "case_id": "SEM-AGR-009",
+        "group": "AGGRESSIVE_PARAPHRASE",
+        "domain": "Etika Rekayasa AI",
+        "is_plagiarized": true,
+        "semantic_cosine": 0.7426999807357788,
+        "lexical_similarity_pct": 0.0,
+        "fp_thresholds": [],
+        "fn_thresholds": [
+          "0.75",
+          "0.8"
+        ]
+      },
+      {
+        "case_id": "SEM-AGR-010",
+        "group": "AGGRESSIVE_PARAPHRASE",
+        "domain": "Ekologi Kelautan",
+        "is_plagiarized": true,
+        "semantic_cosine": 0.7289000153541565,
+        "lexical_similarity_pct": 0.0,
+        "fp_thresholds": [],
+        "fn_thresholds": [
+          "0.75",
+          "0.8"
+        ]
+      },
+      {
+        "case_id": "SEM-AGR-011",
+        "group": "AGGRESSIVE_PARAPHRASE",
+        "domain": "Tata Kelola Perkotaan",
+        "is_plagiarized": true,
+        "semantic_cosine": 0.6883000135421753,
+        "lexical_similarity_pct": 0.0,
+        "fp_thresholds": [],
+        "fn_thresholds": [
+          "0.7",
+          "0.75",
+          "0.8"
+        ]
+      },
+      {
+        "case_id": "SEM-AGR-013",
+        "group": "AGGRESSIVE_PARAPHRASE",
+        "domain": "Manajemen Keuangan Publik",
+        "is_plagiarized": true,
+        "semantic_cosine": 0.676800012588501,
+        "lexical_similarity_pct": 0.0,
+        "fp_thresholds": [],
+        "fn_thresholds": [
+          "0.7",
+          "0.75",
+          "0.8"
+        ]
+      },
+      {
+        "case_id": "SEM-AGR-014",
+        "group": "AGGRESSIVE_PARAPHRASE",
+        "domain": "Metodologi Riset",
+        "is_plagiarized": true,
+        "semantic_cosine": 0.5504999756813049,
+        "lexical_similarity_pct": 0.0,
+        "fp_thresholds": [],
+        "fn_thresholds": [
+          "0.7",
+          "0.75",
+          "0.8"
+        ]
+      },
+      {
+        "case_id": "SEM-AGR-015",
+        "group": "AGGRESSIVE_PARAPHRASE",
+        "domain": "Teknik Perkeretaapian",
+        "is_plagiarized": true,
+        "semantic_cosine": 0.743399977684021,
+        "lexical_similarity_pct": 0.0,
+        "fp_thresholds": [],
+        "fn_thresholds": [
+          "0.75",
+          "0.8"
+        ]
+      },
+      {
+        "case_id": "SEM-XLN-EN3",
+        "group": "CROSS_LINGUAL",
+        "domain": "Ekonomi Moneter",
+        "is_plagiarized": true,
+        "semantic_cosine": 0.6211000084877014,
+        "lexical_similarity_pct": 0.0,
+        "fp_thresholds": [],
+        "fn_thresholds": [
+          "0.7",
+          "0.75",
+          "0.8"
+        ]
+      },
+      {
+        "case_id": "SEM-XLN-NL3",
+        "group": "CROSS_LINGUAL",
+        "domain": "Ilmu Kelautan",
+        "is_plagiarized": true,
+        "semantic_cosine": 0.7597000002861023,
+        "lexical_similarity_pct": 0.0,
+        "fp_thresholds": [],
+        "fn_thresholds": [
+          "0.8"
+        ]
+      }
+    ]
+  },
+  "cases_evaluated": [
+    {
+      "case_id": "SEM-LGT-001",
+      "group": "LIGHT_PARAPHRASE",
+      "domain": "Ilmu Komputer / AI",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.9323999881744385,
+      "semantic_similarity_pct": 93.23999786376953,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.8": {
+          "detected": true,
+          "confusion": "TP"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-LGT-002",
+      "group": "LIGHT_PARAPHRASE",
+      "domain": "Teknologi Energi",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.9589999914169312,
+      "semantic_similarity_pct": 95.9000015258789,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.8": {
+          "detected": true,
+          "confusion": "TP"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-LGT-003",
+      "group": "LIGHT_PARAPHRASE",
+      "domain": "Kesehatan Masyarakat",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.9599999785423279,
+      "semantic_similarity_pct": 96.0,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.8": {
+          "detected": true,
+          "confusion": "TP"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-LGT-004",
+      "group": "LIGHT_PARAPHRASE",
+      "domain": "Ekonomi Makro",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.8468999862670898,
+      "semantic_similarity_pct": 84.69000244140625,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.8": {
+          "detected": true,
+          "confusion": "TP"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-LGT-005",
+      "group": "LIGHT_PARAPHRASE",
+      "domain": "Hukum Tata Negara",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 3.57,
+      "semantic_cosine": 0.9440000057220459,
+      "semantic_similarity_pct": 94.4000015258789,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.8": {
+          "detected": true,
+          "confusion": "TP"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-LGT-006",
+      "group": "LIGHT_PARAPHRASE",
+      "domain": "Teknik Lingkungan",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.9491000175476074,
+      "semantic_similarity_pct": 94.91000366210938,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.8": {
+          "detected": true,
+          "confusion": "TP"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-LGT-007",
+      "group": "LIGHT_PARAPHRASE",
+      "domain": "Pendidikan",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.9520999789237976,
+      "semantic_similarity_pct": 95.20999908447266,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.8": {
+          "detected": true,
+          "confusion": "TP"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-LGT-008",
+      "group": "LIGHT_PARAPHRASE",
+      "domain": "Farmasi",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.9757999777793884,
+      "semantic_similarity_pct": 97.58000183105469,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.8": {
+          "detected": true,
+          "confusion": "TP"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-LGT-009",
+      "group": "LIGHT_PARAPHRASE",
+      "domain": "Ilmu Kelautan",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.8011999726295471,
+      "semantic_similarity_pct": 80.12000274658203,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.8": {
+          "detected": true,
+          "confusion": "TP"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-LGT-010",
+      "group": "LIGHT_PARAPHRASE",
+      "domain": "Manajemen Bisnis",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.9082000255584717,
+      "semantic_similarity_pct": 90.81999969482422,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.8": {
+          "detected": true,
+          "confusion": "TP"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-LGT-011",
+      "group": "LIGHT_PARAPHRASE",
+      "domain": "Sosiologi Perkotaan",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.8650000095367432,
+      "semantic_similarity_pct": 86.5,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.8": {
+          "detected": true,
+          "confusion": "TP"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-LGT-012",
+      "group": "LIGHT_PARAPHRASE",
+      "domain": "Teknik Mesin",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.8069000244140625,
+      "semantic_similarity_pct": 80.69000244140625,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.8": {
+          "detected": true,
+          "confusion": "TP"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-LGT-013",
+      "group": "LIGHT_PARAPHRASE",
+      "domain": "Agronomi",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.9193000197410583,
+      "semantic_similarity_pct": 91.93000030517578,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.8": {
+          "detected": true,
+          "confusion": "TP"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-LGT-014",
+      "group": "LIGHT_PARAPHRASE",
+      "domain": "Psikologi Sosial",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.6147000193595886,
+      "semantic_similarity_pct": 61.470001220703125,
+      "decisions": {
+        "0.7": {
+          "detected": false,
+          "confusion": "FN"
+        },
+        "0.75": {
+          "detected": false,
+          "confusion": "FN"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "FN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-LGT-015",
+      "group": "LIGHT_PARAPHRASE",
+      "domain": "Teknik Geodesi",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.9010999798774719,
+      "semantic_similarity_pct": 90.11000061035156,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.8": {
+          "detected": true,
+          "confusion": "TP"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-MOD-001",
+      "group": "MODERATE_PARAPHRASE",
+      "domain": "Kecerdasan Buatan",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.7882999777793884,
+      "semantic_similarity_pct": 78.83000183105469,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "FN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-MOD-002",
+      "group": "MODERATE_PARAPHRASE",
+      "domain": "Kesehatan / Epidemiologi",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.8557000160217285,
+      "semantic_similarity_pct": 85.56999969482422,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.8": {
+          "detected": true,
+          "confusion": "TP"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-MOD-003",
+      "group": "MODERATE_PARAPHRASE",
+      "domain": "Sains Data",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.6762999892234802,
+      "semantic_similarity_pct": 67.62999725341797,
+      "decisions": {
+        "0.7": {
+          "detected": false,
+          "confusion": "FN"
+        },
+        "0.75": {
+          "detected": false,
+          "confusion": "FN"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "FN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-MOD-004",
+      "group": "MODERATE_PARAPHRASE",
+      "domain": "Keuangan / Fintech",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.8147000074386597,
+      "semantic_similarity_pct": 81.47000122070312,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.8": {
+          "detected": true,
+          "confusion": "TP"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-MOD-005",
+      "group": "MODERATE_PARAPHRASE",
+      "domain": "Bioteknologi",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.941100001335144,
+      "semantic_similarity_pct": 94.11000061035156,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.8": {
+          "detected": true,
+          "confusion": "TP"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-MOD-006",
+      "group": "MODERATE_PARAPHRASE",
+      "domain": "Hukum Bisnis",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.5684999823570251,
+      "semantic_similarity_pct": 56.849998474121094,
+      "decisions": {
+        "0.7": {
+          "detected": false,
+          "confusion": "FN"
+        },
+        "0.75": {
+          "detected": false,
+          "confusion": "FN"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "FN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-MOD-007",
+      "group": "MODERATE_PARAPHRASE",
+      "domain": "Sosiologi Agama",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.7300000190734863,
+      "semantic_similarity_pct": 73.0,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": false,
+          "confusion": "FN"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "FN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-MOD-008",
+      "group": "MODERATE_PARAPHRASE",
+      "domain": "Teknik Kimia",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.7954999804496765,
+      "semantic_similarity_pct": 79.55000305175781,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "FN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-MOD-009",
+      "group": "MODERATE_PARAPHRASE",
+      "domain": "Arsitektur Tropis",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.8561000227928162,
+      "semantic_similarity_pct": 85.61000061035156,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.8": {
+          "detected": true,
+          "confusion": "TP"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-MOD-010",
+      "group": "MODERATE_PARAPHRASE",
+      "domain": "Hubungan Internasional",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.7290999889373779,
+      "semantic_similarity_pct": 72.91000366210938,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": false,
+          "confusion": "FN"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "FN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-MOD-011",
+      "group": "MODERATE_PARAPHRASE",
+      "domain": "Manajemen Rantai Pasok",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.7998999953269958,
+      "semantic_similarity_pct": 79.98999786376953,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "FN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-MOD-012",
+      "group": "MODERATE_PARAPHRASE",
+      "domain": "Linguistik Komputasional",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.6409000158309937,
+      "semantic_similarity_pct": 64.08999633789062,
+      "decisions": {
+        "0.7": {
+          "detected": false,
+          "confusion": "FN"
+        },
+        "0.75": {
+          "detected": false,
+          "confusion": "FN"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "FN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-MOD-013",
+      "group": "MODERATE_PARAPHRASE",
+      "domain": "Teknik Sipil",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.6705999970436096,
+      "semantic_similarity_pct": 67.05999755859375,
+      "decisions": {
+        "0.7": {
+          "detected": false,
+          "confusion": "FN"
+        },
+        "0.75": {
+          "detected": false,
+          "confusion": "FN"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "FN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-MOD-014",
+      "group": "MODERATE_PARAPHRASE",
+      "domain": "Psikologi Perkembangan",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.7924000024795532,
+      "semantic_similarity_pct": 79.23999786376953,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "FN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-MOD-015",
+      "group": "MODERATE_PARAPHRASE",
+      "domain": "Arkeologi Maritim",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.733299970626831,
+      "semantic_similarity_pct": 73.33000183105469,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": false,
+          "confusion": "FN"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "FN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-AGR-001",
+      "group": "AGGRESSIVE_PARAPHRASE",
+      "domain": "Ilmu Lingkungan / Ekologi",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.6937999725341797,
+      "semantic_similarity_pct": 69.37999725341797,
+      "decisions": {
+        "0.7": {
+          "detected": false,
+          "confusion": "FN"
+        },
+        "0.75": {
+          "detected": false,
+          "confusion": "FN"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "FN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-AGR-002",
+      "group": "AGGRESSIVE_PARAPHRASE",
+      "domain": "Ekonomi Publik",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.6503999829292297,
+      "semantic_similarity_pct": 65.04000091552734,
+      "decisions": {
+        "0.7": {
+          "detected": false,
+          "confusion": "FN"
+        },
+        "0.75": {
+          "detected": false,
+          "confusion": "FN"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "FN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-AGR-003",
+      "group": "AGGRESSIVE_PARAPHRASE",
+      "domain": "Kriptografi & Keamanan",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.694599986076355,
+      "semantic_similarity_pct": 69.45999908447266,
+      "decisions": {
+        "0.7": {
+          "detected": false,
+          "confusion": "FN"
+        },
+        "0.75": {
+          "detected": false,
+          "confusion": "FN"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "FN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-AGR-004",
+      "group": "AGGRESSIVE_PARAPHRASE",
+      "domain": "Gizi & Imunologi",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.7024999856948853,
+      "semantic_similarity_pct": 70.25,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": false,
+          "confusion": "FN"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "FN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-AGR-005",
+      "group": "AGGRESSIVE_PARAPHRASE",
+      "domain": "Ilmu Politik",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.6409000158309937,
+      "semantic_similarity_pct": 64.08999633789062,
+      "decisions": {
+        "0.7": {
+          "detected": false,
+          "confusion": "FN"
+        },
+        "0.75": {
+          "detected": false,
+          "confusion": "FN"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "FN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-AGR-006",
+      "group": "AGGRESSIVE_PARAPHRASE",
+      "domain": "Teknologi Bahan",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.5705000162124634,
+      "semantic_similarity_pct": 57.04999923706055,
+      "decisions": {
+        "0.7": {
+          "detected": false,
+          "confusion": "FN"
+        },
+        "0.75": {
+          "detected": false,
+          "confusion": "FN"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "FN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-AGR-007",
+      "group": "AGGRESSIVE_PARAPHRASE",
+      "domain": "Hukum Perlindungan Data",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.6299999952316284,
+      "semantic_similarity_pct": 63.0,
+      "decisions": {
+        "0.7": {
+          "detected": false,
+          "confusion": "FN"
+        },
+        "0.75": {
+          "detected": false,
+          "confusion": "FN"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "FN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-AGR-008",
+      "group": "AGGRESSIVE_PARAPHRASE",
+      "domain": "Farmakologi Onkologi",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.5120000243186951,
+      "semantic_similarity_pct": 51.20000076293945,
+      "decisions": {
+        "0.7": {
+          "detected": false,
+          "confusion": "FN"
+        },
+        "0.75": {
+          "detected": false,
+          "confusion": "FN"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "FN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-AGR-009",
+      "group": "AGGRESSIVE_PARAPHRASE",
+      "domain": "Etika Rekayasa AI",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.7426999807357788,
+      "semantic_similarity_pct": 74.2699966430664,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": false,
+          "confusion": "FN"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "FN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-AGR-010",
+      "group": "AGGRESSIVE_PARAPHRASE",
+      "domain": "Ekologi Kelautan",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.7289000153541565,
+      "semantic_similarity_pct": 72.88999938964844,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": false,
+          "confusion": "FN"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "FN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-AGR-011",
+      "group": "AGGRESSIVE_PARAPHRASE",
+      "domain": "Tata Kelola Perkotaan",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.6883000135421753,
+      "semantic_similarity_pct": 68.83000183105469,
+      "decisions": {
+        "0.7": {
+          "detected": false,
+          "confusion": "FN"
+        },
+        "0.75": {
+          "detected": false,
+          "confusion": "FN"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "FN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-AGR-012",
+      "group": "AGGRESSIVE_PARAPHRASE",
+      "domain": "Neurologi Kognitif",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.8510000109672546,
+      "semantic_similarity_pct": 85.0999984741211,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.8": {
+          "detected": true,
+          "confusion": "TP"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-AGR-013",
+      "group": "AGGRESSIVE_PARAPHRASE",
+      "domain": "Manajemen Keuangan Publik",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.676800012588501,
+      "semantic_similarity_pct": 67.68000030517578,
+      "decisions": {
+        "0.7": {
+          "detected": false,
+          "confusion": "FN"
+        },
+        "0.75": {
+          "detected": false,
+          "confusion": "FN"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "FN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-AGR-014",
+      "group": "AGGRESSIVE_PARAPHRASE",
+      "domain": "Metodologi Riset",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.5504999756813049,
+      "semantic_similarity_pct": 55.04999923706055,
+      "decisions": {
+        "0.7": {
+          "detected": false,
+          "confusion": "FN"
+        },
+        "0.75": {
+          "detected": false,
+          "confusion": "FN"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "FN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-AGR-015",
+      "group": "AGGRESSIVE_PARAPHRASE",
+      "domain": "Teknik Perkeretaapian",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.743399977684021,
+      "semantic_similarity_pct": 74.33999633789062,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": false,
+          "confusion": "FN"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "FN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-CLN-001",
+      "group": "CLEAN_NEGATIVE_CONTROL",
+      "domain": "Matematika Murni / Aljabar",
+      "is_plagiarized": false,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.1868000030517578,
+      "semantic_similarity_pct": 18.68000030517578,
+      "decisions": {
+        "0.7": {
+          "detected": false,
+          "confusion": "TN"
+        },
+        "0.75": {
+          "detected": false,
+          "confusion": "TN"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "TN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-CLN-002",
+      "group": "CLEAN_NEGATIVE_CONTROL",
+      "domain": "Energi Panas Bumi (Topik sama-sama energi, proposisi beda)",
+      "is_plagiarized": false,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.14949999749660492,
+      "semantic_similarity_pct": 14.949999809265137,
+      "decisions": {
+        "0.7": {
+          "detected": false,
+          "confusion": "TN"
+        },
+        "0.75": {
+          "detected": false,
+          "confusion": "TN"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "TN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-CLN-003",
+      "group": "CLEAN_NEGATIVE_CONTROL",
+      "domain": "Kedokteran Bedah",
+      "is_plagiarized": false,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.1225999966263771,
+      "semantic_similarity_pct": 12.260000228881836,
+      "decisions": {
+        "0.7": {
+          "detected": false,
+          "confusion": "TN"
+        },
+        "0.75": {
+          "detected": false,
+          "confusion": "TN"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "TN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-CLN-004",
+      "group": "CLEAN_NEGATIVE_CONTROL",
+      "domain": "Ekonomi Moneter (Suku Bunga vs Nilai Tukar)",
+      "is_plagiarized": false,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.4239000082015991,
+      "semantic_similarity_pct": 42.38999938964844,
+      "decisions": {
+        "0.7": {
+          "detected": false,
+          "confusion": "TN"
+        },
+        "0.75": {
+          "detected": false,
+          "confusion": "TN"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "TN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-CLN-005",
+      "group": "CLEAN_NEGATIVE_CONTROL",
+      "domain": "Hukum Pidana vs Tata Negara",
+      "is_plagiarized": false,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.42489999532699585,
+      "semantic_similarity_pct": 42.4900016784668,
+      "decisions": {
+        "0.7": {
+          "detected": false,
+          "confusion": "TN"
+        },
+        "0.75": {
+          "detected": false,
+          "confusion": "TN"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "TN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-CLN-006",
+      "group": "CLEAN_NEGATIVE_CONTROL",
+      "domain": "Mikrobiologi Medis",
+      "is_plagiarized": false,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.33500000834465027,
+      "semantic_similarity_pct": 33.5,
+      "decisions": {
+        "0.7": {
+          "detected": false,
+          "confusion": "TN"
+        },
+        "0.75": {
+          "detected": false,
+          "confusion": "TN"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "TN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-CLN-007",
+      "group": "CLEAN_NEGATIVE_CONTROL",
+      "domain": "Psikologi Pendidikan (Kognitif vs Evaluasi Belajar)",
+      "is_plagiarized": false,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.31769999861717224,
+      "semantic_similarity_pct": 31.770000457763672,
+      "decisions": {
+        "0.7": {
+          "detected": false,
+          "confusion": "TN"
+        },
+        "0.75": {
+          "detected": false,
+          "confusion": "TN"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "TN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-CLN-008",
+      "group": "CLEAN_NEGATIVE_CONTROL",
+      "domain": "Kimia Organik Bahan Alam",
+      "is_plagiarized": false,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.4058000147342682,
+      "semantic_similarity_pct": 40.58000183105469,
+      "decisions": {
+        "0.7": {
+          "detected": false,
+          "confusion": "TN"
+        },
+        "0.75": {
+          "detected": false,
+          "confusion": "TN"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "TN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-CLN-009",
+      "group": "CLEAN_NEGATIVE_CONTROL",
+      "domain": "Oseanografi Fisik",
+      "is_plagiarized": false,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.39160001277923584,
+      "semantic_similarity_pct": 39.15999984741211,
+      "decisions": {
+        "0.7": {
+          "detected": false,
+          "confusion": "TN"
+        },
+        "0.75": {
+          "detected": false,
+          "confusion": "TN"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "TN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-CLN-010",
+      "group": "CLEAN_NEGATIVE_CONTROL",
+      "domain": "Keamanan Siber Jaringan",
+      "is_plagiarized": false,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.3303000032901764,
+      "semantic_similarity_pct": 33.029998779296875,
+      "decisions": {
+        "0.7": {
+          "detected": false,
+          "confusion": "TN"
+        },
+        "0.75": {
+          "detected": false,
+          "confusion": "TN"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "TN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-CLN-011",
+      "group": "CLEAN_NEGATIVE_CONTROL",
+      "domain": "Perencanaan Wilayah Desa",
+      "is_plagiarized": false,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.24160000681877136,
+      "semantic_similarity_pct": 24.15999984741211,
+      "decisions": {
+        "0.7": {
+          "detected": false,
+          "confusion": "TN"
+        },
+        "0.75": {
+          "detected": false,
+          "confusion": "TN"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "TN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-CLN-012",
+      "group": "CLEAN_NEGATIVE_CONTROL",
+      "domain": "Termodinamika Pembakaran",
+      "is_plagiarized": false,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.43869999051094055,
+      "semantic_similarity_pct": 43.869998931884766,
+      "decisions": {
+        "0.7": {
+          "detected": false,
+          "confusion": "TN"
+        },
+        "0.75": {
+          "detected": false,
+          "confusion": "TN"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "TN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-CLN-013",
+      "group": "CLEAN_NEGATIVE_CONTROL",
+      "domain": "Ilmu Gulma Pertanian",
+      "is_plagiarized": false,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.3799999952316284,
+      "semantic_similarity_pct": 38.0,
+      "decisions": {
+        "0.7": {
+          "detected": false,
+          "confusion": "TN"
+        },
+        "0.75": {
+          "detected": false,
+          "confusion": "TN"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "TN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-CLN-014",
+      "group": "CLEAN_NEGATIVE_CONTROL",
+      "domain": "Psikologi Organisasi (Kepemimpinan)",
+      "is_plagiarized": false,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.3675999939441681,
+      "semantic_similarity_pct": 36.7599983215332,
+      "decisions": {
+        "0.7": {
+          "detected": false,
+          "confusion": "TN"
+        },
+        "0.75": {
+          "detected": false,
+          "confusion": "TN"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "TN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-CLN-015",
+      "group": "CLEAN_NEGATIVE_CONTROL",
+      "domain": "Kartografi Tematik",
+      "is_plagiarized": false,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.4860000014305115,
+      "semantic_similarity_pct": 48.599998474121094,
+      "decisions": {
+        "0.7": {
+          "detected": false,
+          "confusion": "TN"
+        },
+        "0.75": {
+          "detected": false,
+          "confusion": "TN"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "TN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-CLN-016",
+      "group": "CLEAN_NEGATIVE_CONTROL",
+      "domain": "Filsafat Epistemologi",
+      "is_plagiarized": false,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.13300000131130219,
+      "semantic_similarity_pct": 13.300000190734863,
+      "decisions": {
+        "0.7": {
+          "detected": false,
+          "confusion": "TN"
+        },
+        "0.75": {
+          "detected": false,
+          "confusion": "TN"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "TN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-CLN-017",
+      "group": "CLEAN_NEGATIVE_CONTROL",
+      "domain": "Studi Kebijakan Pajak",
+      "is_plagiarized": false,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.3806000053882599,
+      "semantic_similarity_pct": 38.060001373291016,
+      "decisions": {
+        "0.7": {
+          "detected": false,
+          "confusion": "TN"
+        },
+        "0.75": {
+          "detected": false,
+          "confusion": "TN"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "TN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-CLN-018",
+      "group": "CLEAN_NEGATIVE_CONTROL",
+      "domain": "Komunikasi Visual Desain",
+      "is_plagiarized": false,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.17080000042915344,
+      "semantic_similarity_pct": 17.079999923706055,
+      "decisions": {
+        "0.7": {
+          "detected": false,
+          "confusion": "TN"
+        },
+        "0.75": {
+          "detected": false,
+          "confusion": "TN"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "TN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-CLN-019",
+      "group": "CLEAN_NEGATIVE_CONTROL",
+      "domain": "Pediatri Alergi Makanan",
+      "is_plagiarized": false,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.4259999990463257,
+      "semantic_similarity_pct": 42.599998474121094,
+      "decisions": {
+        "0.7": {
+          "detected": false,
+          "confusion": "TN"
+        },
+        "0.75": {
+          "detected": false,
+          "confusion": "TN"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "TN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-CLN-020",
+      "group": "CLEAN_NEGATIVE_CONTROL",
+      "domain": "Sistem Informasi Geografis Transportasi",
+      "is_plagiarized": false,
+      "source_lang": "id",
+      "submission_lang": "id",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.02449999935925007,
+      "semantic_similarity_pct": 2.450000047683716,
+      "decisions": {
+        "0.7": {
+          "detected": false,
+          "confusion": "TN"
+        },
+        "0.75": {
+          "detected": false,
+          "confusion": "TN"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "TN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-XLN-EN1",
+      "group": "CROSS_LINGUAL",
+      "domain": "Kecerdasan Buatan / NLP",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "en",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.8727999925613403,
+      "semantic_similarity_pct": 87.27999877929688,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.8": {
+          "detected": true,
+          "confusion": "TP"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-XLN-EN2",
+      "group": "CROSS_LINGUAL",
+      "domain": "Teknologi Energi Bersih",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "en",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.9086999893188477,
+      "semantic_similarity_pct": 90.87000274658203,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.8": {
+          "detected": true,
+          "confusion": "TP"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-XLN-EN3",
+      "group": "CROSS_LINGUAL",
+      "domain": "Ekonomi Moneter",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "en",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.6211000084877014,
+      "semantic_similarity_pct": 62.11000061035156,
+      "decisions": {
+        "0.7": {
+          "detected": false,
+          "confusion": "FN"
+        },
+        "0.75": {
+          "detected": false,
+          "confusion": "FN"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "FN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-XLN-AR1",
+      "group": "CROSS_LINGUAL",
+      "domain": "Kecerdasan Buatan",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "ar",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.8492000102996826,
+      "semantic_similarity_pct": 84.91999816894531,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.8": {
+          "detected": true,
+          "confusion": "TP"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-XLN-AR2",
+      "group": "CROSS_LINGUAL",
+      "domain": "Kesehatan Masyarakat",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "ar",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.9334999918937683,
+      "semantic_similarity_pct": 93.3499984741211,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.8": {
+          "detected": true,
+          "confusion": "TP"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-XLN-AR3",
+      "group": "CROSS_LINGUAL",
+      "domain": "Teknologi Energi Surya",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "ar",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.8662999868392944,
+      "semantic_similarity_pct": 86.62999725341797,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.8": {
+          "detected": true,
+          "confusion": "TP"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-XLN-ZH1",
+      "group": "CROSS_LINGUAL",
+      "domain": "Kecerdasan Buatan",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "zh",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.8827000260353088,
+      "semantic_similarity_pct": 88.2699966430664,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.8": {
+          "detected": true,
+          "confusion": "TP"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-XLN-ZH2",
+      "group": "CROSS_LINGUAL",
+      "domain": "Kesehatan Masyarakat",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "zh",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.9506000280380249,
+      "semantic_similarity_pct": 95.05999755859375,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.8": {
+          "detected": true,
+          "confusion": "TP"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-XLN-ZH3",
+      "group": "CROSS_LINGUAL",
+      "domain": "Energi Terbarukan",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "zh",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.8935999870300293,
+      "semantic_similarity_pct": 89.36000061035156,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.8": {
+          "detected": true,
+          "confusion": "TP"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-XLN-NL1",
+      "group": "CROSS_LINGUAL",
+      "domain": "Hukum Tata Negara",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "nl",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.8144000172615051,
+      "semantic_similarity_pct": 81.44000244140625,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.8": {
+          "detected": true,
+          "confusion": "TP"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-XLN-NL2",
+      "group": "CROSS_LINGUAL",
+      "domain": "Ekonomi Makro",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "nl",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.8407999873161316,
+      "semantic_similarity_pct": 84.08000183105469,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.8": {
+          "detected": true,
+          "confusion": "TP"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-XLN-NL3",
+      "group": "CROSS_LINGUAL",
+      "domain": "Ilmu Kelautan",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "nl",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.7597000002861023,
+      "semantic_similarity_pct": 75.97000122070312,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.8": {
+          "detected": false,
+          "confusion": "FN"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-XLN-DE1",
+      "group": "CROSS_LINGUAL",
+      "domain": "Teknologi Bahan",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "de",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.8698999881744385,
+      "semantic_similarity_pct": 86.98999786376953,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.8": {
+          "detected": true,
+          "confusion": "TP"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-XLN-DE2",
+      "group": "CROSS_LINGUAL",
+      "domain": "Ekonomi Moneter",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "de",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.847000002861023,
+      "semantic_similarity_pct": 84.69999694824219,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.8": {
+          "detected": true,
+          "confusion": "TP"
+        }
+      }
+    },
+    {
+      "case_id": "SEM-XLN-DE3",
+      "group": "CROSS_LINGUAL",
+      "domain": "Kecerdasan Buatan",
+      "is_plagiarized": true,
+      "source_lang": "id",
+      "submission_lang": "de",
+      "lexical_similarity_pct": 0.0,
+      "semantic_cosine": 0.8812999725341797,
+      "semantic_similarity_pct": 88.12999725341797,
+      "decisions": {
+        "0.7": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.75": {
+          "detected": true,
+          "confusion": "TP"
+        },
+        "0.8": {
+          "detected": true,
+          "confusion": "TP"
+        }
+      }
+    }
+  ]
+}

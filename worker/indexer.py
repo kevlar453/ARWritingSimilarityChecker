@@ -12,6 +12,14 @@ def clear_document_index(connection, document_id: int):
     connection.commit()
     cursor.close()
 
+    # Bersihkan indeks semantik Qdrant jika ada
+    try:
+        from worker.semantic_lens import SemanticLens, is_semantic_engine_ready
+        if is_semantic_engine_ready():
+            SemanticLens().delete_corpus_document(document_id)
+    except Exception:
+        pass
+
 def save_page(connection, document_id: int, page_number: int, text: str) -> int:
     cursor = connection.cursor()
     cursor.execute("""
@@ -249,6 +257,13 @@ def index_document(
         
         if is_corpus:
             save_fingerprint_documents(connection, document_id, shingles)
+            # Indeksasi representasi vektor semantik ke Qdrant (Fase 1 Prototipe)
+            try:
+                from worker.semantic_lens import SemanticLens, is_semantic_engine_ready
+                if is_semantic_engine_ready():
+                    SemanticLens().index_corpus_document(document_id, pages)
+            except Exception:
+                pass
             
         # Ekstraksi judul karya ilmiah asli dari halaman muka jika judul saat ini masih berupa nama berkas
         extracted_academic_title = None

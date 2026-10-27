@@ -2245,6 +2245,186 @@ $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evi
         <?php endif; ?>
 
         <!-- ═════════════════════════════════════════════════════════════════════ -->
+        <!-- PILAR: KEMIRIPAN MAKNA & DETEKSI PARAFRASE (LENSA SEMANTIK MiniLM-L12) -->
+        <!-- ═════════════════════════════════════════════════════════════════════ -->
+        <?php if (!empty($semanticLens) && !empty($semanticLens['evaluated'])): ?>
+        <?php
+            $semScore = (float)($semanticLens['semantic_score'] ?? 0.0);
+            $semCosine = (float)($semanticLens['semantic_cosine'] ?? 0.0);
+            $semDetected = !empty($semanticLens['paraphrase_detected']);
+            $semThreshold = (float)($semanticLens['threshold_used'] ?? 0.75);
+            $semZone = $semanticLens['zone'] ?? 'GREY_ZONE_RECHECK';
+            $semTopMatches = $semanticLens['top_matches'] ?? [];
+
+            $semBadgeClass = match(true) {
+                $semScore >= 75.0 || $semDetected => 'bg-rose-50 text-rose-700 border-rose-300',
+                $semScore >= 50.0 => 'bg-amber-50 text-amber-800 border-amber-300',
+                default => 'bg-emerald-50 text-emerald-700 border-emerald-300'
+            };
+
+            $semScoreColor = match(true) {
+                $semScore >= 75.0 || $semDetected => 'text-rose-600',
+                $semScore >= 50.0 => 'text-amber-600',
+                default => 'text-emerald-600'
+            };
+        ?>
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-5" id="semanticLensSection">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-2xl">🧬</span>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="font-bold text-base text-slate-800">
+                                Kemiripan Makna &amp; Deteksi Parafrase (Lensa Semantik)
+                            </h3>
+                            <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 font-mono-code">
+                                Pilar Eksperimental • Lapisan Ke-2
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-0.5">
+                            Memeriksa ulang naskah pada zona abu-abu melalui penanaman vektor makna <em>(paraphrase-multilingual-MiniLM-L12-v2)</em> secara lokal on-premise tanpa mengubah persentase leksikal utama.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 self-start sm:self-auto">
+                    <span class="text-xs font-bold px-3 py-1.5 rounded-xl border <?= $semBadgeClass ?> flex items-center gap-1.5 shadow-2xs">
+                        <?php if ($semDetected || $semScore >= 75.0): ?>
+                            <span>🚨</span> <span>Terindikasi Parafrase Makna (<?= number_format($semScore, 1) ?>%)</span>
+                        <?php elseif ($semScore >= 50.0): ?>
+                            <span>⚠️</span> <span>Kemiripan Makna Sedang (<?= number_format($semScore, 1) ?>%)</span>
+                        <?php else: ?>
+                            <span>✓</span> <span>Makna Orisinal / Leksikal Bersih (<?= number_format($semScore, 1) ?>%)</span>
+                        <?php endif; ?>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Callout Non-Suppression & Explainability -->
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 flex items-start gap-2.5 leading-relaxed">
+                <span class="text-base shrink-0">🛡️</span>
+                <div>
+                    <strong>Prinsip Anti-Salah-Tuduh &amp; Transparansi:</strong> Skor semantik ini dihitung menggunakan model embedding lokal pada potongan naskah ~200 kata. Sesuai prinsip kejujuran ilmiah AR Tilik, skor leksikal utama tetap utuh apa adanya; lensa semantik hadir sebagai bukti komparatif kedua untuk mendeteksi parafrase terstruktur yang lolos dari pencocokan kata demi kata.
+                </div>
+            </div>
+
+            <!-- 4 Grid KPI Cards -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 font-mono-code">
+                <!-- KPI 1: Semantic Cosine Score -->
+                <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                    <div class="text-[11px] text-slate-500">Kemiripan Makna Puncak</div>
+                    <div class="text-xl sm:text-2xl font-extrabold mt-1 <?= $semScoreColor ?>">
+                        <?= number_format($semScore, 1) ?>%
+                    </div>
+                    <div class="text-[10px] text-slate-400 mt-0.5">
+                        Kosinus: <?= number_format($semCosine, 4) ?>
+                    </div>
+                </div>
+
+                <!-- KPI 2: Calibrated Threshold -->
+                <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                    <div class="text-[11px] text-slate-500">Ambang Kalibrasi</div>
+                    <div class="text-xl sm:text-2xl font-extrabold mt-1 text-slate-800">
+                        <?= number_format($semThreshold * 100, 1) ?>%
+                    </div>
+                    <div class="text-[10px] text-emerald-600 mt-0.5 font-bold">
+                        0.0% FP pada Kontrol Bersih
+                    </div>
+                </div>
+
+                <!-- KPI 3: Model & Hardware -->
+                <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                    <div class="text-[11px] text-slate-500">Mesin Inferensi</div>
+                    <div class="text-sm font-extrabold mt-1 text-indigo-700 truncate" title="MiniLM-L12-v2 ONNX CPU">
+                        MiniLM-L12
+                    </div>
+                    <div class="text-[10px] text-slate-400 mt-0.5">
+                        384-dim Lokal ONNX
+                    </div>
+                </div>
+
+                <!-- KPI 4: Vektor Korpus -->
+                <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                    <div class="text-[11px] text-slate-500">Basis Indeks Vektor</div>
+                    <div class="text-sm font-extrabold mt-1 text-slate-800">
+                        Qdrant Engine
+                    </div>
+                    <div class="text-[10px] text-slate-400 mt-0.5">
+                        <?= count($semTopMatches) ?> Pasase Terkorelasi
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Semantic Matches (Snippets) -->
+            <?php if (!empty($semTopMatches)): ?>
+            <div class="space-y-3 pt-2">
+                <div class="flex items-center justify-between">
+                    <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                        Pasase Terindikasi Parafrase Semantik Teratas
+                    </h4>
+                    <span class="text-[11px] text-slate-400 font-mono-code">
+                        Diurutkan berdasarkan kemiripan makna tertinggi
+                    </span>
+                </div>
+
+                <div class="space-y-3">
+                    <?php foreach (array_slice($semTopMatches, 0, 5) as $smIdx => $sm): ?>
+                    <?php
+                        $matchScore = (float)($sm['semantic_score'] ?? 0.0);
+                        $srcDocTitle = $sm['source_title'] ?? ('Dokumen Korpus #' . ($sm['source_document_id'] ?? '?'));
+                        $srcDocId = (int)($sm['source_document_id'] ?? 0);
+                        $subSnippet = $sm['submission_text'] ?? '';
+                        $srcSnippet = $sm['matched_corpus_preview'] ?? '';
+                        $pageNum = (int)($sm['page_number'] ?? 1);
+                    ?>
+                    <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-3">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/60 pb-2">
+                            <div class="flex items-center gap-2">
+                                <span class="w-5 h-5 rounded-full bg-indigo-100 text-indigo-700 text-[10px] font-bold flex items-center justify-center font-mono-code">
+                                    <?= $smIdx + 1 ?>
+                                </span>
+                                <span class="text-xs font-bold text-slate-800">
+                                    <?= esc($srcDocTitle) ?>
+                                </span>
+                                <span class="text-[11px] text-slate-400 font-mono-code">
+                                    (Halaman <?= $pageNum ?>)
+                                </span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="text-xs font-mono-code font-bold <?= $matchScore >= 75.0 ? 'text-rose-600' : 'text-amber-600' ?>">
+                                    Kemiripan: <?= number_format($matchScore, 1) ?>%
+                                </span>
+                                <?php if ($srcDocId > 0): ?>
+                                <button type="button" onclick="openDualReaderModal(<?= $srcDocId ?>)" class="text-[11px] text-indigo-600 hover:text-indigo-800 font-bold underline cursor-pointer">
+                                    Buka di Layar Ganda &rarr;
+                                </button>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                            <div class="p-3 bg-white rounded-lg border border-slate-200 space-y-1">
+                                <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">Teks Submisi Pengguna</span>
+                                <p class="text-slate-700 leading-relaxed italic">
+                                    &ldquo;<?= esc($subSnippet) ?>&rdquo;
+                                </p>
+                            </div>
+                            <div class="p-3 bg-white rounded-lg border border-indigo-100 space-y-1">
+                                <span class="text-[10px] uppercase font-bold tracking-wider text-indigo-500">Teks Rujukan Korpus</span>
+                                <p class="text-slate-700 leading-relaxed italic">
+                                    &ldquo;<?= esc($srcSnippet) ?>&rdquo;
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <?php endif; ?>
+        </div>
+        <?php endif; ?>
+
+        <!-- ═════════════════════════════════════════════════════════════════════ -->
         <!-- SINTESIS RISIKO AKADEMIK BERBOBOT ML (XGBOOST CLASSIFIER v3.4)       -->
         <!-- ═════════════════════════════════════════════════════════════════════ -->
         <?php if (!empty($xgboostRisk)): ?>

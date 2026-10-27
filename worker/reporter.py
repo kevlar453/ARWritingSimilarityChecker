@@ -528,6 +528,24 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
                 presentation=v11_presentation
             )
 
+            # 10. Evaluasi Lensa Kedua Semantik (Zona Abu-Abu / Re-ranker Semantik Tanpa Merusak Skor Leksikal)
+            try:
+                from worker.semantic_verifier import SemanticVerifier
+                sem_verifier = SemanticVerifier()
+                sem_eval = sem_verifier.verify_submission(
+                    submission_pages=pages,
+                    lexical_similarity=overall_sim,
+                    evasion_data=evasion_res,
+                    exclude_doc_id=document_id,
+                    similarity_threshold=0.75
+                )
+                result["semantic_lens"] = sem_eval
+            except Exception as sem_err:
+                result["semantic_lens"] = {
+                    "is_evaluated": False,
+                    "error": str(sem_err)
+                }
+
             result["v1_1_presentation"] = v11_presentation
             result["v1_1_observability"] = {
                 "citation_parsing_ms": round(cite_latency_ms, 4),

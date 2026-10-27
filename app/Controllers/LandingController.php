@@ -122,10 +122,17 @@ class LandingController extends BaseController
         $metrics = \App\Libraries\SystemSpecs::getLiveMetrics();
         $capabilities = \App\Libraries\SystemSpecs::getCapabilities();
 
+        $semanticReport = null;
+        $semanticReportPath = ROOTPATH . 'datasets/artilik_semantic_calibration_report.json';
+        if (file_exists($semanticReportPath)) {
+            $semanticReport = json_decode(file_get_contents($semanticReportPath), true);
+        }
+
         return $this->response->setBody(view('landing/benchmark', [
-            'title'        => 'Benchmark Terbuka Naskah Akademik Indonesia — Evaluasi Empiris AR Tilik',
-            'metrics'      => $metrics,
-            'capabilities' => $capabilities,
+            'title'           => 'Benchmark Terbuka Naskah Akademik Indonesia — Evaluasi Empiris AR Tilik',
+            'metrics'         => $metrics,
+            'capabilities'    => $capabilities,
+            'semantic_report' => $semanticReport,
         ]));
     }
 
@@ -137,8 +144,12 @@ class LandingController extends BaseController
         $cleanDataset = preg_replace('/\.json$/i', '', strtolower(trim($dataset)));
 
         $fileMap = [
-            'targeted_80' => ROOTPATH . 'evaluation_dataset_v1_1_targeted_80/cases.json',
-            'v1_500'      => ROOTPATH . 'evaluation_dataset_v1/cases.json',
+            'targeted_80'          => ROOTPATH . 'evaluation_dataset_v1_1_targeted_80/cases.json',
+            'v1_500'               => ROOTPATH . 'evaluation_dataset_v1/cases.json',
+            'semantic_80'          => ROOTPATH . 'datasets/artilik_semantic_paraphrase_benchmark.json',
+            'semantic_paraphrase'  => ROOTPATH . 'datasets/artilik_semantic_paraphrase_benchmark.json',
+            'semantic_calibration' => ROOTPATH . 'datasets/artilik_semantic_calibration_report.json',
+            'semantic_report'      => ROOTPATH . 'datasets/artilik_semantic_calibration_report.json',
         ];
 
         $targetPath = $fileMap[$cleanDataset] ?? $fileMap['targeted_80'];
@@ -146,9 +157,15 @@ class LandingController extends BaseController
             return $this->response->setStatusCode(404)->setBody('Berkas dataset evaluasi tidak ditemukan.');
         }
 
-        $filename = ($cleanDataset === 'v1_500')
-            ? 'artilik_indonesia_academic_benchmark_500_cases.json'
-            : 'artilik_indonesia_targeted_contextual_80_cases.json';
+        $filenameMap = [
+            'v1_500'               => 'artilik_indonesia_academic_benchmark_500_cases.json',
+            'semantic_80'          => 'artilik_semantic_paraphrase_80_cases.json',
+            'semantic_paraphrase'  => 'artilik_semantic_paraphrase_80_cases.json',
+            'semantic_calibration' => 'artilik_semantic_calibration_report.json',
+            'semantic_report'      => 'artilik_semantic_calibration_report.json',
+        ];
+
+        $filename = $filenameMap[$cleanDataset] ?? 'artilik_indonesia_targeted_contextual_80_cases.json';
 
         $content = file_get_contents($targetPath);
 

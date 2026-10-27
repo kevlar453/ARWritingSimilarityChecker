@@ -850,6 +850,9 @@ class DashboardController extends BaseController
             $crossLingual = $this->computeFallbackCrossLingualDetection($submissionText);
         }
 
+        // Resolusi Lensa Semantik (Pilar Kemiripan Makna Eksperimental)
+        $semanticLens = $evidenceData['semantic_lens'] ?? $evidenceData['v1_1_presentation']['v1_2_evolution']['semantic_lens'] ?? null;
+
         // Resolusi XGBoost Academic Risk Synthesizer
         $xgboostRisk = $evidenceData['xgboost_risk'] ?? $evidenceData['v1_1_presentation']['v1_2_evolution']['xgboost_risk'] ?? null;
         if (!$xgboostRisk) {
@@ -958,6 +961,7 @@ class DashboardController extends BaseController
             'commonPassagesCount' => $commonPassagesCount,
             'submissionText'      => $submissionText,
             'sourceTexts'         => $sourceTexts,
+            'semanticLens'        => $semanticLens,
             'aiStylometrics'      => $aiStylometrics,
             'crossLingual'        => $crossLingual,
             'xgboostRisk'         => $xgboostRisk,

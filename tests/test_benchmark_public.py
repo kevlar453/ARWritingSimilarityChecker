@@ -19,6 +19,9 @@ def test_public_benchmark_page_renders():
         assert "Methodology Boilerplate" in html
         assert "Sentence Burstiness" in html
         assert "Dual-Reader" in html
+        assert "Lensa Semantik (MiniLM-L12)" in html
+        assert "Kalibrasi Empiris Lensa Semantik" in html
+        assert "Garansi Anti-Salah-Tuduh (0.0% False Positive)" in html
 
 def test_public_benchmark_alternate_route_renders():
     url = f"{BASE_URL}/riset/benchmark-naskah-indonesia"
@@ -59,6 +62,7 @@ def test_download_static_dataset_files():
     for path, expected_count in [
         ("/datasets/artilik_indonesia_targeted_contextual_80_cases.json", 80),
         ("/datasets/artilik_indonesia_academic_benchmark_500_cases.json", 500),
+        ("/datasets/artilik_semantic_paraphrase_benchmark.json", 80),
     ]:
         url = f"{BASE_URL}{path}"
         req = urllib.request.Request(url, method="GET")
@@ -67,3 +71,30 @@ def test_download_static_dataset_files():
             data = json.loads(resp.read().decode("utf-8"))
             assert isinstance(data, list)
             assert len(data) == expected_count
+
+def test_download_semantic_80_dataset():
+    for endpoint in ["/benchmark/dataset/semantic_80", "/benchmark/dataset/semantic_80.json"]:
+        url = f"{BASE_URL}{endpoint}"
+        req = urllib.request.Request(url, method="GET")
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            assert resp.getcode() == 200
+            headers = dict(resp.headers)
+            assert "application/json" in headers.get("Content-Type", "")
+            assert "attachment" in headers.get("Content-Disposition", "")
+            data = json.loads(resp.read().decode("utf-8"))
+            assert isinstance(data, list)
+            assert len(data) == 80
+            assert data[0]["case_id"] == "SEM-LGT-001"
+
+def test_download_semantic_report_dataset():
+    for endpoint in ["/benchmark/dataset/semantic_report", "/benchmark/dataset/semantic_report.json"]:
+        url = f"{BASE_URL}{endpoint}"
+        req = urllib.request.Request(url, method="GET")
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            assert resp.getcode() == 200
+            headers = dict(resp.headers)
+            assert "application/json" in headers.get("Content-Type", "")
+            assert "attachment" in headers.get("Content-Disposition", "")
+            data = json.loads(resp.read().decode("utf-8"))
+            assert "summary" in data
+            assert data["summary"]["total_cases"] == 80

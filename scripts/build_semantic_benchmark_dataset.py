@@ -1,0 +1,964 @@
+#!/usr/bin/env python3
+"""
+Pembangun Dataset Benchmark Kalibrasi Semantik AR Tilik (v1.2)
+Membangun 80 kasus terarah untuk menguji:
+1. Tiga Level Parafrase (Ringan, Sedang, Agresif)
+2. Kontrol Dokumen Bersih (Anti-False-Positive)
+3. Validasi Lintas Bahasa (Indonesia vs Inggris, Arab, Mandarin, Belanda, Jerman)
+"""
+
+import json
+import hashlib
+from pathlib import Path
+
+BENCHMARK_CASES = [
+    # ==========================================
+    # GROUP 1: PARAFRASE RINGAN (LIGHT PARAPHRASE) - 15 KASUS
+    # Karakteristik: Substitusi sinonim, ubah kalimat aktif <-> pasif.
+    # ==========================================
+    {
+        "case_id": "SEM-LGT-001",
+        "group": "LIGHT_PARAPHRASE",
+        "domain": "Ilmu Komputer / AI",
+        "source_text": "Model representasi bahasa transformer memanfaatkan mekanisme atensi mandiri guna menangkap ketergantungan jarak jauh dalam teks berskala masif.",
+        "submission_text": "Mekanisme atensi mandiri dimanfaatkan oleh model representasi bahasa transformer untuk memahami relasi jarak jauh pada korpus teks yang amat besar.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Perubahan aktif ke pasif dan sinonim kata penghubung."
+    },
+    {
+        "case_id": "SEM-LGT-002",
+        "group": "LIGHT_PARAPHRASE",
+        "domain": "Teknologi Energi",
+        "source_text": "Pembangkit listrik tenaga surya fotovoltaik membutuhkan inverter pintar demi menjaga stabilitas tegangan listrik di jaringan transmisi.",
+        "submission_text": "Inverter cerdas sangat diperlukan oleh pembangkit listrik fotovoltaik surya guna mempertahankan kestabilan voltase pada jaringan transmisi.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Sinonim inverter pintar -> inverter cerdas, menjaga stabilitas -> mempertahankan kestabilan."
+    },
+    {
+        "case_id": "SEM-LGT-003",
+        "group": "LIGHT_PARAPHRASE",
+        "domain": "Kesehatan Masyarakat",
+        "source_text": "Penerapan pola makan rendah gula terbukti secara klinis mampu menurunkan prevalensi diabetes melitus tipe 2 pada lansia.",
+        "submission_text": "Secara klinis telah dibuktikan bahwa mengonsumsi makanan rendah glukosa sanggup mengurangi angka kejadian diabetes melitus tipe 2 pada usia lanjut.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Substitusi gula -> glukosa, lansia -> usia lanjut, menurunkan prevalensi -> mengurangi angka kejadian."
+    },
+    {
+        "case_id": "SEM-LGT-004",
+        "group": "LIGHT_PARAPHRASE",
+        "domain": "Ekonomi Makro",
+        "source_text": "Kenaikan suku bunga acuan oleh bank sentral bertujuan mengerem laju inflasi yang dipicu lonjakan harga komoditas pangan.",
+        "submission_text": "Langkah bank sentral menaikkan suku bunga acuan dimaksudkan untuk menahan percepatan inflasi dampak tingginya harga komoditas makanan.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Variasi frasa verbal dan sinonim pangan -> makanan."
+    },
+    {
+        "case_id": "SEM-LGT-005",
+        "group": "LIGHT_PARAPHRASE",
+        "domain": "Hukum Tata Negara",
+        "source_text": "Mahkamah Konstitusi berwenang mengadili pada tingkat pertama dan terakhir yang putusannya bersifat final untuk menguji undang-undang terhadap Undang-Undang Dasar.",
+        "submission_text": "Kewenangan menguji undang-undang terhadap konstitusi pada tingkat pertama dan terakhir dengan putusan bersifat mengikat berada pada Mahkamah Konstitusi.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Inversi struktur klausa hukum dasar."
+    },
+    {
+        "case_id": "SEM-LGT-006",
+        "group": "LIGHT_PARAPHRASE",
+        "domain": "Teknik Lingkungan",
+        "source_text": "Bioremediasi tanah tercemar minyak bumi memanfaatkan bakteri indigenous yang dapat mendegradasi senyawa hidrokarbon rantai panjang.",
+        "submission_text": "Bakteri lokal yang sanggup mengurai senyawa hidrokarbon rantai panjang dipakai dalam proses bioremediasi tanah yang terkontaminasi minyak mentah.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Sinonim indigenous -> lokal, tercemar -> terkontaminasi, mendegradasi -> mengurai."
+    },
+    {
+        "case_id": "SEM-LGT-007",
+        "group": "LIGHT_PARAPHRASE",
+        "domain": "Pendidikan",
+        "source_text": "Pendekatan pembelajaran berbasis proyek meningkatkan keterlibatan kognitif dan motivasi belajar peserta didik di sekolah menengah.",
+        "submission_text": "Keterlibatan kognitif serta dorongan belajar murid sekolah menengah meningkat melalui penerapan metode belajar berbasis proyek.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Substitusi peserta didik -> murid, motivasi -> dorongan, inversi klausa."
+    },
+    {
+        "case_id": "SEM-LGT-008",
+        "group": "LIGHT_PARAPHRASE",
+        "domain": "Farmasi",
+        "source_text": "Ekstrak daun kelor mengandung senyawa flavonoid tinggi yang memperlihatkan aktivitas antioksidan kuat dalam meredam radikal bebas DPPH.",
+        "submission_text": "Senyawa flavonoid berkadar tinggi dalam ekstrak daun kelor menunjukkan khasiat antioksidan yang kuat untuk menangkal radikal bebas DPPH.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Sinonim memperlihatkan aktivitas -> menunjukkan khasiat, meredam -> menangkal."
+    },
+    {
+        "case_id": "SEM-LGT-009",
+        "group": "LIGHT_PARAPHRASE",
+        "domain": "Ilmu Kelautan",
+        "source_text": "Pengasaman air laut akibat absorpsi karbon dioksida berlebih menghambat kalsifikasi kerangka karang hermatipik di perairan tropis.",
+        "submission_text": "Penyerapan karbon dioksida berlebih yang memicu pengasaman samudra mengganggu pembentukan zat kapur kerangka terumbu karang di kawasan tropis.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Substitusi kalsifikasi -> pembentukan zat kapur, absorpsi -> penyerapan."
+    },
+    {
+        "case_id": "SEM-LGT-010",
+        "group": "LIGHT_PARAPHRASE",
+        "domain": "Manajemen Bisnis",
+        "source_text": "Transformasi digital perbankan memerlukan pembaruan arsitektur sistem warisan untuk mendukung integrasi API pihak ketiga secara aman.",
+        "submission_text": "Demi menunjang keterhubungan API eksternal yang terlindungi, perbankan wajib memperbarui arsitektur sistem warisan dalam transformasi digitalnya.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Sinonim pihak ketiga -> eksternal, aman -> terlindungi, integrasi -> keterhubungan."
+    },
+    {
+        "case_id": "SEM-LGT-011",
+        "group": "LIGHT_PARAPHRASE",
+        "domain": "Sosiologi Perkotaan",
+        "source_text": "Gentrifikasi kawasan pinggiran kota seringkali meminggirkan warga lokal berpendapatan rendah akibat melambungnya harga sewa properti.",
+        "submission_text": "Kenaikan harga sewa hunian akibat gentrifikasi wilayah peri-urban kerap kali menyingkirkan masyarakat setempat yang berpenghasilan minim.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Substitusi pinggiran kota -> peri-urban, warga lokal -> masyarakat setempat."
+    },
+    {
+        "case_id": "SEM-LGT-012",
+        "group": "LIGHT_PARAPHRASE",
+        "domain": "Teknik Mesin",
+        "source_text": "Penggunaan pelumas sintetik berbahan dasar ester secara signifikan mengurangi koefisien gesek dan keausan pada bantalan luncur turbin.",
+        "submission_text": "Koefisien gesekan dan tingkat keausan bantalan luncur turbin berkurang secara nyata berkat pemakaian oli sintesis berbasis ester.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Substitusi pelumas -> oli, secara signifikan -> secara nyata, inversi klausa."
+    },
+    {
+        "case_id": "SEM-LGT-013",
+        "group": "LIGHT_PARAPHRASE",
+        "domain": "Agronomi",
+        "source_text": "Inokulasi mikoriza vesikular-arbuskular pada bibit kopi meningkatkan serapan fosfor dan toleransi kekeringan di tanah masam.",
+        "submission_text": "Bibit tanaman kopi yang diinokulasi jamur mikoriza arbuskular menunjukkan penyerapan fosfor yang lebih baik serta daya tahan pada kekeringan di lahan masam.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Sinonim serapan -> penyerapan, toleransi -> daya tahan, tanah -> lahan."
+    },
+    {
+        "case_id": "SEM-LGT-014",
+        "group": "LIGHT_PARAPHRASE",
+        "domain": "Psikologi Sosial",
+        "source_text": "Fenomena konformitas kelompok menekan keberanian individu untuk menyuarakan opini alternatif dalam rapat pengambilan keputusan.",
+        "submission_text": "Rasa takut dan tekanan kelompok membuat seseorang enggan menyampaikan gagasan yang berbeda dalam forum penentuan kebijakan.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Substitusi opini alternatif -> gagasan yang berbeda, rapat -> forum."
+    },
+    {
+        "case_id": "SEM-LGT-015",
+        "group": "LIGHT_PARAPHRASE",
+        "domain": "Teknik Geodesi",
+        "source_text": "Pengukuran deformasi permukaan tanah menggunakan radar interferometri satelit memiliki ketelitian milimeter untuk pemantauan amblesan perkotaan.",
+        "submission_text": "Teknologi interferometri radar berbasis wahana antariksa menyajikan akurasi berskala milimeter dalam memetakan penurunan muka tanah perkotaan.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Sinonim satelit -> wahana antariksa, ketelitian -> akurasi, amblesan -> penurunan muka tanah."
+    },
+
+    # ==========================================
+    # GROUP 2: PARAFRASE SEDANG (MODERATE PARAPHRASE) - 15 KASUS
+    # Karakteristik: Penggabungan proposisi, pemadatan kalimat, restrukturisasi sintaksis.
+    # ==========================================
+    {
+        "case_id": "SEM-MOD-001",
+        "group": "MODERATE_PARAPHRASE",
+        "domain": "Kecerdasan Buatan",
+        "source_text": "Algoritma pembelajaran penguatan mendalam membutuhkan jutaan kali interaksi simulasi untuk mencapai konvergensi kebijakan. Kebutuhan komputasi yang masif ini menjadi hambatan utama dalam implementasi robotika dunia nyata.",
+        "submission_text": "Penerapan deep reinforcement learning pada robot fisik sangat terbentur oleh tuntutan komputasi yang teramat tinggi, mengingat agen memerlukan miliaran langkah latihan trial-and-error sebelum mampu mematangkan strateginya.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Dua kalimat digabung dengan perubahan susunan kausalitas dari sebab-akibat menjadi akibat-sebab."
+    },
+    {
+        "case_id": "SEM-MOD-002",
+        "group": "MODERATE_PARAPHRASE",
+        "domain": "Kesehatan / Epidemiologi",
+        "source_text": "Cakupan vaksinasi campak yang berada di bawah 95 persen berisiko memicu hilangnya kekebalan kelompok. Akibatnya, wabah transmisi lokal dapat merebak dengan cepat pada populasi anak yang belum diimunisasi.",
+        "submission_text": "Komunitas anak menghadapi bahaya ledakan epidemi campak sewaktu-waktu manakala rasio imunisasi belum menyentuh batas aman herd immunity sebesar sembilan puluh lima persen.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Pemadatan dua kalimat menjadi satu kalimat majemuk bersyarat."
+    },
+    {
+        "case_id": "SEM-MOD-003",
+        "group": "MODERATE_PARAPHRASE",
+        "domain": "Sains Data",
+        "source_text": "Kumpulan data yang tidak seimbang menyebabkan pengklasifikasi standar condong memprediksi kelas mayoritas secara akurat sementara mengabaikan kelas minoritas. Pendekatan sampling seperti SMOTE sering diterapkan untuk mengatasi disparitas ini.",
+        "submission_text": "Ketimpangan proporsi data kerap menjebak algoritma klasifikasi sehingga hanya mahir mengenali label terbanyak; guna menyeimbangkan distribusi sampel langka, teknik sintesis SMOTE lazim dikerahkan.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Restrukturisasi sintaksis kompleks dan parafrase konsep machine learning."
+    },
+    {
+        "case_id": "SEM-MOD-004",
+        "group": "MODERATE_PARAPHRASE",
+        "domain": "Keuangan / Fintech",
+        "source_text": "Sistem penilaian kredit alternatif memanfaatkan riwayat jejak digital dan perilaku transaksi e-commerce peminjam. Hal ini membuka akses pendanaan bagi masyarakat unbanked yang tidak memiliki catatan kredit perbankan formal.",
+        "submission_text": "Masyarakat tanpa rekening formal kini dapat memperoleh pinjaman berkat credit scoring inovatif yang menganalisis jejak kebiasaan belanja online serta jejak aktivitas digital mereka.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Perubahan fokus dari mekanisme sistem ke penerima manfaat."
+    },
+    {
+        "case_id": "SEM-MOD-005",
+        "group": "MODERATE_PARAPHRASE",
+        "domain": "Bioteknologi",
+        "source_text": "Penyuntingan genom tanaman menggunakan CRISPR-Cas9 memungkinkan modifikasi target DNA spesifik tanpa memasukkan gen asing. Pendekatan ini mempercepat pemuliaan varietas padi yang tahan terhadap penyakit hawar daun bakteri.",
+        "submission_text": "Ketahanan kultivar padi terhadap serangan hawar bakteri berhasil ditingkatkan lebih cepat lewat manipulasi genetik presisi CRISPR-Cas9, yang tidak melibatkan introduksi materi DNA asing ke dalam tanaman.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Inversi hierarki informasi dan restrukturisasi klausa bioteknologi."
+    },
+    {
+        "case_id": "SEM-MOD-006",
+        "group": "MODERATE_PARAPHRASE",
+        "domain": "Hukum Bisnis",
+        "source_text": "Klausul force majeure dalam kontrak komersial tidak serta-merta membebaskan debitur dari kewajiban pembayaran hutang. Pihak yang terdampak wajib membuktikan adanya hubungan kausal langsung antara peristiwa tak terduga dengan ketidakmampuannya berprestasi.",
+        "submission_text": "Debitur tetap dituntut memenuhi prestasinya kendati ada klausul keadaan memaksa, kecuali bila terbukti secara jelas bahwa wanprestasi tersebut benar-benar timbul sebagai konsekuensi tak terelakkan dari kejadian luar biasa.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Penyusunan ulang dalil hukum komersial dengan kosakata yuridis padat."
+    },
+    {
+        "case_id": "SEM-MOD-007",
+        "group": "MODERATE_PARAPHRASE",
+        "domain": "Sosiologi Agama",
+        "source_text": "Perjumpaan lintas iman di ruang digital cenderung menghasilkan polarisasi opini akibat algoritma media sosial yang memperkuat ruang gema. Namun, inisiatif dialog moderat tetap bermunculan di kalangan generasi muda.",
+        "submission_text": "Kendati algoritma linimasa kerap mengurung netizen dalam echo chamber yang mempertajam friksi keyakinan, anak-anak muda masih giat membangun jembatan percakapan toleran di dunia maya.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Parafrase metaforis (ruang gema -> echo chamber, perjumpaan -> jembatan percakapan)."
+    },
+    {
+        "case_id": "SEM-MOD-008",
+        "group": "MODERATE_PARAPHRASE",
+        "domain": "Teknik Kimia",
+        "source_text": "Katalis zeolit alam yang diaktivasi asam klorida menunjukkan peningkatan luas permukaan spesifik dan keasaman situs aktif. Perlakuan ini melipatgandakan rendemen biodiesel dari minyak jelantah pada reaksi transesterifikasi.",
+        "submission_text": "Aktivasi zeolit alam memakai larutan HCl memicu ekspansi pori dan situs asam, sehingga terbukti jauh lebih efektif dalam mendongkrak perolehan biodiesel dari minyak goreng bekas.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Sinonim minyak jelantah -> minyak goreng bekas, rendemen -> perolehan, mendongkrak."
+    },
+    {
+        "case_id": "SEM-MOD-009",
+        "group": "MODERATE_PARAPHRASE",
+        "domain": "Arsitektur Tropis",
+        "source_text": "Desain selubung bangunan dengan kisi-kisi penangkal radiasi matahari efektif mereduksi beban termal pendingin ruangan. Penataan ventilasi silang alami turut mempertahankan kenyamanan suhu dalam ruang di iklim lembap.",
+        "submission_text": "Efisiensi pendinginan gedung pada iklim tropis dapat dicapai melalui fasad peneduh radiasi surya yang dikombinasikan dengan sirkulasi udara silang untuk menjaga temperatur interior tetap nyaman.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Penggabungan dua elemen arsitektur pasif ke satu kalimat terintegrasi."
+    },
+    {
+        "case_id": "SEM-MOD-010",
+        "group": "MODERATE_PARAPHRASE",
+        "domain": "Hubungan Internasional",
+        "source_text": "Ketergantungan ekonomi yang terlampau dalam pada rantai pasok semikonduktor global mendorong negara-negara industri merelokasi fasilitas fabrikasi ke dalam negeri demi memperkuat keamanan nasional.",
+        "submission_text": "Isu ketahanan nasional mendesak kekuatan manufaktur dunia untuk menarik pulang produksi chip semikonduktor, guna memitigasi kerentanan akibat keterikatan logistik global yang rapuh.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Restrukturisasi argumen geopolitik dengan terminologi chip semikonduktor."
+    },
+    {
+        "case_id": "SEM-MOD-011",
+        "group": "MODERATE_PARAPHRASE",
+        "domain": "Manajemen Rantai Pasok",
+        "source_text": "Penerapan sensor Internet of Things (IoT) pada armada cold chain memastikan pemantauan suhu secara real-time. Dengan demikian, risiko pembusukan produk vaksin dan daging beku selama transit lintas pulau dapat ditekan secara drastis.",
+        "submission_text": "Kerusakan bahan sensitif seperti vaksin dan komoditas beku saat distribusi antarpulau dapat dicegah berkat pengawasan temperatur nirhenti menggunakan piranti IoT di sepanjang jalur logistik dingin.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Pemadatan penjelasan IoT cold chain."
+    },
+    {
+        "case_id": "SEM-MOD-012",
+        "group": "MODERATE_PARAPHRASE",
+        "domain": "Linguistik Komputasional",
+        "source_text": "Pengenalan entitas bernama (NER) untuk bahasa daerah dengan sumber daya terbatas menghadapi kelangkaan korpus beranotasi berkualitas tinggi. Pembelajaran transfer lintas bahasa dari korpus bahasa Indonesia menjadi alternatif yang menjanjikan.",
+        "submission_text": "Minimnya dataset teks berlabel pada bahasa-bahasa lokal nusantara dapat dijembatani melalui cross-lingual transfer learning dengan memanfaatkan kekayaan data bahasa Indonesia untuk tugas pengenalan entitas bernama.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Penyusunan ulang proposisi NLP sumber daya rendah."
+    },
+    {
+        "case_id": "SEM-MOD-013",
+        "group": "MODERATE_PARAPHRASE",
+        "domain": "Teknik Sipil",
+        "source_text": "Stabilisasi tanah lempung ekspansif dengan penambahan abu terbang batubara dan semen mampu meningkatkan nilai CBR rendaman secara signifikan serta mereduksi potensi kembang-susut tanah dasar jalan.",
+        "submission_text": "Pencampuran limbah fly ash dan semen pada subgrade lempung bermasalah terbukti ampuh meminimalisir risiko swelling sekaligus mendongkrak daya dukung tanah CBR setelah direndam.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Pemakaian istilah teknik sinonim (swelling, subgrade, fly ash)."
+    },
+    {
+        "case_id": "SEM-MOD-014",
+        "group": "MODERATE_PARAPHRASE",
+        "domain": "Psikologi Perkembangan",
+        "source_text": "Paparan layar gawai yang berlebihan pada anak usia dini berkorelasi positif dengan keterlambatan bicara dan penurunan konsentrasi belajar di sekolah taman kanak-kanak.",
+        "submission_text": "Anak balita yang terbiasa menghabiskan waktu terlalu lama di depan layar gadget memperlihatkan kecenderungan gangguan perkembangan wicara serta kesulitan memusatkan atensi di ruang kelas.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Substitusi konsentrasi -> memusatkan atensi, keterlambatan bicara -> gangguan wicara."
+    },
+    {
+        "case_id": "SEM-MOD-015",
+        "group": "MODERATE_PARAPHRASE",
+        "domain": "Arkeologi Maritim",
+        "source_text": "Ekskavasi situs kapal karam abad ke-10 di perairan Nusantara mengungkap keberadaan ribuan keramik Tiongkok era Dinasti Song dan rempah-rempah yang membuktikan tingginya intensitas perdagangan maritim kuno.",
+        "submission_text": "Temuan muatan gerabah Dinasti Song serta rempah aromatik pada bangkai kapal abad kesepuluh di laut Indonesia menjadi saksi betapa dinamisnya rute niaga bahari di masa silam.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Sintesis puitik historis pada fakta arkeologis."
+    },
+
+    # ==========================================
+    # GROUP 3: PARAFRASE AGRESIF / MENDALAM (AGGRESSIVE PARAPHRASE) - 15 KASUS
+    # Karakteristik: Perombakan total kosakata & struktur kalimat; n-gram leksikal mendekati 0%.
+    # ==========================================
+    {
+        "case_id": "SEM-AGR-001",
+        "group": "AGGRESSIVE_PARAPHRASE",
+        "domain": "Ilmu Lingkungan / Ekologi",
+        "source_text": "Deforestasi hutan hujan tropis di wilayah tangkapan air menyebabkan erosi permukaan yang parah, mendegradasi kualitas air sungai, dan memicu bencana banjir bandang berulang kali di wilayah hilir permukiman.",
+        "submission_text": "Ketika pepohonan rimba di hulu terus ditebangi, tanah kehilangan cengkeraman akarnya sehingga air bah leluasa menggilas perkampungan bawah dengan membawa endapan lumpur pekat.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Parafrase naratif metaforis; hampir tidak ada kata leksikal yang tumpang tindih (n-gram 5 kata = 0%)."
+    },
+    {
+        "case_id": "SEM-AGR-002",
+        "group": "AGGRESSIVE_PARAPHRASE",
+        "domain": "Ekonomi Publik",
+        "source_text": "Kebijakan subsidi bahan bakar minyak yang bersifat regresif justru lebih banyak dinikmati oleh kelompok masyarakat mampu pengguna kendaraan pribadi daripada golongan miskin sasaran perlindungan sosial.",
+        "submission_text": "Bantuan harga BBM selama ini ternyata salah sasaran: pemilik mobil mewah lah yang mengeruk keuntungan terbanyak dari anggaran negara, sementara warga berkekurangan hanya kecipratan sisa.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Pengubahan terminologi akademis ekonomi publik ke narasi populer."
+    },
+    {
+        "case_id": "SEM-AGR-003",
+        "group": "AGGRESSIVE_PARAPHRASE",
+        "domain": "Kriptografi & Keamanan",
+        "source_text": "Komputasi kuantum berpotensi meretas algoritma enkripsi kunci publik asimetris seperti RSA dalam hitungan menit melalui algoritma pemfaktoran bilangan prima Shor.",
+        "submission_text": "Keamanan pertukaran data rahasia masa kini terancam runtuh seketika andai mesin kuantum berhasil memecahkan teka-teki matematika sandi kriptografi menggunakan metode Shor.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Perombakan konsep RSA dan Shor ke narasi ancaman kriptografi."
+    },
+    {
+        "case_id": "SEM-AGR-004",
+        "group": "AGGRESSIVE_PARAPHRASE",
+        "domain": "Gizi & Imunologi",
+        "source_text": "Pemberian air susu ibu eksklusif selama enam bulan pertama kehidupan mentransfer antibodi sekretori imunoglobulin A yang melindungi saluran cerna bayi dari infeksi patogen enteral.",
+        "submission_text": "ASI murni pada setengah tahun awal menjadi perisai alami bagi usus bayi, menyuplai zat kekebalan ibu agar si kecil kebal dari serbuan kuman penyebab diare.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Parafrase kedokteran ke pemahaman biologis awam tanpa kata leksikal identik."
+    },
+    {
+        "case_id": "SEM-AGR-005",
+        "group": "AGGRESSIVE_PARAPHRASE",
+        "domain": "Ilmu Politik",
+        "source_text": "Klientelisme dan politik uang dalam pemilihan kepala daerah melahirkan lingkaran setan korupsi, di mana kandidat terpilih menyalahgunakan wewenang konsesi demi mengembalikan modal kampanye.",
+        "submission_text": "Praktik bagi-bagi uang saat pilkada menuntut pemenang kursi jabatan menjual izin tambang dan lahan kepada cukong pemodal untuk melunasi utang kontestasi.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Konkretisasi istilah klientelisme dan konsesi menjadi transaksi politik nyata."
+    },
+    {
+        "case_id": "SEM-AGR-006",
+        "group": "AGGRESSIVE_PARAPHRASE",
+        "domain": "Teknologi Bahan",
+        "source_text": "Penambahan serat karbon pada matriks geopolimer abu terbang menghasilkan komposit berkekuatan tarik tinggi yang tahan terhadap suhu ekstrem hingga delapan ratus derajat celsius.",
+        "submission_text": "Bahan bangunan masa depan dari debu pembakaran batu bara yang dianyam serat karbon sanggup bertahan utuh dan tidak retak meski terpanggang kobaran api 800°C.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Parafrase radikal sifat material dan kekuatan tarik komposit."
+    },
+    {
+        "case_id": "SEM-AGR-007",
+        "group": "AGGRESSIVE_PARAPHRASE",
+        "domain": "Hukum Perlindungan Data",
+        "source_text": "Prinsip akuntabilitas dalam regulasi privasi data mewajibkan pengendali data membuktikan bahwa persetujuan pemrosesan diperoleh secara sukarela, eksplisit, dan tanpa paksaan dari subjek data.",
+        "submission_text": "Perusahaan teknologi tidak boleh lagi diam-diam menjebak pengguna; mereka harus bisa memperlihatkan bukti tertulis bahwa pemilik identitas memang ikhlas datanya diolah.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Parafrase bahasa hukum regulasi GDPR/UU PDP ke terminologi praktis."
+    },
+    {
+        "case_id": "SEM-AGR-008",
+        "group": "AGGRESSIVE_PARAPHRASE",
+        "domain": "Farmakologi Onkologi",
+        "source_text": "Terapi sel CAR-T merekayasa limfosit T pasien secara genetik di laboratorium agar mengekspresikan reseptor antigen kimerik yang mengenali dan menghancurkan sel leukemia secara terarah.",
+        "submission_text": "Pasukan imun tubuh pasien diambil untuk dilatih ulang di tabung reaksi agar dibekali radar khusus yang mampu memburu sel kanker darah sampai tuntas.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Metafora militer/biologis untuk terapi imunoterapi CAR-T."
+    },
+    {
+        "case_id": "SEM-AGR-009",
+        "group": "AGGRESSIVE_PARAPHRASE",
+        "domain": "Etika Rekayasa AI",
+        "source_text": "Bias algoritmik dalam sistem rekrutmen otomatis memperpetuasi diskriminasi historis terhadap pelamar perempuan pada sektor industri teknologi tinggi yang didominasi laki-laki.",
+        "submission_text": "Kecerdasan buatan penyeleksi lamaran kerja seringkali secara curang mencoret berkas kandidat wanita lantaran mesin diajari dari riwayat masa lalu yang dikuasai pria.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Parafrase mendalam mengenai bias representasi training data."
+    },
+    {
+        "case_id": "SEM-AGR-010",
+        "group": "AGGRESSIVE_PARAPHRASE",
+        "domain": "Ekologi Kelautan",
+        "source_text": "Akumulasi mikroplastik di jaringan trofik biota laut menyebabkan stres oksidatif dan gangguan reproduksi pada ikan pelagis kecil yang menjadi pakan predator puncak.",
+        "submission_text": "Ikan-ikan kecil pemakan plankton merana karena ususnya tersumbat remah sampah plastik, yang berdampak buruk pada kesuburan mereka dan meracuni rantai makanan ikan besar.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Parafrase trofik biota laut dan stres oksidatif ke penjelasan fungsional ekologis."
+    },
+    {
+        "case_id": "SEM-AGR-011",
+        "group": "AGGRESSIVE_PARAPHRASE",
+        "domain": "Tata Kelola Perkotaan",
+        "source_text": "Eksploitasi air tanah dalam secara masif dan tidak terkendali oleh gedung-gedung bertingkat mempercepat laju penurunan tanah di dataran aluvial pesisir utara Jakarta.",
+        "submission_text": "Daratan pesisir ibu kota terus amblas tenggelam setiap tahunnya gara-gara sumur sedot gedung perkantoran tiada henti memompa sumber air dari perut bumi.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Parafrase jurnalisme investigatif atas fenomena subsidence pesisir."
+    },
+    {
+        "case_id": "SEM-AGR-012",
+        "group": "AGGRESSIVE_PARAPHRASE",
+        "domain": "Neurologi Kognitif",
+        "source_text": "Penumpukan plak amiloid-beta dan kekusutan neurofibrilar protein tau di hipokampus merusak konektivitas sinaps yang berujung pada degenerasi ingatan pada penderita Alzheimer.",
+        "submission_text": "Penyakit lupa pikun Alzheimer bermula saat kotoran protein mengotori pusat memori otak, memutuskan kawat komunikasi antarsaraf hingga ingatan masa lampau lenyap.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Penyederhanaan radikal patofisiologi Alzheimer."
+    },
+    {
+        "case_id": "SEM-AGR-013",
+        "group": "AGGRESSIVE_PARAPHRASE",
+        "domain": "Manajemen Keuangan Publik",
+        "source_text": "Keterlambatan serapan anggaran belanja modal pemerintah daerah pada kuartal awal mengakibatkan penumpukan proyek fisik di akhir tahun anggaran yang menurunkan mutu pengerjaan infrastruktur.",
+        "submission_text": "Kebiasaan birokrasi menimbun dana proyek di awal tahun membuat pembangunan jembatan dan aspal jalan dikerjakan terburu-buru asal jadi menjelang tutup buku Desember.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Parafrase idiomatis siklus penyerapan anggaran APBD."
+    },
+    {
+        "case_id": "SEM-AGR-014",
+        "group": "AGGRESSIVE_PARAPHRASE",
+        "domain": "Metodologi Riset",
+        "source_text": "Publikasi selektif terhadap hasil penelitian yang hanya mendukung hipotesis positif menimbulkan bias publikasi dan distorsi literatur ilmiah meta-analisis.",
+        "submission_text": "Dunia sains tercemar manakala peneliti hanya mengirimkan uji coba yang berhasil dan menyembunyikan percobaan gagal di laci meja laboratorium mereka.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Metafora 'file drawer problem' untuk bias publikasi ilmiah."
+    },
+    {
+        "case_id": "SEM-AGR-015",
+        "group": "AGGRESSIVE_PARAPHRASE",
+        "domain": "Teknik Perkeretaapian",
+        "source_text": "Penerapan sistem pengereman regeneratif pada kereta listrik berkecepatan tinggi mengubah energi kinetik pengereman menjadi arus listrik yang diumpankan kembali ke jaringan katenari.",
+        "submission_text": "Saat lokomotif modern memperlambat lajunya, daya dorong rodanya diputar balik menjadi pembangkit listrik ramah lingkungan untuk dialirkan kembali ke kabel rel atas.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Penjelasan mekanika energi kinetik regeneratif tanpa istilah katenari baku."
+    },
+
+    # ==========================================
+    # GROUP 4: KONTROL NEGATIF BERSIH (CLEAN NEGATIVE CONTROLS) - 20 KASUS
+    # Karakteristik: Teks akademik independen; TIDAK plagiat; untuk mengukur False Positive Rate.
+    # Termasuk topik yang bersinggungan secara leksikal tapi bermakna proposisi berbeda!
+    # ==========================================
+    {
+        "case_id": "SEM-CLN-001",
+        "group": "CLEAN_NEGATIVE_CONTROL",
+        "domain": "Matematika Murni / Aljabar",
+        "source_text": "Model representasi bahasa transformer memanfaatkan mekanisme atensi mandiri guna menangkap ketergantungan jarak jauh dalam teks berskala masif.",
+        "submission_text": "Teorema ketunggalan faktorisasi bilangan bulat menyatakan bahwa setiap bilangan asli yang lebih besar dari satu dapat dituliskan sebagai perkalian bilangan prima secara unik.",
+        "is_plagiarized": False,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Topik sama sekali berbeda (AI vs Matematika Teori Bilangan)."
+    },
+    {
+        "case_id": "SEM-CLN-002",
+        "group": "CLEAN_NEGATIVE_CONTROL",
+        "domain": "Energi Panas Bumi (Topik sama-sama energi, proposisi beda)",
+        "source_text": "Pembangkit listrik tenaga surya fotovoltaik membutuhkan inverter pintar demi menjaga stabilitas tegangan listrik di jaringan transmisi.",
+        "submission_text": "Eksplorasi manifestasi panas bumi di wilayah vulkanik aktif melibatkan kajian geokimia fluida panas untuk memprediksi temperatur reservoir bawah permukaan.",
+        "is_plagiarized": False,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Sama-sama energi terbarukan, tetapi proposisi panas bumi vs surya fotovoltaik."
+    },
+    {
+        "case_id": "SEM-CLN-003",
+        "group": "CLEAN_NEGATIVE_CONTROL",
+        "domain": "Kedokteran Bedah",
+        "source_text": "Penerapan pola makan rendah gula terbukti secara klinis mampu menurunkan prevalensi diabetes melitus tipe 2 pada lansia.",
+        "submission_text": "Teknik bedah laparoskopi kolesistektomi menghasilkan pemulihan pascaoperasi yang lebih cepat dan komplikasi luka minimal dibanding laparotomi konvensional.",
+        "is_plagiarized": False,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Sama-sama domain medis, tetapi gizi endokrin vs teknik bedah digestif."
+    },
+    {
+        "case_id": "SEM-CLN-004",
+        "group": "CLEAN_NEGATIVE_CONTROL",
+        "domain": "Ekonomi Moneter (Suku Bunga vs Nilai Tukar)",
+        "source_text": "Kenaikan suku bunga acuan oleh bank sentral bertujuan mengerem laju inflasi yang dipicu lonjakan harga komoditas pangan.",
+        "submission_text": "Intervensi valuta asing di pasar spot dan obligasi negara dilakukan demi menstabilkan nilai tukar rupiah di tengah keluarnya modal asing secara tiba-tiba.",
+        "is_plagiarized": False,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Sama-sama kebijakan bank sentral, namun instrumen dan fokus analisis sama sekali mandiri."
+    },
+    {
+        "case_id": "SEM-CLN-005",
+        "group": "CLEAN_NEGATIVE_CONTROL",
+        "domain": "Hukum Pidana vs Tata Negara",
+        "source_text": "Mahkamah Konstitusi berwenang mengadili pada tingkat pertama dan terakhir yang putusannya bersifat final untuk menguji undang-undang terhadap Undang-Undang Dasar.",
+        "submission_text": "Asas legalitas dalam Kitab Undang-Undang Hukum Pidana menegaskan bahwa tiada perbuatan yang dapat dipidana kecuali atas kekuatan aturan pidana perundang-undangan terdahulu.",
+        "is_plagiarized": False,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Sama-sama disiplin hukum, namun doktrin pidana vs peradilan konstitusi."
+    },
+    {
+        "case_id": "SEM-CLN-006",
+        "group": "CLEAN_NEGATIVE_CONTROL",
+        "domain": "Mikrobiologi Medis",
+        "source_text": "Bioremediasi tanah tercemar minyak bumi memanfaatkan bakteri indigenous yang dapat mendegradasi senyawa hidrokarbon rantai panjang.",
+        "submission_text": "Uji kepekaan kuman Staphylococcus aureus terhadap antibiotik vankomisin menggunakan metode mikrodilusi kaldu diatur menurut standar pedoman CLSI.",
+        "is_plagiarized": False,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Sama-sama mikrobiologi, namun remediasi polusi tanah vs uji resistensi bakteri patogen rumah sakit."
+    },
+    {
+        "case_id": "SEM-CLN-007",
+        "group": "CLEAN_NEGATIVE_CONTROL",
+        "domain": "Psikologi Pendidikan (Kognitif vs Evaluasi Belajar)",
+        "source_text": "Pendekatan pembelajaran berbasis proyek meningkatkan keterlibatan kognitif dan motivasi belajar peserta didik di sekolah menengah.",
+        "submission_text": "Validitas butir tes pilihan ganda dianalisis dengan model Rasch satu parameter guna mengukur tingkat kesukaran dan daya pembeda butir soal ujian akhir semester.",
+        "is_plagiarized": False,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Sama-sama pendidikan sekolah menengah, tetapi pedagogi proyek vs psikometri butir tes."
+    },
+    {
+        "case_id": "SEM-CLN-008",
+        "group": "CLEAN_NEGATIVE_CONTROL",
+        "domain": "Kimia Organik Bahan Alam",
+        "source_text": "Ekstrak daun kelor mengandung senyawa flavonoid tinggi yang memperlihatkan aktivitas antioksidan kuat dalam meredam radikal bebas DPPH.",
+        "submission_text": "Isolasi minyak atsiri dari rimpang temulawak menggunakan metode distilasi uap-air menghasilkan komponen utama xanthorrhizol dan kurkuminoid murni.",
+        "is_plagiarized": False,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Sama-sama bahan alam nabati, namun tanaman, metode ekstraksi, dan target senyawa beda."
+    },
+    {
+        "case_id": "SEM-CLN-009",
+        "group": "CLEAN_NEGATIVE_CONTROL",
+        "domain": "Oseanografi Fisik",
+        "source_text": "Pengasaman air laut akibat absorpsi karbon dioksida berlebih menghambat kalsifikasi kerangka karang hermatipik di perairan tropis.",
+        "submission_text": "Pola arus pasang surut di Selat Lombok dikendalikan oleh gradien tekanan hidrodinamik antara Samudra Pasifik dan Samudra Hindia bagian timur.",
+        "is_plagiarized": False,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Sama-sama ilmu laut, namun kimia hayati pengasaman vs dinamika arus pasut hidro-oseanografi."
+    },
+    {
+        "case_id": "SEM-CLN-010",
+        "group": "CLEAN_NEGATIVE_CONTROL",
+        "domain": "Keamanan Siber Jaringan",
+        "source_text": "Transformasi digital perbankan memerlukan pembaruan arsitektur sistem warisan untuk mendukung integrasi API pihak ketiga secara aman.",
+        "submission_text": "Arsitektur Zero Trust Network Access menerapkan verifikasi identitas berlapis dan enkripsi ujung-ke-ujung bagi setiap perangkat sebelum mengizinkan koneksi intranet.",
+        "is_plagiarized": False,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Sama-sama keamanan IT, namun API integrasi legacy vs kontrol akses zero-trust internal."
+    },
+    {
+        "case_id": "SEM-CLN-011",
+        "group": "CLEAN_NEGATIVE_CONTROL",
+        "domain": "Perencanaan Wilayah Desa",
+        "source_text": "Gentrifikasi kawasan pinggiran kota seringkali meminggirkan warga lokal berpendapatan rendah akibat melambungnya harga sewa properti.",
+        "submission_text": "Badan Usaha Milik Desa mengelola lumbung pangan lokal guna mengamankan ketersediaan gabah kering giling di tingkat petani saat musim paceklik tiba.",
+        "is_plagiarized": False,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Masalah tata ruang pinggiran kota vs ketahanan pangan pedesaan."
+    },
+    {
+        "case_id": "SEM-CLN-012",
+        "group": "CLEAN_NEGATIVE_CONTROL",
+        "domain": "Termodinamika Pembakaran",
+        "source_text": "Penggunaan pelumas sintetik berbahan dasar ester secara signifikan mengurangi koefisien gesek dan keausan pada bantalan luncur turbin.",
+        "submission_text": "Penambahan campuran etanol pada bensin oktan 92 meningkatkan kecepatan rambat api laminer serta menurunkan emisi gas karbon monoksida hasil pembakaran motor bakar.",
+        "is_plagiarized": False,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Tribologi pelumas mesin vs kinetika pembakaran bahan bakar otomotif."
+    },
+    {
+        "case_id": "SEM-CLN-013",
+        "group": "CLEAN_NEGATIVE_CONTROL",
+        "domain": "Ilmu Gulma Pertanian",
+        "source_text": "Inokulasi mikoriza vesikular-arbuskular pada bibit kopi meningkatkan serapan fosfor dan toleransi kekeringan di tanah masam.",
+        "submission_text": "Pengendalian gulma teki pada pertanaman kedelai secara mekanis melalui penyiangan manual menghasilkan bobot polong kering tertinggi dibanding herbisida kimiawi.",
+        "is_plagiarized": False,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Biologi tanah mikoriza vs pengendalian gulma gulma mekanis."
+    },
+    {
+        "case_id": "SEM-CLN-014",
+        "group": "CLEAN_NEGATIVE_CONTROL",
+        "domain": "Psikologi Organisasi (Kepemimpinan)",
+        "source_text": "Fenomena konformitas kelompok menekan keberanian individu untuk menyuarakan opini alternatif dalam rapat pengambilan keputusan.",
+        "submission_text": "Gaya kepemimpinan transformasional memfasilitasi motivasi inspirasional dan stimulasi intelektual yang mendongkrak komitmen afektif karyawan startup.",
+        "is_plagiarized": False,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Tekanan kelompok vs kepemimpinan transformasional manajerial."
+    },
+    {
+        "case_id": "SEM-CLN-015",
+        "group": "CLEAN_NEGATIVE_CONTROL",
+        "domain": "Kartografi Tematik",
+        "source_text": "Pengukuran deformasi permukaan tanah menggunakan radar interferometri satelit memiliki ketelitian milimeter untuk pemantauan amblesan perkotaan.",
+        "submission_text": "Generalisasi kartografis batas administrasi distrik pada peta skala 1 banding 250.000 dilakukan dengan metode penyederhanaan poligon Douglas-Peucker.",
+        "is_plagiarized": False,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "InSAR radar penginderaan jauh vs algoritma generalisasi garis kartografi."
+    },
+    {
+        "case_id": "SEM-CLN-016",
+        "group": "CLEAN_NEGATIVE_CONTROL",
+        "domain": "Filsafat Epistemologi",
+        "source_text": "Deforestasi hutan hujan tropis di wilayah tangkapan air menyebabkan erosi permukaan yang parah, mendegradasi kualitas air sungai, dan memicu bencana banjir bandang berulang kali di wilayah hilir permukiman.",
+        "submission_text": "Skeptisisme metodis Descartes menuntut subjek meragukan seluruh pengetahuan inderawi demi menemukan fondasi kepastian yang kokoh melalui diktum cogito ergo sum.",
+        "is_plagiarized": False,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Lingkungan fisik hidrologi vs filsafat rasionalisme barat."
+    },
+    {
+        "case_id": "SEM-CLN-017",
+        "group": "CLEAN_NEGATIVE_CONTROL",
+        "domain": "Studi Kebijakan Pajak",
+        "source_text": "Kebijakan subsidi bahan bakar minyak yang bersifat regresif justru lebih banyak dinikmati oleh kelompok masyarakat mampu pengguna kendaraan pribadi daripada golongan miskin sasaran perlindungan sosial.",
+        "submission_text": "Pengenaan tarif pajak karbon terintegrasi pada sektor industri semen dan baja dirancang untuk mendorong dekarbonisasi proses manufaktur berat.",
+        "is_plagiarized": False,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Subsidi BBM konsumen vs pajak karbon industri berat."
+    },
+    {
+        "case_id": "SEM-CLN-018",
+        "group": "CLEAN_NEGATIVE_CONTROL",
+        "domain": "Komunikasi Visual Desain",
+        "source_text": "Komputasi kuantum berpotensi meretas algoritma enkripsi kunci publik asimetris seperti RSA dalam hitungan menit melalui algoritma pemfaktoran bilangan prima Shor.",
+        "submission_text": "Penerapan hierarki tipografi sans-serif dan kontras warna primer pada papan petunjuk arah bandara mempermudah keterbacaan navigasi visual penumpang transit.",
+        "is_plagiarized": False,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Kriptografi kuantum vs tata desain wayfinding bandara."
+    },
+    {
+        "case_id": "SEM-CLN-019",
+        "group": "CLEAN_NEGATIVE_CONTROL",
+        "domain": "Pediatri Alergi Makanan",
+        "source_text": "Pemberian air susu ibu eksklusif selama enam bulan pertama kehidupan mentransfer antibodi sekretori imunoglobulin A yang melindungi saluran cerna bayi dari infeksi patogen enteral.",
+        "submission_text": "Prevalensi dermatitis atopik pada anak dengan riwayat keluarga alergi susu sapi dapat dideteksi sejak dini menggunakan uji tusuk kulit alergen ekstrak kasein.",
+        "is_plagiarized": False,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "ASI imunitas usus bayi vs alergi kulit susu sapi pediatri."
+    },
+    {
+        "case_id": "SEM-CLN-020",
+        "group": "CLEAN_NEGATIVE_CONTROL",
+        "domain": "Sistem Informasi Geografis Transportasi",
+        "source_text": "Klientelisme dan politik uang dalam pemilihan kepala daerah melahirkan lingkaran setan korupsi, di mana kandidat terpilih menyalahgunakan wewenang konsesi demi mengembalikan modal kampanye.",
+        "submission_text": "Penentuan halte bus pengumpan terintegrasi mengadopsi model gravitasi spasial untuk meminimalkan waktu jalan kaki calon penumpang di kawasan pemukiman padat.",
+        "is_plagiarized": False,
+        "source_lang": "id",
+        "submission_lang": "id",
+        "description": "Pilkada politik uang vs pemodelan spasial halte bus."
+    },
+
+    # ==========================================
+    # GROUP 5: UJI LINTAS BAHASA (CROSS-LINGUAL VALIDATION) - 15 KASUS
+    # Karakteristik: Teks rujukan Indonesia vs Teks submisi Bahasa Inggris, Arab, Mandarin, Belanda, Jerman.
+    # Menguji zero-shot cross-lingual embedding tanpa mesin penerjemah Google Translate.
+    # ==========================================
+    # --- Sub-group: Indonesia -> Inggris (3 Kasus) ---
+    {
+        "case_id": "SEM-XLN-EN1",
+        "group": "CROSS_LINGUAL",
+        "domain": "Kecerdasan Buatan / NLP",
+        "source_text": "Model representasi bahasa berbasis transformer memanfaatkan mekanisme atensi mandiri untuk menangkap dependensi kontekstual jarak jauh dalam korpus teks berskala sangat besar.",
+        "submission_text": "Transformer-based language representation models leverage self-attention mechanisms to capture long-range contextual dependencies across large-scale text corpora.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "en",
+        "description": "Lintas bahasa: Indonesia ke Inggris murni."
+    },
+    {
+        "case_id": "SEM-XLN-EN2",
+        "group": "CROSS_LINGUAL",
+        "domain": "Teknologi Energi Bersih",
+        "source_text": "Pembangkit listrik tenaga surya fotovoltaik membutuhkan inverter pintar demi menjaga stabilitas tegangan listrik di jaringan transmisi.",
+        "submission_text": "Distributed photovoltaic solar plants require smart inverters to maintain grid voltage stability during fluctuating solar irradiance.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "en",
+        "description": "Lintas bahasa: Indonesia ke Inggris teknikal fotovoltaik."
+    },
+    {
+        "case_id": "SEM-XLN-EN3",
+        "group": "CROSS_LINGUAL",
+        "domain": "Ekonomi Moneter",
+        "source_text": "Kenaikan suku bunga acuan oleh bank sentral bertujuan mengerem laju inflasi yang dipicu lonjakan harga komoditas pangan.",
+        "submission_text": "Central banks raise baseline interest rates to curb rising inflation driven by global commodity price surges.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "en",
+        "description": "Lintas bahasa: Indonesia ke Inggris moneter."
+    },
+
+    # --- Sub-group: Indonesia -> Arab (3 Kasus) ---
+    {
+        "case_id": "SEM-XLN-AR1",
+        "group": "CROSS_LINGUAL",
+        "domain": "Kecerdasan Buatan",
+        "source_text": "Model representasi bahasa berbasis transformer memanfaatkan mekanisme atensi mandiri untuk menangkap dependensi kontekstual jarak jauh dalam korpus teks berskala sangat besar.",
+        "submission_text": "تعتمد نماذج تمثيل اللغة القائمة على المحولات على آليات الانتباه الذاتي لالتقاط العلاقات السياقية بعيدة المدى في النصوص الضخمة.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "ar",
+        "description": "Lintas bahasa: Indonesia ke Arab (NLP Transformer)."
+    },
+    {
+        "case_id": "SEM-XLN-AR2",
+        "group": "CROSS_LINGUAL",
+        "domain": "Kesehatan Masyarakat",
+        "source_text": "Penerapan pola makan rendah gula terbukti secara klinis mampu menurunkan prevalensi diabetes melitus tipe 2 pada lansia.",
+        "submission_text": "أثبتت الدراسات السريرية أن اتباع نظام غذائي منخفض السكر يقلل بشكل فعال من انتشار مرض السكري من النوع الثاني بين كبار السن.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "ar",
+        "description": "Lintas bahasa: Indonesia ke Arab (Diet Diabetes)."
+    },
+    {
+        "case_id": "SEM-XLN-AR3",
+        "group": "CROSS_LINGUAL",
+        "domain": "Teknologi Energi Surya",
+        "source_text": "Pembangkit listrik tenaga surya fotovoltaik membutuhkan inverter pintar demi menjaga stabilitas tegangan listrik di jaringan transmisi.",
+        "submission_text": "تتطلب محطات الطاقة الشمسية الكهروضوئية محولات ذكية للحفاظ على استقرار الجهد في شبكة النقل الكهربائية.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "ar",
+        "description": "Lintas bahasa: Indonesia ke Arab (Energi Surya)."
+    },
+
+    # --- Sub-group: Indonesia -> Mandarin (3 Kasus) ---
+    {
+        "case_id": "SEM-XLN-ZH1",
+        "group": "CROSS_LINGUAL",
+        "domain": "Kecerdasan Buatan",
+        "source_text": "Model representasi bahasa berbasis transformer memanfaatkan mekanisme atensi mandiri untuk menangkap dependensi kontekstual jarak jauh dalam korpus teks berskala sangat besar.",
+        "submission_text": "基于Transformer的语言表示模型利用自注意力机制捕获大规模文本语料库中的长距离上下文依赖关系。",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "zh",
+        "description": "Lintas bahasa: Indonesia ke Mandarin (Transformer)."
+    },
+    {
+        "case_id": "SEM-XLN-ZH2",
+        "group": "CROSS_LINGUAL",
+        "domain": "Kesehatan Masyarakat",
+        "source_text": "Penerapan pola makan rendah gula terbukti secara klinis mampu menurunkan prevalensi diabetes melitus tipe 2 pada lansia.",
+        "submission_text": "临床证明，采用低糖饮食能够显著降低老年人中2型糖尿病的患病率。",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "zh",
+        "description": "Lintas bahasa: Indonesia ke Mandarin (Diet Gula)."
+    },
+    {
+        "case_id": "SEM-XLN-ZH3",
+        "group": "CROSS_LINGUAL",
+        "domain": "Energi Terbarukan",
+        "source_text": "Pembangkit listrik tenaga surya fotovoltaik membutuhkan inverter pintar demi menjaga stabilitas tegangan listrik di jaringan transmisi.",
+        "submission_text": "光伏太阳能发电站需要智能逆变器，以在输电电网中保持电压稳定性。",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "zh",
+        "description": "Lintas bahasa: Indonesia ke Mandarin (Inverter Surya)."
+    },
+
+    # --- Sub-group: Indonesia -> Belanda (3 Kasus) ---
+    {
+        "case_id": "SEM-XLN-NL1",
+        "group": "CROSS_LINGUAL",
+        "domain": "Hukum Tata Negara",
+        "source_text": "Mahkamah Konstitusi berwenang mengadili pada tingkat pertama dan terakhir yang putusannya bersifat final untuk menguji undang-undang terhadap Undang-Undang Dasar.",
+        "submission_text": "Het Grondwettelijk Hof is bevoegd om in eerste en laatste aanleg bindende uitspraken te doen over de toetsing van wetten aan de Grondwet.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "nl",
+        "description": "Lintas bahasa: Indonesia ke Belanda (Peradilan Konstitusi)."
+    },
+    {
+        "case_id": "SEM-XLN-NL2",
+        "group": "CROSS_LINGUAL",
+        "domain": "Ekonomi Makro",
+        "source_text": "Kenaikan suku bunga acuan oleh bank sentral bertujuan mengerem laju inflasi yang dipicu lonjakan harga komoditas pangan.",
+        "submission_text": "De renteverhoging door de centrale bank is bedoeld om de inflatie af te remmen die wordt aangedreven door stijgende voedselprijzen.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "nl",
+        "description": "Lintas bahasa: Indonesia ke Belanda (Suku Bunga)."
+    },
+    {
+        "case_id": "SEM-XLN-NL3",
+        "group": "CROSS_LINGUAL",
+        "domain": "Ilmu Kelautan",
+        "source_text": "Pengasaman air laut akibat absorpsi karbon dioksida berlebih menghambat kalsifikasi kerangka karang hermatipik di perairan tropis.",
+        "submission_text": "Verzuring van de oceanen door overmatige opname van kooldioxide belemmert de verkalking van koraalriffen in tropische wateren.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "nl",
+        "description": "Lintas bahasa: Indonesia ke Belanda (Pengasaman Laut)."
+    },
+
+    # --- Sub-group: Indonesia -> Jerman (3 Kasus) ---
+    {
+        "case_id": "SEM-XLN-DE1",
+        "group": "CROSS_LINGUAL",
+        "domain": "Teknologi Bahan",
+        "source_text": "Penambahan serat karbon pada matriks geopolimer abu terbang menghasilkan komposit berkekuatan tarik tinggi yang tahan terhadap suhu ekstrem hingga delapan ratus derajat celsius.",
+        "submission_text": "Die Zugabe von Kohlenstofffasern zu einer Flugasche-Geopolymermatrix erzeugt einen hochzugfesten Verbundwerkstoff, der extremen Temperaturen bis zu 800 Grad Celsius standhält.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "de",
+        "description": "Lintas bahasa: Indonesia ke Jerman (Geopolimer Karbon)."
+    },
+    {
+        "case_id": "SEM-XLN-DE2",
+        "group": "CROSS_LINGUAL",
+        "domain": "Ekonomi Moneter",
+        "source_text": "Kenaikan suku bunga acuan oleh bank sentral bertujuan mengerem laju inflasi yang dipicu lonjakan harga komoditas pangan.",
+        "submission_text": "Die Erhöhung der Leitzinsen durch die Zentralbank zielt darauf ab, die Inflation einzudämmen, die durch steigende Rohstoffpreise für Lebensmittel ausgelöst wird.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "de",
+        "description": "Lintas bahasa: Indonesia ke Jerman (Leitzinsen)."
+    },
+    {
+        "case_id": "SEM-XLN-DE3",
+        "group": "CROSS_LINGUAL",
+        "domain": "Kecerdasan Buatan",
+        "source_text": "Model representasi bahasa berbasis transformer memanfaatkan mekanisme atensi mandiri untuk menangkap dependensi kontekstual jarak jauh dalam korpus teks berskala sangat besar.",
+        "submission_text": "Transformer-basierte Sprachmodelle nutzen Selbstaufmerksamkeitsmechanismen, um weitreichende kontextuelle Abhängigkeiten in sehr großen Textkorpora zu erfassen.",
+        "is_plagiarized": True,
+        "source_lang": "id",
+        "submission_lang": "de",
+        "description": "Lintas bahasa: Indonesia ke Jerman (Transformer NLP)."
+    },
+]
+
+
+def main():
+    root = Path(__file__).resolve().parents[1]
+    output_dataset = root / "datasets" / "artilik_semantic_paraphrase_benchmark.json"
+    public_dataset = root / "public" / "datasets" / "artilik_semantic_paraphrase_benchmark.json"
+
+    # Tambahkan hash dan metadata
+    for case in BENCHMARK_CASES:
+        payload = f"{case['source_text']}||{case['submission_text']}".encode("utf-8")
+        case["content_hash"] = hashlib.sha256(payload).hexdigest()[:16]
+
+    with open(output_dataset, "w", encoding="utf-8") as f:
+        json.dump(BENCHMARK_CASES, f, ensure_ascii=False, indent=2)
+
+    with open(public_dataset, "w", encoding="utf-8") as f:
+        json.dump(BENCHMARK_CASES, f, ensure_ascii=False, indent=2)
+
+    print(f"[✓] Berhasil membuat dataset: {len(BENCHMARK_CASES)} kasus tersimpan.")
+    print(f"    - Lokal : {output_dataset}")
+    print(f"    - Publik: {public_dataset}")
+
+    # Ringkasan per grup
+    groups = {}
+    for c in BENCHMARK_CASES:
+        g = c["group"]
+        groups[g] = groups.get(g, 0) + 1
+
+    for g, count in groups.items():
+        print(f"    * {g}: {count} kasus")
+
+
+if __name__ == "__main__":
+    main()

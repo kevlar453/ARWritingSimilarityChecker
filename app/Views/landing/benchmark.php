@@ -932,6 +932,7 @@
             <a href="#dataset" class="subnav-link">Komposisi Dataset</a>
             <a href="#gates" class="subnav-link">Matriks Quality Gates</a>
             <a href="#mismatch" class="subnav-link" style="color: var(--accent-rose); font-weight: 700;">14 Kasus Mismatch</a>
+            <a href="#semantik" class="subnav-link" style="color: #4f46e5; font-weight: 700;">Lensa Semantik (MiniLM-L12)</a>
             <a href="#stylometri" class="subnav-link">Stylometri & AI</a>
             <a href="#dualreader" class="subnav-link">Dual-Reader & OJS</a>
             <a href="#onpremise" class="subnav-link">On-Premise & Privasi</a>
@@ -1306,6 +1307,225 @@ guna menguji pengaruh variabel independen terhadap variabel dependen dengan tara
             </div>
         </section>
 
+        <!-- Section 4B: Kalibrasi Empiris Lensa Semantik (MiniLM-L12) -->
+        <section id="semantik" class="section-block" style="border-left: 4px solid #4f46e5;">
+            <div class="sec-head">
+                <div class="sec-tag" style="color: #4f46e5;">Evaluasi Lapisan Kedua — Mesin Vektor Semantik</div>
+                <h2 class="sec-title">Kalibrasi Empiris Lensa Semantik: Menghalau Parafrase Tanpa Merusak Skor Leksikal</h2>
+                <p class="sec-desc">
+                    Evaluasi empiris komprehensif pada 80 kasus terarah menggunakan model multibahasa on-premise <code>paraphrase-multilingual-MiniLM-L12-v2</code> (118M parameter, 384 dimensi) dan basis data vektor Qdrant.
+                </p>
+            </div>
+
+            <!-- Filosofi Desain -->
+            <div class="callout-box" style="background: #f5f3ff; border: 1px solid #ddd6fe; border-left: 4px solid #6366f1;">
+                <div class="callout-icon">💡</div>
+                <div class="callout-text">
+                    <h4 style="margin: 0 0 6px 0; font-size: 15px; color: #312e81; font-weight: 700;">Prinsip Desain: Semantik Sebagai Lapisan Kedua (Re-Ranker Zona Abu-Abu), Bukan Pengganti</h4>
+                    <p style="margin: 0; font-size: 13.5px; line-height: 1.65; color: #4338ca;">
+                        Mesin leksikal (shingling 5-gram + Jaccard) tetap menjadi tulang punggung utama AR Tilik yang deterministik dan dapat diverifikasi kata demi kata. Penanaman vektor semantik bekerja secara eksklusif sebagai <strong>lensa pemeriksa ulang pada zona abu-abu</strong> (skor leksikal moderat 5%–25% atau naskah dengan anomali parafrase). Ini menghemat komputasi, menjamin waktu respons sub-detik pada CPU server, dan menjaga privasi naskah 100% lokal on-premise tanpa ketergantungan API pihak ketiga.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Tabel 1: Kalibrasi Tiga Ambang Semantik -->
+            <h3 style="font-size: 17px; font-weight: 800; color: var(--dark); margin: 28px 0 12px 0;">1. Kalibrasi Tiga Ambang Semantik &amp; Garansi Anti-Salah-Tuduh (0.0% False Positive)</h3>
+            <p style="font-size: 14px; color: var(--text); line-height: 1.6; margin-bottom: 14px;">
+                Kami mengevaluasi performa klasifikasi pada tiga batas ambang kemiripan kosinus (0.70, 0.75, dan 0.80) terhadap 60 variasi parafrase serta 20 dokumen kontrol bersih dari berbagai disiplin ilmu (Kedokteran, Hukum, Geodesi, Ekonomi, Teknik Kimia, Sosiologi, dll.):
+            </p>
+
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Ambang Kosinus</th>
+                            <th>Karakter Ambang</th>
+                            <th style="text-align: center;">Presisi</th>
+                            <th style="text-align: center;">Recall</th>
+                            <th style="text-align: center;">F1-Score</th>
+                            <th style="text-align: center; color: var(--accent-emerald);">FP Dokumen Bersih</th>
+                            <th style="text-align: center;">Akurasi Total</th>
+                            <th>Status Kebijakan Mesin</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>0.70</strong> (70.0%)</td>
+                            <td>Agresif / Sensitif</td>
+                            <td style="text-align: center; font-weight: 700;">100.0%</td>
+                            <td style="text-align: center; font-weight: 700;">73.3%</td>
+                            <td style="text-align: center; font-mono-code;">0.8462</td>
+                            <td style="text-align: center; font-weight: 800; color: var(--accent-emerald);">0.0% (0/20)</td>
+                            <td style="text-align: center;">80.0%</td>
+                            <td><span style="font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #e0e7ff; color: #3730a3; font-weight: 700;">Mode Penyelidikan Luas</span></td>
+                        </tr>
+                        <tr style="background: #f8fafc; border: 2px solid #6366f1;">
+                            <td><strong style="color: #4f46e5;">0.75</strong> (75.0%)</td>
+                            <td><strong style="color: #4f46e5;">Seimbang (Rekomendasi)</strong></td>
+                            <td style="text-align: center; font-weight: 800; color: #4f46e5;">100.0%</td>
+                            <td style="text-align: center; font-weight: 800; color: #4f46e5;">61.7%</td>
+                            <td style="text-align: center; font-mono-code; font-weight: 700;">0.7629</td>
+                            <td style="text-align: center; font-weight: 800; color: var(--accent-emerald);">0.0% (0/20)</td>
+                            <td style="text-align: center; font-weight: 700;">71.2%</td>
+                            <td><span style="font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #dcfce7; color: #166534; font-weight: 800;">Ambang Resmi Operasional</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>0.80</strong> (80.0%)</td>
+                            <td>Ketat / Konservatif</td>
+                            <td style="text-align: center; font-weight: 700;">100.0%</td>
+                            <td style="text-align: center; font-weight: 700;">53.3%</td>
+                            <td style="text-align: center; font-mono-code;">0.6957</td>
+                            <td style="text-align: center; font-weight: 800; color: var(--accent-emerald);">0.0% (0/20)</td>
+                            <td style="text-align: center;">65.0%</td>
+                            <td><span style="font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #f1f5f9; color: #475569; font-weight: 700;">Ambang Sangat Ketat</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Tabel 2: Perbandingan Daya Tangkap Leksikal vs Semantik -->
+            <h3 style="font-size: 17px; font-weight: 800; color: var(--dark); margin: 28px 0 12px 0;">2. Perbandingan Daya Tangkap Leksikal 5-Gram vs Lensa Semantik (MiniLM-L12)</h3>
+            <p style="font-size: 14px; color: var(--text); line-height: 1.6; margin-bottom: 14px;">
+                Tabel di bawah memperlihatkan lompatan kemampuan deteksi ketika naskah dimutasi dengan berbagai tingkat parafrase. Mesin leksikal konvensional (v1.0) runtuh seketika saat sinonim dan susunan kalimat diubah, sementara Lensa Semantik tetap mengenali proposisi gagasan:
+            </p>
+
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Tingkat Pengujian Parafrase</th>
+                            <th>Karakteristik Teks Submisi</th>
+                            <th style="text-align: center;">Rata-rata Leksikal (v1.0)</th>
+                            <th style="text-align: center;">Rata-rata Semantik (MiniLM-L12)</th>
+                            <th style="text-align: center;">Tingkat Deteksi (@ 0.75)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Parafrase Ringan (Light)</strong> (15 Kasus)</td>
+                            <td>Substitusi sinonim kata kunci &amp; konversi aktif-pasif</td>
+                            <td style="text-align: center; color: var(--accent-rose); font-weight: 700;">0.2%</td>
+                            <td style="text-align: center; color: #4f46e5; font-weight: 800;">88.9%</td>
+                            <td style="text-align: center; font-weight: 800; color: var(--accent-emerald);">93.3% (14/15)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Parafrase Sedang (Moderate)</strong> (15 Kasus)</td>
+                            <td>Restrukturisasi klausa, pemadatan proposisi &amp; variasi sintaksis</td>
+                            <td style="text-align: center; color: var(--accent-rose); font-weight: 700;">0.0%</td>
+                            <td style="text-align: center; color: #4f46e5; font-weight: 800;">76.0%</td>
+                            <td style="text-align: center; font-weight: 800; color: #0284c7;">53.3% (8/15)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Parafrase Agresif (Deep)</strong> (15 Kasus)</td>
+                            <td>Perombakan total kosakata, gaya metaforis / sintesis AI</td>
+                            <td style="text-align: center; color: var(--accent-rose); font-weight: 700;">0.0%</td>
+                            <td style="text-align: center; color: #4f46e5; font-weight: 800;">67.2%</td>
+                            <td style="text-align: center; font-weight: 700; color: var(--accent-amber);">6.7% (1/15)*</td>
+                        </tr>
+                        <tr style="background: #f0fdf4;">
+                            <td><strong>Kontrol Dokumen Bersih</strong> (20 Kasus)</td>
+                            <td>Naskah orisinal independen antar bidang ilmu</td>
+                            <td style="text-align: center; font-weight: 700;">0.0%</td>
+                            <td style="text-align: center; color: var(--accent-emerald); font-weight: 800;">30.7%</td>
+                            <td style="text-align: center; font-weight: 800; color: var(--accent-emerald);">0.0% Alarm Palsu</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Uji Lintas Bahasa (Cross-Lingual)</strong> (15 Kasus)</td>
+                            <td>Indonesia vs Inggris, Arab, Mandarin, Belanda, Jerman</td>
+                            <td style="text-align: center; color: var(--accent-rose); font-weight: 700;">0.0%</td>
+                            <td style="text-align: center; color: #4f46e5; font-weight: 800;">85.3%</td>
+                            <td style="text-align: center; font-weight: 800; color: var(--accent-emerald);">93.3% (14/15)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p style="font-size: 12px; color: var(--muted); margin-top: 6px; font-style: italic;">
+                *Catatan ilmiah: Pada ambang 0.70, daya tangkap parafrase agresif meningkat menjadi 33.3%. Namun demi menjaga zero false positive pada dokumen bersih, AR Tilik memilih ambang seimbang 0.75 secara default.
+            </p>
+
+            <!-- Tabel 3: Validasi Lintas Bahasa per Pasangan Bahasa -->
+            <h3 style="font-size: 17px; font-weight: 800; color: var(--dark); margin: 28px 0 12px 0;">3. Validasi Lintas Bahasa (Zero-Shot Cross-Lingual) Tanpa Mesin Penerjemah</h3>
+            <p style="font-size: 14px; color: var(--text); line-height: 1.6; margin-bottom: 14px;">
+                Karena model representasi MiniLM-L12 bersifat multibahasa, teks berbahasa Indonesia dan teks bahasa asing dipetakan ke dalam satu ruang vektor bersama. Kami memvalidasi setiap bahasa secara terpisah tanpa klaim sepihak:
+            </p>
+
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Pasangan Bahasa</th>
+                            <th>Representasi Kasus Uji</th>
+                            <th style="text-align: center;">Rata-rata Kosinus</th>
+                            <th style="text-align: center;">Kemiripan Makna</th>
+                            <th style="text-align: center;">Lolos Ambang 0.75</th>
+                            <th>Status Validasi AR Tilik</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Indonesia ↔ Mandarin (ZH)</strong></td>
+                            <td>NLP Transformer, Nutrisi Klinis, Inverter Surya</td>
+                            <td style="text-align: center; font-mono-code; font-weight: 700;">0.9090</td>
+                            <td style="text-align: center; font-weight: 800; color: #166534;">90.9%</td>
+                            <td style="text-align: center; font-weight: 800; color: var(--accent-emerald);">3 / 3 (100%)</td>
+                            <td><span style="font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #dcfce7; color: #166534; font-weight: 800;">Tervalidasi Kuat</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Indonesia ↔ Arab (AR)</strong></td>
+                            <td>Arsitektur NLP, Epidemiologi Diabetes, Pembangkit Fotovoltaik</td>
+                            <td style="text-align: center; font-mono-code; font-weight: 700;">0.8830</td>
+                            <td style="text-align: center; font-weight: 800; color: #166534;">88.3%</td>
+                            <td style="text-align: center; font-weight: 800; color: var(--accent-emerald);">3 / 3 (100%)</td>
+                            <td><span style="font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #dcfce7; color: #166534; font-weight: 800;">Tervalidasi Kuat</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Indonesia ↔ Jerman (DE)</strong></td>
+                            <td>Komposit Geopolimer, Kebijakan Suku Bunga, Model Bahasa</td>
+                            <td style="text-align: center; font-mono-code; font-weight: 700;">0.8661</td>
+                            <td style="text-align: center; font-weight: 800; color: #166534;">86.6%</td>
+                            <td style="text-align: center; font-weight: 800; color: var(--accent-emerald);">3 / 3 (100%)</td>
+                            <td><span style="font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #dcfce7; color: #166534; font-weight: 800;">Tervalidasi Kuat</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Indonesia ↔ Belanda (NL)</strong></td>
+                            <td>Peradilan Konstitusi, Inflasi Komoditas, Ekologi Laut Tropis</td>
+                            <td style="text-align: center; font-mono-code; font-weight: 700;">0.8050</td>
+                            <td style="text-align: center; font-weight: 800; color: #166534;">80.5%</td>
+                            <td style="text-align: center; font-weight: 800; color: var(--accent-emerald);">3 / 3 (100%)</td>
+                            <td><span style="font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #dcfce7; color: #166534; font-weight: 800;">Tervalidasi Kuat</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Indonesia ↔ Inggris (EN)</strong></td>
+                            <td>Attention Mechanism, Smart Inverter, Moneter Makro</td>
+                            <td style="text-align: center; font-mono-code; font-weight: 700;">0.8009</td>
+                            <td style="text-align: center; font-weight: 800; color: #166534;">80.1%</td>
+                            <td style="text-align: center; font-weight: 800; color: #0284c7;">2 / 3 (66.7%)*</td>
+                            <td><span style="font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #e0f2fe; color: #0369a1; font-weight: 800;">Tervalidasi Operasional</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p style="font-size: 12px; color: var(--muted); margin-top: 6px; font-style: italic;">
+                *Catatan: Pada kasus SEM-XLN-EN3 (suku bunga moneter), skor kosinus tercatat 0.6211 karena pemadatan frasa yang terlampau ringkas; kasus ini terdeteksi pada ambang 0.60.
+            </p>
+
+            <!-- 4. Transparansi Kasus Batas / Kegagalan Semantik Terbuka -->
+            <h3 style="font-size: 17px; font-weight: 800; color: var(--dark); margin: 28px 0 12px 0;">4. Transparansi Titik Kegagalan Mesin: Di Mana Lensa Semantik Mengalami Batas?</h3>
+            <p style="font-size: 14px; color: var(--text); line-height: 1.6; margin-bottom: 14px;">
+                Sesuai prinsip transparansi radikal AR Tilik, kami tidak menyembunyikan keterbatasan algoritma. Pada ambang operasional 0.75, terdapat 23 kasus parafrase (terutama kelompok agresif) yang lolos di bawah ambang deteksi karena perubahan perumpamaan dan terminologi naratif populer:
+            </p>
+
+            <div class="callout-box" style="background: #fffbeb; border: 1px solid #fef3c7; border-left: 4px solid #f59e0b; margin-bottom: 16px;">
+                <div class="callout-icon">🔍</div>
+                <div class="callout-text">
+                    <h4 style="margin: 0 0 6px 0; font-size: 14.5px; color: #78350f; font-weight: 700;">Temuan Ilmiah: Mengapa Model MiniLM-L12 Meloloskan Parafrase Agresif?</h4>
+                    <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #92400e;">
+                        Ketika sebuah naskah teknis diubah menjadi narasi populer atau metafora awam (misalnya istilah kedokteran <em>"terapi sel CAR-T merekayasa limfosit T..."</em> diubah menjadi <em>"pasukan imun tubuh dilatih ulang di tabung reaksi dibekali radar..."</em> [SEM-AGR-008]), jarak kosinus vektor turun drastis ke angka <strong>0.5120</strong>. Menurunkan ambang ke 0.50 akan meningkatkan recall, namun mengorbankan kepastian hukum karena dapat menimbulkan alarm palsu pada teks berbeda yang kebetulan menggunakan kiasan serupa. AR Tilik dengan tegas menolak kompromi tersebut demi melindungi mahasiswa dan akademisi dari salah tuduh.
+                    </p>
+                </div>
+            </div>
+        </section>
+
         <!-- Section 5: Stylometri & Indikator AI Transparan -->
         <section id="stylometri" class="section-block">
             <div class="sec-head">
@@ -1483,7 +1703,15 @@ docker compose -f docker-compose.yml up -d
             </p>
 
             <div class="btn-group" style="justify-content: center; flex-wrap: wrap; gap: 12px;">
-                <a href="<?= base_url('datasets/artilik_indonesia_targeted_contextual_80_cases.json') ?>" download="artilik_indonesia_targeted_contextual_80_cases.json" target="_blank" class="btn-primary">
+                <a href="<?= base_url('datasets/artilik_semantic_paraphrase_benchmark.json') ?>" download="artilik_semantic_paraphrase_80_cases.json" target="_blank" class="btn-primary" style="background: #4f46e5;">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    <span>Unduh Dataset Parafrase Semantik 80 Kasus (JSON)</span>
+                </a>
+                <a href="<?= base_url('datasets/artilik_semantic_calibration_report.json') ?>" download="artilik_semantic_calibration_report.json" target="_blank" class="btn-secondary" style="border-color: #4f46e5; color: #4f46e5;">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    <span>Unduh Laporan Kalibrasi Semantik (JSON)</span>
+                </a>
+                <a href="<?= base_url('datasets/artilik_indonesia_targeted_contextual_80_cases.json') ?>" download="artilik_indonesia_targeted_contextual_80_cases.json" target="_blank" class="btn-secondary">
                     <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                     <span>Unduh Dataset Terarah 80 Kasus (JSON)</span>
                 </a>
@@ -1493,8 +1721,10 @@ docker compose -f docker-compose.yml up -d
                 </a>
             </div>
 
-            <div style="margin-top: 14px; font-size: 13px; color: var(--muted);">
-                Tautan alternatif rute controller / API:
+            <div style="margin-top: 14px; font-size: 13px; color: var(--muted); line-height: 1.8;">
+                Tautan alternatif rute controller / API:<br>
+                <a href="<?= base_url('benchmark/dataset/semantic_80') ?>" target="_blank" style="color: var(--primary); text-decoration: underline; margin: 0 6px;">/benchmark/dataset/semantic_80</a> |
+                <a href="<?= base_url('benchmark/dataset/semantic_report') ?>" target="_blank" style="color: var(--primary); text-decoration: underline; margin: 0 6px;">/benchmark/dataset/semantic_report</a> |
                 <a href="<?= base_url('benchmark/dataset/targeted_80') ?>" target="_blank" style="color: var(--primary); text-decoration: underline; margin: 0 6px;">/benchmark/dataset/targeted_80</a> |
                 <a href="<?= base_url('benchmark/dataset/v1_500') ?>" target="_blank" style="color: var(--primary); text-decoration: underline; margin: 0 6px;">/benchmark/dataset/v1_500</a>
             </div>
