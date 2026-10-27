@@ -80,29 +80,42 @@ class PublicApiController extends BaseController
         $fileSize = 0;
         $clientFilename = '';
 
-        // 1. Dukungan Unggah Berkas File (PDF, DOCX, TXT)
+        // 1. Dukungan Unggah Berkas File (PDF, DOCX, TXT, TEX)
         $file = $this->request->getFile('document') ?: $this->request->getFile('file');
         if ($file && $file->isValid()) {
             $ext = strtolower($file->getClientExtension());
             $rawMime = $file->getMimeType();
-            $allowedExts = ['pdf', 'docx', 'txt'];
+            $allowedExts = ['pdf', 'docx', 'txt', 'tex'];
             $allowedMimes = [
                 'pdf'  => ['application/pdf', 'application/x-pdf'],
                 'docx' => ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/zip', 'application/octet-stream'],
-                'txt'  => ['text/plain']
+                'txt'  => ['text/plain'],
+                'tex'  => ['text/x-tex', 'application/x-tex', 'text/plain', 'application/octet-stream']
             ];
             if (! in_array($ext, $allowedExts, true) || ! isset($allowedMimes[$ext]) || ! in_array($rawMime, $allowedMimes[$ext], true)) {
                 return $this->response->setStatusCode(415)->setJSON([
                     'status'  => 'error',
                     'code'    => 415,
-                    'message' => 'Format berkas tidak didukung. Hanya file PDF, DOCX, dan TXT yang diperbolehkan.'
+                    'message' => 'Format berkas tidak didukung. Hanya file PDF, DOCX, TXT, dan LaTeX (.TEX) yang diperbolehkan.'
                 ]);
             }
-            if ($file->getSize() > 30 * 1024 * 1024) {
+
+            // Proteksi Ruang Penyimpanan Peladen (Minimal sisa 2 GB bebas)
+            $freeDisk = @disk_free_space(WRITEPATH);
+            if ($freeDisk !== false && $freeDisk < 2 * 1024 * 1024 * 1024) {
+                log_message('critical', "Kapasitas disk peladen hampir habis! Sisa ruang: " . round($freeDisk / (1024 * 1024), 2) . " MB");
+                return $this->response->setStatusCode(507)->setJSON([
+                    'status'  => 'error',
+                    'code'    => 507,
+                    'message' => 'Penyimpanan server sementara penuh untuk memproses berkas baru. Silakan hubungi administrator.'
+                ]);
+            }
+
+            if ($file->getSize() > 64 * 1024 * 1024) {
                 return $this->response->setStatusCode(413)->setJSON([
                     'status'  => 'error',
                     'code'    => 413,
-                    'message' => 'Ukuran berkas melebihi batas maksimal 30 MB.'
+                    'message' => 'Ukuran berkas melebihi batas maksimal 64 MB.'
                 ]);
             }
 

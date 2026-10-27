@@ -2300,6 +2300,7 @@
             const ext = filename.split('.').pop().toLowerCase();
             if (ext === 'pdf') return '📕';
             if (ext === 'docx') return '📘';
+            if (ext === 'tex') return '📜';
             return '📄';
         }
 
@@ -2310,17 +2311,17 @@
         }
 
         function addSubmissionFiles(newFiles) {
-            const allowedExts = ['pdf', 'docx', 'txt'];
-            const maxSizeBytes = 30 * 1024 * 1024; // 30 MB
+            const allowedExts = ['pdf', 'docx', 'txt', 'tex'];
+            const maxSizeBytes = 64 * 1024 * 1024; // 64 MB
 
             Array.from(newFiles).forEach(file => {
                 const ext = file.name.split('.').pop().toLowerCase();
                 if (!allowedExts.includes(ext)) {
-                    alert(`Format berkas "${file.name}" tidak didukung. Hanya PDF, DOCX, dan TXT.`);
+                    alert(`Format berkas "${file.name}" tidak didukung. Hanya format PDF, DOCX, TXT, dan LaTeX (.TEX) yang diperbolehkan.`);
                     return;
                 }
                 if (file.size > maxSizeBytes) {
-                    alert(`Berkas "${file.name}" melebihi batas maksimal 30 MB.`);
+                    alert(`Berkas "${file.name}" melebihi batas maksimal 64 MB.`);
                     return;
                 }
                 // Cegah duplikasi file berdasarkan nama & ukuran
@@ -3293,7 +3294,7 @@
                                 <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Dukungan format naskah lengkap (PDF, DOCX, TXT)</li>
                                 <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Audit Forensik Cerdas &amp; Instrumen Penguji</li>
                                 <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Sintesis Risiko Akademik Berbobot</li>
-                                <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Dukungan berkas hingga 30 MB</li>
+                                <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Dukungan berkas hingga 64 MB</li>
                             </ul>
                         </div>
                         <button type="button" onclick="checkoutPackage('subs_dosen', this)" class="mt-4 w-full py-2 px-3 rounded-xl font-bold text-xs bg-slate-900 hover:bg-purple-600 text-white transition shadow-xs cursor-pointer flex items-center justify-center gap-1">

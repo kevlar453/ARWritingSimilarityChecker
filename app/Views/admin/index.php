@@ -3261,7 +3261,7 @@
   -F "author=Nama Penulis" \
   -F "ojs_submission_id=1240"</pre>
                         <p class="text-[11px] text-slate-400 leading-normal">
-                            Endpoint menerima berkas PDF/DOCX maksimal 30 MB. Autentikasi menggunakan header <code>X-API-Key</code> atau <code>Authorization: Bearer &lt;key&gt;</code>.
+                            Endpoint menerima berkas PDF/DOCX/TXT/TEX maksimal 64 MB. Autentikasi menggunakan header <code>X-API-Key</code> atau <code>Authorization: Bearer &lt;key&gt;</code>.
                         </p>
                     </div>
 
