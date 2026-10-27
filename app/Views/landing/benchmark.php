@@ -1313,75 +1313,121 @@ guna menguji pengaruh variabel independen terhadap variabel dependen dengan tara
                 <div class="sec-tag" style="color: #4f46e5;">Evaluasi Lapisan Kedua — Mesin Vektor Semantik</div>
                 <h2 class="sec-title">Kalibrasi Empiris Lensa Semantik: Menghalau Parafrase Tanpa Merusak Skor Leksikal</h2>
                 <p class="sec-desc">
-                    Evaluasi empiris komprehensif pada 80 kasus terarah menggunakan model multibahasa on-premise <code>paraphrase-multilingual-MiniLM-L12-v2</code> (118M parameter, 384 dimensi) dan basis data vektor Qdrant.
+                    Evaluasi empiris komprehensif pada 80 kasus terarah menggunakan model multibahasa on-premise <code>paraphrase-multilingual-MiniLM-L12-v2</code> (118M parameter, 384 dimensi) dan basis data vektor Qdrant (13.573 potongan korpus).
                 </p>
             </div>
 
-            <!-- Filosofi Desain -->
-            <div class="callout-box" style="background: #f5f3ff; border: 1px solid #ddd6fe; border-left: 4px solid #6366f1;">
+            <!-- Headline Hasil Riset Terbuka -->
+            <div class="callout-box" style="background: #eef2ff; border: 1px solid #c7d2fe; border-left: 4px solid #4f46e5; margin-bottom: 20px;">
+                <div class="callout-icon">📢</div>
+                <div class="callout-text">
+                    <h4 style="margin: 0 0 6px 0; font-size: 15px; color: #1e1b4b; font-weight: 800;">Headline Kejujuran Ilmiah Hasil Evaluasi</h4>
+                    <p style="margin: 0; font-size: 13.5px; line-height: 1.65; color: #312e81;">
+                        <strong>Lensa Semantik menyelesaikan parafrase ringan (93,3%) dan lintas bahasa (93,3%), memangkas separuh parafrase sedang (53,3%), dan hampir tidak menyentuh parafrase agresif (6,7% pada ambang 0,75, atau 33,3% pada 0,70).</strong> Ini adalah lompatan besar dibanding mesin leksikal yang mengalami kebutaan total (0%), namun batas jujurnya tetap nyata: parafrase agresif dan metaforis tetap menjadi medan terbuka dalam perlombaan senjata deteksi teks.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Filosofi Desain & Latensi Ujung-ke-Ujung -->
+            <div class="callout-box" style="background: #f5f3ff; border: 1px solid #ddd6fe; border-left: 4px solid #6366f1; margin-bottom: 24px;">
                 <div class="callout-icon">💡</div>
                 <div class="callout-text">
-                    <h4 style="margin: 0 0 6px 0; font-size: 15px; color: #312e81; font-weight: 700;">Prinsip Desain: Semantik Sebagai Lapisan Kedua (Re-Ranker Zona Abu-Abu), Bukan Pengganti</h4>
-                    <p style="margin: 0; font-size: 13.5px; line-height: 1.65; color: #4338ca;">
-                        Mesin leksikal (shingling 5-gram + Jaccard) tetap menjadi tulang punggung utama AR Tilik yang deterministik dan dapat diverifikasi kata demi kata. Penanaman vektor semantik bekerja secara eksklusif sebagai <strong>lensa pemeriksa ulang pada zona abu-abu</strong> (skor leksikal moderat 5%–25% atau naskah dengan anomali parafrase). Ini menghemat komputasi, menjamin waktu respons sub-detik pada CPU server, dan menjaga privasi naskah 100% lokal on-premise tanpa ketergantungan API pihak ketiga.
+                    <h4 style="margin: 0 0 6px 0; font-size: 15px; color: #312e81; font-weight: 700;">Prinsip Desain &amp; Transparansi Latensi Komputasi</h4>
+                    <p style="margin: 0 0 8px 0; font-size: 13.5px; line-height: 1.65; color: #4338ca;">
+                        Mesin leksikal (shingling 5-gram + Jaccard) tetap menjadi tulang punggung utama AR Tilik yang deterministik dan dapat diverifikasi kata demi kata. Penanaman vektor semantik bekerja secara eksklusif sebagai <strong>lensa pemeriksa ulang pada zona abu-abu</strong> (skor leksikal moderat 5%–25% atau naskah dengan anomali parafrase).
+                    </p>
+                    <p style="margin: 0; font-size: 12.5px; line-height: 1.6; color: #475569; background: #ffffff; padding: 8px 12px; border-radius: 8px; border: 1px solid #e0e7ff;">
+                        ⚡ <strong>Rincian Latensi Jujur:</strong> Angka latensi <strong>~0,4 ms</strong> adalah waktu murni pencarian vektor ANN (HNSW) di memori Qdrant. Untuk alur ujung-ke-ujung pada naskah baru, dibutuhkan waktu inferensi embedding CPU (MiniLM-L12 ONNX) sebesar <strong>~30 ms per paragraf</strong>, sehingga total latensi per potongan naskah berkisar <strong>~30–35 ms</strong>.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Catatan Teknis Komposisi Korpus -->
+            <div class="callout-box" style="background: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #64748b; margin-bottom: 24px;">
+                <div class="callout-icon">📚</div>
+                <div class="callout-text">
+                    <h4 style="margin: 0 0 6px 0; font-size: 14.5px; color: #1e293b; font-weight: 700;">Catatan Teknis Komposisi Korpus: Mengapa 13.573 Potongan dari 1.381 Dokumen?</h4>
+                    <p style="margin: 0; font-size: 13px; line-height: 1.65; color: #475569;">
+                        Rata-rata ~10 potongan semantik per dokumen (~1.600–2.000 kata) mencerminkan komposisi riil korpus produksi kami: <strong>seluruh dokumen diproses penuh dari halaman pertama hingga akhir</strong> (bukan hanya halaman awal). Dari 1.381 dokumen korpus aktif:
+                        <br>&bull; <strong>931 artikel jurnal</strong> berformat standar (5–8 halaman, rata-rata 1.500–2.500 kata).
+                        <br>&bull; <strong>423 naskah bibit benchmark &amp; pasase kontrol</strong> (dokumen ringkas 1 halaman / 1 potongan).
+                        <br>&bull; <strong>27 monograf, repositori, dan skripsi/disertasi tebal</strong> (hingga 351 halaman / 60.242 kata, menghasilkan hingga 223 potongan per naskah).
                     </p>
                 </div>
             </div>
 
             <!-- Tabel 1: Kalibrasi Tiga Ambang Semantik -->
-            <h3 style="font-size: 17px; font-weight: 800; color: var(--dark); margin: 28px 0 12px 0;">1. Kalibrasi Tiga Ambang Semantik &amp; Garansi Anti-Salah-Tuduh (0.0% False Positive)</h3>
+            <h3 style="font-size: 17px; font-weight: 800; color: var(--dark); margin: 28px 0 12px 0;">1. Kalibrasi Tiga Ambang: Kenapa 0,75, Bukan 0,70?</h3>
             <p style="font-size: 14px; color: var(--text); line-height: 1.6; margin-bottom: 14px;">
-                Kami mengevaluasi performa klasifikasi pada tiga batas ambang kemiripan kosinus (0.70, 0.75, dan 0.80) terhadap 60 variasi parafrase serta 20 dokumen kontrol bersih dari berbagai disiplin ilmu (Kedokteran, Hukum, Geodesi, Ekonomi, Teknik Kimia, Sosiologi, dll.):
+                Pertanyaan paling kritis: <em>mengapa memilih ambang 0,75 jika 0,70 memiliki F1-Score lebih tinggi (0,846 vs 0,763) dan akurasi lebih baik (80,0% vs 71,2%) dengan false positive yang sama-sama 0?</em>
+                Jawabannya bertumpu pada <strong>skor kosinus maksimum dokumen kontrol bersih</strong>:
             </p>
+
+            <!-- Box Statistik Dokumen Bersih -->
+            <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 14px 18px; margin-bottom: 18px;">
+                <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; color: #64748b; margin-bottom: 6px;">Statistik Empiris 20 Dokumen Kontrol Bersih:</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 16px; font-size: 13.5px;">
+                    <div>Kosinus Maksimum: <strong style="color: #b91c1c; font-family: monospace;">0,4860 (48,6%)</strong> <span style="font-size: 11.5px; color: #64748b;">(SEM-CLN-015, Kartografi)</span></div>
+                    <div>Kosinus Median: <strong style="color: #334155; font-family: monospace;">0,3141 (31,4%)</strong></div>
+                    <div>Kosinus Rata-rata: <strong style="color: #334155; font-family: monospace;">0,3068 (30,7%)</strong></div>
+                    <div>Kosinus Minimum: <strong style="color: #166534; font-family: monospace;">0,0245 (2,5%)</strong></div>
+                </div>
+                <p style="font-size: 12.5px; color: #475569; margin: 8px 0 0 0; line-height: 1.5;">
+                    Karena dokumen bersih tertinggi berada pada <strong>0,4860</strong>, ambang 0,70 sebenarnya telah memiliki margin keamanan <strong>+21,4 poin</strong>, sementara 0,75 memiliki margin <strong>+26,4 poin</strong>. Memilih 0,75 mengorbankan 7 kasus parafrase nyata di rentang 0,70–0,75 demi margin ekstra menghadapi potensi pergeseran topik (<em>topical drift</em>) pada korpus skala besar.
+                </p>
+            </div>
 
             <div class="table-responsive">
                 <table class="data-table">
                     <thead>
                         <tr>
                             <th>Ambang Kosinus</th>
-                            <th>Karakter Ambang</th>
+                            <th>Karakter &amp; Trade-Off</th>
                             <th style="text-align: center;">Presisi</th>
                             <th style="text-align: center;">Recall</th>
                             <th style="text-align: center;">F1-Score</th>
-                            <th style="text-align: center; color: var(--accent-emerald);">FP Dokumen Bersih</th>
+                            <th style="text-align: center; color: var(--accent-emerald);">FP Kontrol Bersih</th>
                             <th style="text-align: center;">Akurasi Total</th>
                             <th>Status Kebijakan Mesin</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
+                        <tr style="background: #fdf2f8;">
                             <td><strong>0.70</strong> (70.0%)</td>
-                            <td>Agresif / Sensitif</td>
+                            <td><strong>Optimal F1 &amp; Akurasi Maksimal</strong> (+21,4% margin)</td>
                             <td style="text-align: center; font-weight: 700;">100.0%</td>
-                            <td style="text-align: center; font-weight: 700;">73.3%</td>
-                            <td style="text-align: center; font-mono-code;">0.8462</td>
-                            <td style="text-align: center; font-weight: 800; color: var(--accent-emerald);">0.0% (0/20)</td>
-                            <td style="text-align: center;">80.0%</td>
-                            <td><span style="font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #e0e7ff; color: #3730a3; font-weight: 700;">Mode Penyelidikan Luas</span></td>
+                            <td style="text-align: center; font-weight: 800; color: #be185d;">73.3%</td>
+                            <td style="text-align: center; font-mono-code; font-weight: 800; color: #be185d;">0.8462</td>
+                            <td style="text-align: center; font-weight: 800; color: var(--accent-emerald);">0 / 20 (0.0%)*</td>
+                            <td style="text-align: center; font-weight: 800; color: #be185d;">80.0%</td>
+                            <td><span style="font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #fce7f3; color: #9d174d; font-weight: 800;">Ambang F1 Maksimal</span></td>
                         </tr>
                         <tr style="background: #f8fafc; border: 2px solid #6366f1;">
                             <td><strong style="color: #4f46e5;">0.75</strong> (75.0%)</td>
-                            <td><strong style="color: #4f46e5;">Seimbang (Rekomendasi)</strong></td>
+                            <td><strong>Margin Keamanan Konservatif</strong> (+26,4% margin)</td>
                             <td style="text-align: center; font-weight: 800; color: #4f46e5;">100.0%</td>
                             <td style="text-align: center; font-weight: 800; color: #4f46e5;">61.7%</td>
                             <td style="text-align: center; font-mono-code; font-weight: 700;">0.7629</td>
-                            <td style="text-align: center; font-weight: 800; color: var(--accent-emerald);">0.0% (0/20)</td>
+                            <td style="text-align: center; font-weight: 800; color: var(--accent-emerald);">0 / 20 (0.0%)*</td>
                             <td style="text-align: center; font-weight: 700;">71.2%</td>
-                            <td><span style="font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #dcfce7; color: #166534; font-weight: 800;">Ambang Resmi Operasional</span></td>
+                            <td><span style="font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #dcfce7; color: #166534; font-weight: 800;">Ambang Default Operasional</span></td>
                         </tr>
                         <tr>
                             <td><strong>0.80</strong> (80.0%)</td>
-                            <td>Ketat / Konservatif</td>
+                            <td>Sangat Ketat (+31,4% margin, banyak FN)</td>
                             <td style="text-align: center; font-weight: 700;">100.0%</td>
                             <td style="text-align: center; font-weight: 700;">53.3%</td>
                             <td style="text-align: center; font-mono-code;">0.6957</td>
-                            <td style="text-align: center; font-weight: 800; color: var(--accent-emerald);">0.0% (0/20)</td>
+                            <td style="text-align: center; font-weight: 800; color: var(--accent-emerald);">0 / 20 (0.0%)*</td>
                             <td style="text-align: center;">65.0%</td>
                             <td><span style="font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #f1f5f9; color: #475569; font-weight: 700;">Ambang Sangat Ketat</span></td>
                         </tr>
                     </tbody>
                 </table>
             </div>
+            <p style="font-size: 12px; color: var(--muted); margin-top: 6px; font-style: italic;">
+                *Catatan metodologi jujur: "0 alarm palsu" adalah hasil riil pada 20 dokumen kontrol. Dengan ukuran sampel N=20, batas atas interval kepercayaan statistik (95% CI) masih berada pada rentang belasan persen (~14%), sehingga ini adalah margin keamanan empiris awal dan bukan klaim mutlak "bebas risiko seumur hidup".
+            </p>
 
             <!-- Tabel 2: Perbandingan Daya Tangkap Leksikal vs Semantik -->
             <h3 style="font-size: 17px; font-weight: 800; color: var(--dark); margin: 28px 0 12px 0;">2. Perbandingan Daya Tangkap Leksikal 5-Gram vs Lensa Semantik (MiniLM-L12)</h3>
@@ -1397,7 +1443,8 @@ guna menguji pengaruh variabel independen terhadap variabel dependen dengan tara
                             <th>Karakteristik Teks Submisi</th>
                             <th style="text-align: center;">Rata-rata Leksikal (v1.0)</th>
                             <th style="text-align: center;">Rata-rata Semantik (MiniLM-L12)</th>
-                            <th style="text-align: center;">Tingkat Deteksi (@ 0.75)</th>
+                            <th style="text-align: center;">Daya Tangkap (@ 0.70)</th>
+                            <th style="text-align: center;">Daya Tangkap (@ 0.75)</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1407,12 +1454,14 @@ guna menguji pengaruh variabel independen terhadap variabel dependen dengan tara
                             <td style="text-align: center; color: var(--accent-rose); font-weight: 700;">0.2%</td>
                             <td style="text-align: center; color: #4f46e5; font-weight: 800;">88.9%</td>
                             <td style="text-align: center; font-weight: 800; color: var(--accent-emerald);">93.3% (14/15)</td>
+                            <td style="text-align: center; font-weight: 800; color: var(--accent-emerald);">93.3% (14/15)</td>
                         </tr>
                         <tr>
                             <td><strong>Parafrase Sedang (Moderate)</strong> (15 Kasus)</td>
                             <td>Restrukturisasi klausa, pemadatan proposisi &amp; variasi sintaksis</td>
                             <td style="text-align: center; color: var(--accent-rose); font-weight: 700;">0.0%</td>
                             <td style="text-align: center; color: #4f46e5; font-weight: 800;">76.0%</td>
+                            <td style="text-align: center; font-weight: 800; color: var(--accent-emerald);">73.3% (11/15)</td>
                             <td style="text-align: center; font-weight: 800; color: #0284c7;">53.3% (8/15)</td>
                         </tr>
                         <tr>
@@ -1420,14 +1469,16 @@ guna menguji pengaruh variabel independen terhadap variabel dependen dengan tara
                             <td>Perombakan total kosakata, gaya metaforis / sintesis AI</td>
                             <td style="text-align: center; color: var(--accent-rose); font-weight: 700;">0.0%</td>
                             <td style="text-align: center; color: #4f46e5; font-weight: 800;">67.2%</td>
-                            <td style="text-align: center; font-weight: 700; color: var(--accent-amber);">6.7% (1/15)*</td>
+                            <td style="text-align: center; font-weight: 700; color: #f59e0b;">33.3% (5/15)</td>
+                            <td style="text-align: center; font-weight: 700; color: var(--accent-rose);">6.7% (1/15)</td>
                         </tr>
                         <tr style="background: #f0fdf4;">
                             <td><strong>Kontrol Dokumen Bersih</strong> (20 Kasus)</td>
                             <td>Naskah orisinal independen antar bidang ilmu</td>
                             <td style="text-align: center; font-weight: 700;">0.0%</td>
-                            <td style="text-align: center; color: var(--accent-emerald); font-weight: 800;">30.7%</td>
-                            <td style="text-align: center; font-weight: 800; color: var(--accent-emerald);">0.0% Alarm Palsu</td>
+                            <td style="text-align: center; color: var(--accent-emerald); font-weight: 800;">30.7% (max: 48,6%)</td>
+                            <td style="text-align: center; font-weight: 800; color: var(--accent-emerald);">0 / 20 Alarm Palsu</td>
+                            <td style="text-align: center; font-weight: 800; color: var(--accent-emerald);">0 / 20 Alarm Palsu</td>
                         </tr>
                         <tr>
                             <td><strong>Uji Lintas Bahasa (Cross-Lingual)</strong> (15 Kasus)</td>
@@ -1435,18 +1486,16 @@ guna menguji pengaruh variabel independen terhadap variabel dependen dengan tara
                             <td style="text-align: center; color: var(--accent-rose); font-weight: 700;">0.0%</td>
                             <td style="text-align: center; color: #4f46e5; font-weight: 800;">85.3%</td>
                             <td style="text-align: center; font-weight: 800; color: var(--accent-emerald);">93.3% (14/15)</td>
+                            <td style="text-align: center; font-weight: 800; color: var(--accent-emerald);">93.3% (14/15)</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-            <p style="font-size: 12px; color: var(--muted); margin-top: 6px; font-style: italic;">
-                *Catatan ilmiah: Pada ambang 0.70, daya tangkap parafrase agresif meningkat menjadi 33.3%. Namun demi menjaga zero false positive pada dokumen bersih, AR Tilik memilih ambang seimbang 0.75 secara default.
-            </p>
 
             <!-- Tabel 3: Validasi Lintas Bahasa per Pasangan Bahasa -->
             <h3 style="font-size: 17px; font-weight: 800; color: var(--dark); margin: 28px 0 12px 0;">3. Validasi Lintas Bahasa (Zero-Shot Cross-Lingual) Tanpa Mesin Penerjemah</h3>
             <p style="font-size: 14px; color: var(--text); line-height: 1.6; margin-bottom: 14px;">
-                Karena model representasi MiniLM-L12 bersifat multibahasa, teks berbahasa Indonesia dan teks bahasa asing dipetakan ke dalam satu ruang vektor bersama. Kami memvalidasi setiap bahasa secara terpisah tanpa klaim sepihak:
+                Karena model representasi MiniLM-L12 bersifat multibahasa, teks berbahasa Indonesia dan teks bahasa asing dipetakan ke dalam satu ruang vektor bersama. Berikut hasil pengujian awal per pasangan bahasa:
             </p>
 
             <div class="table-responsive">
@@ -1458,7 +1507,7 @@ guna menguji pengaruh variabel independen terhadap variabel dependen dengan tara
                             <th style="text-align: center;">Rata-rata Kosinus</th>
                             <th style="text-align: center;">Kemiripan Makna</th>
                             <th style="text-align: center;">Lolos Ambang 0.75</th>
-                            <th>Status Validasi AR Tilik</th>
+                            <th>Status Validasi Awal</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1468,7 +1517,7 @@ guna menguji pengaruh variabel independen terhadap variabel dependen dengan tara
                             <td style="text-align: center; font-mono-code; font-weight: 700;">0.9090</td>
                             <td style="text-align: center; font-weight: 800; color: #166534;">90.9%</td>
                             <td style="text-align: center; font-weight: 800; color: var(--accent-emerald);">3 / 3 (100%)</td>
-                            <td><span style="font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #dcfce7; color: #166534; font-weight: 800;">Tervalidasi Kuat</span></td>
+                            <td><span style="font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #e0f2fe; color: #0369a1; font-weight: 800;">Indikasi Awal Positif</span></td>
                         </tr>
                         <tr>
                             <td><strong>Indonesia ↔ Arab (AR)</strong></td>
@@ -1476,7 +1525,7 @@ guna menguji pengaruh variabel independen terhadap variabel dependen dengan tara
                             <td style="text-align: center; font-mono-code; font-weight: 700;">0.8830</td>
                             <td style="text-align: center; font-weight: 800; color: #166534;">88.3%</td>
                             <td style="text-align: center; font-weight: 800; color: var(--accent-emerald);">3 / 3 (100%)</td>
-                            <td><span style="font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #dcfce7; color: #166534; font-weight: 800;">Tervalidasi Kuat</span></td>
+                            <td><span style="font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #e0f2fe; color: #0369a1; font-weight: 800;">Indikasi Awal Positif</span></td>
                         </tr>
                         <tr>
                             <td><strong>Indonesia ↔ Jerman (DE)</strong></td>
@@ -1484,7 +1533,7 @@ guna menguji pengaruh variabel independen terhadap variabel dependen dengan tara
                             <td style="text-align: center; font-mono-code; font-weight: 700;">0.8661</td>
                             <td style="text-align: center; font-weight: 800; color: #166534;">86.6%</td>
                             <td style="text-align: center; font-weight: 800; color: var(--accent-emerald);">3 / 3 (100%)</td>
-                            <td><span style="font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #dcfce7; color: #166534; font-weight: 800;">Tervalidasi Kuat</span></td>
+                            <td><span style="font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #e0f2fe; color: #0369a1; font-weight: 800;">Indikasi Awal Positif</span></td>
                         </tr>
                         <tr>
                             <td><strong>Indonesia ↔ Belanda (NL)</strong></td>
@@ -1492,7 +1541,7 @@ guna menguji pengaruh variabel independen terhadap variabel dependen dengan tara
                             <td style="text-align: center; font-mono-code; font-weight: 700;">0.8050</td>
                             <td style="text-align: center; font-weight: 800; color: #166534;">80.5%</td>
                             <td style="text-align: center; font-weight: 800; color: var(--accent-emerald);">3 / 3 (100%)</td>
-                            <td><span style="font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #dcfce7; color: #166534; font-weight: 800;">Tervalidasi Kuat</span></td>
+                            <td><span style="font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #e0f2fe; color: #0369a1; font-weight: 800;">Indikasi Awal Positif</span></td>
                         </tr>
                         <tr>
                             <td><strong>Indonesia ↔ Inggris (EN)</strong></td>
@@ -1500,13 +1549,13 @@ guna menguji pengaruh variabel independen terhadap variabel dependen dengan tara
                             <td style="text-align: center; font-mono-code; font-weight: 700;">0.8009</td>
                             <td style="text-align: center; font-weight: 800; color: #166534;">80.1%</td>
                             <td style="text-align: center; font-weight: 800; color: #0284c7;">2 / 3 (66.7%)*</td>
-                            <td><span style="font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #e0f2fe; color: #0369a1; font-weight: 800;">Tervalidasi Operasional</span></td>
+                            <td><span style="font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #f1f5f9; color: #475569; font-weight: 800;">Indikasi Awal Positif</span></td>
                         </tr>
                     </tbody>
                 </table>
             </div>
             <p style="font-size: 12px; color: var(--muted); margin-top: 6px; font-style: italic;">
-                *Catatan: Pada kasus SEM-XLN-EN3 (suku bunga moneter), skor kosinus tercatat 0.6211 karena pemadatan frasa yang terlampau ringkas; kasus ini terdeteksi pada ambang 0.60.
+                *Catatan transparansi statistik: Selisih 3/3 vs 2/3 pada bahasa Inggris adalah variasi 1 kasus (noise sampel kecil), bukan perbedaan kualitas pemodelan bahasa. Mengingat ukuran sampel 3 kasus per pasangan, label yang jujur adalah "Indikasi Awal Positif". Pengujian berskala lebih besar (&ge;10 kasus per bahasa) sedang dipersiapkan untuk kalibrasi mendalam.
             </p>
 
             <!-- 4. Transparansi Kasus Batas / Kegagalan Semantik Terbuka -->
@@ -1520,7 +1569,7 @@ guna menguji pengaruh variabel independen terhadap variabel dependen dengan tara
                 <div class="callout-text">
                     <h4 style="margin: 0 0 6px 0; font-size: 14.5px; color: #78350f; font-weight: 700;">Temuan Ilmiah: Mengapa Model MiniLM-L12 Meloloskan Parafrase Agresif?</h4>
                     <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #92400e;">
-                        Ketika sebuah naskah teknis diubah menjadi narasi populer atau metafora awam (misalnya istilah kedokteran <em>"terapi sel CAR-T merekayasa limfosit T..."</em> diubah menjadi <em>"pasukan imun tubuh dilatih ulang di tabung reaksi dibekali radar..."</em> [SEM-AGR-008]), jarak kosinus vektor turun drastis ke angka <strong>0.5120</strong>. Menurunkan ambang ke 0.50 akan meningkatkan recall, namun mengorbankan kepastian hukum karena dapat menimbulkan alarm palsu pada teks berbeda yang kebetulan menggunakan kiasan serupa. AR Tilik dengan tegas menolak kompromi tersebut demi melindungi mahasiswa dan akademisi dari salah tuduh.
+                        Ketika sebuah naskah teknis diubah menjadi narasi populer atau metafora awam (misalnya istilah kedokteran <em>"terapi sel CAR-T merekayasa limfosit T..."</em> diubah menjadi <em>"pasukan imun tubuh dilatih ulang di tabung reaksi dibekali radar..."</em> [SEM-AGR-008]), jarak kosinus vektor turun drastis ke angka <strong>0.5120</strong>. Menurunkan ambang ke 0.50 akan meningkatkan recall, namun mengorbankan kepastian hukum karena mendekati batas atas naskah bersih (0,4860) yang dapat menimbulkan alarm palsu pada teks berbeda yang kebetulan menggunakan kiasan serupa. AR Tilik memilih mempublikasikan kegagalan ini secara terbuka ketimbang memaksakan ambang yang rentan salah tuduh.
                     </p>
                 </div>
             </div>
