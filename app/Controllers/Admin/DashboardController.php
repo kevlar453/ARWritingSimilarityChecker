@@ -404,6 +404,9 @@ class DashboardController extends BaseController
                         ->get()
                         ->getResultArray();
 
+        // 16. Data Analitik Prediktif XGBoost + Gemini AI
+        $predictiveAnalytics = $this->getPredictiveAnalyticsData();
+
         return view('admin/index', [
             'activeTab'            => $activeTab,
             'searchQuery'          => $searchQuery,
@@ -463,6 +466,7 @@ class DashboardController extends BaseController
             'ambApplications'      => $ambApplications,
             'ambProfiles'          => $ambProfiles,
             'ambProofs'            => $ambProofs,
+            'predictiveAnalytics'  => $predictiveAnalytics,
             'currentAdmin'         => $userModel->find(session()->get('user_id')),
         ]);
     }
@@ -1094,6 +1098,72 @@ class DashboardController extends BaseController
             }
         }
         return $str;
+    }
+
+    /**
+     * Mengambil data analitik prediktif XGBoost + Gemini terkini
+     */
+    protected function getPredictiveAnalyticsData(bool $forceRefresh = false): array
+    {
+        $cacheFile = WRITEPATH . 'cache/predictive_forecast_latest.json';
+        if (! $forceRefresh && file_exists($cacheFile)) {
+            $raw = file_get_contents($cacheFile);
+            $decoded = json_decode($raw, true);
+            if (is_array($decoded) && ($decoded['status'] ?? '') === 'success') {
+                return $decoded;
+            }
+        }
+
+        $pyPath = '/usr/bin/python3';
+        if (file_exists(ROOTPATH . '.venv/bin/python3')) {
+            $pyPath = ROOTPATH . '.venv/bin/python3';
+        }
+        $scriptPath = escapeshellarg(ROOTPATH . 'worker/predictive_analytics.py');
+        $cmd = "{$pyPath} {$scriptPath} --action=" . ($forceRefresh ? 'run' : 'get') . " 2>&1";
+        $output = shell_exec($cmd);
+
+        if (file_exists($cacheFile)) {
+            $raw = file_get_contents($cacheFile);
+            $decoded = json_decode($raw, true);
+            if (is_array($decoded) && ($decoded['status'] ?? '') === 'success') {
+                return $decoded;
+            }
+        }
+
+        // Jika output CLI langsung berupa JSON valid
+        if ($output) {
+            $cleanJson = trim($output);
+            if (strpos($cleanJson, '{') !== false) {
+                $sub = substr($cleanJson, strpos($cleanJson, '{'));
+                $d = json_decode($sub, true);
+                if (is_array($d) && ($d['status'] ?? '') === 'success') {
+                    return $d;
+                }
+            }
+        }
+
+        return [
+            'status'  => 'empty',
+            'message' => 'Belum ada data proyeksi prediktif.',
+        ];
+    }
+
+    /**
+     * Endpoint API untuk memicu inferensi ulang XGBoost + Gemini secara on-demand
+     */
+    public function runPredictiveForecast(): ResponseInterface
+    {
+        $data = $this->getPredictiveAnalyticsData(true);
+        return $this->response->setJSON($data);
+    }
+
+    /**
+     * Endpoint API untuk mengambil data proyeksi prediktif terkini (JSON)
+     */
+    public function getPredictiveForecastData(): ResponseInterface
+    {
+        $data = $this->getPredictiveAnalyticsData(false);
+        return $this->response->setJSON($data);
     }
 }
 

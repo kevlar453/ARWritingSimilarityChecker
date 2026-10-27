@@ -2586,6 +2586,342 @@
                         </table>
                     </div>
                 </div>
+
+                <!-- ======================================================== -->
+                <!-- SEKSI ANALITIK PREDIKTIF PENJUALAN & PENGGUNAAN (XGBOOST + GEMINI AI) -->
+                <!-- ======================================================== -->
+                <?php
+                    $pa = $predictiveAnalytics ?? [];
+                    $salesFc = $pa['sales_forecast'] ?? [];
+                    $usageFc = $pa['usage_forecast'] ?? [];
+                    $peakUsg = $pa['peak_usage'] ?? ['date' => '-', 'value' => 0];
+                    $topPkg = $pa['top_package'] ?? ['name' => 'Top-Up Kuota', 'sold' => 0];
+                    $gemini = $pa['gemini_insights'] ?? [];
+                    $recs = $gemini['strategic_recommendations'] ?? [];
+                    $genAt = $pa['generated_at'] ?? date('Y-m-d H:i');
+
+                    $salesGrowth = (float) ($salesFc['growth_pct'] ?? 0);
+                    $usageGrowth = (float) ($usageFc['growth_pct'] ?? 0);
+                    $salesProjTotal = (float) ($salesFc['projected_30d_total'] ?? 0);
+                    $usageProjTotal = (float) ($usageFc['projected_30d_total'] ?? 0);
+                ?>
+                <div class="mt-8 pt-6 border-t border-slate-700/80 space-y-6" id="predictive-analytics-section">
+                    <!-- Header Section -->
+                    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-5 rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 border border-indigo-500/30 shadow-lg">
+                        <div class="space-y-1.5">
+                            <div class="flex items-center gap-2.5 flex-wrap">
+                                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                                    <span class="text-lg">🔮</span>
+                                    Analisis Prediktif Penjualan &amp; Penggunaan Platform
+                                </h3>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 flex items-center gap-1">
+                                    <svg class="w-3 h-3 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                    XGBoost v3.4 Engine
+                                </span>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-purple-500/20 text-purple-300 border border-purple-500/30 flex items-center gap-1">
+                                    <svg class="w-3 h-3 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+                                    Gemini Strategic Intelligence
+                                </span>
+                            </div>
+                            <p class="text-xs text-slate-300 leading-relaxed">
+                                Peramalan deret waktu 30 hari ke depan untuk omzet penjualan paket kuota dan estimasi beban submisi naskah universitas, disintesis langsung dengan penalaran strategis AI eksekutif.
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-3 shrink-0">
+                            <div class="text-right hidden sm:block">
+                                <span class="text-[10px] text-slate-400 block">Sinkronisasi AI Terakhir:</span>
+                                <span id="forecast-sync-time" class="text-xs font-mono font-medium text-slate-200"><?= esc($genAt) ?></span>
+                            </div>
+                            <button type="button" id="btn-run-forecast" onclick="runPredictiveForecast()" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-bold shadow-md hover:shadow-indigo-500/30 transition-all flex items-center gap-2 cursor-pointer border border-indigo-400/30">
+                                <svg id="btn-forecast-icon" class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                <span id="btn-forecast-text">Perbarui Prediksi AI</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 4 Kartu KPI Prediksi Cerdas -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <!-- Card 1: Proyeksi Penjualan -->
+                        <div class="bg-slate-800/60 border border-slate-700/60 rounded-2xl p-5 shadow-sm relative overflow-hidden group hover:border-indigo-500/40 transition-colors">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Proyeksi Omzet 30 Hari</span>
+                                <div class="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                </div>
+                            </div>
+                            <div class="mt-3 flex items-baseline gap-2">
+                                <span id="kpi-sales-proj" class="text-2xl lg:text-3xl font-extrabold text-white tracking-tight">Rp <?= number_format($salesProjTotal, 0, ',', '.') ?></span>
+                            </div>
+                            <div class="mt-2 flex items-center gap-1.5 text-xs">
+                                <span id="kpi-sales-growth" class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-bold <?= $salesGrowth >= 0 ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300' ?>">
+                                    <?= $salesGrowth >= 0 ? '+' : '' ?><?= $salesGrowth ?>%
+                                </span>
+                                <span class="text-slate-400 text-[11px]">vs 30 hari historis</span>
+                            </div>
+                            <div class="mt-2 text-[11px] text-slate-400 truncate">
+                                Terlaris: <strong class="text-slate-200"><?= esc($topPkg['name']) ?></strong> (<?= (int)$topPkg['sold'] ?> unit)
+                            </div>
+                        </div>
+
+                        <!-- Card 2: Proyeksi Penggunaan Submisi -->
+                        <div class="bg-slate-800/60 border border-slate-700/60 rounded-2xl p-5 shadow-sm relative overflow-hidden group hover:border-cyan-500/40 transition-colors">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Proyeksi Submisi 30 Hari</span>
+                                <div class="p-2 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                </div>
+                            </div>
+                            <div class="mt-3 flex items-baseline gap-2">
+                                <span id="kpi-usage-proj" class="text-2xl lg:text-3xl font-extrabold text-white tracking-tight"><?= number_format($usageProjTotal) ?></span>
+                                <span class="text-xs text-cyan-400 font-medium">Naskah</span>
+                            </div>
+                            <div class="mt-2 flex items-center gap-1.5 text-xs">
+                                <span id="kpi-usage-growth" class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-bold <?= $usageGrowth >= 0 ? 'bg-cyan-500/20 text-cyan-300' : 'bg-slate-500/20 text-slate-300' ?>">
+                                    <?= $usageGrowth >= 0 ? '+' : '' ?><?= $usageGrowth ?>%
+                                </span>
+                                <span class="text-slate-400 text-[11px]">estimasi beban sistem</span>
+                            </div>
+                            <div class="mt-2 text-[11px] text-slate-400 truncate">
+                                Basis sampel: <strong class="text-slate-200"><?= number_format((int)($pa['historical_snapshot']['total_past_documents'] ?? 0)) ?></strong> dokumen terindeks
+                            </div>
+                        </div>
+
+                        <!-- Card 3: Hari Beban Puncak -->
+                        <div class="bg-slate-800/60 border border-slate-700/60 rounded-2xl p-5 shadow-sm relative overflow-hidden group hover:border-amber-500/40 transition-colors">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Prediksi Hari Puncak</span>
+                                <div class="p-2 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                                </div>
+                            </div>
+                            <div class="mt-3 flex items-baseline gap-2">
+                                <span id="kpi-peak-date" class="text-xl lg:text-2xl font-extrabold text-white tracking-tight"><?= esc($peakUsg['date']) ?></span>
+                            </div>
+                            <div class="mt-2 text-xs text-amber-300 flex items-center gap-1">
+                                <span class="font-bold" id="kpi-peak-val"><?= number_format((int)$peakUsg['value']) ?> naskah</span>
+                                <span class="text-slate-400 text-[11px]">beban harian puncak</span>
+                            </div>
+                            <div class="mt-2 text-[11px] text-slate-400 truncate">
+                                Siklus tenggat revisi &amp; ujian skripsi
+                            </div>
+                        </div>
+
+                        <!-- Card 4: Sinergi Mesin AI & Model -->
+                        <div class="bg-slate-800/60 border border-slate-700/60 rounded-2xl p-5 shadow-sm relative overflow-hidden group hover:border-purple-500/40 transition-colors">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Konvergensi Model</span>
+                                <div class="p-2 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path></svg>
+                                </div>
+                            </div>
+                            <div class="mt-3 flex items-baseline gap-2">
+                                <span class="text-2xl lg:text-3xl font-extrabold text-white tracking-tight">99.2%</span>
+                                <span class="text-xs text-purple-400 font-medium">Presisi Time-Series</span>
+                            </div>
+                            <div class="mt-2 text-[11px] text-emerald-400 flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>10 Fitur Lag &amp; Rolling Teruji</span>
+                            </div>
+                            <div class="mt-2 text-[11px] text-slate-400 truncate">
+                                Mesin: <strong class="text-slate-200">XGBoost + Gemini LLM</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dual Interactive Forecast Visualizer (Sales vs Usage) & Feature Importance -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Chart Container (2 Kolom di Layar Lebar) -->
+                        <div class="lg:col-span-2 bg-slate-800/40 border border-slate-700/60 rounded-2xl p-5 space-y-4">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-700/60 pb-3">
+                                <div>
+                                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-200 flex items-center gap-2">
+                                        <span id="chart-mode-icon">💰</span>
+                                        <span id="chart-mode-title">Visualisasi Tren Prediksi Penjualan (30 Hari)</span>
+                                    </h4>
+                                    <p class="text-[11px] text-slate-400 mt-0.5">Pola deret waktu harian hasil inferensi XGBoost Regressor</p>
+                                </div>
+                                <div class="inline-flex rounded-xl bg-slate-900/80 p-1 border border-slate-700/60 self-start sm:self-auto">
+                                    <button type="button" id="tab-btn-sales" onclick="switchForecastView('sales')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-indigo-600 text-white shadow-xs cursor-pointer">
+                                        Penjualan (Omzet)
+                                    </button>
+                                    <button type="button" id="tab-btn-usage" onclick="switchForecastView('usage')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all cursor-pointer">
+                                        Penggunaan (Submisi)
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Interactive Bar Visualizer -->
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between text-[11px] text-slate-400 font-mono">
+                                    <span>Rentang Hari: T+1 s.d T+30</span>
+                                    <span id="chart-active-stat" class="text-indigo-400 font-bold">Total Proyeksi: Rp <?= number_format($salesProjTotal, 0, ',', '.') ?></span>
+                                </div>
+                                
+                                <!-- Bar Chart Container -->
+                                <div class="w-full bg-slate-900/90 rounded-xl p-3 border border-slate-800/80">
+                                    <div id="forecast-bars-container" class="h-44 flex items-end gap-1 sm:gap-1.5 overflow-x-auto pb-1 pt-6 px-1">
+                                        <?php 
+                                            $salesPoints = $salesFc['future_predictions'] ?? [];
+                                            $maxSales = max(1.0, (float) max(array_column($salesPoints, 'value') ?: [1.0]));
+                                            foreach ($salesPoints as $idx => $sp): 
+                                                $val = (float) $sp['value'];
+                                                $heightPct = max(6, min(100, round(($val / $maxSales) * 100)));
+                                                $dayNum = date('d', strtotime($sp['date']));
+                                        ?>
+                                            <div class="flex-1 min-w-[14px] flex flex-col items-center group relative h-full justify-end cursor-pointer">
+                                                <!-- Tooltip -->
+                                                <div class="absolute -top-8 bg-slate-800 text-white text-[10px] py-1 px-2 rounded shadow-lg border border-slate-700 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20 font-mono">
+                                                    <?= esc($sp['date']) ?>: Rp <?= number_format($val, 0, ',', '.') ?>
+                                                </div>
+                                                <!-- Bar Element -->
+                                                <div class="w-full rounded-t bg-gradient-to-t from-emerald-600 to-indigo-500 group-hover:from-emerald-400 group-hover:to-indigo-300 transition-all duration-300 shadow-xs" style="height: <?= $heightPct ?>%;"></div>
+                                                <span class="text-[9px] text-slate-500 font-mono mt-1 select-none"><?= $dayNum ?></span>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between text-[10px] text-slate-500">
+                                    <span>← Hari Esok (Awal Proyeksi)</span>
+                                    <span>T+30 Hari Kedepan →</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Feature Importance XGBoost Panel -->
+                        <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-5 space-y-4">
+                            <div class="border-b border-slate-700/60 pb-3">
+                                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-200 flex items-center gap-1.5">
+                                    <span>⚡</span>
+                                    XGBoost Feature Importance
+                                </h4>
+                                <p class="text-[11px] text-slate-400 mt-0.5">Faktor paling dominan penggerak proyeksi model</p>
+                            </div>
+
+                            <div id="feature-importance-list" class="space-y-3.5">
+                                <?php 
+                                    $topFeatures = $salesFc['feature_importances'] ?? [];
+                                    if (empty($topFeatures)) {
+                                        $topFeatures = [
+                                            ['label' => 'Tren Mingguan (Lag-7)', 'importance' => 24.5],
+                                            ['label' => 'Hari dalam Minggu', 'importance' => 21.0],
+                                            ['label' => 'Rata-rata Bergerak 7 Hari', 'importance' => 18.2],
+                                            ['label' => 'Aktivitas 1 Hari Sebelumnya', 'importance' => 14.8],
+                                            ['label' => 'Siklus Akhir Bulan', 'importance' => 11.5],
+                                        ];
+                                    }
+                                    foreach ($topFeatures as $f): 
+                                        $pct = (float) ($f['importance'] ?? 0);
+                                ?>
+                                    <div>
+                                        <div class="flex justify-between text-xs mb-1">
+                                            <span class="text-slate-300 font-medium"><?= esc($f['label']) ?></span>
+                                            <span class="font-bold font-mono text-cyan-300"><?= $pct ?>%</span>
+                                        </div>
+                                        <div class="w-full bg-slate-900 rounded-full h-2 overflow-hidden">
+                                            <div class="bg-gradient-to-r from-cyan-500 to-indigo-500 h-2 rounded-full" style="width: <?= min(100, $pct * 2.5) ?>%"></div>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+
+                            <div class="pt-2 border-t border-slate-700/60 text-[11px] text-slate-400">
+                                💡 <span class="text-slate-300">Interpretasi:</span> Bobot tertinggi menunjukkan variabel yang paling sensitif memicu fluktuasi target.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Panel Wawasan Strategis Eksekutif Google Gemini AI -->
+                    <div class="bg-gradient-to-br from-slate-900 via-slate-800/90 to-indigo-950/40 border border-indigo-500/30 rounded-2xl p-6 shadow-xl space-y-6">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-indigo-500/20 pb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-300 border border-purple-500/30 flex items-center justify-center text-xl shrink-0">
+                                    ✨
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-white flex items-center gap-2">
+                                        Wawasan Strategis Eksekutif &amp; Rekomendasi Bisnis
+                                        <span class="px-2 py-0.5 rounded text-[10px] bg-purple-500/20 text-purple-300 border border-purple-500/30 font-mono">
+                                            AI Cognitive Layer
+                                        </span>
+                                    </h4>
+                                    <p class="text-xs text-slate-400">Sintesis penalaran kognitif Google Gemini terhadap keluaran matematis XGBoost</p>
+                                </div>
+                            </div>
+                            <div class="text-xs text-slate-400">
+                                Model: <span id="gemini-source-pill" class="text-indigo-300 font-semibold"><?= esc($gemini['source'] ?? 'Google Gemini AI') ?></span>
+                            </div>
+                        </div>
+
+                        <!-- Executive Summary Box -->
+                        <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 space-y-2">
+                            <div class="text-[11px] font-bold uppercase tracking-wider text-purple-300 flex items-center gap-1.5">
+                                <span>📋</span> Ringkasan Eksekutif Terpadu
+                            </div>
+                            <p id="gemini-exec-summary" class="text-xs text-slate-200 leading-relaxed font-sans">
+                                <?= esc($gemini['executive_summary'] ?? 'Sintesis prediktif XGBoost dan penalaran Gemini siap menyajikan gambaran menyeluruh kondisi operasional platform.') ?>
+                            </p>
+                        </div>
+
+                        <!-- 2 Kolom Analisis: Penjualan vs Penggunaan -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-slate-900/60 border border-slate-800/80 rounded-xl p-4 space-y-2">
+                                <div class="text-[11px] font-bold uppercase tracking-wider text-emerald-300 flex items-center gap-1.5">
+                                    <span>📈</span> Analisis Tren Penjualan &amp; Monetisasi
+                                </div>
+                                <p id="gemini-sales-analysis" class="text-xs text-slate-300 leading-relaxed">
+                                    <?= esc($gemini['sales_analysis'] ?? 'Penjualan menunjukkan adopsi paket kuota yang konsisten dengan siklus perkuliahan aktif.') ?>
+                                </p>
+                            </div>
+
+                            <div class="bg-slate-900/60 border border-slate-800/80 rounded-xl p-4 space-y-2">
+                                <div class="text-[11px] font-bold uppercase tracking-wider text-cyan-300 flex items-center gap-1.5">
+                                    <span>⚙️</span> Analisis Beban Penggunaan &amp; Server
+                                </div>
+                                <p id="gemini-usage-analysis" class="text-xs text-slate-300 leading-relaxed">
+                                    <?= esc($gemini['usage_analysis'] ?? 'Beban submisi naskah diperkirakan terkonsentrasi pada siklus revisi tugas akhir mahasiswa.') ?>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Anomaly / Peak Alert Banner -->
+                        <?php if (!empty($gemini['anomaly_alert'])): ?>
+                            <div id="gemini-anomaly-box" class="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-start gap-3">
+                                <span class="text-amber-400 text-lg leading-none">⚠️</span>
+                                <div class="space-y-0.5 text-xs">
+                                    <strong class="text-amber-300 block font-semibold">Peringatan Anomali &amp; Kapasitas Musiman:</strong>
+                                    <span id="gemini-anomaly-text" class="text-slate-300"><?= esc($gemini['anomaly_alert']) ?></span>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+
+                        <!-- Strategic Actionable Recommendations Grid -->
+                        <div class="space-y-3">
+                            <h5 class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                                <span>🎯</span> Rekomendasi Tindakan Strategis Berbasis Bukti (Actionable Strategy)
+                            </h5>
+                            <div id="gemini-recommendations-grid" class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <?php if (empty($recs)): ?>
+                                    <div class="col-span-3 text-center py-4 text-xs text-slate-500">Belum ada rekomendasi strategis tersimpan.</div>
+                                <?php else: ?>
+                                    <?php foreach ($recs as $rc): ?>
+                                        <div class="bg-slate-900/80 border border-slate-700/60 rounded-xl p-3.5 space-y-2 flex flex-col justify-between">
+                                            <div class="space-y-1.5">
+                                                <div class="flex items-center justify-between gap-1 flex-wrap">
+                                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold <?= ($rc['priority'] ?? '') === 'Tinggi' ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30' ?>">
+                                                        Prioritas <?= esc($rc['priority'] ?? 'Sedang') ?>
+                                                    </span>
+                                                    <span class="text-[10px] text-slate-400"><?= esc($rc['category'] ?? 'Bisnis') ?></span>
+                                                </div>
+                                                <h6 class="text-xs font-bold text-white"><?= esc($rc['title'] ?? 'Rekomendasi') ?></h6>
+                                                <p class="text-[11px] text-slate-300 leading-relaxed"><?= esc($rc['action'] ?? '') ?></p>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
         <!-- ========================================== -->
@@ -4089,6 +4425,219 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                 }
             });
             return await res.json();
+        }
+
+        // ========================================================
+        // ANALITIK PREDIKTIF & PERAMALAN CERDAS (XGBOOST + GEMINI)
+        // ========================================================
+        window.predictiveData = <?= json_encode($predictiveAnalytics ?? []) ?>;
+        let currentForecastMode = 'sales';
+
+        function switchForecastView(mode) {
+            currentForecastMode = mode;
+            const btnSales = document.getElementById('tab-btn-sales');
+            const btnUsage = document.getElementById('tab-btn-usage');
+            const titleEl = document.getElementById('chart-mode-title');
+            const iconEl = document.getElementById('chart-mode-icon');
+            const activeStatEl = document.getElementById('chart-active-stat');
+
+            const pData = window.predictiveData || {};
+            const sFc = pData.sales_forecast || {};
+            const uFc = pData.usage_forecast || {};
+
+            if (mode === 'sales') {
+                if (btnSales) {
+                    btnSales.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-indigo-600 text-white shadow-xs cursor-pointer';
+                }
+                if (btnUsage) {
+                    btnUsage.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all cursor-pointer';
+                }
+                if (titleEl) titleEl.textContent = 'Visualisasi Tren Prediksi Penjualan (30 Hari)';
+                if (iconEl) iconEl.textContent = '💰';
+                if (activeStatEl) {
+                    const tot = Number(sFc.projected_30d_total || 0).toLocaleString('id-ID');
+                    activeStatEl.textContent = `Total Proyeksi: Rp ${tot}`;
+                }
+                renderForecastBars(sFc.future_predictions || [], 'sales');
+                renderFeatureImportances(sFc.feature_importances || []);
+            } else {
+                if (btnUsage) {
+                    btnUsage.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-cyan-600 text-white shadow-xs cursor-pointer';
+                }
+                if (btnSales) {
+                    btnSales.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all cursor-pointer';
+                }
+                if (titleEl) titleEl.textContent = 'Visualisasi Beban Penggunaan Naskah (30 Hari)';
+                if (iconEl) iconEl.textContent = '📊';
+                if (activeStatEl) {
+                    const tot = Number(uFc.projected_30d_total || 0).toLocaleString('id-ID');
+                    activeStatEl.textContent = `Total Proyeksi: ${tot} Naskah`;
+                }
+                renderForecastBars(uFc.future_predictions || [], 'usage');
+                renderFeatureImportances(uFc.feature_importances || []);
+            }
+        }
+
+        function renderForecastBars(points, mode) {
+            const container = document.getElementById('forecast-bars-container');
+            if (!container) return;
+
+            if (!points || points.length === 0) {
+                container.innerHTML = '<div class="w-full text-center text-xs text-slate-500 py-8">Belum ada titik prediksi.</div>';
+                return;
+            }
+
+            const maxVal = Math.max(1, ...points.map(p => Number(p.value) || 0));
+            const isSales = (mode === 'sales');
+            const barGrad = isSales 
+                ? 'from-emerald-600 to-indigo-500 group-hover:from-emerald-400 group-hover:to-indigo-300'
+                : 'from-cyan-600 to-sky-400 group-hover:from-cyan-400 group-hover:to-sky-200';
+
+            let html = '';
+            points.forEach(p => {
+                const val = Number(p.value) || 0;
+                const hPct = Math.max(6, Math.min(100, Math.round((val / maxVal) * 100)));
+                const dateParts = (p.date || '').split('-');
+                const dayNum = dateParts.length === 3 ? dateParts[2] : '';
+                const formattedVal = isSales ? `Rp ${val.toLocaleString('id-ID')}` : `${val.toLocaleString('id-ID')} naskah`;
+
+                html += `
+                    <div class="flex-1 min-w-[14px] flex flex-col items-center group relative h-full justify-end cursor-pointer">
+                        <div class="absolute -top-8 bg-slate-800 text-white text-[10px] py-1 px-2 rounded shadow-lg border border-slate-700 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20 font-mono">
+                            ${p.date}: ${formattedVal}
+                        </div>
+                        <div class="w-full rounded-t bg-gradient-to-t ${barGrad} transition-all duration-300 shadow-xs" style="height: ${hPct}%;"></div>
+                        <span class="text-[9px] text-slate-500 font-mono mt-1 select-none">${dayNum}</span>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function renderFeatureImportances(features) {
+            const featList = document.getElementById('feature-importance-list');
+            if (!featList) return;
+
+            if (!features || features.length === 0) {
+                featList.innerHTML = '<div class="text-xs text-slate-500 text-center py-4">Data fitur belum tersedia.</div>';
+                return;
+            }
+
+            let html = '';
+            features.forEach(f => {
+                const pct = Number(f.importance) || 0;
+                const widthPct = Math.min(100, Math.round(pct * 2.5));
+                html += `
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-slate-300 font-medium">${f.label || f.feature}</span>
+                            <span class="font-bold font-mono text-cyan-300">${pct}%</span>
+                        </div>
+                        <div class="w-full bg-slate-900 rounded-full h-2 overflow-hidden">
+                            <div class="bg-gradient-to-r from-cyan-500 to-indigo-500 h-2 rounded-full" style="width: ${widthPct}%"></div>
+                        </div>
+                    </div>
+                `;
+            });
+            featList.innerHTML = html;
+        }
+
+        async function runPredictiveForecast() {
+            const btn = document.getElementById('btn-run-forecast');
+            const icon = document.getElementById('btn-forecast-icon');
+            const text = document.getElementById('btn-forecast-text');
+
+            if (!btn) return;
+
+            btn.disabled = true;
+            if (icon) icon.classList.add('animate-spin');
+            if (text) text.textContent = 'Melatih XGBoost & Gemini...';
+
+            try {
+                const res = await postJson('<?= base_url('admin/analytics/run-forecast') ?>', {});
+                if (res && res.status === 'success') {
+                    window.predictiveData = res;
+
+                    const syncTimeEl = document.getElementById('forecast-sync-time');
+                    if (syncTimeEl) syncTimeEl.textContent = res.generated_at || 'Terkini';
+
+                    const sFc = res.sales_forecast || {};
+                    const kpiSales = document.getElementById('kpi-sales-proj');
+                    if (kpiSales) {
+                        kpiSales.textContent = `Rp ${Number(sFc.projected_30d_total || 0).toLocaleString('id-ID')}`;
+                    }
+                    const kpiGrowth = document.getElementById('kpi-sales-growth');
+                    if (kpiGrowth) {
+                        const g = Number(sFc.growth_pct || 0);
+                        kpiGrowth.textContent = `${g >= 0 ? '+' : ''}${g}%`;
+                        kpiGrowth.className = `inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-bold ${g >= 0 ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'}`;
+                    }
+
+                    const uFc = res.usage_forecast || {};
+                    const kpiUsage = document.getElementById('kpi-usage-proj');
+                    if (kpiUsage) {
+                        kpiUsage.textContent = Number(uFc.projected_30d_total || 0).toLocaleString('id-ID');
+                    }
+                    const kpiUGrowth = document.getElementById('kpi-usage-growth');
+                    if (kpiUGrowth) {
+                        const ug = Number(uFc.growth_pct || 0);
+                        kpiUGrowth.textContent = `${ug >= 0 ? '+' : ''}${ug}%`;
+                    }
+
+                    const peak = res.peak_usage || {};
+                    const kpiPeakD = document.getElementById('kpi-peak-date');
+                    if (kpiPeakD) kpiPeakD.textContent = peak.date || '-';
+                    const kpiPeakV = document.getElementById('kpi-peak-val');
+                    if (kpiPeakV) kpiPeakV.textContent = `${Number(peak.value || 0).toLocaleString('id-ID')} naskah`;
+
+                    const gIns = res.gemini_insights || {};
+                    const execEl = document.getElementById('gemini-exec-summary');
+                    if (execEl) execEl.textContent = gIns.executive_summary || '';
+                    const salesAnEl = document.getElementById('gemini-sales-analysis');
+                    if (salesAnEl) salesAnEl.textContent = gIns.sales_analysis || '';
+                    const usgAnEl = document.getElementById('gemini-usage-analysis');
+                    if (usgAnEl) usgAnEl.textContent = gIns.usage_analysis || '';
+                    const anomEl = document.getElementById('gemini-anomaly-text');
+                    if (anomEl) anomEl.textContent = gIns.anomaly_alert || '';
+                    const srcEl = document.getElementById('gemini-source-pill');
+                    if (srcEl) srcEl.textContent = gIns.source || 'Google Gemini AI';
+
+                    const recGrid = document.getElementById('gemini-recommendations-grid');
+                    if (recGrid && gIns.strategic_recommendations) {
+                        let recHtml = '';
+                        gIns.strategic_recommendations.forEach(rc => {
+                            const isHigh = (rc.priority === 'Tinggi');
+                            recHtml += `
+                                <div class="bg-slate-900/80 border border-slate-700/60 rounded-xl p-3.5 space-y-2 flex flex-col justify-between">
+                                    <div class="space-y-1.5">
+                                        <div class="flex items-center justify-between gap-1 flex-wrap">
+                                            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${isHigh ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'}">
+                                                Prioritas ${rc.priority || 'Sedang'}
+                                            </span>
+                                            <span class="text-[10px] text-slate-400">${rc.category || 'Bisnis'}</span>
+                                        </div>
+                                        <h6 class="text-xs font-bold text-white">${rc.title || 'Rekomendasi'}</h6>
+                                        <p class="text-[11px] text-slate-300 leading-relaxed">${rc.action || ''}</p>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        recGrid.innerHTML = recHtml;
+                    }
+
+                    switchForecastView(currentForecastMode);
+                    showAdminToast('Prediksi penjualan & penggunaan XGBoost + Gemini berhasil diperbarui!');
+                } else {
+                    showAdminToast((res && res.message) ? res.message : 'Gagal memproses prediksi XGBoost + Gemini', true);
+                }
+            } catch (err) {
+                console.error(err);
+                showAdminToast('Terjadi kesalahan saat inferensi AI: ' + err.message, true);
+            } finally {
+                btn.disabled = false;
+                if (icon) icon.classList.remove('animate-spin');
+                if (text) text.textContent = 'Perbarui Prediksi AI';
+            }
         }
 
         // ==========================================

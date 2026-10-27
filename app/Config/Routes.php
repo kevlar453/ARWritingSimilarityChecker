@@ -183,6 +183,8 @@ $routes->group('admin', ['filter' => 'admin'], function ($routes) {
     $routes->post('security/clear-all', 'Admin\DashboardController::clearAllLocks');
     $routes->get('analytics/export-csv', 'Admin\DashboardController::exportIntegrityCsv');
     $routes->get('analytics/visitors-realtime', 'Admin\DashboardController::getVisitorsRealtime');
+    $routes->get('analytics/forecast-data', 'Admin\DashboardController::getPredictiveForecastData');
+    $routes->post('analytics/run-forecast', 'Admin\DashboardController::runPredictiveForecast');
     $routes->get('sidebar-badges-realtime', 'Admin\DashboardController::getSidebarBadgesRealtime');
 
     // Corpus management API routes
