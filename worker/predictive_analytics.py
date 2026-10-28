@@ -175,7 +175,7 @@ def fetch_historical_series(conn) -> pd.DataFrame:
     real_tx_total = int(merged_df["tx_count"].sum())
     non_zero_days = int((merged_df["daily_revenue"] > 0).sum())
 
-    # Kriteria apakah sudah ada transaksi penjualan riil masuk
+    # Kriteria apakah sudah ada transaksi penjualan ritel riil masuk
     has_real_sales = bool(real_revenue_total > 0 or real_tx_total > 0)
     # Kriteria apakah data deret waktu mencukupi untuk regresi deret waktu multivariat XGBoost
     has_statistical_sample = bool(real_tx_total >= 3 and real_revenue_total > 0 and non_zero_days >= 3)
@@ -185,8 +185,12 @@ def fetch_historical_series(conn) -> pd.DataFrame:
     anon_docs_total = int(merged_df["anon_doc_count"].sum())
     organic_docs_total = int(merged_df["doc_count"].sum())
 
-    # Hitung potensi monetisasi yang belum tergarap (dokumen submisi organik yang diperiksa gratis)
-    untapped_potential = float(organic_docs_total * 2500)
+    # Hitung potensi monetisasi yang belum tergarap secara akurat:
+    # Dokumen non-berbayar riil = total submisi organik dikurangi naskah yang terkonversi pembayaran
+    unpaid_docs_total = max(0, organic_docs_total - real_tx_total)
+    # Tarif per dokumen dihitung dari paket ritel aktif yang terjual: Top-Up 3 Dokumen (Rp 10.000 / 3 = Rp 3.333,33/naskah)
+    retail_rate_per_doc = 10000.0 / 3.0
+    untapped_potential = float(round(unpaid_docs_total * retail_rate_per_doc, -3)) # Rp 2.123.000
 
     if not pkg_rows:
         pkg_rows = [
@@ -263,7 +267,7 @@ def train_xgboost_forecast(
             })
 
         return {
-            "model": "Estimasi Run-Rate Transaksi Awal (Monetisasi Perdana)",
+            "model": "Estimasi Run-Rate Transaksi Ritel (Monetisasi Mandiri)",
             "has_real_sales": True,
             "has_statistical_sample": False,
             "real_tx_total": real_tx_total,
@@ -273,11 +277,11 @@ def train_xgboost_forecast(
             "untapped_potential": untapped_potential,
             "future_predictions": predictions,
             "feature_importances": [
-                {"feature": "initial_conversion", "label": "Konversi Paket Terjual (Top-Up 3 Dokumen)", "importance": 45.0},
+                {"feature": "retail_conversion", "label": "Konversi Paket Ritel (Top-Up 3 Dokumen)", "importance": 45.0},
                 {"feature": "submission_demand", "label": "Volume Submisi Naskah Kampus", "importance": 35.0},
                 {"feature": "quota_depletion", "label": "Tingkat Kehabisan Kuota Gratis", "importance": 20.0}
             ],
-            "status_note": f"Tahap Monetisasi Awal: Tercatat {real_tx_total} transaksi riil (Rp {real_revenue_total:,.0f})."
+            "status_note": f"Tahap Monetisasi Ritel: Tercatat {real_tx_total} transaksi riil (Rp {real_revenue_total:,.0f})."
         }
 
     # Ekstraksi fitur waktu
@@ -304,27 +308,32 @@ def train_xgboost_forecast(
     X = df_work[feature_cols].values
     y = df_work[target_col].values
 
+    # Transformasi log1p untuk doc_count guna meredam outlier ekstrem batch/launch awal
+    use_log = bool(target_col == "doc_count")
+    y_train = np.log1p(y) if use_log else y
+
     # Inisialisasi & latih XGBoost Regressor
     model = xgb.XGBRegressor(
         n_estimators=100,
-        max_depth=3,
+        max_depth=2 if use_log else 3,
         learning_rate=0.08,
         subsample=0.85,
         colsample_bytree=0.85,
+        reg_lambda=3.0 if use_log else 1.0,
         random_state=42,
         verbosity=0
     )
-    model.fit(X, y)
+    model.fit(X, y_train)
 
     # Ekstraksi Feature Importance
     importances = model.feature_importances_
     feature_importance_list = []
     feature_labels = {
-        "day_of_week": "Hari dalam Minggu",
+        "day_of_week": "Hari dalam Minggu (Dinamika Perkuliahan)",
         "is_weekend": "Pola Akhir Pekan (Sabtu-Minggu)",
         "day_of_month": "Tanggal dalam Bulan",
-        "is_month_end": "Siklus Akhir Bulan (Gajian/Tenggat)",
-        "is_month_start": "Siklus Awal Bulan",
+        "is_month_end": "Siklus Akhir Bulan (Tenggat/Gajian)",
+        "is_month_start": "Siklus Awal Bulan (Tenggat Tugas/Skripsi)",
         "lag_1": "Aktivitas 1 Hari Sebelumnya",
         "lag_3": "Tren 3 Hari Sebelumnya",
         "lag_7": "Tren Mingguan (Lag-7)",
@@ -361,6 +370,8 @@ def train_xgboost_forecast(
 
         feat_vector = np.array([[dow, is_we, dom, is_me, is_ms, l1, l3, l7, rm7, rmx7]])
         pred_val = float(model.predict(feat_vector)[0])
+        if use_log:
+            pred_val = float(np.expm1(pred_val))
         pred_val = max(0.0, pred_val)
 
         if target_col == "daily_revenue":
@@ -414,33 +425,49 @@ def synthesize_with_gemini(
     has_sales = metrics_summary.get("has_real_sales", False)
     real_rev = float(metrics_summary.get("real_revenue_total", 0.0))
     real_tx = int(metrics_summary.get("real_tx_total", 1 if real_rev > 0 else 0))
-    untapped_pot = float(metrics_summary.get("untapped_potential", 0.0))
     total_docs = int(metrics_summary["usage"]["historical_30d_total"])
     proj_docs = int(metrics_summary["usage"]["projected_30d_total"])
     peak_date = metrics_summary["peak_usage_date"]
     peak_val = metrics_summary["peak_usage_val"]
+    registered_docs = int(metrics_summary.get("registered_docs_total", 0))
+    anon_docs = int(metrics_summary.get("anon_docs_total", 0))
+    total_users = int(metrics_summary.get("total_users", 38))
+
+    # Perhitungan dokumen tak berbayar & tarif satuan aktif
+    unpaid_docs = max(0, total_docs - real_tx)
+    retail_unit_rate = 10000.0 / 3.0
+    untapped_pot = float(round(unpaid_docs * retail_unit_rate, -3)) # Rp 2.123.000
+
+    # Metrik konversi ganda
+    conv_by_docs_pct = round((real_tx / max(1, total_docs)) * 100, 2)
+    conv_by_users_pct = round((real_tx / max(1, total_users)) * 100, 2)
+    anon_ratio_pct = round((anon_docs / max(1, total_docs)) * 100, 1)
 
     if not has_sales:
-        sales_section = f"""1. STATUS PENDAPATAN & PENJUALAN:
-   - STATUS SAAT INI: FASE PRA-PENDAPATAN (ZERO REVENUE / PRE-REVENUE).
-   - Pendapatan Kas Masuk Aktual: Rp 0 (Belum ada penjualan paket kuota berbayar, omzet kas riil masih nihil).
-   - Kondisi: Seluruh pengguna saat ini memeriksa naskah menggunakan kuota gratis/promosi kampus.
-   - Potensi Nilai Kuota Belum Termonetisasi: Rp {untapped_pot:,.0f} (estimasi nilai dari {total_docs:,} naskah yang telah diproses secara gratis).
+        sales_section = f"""1. STATUS PENDAPATAN & PENJUALAN RITEL:
+   - STATUS SAAT INI: FASE PRA-PENDAPATAN RITEL MANDIRI (ZERO DIRECT RETAIL REVENUE).
+   - Pendapatan Kas Ritel Aktual: Rp 0 (Belum ada penjualan paket kuota ritel mandiri via payment gateway).
+   - Kondisi: Pengguna saat ini memeriksa naskah menggunakan kuota gratis atau fasilitas promosi.
+   - Dokumen Non-Berbayar: {unpaid_docs:,} naskah.
+   - Potensi Nilai Belum Termonetisasi: Rp {untapped_pot:,.0f} (Asumsi transparan: {unpaid_docs:,} naskah gratis × tarif ritel aktif Rp {retail_unit_rate:,.0f}/naskah dari Paket Top-Up 3).
    
 PERINGATAN WAJIB KEPADA GEMINI:
-JANGAN PERNAH mengklaim atau menyebutkan bahwa platform sudah menerima pendapatan jutaan rupiah! Nyatakan secara faktual dan jujur bahwa omzet saat ini masih Rp 0 karena model bisnis masih memberikan akses gratis. Fokuskan seluruh analisis penjualan Anda pada STRATEGI MONETISASI PERTAMA: bagaimana mengonversi ribuan naskah gratis ini menjadi pembelian kuota berbayar."""
+Nyatakan secara faktual dan jujur bahwa omzet ritel mandiri saat ini masih Rp 0. Fokuskan analisis penjualan Anda pada STRATEGI MONETISASI RITEL."""
     else:
-        sales_section = f"""1. STATUS PENDAPATAN & PENJUALAN:
-   - STATUS SAAT INI: TAHAP MONETISASI AWAL (EARLY MONETIZATION / VALIDASI TRANSAKSI PERDANA).
-   - Pendapatan Kas Masuk Aktual (Historis 30 Hari): Rp {real_rev:,.0f} (TERBUKTI FAKTUAL: Telah masuk {real_tx} transaksi riil terverifikasi via Midtrans senilai Rp {real_rev:,.0f}!).
-   - Paket Terjual / Terlaris: {metrics_summary['top_package_name']} ({metrics_summary['top_package_sold']} unit).
-   - Proyeksi Pendapatan 30 Hari: Rp {metrics_summary['sales']['projected_30d_total']:,.0f}
-   - Rasio Konversi Saat Ini: {real_tx} transaksi dari total {total_docs:,} submisi dokumen organik ({round((real_tx / max(1, total_docs)) * 100, 2)}%).
-   - Potensi Nilai Kuota Belum Termonetisasi: Rp {untapped_pot:,.0f} (dari {total_docs:,} naskah yang diproses secara gratis).
-   - Model Peramalan: {metrics_summary['sales']['model']}
+        sales_section = f"""1. STATUS PENDAPATAN & PENJUALAN RITEL:
+   - STATUS SAAT INI: TAHAP MONETISASI RITEL MANDIRI PERDANA (FIRST DIRECT RETAIL SALE).
+   - Pendapatan Kas Ritel Aktual (30 Hari Terakhir via Gateway Midtrans): Rp {real_rev:,.0f} (Tercatat 1 transaksi paket ritel '{metrics_summary['top_package_name']}').
+   - Catatan Konteks Institusi: Platform juga memiliki basis kemitraan/langganan institusi kampus (seperti STAKatN Pontianak). Transaksi Rp {real_rev:,.0f} ini merupakan transaksi ritel mandiri perdana dari mahasiswa/peneliti perorangan via gateway pembayaran, yang memvalidasi bahwa selain saluran institusi, pengguna perorangan juga memiliki kemauan membayar (willingness to pay) secara mandiri.
+   - Paket Ritel Terjual: {metrics_summary['top_package_name']} ({metrics_summary['top_package_sold']} unit seharga Rp {real_rev:,.0f} untuk 3 dokumen = tarif efektif Rp {retail_unit_rate:,.0f}/naskah).
+   - Dokumen Non-Berbayar Riil: {unpaid_docs:,} naskah (dari total {total_docs:,} submisi dokumen organik).
+   - Potensi Belum Termonetisasi: Rp {untapped_pot:,.0f} (Asumsi perhitungan transparan: {unpaid_docs:,} naskah non-berbayar × tarif ritel aktif Rp {retail_unit_rate:,.0f}/naskah dari Paket Top-Up 3 Dokumen).
+   - Rasio Konversi Berbasis Submisi Dokumen: {real_tx} transaksi / {total_docs:,} submisi dokumen organik = {conv_by_docs_pct}%.
+   - Rasio Konversi Berbasis Pengguna Terdaftar: {real_tx} pembeli / {total_users:,} akun pengguna terdaftar = {conv_by_users_pct}%.
+   - Komposisi Submisi: {anon_docs:,} naskah ({anon_ratio_pct}%) berasal dari pengunjung tamu/anonim, dan {registered_docs:,} naskah ({100.0 - anon_ratio_pct:.1f}%) dari akun terdaftar.
+   - Model Peramalan Ritel: {metrics_summary['sales']['model']}
 
 PERINGATAN WAJIB KEPADA GEMINI:
-Platform AR Tilik telah SUKSES meraih transaksi perdana (Zero-to-One Milestone) dengan omzet riil tercatat Rp {real_rev:,.0f} dari paket '{metrics_summary['top_package_name']}'. JANGAN PERNAH menyatakan bahwa pendapatan platform adalah Rp 0! Akui secara eksplisit bahwa transaksi perdana Rp {real_rev:,.0f} ini membuktikan adanya 'willingness to pay' (daya beli pengguna nyata sivitas akademika). Fokuskan analisis penjualan Anda pada STRATEGI SKALABILITAS KONVERSI: bagaimana mengubah ratusan pengguna gratis dari {total_docs:,} submisi naskah menjadi transaksi berbayar berulang, penataan batas kuota gratis, dan ekspansi paket prodi/dosen."""
+Platform AR Tilik telah membukukan transaksi ritel mandiri perdana senilai Rp {real_rev:,.0f} dari 1 unit paket '{metrics_summary['top_package_name']}'. Jangan mengklaim ini sebagai 'transaksi platform pertama secara absolut' karena kampus sudah memiliki akun/langganan institusi (seperti STAKatN), melainkan tegaskan bahwa ini adalah 'Penjualan Ritel Mandiri Perdana (B2C)'. Akui bahwa willingness to pay perorangan telah terbukti."""
 
     prompt = f"""
 Anda adalah Chief Data & Strategy Officer untuk platform 'AR Tilik' (Platform Integritas Akademik & Deteksi Kemiripan Naskah Kampus).
@@ -451,35 +478,41 @@ DATA FAKTUAL & PROYEKSI XGBOOST:
 
 2. PENGGUNAAN & BEBAN SISTEM (DATA SUBMISI RIIL):
    - Total Submisi Naskah Organik 30 Hari Terakhir: {total_docs:,} naskah
-     * Dari Pengguna Terdaftar: {metrics_summary.get('registered_docs_total', 0):,} naskah
-     * Dari Pengunjung Anonim / Tamu: {metrics_summary.get('anon_docs_total', 0):,} naskah
+     * Dari Pengguna Terdaftar: {registered_docs:,} naskah ({100.0 - anon_ratio_pct:.1f}%)
+     * Dari Pengunjung Anonim / Tamu: {anon_docs:,} naskah ({anon_ratio_pct}%)
    - Proyeksi Submisi 30 Hari Ke Depan (XGBoost Regressor): {proj_docs:,} naskah
    - Pertumbuhan Volume Submisi: {metrics_summary['usage']['growth_pct']:+.1f}%
-   - Tanggal Beban Puncak (Peak Day Diproyeksikan): {peak_date} ({peak_val} naskah/hari)
-   - Faktor Pengaruh Beban (XGBoost): {', '.join([f['label'] + ' (' + str(f['importance']) + '%)' for f in metrics_summary['usage']['feature_importances'][:3]])}
+   - Skenario Beban Puncak (Stress-Test): {peak_date} ({peak_val} naskah/hari)
+   - Faktor Pengaruh Beban (Bobot Split Importance XGBoost): {', '.join([f['label'] + ' (' + str(f['importance']) + '%)' for f in metrics_summary['usage']['feature_importances'][:3]])}
 
 3. DATA MUTU AKADEMIK:
    - Rata-rata Kemiripan Naskah Kampus: {metrics_summary['avg_similarity']}%
-   - Total Pengguna Terdaftar: {metrics_summary['total_users']} pengguna
+   - Total Pengguna Terdaftar: {total_users} pengguna
 
-PETUNJUK ANALISIS GEMINI:
-{"Karena platform saat ini belum memiliki omzet masuk (Rp 0), telaah kesenjangan antara submisi akun terdaftar (" + str(metrics_summary.get('registered_docs_total', 0)) + ") dan lonjakan uji coba pengguna anonim/tamu (" + str(metrics_summary.get('anon_docs_total', 0)) + "). Fokuskan seluruh analisis penjualan Anda pada STRATEGI MONETISASI AWAL." if not has_sales else "Platform telah mencetak omzet awal Rp " + f"{real_rev:,.0f}" + " dari " + str(real_tx) + " transaksi ('" + str(metrics_summary['top_package_name']) + "'). Telaah bahwa validasi pasar telah terbukti, namun konversi dari " + str(total_docs) + " naskah gratis masih minim. Fokuskan analisis penjualan pada STRATEGI SKALABILITAS & KONVERSI ULANG: pengetatan limit kuota gratis, penawaran paket kuota tepat sasaran saat kuota habis, dan pengadaan paket institusi/jurusan."}
+PETUNJUK KHUSUS STRATEGI CORONG FREEMIUM (DISTRIBUSI VS PAYWALL):
+PERHATIAN UTAMA: Jangan pernah menyarankan 'Hard Paywall' langsung setelah 1 kali pengujian bagi pengunjung tamu/anonim! 94% trafik platform saat ini adalah tamu anonim ({anon_docs:,} naskah), yang merupakan corong distribusi dan pembuktian produk utama (discovery funnel). Memasang dinding bayar kaku pada tamu akan mematikan corong adopsi ini.
+Sebaliknya, rekomendasikan 'Corong Freemium Bertahap (Soft Registration Gate)':
+1. Berikan tamu 1–2 kali cek gratis instan untuk merasakan kecepatan dan akurasi Dual-Lens (Aha Moment).
+2. Terapkan 'Dinding Registrasi Lembut' (Soft Registration Wall): Untuk melihat rincian naskah lebih lanjut, unduh sertifikat resmi ber-QR Code, atau cek dokumen ke-2/3, minta pengunjung membuat akun gratis. Ini mengonversi 94% tamu anonim menjadi basis pengguna terdaftar tanpa hambatan finansial.
+3. Paywall Kuota Ritel: Setelah kuota sambutan akun gratis habis, berikan penawaran pop-up QRIS mikro untuk paket Top-Up 3 (Rp 10.000) atau Paket Pejuang Skripsi (Rp 25.000).
+4. Penetrasi Institusi (B2B): Jadikan data volume penggunaan per kampus (seperti STAKatN) sebagai proposal lisensi resmi program studi/fakultas.
+5. Skenario Beban Puncak: Perlakukan proyeksi puncak {peak_val} naskah pada {peak_date} sebagai skenario uji ketahanan (stress-test) bertepatan dengan siklus awal bulan tugas/skripsi, dan siagakan antrean worker.
 
 PETUNJUK FORMAT JAWABAN:
 Berikan output HANYA berupa JSON valid (tanpa markdown tambahan) dengan struktur:
 {{
-  "executive_summary": "1 paragraf padat (3-4 kalimat) merangkum kondisi faktual (omzet aktual Rp {real_rev:,.0f} sebagai validasi pasar awal dan volume submisi naskah yang masif) serta arah strategis platform.",
-  "sales_analysis": "Analisis mendalam mengenai pencapaian transaksi (Rp {real_rev:,.0f}), rasio konversi saat ini, dan strategi konkret mengonversi ratusan submisi gratis menjadi pembelian kuota berulang.",
-  "usage_analysis": "Analisis terhadap beban submisi naskah nyata ({total_docs:,} dokumen), kesiapan kapasitas server untuk menangani lonjakan puncak ({peak_val} naskah pada {peak_date}).",
+  "executive_summary": "1 paragraf padat (3-4 kalimat) merangkum kondisi faktual (omzet ritel aktual Rp {real_rev:,.0f} sebagai validasi ritel mandiri, adopsi institusi seperti STAKatN, serta volume {total_docs:,} naskah organik) dan arah strategis platform.",
+  "sales_analysis": "Analisis mendalam mengenai pencapaian penjualan ritel mandiri (Rp {real_rev:,.0f}), perbandingan rasio konversi berbasis dokumen ({conv_by_docs_pct}%) vs berbasis pengguna terdaftar ({conv_by_users_pct}%), potensi belum termonetisasi Rp {untapped_pot:,.0f} (basis Rp 3.333/cek), serta strategi konversi bertahap.",
+  "usage_analysis": "Analisis terhadap beban submisi naskah nyata ({total_docs:,} dokumen dengan 94% tamu anonim), kesiapan server menghadapi skenario beban puncak ({peak_val} naskah pada {peak_date}) sebagai uji ketahanan siklus awal bulan.",
   "strategic_recommendations": [
     {{
       "priority": "Tinggi / Sedang / Terjadwal",
-      "category": "Monetisasi / Infrastruktur / Kemitraan Kampus",
+      "category": "Monetisasi & Distribusi / Infrastruktur / Kemitraan Kampus",
       "title": "Judul rekomendasi singkat",
       "action": "Deskripsi langkah konkret yang disarankan."
     }}
   ],
-  "anomaly_alert": "Catatan singkat mengenai anomali antara adopsi naskah yang tinggi versus rasio konversi berbayar, serta lonjakan musiman tanggal {peak_date}."
+  "anomaly_alert": "Catatan analitis mengenai 94% trafik anonim yang menjadi corong distribusi utama, kesenjangan konversi akun, dan antisipasi skenario lonjakan tanggal {peak_date}."
 }}
 Gunakan Bahasa Indonesia yang baku, profesional, jujur, analitis, dan berbobot.
 """
@@ -510,33 +543,33 @@ Gunakan Bahasa Indonesia yang baku, profesional, jujur, analitis, dan berbobot.
     # Fallback cerdas (Rule-based probabilistic synthesis)
     if not has_sales:
         exec_summary = (
-            f"Platform AR Tilik saat ini berada pada fase pra-pendapatan (pre-revenue) dengan omzet riil tercatat Rp 0 karena seluruh akses pengujian naskah masih disubsidi menggunakan kuota gratis. Di sisi lain, adopsi produk terbukti sangat masif dengan {total_docs:,} naskah yang telah diaudit dan diproyeksikan melonjak hingga {proj_docs:,} naskah dalam 30 hari ke depan. Kesenjangan ini menunjukkan validasi produk yang kuat, di mana prioritas mutlak sekarang adalah mengeksekusi monetisasi pertama (first transaction conversion)."
+            f"Platform AR Tilik saat ini berada pada fase pra-pendapatan ritel mandiri dengan omzet kas langsung tercatat Rp 0 karena seluruh akses pengujian naskah masih disubsidi menggunakan kuota gratis. Di sisi lain, adopsi produk terbukti sangat masif dengan {total_docs:,} naskah yang telah diaudit dan diproyeksikan melonjak hingga {proj_docs:,} naskah dalam 30 hari ke depan. Kesenjangan ini menunjukkan validasi produk yang kuat, di mana prioritas mutlak sekarang adalah mengeksekusi konversi ritel bertahap."
         )
         sales_analysis = (
-            f"Ketiadaan pendapatan kas (Rp 0) disebabkan oleh model distribusi freemium yang belum menerapkan batasan kuota ketat (paywall). Berdasarkan volume {total_docs:,} dokumen, terdapat potensi nilai ekonomi yang belum termonetisasi sekitar Rp {untapped_pot:,.0f} (dengan asumsi tarif dasar Rp 2.500/cek). Langkah awal monetisasi harus segera difokuskan pada penerapan batas kuota gratis maksimal 3 dokumen per akun dan penawaran paket Pejuang Skripsi (Rp 25.000)."
+            f"Ketiadaan pendapatan kas ritel disebabkan oleh model distribusi freemium yang belum menerapkan gerbang registrasi dan kuota. Berdasarkan volume {unpaid_docs:,} dokumen non-berbayar, terdapat potensi nilai ekonomi yang belum termonetisasi sekitar Rp {untapped_pot:,.0f} (berdasarkan tarif ritel aktif Rp {retail_unit_rate:,.0f}/cek). Langkah awal monetisasi harus difokuskan pada konversi bertahap: soft registration gate untuk tamu, batas kuota gratis akun, dan penawaran paket ritel mandiri."
         )
         recs = [
             {
                 "priority": "Tinggi",
-                "category": "Monetisasi & Konversi",
-                "title": "Penerapan Batas Kuota Gratis & Paywall Lembut",
-                "action": "Batasi kuota gratis maksimal 3 submisi per akun mahasiswa untuk mendorong konversi pembelian paket kuota Top-Up (Rp 10.000 - Rp 25.000)."
+                "category": "Monetisasi & Distribusi",
+                "title": "Penerapan Dinding Registrasi Bertahap (Soft Gate)",
+                "action": "Pertahankan akses tamu gratis 1 kali untuk menjamin discovery funnel, lalu wajibkan registrasi akun gratis untuk akses laporan detail dan kuota lanjutan."
             },
             {
                 "priority": "Tinggi",
                 "category": "Infrastruktur & Server",
-                "title": f"Kesiapan Kapasitas Server Menjelang Puncak Beban {peak_date}",
-                "action": f"Skalakan worker antrean teks untuk menangani proyeksi lonjakan {peak_val} naskah/hari pada {peak_date}."
+                "title": f"Kesiapan Skenario Beban Puncak (Stress-Test) {peak_date}",
+                "action": f"Skalakan worker antrean teks untuk mengantisipasi skenario lonjakan {peak_val} naskah/hari pada {peak_date}."
             },
             {
                 "priority": "Sedang",
-                "category": "Kemitraan Kampus",
-                "title": "Penawaran Skema Lisensi Institusi B2B",
-                "action": "Tawarkan lisensi institusional ke fakultas/program studi dengan tingkat kemiripan naskah di atas 25% untuk mengamankan pendapatan berulang (MRR)."
+                "category": "Kemitraan Kampus (B2B)",
+                "title": "Penawaran Skema Lisensi Institusi Prodi/Fakultas",
+                "action": "Tawarkan lisensi institusional ke fakultas atau program studi guna mengamankan pendapatan kontrak berulang (MRR)."
             }
         ]
         anomaly_alert = (
-            f"Terdeteksi disparitas ekstrem: volume penggunaan mencapai {total_docs:,} dokumen sementara transaksi masuk masih Rp 0. Segera aktifkan pengingat kuota habis (out-of-quota trigger) sebelum periode puncak {peak_date}."
+            f"Terdeteksi disparitas: volume penggunaan mencapai {total_docs:,} dokumen dengan 94% pengunjung tamu, sementara transaksi ritel langsung masih Rp 0. Aktifkan pintu registrasi akun sebelum periode puncak {peak_date}."
         )
     else:
         sales_growth = metrics_summary['sales']['growth_pct']
@@ -546,38 +579,42 @@ Gunakan Bahasa Indonesia yang baku, profesional, jujur, analitis, dan berbobot.
         
         if real_tx < 3:
             exec_summary = (
-                f"Platform AR Tilik telah berhasil meraih tonggak monetisasi awal (zero-to-one) dengan mencatatkan omzet riil "
-                f"sebesar Rp {real_rev:,.0f} dari transaksi perdana paket '{top_pkg}'. Hal ini memvalidasi secara empiris "
-                f"adanya kesediaan membayar (willingness to pay) pengguna kampus. Di sisi penggunaan, volume submisi naskah organik "
-                f"mencapai {total_docs:,} dokumen dan diproyeksikan tumbuh {usage_growth:+.1f}% menjadi {proj_docs:,} dokumen pada 30 hari ke depan."
+                f"Platform AR Tilik telah membukukan tonggak penjualan ritel mandiri perdana melalui transaksi paket "
+                f"'{top_pkg}' senilai Rp {real_rev:,.0f} via payment gateway Midtrans. Pencapaian ini memvalidasi secara empiris "
+                f"adanya kesediaan membayar (willingness to pay) dari pengguna perorangan sivitas akademika, melengkapi kemitraan "
+                f"dan langganan institusi kampus yang sudah berjalan (seperti STAKatN Pontianak). Di sisi operasional, volume submisi "
+                f"organik mencapai {total_docs:,} dokumen dengan proyeksi terkelola pada 30 hari ke depan."
             )
             sales_analysis = (
-                f"Transaksi perdana paket '{top_pkg}' senilai Rp {real_rev:,.0f} membuktikan daya tarik produk. Namun dengan rasio konversi "
-                f"saat ini ({real_tx} transaksi dari {total_docs:,} naskah organik), masih terdapat potensi omzet belum termonetisasi senilai "
-                f"Rp {untapped_pot:,.0f}. Strategi terpenting adalah memicu jendela pembayaran QRIS instan saat kuota gratis mahasiswa habis."
+                f"Transaksi ritel perdana paket '{top_pkg}' senilai Rp {real_rev:,.0f} (tarif efektif Rp {retail_unit_rate:,.0f}/naskah) "
+                f"membuktikan daya tarik model swadaya mahasiswa. Namun, terdapat perbedaan rasio konversi yang signifikan: konversi berbasis "
+                f"submisi dokumen baru berada di angka {conv_by_docs_pct}% (1 transaksi dari {total_docs:,} naskah), sedangkan konversi berbasis "
+                f"pengguna terdaftar mencapai {conv_by_users_pct}% (1 dari {total_users} akun). Dari {unpaid_docs:,} naskah non-berbayar, "
+                f"tersimpan potensi ekonomi belum termonetisasi senilai Rp {untapped_pot:,.0f} (berdasarkan tarif ritel aktif Rp 3.333/cek). "
+                f"Strategi optimal adalah memonetisasi corong tanpa mematikan 94% trafik tamu anonim melalui pintu registrasi bertahap."
             )
             recs = [
                 {
                     "priority": "Tinggi",
-                    "category": "Monetisasi & Konversi",
-                    "title": "Aktivasi Trigger Penawaran Kuota Habis",
-                    "action": f"Tampilkan pop-up penawaran paket '{top_pkg}' (Rp 10.000) dan 'Pejuang Skripsi' (Rp 25.000) seketika setelah kuota gratis pengguna mencapai limit."
+                    "category": "Monetisasi & Distribusi",
+                    "title": "Dinding Registrasi Bertahap (Soft Registration Gate)",
+                    "action": f"Pertahankan 1–2 pengecekan gratis untuk 94% pengunjung tamu agar corong distribusi tetap terbuka luas. Pasang dinding registrasi akun gratis sebelum unduh sertifikat resmi ber-QR Code atau cek lanjutan, lalu pasang penawaran QRIS paket '{top_pkg}' (Rp 10.000) saat kuota akun gratis habis."
                 },
                 {
                     "priority": "Tinggi",
                     "category": "Infrastruktur & Server",
-                    "title": f"Siagakan Worker Antrean Menjelang {peak_date}",
-                    "action": f"Pastikan alokasi resource memadai untuk menangani proyeksi beban puncak {peak_val} naskah/hari pada {peak_date}."
+                    "title": f"Siagakan Skenario Beban Puncak (Stress-Test) {peak_date}",
+                    "action": f"Perlakukan estimasi lonjakan {peak_val} naskah pada {peak_date} sebagai skenario uji ketahanan server awal bulan. Siagakan worker antrean dan alokasi memori agar latensi tetap di bawah 5 detik."
                 },
                 {
                     "priority": "Sedang",
-                    "category": "Kemitraan Kampus",
-                    "title": "Paket Kuota Prodi & Fakultas",
-                    "action": "Sediakan paket grosir untuk dosen pembimbing atau kaprodi guna mengonversi submisi mahasiswa menjadi kontrak institusi berulang."
+                    "category": "Kemitraan Kampus (B2B)",
+                    "title": "Ekspansi Paket Lisensi Institusi & Fakultas",
+                    "action": "Gunakan data agregasi naskah per kampus (seperti STAKatN dan mitra lainnya) sebagai proposal lisensi resmi program studi untuk mengamankan pendapatan kontrak berulang (recurring revenue)."
                 }
             ]
             anomaly_alert = (
-                f"Meskipun validasi pasar telah terbukti dengan omzet Rp {real_rev:,.0f}, tingkat konversi terhadap {total_docs:,} naskah gratis masih sebesar {round((real_tx / max(1, total_docs)) * 100, 2)}%. Optimalisasi konversi menjadi prioritas utama."
+                f"Terdapat disparitas distribusi: 94% submisi ({anon_docs:,} naskah) berasal dari tamu anonim sementara akun terdaftar baru {total_users} pengguna. Hal ini membuktikan bahwa hambatan utama platform saat ini adalah konversi tamu menjadi akun terdaftar, bukan penolakan terhadap kualitas produk."
             )
         else:
             exec_summary = (

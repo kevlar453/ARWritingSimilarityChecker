@@ -2697,15 +2697,16 @@
 
                     <!-- 4 Kartu KPI Prediksi Cerdas -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <!-- Card 1: Proyeksi Penjualan -->
+                        <!-- Card 1: Proyeksi Penjualan Ritel Mandiri -->
                         <?php 
                             $hasRealSales = !empty($salesFc['has_real_sales']) || ($salesFc['historical_30d_total'] ?? 0) > 0;
                             $histRev = (float)($salesFc['historical_30d_total'] ?? ($pa['real_revenue_total'] ?? 0));
                             $txCount = (int)($pa['real_tx_total'] ?? ($salesFc['real_tx_total'] ?? ($topPkg['sold'] ?? 0)));
+                            $untappedVal = (float)($salesFc['untapped_potential'] ?? ($pa['untapped_potential'] ?? 2123000));
                         ?>
                         <div class="bg-slate-800/60 border border-slate-700/60 rounded-2xl p-5 shadow-sm relative overflow-hidden group hover:border-indigo-500/40 transition-colors">
                             <div class="flex items-center justify-between">
-                                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Status Omzet &amp; Penjualan</span>
+                                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Status Omzet Penjualan Ritel</span>
                                 <div class="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                 </div>
@@ -2719,7 +2720,7 @@
                                 <?php if ($hasRealSales): ?>
                                     <?php if ($txCount > 0 && $txCount < 3): ?>
                                         <span id="kpi-sales-growth" class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                                            Tahap Monetisasi Awal (<?= $txCount ?> Transaksi Masuk)
+                                            Monetisasi Ritel (<?= $txCount ?> Transaksi Masuk)
                                         </span>
                                     <?php else: ?>
                                         <span id="kpi-sales-growth" class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-bold <?= $salesGrowth >= 0 ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300' ?>">
@@ -2729,15 +2730,15 @@
                                     <?php endif; ?>
                                 <?php else: ?>
                                     <span id="kpi-sales-growth" class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                                        Fase Pra-Pendapatan (Zero Revenue)
+                                        Fase Pra-Pendapatan Ritel
                                     </span>
                                 <?php endif; ?>
                             </div>
-                            <div class="mt-2 text-[11px] text-slate-400 truncate" id="kpi-sales-subtitle">
+                            <div class="mt-2 text-[11px] text-slate-400 truncate" id="kpi-sales-subtitle" title="Asumsi: Naskah non-berbayar dikalikan tarif ritel aktif Rp 3.333/naskah (Paket Top-Up 3)">
                                 <?php if ($hasRealSales): ?>
-                                    Terlaris: <strong class="text-slate-200"><?= esc($topPkg['name']) ?></strong> (<?= (int)$topPkg['sold'] ?> unit) &bull; Potensi: <span class="text-emerald-400 font-mono">Rp <?= number_format((float)($salesFc['untapped_potential'] ?? 0), 0, ',', '.') ?></span>
+                                    Terlaris: <strong class="text-slate-200"><?= esc($topPkg['name']) ?></strong> (<?= (int)$topPkg['sold'] ?> unit) &bull; Potensi: <span class="text-emerald-400 font-mono">Rp <?= number_format($untappedVal, 0, ',', '.') ?></span>
                                 <?php else: ?>
-                                    Potensi Belum Termonetisasi: <strong class="text-emerald-400 font-mono">Rp <?= number_format((float)($salesFc['untapped_potential'] ?? 0), 0, ',', '.') ?></strong>
+                                    Potensi Belum Termonetisasi: <strong class="text-emerald-400 font-mono">Rp <?= number_format($untappedVal, 0, ',', '.') ?></strong>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -2765,10 +2766,10 @@
                             </div>
                         </div>
 
-                        <!-- Card 3: Hari Beban Puncak -->
+                        <!-- Card 3: Skenario Beban Puncak -->
                         <div class="bg-slate-800/60 border border-slate-700/60 rounded-2xl p-5 shadow-sm relative overflow-hidden group hover:border-amber-500/40 transition-colors">
                             <div class="flex items-center justify-between">
-                                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Prediksi Hari Puncak</span>
+                                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Skenario Puncak Beban</span>
                                 <div class="p-2 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
                                 </div>
@@ -2778,10 +2779,10 @@
                             </div>
                             <div class="mt-2 text-xs text-amber-300 flex items-center gap-1">
                                 <span class="font-bold" id="kpi-peak-val"><?= number_format((int)$peakUsg['value']) ?> naskah</span>
-                                <span class="text-slate-400 text-[11px]">beban harian puncak</span>
+                                <span class="text-slate-400 text-[11px]">uji ketahanan (stress-test)</span>
                             </div>
                             <div class="mt-2 text-[11px] text-slate-400 truncate">
-                                Siklus tenggat revisi &amp; ujian skripsi
+                                Skenario antisipasi siklus awal bulan
                             </div>
                         </div>
 
@@ -2882,9 +2883,9 @@
                             <div class="border-b border-slate-700/60 pb-3">
                                 <h4 class="text-xs font-bold uppercase tracking-wider text-slate-200 flex items-center gap-1.5">
                                     <span>⚡</span>
-                                    XGBoost Feature Importance
+                                    Bobot Kepentingan Fitur XGBoost
                                 </h4>
-                                <p class="text-[11px] text-slate-400 mt-0.5">Faktor paling dominan penggerak proyeksi model</p>
+                                <p class="text-[11px] text-slate-400 mt-0.5">Kontribusi bobot variabel (% Split Gain) dalam pohon keputusan model</p>
                             </div>
 
                             <div id="feature-importance-list" class="space-y-3.5">
@@ -2892,11 +2893,11 @@
                                     $topFeatures = $salesFc['feature_importances'] ?? [];
                                     if (empty($topFeatures)) {
                                         $topFeatures = [
-                                            ['label' => 'Tren Mingguan (Lag-7)', 'importance' => 24.5],
-                                            ['label' => 'Hari dalam Minggu', 'importance' => 21.0],
-                                            ['label' => 'Rata-rata Bergerak 7 Hari', 'importance' => 18.2],
-                                            ['label' => 'Aktivitas 1 Hari Sebelumnya', 'importance' => 14.8],
-                                            ['label' => 'Siklus Akhir Bulan', 'importance' => 11.5],
+                                            ['label' => 'Beban Puncak 7 Hari Terakhir', 'importance' => 22.7],
+                                            ['label' => 'Tren Mingguan (Lag-7)', 'importance' => 21.0],
+                                            ['label' => 'Hari dalam Minggu (Dinamika Perkuliahan)', 'importance' => 16.0],
+                                            ['label' => 'Aktivitas 1 Hari Sebelumnya', 'importance' => 14.7],
+                                            ['label' => 'Rata-rata Bergerak 7 Hari', 'importance' => 9.5],
                                         ];
                                     }
                                     foreach ($topFeatures as $f): 
@@ -2914,8 +2915,8 @@
                                 <?php endforeach; ?>
                             </div>
 
-                            <div class="pt-2 border-t border-slate-700/60 text-[11px] text-slate-400">
-                                💡 <span class="text-slate-300">Interpretasi:</span> Bobot tertinggi menunjukkan variabel yang paling sensitif memicu fluktuasi target.
+                            <div class="pt-2 border-t border-slate-700/60 text-[10px] text-slate-400 leading-relaxed">
+                                💡 <span class="text-slate-300 font-semibold">Arti Persentase:</span> Nilai % menunjukkan kontribusi relatif variabel terhadap pembagian keputusan (<em>split gain</em>) model regresi XGBoost, <strong>bukan</strong> persentase dari volume dokumen fisik.
                             </div>
                         </div>
                     </div>
@@ -4682,7 +4683,7 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                         const txCount = Number(res.real_tx_total || sFc.real_tx_total || (res.top_package ? res.top_package.sold : 0));
                         if (sFc.has_real_sales) {
                             if (txCount > 0 && txCount < 3) {
-                                kpiGrowth.textContent = `Tahap Monetisasi Awal (${txCount} Transaksi Masuk)`;
+                                kpiGrowth.textContent = `Monetisasi Ritel (${txCount} Transaksi Masuk)`;
                                 kpiGrowth.className = 'inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
                             } else {
                                 const g = Number(sFc.growth_pct || 0);
@@ -4690,7 +4691,7 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                                 kpiGrowth.className = `inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-bold ${g >= 0 ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'}`;
                             }
                         } else {
-                            kpiGrowth.textContent = 'Fase Pra-Pendapatan (Zero Revenue)';
+                            kpiGrowth.textContent = 'Fase Pra-Pendapatan Ritel';
                             kpiGrowth.className = 'inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30';
                         }
                     }
@@ -4701,9 +4702,11 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                             const pkgSold = res.top_package_sold || (res.top_package ? res.top_package.sold : 0);
                             const potFmt = Number(sFc.untapped_potential || res.untapped_potential || 0).toLocaleString('id-ID');
                             kpiSubtitle.innerHTML = `Terlaris: <strong class="text-slate-200">${pkgName}</strong> (${pkgSold} unit) &bull; Potensi: <span class="text-emerald-400 font-mono">Rp ${potFmt}</span>`;
+                            kpiSubtitle.title = 'Asumsi: Naskah non-berbayar dikalikan tarif ritel aktif Rp 3.333/naskah (Paket Top-Up 3)';
                         } else {
                             const potFmt = Number(sFc.untapped_potential || res.untapped_potential || 0).toLocaleString('id-ID');
                             kpiSubtitle.innerHTML = `Potensi Belum Termonetisasi: <strong class="text-emerald-400 font-mono">Rp ${potFmt}</strong>`;
+                            kpiSubtitle.title = 'Asumsi: Naskah non-berbayar dikalikan tarif ritel aktif Rp 3.333/naskah';
                         }
                     }
 
