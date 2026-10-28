@@ -103,6 +103,7 @@
         </p>
         <div class="legal-contact-card">
             <strong>Tim Pengembang &amp; Kepatuhan Data AR Tilik</strong><br>
+            WhatsApp / Kontak Resmi: <a href="https://wa.me/6285138862032" target="_blank" rel="noopener noreferrer">085138862032</a><br>
             Surat Elektronik: <a href="mailto:admin@tilik.arsetontong.top">admin@tilik.arsetontong.top</a><br>
             Pengembang &amp; Infrastruktur: <a href="https://www.arsetontong.top" target="_blank" rel="noopener noreferrer">Powered by ARSetontong</a> &bull; Indonesia
         </div>

@@ -1592,7 +1592,7 @@
             </div>
 
             <div class="footer-bottom">
-                AR Tilik &copy; <?= date('Y') ?> &bull; Academic Writing Similarity &amp; Evidence Checker &bull; <a href="https://www.arsetontong.top" target="_blank" rel="noopener noreferrer" style="color: #94a3b8; text-decoration: underline; text-underline-offset: 2px;">Powered by ARSetontong</a>
+                AR Tilik &copy; <?= date('Y') ?> &bull; Academic Writing Similarity &amp; Evidence Checker &bull; Kontak WhatsApp: <a href="https://wa.me/6285138862032" target="_blank" rel="noopener noreferrer" style="color: #cbd5e1; font-weight: 600;">085138862032</a> &bull; <a href="https://www.arsetontong.top" target="_blank" rel="noopener noreferrer" style="color: #94a3b8; text-decoration: underline; text-underline-offset: 2px;">Powered by ARSetontong</a>
             </div>
         </div>
     </footer>

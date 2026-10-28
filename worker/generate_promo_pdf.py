@@ -63,7 +63,7 @@ def build_html() -> str:
     piagam_mockup_b64 = load_image_base64(PUBLIC_DIR / "images" / "piagam_akreditasi_mockup.png")
     qr_portal_b64 = generate_qr_base64("https://tilik.arsetontong.top/#solusi")
     qr_demo_b64 = generate_qr_base64("https://tilik.arsetontong.top/verify/ART-OJS3-8821-DEMO")
-    qr_wa_b64 = generate_qr_base64("https://wa.me/6282353201673?text=Halo%20Pak%20Makarius,%20saya%20ingin%20mengajukan%20Trial%20Gratis%2014%20Hari%20AR%20Tilik")
+    qr_wa_b64 = generate_qr_base64("https://wa.me/6285138862032?text=Halo%20Pak%20Makarius,%20saya%20ingin%20mengajukan%20Trial%20Gratis%2014%20Hari%20AR%20Tilik")
 
     template = """<!DOCTYPE html>
 <html lang="id">
@@ -1095,7 +1095,7 @@ body {
                     <span class="contact-icon">📱</span>
                     <div>
                         <span class="contact-label">WhatsApp:</span>
-                        <strong class="contact-val">082353201673</strong>
+                        <strong class="contact-val">085138862032</strong>
                     </div>
                 </div>
                 <div class="contact-item">

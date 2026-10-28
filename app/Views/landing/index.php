@@ -4696,7 +4696,7 @@
             </div>
 
             <div class="footer-bottom">
-                AR Tilik &copy; <?= date('Y') ?> &bull; Academic Writing Similarity & Evidence Checker &bull; <a href="https://www.arsetontong.top" target="_blank" rel="noopener noreferrer" style="color: #94a3b8; text-decoration: underline; text-underline-offset: 2px;">Powered by ARSetontong</a>
+                AR Tilik &copy; <?= date('Y') ?> &bull; Academic Writing Similarity & Evidence Checker &bull; Kontak WhatsApp: <a href="https://wa.me/6285138862032" target="_blank" rel="noopener noreferrer" style="color: #cbd5e1; font-weight: 600;">085138862032</a> &bull; <a href="https://www.arsetontong.top" target="_blank" rel="noopener noreferrer" style="color: #94a3b8; text-decoration: underline; text-underline-offset: 2px;">Powered by ARSetontong</a>
             </div>
         </div>
     </footer>
@@ -4923,8 +4923,8 @@
                     <button type="submit" id="btnSubmitContact" class="btn btn-primary" style="width: 100%;">
                         Kirim Pesan ke Pengembang 🚀
                     </button>
-                    <div style="font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 10px;">
-                        📧 Pesan Anda langsung diteruskan ke <strong>admin@tilik.arsetontong.top</strong>
+                    <div style="font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 10px; line-height: 1.6;">
+                        📧 Pesan Anda langsung diteruskan ke <strong>admin@tilik.arsetontong.top</strong> &bull; 💬 WhatsApp Resmi: <a href="https://wa.me/6285138862032" target="_blank" rel="noopener noreferrer" style="color: var(--primary); font-weight: 700; text-decoration: underline;">085138862032</a>
                     </div>
                 </form>
             </div>
