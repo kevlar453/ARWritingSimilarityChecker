@@ -24,9 +24,11 @@ def test_extract_features_vector_dimension():
         cross_lingual_score=20.0,
         boilerplate_ratio=0.1,
         quote_ratio=0.2,
+        semantic_score=15.0,
+        semantic_cosine=0.55,
     )
     assert len(features) == len(FEATURE_NAMES)
-    assert len(features) == 11
+    assert len(features) == 13
 
 
 def test_predict_academic_risk_original_document():
@@ -43,6 +45,8 @@ def test_predict_academic_risk_original_document():
         cross_lingual_score=0.0,
         boilerplate_ratio=0.0,
         quote_ratio=0.0,
+        semantic_score=0.0,
+        semantic_cosine=0.0,
     )
     assert res["status"] == "completed"
     assert res["risk_level"] == "LOW"
@@ -63,8 +67,32 @@ def test_predict_academic_risk_high_verbatim():
         cross_lingual_score=0.0,
         boilerplate_ratio=0.0,
         quote_ratio=0.0,
+        semantic_score=85.0,
+        semantic_cosine=0.92,
     )
     assert res["status"] == "completed"
     assert res["risk_level"] == "HIGH"
     assert res["probabilities"]["p_high_risk"] > 0.5
     assert any("Pasase kontigu panjang" in d for d in res["explainable_drivers"])
+
+
+def test_predict_academic_risk_semantic_paraphrase_grey_zone():
+    # Dokumen parafrase zona abu-abu: verbatim rendah tapi kemiripan makna tinggi
+    res = predict_academic_risk_xgboost(
+        exact_sim=4.0,
+        cosine_sim=20.0,
+        longest_match_words=3,
+        avg_idf=1.8,
+        shared_terms_count=12,
+        source_count=1,
+        burstiness=0.48,
+        transition_density=0.8,
+        cross_lingual_score=0.0,
+        boilerplate_ratio=0.0,
+        quote_ratio=0.0,
+        semantic_score=75.0,
+        semantic_cosine=0.84,
+    )
+    assert res["status"] == "completed"
+    assert res["risk_level"] in ("MODERATE", "HIGH")
+    assert any("Kemiripan makna & parafrase semantik" in d for d in res["explainable_drivers"])

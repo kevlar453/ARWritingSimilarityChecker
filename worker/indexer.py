@@ -16,9 +16,11 @@ def clear_document_index(connection, document_id: int):
     try:
         from worker.semantic_lens import SemanticLens, is_semantic_engine_ready
         if is_semantic_engine_ready():
-            SemanticLens().delete_corpus_document(document_id)
-    except Exception:
-        pass
+            deleted = SemanticLens().delete_corpus_document(document_id)
+            if deleted:
+                print(f"[SEMANTIC INDEXER] Vektor Qdrant untuk dokumen korpus #{document_id} berhasil dibersihkan.")
+    except Exception as e:
+        print(f"[SEMANTIC INDEXER WARN] Gagal membersihkan vektor Qdrant dokumen #{document_id}: {e}")
 
 def save_page(connection, document_id: int, page_number: int, text: str) -> int:
     cursor = connection.cursor()
@@ -257,13 +259,16 @@ def index_document(
         
         if is_corpus:
             save_fingerprint_documents(connection, document_id, shingles)
-            # Indeksasi representasi vektor semantik ke Qdrant (Fase 1 Prototipe)
+            # Indeksasi representasi vektor semantik ke Qdrant (Fase 4 Produksi Penuh)
             try:
                 from worker.semantic_lens import SemanticLens, is_semantic_engine_ready
                 if is_semantic_engine_ready():
-                    SemanticLens().index_corpus_document(document_id, pages)
-            except Exception:
-                pass
+                    sem_count = SemanticLens().index_corpus_document(document_id, pages)
+                    print(f"[SEMANTIC INDEXER] Dokumen korpus #{document_id}: Berhasil mengindeks {sem_count} vektor semantik ke Qdrant.")
+                else:
+                    print(f"[SEMANTIC INDEXER WARN] Qdrant/FastEmbed tidak siap untuk dokumen korpus #{document_id}.")
+            except Exception as e:
+                print(f"[SEMANTIC INDEXER ERROR] Gagal mengindeks vektor semantik untuk dokumen #{document_id}: {e}")
             
         # Ekstraksi judul karya ilmiah asli dari halaman muka jika judul saat ini masih berupa nama berkas
         extracted_academic_title = None

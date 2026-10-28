@@ -905,7 +905,7 @@ class DashboardController extends BaseController
         // Resolusi XGBoost Academic Risk Synthesizer
         $xgboostRisk = $evidenceData['xgboost_risk'] ?? $evidenceData['v1_1_presentation']['v1_2_evolution']['xgboost_risk'] ?? null;
         if (!$xgboostRisk) {
-            $xgboostRisk = $this->computeFallbackXgboostRisk($report, $matches, $aiStylometrics, $crossLingual);
+            $xgboostRisk = $this->computeFallbackXgboostRisk($report, $matches, $aiStylometrics, $crossLingual, $semanticLens);
         }
 
         // Resolusi JIT Harvesting Discovery
@@ -2194,13 +2194,15 @@ class DashboardController extends BaseController
         ]);
     }
 
-    private function computeFallbackXgboostRisk(array $report, array $matches, ?array $aiStylometrics, ?array $crossLingual): array
+    private function computeFallbackXgboostRisk(array $report, array $matches, ?array $aiStylometrics, ?array $crossLingual, ?array $semanticLens = null): array
     {
         $exactSim = (float) ($report['exact_similarity'] ?? 0.0);
         $cosineSim = (float) ($report['cosine_similarity'] ?? 0.0);
         $longestMatch = (int) ($report['longest_match_words'] ?? 0);
         $burstiness = (float) ($aiStylometrics['metrics']['burstiness'] ?? 0.5);
         $clScore = (float) ($crossLingual['cross_lingual_score'] ?? 0.0);
+        $semScore = (float) ($semanticLens['semantic_score'] ?? 0.0);
+        $semCosine = (float) ($semanticLens['semantic_cosine'] ?? 0.0);
 
         $totalMatches = count($matches);
         $bpCount = 0;
@@ -2214,9 +2216,10 @@ class DashboardController extends BaseController
         $qRatio = $totalMatches > 0 ? ($citedCount / $totalMatches) : 0.0;
 
         $riskScore = min(100.0, max(0.0,
-            ($exactSim * 0.45) +
-            (min(100.0, $longestMatch * 0.5) * 0.25) +
-            ($clScore * 0.20) +
+            ($exactSim * 0.40) +
+            (min(100.0, $longestMatch * 0.5) * 0.20) +
+            ($clScore * 0.15) +
+            ($semScore * 0.15) +
             (max(0.0, 0.40 - $burstiness) * 50.0 * 0.10) -
             ($qRatio * 30.0) -
             ($bpRatio * 20.0)
@@ -2234,7 +2237,7 @@ class DashboardController extends BaseController
 
         $labels = [
             0 => ['LOW', 'Aman (Bebas Indikasi Signifikan)', 'Naskah menunjukkan profil kepenulisan orisinal tanpa bukti penyalinan substansial.'],
-            1 => ['MODERATE', 'Perlu Telaah Konseptual Dosen', 'Terdapat nuansa teks (frasa baku, parafrasa AI, atau alih bahasa) yang memerlukan konfirmasi lisan.'],
+            1 => ['MODERATE', 'Perlu Telaah Konseptual Dosen', 'Terdapat nuansa teks (frasa baku, parafrasa semantik, atau alih bahasa) yang memerlukan konfirmasi lisan.'],
             2 => ['HIGH', 'Risiko Integritas Tinggi (Verbatim Overlap)', 'Terdeteksi pasase sekuensial panjang atau kesamaan tekstual substansial tanpa atribusi memadai.']
         ];
 
@@ -2243,6 +2246,9 @@ class DashboardController extends BaseController
         $drivers = [];
         if ($longestMatch >= 30) $drivers[] = "Pasase kontigu panjang ({$longestMatch} kata) menaikkan skor risiko.";
         if ($clScore >= 35.0) $drivers[] = "Kemiripan konsep alih bahasa internasional (" . number_format($clScore, 1) . "%) memicu atensi telaah.";
+        if ($semScore >= 50.0 || $semCosine >= 0.75) {
+            $drivers[] = "Kemiripan makna & parafrase semantik (" . number_format($semScore, 1) . "%, kosinus " . number_format($semCosine, 2) . ") menaikkan atensi telaah.";
+        }
         if ($burstiness < 0.28) $drivers[] = "Ritme kalimat seragam khas AI (Burstiness: " . number_format($burstiness, 2) . ") meningkatkan indikasi berbantuan mesin.";
         if ($qRatio >= 0.5) $drivers[] = "Tingginya proporsi kutipan bertanda petik (" . round($qRatio * 100) . "%) meringankan potensi pelanggaran.";
         if ($bpRatio >= 0.5) $drivers[] = "Dominasi frasa ilmiah baku (" . round($bpRatio * 100) . "%) mengonfirmasi konvensi metodologi standar.";

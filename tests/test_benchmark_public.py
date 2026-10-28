@@ -21,7 +21,7 @@ def test_public_benchmark_page_renders():
         assert "Dual-Reader" in html
         assert "Lensa Semantik (MiniLM-L12)" in html
         assert "Kalibrasi Empiris Lensa Semantik" in html
-        assert "Garansi Anti-Salah-Tuduh (0.0% False Positive)" in html
+        assert "Margin Keamanan Anti-Salah-Tuduh" in html
 
 def test_public_benchmark_alternate_route_renders():
     url = f"{BASE_URL}/riset/benchmark-naskah-indonesia"

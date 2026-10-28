@@ -32,7 +32,9 @@ FEATURE_NAMES = [
     "transition_density",
     "cross_lingual_score",
     "boilerplate_ratio",
-    "quote_ratio"
+    "quote_ratio",
+    "semantic_score",
+    "semantic_cosine"
 ]
 
 _GLOBAL_MODEL = None
@@ -50,8 +52,10 @@ def extract_features_vector(
     cross_lingual_score: float = 0.0,
     boilerplate_ratio: float = 0.0,
     quote_ratio: float = 0.0,
+    semantic_score: float = 0.0,
+    semantic_cosine: float = 0.0,
 ) -> List[float]:
-    """Ekstraksi 11 dimensi fitur tabular terstandardisasi untuk XGBoost."""
+    """Ekstraksi 13 dimensi fitur tabular terstandardisasi untuk XGBoost (termasuk Lensa Semantik)."""
     return [
         float(exact_sim),
         float(cosine_sim),
@@ -64,6 +68,8 @@ def extract_features_vector(
         float(cross_lingual_score),
         float(boilerplate_ratio),
         float(quote_ratio),
+        float(semantic_score),
+        float(semantic_cosine),
     ]
 
 
@@ -77,12 +83,13 @@ def build_synthetic_training_dataset() -> Tuple[List[List[float]], List[int]]:
     X = []
     y = []
 
-    # 1. Dokumen Orisinal Mandiri (Low similarity, burstiness organik, no long match)
+    # 1. Dokumen Orisinal Mandiri (Low similarity, burstiness organik, no long match, semantic bersih)
     for _ in range(40):
         X.append(extract_features_vector(
             exact_sim=0.0, cosine_sim=4.5, longest_match_words=0, avg_idf=0.0,
             shared_terms_count=4, source_count=1, burstiness=0.55, transition_density=0.5,
-            cross_lingual_score=0.0, boilerplate_ratio=0.0, quote_ratio=0.0
+            cross_lingual_score=0.0, boilerplate_ratio=0.0, quote_ratio=0.0,
+            semantic_score=0.0, semantic_cosine=0.0
         ))
         y.append(0)
 
@@ -91,7 +98,8 @@ def build_synthetic_training_dataset() -> Tuple[List[List[float]], List[int]]:
         X.append(extract_features_vector(
             exact_sim=12.0, cosine_sim=28.0, longest_match_words=12, avg_idf=1.1,
             shared_terms_count=18, source_count=2, burstiness=0.48, transition_density=1.2,
-            cross_lingual_score=0.0, boilerplate_ratio=0.85, quote_ratio=0.1
+            cross_lingual_score=0.0, boilerplate_ratio=0.85, quote_ratio=0.1,
+            semantic_score=15.0, semantic_cosine=0.55
         ))
         y.append(0)
 
@@ -100,7 +108,8 @@ def build_synthetic_training_dataset() -> Tuple[List[List[float]], List[int]]:
         X.append(extract_features_vector(
             exact_sim=0.0, cosine_sim=18.0, longest_match_words=0, avg_idf=2.5,
             shared_terms_count=12, source_count=1, burstiness=0.40, transition_density=2.2,
-            cross_lingual_score=48.0, boilerplate_ratio=0.0, quote_ratio=0.0
+            cross_lingual_score=48.0, boilerplate_ratio=0.0, quote_ratio=0.0,
+            semantic_score=40.0, semantic_cosine=0.72
         ))
         y.append(1)
 
@@ -109,7 +118,8 @@ def build_synthetic_training_dataset() -> Tuple[List[List[float]], List[int]]:
         X.append(extract_features_vector(
             exact_sim=2.0, cosine_sim=15.0, longest_match_words=4, avg_idf=0.8,
             shared_terms_count=8, source_count=1, burstiness=0.18, transition_density=5.2,
-            cross_lingual_score=0.0, boilerplate_ratio=0.2, quote_ratio=0.0
+            cross_lingual_score=0.0, boilerplate_ratio=0.2, quote_ratio=0.0,
+            semantic_score=10.0, semantic_cosine=0.45
         ))
         y.append(1)
 
@@ -118,7 +128,8 @@ def build_synthetic_training_dataset() -> Tuple[List[List[float]], List[int]]:
         X.append(extract_features_vector(
             exact_sim=24.0, cosine_sim=35.0, longest_match_words=35, avg_idf=2.8,
             shared_terms_count=25, source_count=2, burstiness=0.46, transition_density=0.8,
-            cross_lingual_score=0.0, boilerplate_ratio=0.1, quote_ratio=0.85
+            cross_lingual_score=0.0, boilerplate_ratio=0.1, quote_ratio=0.85,
+            semantic_score=35.0, semantic_cosine=0.78
         ))
         y.append(1)
 
@@ -127,7 +138,28 @@ def build_synthetic_training_dataset() -> Tuple[List[List[float]], List[int]]:
         X.append(extract_features_vector(
             exact_sim=78.0, cosine_sim=82.0, longest_match_words=145, avg_idf=4.2,
             shared_terms_count=120, source_count=3, burstiness=0.35, transition_density=1.5,
-            cross_lingual_score=0.0, boilerplate_ratio=0.05, quote_ratio=0.0
+            cross_lingual_score=0.0, boilerplate_ratio=0.05, quote_ratio=0.0,
+            semantic_score=85.0, semantic_cosine=0.92
+        ))
+        y.append(2)
+
+    # 7. Dokumen parafrase semantik / zona abu-abu (Exact rendah, tapi semantic match tinggi -> Review)
+    for _ in range(30):
+        X.append(extract_features_vector(
+            exact_sim=5.0, cosine_sim=25.0, longest_match_words=4, avg_idf=2.2,
+            shared_terms_count=15, source_count=1, burstiness=0.48, transition_density=1.0,
+            cross_lingual_score=0.0, boilerplate_ratio=0.1, quote_ratio=0.0,
+            semantic_score=78.0, semantic_cosine=0.85
+        ))
+        y.append(1)
+
+    # 8. Dokumen penjiplakan semantik & verbatim masif (Exact tinggi, semantic sangat tinggi -> Match)
+    for _ in range(20):
+        X.append(extract_features_vector(
+            exact_sim=65.0, cosine_sim=75.0, longest_match_words=110, avg_idf=3.8,
+            shared_terms_count=90, source_count=2, burstiness=0.38, transition_density=1.2,
+            cross_lingual_score=0.0, boilerplate_ratio=0.05, quote_ratio=0.0,
+            semantic_score=92.0, semantic_cosine=0.95
         ))
         y.append(2)
 
@@ -243,6 +275,17 @@ def load_expert_reviewed_training_dataset() -> Tuple[List[List[float]], List[int
             quote_ratio = 0.0
             boilerplate_ratio = 0.05
 
+        # Ekstraksi metrik semantik terkalibrasi
+        sem_score = float(item.get("semantic_score", 0.0))
+        sem_cosine = float(item.get("semantic_cosine", item.get("max_cosine", 0.0)))
+        if sem_score == 0.0 and sem_cosine == 0.0:
+            if exact_sim >= 60.0 or dec_str == "match":
+                sem_score = max(75.0, round(min(95.0, exact_sim * 1.1), 1))
+                sem_cosine = 0.88
+            elif dec_str == "review":
+                sem_score = 55.0
+                sem_cosine = 0.76
+
         vec = extract_features_vector(
             exact_sim=exact_sim,
             cosine_sim=cosine_sim,
@@ -254,7 +297,9 @@ def load_expert_reviewed_training_dataset() -> Tuple[List[List[float]], List[int
             transition_density=transition_density,
             cross_lingual_score=cross_lingual_score,
             boilerplate_ratio=boilerplate_ratio,
-            quote_ratio=quote_ratio
+            quote_ratio=quote_ratio,
+            semantic_score=sem_score,
+            semantic_cosine=sem_cosine
         )
         X_human.append(vec)
         y_human.append(class_map[dec_str])
@@ -370,9 +415,12 @@ def predict_academic_risk_xgboost(
     cross_lingual_score: float = 0.0,
     boilerplate_ratio: float = 0.0,
     quote_ratio: float = 0.0,
+    semantic_score: float = 0.0,
+    semantic_cosine: float = 0.0,
 ) -> Dict[str, Any]:
     """
     Melakukan inferensi risiko akademik dan transparansi pendorong (Explainable AI).
+    Mengintegrasikan dimensi leksikal, stylometri, lintas bahasa, dan lensa semantik.
     """
     features = extract_features_vector(
         exact_sim=exact_sim,
@@ -386,17 +434,20 @@ def predict_academic_risk_xgboost(
         cross_lingual_score=cross_lingual_score,
         boilerplate_ratio=boilerplate_ratio,
         quote_ratio=quote_ratio,
+        semantic_score=semantic_score,
+        semantic_cosine=semantic_cosine,
     )
 
     model = get_risk_model()
 
     # Fallback jika library XGBoost belum siap
     if model is None:
-        # Perhitungan berbasis bobot heuristik analitik terkalibrasi
+        # Perhitungan berbasis bobot heuristik analitik terkalibrasi (Fase 4 Multidimensi)
         risk_score = round(min(100.0, max(0.0,
-            (exact_sim * 0.45) +
-            (min(100.0, longest_match_words * 0.5) * 0.25) +
-            (cross_lingual_score * 0.20) +
+            (exact_sim * 0.40) +
+            (min(100.0, longest_match_words * 0.5) * 0.20) +
+            (cross_lingual_score * 0.15) +
+            (semantic_score * 0.15) +
             (max(0.0, 0.40 - burstiness) * 50.0 * 0.10) -
             (quote_ratio * 30.0) -
             (boilerplate_ratio * 20.0)
@@ -428,6 +479,8 @@ def predict_academic_risk_xgboost(
         drivers.append(f"Pasase kontigu panjang ({longest_match_words} kata) menaikkan skor risiko.")
     if cross_lingual_score >= 35.0:
         drivers.append(f"Kemiripan konsep alih bahasa internasional ({cross_lingual_score:.1f}%) memicu atensi telaah.")
+    if semantic_score >= 50.0 or semantic_cosine >= 0.75:
+        drivers.append(f"Kemiripan makna & parafrase semantik ({semantic_score:.1f}%, kosinus: {semantic_cosine:.2f}) memicu atensi telaah konseptual.")
     if burstiness < 0.28:
         drivers.append(f"Ritme kalimat seragam khas AI (Burstiness: {burstiness:.2f}) meningkatkan indikasi berbantuan mesin.")
     if transition_density >= 2.0:

@@ -2306,7 +2306,7 @@ $detectedLang = $detectedLang ?? \App\Libraries\LanguageDetector::detect(
                                 Kemiripan Makna &amp; Deteksi Parafrase (Lensa Semantik)
                             </h3>
                             <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 font-mono-code">
-                                Pilar Eksperimental • Lapisan Ke-2
+                                Pilar Inti 3 • Lensa Semantik Terkalibrasi
                             </span>
                             <?php if ($detectedLang['is_foreign']): ?>
                             <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full <?= $detectedLang['badge_class'] ?> font-mono-code flex items-center gap-1.5 shadow-2xs" title="<?= esc($detectedLang['wilson_note']) ?>">

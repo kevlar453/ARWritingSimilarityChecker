@@ -69,7 +69,7 @@ def determine_queue_priority(job_type: str, payload: Dict[str, Any]) -> str:
     - FAST: index_corpus, verifikasi singkat, atau re-index
     - HEAVY: similarity_check hybrid, JIT topic harvesting, gemini forensic audit
     """
-    if job_type in ("index_corpus", "reindex", "notify"):
+    if job_type in ("index_corpus", "reindex", "notify", "delete_corpus"):
         return QUEUE_FAST
 
     # Jika similarity check tanpa engine hybrid berat, bisa masuk antrean fast

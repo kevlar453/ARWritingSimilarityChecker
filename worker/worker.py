@@ -67,6 +67,18 @@ def process_job(job: dict):
             report_id=payload["report_id"],
             engine=payload.get("engine", "hybrid")
         )
+    elif job_type == "delete_corpus":
+        doc_id = payload.get("document_id")
+        if doc_id:
+            try:
+                from worker.semantic_lens import SemanticLens, is_semantic_engine_ready
+                if is_semantic_engine_ready():
+                    deleted = SemanticLens().delete_corpus_document(int(doc_id))
+                    print(f"[WORKER] Sukses membersihkan vektor Qdrant korpus #{doc_id}: {deleted}")
+                else:
+                    print(f"[WORKER WARN] Qdrant tidak siap saat memproses delete_corpus #{doc_id}")
+            except Exception as e:
+                print(f"[WORKER ERROR] Gagal menghapus vektor Qdrant korpus #{doc_id}: {e}")
     elif job_type == "process_document":
         doc_id = payload["document_id"]
         conn = get_connection()

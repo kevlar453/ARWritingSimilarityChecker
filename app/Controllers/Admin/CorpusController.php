@@ -148,6 +148,13 @@ class CorpusController extends BaseController
         $db->table('document_pages')->where('document_id', $id)->delete();
         $model->delete($id);
 
+        // Bersihkan vektor semantik Qdrant via antrean background
+        try {
+            QueueService::dispatch('delete_corpus', ['document_id' => (int) $id]);
+        } catch (\Throwable $e) {
+            // Failsafe jika koneksi antrean terkendala
+        }
+
         return $this->response->setJSON([
             'status'  => 'success',
             'message' => "Dokumen korpus #{$id} berhasil dihapus."

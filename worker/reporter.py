@@ -471,7 +471,44 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
                 "corpus_docs_count": total_corpus_docs,
             }
 
-            # 6. XGBoost Academic Risk Synthesizer (Penyintesis Risiko Akademik Berbobot ML)
+            # 6. Evaluasi Lensa Kedua Semantik (Zona Abu-Abu / Re-ranker Semantik Tanpa Merusak Skor Leksikal)
+            sem_score_val = 0.0
+            sem_cosine_val = 0.0
+            try:
+                from worker.semantic_verifier import SemanticVerifier
+                sem_verifier = SemanticVerifier()
+                sem_eval_75 = sem_verifier.verify_submission(
+                    submission_pages=pages,
+                    lexical_similarity=overall_sim,
+                    evasion_data=evasion_res,
+                    exclude_doc_id=document_id,
+                    similarity_threshold=0.75,
+                    force_check=True
+                )
+                sem_eval_70 = sem_verifier.verify_submission(
+                    submission_pages=pages,
+                    lexical_similarity=overall_sim,
+                    evasion_data=evasion_res,
+                    exclude_doc_id=document_id,
+                    similarity_threshold=0.70,
+                    force_check=True
+                )
+                sem_payload = dict(sem_eval_75)
+                sem_payload["evaluated"] = True
+                sem_payload["threshold_variants"] = {
+                    "0.75": sem_eval_75,
+                    "0.70": sem_eval_70
+                }
+                result["semantic_lens"] = sem_payload
+                sem_score_val = float(sem_eval_75.get("semantic_score", 0.0))
+                sem_cosine_val = float(sem_eval_75.get("semantic_cosine", 0.0))
+            except Exception as sem_err:
+                result["semantic_lens"] = {
+                    "is_evaluated": False,
+                    "error": str(sem_err)
+                }
+
+            # 7. XGBoost Academic Risk Synthesizer (Penyintesis Risiko Akademik Berbobot ML)
             from worker.risk_classifier import predict_academic_risk_xgboost
 
             matches_list = result.get("matches", [])
@@ -505,7 +542,9 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
                 transition_density=trans_density_val,
                 cross_lingual_score=cl_score,
                 boilerplate_ratio=bp_ratio,
-                quote_ratio=q_ratio
+                quote_ratio=q_ratio,
+                semantic_score=sem_score_val,
+                semantic_cosine=sem_cosine_val,
             )
             result["xgboost_risk"] = xgboost_risk_res
             result["jit_harvesting"] = jit_harvest_res
@@ -535,39 +574,6 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
                 v1_decision=predicted_decision,
                 presentation=v11_presentation
             )
-
-            # 10. Evaluasi Lensa Kedua Semantik (Zona Abu-Abu / Re-ranker Semantik Tanpa Merusak Skor Leksikal)
-            try:
-                from worker.semantic_verifier import SemanticVerifier
-                sem_verifier = SemanticVerifier()
-                sem_eval_75 = sem_verifier.verify_submission(
-                    submission_pages=pages,
-                    lexical_similarity=overall_sim,
-                    evasion_data=evasion_res,
-                    exclude_doc_id=document_id,
-                    similarity_threshold=0.75,
-                    force_check=True
-                )
-                sem_eval_70 = sem_verifier.verify_submission(
-                    submission_pages=pages,
-                    lexical_similarity=overall_sim,
-                    evasion_data=evasion_res,
-                    exclude_doc_id=document_id,
-                    similarity_threshold=0.70,
-                    force_check=True
-                )
-                sem_payload = dict(sem_eval_75)
-                sem_payload["evaluated"] = True
-                sem_payload["threshold_variants"] = {
-                    "0.75": sem_eval_75,
-                    "0.70": sem_eval_70
-                }
-                result["semantic_lens"] = sem_payload
-            except Exception as sem_err:
-                result["semantic_lens"] = {
-                    "is_evaluated": False,
-                    "error": str(sem_err)
-                }
 
             result["v1_1_presentation"] = v11_presentation
             result["v1_1_observability"] = {

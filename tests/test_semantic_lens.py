@@ -46,23 +46,25 @@ class TestSemanticLens(unittest.TestCase):
     def test_should_evaluate_gray_zone_logic(self):
         verifier = SemanticVerifier()
 
-        # 1. Kasus kemiripan rendah normal (< 5%) -> Bukan zona abu-abu
+        # 1. Kasus kemiripan leksikal rendah/nol (< 25%) -> Zona abu-abu (potensi parafrase tanpa kesamaan leksikal)
         should_eval, reason = verifier.should_evaluate_gray_zone(lexical_similarity=2.5, evasion_data={"is_manipulated": False})
-        self.assertFalse(should_eval)
-        self.assertEqual(reason, "outside_gray_zone")
+        self.assertTrue(should_eval)
+        self.assertEqual(reason, "gray_zone_or_low_lexical_range")
 
         # 2. Kasus kemiripan leksikal moderat (5% - 25%) -> Zona abu-abu
         should_eval, reason = verifier.should_evaluate_gray_zone(lexical_similarity=12.0)
         self.assertTrue(should_eval)
-        self.assertEqual(reason, "gray_zone_lexical_range")
+        self.assertEqual(reason, "gray_zone_or_low_lexical_range")
 
         # 3. Kasus kemiripan leksikal tinggi (>= 25%) -> Di luar zona abu-abu
         should_eval, reason = verifier.should_evaluate_gray_zone(lexical_similarity=30.0)
         self.assertFalse(should_eval)
         self.assertEqual(reason, "outside_gray_zone")
 
-        # 4. Kasus evasif manipulatif aktif -> Selalu dievaluasi
-        should_eval, reason = verifier.should_evaluate_gray_zone(lexical_similarity=2.0, evasion_data={"is_manipulated": True})
+        # 4. Kasus evasif manipulatif aktif pada kemiripan tinggi -> Tetap dievaluasi
+        should_eval, reason = verifier.should_evaluate_gray_zone(lexical_similarity=35.0, evasion_data={"is_manipulated": True})
+        self.assertTrue(should_eval)
+        self.assertEqual(reason, "evasion_anomaly_detected")
         self.assertTrue(should_eval)
         self.assertEqual(reason, "evasion_anomaly_detected")
 

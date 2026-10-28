@@ -55,7 +55,7 @@ class QueueService
         $engine = $payload['engine'] ?? 'hybrid';
         $targetQueue = $priority;
         if (! $targetQueue) {
-            if (in_array($type, ['index_corpus', 'reindex', 'notify'], true) || in_array($engine, ['exact', 'idf'], true)) {
+            if (in_array($type, ['index_corpus', 'reindex', 'notify', 'delete_corpus'], true) || in_array($engine, ['exact', 'idf'], true)) {
                 $targetQueue = 'artilik:queue:fast';
             } else {
                 $targetQueue = 'artilik:queue:heavy';
