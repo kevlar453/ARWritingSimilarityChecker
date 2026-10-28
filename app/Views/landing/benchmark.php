@@ -1670,6 +1670,9 @@ guna menguji pengaruh variabel independen terhadap variabel dependen dengan tara
                         • <strong>Sensitif di Mode 0,70 ($N=10$):</strong> Memerlukan ambang penyelidikan 0,70 untuk mengimbangi pemadatan morfologi majemuk (*Komposita*), di mana recall melonjak signifikan dari 60% ke 100% dengan LB 72,2% (Jerman).<br>
                         • <strong>Indikasi Terarah ($N=10$, LB $\sim 40\%$):</strong> Menunjukkan sinyal semantik terarah pada naskah hukum dan keagamaan klasik, namun rentang kosinus dipengaruhi peristilahan arkais/filologis khusus (Belanda, Arab).
                     </p>
+                    <p style="margin: 8px 0 0 0; font-size: 12.5px; line-height: 1.6; color: #334155; border-top: 1px dashed #cbd5e1; padding-top: 8px;">
+                        <strong>3. Mekanisme Proyeksi Konsep Dwibahasa vs Cakupan Korpus:</strong> Mekanisme validasi lintas bahasa bertumpu pada proyeksi konsep dwibahasa (<em>cross-lingual concept projection</em>), yaitu memetakan naskah submisi bahasa asing ke naskah rujukan Bahasa Indonesia dan Inggris di ruang vektor bersama. Lencana pasangan bahasa menandakan bahwa lensa ini terbukti mendeteksi terjemahan dari sumber rujukan ID/EN pada pasangan bahasa tersebut, bukan klaim kepemilikan perpustakaan teks pasif dalam bahasa Mandarin, Jerman, atau Belanda.
+                    </p>
                 </div>
             </div>
 
