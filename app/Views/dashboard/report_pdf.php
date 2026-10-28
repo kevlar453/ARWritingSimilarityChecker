@@ -27,6 +27,12 @@ $total_words = $evidenceData['total_words'] ?? 0;
 $exec_time = $evidenceData['execution_time_seconds'] ?? 0;
 $corpus_docs_count = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evidenceData['substantive_summary']['corpus_docs_count'] ?? $evidenceData['exact_evidence']['corpus_docs_count'] ?? 0);
 
+$detectedLang = $detectedLang ?? \App\Libraries\LanguageDetector::detect(
+    $submissionText ?? '',
+    $document['title'] ?? ($report['document_title'] ?? '')
+);
+$semanticLens = $semanticLens ?? ($evidenceData['semantic_lens'] ?? $evidenceData['v1_1_presentation']['v1_2_evolution']['semantic_lens'] ?? null);
+
 if ($dec === 'match') {
     $dec_label = "MATCH (Kesamaan Harfiah Kuat)";
     $dec_desc = "Terdeteksi pasase identik verbatim melebihi ambang batas kesamaan sekuensial institusi.";
@@ -416,6 +422,17 @@ if ($dec === 'match') {
             <td class="meta-label">Cakupan Korpus</td>
             <td class="meta-val"><?= $corpus_docs_count > 0 ? number_format($corpus_docs_count, 0, ',', '.') . ' dokumen pembanding (snapshot audit)' : 'Seluruh repositori aktif' ?></td>
         </tr>
+        <tr>
+            <td class="meta-label">Bahasa Naskah</td>
+            <td class="meta-val">
+                <strong><?= $detectedLang['flag'] ?> <?= esc($detectedLang['name']) ?> (<?= esc($detectedLang['code']) ?>)</strong>
+            </td>
+            <td class="meta-label">Status Pasangan</td>
+            <td class="meta-val">
+                <strong style="color: <?= $detectedLang['is_foreign'] ? '#4338ca' : '#047857' ?>;"><?= esc($detectedLang['pair_code']) ?>: <?= esc($detectedLang['status']) ?></strong>
+                <div style="font-size: 7pt; color: #64748b; margin-top: 1px;"><?= esc($detectedLang['wilson_note']) ?></div>
+            </td>
+        </tr>
         <?php if (!empty($document['faculty']) || !empty($document['department'])): ?>
         <tr>
             <td class="meta-label">Fakultas / Prodi</td>
@@ -679,7 +696,7 @@ if ($dec === 'match') {
             </tr>
             <?php endif; ?>
             <tr>
-                <td><strong>Plagiarisme Terjemahan (ID ↔ EN)</strong><br><span style="font-size: 7.5pt; color: #64748b;">Analisis Semantik Proyeksi Konsep Dwibahasa</span></td>
+                <td><strong>Plagiarisme Terjemahan (<?= esc($detectedLang['is_foreign'] ? $detectedLang['pair_code'] : 'ID ↔ EN') ?>)</strong><br><span style="font-size: 7.5pt; color: #64748b;">Analisis Semantik Proyeksi Konsep Dwibahasa</span></td>
                 <td style="text-align: center; font-weight: bold; color: <?= $clScorePdf >= 35 ? '#b91c1c' : ($clScorePdf >= 15 ? '#b45309' : '#047857') ?>; font-size: 10pt; line-height: 1.25;">
                     <?= number_format($clScorePdf, 1) ?>% Keselarasan
                     <?= $formatRentangPdf([
@@ -690,7 +707,46 @@ if ($dec === 'match') {
                 </td>
                 <td>
                     <strong><?= $clMatchPdf ? 'Terindikasi Terjemahan Langsung' : ($clScorePdf >= 15 ? 'Parafrasa Lintas Bahasa' : 'Orisinal / Bebas Terjemahan Mesin') ?></strong>
+                    <?php if ($detectedLang['is_foreign']): ?>
+                    <div style="font-size: 7.5pt; color: #4338ca; font-weight: bold; margin-top: 2px;">
+                        ⚖️ <?= esc($detectedLang['badge_label']) ?>
+                    </div>
+                    <?php endif; ?>
                     <div style="font-size: 7.5pt; color: #475569;">Konsep terpadan: <?= (int)($clAudit['shared_concept_count'] ?? 0) ?> istilah, Pasase: <?= count($clAudit['aligned_passages'] ?? []) ?></div>
+                </td>
+            </tr>
+            <?php
+                $semScorePdf = (float)($semanticLens['semantic_score'] ?? 0.0);
+                $semDetectedPdf = !empty($semanticLens['paraphrase_detected']);
+                $semTopMatchesPdf = $semanticLens['top_matches'] ?? [];
+                $semColorPdf = ($semDetectedPdf || $semScorePdf >= 75.0) ? '#b91c1c' : (($semScorePdf >= 50.0) ? '#b45309' : '#047857');
+                $semLblPdf = ($semDetectedPdf || $semScorePdf >= 75.0) ? 'Terindikasi Parafrase Makna' : (($semScorePdf >= 50.0) ? 'Perlu Tinjauan Konseptual' : 'Bebas Indikasi Parafrase');
+            ?>
+            <tr>
+                <td>
+                    <strong>Kemiripan Makna &amp; Parafrase (Lensa Semantik)</strong><br>
+                    <span style="font-size: 7.5pt; color: #64748b;">Embedding 384-dim Lokal ONNX • Vektor Qdrant (<?= esc($detectedLang['pair_code']) ?>)</span>
+                </td>
+                <td style="text-align: center; font-weight: bold; color: <?= $semColorPdf ?>; font-size: 10pt; line-height: 1.25;">
+                    <?= number_format($semScorePdf, 1) ?>% Makna
+                    <?= $formatRentangPdf([
+                        ['label' => '[<50%] Aman', 'color' => '#047857', 'bg' => '#ecfdf5', 'border' => '#a7f3d0', 'active' => $semScorePdf < 50.0],
+                        ['label' => '[50–74%] Tinjau', 'color' => '#b45309', 'bg' => '#fffbeb', 'border' => '#fde68a', 'active' => ($semScorePdf >= 50.0 && $semScorePdf < 75.0)],
+                        ['label' => '[≥75%] Parafrase', 'color' => '#b91c1c', 'bg' => '#fef2f2', 'border' => '#fecaca', 'active' => $semScorePdf >= 75.0],
+                    ]) ?>
+                </td>
+                <td>
+                    <strong style="color: <?= $semColorPdf ?>;"><?= esc($semLblPdf) ?></strong>
+                    <div style="font-size: 7.5pt; color: <?= $detectedLang['is_foreign'] ? '#4338ca' : '#047857' ?>; font-weight: bold; margin-top: 2px;">
+                        <?= esc($detectedLang['badge_label']) ?>
+                    </div>
+                    <div style="font-size: 7.5pt; color: #475569;">
+                        <?php if (!empty($semTopMatchesPdf)): ?>
+                            Ditemukan <?= count($semTopMatchesPdf) ?> pasase dengan kemiripan konseptual di ambang 0,75.
+                        <?php else: ?>
+                            Naskah bersih; tidak ditemukan pasase yang melampaui ambang batas semantik.
+                        <?php endif; ?>
+                    </div>
                 </td>
             </tr>
             <?php

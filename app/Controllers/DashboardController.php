@@ -965,6 +965,12 @@ class DashboardController extends BaseController
             }
         }
 
+        // Resolusi Deteksi Bahasa Naskah & Status Kematangan Pasangan Bahasa (Fase 3)
+        $detectedLang = \App\Libraries\LanguageDetector::detect(
+            $submissionText,
+            $document['title'] ?? ($report['document_title'] ?? '')
+        );
+
         // Feedback & Testimoni Akademik (Fase 1)
         $voteModel = new \App\Models\FeatureVoteModel();
         $testimonialModel = new \App\Models\TestimonialModel();
@@ -1010,6 +1016,7 @@ class DashboardController extends BaseController
             'commonPassagesCount' => $commonPassagesCount,
             'submissionText'      => $submissionText,
             'sourceTexts'         => $sourceTexts,
+            'detectedLang'        => $detectedLang,
             'semanticLens'        => $semanticLens,
             'aiStylometrics'      => $aiStylometrics,
             'crossLingual'        => $crossLingual,
@@ -2152,17 +2159,38 @@ class DashboardController extends BaseController
         }
         unset($m);
 
+        $subChunks = $db->table('document_chunks')
+                        ->select('text')
+                        ->where('document_id', $report['document_id'])
+                        ->orderBy('chunk_index', 'ASC')
+                        ->orderBy('id', 'ASC')
+                        ->get()->getResultArray();
+        $submissionText = implode("\n\n", array_column($subChunks, 'text'));
+
+        $detectedLang = \App\Libraries\LanguageDetector::detect(
+            $submissionText,
+            $document['title'] ?? ($report['document_title'] ?? '')
+        );
+
+        $semanticLens = $evidenceData['semantic_lens'] ?? $evidenceData['v1_1_presentation']['v1_2_evolution']['semantic_lens'] ?? null;
+        if (!$semanticLens) {
+            $semanticLens = $this->computeFallbackSemanticLens($report, $submissionText);
+        }
+
         $fallbackCorpus = (new DocumentModel())->where('document_type', 'corpus')->where('benchmark_run_id IS NULL', null, false)->countAllResults();
         $corpusCount = self::extractCorpusCount($report, $fallbackCorpus);
 
         return view('dashboard/report_pdf', [
-            'report'       => $report,
-            'document'     => $document,
-            'evidenceData' => $evidenceData,
-            'sources'      => $sources,
-            'matches'      => $matches,
-            'corpusCount'  => $corpusCount,
+            'report'          => $report,
+            'document'        => $document,
+            'evidenceData'    => $evidenceData,
+            'sources'         => $sources,
+            'matches'         => $matches,
+            'corpusCount'     => $corpusCount,
             'liveCorpusCount' => $fallbackCorpus,
+            'submissionText'  => $submissionText,
+            'detectedLang'    => $detectedLang,
+            'semanticLens'    => $semanticLens,
         ]);
     }
 

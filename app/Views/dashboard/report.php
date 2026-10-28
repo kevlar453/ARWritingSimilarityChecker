@@ -1,5 +1,9 @@
 <?php
 $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evidenceData['substantive_summary']['corpus_docs_count'] ?? $evidenceData['exact_evidence']['corpus_docs_count'] ?? 0);
+$detectedLang = $detectedLang ?? \App\Libraries\LanguageDetector::detect(
+    $submissionText ?? '',
+    $document['title'] ?? ($report['document_title'] ?? '')
+);
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -234,13 +238,24 @@ $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evi
                         </button>
                     <?php endif; ?>
                 </div>
-                <p class="text-xs sm:text-sm text-slate-500 mt-1 flex flex-wrap items-center gap-3">
+                <p class="text-xs sm:text-sm text-slate-500 mt-1 flex flex-wrap items-center gap-2.5">
                     <span>File: <span class="font-mono-code text-slate-700 font-semibold break-all"><?= esc($document['original_filename'] ?? '-') ?></span></span>
                     <span>•</span>
                     <span>Diperiksa: <strong class="text-slate-700"><?= date('d M Y, H:i', strtotime($report['created_at'])) ?></strong></span>
                     <?php if (!empty($evidenceData['total_words'])): ?>
                         <span>•</span>
                         <span>Total: <strong class="text-slate-700"><?= number_format($evidenceData['total_words']) ?> kata</strong></span>
+                    <?php endif; ?>
+                    <span>•</span>
+                    <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md font-bold text-xs bg-slate-100 text-slate-700 border border-slate-200" title="Deteksi Bahasa Naskah Submisi">
+                        <span><?= $detectedLang['flag'] ?></span>
+                        <span>Bahasa: <strong class="text-slate-800"><?= esc($detectedLang['name']) ?></strong></span>
+                    </span>
+                    <?php if ($detectedLang['is_foreign']): ?>
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md font-bold text-xs <?= $detectedLang['badge_class'] ?> shadow-2xs font-mono-code" title="<?= esc($detectedLang['wilson_note']) ?>">
+                        <span>⚖️</span>
+                        <span><?= esc($detectedLang['badge_label']) ?></span>
+                    </span>
                     <?php endif; ?>
                     <?php if ($corpusCount > 0): ?>
                         <span>•</span>
@@ -2045,16 +2060,22 @@ $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evi
                 <div class="flex items-center gap-2.5">
                     <span class="text-2xl">🌐</span>
                     <div>
-                        <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-2 flex-wrap">
                             <h3 class="font-bold text-base text-slate-800">
-                                Deteksi Plagiarisme Lintas Bahasa &amp; Terjemahan (ID ↔ EN)
+                                Deteksi Plagiarisme Lintas Bahasa &amp; Terjemahan (<?= esc($detectedLang['is_foreign'] ? $detectedLang['pair_code'] : 'ID ↔ EN') ?>)
                             </h3>
+                            <?php if ($detectedLang['is_foreign']): ?>
+                            <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full <?= $detectedLang['badge_class'] ?> font-mono-code" title="<?= esc($detectedLang['wilson_note']) ?>">
+                                <?= esc($detectedLang['badge_label']) ?>
+                            </span>
+                            <?php else: ?>
                             <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200 font-mono-code">
                                 Opsi A: Cross-Language
                             </span>
+                            <?php endif; ?>
                         </div>
                         <p class="text-xs text-slate-500 mt-0.5">
-                            Menganalisis indikasi penerjemahan langsung (*machine translation / direct paraphrase*) dari naskah internasional berbahasa Inggris tanpa sitasi primer.
+                            Menganalisis indikasi penerjemahan langsung (*machine translation / direct paraphrase*) dari naskah rujukan ilmiah internasional tanpa sitasi primer. Bahasa naskah submisi: <strong><?= esc($detectedLang['name']) ?></strong>.
                         </p>
                     </div>
                 </div>
@@ -2287,12 +2308,26 @@ $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evi
                             <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 font-mono-code">
                                 Pilar Eksperimental • Lapisan Ke-2
                             </span>
-                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200 font-mono-code" title="Fase 3: Terkalibrasi pada 5 Pasangan Bahasa Ilmiah (N=10 per Bahasa, Wilson 95%)">
-                                Multibahasa Terarah (N=10/Bahasa)
+                            <?php if ($detectedLang['is_foreign']): ?>
+                            <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full <?= $detectedLang['badge_class'] ?> font-mono-code flex items-center gap-1.5 shadow-2xs" title="<?= esc($detectedLang['wilson_note']) ?>">
+                                <span><?= $detectedLang['flag'] ?></span>
+                                <span><?= esc($detectedLang['badge_label']) ?></span>
                             </span>
+                            <?php else: ?>
+                            <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-300 font-mono-code flex items-center gap-1.5 shadow-2xs" title="<?= esc($detectedLang['wilson_note']) ?>">
+                                <span>🇮🇩</span>
+                                <span>Terkalibrasi Nasional (F1: 0,85 • 0 FP)</span>
+                            </span>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200 font-mono-code" title="Fase 3: Terkalibrasi pada 5 Pasangan Bahasa Ilmiah (N=10 per Bahasa, Wilson 95%)">
+                                Multibahasa Siap
+                            </span>
+                            <?php endif; ?>
                         </div>
                         <p class="text-xs text-slate-500 mt-0.5">
                             Memeriksa ulang naskah pada zona abu-abu melalui penanaman vektor makna <em>(paraphrase-multilingual-MiniLM-L12-v2)</em> secara lokal on-premise tanpa mengubah persentase leksikal utama.
+                            <?php if ($detectedLang['is_foreign']): ?>
+                                <span class="text-indigo-700 font-semibold">• Bahasa Naskah: <?= esc($detectedLang['name']) ?> (Pasangan Relevan: <?= esc($detectedLang['pair_code']) ?>)</span>
+                            <?php endif; ?>
                         </p>
                     </div>
                 </div>
@@ -2382,14 +2417,16 @@ $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evi
                     </div>
                 </div>
 
-                <!-- KPI 4: Vektor Korpus -->
+                <!-- KPI 4: Vektor Korpus & Pasangan Bahasa -->
                 <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
-                    <div class="text-[11px] text-slate-500">Basis Indeks Vektor</div>
-                    <div class="text-sm font-extrabold mt-1 text-slate-800">
-                        Qdrant Engine
+                    <div class="text-[11px] text-slate-500">Pasangan &amp; Vektor</div>
+                    <div class="text-sm font-extrabold mt-1 text-slate-800 flex items-center gap-1.5 truncate">
+                        <span><?= $detectedLang['flag'] ?></span>
+                        <span><?= esc($detectedLang['pair_code']) ?></span>
+                        <span class="text-[10px] font-normal text-slate-400 font-mono-code">• Qdrant</span>
                     </div>
-                    <div id="semKpiMatchesCount" class="text-[10px] text-slate-400 mt-0.5">
-                        <?= count($semTopMatches) ?> Pasase Terkorelasi
+                    <div id="semKpiMatchesCount" class="text-[10px] <?= $detectedLang['is_foreign'] ? 'text-indigo-600 font-bold' : 'text-slate-400' ?> mt-0.5 truncate" title="<?= esc($detectedLang['wilson_note']) ?>">
+                        <?= esc($detectedLang['status']) ?> (<?= count($semTopMatches) ?> Pasase)
                     </div>
                 </div>
             </div>
@@ -2522,12 +2559,24 @@ $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evi
             <div id="semEmptyState" class="p-4 rounded-xl bg-emerald-50/70 border border-emerald-200 text-xs text-emerald-900 flex items-start gap-3 <?= empty($semTopMatches) ? '' : 'hidden' ?>">
                 <span class="text-xl">✅</span>
                 <div class="space-y-1">
-                    <strong class="font-bold text-emerald-800" id="semEmptyTitle">Naskah Bersih di Ambang Standar (0,75)</strong>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <strong class="font-bold text-emerald-800" id="semEmptyTitle">Naskah Bersih di Ambang Standar (0,75)</strong>
+                        <?php if ($detectedLang['is_foreign']): ?>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full <?= $detectedLang['badge_class'] ?> font-mono-code shadow-2xs" title="<?= esc($detectedLang['wilson_note']) ?>">
+                                <?= esc($detectedLang['badge_label']) ?>
+                            </span>
+                        <?php endif; ?>
+                    </div>
                     <p class="text-emerald-700 leading-relaxed" id="semEmptyDesc">
                         <?php if ($hasAnyMatches): ?>
                             Pada ambang standar ketat (0,75), tidak ada pasase yang melampaui batas toleransi. Beralihlah ke <strong>Mode Penyelidikan (0,70)</strong> untuk melihat pasase pada zona transisi sensitif.
                         <?php else: ?>
-                            Seluruh potongan naskah telah diproyeksikan ke ruang vektor 384-dimensi dan dicocokkan terhadap <strong>13.573+ vektor korpus akademik</strong>. Tidak ditemukan pasase yang melewati batas kemiripan makna baik pada Ambang Standar (0,75) maupun Mode Penyelidikan (0,70). Naskah ini memiliki struktur gagasan yang orisinal.
+                            Seluruh potongan naskah telah diproyeksikan ke ruang vektor 384-dimensi dan dicocokkan terhadap basis vektor korpus akademik. Tidak ditemukan pasase yang melewati batas kemiripan makna baik pada Ambang Standar (0,75) maupun Mode Penyelidikan (0,70).
+                            <?php if ($detectedLang['is_foreign']): ?>
+                                Naskah terverifikasi bersih dalam bahasa <strong><?= esc($detectedLang['name']) ?></strong> terhadap korpus rujukan dengan validasi kematangan empiris <strong><?= esc($detectedLang['badge_label']) ?></strong>.
+                            <?php else: ?>
+                                Naskah ini memiliki struktur gagasan yang orisinal dan bebas dari indikasi parafrase terstruktur.
+                            <?php endif; ?>
                         <?php endif; ?>
                     </p>
                 </div>

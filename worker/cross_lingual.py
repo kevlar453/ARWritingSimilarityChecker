@@ -522,7 +522,20 @@ def generate_unordered_concept_pairs(concepts: List[str], window_size: int = 4) 
 
 
 def detect_language(text: str) -> str:
-    """Mendeteksi apakah naskah dominan Bahasa Indonesia (ID) atau Inggris (EN)."""
+    """Mendeteksi apakah naskah dominan Bahasa Indonesia (ID), Inggris (EN), Mandarin (ZH), Arab (AR), Jerman (DE), atau Belanda (NL)."""
+    if not text:
+        return "UNKNOWN"
+
+    sample = text[:5000]
+
+    # 1. Cek Aksara Hanzi (Mandarin)
+    if len(re.findall(r'[\u4e00-\u9fff]', sample)) >= 10:
+        return "ZH"
+
+    # 2. Cek Aksara Hijaiyah (Arab)
+    if len(re.findall(r'[\u0600-\u06ff]', sample)) >= 10:
+        return "AR"
+
     id_markers = {
         "yang", "dan", "di", "dari", "ini", "dengan", "untuk", "pada", "adalah", "sebagai",
         "bahwa", "penelitian", "hasil", "metode", "tersebut", "secara", "dapat", "dalam"
@@ -531,18 +544,38 @@ def detect_language(text: str) -> str:
         "the", "and", "of", "in", "to", "is", "that", "for", "with", "as", "by", "from",
         "research", "results", "study", "this", "were", "using", "between", "analysis"
     }
+    de_markers = {
+        "der", "die", "das", "und", "in", "zu", "den", "nicht", "von", "sie", "ist",
+        "des", "sich", "mit", "dem", "dass", "er", "es", "ein", "eine", "wird", "sind"
+    }
+    nl_markers = {
+        "de", "het", "en", "van", "ik", "te", "dat", "die", "in", "een", "hij",
+        "niet", "zijn", "is", "was", "op", "aan", "met", "als", "voor", "maar", "door"
+    }
 
-    tokens = [w.lower() for w in re.findall(r"\b[a-zA-Z]{2,}\b", text[:4000])]
+    tokens = [w.lower() for w in re.findall(r"\b[a-zA-Z]{2,}\b", sample)]
     if not tokens:
         return "UNKNOWN"
 
-    id_count = sum(1 for t in tokens if t in id_markers)
-    en_count = sum(1 for t in tokens if t in en_markers)
+    counts = {
+        "ID": sum(1 for t in tokens if t in id_markers),
+        "EN": sum(1 for t in tokens if t in en_markers),
+        "DE": sum(1 for t in tokens if t in de_markers) + len(re.findall(r'[äöüß]', sample, re.I)) * 2,
+        "NL": sum(1 for t in tokens if t in nl_markers) + len(re.findall(r'\b\w*ij\w*\b', sample, re.I)),
+    }
 
-    if id_count >= max(en_count * 1.4, 3):
-        return "ID"
-    elif en_count >= max(id_count * 1.4, 3):
-        return "EN"
+    best_lang = max(counts, key=counts.get)
+    best_score = counts[best_lang]
+
+    if best_score >= 3:
+        if best_lang == "EN" and counts["EN"] >= counts["ID"] * 1.4:
+            return "EN"
+        if best_lang == "ID" and counts["ID"] >= counts["EN"] * 1.3:
+            return "ID"
+        if best_lang in ("DE", "NL") and counts[best_lang] > counts["EN"] * 1.2:
+            return best_lang
+        return best_lang
+
     return "MIXED"
 
 
