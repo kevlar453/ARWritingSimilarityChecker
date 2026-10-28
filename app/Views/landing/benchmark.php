@@ -1313,10 +1313,10 @@ guna menguji pengaruh variabel independen terhadap variabel dependen dengan tara
         <!-- Section 4B: Kalibrasi Empiris Lensa Semantik (MiniLM-L12) -->
         <section id="semantik" class="section-block" style="border-left: 4px solid #4f46e5;">
             <div class="sec-head">
-                <div class="sec-tag" style="color: #4f46e5;">Evaluasi Lapisan Kedua — Mesin Vektor Semantik</div>
+                <div class="sec-tag" style="color: #4f46e5;">Pilar Inti 3 — Mesin Vektor Semantik Terkalibrasi</div>
                 <h2 class="sec-title">Kalibrasi Empiris Lensa Semantik: Menghalau Parafrase Tanpa Merusak Skor Leksikal</h2>
                 <p class="sec-desc">
-                    Evaluasi empiris komprehensif pada 80 kasus terarah menggunakan model multibahasa on-premise <code>paraphrase-multilingual-MiniLM-L12-v2</code> (118M parameter, 384 dimensi) dan basis data vektor Qdrant (13.573 potongan korpus).
+                    Evaluasi empiris komprehensif pada 80 kasus terarah menggunakan model multibahasa on-premise <code>paraphrase-multilingual-MiniLM-L12-v2</code> (118M parameter, 384 dimensi) dan basis data vektor Qdrant (13.976 potongan korpus).
                 </p>
             </div>
 
@@ -1337,7 +1337,7 @@ guna menguji pengaruh variabel independen terhadap variabel dependen dengan tara
                 <div class="callout-text">
                     <h4 style="margin: 0 0 6px 0; font-size: 15px; color: #312e81; font-weight: 700;">Prinsip Desain &amp; Transparansi Latensi Komputasi</h4>
                     <p style="margin: 0 0 8px 0; font-size: 13.5px; line-height: 1.65; color: #4338ca;">
-                        Mesin leksikal (shingling 5-gram + Jaccard) tetap menjadi tulang punggung utama AR Tilik yang deterministik dan dapat diverifikasi kata demi kata. Penanaman vektor semantik bekerja secara eksklusif sebagai <strong>lensa pemeriksa ulang pada zona abu-abu</strong> (skor leksikal moderat 5%–25% atau naskah dengan anomali parafrase).
+                        Mesin leksikal (shingling 5-gram + Jaccard) tetap menjadi tulang punggung utama AR Tilik yang deterministik dan dapat diverifikasi kata demi kata. Sejak Fase 4, Lensa Semantik adalah <strong>Pilar Inti 3</strong> yang setara dengan kedua lensa leksikal: skornya menjadi fitur utama Sintesis Risiko Akademik (bobot 32,94%) sekaligus tetap berfungsi sebagai pemeriksa ulang pada zona abu-abu (skor leksikal moderat 5%–25% atau naskah dengan anomali parafrase).
                     </p>
                     <p style="margin: 0; font-size: 12.5px; line-height: 1.6; color: #475569; background: #ffffff; padding: 8px 12px; border-radius: 8px; border: 1px solid #e0e7ff;">
                         ⚡ <strong>Rincian Latensi Jujur:</strong> Angka latensi <strong>~0,4 ms</strong> adalah waktu murni pencarian vektor ANN (HNSW) di memori Qdrant. Untuk alur ujung-ke-ujung pada naskah baru, dibutuhkan waktu inferensi embedding CPU (MiniLM-L12 ONNX) sebesar <strong>~30 ms per paragraf</strong>, sehingga total latensi per potongan naskah berkisar <strong>~30–35 ms</strong>.
@@ -1349,7 +1349,7 @@ guna menguji pengaruh variabel independen terhadap variabel dependen dengan tara
             <div class="callout-box" style="background: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #64748b; margin-bottom: 24px;">
                 <div class="callout-icon">📚</div>
                 <div class="callout-text">
-                    <h4 style="margin: 0 0 6px 0; font-size: 14.5px; color: #1e293b; font-weight: 700;">Catatan Teknis Komposisi Korpus: Mengapa 13.573 Potongan dari 1.381 Dokumen?</h4>
+                    <h4 style="margin: 0 0 6px 0; font-size: 14.5px; color: #1e293b; font-weight: 700;">Catatan Teknis Komposisi Korpus: Mengapa 13.976 Potongan dari 1.381 Dokumen?</h4>
                     <p style="margin: 0; font-size: 13px; line-height: 1.65; color: #475569;">
                         Rata-rata ~10 potongan semantik per dokumen (~1.600–2.000 kata) mencerminkan komposisi riil korpus produksi kami: <strong>seluruh dokumen diproses penuh dari halaman pertama hingga akhir</strong> (bukan hanya halaman awal). Dari 1.381 dokumen korpus aktif:
                         <br>&bull; <strong>931 artikel jurnal</strong> berformat standar (5–8 halaman, rata-rata 1.500–2.500 kata).

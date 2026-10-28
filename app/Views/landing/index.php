@@ -6,7 +6,7 @@
     <title>AR Tilik — Cek Plagiarisme &amp; Penelaah Kesepadanan Naskah Akademik Mandiri</title>
     
     <!-- Primary SEO Meta Tags -->
-    <meta name="description" content="AR Tilik adalah instrumen penelaah kesepadanan naskah akademik &amp; cek plagiarisme mandiri berbasis bukti ilmiah, arsitektur Dual-Lens 5-Gram &amp; TF-IDF, integrasi OJS 3.x, audit sitasi APA/IEEE, serta transparansi keadilan akademik.">
+    <meta name="description" content="AR Tilik adalah instrumen penelaah kesepadanan naskah akademik &amp; cek plagiarisme mandiri berbasis bukti ilmiah, arsitektur Tiga Lensa 5-Gram, TF-IDF &amp; Semantik, integrasi OJS 3.x, audit sitasi APA/IEEE, serta transparansi keadilan akademik.">
     <meta name="keywords" content="cek plagiasi, cek plagiarisme, similarity checker indonesia, uji kesepadanan naskah, plagiarism checker ojs, anti plagiasi karya ilmiah, turnitin alternatif, cek plagiasi gratis, ojs 3 similarity plugin, ar tilik, arsetontong, integritas akademik">
     <meta name="author" content="ARSetontong">
     <meta name="publisher" content="ARSetontong">
@@ -22,7 +22,7 @@
     <meta property="og:locale" content="id_ID">
     <meta property="og:site_name" content="AR Tilik">
     <meta property="og:title" content="AR Tilik — Cek Plagiarisme &amp; Penelaah Kesepadanan Naskah Akademik">
-    <meta property="og:description" content="Platform penelaah kesepadanan karya ilmiah mandiri berbasis bukti transparan, arsitektur Dual-Lens 5-Gram &amp; TF-IDF, integrasi otomatis OJS 3.x, dan perlindungan privasi naskah.">
+    <meta property="og:description" content="Platform penelaah kesepadanan karya ilmiah mandiri berbasis bukti transparan, arsitektur Tiga Lensa 5-Gram, TF-IDF &amp; Semantik, integrasi otomatis OJS 3.x, dan perlindungan privasi naskah.">
     <meta property="og:url" content="<?= base_url() ?>">
     <meta property="og:image" content="<?= base_url('images/og-artilik.png') ?>">
     <meta property="og:image:secure_url" content="<?= base_url('images/og-artilik.png') ?>">
@@ -86,7 +86,7 @@
             "name": "Kuota Sivitas Akademika Gratis (3 Submisi/Minggu)"
           },
           "featureList": [
-            "Dual-Lens 5-Gram & TF-IDF Cosine Similarity Engine",
+            "Tiga Lensa: 5-Gram, TF-IDF & Semantik Engine",
             "Citation Context Awareness (APA, IEEE, Harvard)",
             "Open Journal Systems (OJS 3.x) Automatic REST Integration",
             "Anti-Cheat Homoglyph & Font Spoofing Shield",
@@ -133,7 +133,7 @@
               "name": "Apa perbedaan mendasar antara AR Tilik dan aplikasi pemeriksa plagiarisme lainnya?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "AR Tilik berfokus pada Keadilan Bukti (Evidence-Based Fairness) menggunakan arsitektur Dual-Lens (5-Gram Sintaktis & TF-IDF Semantik) serta kesadaran konteks sitasi. Berbeda dengan matcher konvensional yang kerap menandai kutipan resmi, rumus, dan frasa umum sebagai plagiarisme, AR Tilik mengisolasi daftar pustaka, mengenali blok kutipan bertanda, dan menyediakan sintesis risiko terkalibrasi melalui Sintesis Risiko Akademik Berbobot serta penampil perbandingan berdampingan (Dual-Reader)."
+                "text": "AR Tilik berfokus pada Keadilan Bukti (Evidence-Based Fairness) menggunakan arsitektur Tiga Lensa (5-Gram Sintaktis, TF-IDF Leksikal, dan Lensa Semantik Terkalibrasi) serta kesadaran konteks sitasi. Berbeda dengan matcher konvensional yang kerap menandai kutipan resmi, rumus, dan frasa umum sebagai plagiarisme, AR Tilik mengisolasi daftar pustaka, mengenali blok kutipan bertanda, dan menyediakan sintesis risiko terkalibrasi melalui Sintesis Risiko Akademik Berbobot serta penampil perbandingan berdampingan (Dual-Reader)."
               }
             },
             {
@@ -2918,7 +2918,7 @@
                             <div class="dropdown-icon" style="background: #eef2ff; color: #4338ca;">⚡</div>
                             <div class="dropdown-content">
                                 <span class="dropdown-title">Inovasi Mesin</span>
-                                <span class="dropdown-sub">Dual-Lens 5-Gram &amp; Anti-Cheat Shield</span>
+                                <span class="dropdown-sub">Tiga Lensa 5-Gram, TF-IDF &amp; Semantik</span>
                             </div>
                         </a>
                         <a href="#integrasi-ojs" class="dropdown-item" onclick="closeAllNavDropdowns()">
@@ -3206,7 +3206,7 @@
             <div class="hero-grid">
                 <div>
                     <div class="hero-badge">
-                        <span>🏛️</span> Standar Keadilan Akademik &bull; OJS 3.x Ready &bull; Lintas Bahasa EN⇄ID &bull; Anti-Cheat Shield
+                        <span>🏛️</span> Standar Keadilan Akademik &bull; OJS 3.x Ready &bull; Lintas Bahasa 5 Pasangan Tervalidasi (EN, ZH, DE, NL, AR ⇄ ID) &bull; Anti-Cheat Shield
                     </div>
                     <h1 class="hero-title">
                         Cek Plagiarisme &amp; Penelaah Kesepadanan Naskah Berbasis <span>Bukti Ilmiah Terbuka</span>
@@ -3235,8 +3235,8 @@
 
                     <!-- Micro Feature Badges -->
                     <div class="hero-pills-wrap">
-                        <div class="hero-pill-badge"><span>⚡</span> Dual-Lens 5-Gram & TF-IDF</div>
-                        <div class="hero-pill-badge"><span>🌐</span> Cross-Lingual EN⇄ID</div>
+                        <div class="hero-pill-badge"><span>⚡</span> Tiga Lensa: 5-Gram, TF-IDF &amp; Semantik</div>
+                        <div class="hero-pill-badge"><span>🌐</span> Lintas Bahasa 5 Pasangan Tervalidasi (EN, ZH, DE, NL, AR ⇄ ID)</div>
                         <div class="hero-pill-badge"><span>🛡️</span> Anti-Cheat Font/Homoglyph</div>
                         <div class="hero-pill-badge"><span>📑</span> Auditor Sitasi APA/IEEE</div>
                         <div class="hero-pill-badge"><span>🦅</span> Pemanen Neliti & GARUDA Dikti</div>
@@ -3251,10 +3251,10 @@
                         </picture>
                         <div class="hero-visual-overlay">
                             <span class="hero-visual-tag">
-                                <span>🔬</span> Dual-Lens Spectrum Analysis
+                                <span>🔬</span> Mesin Tiga Lensa Aktif
                             </span>
                             <span class="hero-visual-status">
-                                Engine Active
+                                Exact, Leksikal &amp; Semantik
                             </span>
                         </div>
                     </div>
@@ -3301,9 +3301,9 @@
             <div class="grid-3" style="margin-bottom: 40px;">
                 <div class="theory-card" data-aos="fade-up" data-aos-delay="100" data-aos-duration="700">
                     <div class="card-icon-badge badge-indigo">🔍</div>
-                    <h3 class="theory-title">Dual-Lens Architecture</h3>
+                    <h3 class="theory-title">Arsitektur Tiga Lensa</h3>
                     <p class="theory-desc">
-                        Membedakan secara matematis antara <strong>Exact Matcher</strong> (5-gram shingle) untuk mendeteksi tumpang tindih kata berurutan, dan <strong>Sparse TF-IDF Cosine</strong> untuk menganalisis orientasi kosakata dan topik bersama.
+                        Membedakan secara matematis antara <strong>Exact Matcher</strong> (5-gram shingle), <strong>Sparse TF-IDF Leksikal</strong>, dan <strong>Lensa Semantik Terkalibrasi</strong> (Pilar Inti 3) untuk memisahkan karya orisinal dari parafrase dan alih bahasa.
                     </p>
                 </div>
 
@@ -3319,29 +3319,30 @@
                     <div class="card-icon-badge badge-amber">⚖️</div>
                     <h3 class="theory-title">Sintesis Risiko Akademik Berbobot</h3>
                     <p class="theory-desc">
-                        Model komputasi probabilistik terkalibrasi yang mensintesis 11 dimensi bukti keabsahan—termasuk estilometri panjang kalimat (burstiness), frasa baku metodologi, dan konsistensi naskah secara non-linear tanpa vonis kaku.
+                        Model komputasi probabilistik terkalibrasi yang mensintesis 13 dimensi bukti keabsahan — termasuk skor kemiripan makna sebagai penggerak terbesar, estilometri panjang kalimat (burstiness), frasa baku metodologi, dan konsistensi naskah secara non-linear tanpa vonis kaku.
                     </p>
                 </div>
             </div>
 
-            <!-- Spotlight Card: Visualisasi Dual-Lens Engine -->
+            <!-- Spotlight Card: Visualisasi Tiga Lensa Engine -->
             <div class="spotlight-card" data-aos="fade-up" data-aos-duration="800">
                 <div class="spotlight-img-wrap" data-aos="fade-right" data-aos-delay="100" data-aos-duration="800">
                     <picture>
                         <source srcset="<?= base_url('images/dual_lens_concept.webp') ?>" type="image/webp">
-                        <img src="<?= base_url('images/dual_lens_concept.jpg') ?>" alt="Konsep Arsitektur Dual-Lens AR Tilik" loading="lazy" width="800" height="450">
+                        <img src="<?= base_url('images/dual_lens_concept.jpg') ?>" alt="Konsep Arsitektur Tiga Lensa AR Tilik" loading="lazy" width="800" height="450">
                     </picture>
                     <div class="spotlight-caption">
                         <span>LENSA 1: Sequential 5-Gram</span>
                         <span>LENSA 2: Lexical TF-IDF</span>
+                        <span>LENSA 3: Semantik Qdrant</span>
                     </div>
                 </div>
 
                 <div data-aos="fade-left" data-aos-delay="150" data-aos-duration="800">
                     <div style="font-size: 11px; text-transform: uppercase; font-weight: 800; color: var(--primary); letter-spacing: 1px; margin-bottom: 6px;">Arsitektur Komparasi Presisi</div>
-                    <h3 style="font-size: 24px; font-weight: 800; color: var(--dark); margin-bottom: 12px; letter-spacing: -0.5px;">Konvergensi Dua Lensa Bukti Ilmiah</h3>
+                    <h3 style="font-size: 24px; font-weight: 800; color: var(--dark); margin-bottom: 12px; letter-spacing: -0.5px;">Arsitektur Tiga Lensa</h3>
                     <p style="font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px;">
-                        Algoritma AR Tilik menolak pendekatan monolitik. Kami menggunakan dua lensa matematis independen yang dikombinasikan secara transparan untuk memisahkan karya orisinal dari modifikasi dangkal:
+                        AR Tilik menolak pendekatan monolitik. Kami memakai tiga lensa matematis yang dipadukan secara transparan: Lensa 1 Exact Matcher (5-gram shingle) untuk tumpang tindih kata berurutan; Lensa 2 TF-IDF Leksikal untuk orientasi kosakata dan topik; dan Lensa 3 Semantik Terkalibrasi (Pilar Inti 3) untuk menangkap parafrase dan terjemahan yang lolos dari kedua lensa leksikal.
                     </p>
 
                     <div class="lens-list">
@@ -3361,6 +3362,16 @@
                                 <strong style="font-size: 13px; color: var(--dark);">Lensa Leksikal (Sparse TF-IDF Cosine Vector)</strong>
                                 <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">
                                     Mengukur kedekatan medan makna, distribusi leksikon tematik, dan konsistensi terminologi disiplin ilmu yang diteliti.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="lens-item">
+                            <div class="lens-item-badge badge-purple">🧠</div>
+                            <div>
+                                <strong style="font-size: 13px; color: var(--dark);">Lensa Semantik (MiniLM-L12, 384 dimensi, Qdrant)</strong>
+                                <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">
+                                    Mengukur kesepadanan makna antar pasase, termasuk parafrase berat dan alih bahasa, dengan ambang baku 0,75 dan mode penyelidikan 0,70.
                                 </p>
                             </div>
                         </div>
@@ -3424,7 +3435,7 @@
                     <div class="card-icon-badge" style="background: #fff7ed; color: #ea580c;">⚖️</div>
                     <h3 class="theory-title">Objek Ukur Berbeda</h3>
                     <p class="theory-desc">
-                        Detektor konvensional bekerja lewat inferensi statistik gaya bahasa tertutup. AR Tilik menyajikan <strong>4 pilar bukti yang dapat dilacak</strong>: frasa sekuensial, orientasi leksikal, pasase beririsan, dan validasi keaslian rujukan.
+                        Detektor konvensional bekerja lewat inferensi statistik gaya bahasa tertutup. AR Tilik menyajikan <strong>4 jenis bukti yang dapat dilacak</strong>: frasa sekuensial, orientasi leksikal, pasase beririsan, dan validasi keaslian rujukan.
                     </p>
                 </div>
 
@@ -3514,10 +3525,10 @@
                 <!-- Fitur 3: Cross-Lingual -->
                 <div class="theory-card" data-aos="fade-up" data-aos-delay="200" data-aos-duration="700">
                     <div class="card-icon-badge badge-rose">🌐</div>
-                    <div style="font-size: 11px; font-weight: 800; color: #e11d48; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Penyelarasan Bilingual</div>
-                    <h3 class="theory-title">Deteksi Plagiarisme Lintas Bahasa (EN ⇄ ID)</h3>
+                    <div style="font-size: 11px; font-weight: 800; color: #e11d48; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">5 Pasangan Bahasa Tervalidasi</div>
+                    <h3 class="theory-title">Deteksi Plagiarisme Lintas Bahasa (5 Pasangan Tervalidasi)</h3>
                     <p class="theory-desc">
-                        Membongkar modus plagiarisme terjemahan langsung dari literatur asing (bahasa Inggris) ke bahasa Indonesia tanpa atribusi. Model representasi multilingual kami mendeteksi kesepadanan semantik dan susunan alur argumen sekalipun naskah telah dialihbahasakan.
+                        Membongkar modus plagiarisme terjemahan tanpa atribusi dari lima pasangan bahasa yang tervalidasi empiris (Inggris, Mandarin, Jerman, Belanda, Arab ⇄ Indonesia; masing-masing 10 kasus uji dengan interval kepercayaan Wilson 95%). Model multibahasa kami memetakan naskah asing ke rujukan Indonesia dan Inggris di ruang vektor bersama, sehingga kesepadanan makna dan alur argumen tetap terdeteksi sekalipun naskah telah dialihbahasakan. Catatan jujur: lencana pasangan bahasa menandakan kemampuan deteksi terjemahan yang terbukti, bukan kepemilikan perpustakaan teks pasif berbahasa Mandarin, Jerman, atau Belanda.
                     </p>
                 </div>
 
@@ -3580,7 +3591,7 @@
                     <div class="card-icon-badge badge-cyan">📤</div>
                     <h3 class="step-title">Unggah Dokumen Karya Ilmiah</h3>
                     <p class="step-desc">
-                        Kirimkan naskah dalam format PDF, DOCX, atau TXT (maks. 30 MB). Sistem secara otomatis mengekstrak teks, menormalisasi tanda baca, dan menghitung shingle sekuensial.
+                        Kirimkan naskah dalam format PDF, DOCX, TXT, atau LaTeX (.tex) (maks. 64 MB). PDF hasil pindaian dibaca dengan OCR, dan sistem secara otomatis mengekstrak teks, menormalisasi tanda baca, dan menghitung shingle sekuensial.
                     </p>
                 </div>
 
@@ -3681,7 +3692,7 @@
                             Buku Panduan Integrasi OJS 3.x (Format PDF Resolusi Tinggi - 8 Halaman)
                         </h3>
                         <p style="font-size: 14px; color: #cbd5e1; line-height: 1.6; margin-bottom: 24px;">
-                            Disusun khusus untuk pengelola jurnal, IT kampus, dan Dewan Redaksi. Dilengkapi diagram alur kerja <em>end-to-end</em> (Penulis &rarr; OJS 3 &rarr; REST API &rarr; Dual-Lens &rarr; Sertifikat Digital), konsep komputasi Dual-Lens, Audit Forensik Cerdas AI, Panduan Telaah Redaksi, panduan instalasi, dan contoh kode PHP konektor.
+                            Disusun khusus untuk pengelola jurnal, IT kampus, dan Dewan Redaksi. Dilengkapi diagram alur kerja <em>end-to-end</em> (Penulis &rarr; OJS 3 &rarr; REST API &rarr; Tiga Lensa &rarr; Sertifikat Digital), konsep komputasi Tiga Lensa, Audit Forensik Cerdas AI, Panduan Telaah Redaksi, panduan instalasi, dan contoh kode PHP konektor.
                         </p>
 
                         <div style="display: flex; gap: 12px; flex-wrap: wrap;">
@@ -4349,7 +4360,7 @@
                         <ul class="plan-features">
                             <li><strong>Aktif selamanya</strong> (kuota tanpa masa kedaluwarsa)</li>
                             <li>Pilihan paket isi ulang 3 cek atau 10 cek</li>
-                            <li>Analisis Dual-Lens n-gram &amp; TF-IDF Cosine</li>
+                            <li>Analisis Tiga Lensa: n-gram, TF-IDF Cosine &amp; kemiripan makna</li>
                             <li><strong>Audit Forensik Cerdas</strong> & instrumen ujian sidang aktif</li>
                             <li>Semua fitur deteksi kecerdasan buatan & stylometri aktif</li>
                             <li>Ekspor PDF laporan resmi lengkap ber-QR</li>
@@ -4384,7 +4395,7 @@
 
                         <ul class="plan-features">
                             <li><strong>20 submisi dokumen</strong> selama masa aktif</li>
-                            <li>Analisis Dual-Lens n-gram &amp; TF-IDF Cosine</li>
+                            <li>Analisis Tiga Lensa: n-gram, TF-IDF Cosine &amp; kemiripan makna</li>
                             <li><strong>Audit Forensik Cerdas</strong> & 3 panduan pertanyaan sidang dosen</li>
                             <li>Deteksi fabrikasi sitasi gaib & inkonsistensi metodologi</li>
                             <li>Ekspor PDF laporan resmi lengkap tanpa batas</li>
@@ -4423,7 +4434,7 @@
                             <li>Dukungan format naskah lengkap (PDF, DOCX, TXT)</li>
                             <li><strong>Audit Forensik Cerdas</strong> mendalam & instrumen dewan penguji</li>
                             <li>Sintesis risiko akademik berbobot & integritas sitasi</li>
-                            <li>Dukungan berkas besar hingga <strong>30 MB</strong></li>
+                            <li>Dukungan berkas besar hingga <strong>64 MB</strong></li>
                             <li>Pemeriksaan draf jurnal & tugas kelas</li>
                             <li>Masa aktif paket 30 hari penuh</li>
                             <li>Aktivasi instan via QRIS & Virtual Account</li>
@@ -4505,7 +4516,7 @@
                     </button>
                     <div class="faq-content">
                         <p>
-                            AR Tilik berfokus pada <strong>Keadilan Bukti (Evidence-Based Fairness)</strong> menggunakan arsitektur <em>Dual-Lens</em> (5-Gram Sintaktis &amp; TF-IDF Semantik) serta kesadaran konteks sitasi. Berbeda dengan matcher konvensional yang kerap menandai kutipan resmi, rumus, dan frasa umum sebagai plagiarisme, AR Tilik mengisolasi daftar pustaka, mengenali blok kutipan bertanda, dan menyediakan sintesis risiko terkalibrasi melalui Sintesis Risiko Akademik Berbobot serta penampil perbandingan berdampingan (Dual-Reader).
+                            AR Tilik berfokus pada <strong>Keadilan Bukti (Evidence-Based Fairness)</strong> menggunakan arsitektur <em>Tiga Lensa</em> (5-Gram Sintaktis, TF-IDF Leksikal, dan Lensa Semantik Terkalibrasi) serta kesadaran konteks sitasi. Berbeda dengan matcher konvensional yang kerap menandai kutipan resmi, rumus, dan frasa umum sebagai plagiarisme, AR Tilik mengisolasi daftar pustaka, mengenali blok kutipan bertanda, dan menyediakan sintesis risiko terkalibrasi melalui Sintesis Risiko Akademik Berbobot serta penampil perbandingan berdampingan (Dual-Reader).
                         </p>
                     </div>
                 </div>
@@ -4531,7 +4542,7 @@
                     </button>
                     <div class="faq-content">
                         <p>
-                            Integrasi OJS dapat dilakukan melalui pustaka konektor PHP mandiri <code>ARTilikOJSConnector.php</code> dan REST API v1 AR Tilik tanpa mengubah core OJS. Pengelola jurnal dapat memanggil konektor ini pada alur kerja peninjauan artikel di OJS untuk mengirimkan naskah submisi dan menerima kembali skor kemiripan Dual-Lens serta tautan sertifikat QR ke meja editor. Panduan lengkap tersedia di Buku Panduan OJS (PDF).
+                            Integrasi OJS dapat dilakukan melalui pustaka konektor PHP mandiri <code>ARTilikOJSConnector.php</code> dan REST API v1 AR Tilik tanpa mengubah core OJS. Pengelola jurnal dapat memanggil konektor ini pada alur kerja peninjauan artikel di OJS untuk mengirimkan naskah submisi dan menerima kembali skor kemiripan Tiga Lensa serta tautan sertifikat QR ke meja editor. Panduan lengkap tersedia di Buku Panduan OJS (PDF).
                         </p>
                     </div>
                 </div>
@@ -4629,8 +4640,8 @@
                 <div>
                     <strong style="color: #ffffff; display: block; margin-bottom: 14px;">Fitur &amp; Inovasi</strong>
                     <ul class="footer-links">
-                        <li><a href="#teori">Dual-Lens Engine (5-Gram &amp; Cosine)</a></li>
-                        <li><a href="#fitur-unggulan">Deteksi Lintas Bahasa (EN⇄ID)</a></li>
+                        <li><a href="#teori">Mesin Tiga Lensa (5-Gram, TF-IDF &amp; Semantik)</a></li>
+                        <li><a href="#fitur-unggulan">Deteksi Lintas Bahasa (5 Pasangan Tervalidasi)</a></li>
                         <li><a href="#fitur-unggulan">Perisai Anti-Manipulasi Karakter</a></li>
                         <li><a href="#fitur-unggulan">Auditor Sitasi &amp; Daftar Pustaka</a></li>
                         <li><a href="#fitur-unggulan">Pemanen Neliti &amp; GARUDA Dikti</a></li>
