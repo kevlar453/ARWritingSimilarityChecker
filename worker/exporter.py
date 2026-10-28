@@ -92,7 +92,7 @@ LANGUAGE_REGISTRY = {
         "pair_code": "ID-EN",
         "status": "Tervalidasi Terarah",
         "badge_label": "ID-EN: Tervalidasi Terarah (N=10, LB: 60%)",
-        "wilson_note": "Validasi Fase 3 Lintas Bahasa: Recall@0.75: 90.0% | Recall@0.70: 100.0% | Wilson 95% LB: 59,6% – 98,2% (N=10)",
+        "wilson_note": "Validasi Fase 3 Lintas Bahasa: Recall@0,75: 90,0% | Recall@0,70: 100,0% | Wilson 95% CI: [59,6%–98,2%] (LB: 60%) (N=10)",
         "is_foreign": True,
     },
     "ZH": {
@@ -102,7 +102,7 @@ LANGUAGE_REGISTRY = {
         "pair_code": "ID-ZH",
         "status": "Tervalidasi Terarah",
         "badge_label": "ID-ZH: Tervalidasi Terarah (N=10, LB: 72%)",
-        "wilson_note": "Validasi Fase 3 Lintas Bahasa: Recall@0.75: 100.0% | Recall@0.70: 100.0% | Wilson 95% LB: 72,2% – 100.0% (N=10)",
+        "wilson_note": "Validasi Fase 3 Lintas Bahasa: Recall@0,75: 100,0% | Recall@0,70: 100,0% | Wilson 95% CI: [72,2%–100,0%] (LB: 72%) (N=10)",
         "is_foreign": True,
     },
     "DE": {
@@ -112,7 +112,7 @@ LANGUAGE_REGISTRY = {
         "pair_code": "ID-DE",
         "status": "Sensitif di Mode 0,70",
         "badge_label": "ID-DE: Sensitif di Mode 0,70 (N=10, LB: 31% @0.75 → 72% @0.70)",
-        "wilson_note": "Validasi Fase 3 Lintas Bahasa: Recall@0.75: 60.0% (LB 31,3%) | Recall@0.70: 100.0% (LB 72,2%) | Efek Komposita",
+        "wilson_note": "Validasi Fase 3 Lintas Bahasa: Recall@0,75: 60,0% (CI: [31,3%–83,2%], LB: 31%) | Recall@0,70: 100,0% (CI: [72,2%–100,0%], LB: 72%) | Efek Komposita (N=10)",
         "is_foreign": True,
     },
     "NL": {
@@ -122,7 +122,7 @@ LANGUAGE_REGISTRY = {
         "pair_code": "ID-NL",
         "status": "Indikasi Terarah",
         "badge_label": "ID-NL: Indikasi Terarah (N=10, LB: 40%)",
-        "wilson_note": "Validasi Fase 3 Lintas Bahasa: Recall@0.75: 70.0% | Recall@0.70: 80.0% | Wilson 95% LB: 39,7% – 89,2% (N=10)",
+        "wilson_note": "Validasi Fase 3 Lintas Bahasa: Recall@0,75: 70,0% | Recall@0,70: 80,0% | Wilson 95% CI: [39,7%–89,2%] (LB: 40%) (N=10)",
         "is_foreign": True,
     },
     "AR": {
@@ -132,7 +132,7 @@ LANGUAGE_REGISTRY = {
         "pair_code": "ID-AR",
         "status": "Indikasi Terarah",
         "badge_label": "ID-AR: Indikasi Terarah (N=10, LB: 40%)",
-        "wilson_note": "Validasi Fase 3 Lintas Bahasa: Recall@0.75: 70.0% | Recall@0.70: 80.0% | Wilson 95% LB: 39,7% – 89,2% (N=10)",
+        "wilson_note": "Validasi Fase 3 Lintas Bahasa: Recall@0,75: 70,0% | Recall@0,70: 80,0% | Wilson 95% CI: [39,7%–89,2%] (LB: 40%) (N=10)",
         "is_foreign": True,
     },
     "ID": {
@@ -142,7 +142,7 @@ LANGUAGE_REGISTRY = {
         "pair_code": "ID",
         "status": "Terkalibrasi Nasional",
         "badge_label": "Terkalibrasi Nasional (F1: 0,85)",
-        "wilson_note": "Benchmark Nasional AR Tilik: F1-Score 0.8462 @0.70 / 0.7629 @0.75 (N=80 Dokumen)",
+        "wilson_note": "Dataset Terarah 80 Kasus: F1 0,8462 @0,70 / 0,7629 @0,75 | 0 Alarm Palsu pada 20 Kontrol Bersih",
         "is_foreign": False,
     },
 }
