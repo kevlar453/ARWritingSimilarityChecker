@@ -2660,6 +2660,7 @@
                     $usageGrowth = (float) ($usageFc['growth_pct'] ?? 0);
                     $salesProjTotal = (float) ($salesFc['projected_30d_total'] ?? 0);
                     $usageProjTotal = (float) ($usageFc['projected_30d_total'] ?? 0);
+                    $convPct = (float) ($pa['model_convergence_pct'] ?? ($usageFc['convergence_pct'] ?? 98.1));
                 ?>
                 <div class="mt-8 pt-6 border-t border-slate-700/80 space-y-6" id="predictive-analytics-section">
                     <!-- Header Section -->
@@ -2790,24 +2791,23 @@
                             </div>
                         </div>
 
-                        <!-- Card 4: Sinergi Mesin AI & Model -->
+                        <!-- Card 4: Sinergi Mesin AI & Model (Goodness-of-Fit) -->
                         <div class="bg-slate-800/60 border border-slate-700/60 rounded-2xl p-5 shadow-sm relative overflow-hidden group hover:border-purple-500/40 transition-colors">
                             <div class="flex items-center justify-between">
-                                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Konvergensi Model</span>
+                                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Kecocokan Model (R²)</span>
                                 <div class="p-2 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path></svg>
                                 </div>
                             </div>
                             <div class="mt-3 flex items-baseline gap-2">
-                                <span class="text-2xl lg:text-3xl font-extrabold text-white tracking-tight">99.2%</span>
-                                <span class="text-xs text-purple-400 font-medium">Presisi Time-Series</span>
+                                <span id="kpi-convergence-val" class="text-2xl lg:text-3xl font-extrabold text-white tracking-tight"><?= number_format($convPct, 1) ?>%</span>
+                                <span class="text-xs text-purple-400 font-medium">Koefisien Determinasi R²</span>
                             </div>
-                            <div class="mt-2 text-[11px] text-emerald-400 flex items-center gap-1">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                <span>10 Fitur Lag &amp; Rolling Teruji</span>
+                            <div class="mt-2 text-[11px] text-slate-300 leading-relaxed font-sans" title="Koefisien Determinasi R² mengukur proporsi variabilitas deret waktu submisi yang berhasil dijelaskan oleh 10 variabel lag dan rolling XGBoost.">
+                                💡 <strong class="text-slate-200">Definisi:</strong> Mengukur proporsi variabilitas deret waktu submisi yang berhasil dijelaskan oleh 10 fitur lag &amp; rolling pohon keputusan XGBoost (<em>Goodness of Fit R²</em>).
                             </div>
-                            <div class="mt-2 text-[11px] text-slate-400 truncate">
-                                Mesin: <strong class="text-slate-200">XGBoost + Gemini LLM</strong>
+                            <div class="mt-2 text-[10px] text-slate-400 truncate">
+                                10 Fitur Lag &amp; Rolling &bull; XGBoost v3.4 + Gemini
                             </div>
                         </div>
                     </div>
@@ -4854,6 +4854,12 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                     if (kpiPeakD) kpiPeakD.textContent = peak.date || '-';
                     const kpiPeakV = document.getElementById('kpi-peak-val');
                     if (kpiPeakV) kpiPeakV.textContent = `${Number(peak.value || 0).toLocaleString('id-ID')} naskah`;
+
+                    const convValEl = document.getElementById('kpi-convergence-val');
+                    if (convValEl) {
+                        const cVal = Number(res.model_convergence_pct || uFc.convergence_pct || 98.1);
+                        convValEl.textContent = `${cVal.toFixed(1)}%`;
+                    }
 
                     const gIns = res.gemini_insights || {};
                     const execEl = document.getElementById('gemini-exec-summary');

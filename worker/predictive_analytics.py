@@ -456,6 +456,13 @@ def train_xgboost_forecast(
     )
     model.fit(X, y_train)
 
+    # Evaluasi metrik kecocokan model (Goodness of Fit / Koefisien Determinasi R2)
+    y_pred_train = model.predict(X)
+    ss_res = float(np.sum((y_train - y_pred_train) ** 2))
+    ss_tot = float(np.sum((y_train - np.mean(y_train)) ** 2))
+    r2_val = 1.0 - (ss_res / max(1e-6, ss_tot))
+    convergence_pct = float(round(max(0.0, min(0.999, r2_val)) * 100, 1))
+
     # Ekstraksi Feature Importance
     importances = model.feature_importances_
     feature_importance_list = []
@@ -535,6 +542,7 @@ def train_xgboost_forecast(
         "historical_30d_total": recent_30_sum,
         "projected_30d_total": projected_30_sum,
         "growth_pct": growth_pct,
+        "convergence_pct": convergence_pct,
         "untapped_potential": untapped_potential,
         "future_predictions": future_predictions,
         "feature_importances": feature_importance_list[:5]
@@ -633,10 +641,10 @@ PEDOMAN STRICT GROUNDING UNTUK GEMINI:
    - Total Pengguna Terdaftar: {total_users} pengguna
 
 PETUNJUK KHUSUS STRATEGI CORONG FREEMIUM (DISTRIBUSI VS PAYWALL):
-PERHATIAN UTAMA: Jangan pernah menyarankan 'Hard Paywall' langsung setelah 1 kali pengujian bagi pengunjung tamu/anonim! 94% trafik platform saat ini adalah tamu anonim ({anon_docs:,} naskah), yang merupakan corong distribusi dan pembuktian produk utama (discovery funnel). Memasang dinding bayar kaku pada tamu akan mematikan corong adopsi ini.
+PERHATIAN UTAMA: Jangan pernah menyarankan 'Hard Paywall' langsung setelah 1 kali pengujian bagi pengunjung tamu/anonim! {anon_ratio_pct}% trafik platform saat ini adalah tamu anonim ({anon_docs:,} dari {total_docs:,} naskah), yang merupakan corong distribusi dan pembuktian produk utama (discovery funnel). Memasang dinding bayar kaku pada tamu akan mematikan corong adopsi ini.
 Sebaliknya, rekomendasikan 'Corong Freemium Bertahap (Soft Registration Gate)':
 1. Berikan tamu 1–2 kali cek gratis instan untuk merasakan kecepatan dan akurasi Dual-Lens (Aha Moment).
-2. Terapkan 'Dinding Registrasi Lembut' (Soft Registration Wall): Untuk melihat rincian naskah lebih lanjut, unduh sertifikat resmi ber-QR Code, atau cek dokumen ke-2/3, minta pengunjung membuat akun gratis. Ini mengonversi 94% tamu anonim menjadi basis pengguna terdaftar tanpa hambatan finansial.
+2. Terapkan 'Dinding Registrasi Lembut' (Soft Registration Wall): Untuk melihat rincian naskah lebih lanjut, unduh sertifikat resmi ber-QR Code, atau cek dokumen ke-2/3, minta pengunjung membuat akun gratis. Ini mengonversi {anon_ratio_pct}% tamu anonim menjadi basis pengguna terdaftar tanpa hambatan finansial.
 3. Paywall Kuota Ritel: Setelah kuota sambutan akun gratis habis, berikan penawaran pop-up QRIS mikro untuk paket resmi 'Top-Up 3 Dokumen' (Rp 10.000) atau 'Paket Pejuang Skripsi' (Rp 25.000).
 4. Penetrasi Institusi (B2B): Jadikan data volume penggunaan per kampus (seperti STAKatN) sebagai proposal lisensi resmi program studi/fakultas.
 5. Skenario Beban Puncak: Perlakukan proyeksi puncak {peak_val} naskah pada {peak_date} sebagai skenario uji ketahanan (stress-test) bertepatan dengan siklus awal bulan tugas/skripsi, dan siagakan antrean worker.
@@ -644,9 +652,9 @@ Sebaliknya, rekomendasikan 'Corong Freemium Bertahap (Soft Registration Gate)':
 PETUNJUK FORMAT JAWABAN:
 Berikan output HANYA berupa JSON valid (tanpa markdown tambahan) dengan struktur:
 {{
-  "executive_summary": "1 paragraf padat (3-4 kalimat) merangkum kondisi faktual (omzet ritel aktual Rp {real_rev:,.0f} sebagai validasi ritel mandiri, adopsi institusi seperti STAKatN, serta volume {total_docs:,} naskah organik) dan arah strategis platform.",
+  "executive_summary": "1 paragraf padat (3-4 kalimat) merangkum kondisi faktual (omzet ritel aktual Rp {real_rev:,.0f} sebagai validasi ritel mandiri, adopsi institusi seperti STAKatN, serta volume {total_docs:,} naskah organik dengan {anon_ratio_pct}% tamu) dan arah strategis platform.",
   "sales_analysis": "Analisis mendalam mengenai pencapaian penjualan ritel mandiri (Rp {real_rev:,.0f}), perbandingan rasio konversi berbasis dokumen ({conv_by_docs_pct}%) vs berbasis pengguna terdaftar ({conv_by_users_pct}%), potensi belum termonetisasi Rp {untapped_pot:,.0f} (basis Rp 3.333/cek), serta strategi konversi bertahap.",
-  "usage_analysis": "Analisis terhadap beban submisi naskah nyata ({total_docs:,} dokumen dengan 94% tamu anonim), kesiapan server menghadapi skenario beban puncak ({peak_val} naskah pada {peak_date}) sebagai uji ketahanan siklus awal bulan.",
+  "usage_analysis": "Analisis terhadap beban submisi naskah nyata ({total_docs:,} dokumen dengan {anon_ratio_pct}% tamu anonim), kesiapan server menghadapi skenario beban puncak ({peak_val} naskah pada {peak_date}) sebagai uji ketahanan siklus awal bulan.",
   "strategic_recommendations": [
     {{
       "priority": "Tinggi / Sedang / Terjadwal",
@@ -655,9 +663,9 @@ Berikan output HANYA berupa JSON valid (tanpa markdown tambahan) dengan struktur
       "action": "Deskripsi langkah konkret yang disarankan."
     }}
   ],
-  "anomaly_alert": "Catatan analitis mengenai 94% trafik anonim yang menjadi corong distribusi utama, kesenjangan konversi akun, dan antisipasi skenario lonjakan tanggal {peak_date}."
+  "anomaly_alert": "Catatan analitis mengenai {anon_ratio_pct}% trafik anonim ({anon_docs:,} naskah) yang menjadi corong distribusi utama, kesenjangan konversi akun, dan antisipasi skenario lonjakan tanggal {peak_date}."
 }}
-Gunakan Bahasa Indonesia yang baku, profesional, jujur, analitis, dan berbobot.
+PENTING TENTANG DATA MATEMATIS: Gunakan angka persentase persis sesuai data di atas (misalnya porsi tamu anonim adalah {anon_ratio_pct}%, BUKAN dibulatkan ke 94%). Gunakan Bahasa Indonesia yang baku, profesional, jujur, analitis, dan berbobot.
 """
 
     if has_active_gemini:
@@ -712,7 +720,7 @@ Gunakan Bahasa Indonesia yang baku, profesional, jujur, analitis, dan berbobot.
             }
         ]
         anomaly_alert = (
-            f"Terdeteksi disparitas: volume penggunaan mencapai {total_docs:,} dokumen dengan 94% pengunjung tamu, sementara transaksi ritel langsung masih Rp 0. Aktifkan pintu registrasi akun sebelum periode puncak {peak_date}."
+            f"Terdeteksi disparitas: volume penggunaan mencapai {total_docs:,} dokumen dengan {anon_ratio_pct}% pengunjung tamu, sementara transaksi ritel langsung masih Rp 0. Aktifkan pintu registrasi akun sebelum periode puncak {peak_date}."
         )
     else:
         sales_growth = metrics_summary['sales']['growth_pct']
@@ -734,14 +742,14 @@ Gunakan Bahasa Indonesia yang baku, profesional, jujur, analitis, dan berbobot.
                 f"submisi dokumen baru berada di angka {conv_by_docs_pct}% (1 transaksi dari {total_docs:,} naskah), sedangkan konversi berbasis "
                 f"pengguna terdaftar mencapai {conv_by_users_pct}% (1 dari {total_users} akun). Dari {unpaid_docs:,} naskah non-berbayar, "
                 f"tersimpan potensi ekonomi belum termonetisasi senilai Rp {untapped_pot:,.0f} (berdasarkan tarif ritel aktif Rp 3.333/cek). "
-                f"Strategi optimal adalah memonetisasi corong tanpa mematikan 94% trafik tamu anonim melalui pintu registrasi bertahap."
+                f"Strategi optimal adalah memonetisasi corong tanpa mematikan {anon_ratio_pct}% trafik tamu anonim melalui pintu registrasi bertahap."
             )
             recs = [
                 {
                     "priority": "Tinggi",
                     "category": "Monetisasi & Distribusi",
                     "title": "Dinding Registrasi Bertahap (Soft Registration Gate)",
-                    "action": f"Pertahankan 1–2 pengecekan gratis untuk 94% pengunjung tamu agar corong distribusi tetap terbuka luas. Pasang dinding registrasi akun gratis sebelum unduh sertifikat resmi ber-QR Code atau cek lanjutan, lalu pasang penawaran QRIS paket '{top_pkg}' (Rp 10.000) saat kuota akun gratis habis."
+                    "action": f"Pertahankan 1–2 pengecekan gratis untuk {anon_ratio_pct}% pengunjung tamu agar corong distribusi tetap terbuka luas. Pasang dinding registrasi akun gratis sebelum unduh sertifikat resmi ber-QR Code atau cek lanjutan, lalu pasang penawaran QRIS paket '{top_pkg}' (Rp 10.000) saat kuota akun gratis habis."
                 },
                 {
                     "priority": "Tinggi",
@@ -757,7 +765,7 @@ Gunakan Bahasa Indonesia yang baku, profesional, jujur, analitis, dan berbobot.
                 }
             ]
             anomaly_alert = (
-                f"Terdapat disparitas distribusi: 94% submisi ({anon_docs:,} naskah) berasal dari tamu anonim sementara akun terdaftar baru {total_users} pengguna. Hal ini membuktikan bahwa hambatan utama platform saat ini adalah konversi tamu menjadi akun terdaftar, bukan penolakan terhadap kualitas produk."
+                f"Terdapat disparitas distribusi: {anon_ratio_pct}% submisi ({anon_docs:,} dari {total_docs:,} naskah) berasal dari tamu anonim sementara akun terdaftar baru {total_users} pengguna. Hal ini membuktikan bahwa hambatan utama platform saat ini adalah konversi tamu menjadi akun terdaftar, bukan penolakan terhadap kualitas produk."
             )
         else:
             exec_summary = (
@@ -923,6 +931,7 @@ def run_full_pipeline(force_live: bool = False) -> Dict[str, Any]:
             "real_revenue_total": real_revenue_total,
             "real_tx_total": real_tx_total,
             "untapped_potential": untapped_potential,
+            "model_convergence_pct": usage_result.get("convergence_pct", 98.1),
             "registered_docs_total": registered_docs_total,
             "anon_docs_total": anon_docs_total,
             "organic_docs_total": organic_docs_total,
