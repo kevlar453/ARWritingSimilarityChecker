@@ -724,7 +724,7 @@ if ($dec === 'match') {
             ?>
             <tr>
                 <td>
-                    <strong>Pilar 3: Kemiripan Makna &amp; Parafrase (Lensa Semantik)</strong><br>
+                    <strong>Pilar 3: Kemiripan Makna &amp; Deteksi Parafrase (Lensa Semantik)</strong><br>
                     <span style="font-size: 7.5pt; color: #64748b;">Embedding 384-dim Lokal ONNX • Vektor Qdrant (<?= esc($detectedLang['pair_code']) ?>)</span>
                 </td>
                 <td style="text-align: center; font-weight: bold; color: <?= $semColorPdf ?>; font-size: 10pt; line-height: 1.25;">

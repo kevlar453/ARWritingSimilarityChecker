@@ -718,7 +718,7 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
     sem_badge_html = f"""<div style="font-size: 7.5pt; color: {'#4338ca' if detected_lang['is_foreign'] else '#047857'}; font-weight: bold; margin-top: 2px;">{html_escape(detected_lang['badge_label'])}</div>"""
     sem_row = f"""
             <tr>
-                <td><strong>Kemiripan Makna &amp; Parafrase (Lensa Semantik)</strong><br><span style="font-size: 7.5pt; color: #64748b;">Embedding 384-dim Lokal ONNX • Vektor Qdrant ({detected_lang['pair_code']})</span></td>
+                <td><strong>Pilar 3: Kemiripan Makna &amp; Deteksi Parafrase (Lensa Semantik)</strong><br><span style="font-size: 7.5pt; color: #64748b;">Embedding 384-dim Lokal ONNX • Vektor Qdrant ({detected_lang['pair_code']})</span></td>
                 <td style="text-align: center; font-weight: bold; color: {sem_color}; font-size: 10pt; line-height: 1.25;">
                     {sem_score:.1f}% Makna
                     {sem_rentang}
