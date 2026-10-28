@@ -1131,7 +1131,7 @@
 
             <nav>
                 <ul class="nav-links">
-                    <li><a href="<?= base_url() ?>#teori">Dual-Lens</a></li>
+                    <li><a href="<?= base_url() ?>#teori">Tiga Lensa</a></li>
                     <li><a href="<?= base_url() ?>#fitur-unggulan">Inovasi Mesin</a></li>
                     <li><a href="<?= base_url() ?>#integrasi-ojs">Integrasi OJS</a></li>
                     <li><a href="<?= base_url('riset/ar-tilik-vs-zerogpt') ?>">AR Tilik vs ZeroGPT</a></li>
@@ -1233,7 +1233,7 @@
 
             <div class="duel-cards">
                 <article class="duel-card card-ar">
-                    <div class="duel-tag">AR Tilik (Dual-Lens Engine)</div>
+                    <div class="duel-tag">AR Tilik (Mesin Tiga Lensa)</div>
                     <h3>Menilai Risiko, Lalu Memverifikasi Rujukan</h3>
                     <ul class="duel-list">
                         <li><strong>Empat Pilar Terbuka:</strong> Mengombinasikan 5-gram token match, TF-IDF kemiripan kosinus semantik, pasase beririsan terpanjang, dan sintesis risiko berbasis XGBoost v<?= esc($metrics['engine_version'] ?? '3.4.2') ?>.</li>
@@ -1663,7 +1663,7 @@
             <div class="crosslink-banner">
                 <div class="crosslink-content">
                     <h4>Baca Juga Whitepaper: AR Tilik vs ZeroGPT</h4>
-                    <p>Mengapa detektor probabilitas gaya bahasa AI kerap menghasilkan 80% false-positive pada naskah Indonesia, dan bagaimana Dual-Lens Engine membuktikan integritas secara ilmiah.</p>
+                    <p>Mengapa detektor probabilitas gaya bahasa AI kerap menghasilkan 80% false-positive pada naskah Indonesia, dan bagaimana Mesin Tiga Lensa membuktikan integritas secara ilmiah.</p>
                 </div>
                 <a href="<?= base_url('riset/ar-tilik-vs-zerogpt') ?>" class="btn-crosslink">
                     <span>Baca Whitepaper ZeroGPT</span>
@@ -1741,7 +1741,7 @@
                     <ul class="footer-links">
                         <li><a href="<?= base_url('riset/ar-tilik-vs-turnitin') ?>" style="color: #38bdf8; font-weight: 700;">AR Tilik vs Turnitin</a></li>
                         <li><a href="<?= base_url('riset/ar-tilik-vs-zerogpt') ?>">AR Tilik vs ZeroGPT</a></li>
-                        <li><a href="<?= base_url() ?>#teori">Dual-Lens Engine</a></li>
+                        <li><a href="<?= base_url() ?>#teori">Mesin Tiga Lensa</a></li>
                         <li><a href="<?= base_url() ?>#fitur-unggulan">Audit Forensik Cerdas</a></li>
                     </ul>
                 </div>

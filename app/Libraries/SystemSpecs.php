@@ -21,7 +21,7 @@ class SystemSpecs
     /**
      * Nama Edisi Rilis
      */
-    public const EDITION_NAME = 'Dual-Lens Forensics Edition 2026';
+    public const EDITION_NAME = 'Tiga Lensa Forensics Edition 2026';
 
     /**
      * Harga langganan publik resmi
@@ -132,7 +132,7 @@ class SystemSpecs
                 'description'  => 'Mendeteksi substitusi karakter homoglif Cyrillic/Greek dan penyisipan zero-width space yang dipakai untuk mengelabui detektor konvensional.',
             ],
             'dual_lens' => [
-                'name'         => 'Arsitektur Dual-Lens & Risiko XGBoost',
+                'name'         => 'Arsitektur Tiga Lensa & Risiko XGBoost',
                 'status'       => 'verified',
                 'status_label' => 'Terverifikasi & Aktif',
                 'badge_class'  => 'good',

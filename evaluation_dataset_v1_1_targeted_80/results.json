@@ -37,8 +37,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.1287,
-    "evaluated_at": "2026-10-19T20:47:27.726349"
+    "citation_parsing_ms": 0.1571,
+    "evaluated_at": "2026-10-28T16:01:59.103464"
   },
   {
     "case_id": "EV11-UNC-002",
@@ -78,8 +78,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.0966,
-    "evaluated_at": "2026-10-19T20:47:27.726630"
+    "citation_parsing_ms": 0.1174,
+    "evaluated_at": "2026-10-28T16:01:59.103835"
   },
   {
     "case_id": "EV11-UNC-003",
@@ -119,8 +119,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.1356,
-    "evaluated_at": "2026-10-19T20:47:27.726937"
+    "citation_parsing_ms": 0.1595,
+    "evaluated_at": "2026-10-28T16:01:59.104251"
   },
   {
     "case_id": "EV11-UNC-004",
@@ -160,8 +160,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.0944,
-    "evaluated_at": "2026-10-19T20:47:27.727180"
+    "citation_parsing_ms": 0.1077,
+    "evaluated_at": "2026-10-28T16:01:59.104556"
   },
   {
     "case_id": "EV11-UNC-005",
@@ -201,8 +201,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.0903,
-    "evaluated_at": "2026-10-19T20:47:27.727416"
+    "citation_parsing_ms": 0.097,
+    "evaluated_at": "2026-10-28T16:01:59.104822"
   },
   {
     "case_id": "EV11-UNC-006",
@@ -242,8 +242,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.1168,
-    "evaluated_at": "2026-10-19T20:47:27.727685"
+    "citation_parsing_ms": 0.093,
+    "evaluated_at": "2026-10-28T16:01:59.105070"
   },
   {
     "case_id": "EV11-UNC-007",
@@ -283,8 +283,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.161,
-    "evaluated_at": "2026-10-19T20:47:27.728160"
+    "citation_parsing_ms": 0.0938,
+    "evaluated_at": "2026-10-28T16:01:59.105315"
   },
   {
     "case_id": "EV11-UNC-008",
@@ -324,8 +324,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.1357,
-    "evaluated_at": "2026-10-19T20:47:27.728532"
+    "citation_parsing_ms": 0.1267,
+    "evaluated_at": "2026-10-28T16:01:59.105601"
   },
   {
     "case_id": "EV11-UNC-009",
@@ -365,8 +365,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.1226,
-    "evaluated_at": "2026-10-19T20:47:27.728840"
+    "citation_parsing_ms": 0.0913,
+    "evaluated_at": "2026-10-28T16:01:59.105841"
   },
   {
     "case_id": "EV11-UNC-010",
@@ -406,8 +406,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.1269,
-    "evaluated_at": "2026-10-19T20:47:27.729161"
+    "citation_parsing_ms": 0.0978,
+    "evaluated_at": "2026-10-28T16:01:59.106087"
   },
   {
     "case_id": "EV11-PAR-001",
@@ -447,8 +447,8 @@
     "span_start": 0,
     "span_end": 20,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.1955,
-    "evaluated_at": "2026-10-19T20:47:27.729625"
+    "citation_parsing_ms": 0.1091,
+    "evaluated_at": "2026-10-28T16:01:59.106383"
   },
   {
     "case_id": "EV11-PAR-002",
@@ -488,8 +488,8 @@
     "span_start": 0,
     "span_end": 32,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.1231,
-    "evaluated_at": "2026-10-19T20:47:27.730070"
+    "citation_parsing_ms": 0.0955,
+    "evaluated_at": "2026-10-28T16:01:59.106653"
   },
   {
     "case_id": "EV11-PAR-003",
@@ -529,8 +529,8 @@
     "span_start": 0,
     "span_end": 43,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.1877,
-    "evaluated_at": "2026-10-19T20:47:27.730516"
+    "citation_parsing_ms": 0.1744,
+    "evaluated_at": "2026-10-28T16:01:59.107031"
   },
   {
     "case_id": "EV11-PAR-004",
@@ -570,8 +570,8 @@
     "span_start": 182,
     "span_end": 201,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.1377,
-    "evaluated_at": "2026-10-19T20:47:27.730856"
+    "citation_parsing_ms": 0.1831,
+    "evaluated_at": "2026-10-28T16:01:59.107497"
   },
   {
     "case_id": "EV11-PAR-005",
@@ -611,8 +611,8 @@
     "span_start": 0,
     "span_end": 27,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.1132,
-    "evaluated_at": "2026-10-19T20:47:27.731175"
+    "citation_parsing_ms": 0.1617,
+    "evaluated_at": "2026-10-28T16:01:59.107971"
   },
   {
     "case_id": "EV11-PAR-006",
@@ -652,8 +652,8 @@
     "span_start": 168,
     "span_end": 188,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.1287,
-    "evaluated_at": "2026-10-19T20:47:27.731559"
+    "citation_parsing_ms": 0.2142,
+    "evaluated_at": "2026-10-28T16:01:59.108580"
   },
   {
     "case_id": "EV11-PAR-007",
@@ -693,8 +693,8 @@
     "span_start": 0,
     "span_end": 34,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.1228,
-    "evaluated_at": "2026-10-19T20:47:27.731870"
+    "citation_parsing_ms": 0.1201,
+    "evaluated_at": "2026-10-28T16:01:59.108975"
   },
   {
     "case_id": "EV11-PAR-008",
@@ -734,8 +734,8 @@
     "span_start": 175,
     "span_end": 198,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.1295,
-    "evaluated_at": "2026-10-19T20:47:27.732184"
+    "citation_parsing_ms": 0.1538,
+    "evaluated_at": "2026-10-28T16:01:59.109396"
   },
   {
     "case_id": "EV11-PAR-009",
@@ -775,8 +775,8 @@
     "span_start": 0,
     "span_end": 43,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.1221,
-    "evaluated_at": "2026-10-19T20:47:27.732498"
+    "citation_parsing_ms": 0.1261,
+    "evaluated_at": "2026-10-28T16:01:59.109819"
   },
   {
     "case_id": "EV11-PAR-010",
@@ -816,8 +816,8 @@
     "span_start": 182,
     "span_end": 197,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.1505,
-    "evaluated_at": "2026-10-19T20:47:27.732838"
+    "citation_parsing_ms": 0.1398,
+    "evaluated_at": "2026-10-28T16:01:59.110164"
   },
   {
     "case_id": "EV11-INL-001",
@@ -857,8 +857,8 @@
     "span_start": 209,
     "span_end": 212,
     "rationale": "Detected bracketed inline reference marker adjacent to evidence span.",
-    "citation_parsing_ms": 0.1324,
-    "evaluated_at": "2026-10-19T20:47:27.733201"
+    "citation_parsing_ms": 0.1417,
+    "evaluated_at": "2026-10-28T16:01:59.110573"
   },
   {
     "case_id": "EV11-INL-002",
@@ -898,8 +898,8 @@
     "span_start": 175,
     "span_end": 188,
     "rationale": "Detected bracketed inline reference marker adjacent to evidence span.",
-    "citation_parsing_ms": 0.114,
-    "evaluated_at": "2026-10-19T20:47:27.733524"
+    "citation_parsing_ms": 0.115,
+    "evaluated_at": "2026-10-28T16:01:59.110904"
   },
   {
     "case_id": "EV11-INL-003",
@@ -939,8 +939,8 @@
     "span_start": 205,
     "span_end": 211,
     "rationale": "Detected bracketed inline reference marker adjacent to evidence span.",
-    "citation_parsing_ms": 0.1569,
-    "evaluated_at": "2026-10-19T20:47:27.733869"
+    "citation_parsing_ms": 0.1631,
+    "evaluated_at": "2026-10-28T16:01:59.111272"
   },
   {
     "case_id": "EV11-INL-004",
@@ -980,8 +980,8 @@
     "span_start": 182,
     "span_end": 203,
     "rationale": "Detected bracketed inline reference marker adjacent to evidence span.",
-    "citation_parsing_ms": 0.1139,
-    "evaluated_at": "2026-10-19T20:47:27.734154"
+    "citation_parsing_ms": 0.1215,
+    "evaluated_at": "2026-10-28T16:01:59.111586"
   },
   {
     "case_id": "EV11-INL-005",
@@ -1021,8 +1021,8 @@
     "span_start": 171,
     "span_end": 176,
     "rationale": "Detected bracketed inline reference marker adjacent to evidence span.",
-    "citation_parsing_ms": 0.0973,
-    "evaluated_at": "2026-10-19T20:47:27.734408"
+    "citation_parsing_ms": 0.1079,
+    "evaluated_at": "2026-10-28T16:01:59.111868"
   },
   {
     "case_id": "EV11-INL-006",
@@ -1062,8 +1062,8 @@
     "span_start": 168,
     "span_end": 183,
     "rationale": "Detected bracketed inline reference marker adjacent to evidence span.",
-    "citation_parsing_ms": 0.1003,
-    "evaluated_at": "2026-10-19T20:47:27.734659"
+    "citation_parsing_ms": 0.1113,
+    "evaluated_at": "2026-10-28T16:01:59.112150"
   },
   {
     "case_id": "EV11-INL-007",
@@ -1103,8 +1103,8 @@
     "span_start": 177,
     "span_end": 180,
     "rationale": "Detected bracketed inline reference marker adjacent to evidence span.",
-    "citation_parsing_ms": 0.1628,
-    "evaluated_at": "2026-10-19T20:47:27.735070"
+    "citation_parsing_ms": 0.1083,
+    "evaluated_at": "2026-10-28T16:01:59.112443"
   },
   {
     "case_id": "EV11-INL-008",
@@ -1144,8 +1144,8 @@
     "span_start": 175,
     "span_end": 189,
     "rationale": "Detected bracketed inline reference marker adjacent to evidence span.",
-    "citation_parsing_ms": 0.1293,
-    "evaluated_at": "2026-10-19T20:47:27.735392"
+    "citation_parsing_ms": 0.1305,
+    "evaluated_at": "2026-10-28T16:01:59.112755"
   },
   {
     "case_id": "EV11-INL-009",
@@ -1185,8 +1185,8 @@
     "span_start": 170,
     "span_end": 176,
     "rationale": "Detected bracketed inline reference marker adjacent to evidence span.",
-    "citation_parsing_ms": 0.1193,
-    "evaluated_at": "2026-10-19T20:47:27.735681"
+    "citation_parsing_ms": 0.1228,
+    "evaluated_at": "2026-10-28T16:01:59.113057"
   },
   {
     "case_id": "EV11-INL-010",
@@ -1226,8 +1226,8 @@
     "span_start": 182,
     "span_end": 196,
     "rationale": "Detected bracketed inline reference marker adjacent to evidence span.",
-    "citation_parsing_ms": 0.131,
-    "evaluated_at": "2026-10-19T20:47:27.735988"
+    "citation_parsing_ms": 0.1191,
+    "evaluated_at": "2026-10-28T16:01:59.113356"
   },
   {
     "case_id": "EV11-QUO-001",
@@ -1267,8 +1267,8 @@
     "span_start": 25,
     "span_end": 236,
     "rationale": "Detected passage enclosed within typographic or direct quotation marks.",
-    "citation_parsing_ms": 0.141,
-    "evaluated_at": "2026-10-19T20:47:27.736339"
+    "citation_parsing_ms": 0.1324,
+    "evaluated_at": "2026-10-28T16:01:59.113706"
   },
   {
     "case_id": "EV11-QUO-002",
@@ -1308,8 +1308,8 @@
     "span_start": 25,
     "span_end": 202,
     "rationale": "Detected passage enclosed within typographic or direct quotation marks.",
-    "citation_parsing_ms": 0.1182,
-    "evaluated_at": "2026-10-19T20:47:27.736623"
+    "citation_parsing_ms": 0.1224,
+    "evaluated_at": "2026-10-28T16:01:59.113998"
   },
   {
     "case_id": "EV11-QUO-003",
@@ -1349,8 +1349,8 @@
     "span_start": 25,
     "span_end": 232,
     "rationale": "Detected passage enclosed within typographic or direct quotation marks.",
-    "citation_parsing_ms": 0.2131,
-    "evaluated_at": "2026-10-19T20:47:27.737032"
+    "citation_parsing_ms": 0.1795,
+    "evaluated_at": "2026-10-28T16:01:59.114384"
   },
   {
     "case_id": "EV11-QUO-004",
@@ -1390,8 +1390,8 @@
     "span_start": 25,
     "span_end": 209,
     "rationale": "Detected passage enclosed within typographic or direct quotation marks.",
-    "citation_parsing_ms": 0.1367,
-    "evaluated_at": "2026-10-19T20:47:27.737379"
+    "citation_parsing_ms": 0.1316,
+    "evaluated_at": "2026-10-28T16:01:59.114706"
   },
   {
     "case_id": "EV11-QUO-005",
@@ -1431,8 +1431,8 @@
     "span_start": 27,
     "span_end": 200,
     "rationale": "Detected passage enclosed within typographic or direct quotation marks.",
-    "citation_parsing_ms": 0.1356,
-    "evaluated_at": "2026-10-19T20:47:27.737725"
+    "citation_parsing_ms": 0.1381,
+    "evaluated_at": "2026-10-28T16:01:59.115075"
   },
   {
     "case_id": "EV11-QUO-006",
@@ -1472,8 +1472,8 @@
     "span_start": 27,
     "span_end": 197,
     "rationale": "Detected passage enclosed within typographic or direct quotation marks.",
-    "citation_parsing_ms": 0.1274,
-    "evaluated_at": "2026-10-19T20:47:27.738047"
+    "citation_parsing_ms": 0.1144,
+    "evaluated_at": "2026-10-28T16:01:59.115380"
   },
   {
     "case_id": "EV11-QUO-007",
@@ -1513,8 +1513,8 @@
     "span_start": 48,
     "span_end": 229,
     "rationale": "Detected indented block quotation formatting structure.",
-    "citation_parsing_ms": 0.0882,
-    "evaluated_at": "2026-10-19T20:47:27.738315"
+    "citation_parsing_ms": 0.0779,
+    "evaluated_at": "2026-10-28T16:01:59.115639"
   },
   {
     "case_id": "EV11-QUO-008",
@@ -1554,8 +1554,8 @@
     "span_start": 48,
     "span_end": 227,
     "rationale": "Detected indented block quotation formatting structure.",
-    "citation_parsing_ms": 0.0853,
-    "evaluated_at": "2026-10-19T20:47:27.738575"
+    "citation_parsing_ms": 0.0873,
+    "evaluated_at": "2026-10-28T16:01:59.115895"
   },
   {
     "case_id": "EV11-QUO-009",
@@ -1595,8 +1595,8 @@
     "span_start": 51,
     "span_end": 223,
     "rationale": "Detected indented block quotation formatting structure.",
-    "citation_parsing_ms": 0.0859,
-    "evaluated_at": "2026-10-19T20:47:27.738830"
+    "citation_parsing_ms": 0.0933,
+    "evaluated_at": "2026-10-28T16:01:59.116186"
   },
   {
     "case_id": "EV11-QUO-010",
@@ -1636,8 +1636,8 @@
     "span_start": 51,
     "span_end": 235,
     "rationale": "Detected indented block quotation formatting structure.",
-    "citation_parsing_ms": 0.0905,
-    "evaluated_at": "2026-10-19T20:47:27.739095"
+    "citation_parsing_ms": 0.0988,
+    "evaluated_at": "2026-10-28T16:01:59.116478"
   },
   {
     "case_id": "EV11-PRA-001",
@@ -1677,8 +1677,8 @@
     "span_start": 0,
     "span_end": 20,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.1121,
-    "evaluated_at": "2026-10-19T20:47:27.739368"
+    "citation_parsing_ms": 0.1286,
+    "evaluated_at": "2026-10-28T16:01:59.116817"
   },
   {
     "case_id": "EV11-PRA-002",
@@ -1718,8 +1718,8 @@
     "span_start": 166,
     "span_end": 187,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.1082,
-    "evaluated_at": "2026-10-19T20:47:27.739615"
+    "citation_parsing_ms": 0.1325,
+    "evaluated_at": "2026-10-28T16:01:59.117147"
   },
   {
     "case_id": "EV11-PRA-003",
@@ -1759,8 +1759,8 @@
     "span_start": 0,
     "span_end": 32,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.0839,
-    "evaluated_at": "2026-10-19T20:47:27.739855"
+    "citation_parsing_ms": 0.1169,
+    "evaluated_at": "2026-10-28T16:01:59.117464"
   },
   {
     "case_id": "EV11-PRA-004",
@@ -1800,8 +1800,8 @@
     "span_start": 148,
     "span_end": 151,
     "rationale": "Detected bracketed inline reference marker adjacent to evidence span.",
-    "citation_parsing_ms": 0.0836,
-    "evaluated_at": "2026-10-19T20:47:27.740061"
+    "citation_parsing_ms": 0.112,
+    "evaluated_at": "2026-10-28T16:01:59.117768"
   },
   {
     "case_id": "EV11-PRA-005",
@@ -1841,8 +1841,8 @@
     "span_start": 0,
     "span_end": 40,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.0863,
-    "evaluated_at": "2026-10-19T20:47:27.740275"
+    "citation_parsing_ms": 0.126,
+    "evaluated_at": "2026-10-28T16:01:59.118083"
   },
   {
     "case_id": "EV11-PRA-006",
@@ -1882,8 +1882,8 @@
     "span_start": 145,
     "span_end": 161,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.089,
-    "evaluated_at": "2026-10-19T20:47:27.740481"
+    "citation_parsing_ms": 0.1148,
+    "evaluated_at": "2026-10-28T16:01:59.118384"
   },
   {
     "case_id": "EV11-PRA-007",
@@ -1925,8 +1925,8 @@
     "span_start": 0,
     "span_end": 43,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.0834,
-    "evaluated_at": "2026-10-19T20:47:27.740690"
+    "citation_parsing_ms": 0.0964,
+    "evaluated_at": "2026-10-28T16:01:59.118660"
   },
   {
     "case_id": "EV11-PRA-008",
@@ -1966,8 +1966,8 @@
     "span_start": 147,
     "span_end": 150,
     "rationale": "Detected bracketed inline reference marker adjacent to evidence span.",
-    "citation_parsing_ms": 0.0953,
-    "evaluated_at": "2026-10-19T20:47:27.740916"
+    "citation_parsing_ms": 0.096,
+    "evaluated_at": "2026-10-28T16:01:59.118915"
   },
   {
     "case_id": "EV11-PRA-009",
@@ -2009,8 +2009,8 @@
     "span_start": 0,
     "span_end": 23,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.0754,
-    "evaluated_at": "2026-10-19T20:47:27.741114"
+    "citation_parsing_ms": 0.0993,
+    "evaluated_at": "2026-10-28T16:01:59.119161"
   },
   {
     "case_id": "EV11-PRA-010",
@@ -2050,8 +2050,8 @@
     "span_start": 152,
     "span_end": 167,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.1015,
-    "evaluated_at": "2026-10-19T20:47:27.741355"
+    "citation_parsing_ms": 0.1104,
+    "evaluated_at": "2026-10-28T16:01:59.119432"
   },
   {
     "case_id": "EV11-MET-001",
@@ -2094,8 +2094,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.0848,
-    "evaluated_at": "2026-10-19T20:47:27.741575"
+    "citation_parsing_ms": 0.1043,
+    "evaluated_at": "2026-10-28T16:01:59.119726"
   },
   {
     "case_id": "EV11-MET-002",
@@ -2138,8 +2138,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.0827,
-    "evaluated_at": "2026-10-19T20:47:27.741785"
+    "citation_parsing_ms": 0.098,
+    "evaluated_at": "2026-10-28T16:01:59.119992"
   },
   {
     "case_id": "EV11-MET-003",
@@ -2182,8 +2182,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.0799,
-    "evaluated_at": "2026-10-19T20:47:27.741993"
+    "citation_parsing_ms": 0.0958,
+    "evaluated_at": "2026-10-28T16:01:59.120251"
   },
   {
     "case_id": "EV11-MET-004",
@@ -2226,8 +2226,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.0908,
-    "evaluated_at": "2026-10-19T20:47:27.742223"
+    "citation_parsing_ms": 0.101,
+    "evaluated_at": "2026-10-28T16:01:59.120536"
   },
   {
     "case_id": "EV11-MET-005",
@@ -2270,8 +2270,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.081,
-    "evaluated_at": "2026-10-19T20:47:27.742437"
+    "citation_parsing_ms": 0.0861,
+    "evaluated_at": "2026-10-28T16:01:59.120784"
   },
   {
     "case_id": "EV11-MET-006",
@@ -2314,8 +2314,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.0795,
-    "evaluated_at": "2026-10-19T20:47:27.742638"
+    "citation_parsing_ms": 0.0958,
+    "evaluated_at": "2026-10-28T16:01:59.121028"
   },
   {
     "case_id": "EV11-MET-007",
@@ -2358,8 +2358,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.0922,
-    "evaluated_at": "2026-10-19T20:47:27.742848"
+    "citation_parsing_ms": 0.1033,
+    "evaluated_at": "2026-10-28T16:01:59.121281"
   },
   {
     "case_id": "EV11-MET-008",
@@ -2402,8 +2402,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.0808,
-    "evaluated_at": "2026-10-19T20:47:27.743078"
+    "citation_parsing_ms": 0.0964,
+    "evaluated_at": "2026-10-28T16:01:59.121537"
   },
   {
     "case_id": "EV11-MET-009",
@@ -2446,8 +2446,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.0833,
-    "evaluated_at": "2026-10-19T20:47:27.743304"
+    "citation_parsing_ms": 0.0904,
+    "evaluated_at": "2026-10-28T16:01:59.121801"
   },
   {
     "case_id": "EV11-MET-010",
@@ -2490,8 +2490,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.0737,
-    "evaluated_at": "2026-10-19T20:47:27.743500"
+    "citation_parsing_ms": 0.0852,
+    "evaluated_at": "2026-10-28T16:01:59.122026"
   },
   {
     "case_id": "EV11-DIV-001",
@@ -2531,8 +2531,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.1151,
-    "evaluated_at": "2026-10-19T20:47:27.743752"
+    "citation_parsing_ms": 0.0892,
+    "evaluated_at": "2026-10-28T16:01:59.122269"
   },
   {
     "case_id": "EV11-DIV-002",
@@ -2572,8 +2572,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.1208,
-    "evaluated_at": "2026-10-19T20:47:27.744021"
+    "citation_parsing_ms": 0.1039,
+    "evaluated_at": "2026-10-28T16:01:59.122518"
   },
   {
     "case_id": "EV11-DIV-003",
@@ -2613,8 +2613,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.077,
-    "evaluated_at": "2026-10-19T20:47:27.744234"
+    "citation_parsing_ms": 0.0828,
+    "evaluated_at": "2026-10-28T16:01:59.122769"
   },
   {
     "case_id": "EV11-DIV-004",
@@ -2654,8 +2654,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.1051,
-    "evaluated_at": "2026-10-19T20:47:27.744650"
+    "citation_parsing_ms": 0.0811,
+    "evaluated_at": "2026-10-28T16:01:59.122985"
   },
   {
     "case_id": "EV11-DIV-005",
@@ -2695,8 +2695,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.1316,
-    "evaluated_at": "2026-10-19T20:47:27.744976"
+    "citation_parsing_ms": 0.085,
+    "evaluated_at": "2026-10-28T16:01:59.123209"
   },
   {
     "case_id": "EV11-DIV-006",
@@ -2736,8 +2736,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.0883,
-    "evaluated_at": "2026-10-19T20:47:27.745209"
+    "citation_parsing_ms": 0.0743,
+    "evaluated_at": "2026-10-28T16:01:59.123410"
   },
   {
     "case_id": "EV11-DIV-007",
@@ -2777,8 +2777,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.0895,
-    "evaluated_at": "2026-10-19T20:47:27.745434"
+    "citation_parsing_ms": 0.0797,
+    "evaluated_at": "2026-10-28T16:01:59.123619"
   },
   {
     "case_id": "EV11-DIV-008",
@@ -2818,8 +2818,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.0861,
-    "evaluated_at": "2026-10-19T20:47:27.745658"
+    "citation_parsing_ms": 0.0827,
+    "evaluated_at": "2026-10-28T16:01:59.123829"
   },
   {
     "case_id": "EV11-DIV-009",
@@ -2859,8 +2859,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.1,
-    "evaluated_at": "2026-10-19T20:47:27.745893"
+    "citation_parsing_ms": 0.1038,
+    "evaluated_at": "2026-10-28T16:01:59.124065"
   },
   {
     "case_id": "EV11-DIV-010",
@@ -2900,8 +2900,8 @@
     "span_start": null,
     "span_end": null,
     "rationale": "No adjacent citation marker or attribution pattern detected in surrounding passage.",
-    "citation_parsing_ms": 0.1358,
-    "evaluated_at": "2026-10-19T20:47:27.746231"
+    "citation_parsing_ms": 0.1192,
+    "evaluated_at": "2026-10-28T16:01:59.124386"
   },
   {
     "case_id": "EV11-DIS-001",
@@ -2941,8 +2941,8 @@
     "span_start": 256,
     "span_end": 274,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.1824,
-    "evaluated_at": "2026-10-19T20:47:27.746686"
+    "citation_parsing_ms": 0.2517,
+    "evaluated_at": "2026-10-28T16:01:59.125016"
   },
   {
     "case_id": "EV11-DIS-002",
@@ -2984,8 +2984,8 @@
     "span_start": 176,
     "span_end": 225,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.1701,
-    "evaluated_at": "2026-10-19T20:47:27.747074"
+    "citation_parsing_ms": 0.3668,
+    "evaluated_at": "2026-10-28T16:01:59.125786"
   },
   {
     "case_id": "EV11-DIS-003",
@@ -3025,8 +3025,8 @@
     "span_start": 256,
     "span_end": 268,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.2473,
-    "evaluated_at": "2026-10-19T20:47:27.747680"
+    "citation_parsing_ms": 0.2209,
+    "evaluated_at": "2026-10-28T16:01:59.126317"
   },
   {
     "case_id": "EV11-DIS-004",
@@ -3066,8 +3066,8 @@
     "span_start": 183,
     "span_end": 249,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.2106,
-    "evaluated_at": "2026-10-19T20:47:27.748238"
+    "citation_parsing_ms": 0.1604,
+    "evaluated_at": "2026-10-28T16:01:59.126767"
   },
   {
     "case_id": "EV11-DIS-005",
@@ -3109,8 +3109,8 @@
     "span_start": 172,
     "span_end": 223,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.1495,
-    "evaluated_at": "2026-10-19T20:47:27.748706"
+    "citation_parsing_ms": 0.1459,
+    "evaluated_at": "2026-10-28T16:01:59.127156"
   },
   {
     "case_id": "EV11-DIS-006",
@@ -3150,8 +3150,8 @@
     "span_start": 169,
     "span_end": 237,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.1601,
-    "evaluated_at": "2026-10-19T20:47:27.749126"
+    "citation_parsing_ms": 0.1517,
+    "evaluated_at": "2026-10-28T16:01:59.127585"
   },
   {
     "case_id": "EV11-DIS-007",
@@ -3193,8 +3193,8 @@
     "span_start": 178,
     "span_end": 242,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.1823,
-    "evaluated_at": "2026-10-19T20:47:27.749658"
+    "citation_parsing_ms": 0.1558,
+    "evaluated_at": "2026-10-28T16:01:59.127971"
   },
   {
     "case_id": "EV11-DIS-008",
@@ -3234,8 +3234,8 @@
     "span_start": 176,
     "span_end": 236,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.1672,
-    "evaluated_at": "2026-10-19T20:47:27.750047"
+    "citation_parsing_ms": 0.1555,
+    "evaluated_at": "2026-10-28T16:01:59.128344"
   },
   {
     "case_id": "EV11-DIS-009",
@@ -3277,8 +3277,8 @@
     "span_start": 171,
     "span_end": 230,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.1577,
-    "evaluated_at": "2026-10-19T20:47:27.750396"
+    "citation_parsing_ms": 0.1514,
+    "evaluated_at": "2026-10-28T16:01:59.128694"
   },
   {
     "case_id": "EV11-DIS-010",
@@ -3320,7 +3320,7 @@
     "span_start": 183,
     "span_end": 245,
     "rationale": "Detected author-year citation pattern adjacent to evidence span.",
-    "citation_parsing_ms": 0.1383,
-    "evaluated_at": "2026-10-19T20:47:27.750720"
+    "citation_parsing_ms": 0.1586,
+    "evaluated_at": "2026-10-28T16:01:59.129055"
   }
 ]

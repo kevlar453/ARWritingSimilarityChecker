@@ -40,7 +40,7 @@ class ArtilikPlugin extends GenericPlugin {
      * Deskripsi fungsi plugin
      */
     public function getDescription() {
-        return 'Modul integrasi otomatis PKP OJS 3.x dengan mesin orisinalitas Dual-Lens AR Tilik dan Audit Forensik Cerdas AI.';
+        return 'Modul integrasi otomatis PKP OJS 3.x dengan mesin orisinalitas Tiga Lensa AR Tilik dan Audit Forensik Cerdas AI.';
     }
 
     /**

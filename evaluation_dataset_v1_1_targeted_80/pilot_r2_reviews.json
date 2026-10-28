@@ -1,6 +1,6 @@
 {
   "version": "v1.1.0",
-  "updated_at": "2026-10-19T13:47:33.668682+00:00",
+  "updated_at": "2026-10-28T09:02:05.214803+00:00",
   "reviews": [
     {
       "case_id": "PILOT-P1-002",
@@ -420,7 +420,7 @@
       "decomposition_utility": "YES",
       "review_status": "REVIEWED",
       "notes": "Anotasi uji otomatis validasi Milestone R2.",
-      "reviewed_at": "2026-10-19T13:47:33.668675+00:00"
+      "reviewed_at": "2026-10-28T09:02:05.214796+00:00"
     }
   ]
 }

@@ -1,7 +1,7 @@
 {
   "name": "AR Tilik — Cek Plagiarisme & Penelaah Kesepadanan Naskah Akademik",
   "short_name": "AR Tilik",
-  "description": "Instrumen penelaah kesepadanan naskah akademik dan cek plagiarisme mandiri berbasis bukti ilmiah terbuka, arsitektur Dual-Lens, dan integrasi OJS 3.x.",
+  "description": "Instrumen penelaah kesepadanan naskah akademik dan cek plagiarisme mandiri berbasis bukti ilmiah terbuka, arsitektur Tiga Lensa, dan integrasi OJS 3.x.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

@@ -43,7 +43,7 @@ def test_landing_page_rendered_correctly():
     assert "AR Tilik" in html
     assert ("Penelaah Kesepadanan Naskah" in html or "Deteksi Kesepadanan Naskah" in html)
     assert "Three-Layer Separation" in html
-    assert "Dual-Lens Architecture" in html
+    assert ("Dual-Lens Architecture" in html or "Arsitektur Tiga Lensa" in html or "Three-Lens" in html)
     assert "Civitas Akademika" in html
     assert ("Dosen & Peneliti Pro" in html or "Peneliti Produktif" in html)
     assert "Kampus" in html

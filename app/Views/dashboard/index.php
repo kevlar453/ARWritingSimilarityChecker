@@ -3078,7 +3078,7 @@
                     </div>
                     <div class="flex items-start gap-2">
                         <span class="text-indigo-600 font-bold mt-0.5">✓</span>
-                        <div><strong>Alokasi Sumber Daya:</strong> Setiap submisi sukses mengonsumsi daya komputasi Lensa Ganda (5-Gram + TF-IDF) dan token kuota AI Google Gemini untuk audit forensik semantik.</div>
+                        <div><strong>Alokasi Sumber Daya:</strong> Setiap submisi sukses mengonsumsi daya komputasi Mesin Tiga Lensa (5-Gram, TF-IDF &amp; Semantik) dan token kuota AI Google Gemini untuk audit forensik semantik.</div>
                     </div>
                     <div class="flex items-start gap-2">
                         <span class="text-sky-600 font-bold mt-0.5">✓</span>
@@ -3239,7 +3239,7 @@
                             <ul class="text-[11px] text-slate-600 space-y-1.5 pt-2 border-t border-amber-100">
                                 <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> +10 submisi dokumen</li>
                                 <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Aktif selamanya (tanpa batas)</li>
-                                <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Analisis Dual-Lens n-gram &amp; TF-IDF Cosine</li>
+                                <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Analisis Tiga Lensa: n-gram, TF-IDF Cosine &amp; kemiripan makna</li>
                                 <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Audit Forensik Cerdas &amp; Panduan Sidang</li>
                             </ul>
                         </div>
@@ -3264,7 +3264,7 @@
                             </div>
                             <ul class="text-[11px] text-slate-600 space-y-1.5 pt-2 border-t border-slate-100">
                                 <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> 20 submisi dokumen / bulan</li>
-                                <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Analisis Dual-Lens n-gram &amp; TF-IDF Cosine</li>
+                                <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Analisis Tiga Lensa: n-gram, TF-IDF Cosine &amp; kemiripan makna</li>
                                 <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Audit Forensik Cerdas &amp; Panduan Ujian Sidang</li>
                                 <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Deteksi Fabrikasi Sitasi &amp; Metodologi</li>
                                 <li class="flex items-center gap-1.5"><span class="text-emerald-500 font-bold">✓</span> Masa aktif paket 30 hari</li>

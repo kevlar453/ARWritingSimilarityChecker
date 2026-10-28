@@ -15,7 +15,7 @@
 
     <div class="pkp_form_area">
         <p class="description" style="margin-bottom: 1.5em; line-height: 1.5; color: #475569;">
-            Hubungkan jurnal Anda ke mesin evaluasi orisinalitas <strong>Dual-Lens</strong> (5-Gram Exact &amp; TF-IDF Cosine Vector) serta <strong>Audit Forensik Cerdas AI</strong> AR Tilik.
+            Hubungkan jurnal Anda ke mesin evaluasi orisinalitas <strong>Tiga Lensa</strong> (5-Gram Exact, TF-IDF Cosine &amp; Semantik Qdrant) serta <strong>Audit Forensik Cerdas AI</strong> AR Tilik.
             Dapatkan API Key melalui portal <a href="https://tilik.arsetontong.top" target="_blank" style="color: #0284c7; text-decoration: underline;">https://tilik.arsetontong.top</a> (Menu Integrasi API &amp; OJS).
         </p>
 

@@ -103,7 +103,7 @@ class MidtransService
                 'description' => '20 Submisi Dokumen / Bulan khusus persiapan sidang dan revisi bab skripsi.',
                 'features'    => [
                     '20 submisi dokumen per bulan',
-                    'Analisis Dual-Lens n-gram & TF-IDF Cosine',
+                    'Analisis Tiga Lensa: n-gram, TF-IDF Cosine & kemiripan makna',
                     'Laporan kemiripan interaktif & ekspor PDF',
                     'Masa aktif langganan 30 hari'
                 ]
@@ -122,7 +122,7 @@ class MidtransService
                 'features'    => [
                     '75 submisi dokumen per bulan (Rp 1.000 / cek)',
                     'Dukungan format naskah lengkap (PDF, DOCX, TXT)',
-                    'Dukungan file dokumen besar hingga 30 MB',
+                    'Dukungan file dokumen besar hingga 64 MB',
                     'Masa aktif langganan 30 hari'
                 ]
             ],

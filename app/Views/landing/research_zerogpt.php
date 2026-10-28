@@ -1059,7 +1059,7 @@
 
             <nav>
                 <ul class="nav-links">
-                    <li><a href="<?= base_url() ?>#teori">Dual-Lens</a></li>
+                    <li><a href="<?= base_url() ?>#teori">Tiga Lensa</a></li>
                     <li><a href="<?= base_url() ?>#fitur-unggulan">Inovasi Mesin</a></li>
                     <li><a href="<?= base_url() ?>#integrasi-ojs">Integrasi OJS</a></li>
                     <li><a href="<?= base_url('riset/ar-tilik-vs-turnitin') ?>">AR Tilik vs Turnitin</a></li>
@@ -1157,7 +1157,7 @@
                     <thead>
                         <tr>
                             <th class="td-label">Parameter Telaah</th>
-                            <th class="th-ar">AR Tilik (Dual-Lens Engine)</th>
+                            <th class="th-ar">AR Tilik (Mesin Tiga Lensa)</th>
                             <th class="th-zero">ZeroGPT (DeepAnalyse™)</th>
                         </tr>
                     </thead>
@@ -1290,7 +1290,7 @@
             <div class="engines-grid">
                 <article class="engine-card ar">
                     <span class="engine-tag" style="color: var(--primary);">Arsitektur AR Tilik</span>
-                    <h3 class="engine-title">Mesin Dual-Lens + Audit Forensik Cerdas</h3>
+                    <h3 class="engine-title">Mesin Tiga Lensa + Audit Forensik Cerdas</h3>
                     <p style="font-size: 13.5px; color: var(--text-muted);">
                         Mendekomposisi naskah ke dalam pilar matematis terbuka yang setiap pasasenya dapat ditinjau ulang:
                     </p>
@@ -1516,7 +1516,7 @@
                 </div>
                 <div class="source-item">
                     <strong>Audit Produk AR Tilik (Engine v<?= esc($metrics['engine_version'] ?? '3.4.2') ?>)</strong>
-                    Pengujian empiris sistem Dual-Lens, audit sitasi fiktif (Crossref &amp; OpenAlex), ekstraksi 5-gram sekuensial, dan sintesis risiko akademik terkalibrasi XGBoost. Terverifikasi pada <?= number_format($metrics['total_reports'] ?? 1167) ?> laporan audit selesai per <?= esc($metrics['last_sync_date'] ?? date('d F Y')) ?>.
+                    Pengujian empiris sistem Tiga Lensa, audit sitasi fiktif (Crossref &amp; OpenAlex), ekstraksi 5-gram sekuensial, dan sintesis risiko akademik terkalibrasi XGBoost. Terverifikasi pada <?= number_format($metrics['total_reports'] ?? 1167) ?> laporan audit selesai per <?= esc($metrics['last_sync_date'] ?? date('d F Y')) ?>.
                 </div>
             </div>
 
@@ -1559,8 +1559,8 @@
                 <div>
                     <strong style="color: #ffffff; display: block; margin-bottom: 14px;">Fitur &amp; Inovasi</strong>
                     <ul class="footer-links">
-                        <li><a href="<?= base_url() ?>#teori">Dual-Lens Engine (5-Gram &amp; Cosine)</a></li>
-                        <li><a href="<?= base_url() ?>#fitur-unggulan">Deteksi Lintas Bahasa (EN⇄ID)</a></li>
+                        <li><a href="<?= base_url() ?>#teori">Mesin Tiga Lensa (5-Gram, TF-IDF &amp; Semantik)</a></li>
+                        <li><a href="<?= base_url() ?>#fitur-unggulan">Deteksi Lintas Bahasa (5 Pasangan Tervalidasi)</a></li>
                         <li><a href="<?= base_url() ?>#fitur-unggulan">Perisai Anti-Manipulasi Karakter</a></li>
                         <li><a href="<?= base_url() ?>#fitur-unggulan">Auditor Sitasi &amp; Daftar Pustaka</a></li>
                         <li><a href="<?= base_url() ?>#fitur-unggulan">Pemanen Neliti &amp; GARUDA Dikti</a></li>

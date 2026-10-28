@@ -1537,7 +1537,7 @@
             box-shadow: 0 0 8px #10b981;
         }
 
-        /* Dual-Lens Architecture Spotlight */
+        /* Three-Lens Architecture Spotlight */
         .spotlight-card {
             background: #ffffff;
             border: 1px solid var(--border);
@@ -3818,7 +3818,7 @@
                         <ul class="persona-list">
                             <li><span class="check-icon">✓</span> <span><strong>Bebas Risiko Self-Plagiarism:</strong> Naskah pra-sidang Anda tidak disimpan ke korpus publik.</span></li>
                             <li><span class="check-icon">✓</span> <span><strong>Audit Sitasi Otomatis:</strong> Pastikan tidak ada kutipan fiktif sebelum naskah dicetak.</span></li>
-                            <li><span class="check-icon">✓</span> <span><strong>Lensa Ganda (Dual-Reader):</strong> Telusuri kalimat yang perlu diparafrasa berdampingan.</span></li>
+                            <li><span class="check-icon">✓</span> <span><strong>Layar Ganda (Dual-Reader):</strong> Telusuri kalimat yang perlu diparafrasa berdampingan.</span></li>
                             <li><span class="check-icon">✓</span> <span><strong>Tarif Ringan Mahasiswa:</strong> Gratis 3x/minggu atau top-up fleksibel Rp 3.500/dokumen.</span></li>
                         </ul>
                     </div>

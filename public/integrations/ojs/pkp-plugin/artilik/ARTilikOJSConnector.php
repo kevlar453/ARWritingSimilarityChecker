@@ -88,7 +88,7 @@ class ARTilikOJSConnector
     }
 
     /**
-     * Mengambil laporan kemiripan lengkap (Dual-Lens Analysis)
+     * Mengambil laporan kemiripan lengkap (Analisis Tiga Lensa)
      * 
      * @param int $reportId ID Laporan AR Tilik
      * @return array Data laporan kemiripan

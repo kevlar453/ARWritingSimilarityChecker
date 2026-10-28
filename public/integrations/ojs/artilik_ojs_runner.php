@@ -3,7 +3,7 @@
  * AR Tilik - Contoh Eksekutor Integrasi PKP OJS 3.x (artilik_ojs_runner.php)
  * 
  * Skrip eksekutor mandiri untuk menguji integrasi naskah OJS 3.x dengan
- * mesin Dual-Lens AR Tilik dan modul Audit Forensik Cerdas AI v1.3.0.
+ * mesin Tiga Lensa AR Tilik dan modul Audit Forensik Cerdas AI v1.3.0.
  *
  * Cara menjalankan via CLI server OJS:
  *   php artilik_ojs_runner.php /path/to/manuscript.pdf "Judul Naskah" "Dr. Penulis" "sub_102"
@@ -71,7 +71,7 @@ try {
     echo "          Report ID   : #{$reportId}\n";
 
     // 3. Menunggu Hasil Komputasi (Polling Asinkron)
-    echo "[2/3] Menunggu komputasi selesai (Dual-Lens Engine & Forensik Cerdas)...\n";
+    echo "[2/3] Menunggu komputasi selesai (Mesin Tiga Lensa & Forensik Cerdas)...\n";
     $statusRes = $tilik->waitForCompletion($docId, 90, 3);
 
     $overallSim = $statusRes['data']['overall_similarity'] ?? 0;
@@ -100,7 +100,7 @@ try {
         if ($dualLens) {
             $exactSim  = $dualLens['exact_matcher']['similarity'] ?? 0;
             $cosineSim = $dualLens['tfidf_vectorizer']['similarity'] ?? 0;
-            echo "   • Dekomposisi Dual-Lens   :\n";
+            echo "   • Dekomposisi Tiga Lensa   :\n";
             echo "     - Lensa 1 (5-Gram Exact Match)   : {$exactSim}%\n";
             echo "     - Lensa 2 (TF-IDF Cosine Vector) : {$cosineSim}%\n";
         }

@@ -242,7 +242,7 @@ class PublicApiController extends BaseController
 
         return $this->response->setStatusCode(202)->setJSON([
             'status'      => 'accepted',
-            'message'     => 'Naskah berhasil diterima dan sedang diproses oleh Mesin Dual-Lens AR Tilik.',
+            'message'     => 'Naskah berhasil diterima dan sedang diproses oleh Mesin Tiga Lensa AR Tilik.',
             'data'        => [
                 'document_id'            => (int) $docId,
                 'report_id'              => (int) $reportId,

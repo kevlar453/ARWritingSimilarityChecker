@@ -1,7 +1,7 @@
 # Panduan Integrasi AR Tilik untuk Open Journal Systems (OJS 3.x)
 
 > 📕 **DOKUMENTASI RESMI VERSI PDF SIAP UNDUH (v1.3.0)**:  
-> Buku panduan lengkap berformat PDF visual resolusi tinggi (8 Halaman) edisi v1.3.0 Production kini telah tersedia. Dilengkapi dengan **diagram alur kerja end-to-end, konsep komputasi Dual-Lens, modul Audit Forensik Cerdas AI, Panduan Pertanyaan Telaah Redaksi, tangkapan layar langkah-demi-langkah, contoh kode PHP siap pakai (`artilik_ojs_runner.php`), spesifikasi REST API publik v1, serta informasi keunggulan & kemitraan institusi AR Tilik**.  
+> Buku panduan lengkap berformat PDF visual resolusi tinggi (8 Halaman) edisi v1.3.0 Production kini telah tersedia. Dilengkapi dengan **diagram alur kerja end-to-end, konsep komputasi Tiga Lensa, modul Audit Forensik Cerdas AI, Panduan Pertanyaan Telaah Redaksi, tangkapan layar langkah-demi-langkah, contoh kode PHP siap pakai (`artilik_ojs_runner.php`), spesifikasi REST API publik v1, serta informasi keunggulan & kemitraan institusi AR Tilik**.  
 > 👉 **[Unduh Panduan Integrasi OJS 3.x (PDF)](Panduan_Integrasi_OJS_ARTilik.pdf)** *(atau buka via browser: `/integrations/ojs/pdf`)*
 
 > [!NOTE]
@@ -10,7 +10,7 @@
 > Agar terintegrasi ke dalam alur kerja editorial OJS, developer atau pengelola teknis jurnal perlu melakukan pengkabelan (*wiring*) — baik melalui pemanggilan skrip dari *cron/daemon*, penyematan pada formulir keputusan editor, maupun pendaftaran hook PKP OJS (`HookRegistry`).  
 > *(Bagi pengembang yang membutuhkan kerangka PKP Generic Plugin siap pakai dengan `version.xml` dan `HookRegistry`, kami juga menyediakan boilerplate pada folder `pkp-plugin/` atau unduhan paket ZIP).*
 
-Modul ini memungkinkan pengelola jurnal ilmiah di lingkungan kampus yang menggunakan **PKP Open Journal Systems (OJS 3.x)** untuk melakukan pengecekan orisinalitas naskah secara terprogram menggunakan mesin **Dual-Lens Academic Writing Similarity Checker (AR Tilik)** yang dilengkapi penalaran semantik **Audit Forensik Cerdas AI**.
+Modul ini memungkinkan pengelola jurnal ilmiah di lingkungan kampus yang menggunakan **PKP Open Journal Systems (OJS 3.x)** untuk melakukan pengecekan orisinalitas naskah secara terprogram menggunakan mesin **Tiga Lensa Academic Writing Similarity Checker (AR Tilik)** yang dilengkapi penalaran semantik **Audit Forensik Cerdas AI**.
 
 ---
 
@@ -18,9 +18,10 @@ Modul ini memungkinkan pengelola jurnal ilmiah di lingkungan kampus yang menggun
 
 1. **Pengecekan Naskah melalui Pustaka Mandiri & REST API**:
    - Menyediakan pustaka konektor PHP (`ARTilikOJSConnector.php`) dan REST API v1 untuk mengevaluasi naskah artikel jurnal secara terprogram dalam alur penelaahan editor.
-2. **Mesin Evaluasi Dual-Lens Akurat**:
+2. **Mesin Evaluasi Tiga Lensa Akurat**:
    - **Lensa 1 (5-Gram Exact Matching)**: mendeteksi pasase salin-tempel literal kata-demi-kata.
-   - **Lensa 2 (TF-IDF Cosine Vector)**: mendeteksi kemiripan orientasi kosakata, parafrase kalimat, dan istilah topikal ilmiah.
+   - **Lensa 2 (TF-IDF Cosine Vector)**: mendeteksi kemiripan orientasi kosakata dan topik ilmiah.
+   - **Lensa 3 (Semantik Terkalibrasi Qdrant)**: menangkap parafrase substansial dan alih bahasa.
 3. **Audit Forensik Cerdas AI (Google Gemini Semantics)**:
    - Memvalidasi sitasi dan referensi naskah guna mengidentifikasi fabrikasi rujukan/halusinasi AI (*hallucinated citations*), inkonsistensi metodologi, dan anomali struktur teks ilmiah.
 4. **Panduan Pertanyaan Telaah Redaksi & Mitra Bestari**:
@@ -70,7 +71,7 @@ php artilik_ojs_runner.php /path/to/manuscript.pdf "Judul Artikel Jurnal" "Dr. N
 Skrip ini akan secara otomatis:
 1. Mengunggah berkas PDF naskah ke mesin evaluasi AR Tilik melalui REST API v1.
 2. Memantau antrean komputasi secara asinkron hingga selesai (Mode Polling).
-3. Mengembalikan skor kemiripan terpadu, dekomposisi Dual-Lens (Lensa 1 & 2), putusan redaksi, tautan laporan web, hasil Audit Forensik AI, panduan pertanyaan telaah reviewer, dan tautan sertifikat QR SHA-256.
+3. Mengembalikan skor kemiripan terpadu, dekomposisi Tiga Lensa (Lensa 1, 2 & 3), putusan redaksi, tautan laporan web, hasil Audit Forensik AI, panduan pertanyaan telaah reviewer, dan tautan sertifikat QR SHA-256.
 
 ### Langkah 2: Lanjutkan ke Wiring OJS
 Setelah siklus pada Langkah 1 terbukti sukses 100%, Anda siap menghubungkan pustaka konektor ke alur kerja OJS yang sebenarnya.
@@ -230,7 +231,7 @@ docker compose up -d
 | :--- | :--- | :--- |
 | `POST` | `/api/v1/check` | Mengunggah dan menjadwalkan pengecekan naskah |
 | `GET` | `/api/v1/status/{id}` | Mengecek status komputasi naskah (pending/processing/completed) |
-| `GET` | `/api/v1/report/{id}` | Mengambil data JSON laporan audit lengkap (Dual-Lens, Audit Forensik Cerdas, Pertanyaan Telaah) |
+| `GET` | `/api/v1/report/{id}` | Mengambil data JSON laporan audit lengkap (Tiga Lensa, Audit Forensik Cerdas, Pertanyaan Telaah) |
 | `GET` | `/api/v1/quota` | Mengecek sisa kuota dan limit API Key |
 
 Header Autentikasi:
