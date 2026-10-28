@@ -2685,8 +2685,12 @@
                         </div>
                         <div class="flex items-center gap-3 shrink-0">
                             <div class="text-right hidden sm:block">
-                                <span class="text-[10px] text-slate-400 block">Sinkronisasi AI Terakhir:</span>
-                                <span id="forecast-sync-time" class="text-xs font-mono font-medium text-slate-200"><?= esc($genAt) ?></span>
+                                <span class="text-[10px] text-slate-400 block font-sans">Waktu Eksekusi Terakhir:</span>
+                                <div class="flex items-center justify-end gap-1.5">
+                                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                                    <span id="forecast-sync-time" class="text-xs font-mono font-bold text-white"><?= !empty($genAt) ? date('d M Y, H:i', strtotime($genAt)) . ' WIB' : 'Terkini' ?></span>
+                                </div>
+                                <span id="header-gemini-pill" class="text-[10px] font-mono text-purple-300 block"><?= esc($gemini['source'] ?? 'Google Gemini AI') ?></span>
                             </div>
                             <button type="button" id="btn-run-forecast" onclick="runPredictiveForecast()" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-bold shadow-md hover:shadow-indigo-500/30 transition-all flex items-center gap-2 cursor-pointer border border-indigo-400/30">
                                 <svg id="btn-forecast-icon" class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
@@ -3010,6 +3014,130 @@
                                     <?php endforeach; ?>
                                 <?php endif; ?>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Panel Grounding Resmi Katalog Harga Sistem Pembayaran (Midtrans) -->
+                    <?php 
+                        $pricingCat = $pa['pricing_catalog'] ?? [
+                            ['name' => 'Top-Up 3 Dokumen', 'amount' => 10000, 'submissions' => 3, 'unit_rate' => 3333, 'status' => 'Terverifikasi Terjual Riil', 'validity' => 'Aktif Selamanya', 'description' => '3 Submisi Cek Plagiarisme, Masa Aktif Selamanya (Rp 3.333 / cek). Paling diminati untuk kebutuhan darurat tugas kuliah.'],
+                            ['name' => 'Top-Up 10 Dokumen', 'amount' => 25000, 'submissions' => 10, 'unit_rate' => 2500, 'status' => 'Katalog Resmi Etalase', 'validity' => 'Aktif Selamanya', 'description' => '10 Submisi Cek Plagiarisme, Hemat 16%, Masa Aktif Selamanya (Rp 2.500 / cek). Paket kuota reguler tugas makalah semester.'],
+                            ['name' => 'Paket Pejuang Skripsi', 'amount' => 25000, 'submissions' => 20, 'unit_rate' => 1250, 'status' => 'Katalog Resmi Etalase', 'validity' => 'Langganan 30 Hari', 'description' => '20 Submisi Dokumen / Bulan (Rp 1.250 / cek) khusus persiapan sidang dan revisi bab skripsi/tesis.'],
+                            ['name' => 'Paket Dosen & Peneliti Pro', 'amount' => 75000, 'submissions' => 75, 'unit_rate' => 1000, 'status' => 'Katalog Resmi Etalase', 'validity' => 'Langganan 30 Hari', 'description' => '75 Submisi Dokumen / Bulan (Rp 1.000 / cek) untuk cek tugas kelas, tesis, & draf jurnal ilmiah.']
+                        ];
+                        $execHistory = $pa['execution_history'] ?? [];
+                    ?>
+                    <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 shadow-sm space-y-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+                            <div class="space-y-0.5">
+                                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-200 flex items-center gap-2">
+                                    <span>🏷️</span> Grounding Katalog Paket Resmi AR Tilik (Single Source of Truth)
+                                </h4>
+                                <p class="text-[11px] text-slate-400">Seluruh rekomendasi dan proyeksi monetisasi AI di-grounding secara ketat ke etalase Midtrans aktif</p>
+                            </div>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 self-start sm:self-auto">
+                                Terhubung ke Gateway Midtrans
+                            </span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                            <?php foreach ($pricingCat as $pkg): 
+                                $isVerified = ($pkg['status'] ?? '') === 'Terverifikasi Terjual Riil' || ($pkg['name'] ?? '') === 'Top-Up 3 Dokumen';
+                            ?>
+                                <div class="p-3.5 rounded-xl border <?= $isVerified ? 'bg-emerald-950/20 border-emerald-500/30' : 'bg-slate-800/40 border-slate-700/50' ?> space-y-2 flex flex-col justify-between">
+                                    <div class="space-y-1">
+                                        <div class="flex items-center justify-between gap-1 flex-wrap">
+                                            <span class="text-xs font-bold text-white"><?= esc($pkg['name']) ?></span>
+                                            <span class="px-1.5 py-0.5 rounded text-[9px] font-bold <?= $isVerified ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-slate-700/50 text-slate-300' ?>">
+                                                <?= $isVerified ? '✓ Terverifikasi Riil' : 'Etalase Aktif' ?>
+                                            </span>
+                                        </div>
+                                        <div class="flex items-baseline gap-1 text-sm font-extrabold text-white">
+                                            Rp <?= number_format((float)$pkg['amount'], 0, ',', '.') ?>
+                                            <span class="text-[10px] font-normal text-slate-400">/ <?= (int)$pkg['submissions'] ?> naskah</span>
+                                        </div>
+                                        <div class="text-[10px] text-cyan-300 font-mono">
+                                            Tarif: Rp <?= number_format((float)$pkg['unit_rate'], 0, ',', '.') ?> / cek
+                                        </div>
+                                        <p class="text-[10px] text-slate-300 leading-relaxed"><?= esc($pkg['description']) ?></p>
+                                    </div>
+                                    <div class="text-[9px] text-slate-400 pt-2 border-t border-slate-800">
+                                        Masa Aktif: <strong class="text-slate-300"><?= esc($pkg['validity']) ?></strong>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+
+                    <!-- Panel Audit Riwayat & Komparasi Proyeksi (Projection Execution Audit Trail) -->
+                    <div class="bg-slate-900/80 border border-indigo-500/20 rounded-2xl p-5 shadow-lg space-y-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+                            <div class="space-y-0.5">
+                                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-200 flex items-center gap-2">
+                                    <span>📜</span> Riwayat &amp; Audit Trail Eksekusi Proyeksi (Projection Evolution Log)
+                                </h4>
+                                <p class="text-[11px] text-slate-400">
+                                    Menjamin transparansi data antar eksekusi. Perubahan angka mencerminkan data historis bergulir dan kalibrasi parameter algoritma.
+                                </p>
+                            </div>
+                            <div class="flex items-center gap-2 text-[10px] text-slate-400">
+                                <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                                Tersimpan di Tabel Audit DB: <code class="text-slate-300 font-mono">predictive_forecast_logs</code>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto rounded-xl border border-slate-800">
+                            <table class="w-full text-left text-xs text-slate-300">
+                                <thead class="bg-slate-950/80 text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-800">
+                                    <tr>
+                                        <th class="py-3 px-3.5">ID &amp; Waktu Eksekusi</th>
+                                        <th class="py-3 px-3.5">Engine ML &amp; AI Layer</th>
+                                        <th class="py-3 px-3.5 text-right">Proyeksi 30 Hari</th>
+                                        <th class="py-3 px-3.5 text-right">Skenario Puncak</th>
+                                        <th class="py-3 px-3.5 text-right">Proyeksi Ritel</th>
+                                        <th class="py-3 px-3.5">Catatan Kalibrasi &amp; Konteks Metodologi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="forecast-history-tbody" class="divide-y divide-slate-800/60 font-sans">
+                                    <?php if (empty($execHistory)): ?>
+                                        <tr>
+                                            <td colspan="6" class="py-4 text-center text-slate-500 text-xs">Belum ada riwayat eksekusi tercatat.</td>
+                                        </tr>
+                                    <?php else: ?>
+                                        <?php foreach ($execHistory as $idx => $h): 
+                                            $isLatest = ($idx === 0);
+                                        ?>
+                                            <tr class="<?= $isLatest ? 'bg-indigo-950/30 border-l-2 border-indigo-400' : 'hover:bg-slate-800/30' ?> transition-colors">
+                                                <td class="py-2.5 px-3.5 whitespace-nowrap">
+                                                    <div class="font-mono text-xs text-white flex items-center gap-1.5">
+                                                        <?php if ($isLatest): ?>
+                                                            <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse" title="Sesi Terkini"></span>
+                                                        <?php endif; ?>
+                                                        #<?= (int)$h['id'] ?> &bull; <?= !empty($h['created_at']) ? date('d/m/Y H:i', strtotime($h['created_at'])) . ' WIB' : '-' ?>
+                                                    </div>
+                                                </td>
+                                                <td class="py-2.5 px-3.5">
+                                                    <div class="text-xs text-slate-200 font-semibold"><?= esc($h['model_type'] ?? 'XGBoost') ?></div>
+                                                    <div class="text-[10px] text-purple-300 font-mono"><?= esc($h['gemini_model'] ?? 'Gemini AI') ?></div>
+                                                </td>
+                                                <td class="py-2.5 px-3.5 text-right">
+                                                    <span class="font-mono text-xs font-bold text-white"><?= number_format((int)$h['usage_projected_30d'], 0, ',', '.') ?></span>
+                                                    <span class="text-[10px] text-slate-400 block"><?= ($h['usage_growth'] >= 0 ? '+' : '') . number_format((float)$h['usage_growth'], 1) ?>%</span>
+                                                </td>
+                                                <td class="py-2.5 px-3.5 text-right">
+                                                    <span class="font-mono text-xs font-bold text-amber-300"><?= number_format((int)$h['peak_val'], 0, ',', '.') ?> naskah</span>
+                                                    <span class="text-[10px] text-slate-400 block"><?= esc($h['peak_date']) ?></span>
+                                                </td>
+                                                <td class="py-2.5 px-3.5 text-right">
+                                                    <span class="font-mono text-xs text-emerald-400 font-semibold">Rp <?= number_format((float)$h['sales_projected_30d'], 0, ',', '.') ?></span>
+                                                </td>
+                                                <td class="py-2.5 px-3.5 text-xs text-slate-300 leading-relaxed max-w-sm">
+                                                    <?= esc($h['methodology_note'] ?? '-') ?>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -4670,7 +4798,7 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                     window.predictiveData = res;
 
                     const syncTimeEl = document.getElementById('forecast-sync-time');
-                    if (syncTimeEl) syncTimeEl.textContent = res.generated_at || 'Terkini';
+                    if (syncTimeEl) syncTimeEl.textContent = res.generated_at ? (res.generated_at + ' WIB') : 'Terkini';
 
                     const sFc = res.sales_forecast || {};
                     const kpiSales = document.getElementById('kpi-sales-proj');
@@ -4738,6 +4866,8 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                     if (anomEl) anomEl.textContent = gIns.anomaly_alert || '';
                     const srcEl = document.getElementById('gemini-source-pill');
                     if (srcEl) srcEl.textContent = gIns.source || 'Google Gemini AI';
+                    const headGeminiEl = document.getElementById('header-gemini-pill');
+                    if (headGeminiEl) headGeminiEl.textContent = gIns.source || 'Google Gemini AI';
 
                     const recGrid = document.getElementById('gemini-recommendations-grid');
                     if (recGrid && gIns.strategic_recommendations) {
@@ -4760,6 +4890,44 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                             `;
                         });
                         recGrid.innerHTML = recHtml;
+                    }
+
+                    const histTbody = document.getElementById('forecast-history-tbody');
+                    if (histTbody && res.execution_history && res.execution_history.length > 0) {
+                        let rowsHtml = '';
+                        res.execution_history.forEach((h, idx) => {
+                            const isLatest = (idx === 0);
+                            const dtStr = h.created_at ? h.created_at.substring(0, 16) : '-';
+                            rowsHtml += `
+                                <tr class="${isLatest ? 'bg-indigo-950/30 border-l-2 border-indigo-400' : 'hover:bg-slate-800/30'} transition-colors">
+                                    <td class="py-2.5 px-3.5 whitespace-nowrap">
+                                        <div class="font-mono text-xs text-white flex items-center gap-1.5">
+                                            ${isLatest ? '<span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse" title="Sesi Terkini"></span>' : ''}
+                                            #${h.id} &bull; ${dtStr} WIB
+                                        </div>
+                                    </td>
+                                    <td class="py-2.5 px-3.5">
+                                        <div class="text-xs text-slate-200 font-semibold">${h.model_type || 'XGBoost'}</div>
+                                        <div class="text-[10px] text-purple-300 font-mono">${h.gemini_model || 'Gemini AI'}</div>
+                                    </td>
+                                    <td class="py-2.5 px-3.5 text-right">
+                                        <span class="font-mono text-xs font-bold text-white">${Number(h.usage_projected_30d || 0).toLocaleString('id-ID')}</span>
+                                        <span class="text-[10px] text-slate-400 block">${(h.usage_growth >= 0 ? '+' : '')}${Number(h.usage_growth || 0).toFixed(1)}%</span>
+                                    </td>
+                                    <td class="py-2.5 px-3.5 text-right">
+                                        <span class="font-mono text-xs font-bold text-amber-300">${Number(h.peak_val || 0).toLocaleString('id-ID')} naskah</span>
+                                        <span class="text-[10px] text-slate-400 block">${h.peak_date || '-'}</span>
+                                    </td>
+                                    <td class="py-2.5 px-3.5 text-right">
+                                        <span class="font-mono text-xs text-emerald-400 font-semibold">Rp ${Number(h.sales_projected_30d || 0).toLocaleString('id-ID')}</span>
+                                    </td>
+                                    <td class="py-2.5 px-3.5 text-xs text-slate-300 leading-relaxed max-w-sm">
+                                        ${h.methodology_note || '-'}
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                        histTbody.innerHTML = rowsHtml;
                     }
 
                     switchForecastView(currentForecastMode);
