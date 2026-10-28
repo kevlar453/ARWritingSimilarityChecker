@@ -1,0 +1,212 @@
+{
+  "benchmark_name": "AR Tilik Latin Theology Semantic Calibration Benchmark (Phase 3 Extension)",
+  "pair": "LA-ID",
+  "pair_name": "Latin ⇄ Indonesia",
+  "model": "paraphrase-multilingual-MiniLM-L12-v2",
+  "total_cases": 12,
+  "total_positive_cases": 10,
+  "total_negative_controls": 2,
+  "assigned_status": {
+    "label": "Tanpa Lencana (Batas Kapabilitas Terbuka)",
+    "badge_status": "unvalidated",
+    "decision_rule": "Batas bawah Wilson @0.75 < 35% -> Tanpa Lencana sesuai protokol transparansi ilmiah"
+  },
+  "positive_metrics": {
+    "n_cases": 10,
+    "mean_cosine": 0.3019,
+    "median_cosine": 0.2703,
+    "min_cosine": 0.2068,
+    "max_cosine": 0.4926,
+    "threshold_075": {
+      "detected": 0,
+      "recall_pct": 0.0,
+      "wilson_ci_95": [
+        0.0,
+        27.8
+      ],
+      "wilson_lower_bound": 0.0
+    },
+    "threshold_070": {
+      "detected": 0,
+      "recall_pct": 0.0,
+      "wilson_ci_95": [
+        0.0,
+        27.8
+      ],
+      "wilson_lower_bound": 0.0
+    }
+  },
+  "negative_controls_metrics": {
+    "n_samples": 2,
+    "max_cosine": 0.3147,
+    "mean_cosine": 0.1594,
+    "fp_at_075": 0,
+    "fp_at_070": 0,
+    "safety_margin_075": 43.5,
+    "safety_margin_070": 38.5
+  },
+  "technical_limitations": [
+    "Model paraphrase-multilingual-MiniLM-L12-v2 dilatih pada 50+ bahasa modern dan tidak memiliki korpus paralel Latin-Indonesia yang memadai pada bobot pre-training.",
+    "Teks uji berupa perikop/ayat pendek liturgis (5-25 kata) yang memiliki kepadatan konteks rendah dibanding makalah jurnal.",
+    "Bahkan pada naskah prosa panjang (Augustinus Confessiones), kosinus hanya mencapai ~0.288 (Latin vs ID) dan ~0.333 (Latin vs EN).",
+    "Sesuai asas keadilan bukti, pasangan Latin TIDAK DIBERI LENCANA terarah agar pengguna STAKat Pontianak memahami batas jangkauan sistem saat ini."
+  ],
+  "cases_detail": [
+    {
+      "case_id": "XLN-LA-001",
+      "pair": "LA-ID",
+      "domain": "Kitab Suci / Teologi Penciptaan",
+      "source_lang": "id",
+      "submission_lang": "la",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.2561,
+      "percentage": 25.61,
+      "detected_075": false,
+      "detected_070": false,
+      "description": "Terjemahan segar Vulgata Kejadian 1:1."
+    },
+    {
+      "case_id": "XLN-LA-002",
+      "pair": "LA-ID",
+      "domain": "Kitab Suci / Kristologi Sabda",
+      "source_lang": "id",
+      "submission_lang": "la",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.2068,
+      "percentage": 20.68,
+      "detected_075": false,
+      "detected_070": false,
+      "description": "Terjemahan segar Vulgata Yohanes 1:1."
+    },
+    {
+      "case_id": "XLN-LA-003",
+      "pair": "LA-ID",
+      "domain": "Kitab Suci / Teologi Pastoral",
+      "source_lang": "id",
+      "submission_lang": "la",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.4926,
+      "percentage": 49.26,
+      "detected_075": false,
+      "detected_070": false,
+      "description": "Terjemahan segar Vulgata Mazmur 23:1."
+    },
+    {
+      "case_id": "XLN-LA-004",
+      "pair": "LA-ID",
+      "domain": "Kitab Suci / Spiritualitas Injil",
+      "source_lang": "id",
+      "submission_lang": "la",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.2738,
+      "percentage": 27.38,
+      "detected_075": false,
+      "detected_070": false,
+      "description": "Terjemahan segar Vulgata Matius 5:3."
+    },
+    {
+      "case_id": "XLN-LA-005",
+      "pair": "LA-ID",
+      "domain": "Kitab Suci / Kebajikan Ilahi",
+      "source_lang": "id",
+      "submission_lang": "la",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.2934,
+      "percentage": 29.34,
+      "detected_075": false,
+      "detected_070": false,
+      "description": "Terjemahan segar Vulgata 1 Korintus 13:13."
+    },
+    {
+      "case_id": "XLN-LA-006",
+      "pair": "LA-ID",
+      "domain": "Liturgi / Doa Kristen Purba",
+      "source_lang": "id",
+      "submission_lang": "la",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.2572,
+      "percentage": 25.72,
+      "detected_075": false,
+      "detected_070": false,
+      "description": "Terjemahan segar formula doa Pater Noster."
+    },
+    {
+      "case_id": "XLN-LA-007",
+      "pair": "LA-ID",
+      "domain": "Devosi / Mariologi Tradisional",
+      "source_lang": "id",
+      "submission_lang": "la",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.3978,
+      "percentage": 39.78,
+      "detected_075": false,
+      "detected_070": false,
+      "description": "Terjemahan segar doa devosional Ave Maria."
+    },
+    {
+      "case_id": "XLN-LA-008",
+      "pair": "LA-ID",
+      "domain": "Pengakuan Iman / Eklesiologi",
+      "source_lang": "id",
+      "submission_lang": "la",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.2573,
+      "percentage": 25.73,
+      "detected_075": false,
+      "detected_070": false,
+      "description": "Terjemahan segar Simbolon Nicea-Konstantinopel."
+    },
+    {
+      "case_id": "XLN-LA-009",
+      "pair": "LA-ID",
+      "domain": "Doktrin Skolastik / Etika Moral",
+      "source_lang": "id",
+      "submission_lang": "la",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.3169,
+      "percentage": 31.69,
+      "detected_075": false,
+      "detected_070": false,
+      "description": "Terjemahan segar Thomas Aquinas (Summa Theologiae I-II, q. 91, a. 2)."
+    },
+    {
+      "case_id": "XLN-LA-010",
+      "pair": "LA-ID",
+      "domain": "Liturgi / Himne Kemuliaan",
+      "source_lang": "id",
+      "submission_lang": "la",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.2669,
+      "percentage": 26.69,
+      "detected_075": false,
+      "detected_070": false,
+      "description": "Terjemahan segar Doksologi Raya Gloria in Excelsis Deo."
+    },
+    {
+      "case_id": "XLN-LA-NEG-001",
+      "pair": "LA-CLEAN",
+      "domain": "Retorika Romawi Klasik (Non-Teologis)",
+      "source_lang": "id",
+      "submission_lang": "la",
+      "is_plagiarized": false,
+      "cosine_similarity": 0.004,
+      "percentage": 0.4,
+      "detected_075": false,
+      "detected_070": false,
+      "description": "Kontrol Negatif: Pidato Cicero In Catilinam vs Teologi Penciptaan."
+    },
+    {
+      "case_id": "XLN-LA-NEG-002",
+      "pair": "LA-CLEAN",
+      "domain": "Formula Liturgis Doksologi Singkat",
+      "source_lang": "id",
+      "submission_lang": "la",
+      "is_plagiarized": false,
+      "cosine_similarity": 0.3147,
+      "percentage": 31.47,
+      "detected_075": false,
+      "detected_070": false,
+      "description": "Kontrol Negatif: Formula boilerplate Gloria Patri vs Doa Bapa Kami."
+    }
+  ]
+}

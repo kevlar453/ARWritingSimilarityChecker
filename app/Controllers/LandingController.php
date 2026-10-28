@@ -153,6 +153,10 @@ class LandingController extends BaseController
             'cross_lingual_60'     => ROOTPATH . 'datasets/artilik_cross_lingual_benchmark_dataset.json',
             'cross_lingual'        => ROOTPATH . 'datasets/artilik_cross_lingual_benchmark_dataset.json',
             'cross_lingual_report' => ROOTPATH . 'datasets/artilik_cross_lingual_calibration_report.json',
+            'latin_12'             => ROOTPATH . 'datasets/artilik_latin_benchmark_dataset.json',
+            'latin'                => ROOTPATH . 'datasets/artilik_latin_benchmark_dataset.json',
+            'latin_report'         => ROOTPATH . 'datasets/artilik_latin_calibration_report.json',
+            'latin_calibration'    => ROOTPATH . 'datasets/artilik_latin_calibration_report.json',
         ];
 
         $targetPath = $fileMap[$cleanDataset] ?? $fileMap['targeted_80'];
@@ -169,6 +173,10 @@ class LandingController extends BaseController
             'cross_lingual_60'     => 'artilik_cross_lingual_60_cases_benchmark.json',
             'cross_lingual'        => 'artilik_cross_lingual_60_cases_benchmark.json',
             'cross_lingual_report' => 'artilik_cross_lingual_calibration_report.json',
+            'latin_12'             => 'artilik_latin_12_cases_benchmark.json',
+            'latin'                => 'artilik_latin_12_cases_benchmark.json',
+            'latin_report'         => 'artilik_latin_calibration_report.json',
+            'latin_calibration'    => 'artilik_latin_calibration_report.json',
         ];
 
         $filename = $filenameMap[$cleanDataset] ?? 'artilik_indonesia_targeted_contextual_80_cases.json';

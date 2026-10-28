@@ -1,0 +1,134 @@
+[
+  {
+    "case_id": "XLN-LA-001",
+    "pair": "LA-ID",
+    "domain": "Kitab Suci / Teologi Penciptaan",
+    "source_text": "Pada awal mula, Sang Pencipta menjadikan langit beserta bumi seisinya.",
+    "submission_text": "In principio creavit Deus caelum et terram.",
+    "is_plagiarized": true,
+    "source_lang": "id",
+    "submission_lang": "la",
+    "description": "Terjemahan segar Vulgata Kejadian 1:1."
+  },
+  {
+    "case_id": "XLN-LA-002",
+    "pair": "LA-ID",
+    "domain": "Kitab Suci / Kristologi Sabda",
+    "source_text": "Pada permulaan telah ada Sang Sabda, dan Sabda itu senantiasa bersama Allah, dan Sabda itu sungguhlah Allah.",
+    "submission_text": "In principio erat Verbum, et Verbum erat apud Deum, et Deus erat Verbum.",
+    "is_plagiarized": true,
+    "source_lang": "id",
+    "submission_lang": "la",
+    "description": "Terjemahan segar Vulgata Yohanes 1:1."
+  },
+  {
+    "case_id": "XLN-LA-003",
+    "pair": "LA-ID",
+    "domain": "Kitab Suci / Teologi Pastoral",
+    "source_text": "Tuhan yang menuntunku bagai seorang gembala, sehingga aku tidak akan berkekurangan.",
+    "submission_text": "Dominus regit me, et nihil mihi deerit.",
+    "is_plagiarized": true,
+    "source_lang": "id",
+    "submission_lang": "la",
+    "description": "Terjemahan segar Vulgata Mazmur 23:1."
+  },
+  {
+    "case_id": "XLN-LA-004",
+    "pair": "LA-ID",
+    "domain": "Kitab Suci / Spiritualitas Injil",
+    "source_text": "Berbahagialah mereka yang rendah hati dan bersahaja dalam roh, karena milik merekalah kerajaan surga.",
+    "submission_text": "Beati pauperes spiritu, quoniam ipsorum est regnum caelorum.",
+    "is_plagiarized": true,
+    "source_lang": "id",
+    "submission_lang": "la",
+    "description": "Terjemahan segar Vulgata Matius 5:3."
+  },
+  {
+    "case_id": "XLN-LA-005",
+    "pair": "LA-ID",
+    "domain": "Kitab Suci / Kebajikan Ilahi",
+    "source_text": "Maka kini tetaplah ada ketiga perkara ini: iman, pengharapan, dan kasih; namun yang paling utama di antaranya adalah kasih.",
+    "submission_text": "Nunc autem manent fides, spes, caritas, tria haec; maior autem his est caritas.",
+    "is_plagiarized": true,
+    "source_lang": "id",
+    "submission_lang": "la",
+    "description": "Terjemahan segar Vulgata 1 Korintus 13:13."
+  },
+  {
+    "case_id": "XLN-LA-006",
+    "pair": "LA-ID",
+    "domain": "Liturgi / Doa Kristen Purba",
+    "source_text": "Bapa kami yang bertakhta di surga, dimuliakanlah nama-Mu yang kudus. Datanglah kerajaan-Mu, terwujudlah kehendak-Mu di atas bumi seperti halnya di dalam surga.",
+    "submission_text": "Pater noster, qui es in caelis, sanctificetur nomen tuum. Adveniat regnum tuum; fiat voluntas tua, sicut in caelo et in terra.",
+    "is_plagiarized": true,
+    "source_lang": "id",
+    "submission_lang": "la",
+    "description": "Terjemahan segar formula doa Pater Noster."
+  },
+  {
+    "case_id": "XLN-LA-007",
+    "pair": "LA-ID",
+    "domain": "Devosi / Mariologi Tradisional",
+    "source_text": "Salam kepadamu Maria, yang penuh kelimpahan rahmat, Tuhan menyertaimu. Terberkatilah engkau di antara kaum perempuan, dan terberkatilah buah rahimmu, Yesus.",
+    "submission_text": "Ave Maria, gratia plena, Dominus tecum. Benedicta tu in mulieribus, et benedictus fructus ventris tui, Iesus.",
+    "is_plagiarized": true,
+    "source_lang": "id",
+    "submission_lang": "la",
+    "description": "Terjemahan segar doa devosional Ave Maria."
+  },
+  {
+    "case_id": "XLN-LA-008",
+    "pair": "LA-ID",
+    "domain": "Pengakuan Iman / Eklesiologi",
+    "source_text": "Aku beriman kepada satu Allah, Bapa yang mahakuasa, pencipta semesta langit dan bumi, beserta segala ciptaan yang tampak maupun yang tak tampak.",
+    "submission_text": "Credo in unum Deum, Patrem omnipotentem, factorem caeli et terrae, visibilium omnium et invisibilium.",
+    "is_plagiarized": true,
+    "source_lang": "id",
+    "submission_lang": "la",
+    "description": "Terjemahan segar Simbolon Nicea-Konstantinopel."
+  },
+  {
+    "case_id": "XLN-LA-009",
+    "pair": "LA-ID",
+    "domain": "Doktrin Skolastik / Etika Moral",
+    "source_text": "Dari sanalah tampak jelas bahwa hukum kodrat alami tiada lain merupakan keikutsertaan hukum abadi pada makhluk yang berakal budi.",
+    "submission_text": "Unde patet quod lex naturalis nihil aliud est quam participatio legis aeternae in rationali creatura.",
+    "is_plagiarized": true,
+    "source_lang": "id",
+    "submission_lang": "la",
+    "description": "Terjemahan segar Thomas Aquinas (Summa Theologiae I-II, q. 91, a. 2)."
+  },
+  {
+    "case_id": "XLN-LA-010",
+    "pair": "LA-ID",
+    "domain": "Liturgi / Himne Kemuliaan",
+    "source_text": "Kemuliaan bagi Allah di tempat yang mahatinggi, dan damai sejahtera di bumi bagi sekalian insan yang berkehendak baik.",
+    "submission_text": "Gloria in excelsis Deo, et in terra pax hominibus bonae voluntatis.",
+    "is_plagiarized": true,
+    "source_lang": "id",
+    "submission_lang": "la",
+    "description": "Terjemahan segar Doksologi Raya Gloria in Excelsis Deo."
+  },
+  {
+    "case_id": "XLN-LA-NEG-001",
+    "pair": "LA-CLEAN",
+    "domain": "Retorika Romawi Klasik (Non-Teologis)",
+    "source_text": "Pada awal mula, Sang Pencipta menjadikan langit beserta bumi seisinya.",
+    "submission_text": "Quo usque tandem abutere, Catilina, patientia nostra? Quam diu etiam furor iste tuus nos eludet?",
+    "is_plagiarized": false,
+    "source_lang": "id",
+    "submission_lang": "la",
+    "description": "Kontrol Negatif: Pidato Cicero In Catilinam vs Teologi Penciptaan."
+  },
+  {
+    "case_id": "XLN-LA-NEG-002",
+    "pair": "LA-CLEAN",
+    "domain": "Formula Liturgis Doksologi Singkat",
+    "source_text": "Bapa kami yang bertakhta di surga, dimuliakanlah nama-Mu yang kudus. Datanglah kerajaan-Mu, terwujudlah kehendak-Mu di atas bumi seperti halnya di dalam surga.",
+    "submission_text": "Gloria Patri, et Filio, et Spiritui Sancto, sicut erat in principio, et nunc, et semper, et in saecula saeculorum. Amen.",
+    "is_plagiarized": false,
+    "source_lang": "id",
+    "submission_lang": "la",
+    "description": "Kontrol Negatif: Formula boilerplate Gloria Patri vs Doa Bapa Kami."
+  }
+]
