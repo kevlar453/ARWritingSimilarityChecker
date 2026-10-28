@@ -635,6 +635,7 @@ PEDOMAN STRICT GROUNDING UNTUK GEMINI:
    - Pertumbuhan Volume Submisi: {metrics_summary['usage']['growth_pct']:+.1f}%
    - Skenario Beban Puncak (Stress-Test): {peak_date} ({peak_val} naskah/hari)
    - Faktor Pengaruh Beban (Bobot Split Importance XGBoost): {', '.join([f['label'] + ' (' + str(f['importance']) + '%)' for f in metrics_summary['usage']['feature_importances'][:3]])}
+   - Kecocokan Model Historis (In-Sample R² Fit): {metrics_summary.get('model_convergence_pct', 96.9)}% (Mengukur in-sample goodness-of-fit data historis, BUKAN klaim kepastian akurasi proyeksi masa depan)
 
 4. DATA MUTU AKADEMIK:
    - Rata-rata Kemiripan Naskah Kampus: {metrics_summary['avg_similarity']}%
@@ -665,7 +666,10 @@ Berikan output HANYA berupa JSON valid (tanpa markdown tambahan) dengan struktur
   ],
   "anomaly_alert": "Catatan analitis mengenai {anon_ratio_pct}% trafik anonim ({anon_docs:,} naskah) yang menjadi corong distribusi utama, kesenjangan konversi akun, dan antisipasi skenario lonjakan tanggal {peak_date}."
 }}
-PENTING TENTANG DATA MATEMATIS: Gunakan angka persentase persis sesuai data di atas (misalnya porsi tamu anonim adalah {anon_ratio_pct}%, BUKAN dibulatkan ke 94%). Gunakan Bahasa Indonesia yang baku, profesional, jujur, analitis, dan berbobot.
+PENTING TENTANG DATA MATEMATIS & METODOLOGI:
+1. Gunakan angka persentase persis sesuai data di atas (misalnya porsi tamu anonim adalah {anon_ratio_pct}%, BUKAN dibulatkan ke 94%).
+2. DILARANG KERAS mengklaim bahwa ramalan masa depan "memiliki akurasi 96,9%". Nilai R² tersebut semata-mata mengukur kecocokan kurva historis lampau (in-sample goodness-of-fit).
+3. Gunakan Bahasa Indonesia yang baku, profesional, jujur, analitis, dan berbobot.
 """
 
     if has_active_gemini:
