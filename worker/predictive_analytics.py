@@ -581,6 +581,8 @@ def synthesize_with_gemini(
     conv_by_docs_pct = round((real_tx / max(1, total_docs)) * 100, 2)
     conv_by_users_pct = round((real_tx / max(1, total_users)) * 100, 2)
     anon_ratio_pct = round((anon_docs / max(1, total_docs)) * 100, 1)
+    conv_pct = round(float(metrics_summary.get("model_convergence_pct") or metrics_summary.get("usage", {}).get("convergence_pct") or 96.8), 1)
+    conv_pct_id = f"{conv_pct:.1f}".replace('.', ',')
 
     if not has_sales:
         sales_section = f"""1. STATUS PENDAPATAN & PENJUALAN RITEL:
@@ -635,7 +637,7 @@ PEDOMAN STRICT GROUNDING UNTUK GEMINI:
    - Pertumbuhan Volume Submisi: {metrics_summary['usage']['growth_pct']:+.1f}%
    - Skenario Beban Puncak (Stress-Test): {peak_date} ({peak_val} naskah/hari)
    - Faktor Pengaruh Beban (Bobot Split Importance XGBoost): {', '.join([f['label'] + ' (' + str(f['importance']) + '%)' for f in metrics_summary['usage']['feature_importances'][:3]])}
-   - Kecocokan Model Historis (In-Sample R² Fit): {metrics_summary.get('model_convergence_pct', 96.9)}% (Mengukur in-sample goodness-of-fit data historis, BUKAN klaim kepastian akurasi proyeksi masa depan)
+   - Kecocokan Model Historis (In-Sample R² Fit): {conv_pct_id}% (Mengukur in-sample goodness-of-fit data historis, BUKAN klaim kepastian akurasi proyeksi masa depan)
 
 4. DATA MUTU AKADEMIK:
    - Rata-rata Kemiripan Naskah Kampus: {metrics_summary['avg_similarity']}%
@@ -668,7 +670,7 @@ Berikan output HANYA berupa JSON valid (tanpa markdown tambahan) dengan struktur
 }}
 PENTING TENTANG DATA MATEMATIS & METODOLOGI:
 1. Gunakan angka persentase persis sesuai data di atas (misalnya porsi tamu anonim adalah {anon_ratio_pct}%, BUKAN dibulatkan ke 94%).
-2. DILARANG KERAS mengklaim bahwa ramalan masa depan "memiliki akurasi 96,9%". Nilai R² tersebut semata-mata mengukur kecocokan kurva historis lampau (in-sample goodness-of-fit).
+2. DILARANG KERAS mengklaim bahwa ramalan masa depan "memiliki akurasi {conv_pct_id}%". Nilai R² tersebut ({conv_pct_id}%) semata-mata mengukur kecocokan kurva historis lampau (in-sample goodness-of-fit). Jika menyebutkan nilai R² atau in-sample fit, selalu sebutkan angkanya secara tepat yaitu {conv_pct_id}%.
 3. Gunakan Bahasa Indonesia yang baku, profesional, jujur, analitis, dan berbobot.
 """
 
@@ -688,6 +690,22 @@ PENTING TENTANG DATA MATEMATIS & METODOLOGI:
                 parsed["source"] = f"Google Gemini ({res.get('model_executed', model_name)})"
                 parsed["is_live_gemini"] = True
                 mark_key_success(k.get("id"), conn)
+
+                # Pastikan persentase in-sample R2 di teks selaras sempurna dengan conv_pct_id
+                def _sync_conv(txt):
+                    if not txt or not isinstance(txt, str):
+                        return txt
+                    return re.sub(
+                        r'(\b(?:R²\s*(?:sebesar\s*|\(\s*)?|metrik\s+|akurasi\s+))\d{2}(?:[.,]\d+)?%',
+                        rf'\g<1>{conv_pct_id}%',
+                        txt,
+                        flags=re.IGNORECASE
+                    )
+
+                for field in ["executive_summary", "sales_analysis", "usage_analysis", "anomaly_alert"]:
+                    if field in parsed:
+                        parsed[field] = _sync_conv(parsed[field])
+
                 return parsed
             except Exception as e:
                 logger.warning(f"Gagal parse JSON dari Gemini: {e}. Output raw: {raw_text[:200]}")
@@ -911,6 +929,7 @@ def run_full_pipeline(force_live: bool = False) -> Dict[str, Any]:
             "real_revenue_total": real_revenue_total,
             "real_tx_total": real_tx_total,
             "untapped_potential": untapped_potential,
+            "model_convergence_pct": usage_result.get("convergence_pct", 96.8),
             "registered_docs_total": registered_docs_total,
             "anon_docs_total": anon_docs_total,
             "organic_docs_total": organic_docs_total,

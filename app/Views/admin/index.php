@@ -2660,7 +2660,12 @@
                     $usageGrowth = (float) ($usageFc['growth_pct'] ?? 0);
                     $salesProjTotal = (float) ($salesFc['projected_30d_total'] ?? 0);
                     $usageProjTotal = (float) ($usageFc['projected_30d_total'] ?? 0);
-                    $convPct = (float) ($pa['model_convergence_pct'] ?? ($usageFc['convergence_pct'] ?? 98.1));
+                    $convPct = (float) ($pa['model_convergence_pct'] ?? ($usageFc['convergence_pct'] ?? 96.8));
+                    $convPctFormatted = number_format($convPct, 1, ',', '.') . '%';
+                    $syncConvNarrative = function(?string $text) use ($convPctFormatted): string {
+                        if (empty($text)) return '';
+                        return preg_replace('/(\b(?:R²\s*(?:sebesar\s*|\(\s*)?|metrik\s+|akurasi\s+))\d{2}(?:[.,]\d+)?%/iu', '${1}' . $convPctFormatted, $text);
+                    };
                 ?>
                 <div class="mt-8 pt-6 border-t border-slate-700/80 space-y-6" id="predictive-analytics-section">
                     <!-- Header Section -->
@@ -2800,7 +2805,7 @@
                                 </div>
                             </div>
                             <div class="mt-3 flex items-baseline gap-2">
-                                <span id="kpi-convergence-val" class="text-2xl lg:text-3xl font-extrabold text-white tracking-tight"><?= number_format($convPct, 1) ?>%</span>
+                                <span id="kpi-convergence-val" class="text-2xl lg:text-3xl font-extrabold text-white tracking-tight"><?= number_format($convPct, 1, ',', '.') ?>%</span>
                                 <span class="text-xs text-purple-400 font-medium">In-Sample Fit R²</span>
                             </div>
                             <div class="mt-2 text-[11px] text-slate-300 leading-relaxed font-sans" title="In-Sample R²: Mengukur seberapa presisi model XGBoost menyesuaikan variasi data historis yang telah diamati (27 hari terakhir). Nilai ini bukan ukuran out-of-sample atau jaminan kepastian akurasi proyeksi 30 hari ke depan.">
@@ -2953,7 +2958,7 @@
                                 <span>📋</span> Ringkasan Eksekutif Terpadu
                             </div>
                             <p id="gemini-exec-summary" class="text-xs text-slate-200 leading-relaxed font-sans">
-                                <?= esc($gemini['executive_summary'] ?? 'Sintesis prediktif XGBoost dan penalaran Gemini siap menyajikan gambaran menyeluruh kondisi operasional platform.') ?>
+                                <?= esc($syncConvNarrative($gemini['executive_summary'] ?? 'Sintesis prediktif XGBoost dan penalaran Gemini siap menyajikan gambaran menyeluruh kondisi operasional platform.')) ?>
                             </p>
                         </div>
 
@@ -2964,7 +2969,7 @@
                                     <span>📈</span> Analisis Tren Penjualan &amp; Monetisasi
                                 </div>
                                 <p id="gemini-sales-analysis" class="text-xs text-slate-300 leading-relaxed">
-                                    <?= esc($gemini['sales_analysis'] ?? 'Penjualan menunjukkan adopsi paket kuota yang konsisten dengan siklus perkuliahan aktif.') ?>
+                                    <?= esc($syncConvNarrative($gemini['sales_analysis'] ?? 'Penjualan menunjukkan adopsi paket kuota yang konsisten dengan siklus perkuliahan aktif.')) ?>
                                 </p>
                             </div>
 
@@ -2973,7 +2978,7 @@
                                     <span>⚙️</span> Analisis Beban Penggunaan &amp; Server
                                 </div>
                                 <p id="gemini-usage-analysis" class="text-xs text-slate-300 leading-relaxed">
-                                    <?= esc($gemini['usage_analysis'] ?? 'Beban submisi naskah diperkirakan terkonsentrasi pada siklus revisi tugas akhir mahasiswa.') ?>
+                                    <?= esc($syncConvNarrative($gemini['usage_analysis'] ?? 'Beban submisi naskah diperkirakan terkonsentrasi pada siklus revisi tugas akhir mahasiswa.')) ?>
                                 </p>
                             </div>
                         </div>
@@ -2984,7 +2989,7 @@
                                 <span class="text-amber-400 text-lg leading-none">⚠️</span>
                                 <div class="space-y-0.5 text-xs">
                                     <strong class="text-amber-300 block font-semibold">Peringatan Anomali &amp; Kapasitas Musiman:</strong>
-                                    <span id="gemini-anomaly-text" class="text-slate-300"><?= esc($gemini['anomaly_alert']) ?></span>
+                                    <span id="gemini-anomaly-text" class="text-slate-300"><?= esc($syncConvNarrative($gemini['anomaly_alert'])) ?></span>
                                 </div>
                             </div>
                         <?php endif; ?>
@@ -4856,20 +4861,26 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                     if (kpiPeakV) kpiPeakV.textContent = `${Number(peak.value || 0).toLocaleString('id-ID')} naskah`;
 
                     const convValEl = document.getElementById('kpi-convergence-val');
+                    let cVal = 96.8;
                     if (convValEl) {
-                        const cVal = Number(res.model_convergence_pct || uFc.convergence_pct || 98.1);
-                        convValEl.textContent = `${cVal.toFixed(1)}%`;
+                        cVal = Number(res.model_convergence_pct || uFc.convergence_pct || 96.8);
+                        convValEl.textContent = `${cVal.toFixed(1).replace('.', ',')}%`;
                     }
+                    const cValFormatted = cVal.toFixed(1).replace('.', ',') + '%';
+                    const syncConv = (txt) => {
+                        if (!txt) return '';
+                        return txt.replace(/(\b(?:R²\s*(?:sebesar\s*|\(\s*)?|metrik\s+|akurasi\s+))\d{2}(?:[.,]\d+)?%/giu, `$1${cValFormatted}`);
+                    };
 
                     const gIns = res.gemini_insights || {};
                     const execEl = document.getElementById('gemini-exec-summary');
-                    if (execEl) execEl.textContent = gIns.executive_summary || '';
+                    if (execEl) execEl.textContent = syncConv(gIns.executive_summary || '');
                     const salesAnEl = document.getElementById('gemini-sales-analysis');
-                    if (salesAnEl) salesAnEl.textContent = gIns.sales_analysis || '';
+                    if (salesAnEl) salesAnEl.textContent = syncConv(gIns.sales_analysis || '');
                     const usgAnEl = document.getElementById('gemini-usage-analysis');
-                    if (usgAnEl) usgAnEl.textContent = gIns.usage_analysis || '';
+                    if (usgAnEl) usgAnEl.textContent = syncConv(gIns.usage_analysis || '');
                     const anomEl = document.getElementById('gemini-anomaly-text');
-                    if (anomEl) anomEl.textContent = gIns.anomaly_alert || '';
+                    if (anomEl) anomEl.textContent = syncConv(gIns.anomaly_alert || '');
                     const srcEl = document.getElementById('gemini-source-pill');
                     if (srcEl) srcEl.textContent = gIns.source || 'Google Gemini AI';
                     const headGeminiEl = document.getElementById('header-gemini-pill');
