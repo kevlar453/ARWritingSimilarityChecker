@@ -1492,70 +1492,167 @@ guna menguji pengaruh variabel independen terhadap variabel dependen dengan tara
                 </table>
             </div>
 
-            <!-- Tabel 3: Validasi Lintas Bahasa per Pasangan Bahasa -->
-            <h3 style="font-size: 17px; font-weight: 800; color: var(--dark); margin: 28px 0 12px 0;">3. Validasi Lintas Bahasa (Zero-Shot Cross-Lingual) Tanpa Mesin Penerjemah</h3>
-            <p style="font-size: 14px; color: var(--text); line-height: 1.6; margin-bottom: 14px;">
-                Karena model representasi MiniLM-L12 bersifat multibahasa, teks berbahasa Indonesia dan teks bahasa asing dipetakan ke dalam satu ruang vektor bersama. Berikut hasil pengujian awal per pasangan bahasa:
-            </p>
+            <!-- Tabel 3: Validasi Lintas Bahasa per Pasangan Bahasa (Fase 3 - N=10 per Bahasa) -->
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin: 32px 0 12px 0;">
+                <div>
+                    <h3 style="font-size: 18px; font-weight: 800; color: var(--dark); margin: 0;">
+                        3. Validasi Empiris Lintas Bahasa &amp; Interval Kepercayaan Wilson 95% (Fase 3)
+                    </h3>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">
+                        Evaluasi terarah pada 5 pasangan bahasa ilmiah ($N=10$ per bahasa, total 50 kasus positif + 10 kontrol negatif). Interval dihitung memakai metode <em>Wilson Score Interval</em> (95% CI) untuk menangani ketidakpastian sampel terbatas secara jujur.
+                    </p>
+                </div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <a href="<?= base_url('benchmark/dataset/cross_lingual_60') ?>" class="btn-download-dataset" style="font-size: 12px; padding: 6px 12px;">
+                        <span>📥</span> Unduh Dataset Lintas Bahasa (60 Kasus JSON)
+                    </a>
+                    <a href="<?= base_url('benchmark/dataset/cross_lingual_report') ?>" class="btn-download-dataset" style="font-size: 12px; padding: 6px 12px; background: #f8fafc; border-color: #cbd5e1; color: #334155;">
+                        <span>📊</span> Unduh Laporan Kalibrasi Wilson (JSON)
+                    </a>
+                </div>
+            </div>
 
             <div class="table-responsive">
                 <table class="data-table">
                     <thead>
                         <tr>
                             <th>Pasangan Bahasa</th>
-                            <th>Representasi Kasus Uji</th>
-                            <th style="text-align: center;">Rata-rata Kosinus</th>
-                            <th style="text-align: center;">Kemiripan Makna</th>
-                            <th style="text-align: center;">Lolos Ambang 0.75</th>
-                            <th>Status Validasi Awal</th>
+                            <th>Karakteristik &amp; Ranah Keilmuan</th>
+                            <th style="text-align: center;">Rerata Kosinus</th>
+                            <th style="text-align: center;">Rentang [Min..Max]</th>
+                            <th style="text-align: center;">Recall @ 0,75 (Standar)</th>
+                            <th style="text-align: center;">Recall @ 0,70 (Penyelidikan)</th>
+                            <th>Status Kematangan Metodologis</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td><strong>Indonesia ↔ Mandarin (ZH)</strong></td>
-                            <td>NLP Transformer, Nutrisi Klinis, Inverter Surya</td>
-                            <td style="text-align: center; font-mono-code; font-weight: 700;">0.9090</td>
-                            <td style="text-align: center; font-weight: 800; color: #166534;">90.9%</td>
-                            <td style="text-align: center; font-weight: 800; color: var(--accent-emerald);">3 / 3 (100%)</td>
-                            <td><span style="font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #e0f2fe; color: #0369a1; font-weight: 800;">Indikasi Awal Positif</span></td>
+                            <td><strong>Indonesia ↔ Mandarin (ZH)</strong><br><span style="font-size: 11px; color: #64748b;">Aksara Hanzi Sederhana</span></td>
+                            <td>Rantai pasok industri, baterai litium HPAL, RCEP, ViT AI, 5G</td>
+                            <td style="text-align: center; font-mono-code; font-weight: 700; color: #166534;">0.8454</td>
+                            <td style="text-align: center; font-mono-code; font-size: 12px;">0.76 .. 0.91</td>
+                            <td style="text-align: center; font-weight: 800; color: var(--accent-emerald);">
+                                10 / 10 (100.0%)<br>
+                                <span style="font-size: 10px; color: #64748b; font-weight: 600;">Wilson: 72,2% – 100%</span>
+                            </td>
+                            <td style="text-align: center; font-weight: 800; color: var(--accent-emerald);">
+                                10 / 10 (100.0%)<br>
+                                <span style="font-size: 10px; color: #64748b; font-weight: 600;">Wilson: 72,2% – 100%</span>
+                            </td>
+                            <td>
+                                <span style="font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #dcfce7; color: #166534; font-weight: 800;">
+                                    Tervalidasi Kuat (N=10, LB 72%)
+                                </span>
+                            </td>
                         </tr>
                         <tr>
-                            <td><strong>Indonesia ↔ Arab (AR)</strong></td>
-                            <td>Arsitektur NLP, Epidemiologi Diabetes, Pembangkit Fotovoltaik</td>
-                            <td style="text-align: center; font-mono-code; font-weight: 700;">0.8830</td>
-                            <td style="text-align: center; font-weight: 800; color: #166534;">88.3%</td>
-                            <td style="text-align: center; font-weight: 800; color: var(--accent-emerald);">3 / 3 (100%)</td>
-                            <td><span style="font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #e0f2fe; color: #0369a1; font-weight: 800;">Indikasi Awal Positif</span></td>
+                            <td><strong>Indonesia ↔ Inggris (EN)</strong><br><span style="font-size: 11px; color: #64748b;">Aksara Latin</span></td>
+                            <td>NLP transformer, sel fotovoltaik, aerosol medis, moneter, CRISPR</td>
+                            <td style="text-align: center; font-mono-code; font-weight: 700; color: #166534;">0.8426</td>
+                            <td style="text-align: center; font-mono-code; font-size: 12px;">0.72 .. 0.91</td>
+                            <td style="text-align: center; font-weight: 800; color: var(--accent-emerald);">
+                                9 / 10 (90.0%)<br>
+                                <span style="font-size: 10px; color: #64748b; font-weight: 600;">Wilson: 59,6% – 98,2%</span>
+                            </td>
+                            <td style="text-align: center; font-weight: 800; color: var(--accent-emerald);">
+                                10 / 10 (100.0%)<br>
+                                <span style="font-size: 10px; color: #64748b; font-weight: 600;">Wilson: 72,2% – 100%</span>
+                            </td>
+                            <td>
+                                <span style="font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #e0f2fe; color: #0369a1; font-weight: 800;">
+                                    Tervalidasi Terarah (N=10, LB 60%)
+                                </span>
+                            </td>
                         </tr>
                         <tr>
-                            <td><strong>Indonesia ↔ Jerman (DE)</strong></td>
-                            <td>Komposit Geopolimer, Kebijakan Suku Bunga, Model Bahasa</td>
-                            <td style="text-align: center; font-mono-code; font-weight: 700;">0.8661</td>
-                            <td style="text-align: center; font-weight: 800; color: #166534;">86.6%</td>
-                            <td style="text-align: center; font-weight: 800; color: var(--accent-emerald);">3 / 3 (100%)</td>
-                            <td><span style="font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #e0f2fe; color: #0369a1; font-weight: 800;">Indikasi Awal Positif</span></td>
+                            <td><strong>Indonesia ↔ Jerman (DE)</strong><br><span style="font-size: 11px; color: #64748b;">Aksara Latin Majemuk</span></td>
+                            <td>Hermeneutika, emisi diesel common-rail, Frankfurt School, BGB</td>
+                            <td style="text-align: center; font-mono-code; font-weight: 700; color: #0369a1;">0.7803</td>
+                            <td style="text-align: center; font-mono-code; font-size: 12px;">0.72 .. 0.87</td>
+                            <td style="text-align: center; font-weight: 800; color: #d97706;">
+                                6 / 10 (60.0%)<br>
+                                <span style="font-size: 10px; color: #64748b; font-weight: 600;">Wilson: 31,3% – 83,2%</span>
+                            </td>
+                            <td style="text-align: center; font-weight: 800; color: var(--accent-emerald);">
+                                10 / 10 (100.0%)<br>
+                                <span style="font-size: 10px; color: #64748b; font-weight: 600;">Wilson: 72,2% – 100%</span>
+                            </td>
+                            <td>
+                                <span style="font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #fef3c7; color: #92400e; font-weight: 800;">
+                                    Sensitif di Mode 0,70 (N=10)
+                                </span>
+                            </td>
                         </tr>
                         <tr>
-                            <td><strong>Indonesia ↔ Belanda (NL)</strong></td>
-                            <td>Peradilan Konstitusi, Inflasi Komoditas, Ekologi Laut Tropis</td>
-                            <td style="text-align: center; font-mono-code; font-weight: 700;">0.8050</td>
-                            <td style="text-align: center; font-weight: 800; color: #166534;">80.5%</td>
-                            <td style="text-align: center; font-weight: 800; color: var(--accent-emerald);">3 / 3 (100%)</td>
-                            <td><span style="font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #e0f2fe; color: #0369a1; font-weight: 800;">Indikasi Awal Positif</span></td>
+                            <td><strong>Indonesia ↔ Belanda (NL)</strong><br><span style="font-size: 11px; color: #64748b;">Aksara Latin Arkais</span></td>
+                            <td>KUHPerdata/BW, PMH 1365, Agrarische Wet 1870, Daghregister VOC</td>
+                            <td style="text-align: center; font-mono-code; font-weight: 700; color: #166534;">0.8083</td>
+                            <td style="text-align: center; font-mono-code; font-size: 12px;">0.64 .. 0.94</td>
+                            <td style="text-align: center; font-weight: 800; color: #0284c7;">
+                                7 / 10 (70.0%)<br>
+                                <span style="font-size: 10px; color: #64748b; font-weight: 600;">Wilson: 39,7% – 89,2%</span>
+                            </td>
+                            <td style="text-align: center; font-weight: 800; color: var(--accent-emerald);">
+                                8 / 10 (80.0%)<br>
+                                <span style="font-size: 10px; color: #64748b; font-weight: 600;">Wilson: 49,0% – 94,3%</span>
+                            </td>
+                            <td>
+                                <span style="font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #f1f5f9; color: #475569; font-weight: 800;">
+                                    Indikasi Terarah (N=10, LB 40%)
+                                </span>
+                            </td>
                         </tr>
                         <tr>
-                            <td><strong>Indonesia ↔ Inggris (EN)</strong></td>
-                            <td>Attention Mechanism, Smart Inverter, Moneter Makro</td>
-                            <td style="text-align: center; font-mono-code; font-weight: 700;">0.8009</td>
-                            <td style="text-align: center; font-weight: 800; color: #166534;">80.1%</td>
-                            <td style="text-align: center; font-weight: 800; color: #0284c7;">2 / 3 (66.7%)*</td>
-                            <td><span style="font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #f1f5f9; color: #475569; font-weight: 800;">Indikasi Awal Positif</span></td>
+                            <td><strong>Indonesia ↔ Arab (AR)</strong><br><span style="font-size: 11px; color: #64748b;">Aksara Hijaiyah Kanan-ke-Kiri</span></td>
+                            <td>Mudharabah, mashlahah ushul fikih, filologi naskah, Ibn Rusyd</td>
+                            <td style="text-align: center; font-mono-code; font-weight: 700; color: #0369a1;">0.7514</td>
+                            <td style="text-align: center; font-mono-code; font-size: 12px;">0.47 .. 0.84</td>
+                            <td style="text-align: center; font-weight: 800; color: #0284c7;">
+                                7 / 10 (70.0%)<br>
+                                <span style="font-size: 10px; color: #64748b; font-weight: 600;">Wilson: 39,7% – 89,2%</span>
+                            </td>
+                            <td style="text-align: center; font-weight: 800; color: var(--accent-emerald);">
+                                8 / 10 (80.0%)<br>
+                                <span style="font-size: 10px; color: #64748b; font-weight: 600;">Wilson: 49,0% – 94,3%</span>
+                            </td>
+                            <td>
+                                <span style="font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #f1f5f9; color: #475569; font-weight: 800;">
+                                    Indikasi Terarah (N=10, LB 40%)
+                                </span>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-            <p style="font-size: 12px; color: var(--muted); margin-top: 6px; font-style: italic;">
-                *Catatan transparansi statistik: Selisih 3/3 vs 2/3 pada bahasa Inggris adalah variasi 1 kasus (noise sampel kecil), bukan perbedaan kualitas pemodelan bahasa. Mengingat ukuran sampel 3 kasus per pasangan, label yang jujur adalah "Indikasi Awal Positif". Pengujian berskala lebih besar (&ge;10 kasus per bahasa) sedang dipersiapkan untuk kalibrasi mendalam.
+
+            <!-- Analisis Pergeseran Aksara & Catatan Metodologis Wilson -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; margin-top: 16px;">
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; p: 14px; padding: 14px;">
+                    <h4 style="font-size: 13px; font-weight: 800; color: var(--dark); margin: 0 0 6px 0;">
+                        🔍 Temuan Pergeseran Aksara (Latin vs Non-Latin)
+                    </h4>
+                    <p style="font-size: 12px; color: var(--text); line-height: 1.6; margin: 0;">
+                        * <strong>Rumpun Aksara Latin (EN, NL, DE)</strong>: Rerata kosinus $0{,}8104$ | Recall@0.75: $73{,}3\%$ | Recall@0.70: $93{,}3\%$.<br>
+                        * <strong>Rumpun Aksara Non-Latin (AR, ZH)</strong>: Rerata kosinus $0{,}7984$ | Recall@0.75: $85{,}0\%$ | Recall@0.70: $90{,}0\%$.<br>
+                        * <strong>Gap Kosinus Rerata</strong>: Hanya sebesar $0{,}0120$ ($1{,}2$ poin).<br>
+                        <strong>Kesimpulan Desain</strong>: Tidak ditemukan pergeseran ambang yang drastis antar aksara secara agregat. Aksara Hanzi (Mandarin) justru mencatat kemiripan tertinggi, sedangkan Arab memiliki varians tertinggi pada istilah filologis kuno. Ambang $0{,}70$ pada Mode Penyelidikan terbukti menjadi ambang universal paling tangguh (menaikkan Recall global lintas bahasa dari $78{,}0\%$ ke $92{,}0\%$).
+                    </p>
+                </div>
+
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; p: 14px; padding: 14px;">
+                    <h4 style="font-size: 13px; font-weight: 800; color: var(--dark); margin: 0 0 6px 0;">
+                        🛡️ Uji Kontrol Negatif Lintas Bahasa ($N=10$)
+                    </h4>
+                    <p style="font-size: 12px; color: var(--text); line-height: 1.6; margin: 0;">
+                        Sebanyak 10 teks ilmiah bahasa asing non-plagiarisme (misal: astrofisika radio Inggris, badai pasir Sahara Arab, geologi sesar Tibet Mandarin, teknik lukis Rembrandt Belanda) diuji terhadap korpus Indonesia:<br>
+                        * <strong>Kosinus Puncak Terbersih</strong>: $0{,}2274$ (22,7%)<br>
+                        * <strong>False Positive Rate</strong>: $0{,}0\%$ pada ambang $0{,}75$ dan $0{,}0\%$ pada ambang $0{,}70$.<br>
+                        * <strong>Margin Keamanan Anti-Salah-Tuduh</strong>: $+47{,}3$ poin ke ambang $0{,}70$ dan $+52{,}3$ poin ke ambang $0{,}75$.
+                    </p>
+                </div>
+            </div>
+            <p style="font-size: 12px; color: var(--text-muted); margin-top: 10px; font-style: italic;">
+                *Catatan metodologis: Nilai $N=10$ adalah batas uji terarah minimum. Sesuai interval kepercayaan Wilson 95%, skor 10/10 tetap menyisakan ambang bawah statistik 72,2%. Oleh sebab itu, AR Tilik menggunakan label jujur "Tervalidasi Terarah (N=10)" dan mencantumkan batas bawah interval pada setiap pasangan bahasa.
             </p>
 
             <!-- 4. Transparansi Kasus Batas / Kegagalan Semantik Terbuka -->

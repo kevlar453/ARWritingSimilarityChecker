@@ -2284,6 +2284,9 @@ $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evi
                             <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 font-mono-code">
                                 Pilar Eksperimental • Lapisan Ke-2
                             </span>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200 font-mono-code" title="Fase 3: Terkalibrasi pada 5 Pasangan Bahasa Ilmiah (N=10 per Bahasa, Wilson 95%)">
+                                Multibahasa Terarah (N=10/Bahasa)
+                            </span>
                         </div>
                         <p class="text-xs text-slate-500 mt-0.5">
                             Memeriksa ulang naskah pada zona abu-abu melalui penanaman vektor makna <em>(paraphrase-multilingual-MiniLM-L12-v2)</em> secara lokal on-premise tanpa mengubah persentase leksikal utama.
@@ -2445,6 +2448,27 @@ $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evi
                                 <?php if ($isTransitionZone): ?>
                                 <span class="sem-transition-pill text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300">
                                     Zona Transisi [0,70–0,75)
+                                </span>
+                                <?php endif; ?>
+                                <?php if (str_contains($srcDocTitle, 'XLN-ZH') || str_contains($srcDocTitle, 'ID-ZH')): ?>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300" title="Validasi Lintas Bahasa Fase 3: Recall 100%, Wilson LB: 72,2%">
+                                    Mandarin (LB: 72%)
+                                </span>
+                                <?php elseif (str_contains($srcDocTitle, 'XLN-EN') || str_contains($srcDocTitle, 'ID-EN')): ?>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800 border border-indigo-300" title="Validasi Lintas Bahasa Fase 3: Recall 90%-100%, Wilson LB: 60%-72%">
+                                    Inggris (LB: 60%)
+                                </span>
+                                <?php elseif (str_contains($srcDocTitle, 'XLN-DE') || str_contains($srcDocTitle, 'ID-DE')): ?>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300" title="Validasi Lintas Bahasa Fase 3: Recall 60% @0.75, 100% @0.70">
+                                    Jerman (Sensitif @0.70)
+                                </span>
+                                <?php elseif (str_contains($srcDocTitle, 'XLN-NL') || str_contains($srcDocTitle, 'ID-NL')): ?>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-700 border border-slate-300" title="Validasi Lintas Bahasa Fase 3: Recall 70%-80%, Wilson LB: 40%">
+                                    Belanda (LB: 40%)
+                                </span>
+                                <?php elseif (str_contains($srcDocTitle, 'XLN-AR') || str_contains($srcDocTitle, 'ID-AR')): ?>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-700 border border-slate-300" title="Validasi Lintas Bahasa Fase 3: Recall 70%-80%, Wilson LB: 40%">
+                                    Arab (LB: 40%)
                                 </span>
                                 <?php endif; ?>
                             </div>

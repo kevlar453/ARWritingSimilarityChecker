@@ -150,6 +150,9 @@ class LandingController extends BaseController
             'semantic_paraphrase'  => ROOTPATH . 'datasets/artilik_semantic_paraphrase_benchmark.json',
             'semantic_calibration' => ROOTPATH . 'datasets/artilik_semantic_calibration_report.json',
             'semantic_report'      => ROOTPATH . 'datasets/artilik_semantic_calibration_report.json',
+            'cross_lingual_60'     => ROOTPATH . 'datasets/artilik_cross_lingual_benchmark_dataset.json',
+            'cross_lingual'        => ROOTPATH . 'datasets/artilik_cross_lingual_benchmark_dataset.json',
+            'cross_lingual_report' => ROOTPATH . 'datasets/artilik_cross_lingual_calibration_report.json',
         ];
 
         $targetPath = $fileMap[$cleanDataset] ?? $fileMap['targeted_80'];
@@ -163,6 +166,9 @@ class LandingController extends BaseController
             'semantic_paraphrase'  => 'artilik_semantic_paraphrase_80_cases.json',
             'semantic_calibration' => 'artilik_semantic_calibration_report.json',
             'semantic_report'      => 'artilik_semantic_calibration_report.json',
+            'cross_lingual_60'     => 'artilik_cross_lingual_60_cases_benchmark.json',
+            'cross_lingual'        => 'artilik_cross_lingual_60_cases_benchmark.json',
+            'cross_lingual_report' => 'artilik_cross_lingual_calibration_report.json',
         ];
 
         $filename = $filenameMap[$cleanDataset] ?? 'artilik_indonesia_targeted_contextual_80_cases.json';

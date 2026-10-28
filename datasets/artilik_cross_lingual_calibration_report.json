@@ -1,0 +1,883 @@
+{
+  "benchmark_name": "AR Tilik Cross-Lingual Semantic Benchmark (v1.3 - Phase 3)",
+  "model": "paraphrase-multilingual-MiniLM-L12-v2",
+  "total_cases": 60,
+  "total_positive_pairs": 50,
+  "total_negative_controls": 10,
+  "negative_controls_metrics": {
+    "n_samples": 10,
+    "max_cosine": 0.2274,
+    "mean_cosine": 0.018,
+    "fp_at_075": 0,
+    "fp_at_070": 0,
+    "safety_margin_075": 52.3,
+    "safety_margin_070": 47.3
+  },
+  "script_asymmetry_analysis": {
+    "latin_script_pairs": [
+      "ID-EN",
+      "ID-NL",
+      "ID-DE"
+    ],
+    "latin_mean_cosine": 0.8104,
+    "latin_recall_075": 73.3,
+    "latin_recall_070": 93.3,
+    "non_latin_script_pairs": [
+      "ID-AR",
+      "ID-ZH"
+    ],
+    "non_latin_mean_cosine": 0.7984,
+    "non_latin_recall_075": 85.0,
+    "non_latin_recall_070": 90.0,
+    "cosine_gap": 0.012
+  },
+  "pairs_summary": {
+    "ID-EN": {
+      "n_cases": 10,
+      "mean_cosine": 0.8426,
+      "median_cosine": 0.8558,
+      "min_cosine": 0.7152,
+      "max_cosine": 0.9087,
+      "threshold_075": {
+        "detected": 9,
+        "recall_pct": 90.0,
+        "wilson_ci_95": [
+          59.6,
+          98.2
+        ],
+        "wilson_lower_bound": 59.6
+      },
+      "threshold_070": {
+        "detected": 10,
+        "recall_pct": 100.0,
+        "wilson_ci_95": [
+          72.2,
+          100.0
+        ],
+        "wilson_lower_bound": 72.2
+      }
+    },
+    "ID-AR": {
+      "n_cases": 10,
+      "mean_cosine": 0.7514,
+      "median_cosine": 0.7835,
+      "min_cosine": 0.4716,
+      "max_cosine": 0.8431,
+      "threshold_075": {
+        "detected": 7,
+        "recall_pct": 70.0,
+        "wilson_ci_95": [
+          39.7,
+          89.2
+        ],
+        "wilson_lower_bound": 39.7
+      },
+      "threshold_070": {
+        "detected": 8,
+        "recall_pct": 80.0,
+        "wilson_ci_95": [
+          49.0,
+          94.3
+        ],
+        "wilson_lower_bound": 49.0
+      }
+    },
+    "ID-ZH": {
+      "n_cases": 10,
+      "mean_cosine": 0.8454,
+      "median_cosine": 0.8382,
+      "min_cosine": 0.7648,
+      "max_cosine": 0.9079,
+      "threshold_075": {
+        "detected": 10,
+        "recall_pct": 100.0,
+        "wilson_ci_95": [
+          72.2,
+          100.0
+        ],
+        "wilson_lower_bound": 72.2
+      },
+      "threshold_070": {
+        "detected": 10,
+        "recall_pct": 100.0,
+        "wilson_ci_95": [
+          72.2,
+          100.0
+        ],
+        "wilson_lower_bound": 72.2
+      }
+    },
+    "ID-NL": {
+      "n_cases": 10,
+      "mean_cosine": 0.8083,
+      "median_cosine": 0.8446,
+      "min_cosine": 0.6438,
+      "max_cosine": 0.9362,
+      "threshold_075": {
+        "detected": 7,
+        "recall_pct": 70.0,
+        "wilson_ci_95": [
+          39.7,
+          89.2
+        ],
+        "wilson_lower_bound": 39.7
+      },
+      "threshold_070": {
+        "detected": 8,
+        "recall_pct": 80.0,
+        "wilson_ci_95": [
+          49.0,
+          94.3
+        ],
+        "wilson_lower_bound": 49.0
+      }
+    },
+    "ID-DE": {
+      "n_cases": 10,
+      "mean_cosine": 0.7803,
+      "median_cosine": 0.7613,
+      "min_cosine": 0.7159,
+      "max_cosine": 0.8708,
+      "threshold_075": {
+        "detected": 6,
+        "recall_pct": 60.0,
+        "wilson_ci_95": [
+          31.3,
+          83.2
+        ],
+        "wilson_lower_bound": 31.3
+      },
+      "threshold_070": {
+        "detected": 10,
+        "recall_pct": 100.0,
+        "wilson_ci_95": [
+          72.2,
+          100.0
+        ],
+        "wilson_lower_bound": 72.2
+      }
+    }
+  },
+  "cases_detail": [
+    {
+      "case_id": "XLN-EN-001",
+      "pair": "ID-EN",
+      "domain": "Kecerdasan Buatan / NLP",
+      "source_lang": "id",
+      "submission_lang": "en",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.8728,
+      "percentage": 87.28,
+      "detected_075": true,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-EN-002",
+      "pair": "ID-EN",
+      "domain": "Teknologi Energi Bersih",
+      "source_lang": "id",
+      "submission_lang": "en",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.9087,
+      "percentage": 90.87,
+      "detected_075": true,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-EN-003",
+      "pair": "ID-EN",
+      "domain": "Epidemiologi Klinis",
+      "source_lang": "id",
+      "submission_lang": "en",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.9083,
+      "percentage": 90.83,
+      "detected_075": true,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-EN-004",
+      "pair": "ID-EN",
+      "domain": "Ekonomi Moneter",
+      "source_lang": "id",
+      "submission_lang": "en",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.8035,
+      "percentage": 80.35,
+      "detected_075": true,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-EN-005",
+      "pair": "ID-EN",
+      "domain": "Sains Material / Nanoteknologi",
+      "source_lang": "id",
+      "submission_lang": "en",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.8058,
+      "percentage": 80.58,
+      "detected_075": true,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-EN-006",
+      "pair": "ID-EN",
+      "domain": "Hukum Internasional",
+      "source_lang": "id",
+      "submission_lang": "en",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.8019,
+      "percentage": 80.19,
+      "detected_075": true,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-EN-007",
+      "pair": "ID-EN",
+      "domain": "Bioteknologi Pertanian",
+      "source_lang": "id",
+      "submission_lang": "en",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.8775,
+      "percentage": 87.75,
+      "detected_075": true,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-EN-008",
+      "pair": "ID-EN",
+      "domain": "Arsitektur Komputer",
+      "source_lang": "id",
+      "submission_lang": "en",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.7152,
+      "percentage": 71.52,
+      "detected_075": false,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-EN-009",
+      "pair": "ID-EN",
+      "domain": "Oseanografi Fisik",
+      "source_lang": "id",
+      "submission_lang": "en",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.8935,
+      "percentage": 89.35,
+      "detected_075": true,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-EN-010",
+      "pair": "ID-EN",
+      "domain": "Psikologi Kognitif",
+      "source_lang": "id",
+      "submission_lang": "en",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.8388,
+      "percentage": 83.88,
+      "detected_075": true,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-AR-001",
+      "pair": "ID-AR",
+      "domain": "Hukum Ekonomi Syariah",
+      "source_lang": "id",
+      "submission_lang": "ar",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.7765,
+      "percentage": 77.65,
+      "detected_075": true,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-AR-002",
+      "pair": "ID-AR",
+      "domain": "Ushul Fikih",
+      "source_lang": "id",
+      "submission_lang": "ar",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.7765,
+      "percentage": 77.65,
+      "detected_075": true,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-AR-003",
+      "pair": "ID-AR",
+      "domain": "Filologi Naskah Nusantara",
+      "source_lang": "id",
+      "submission_lang": "ar",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.734,
+      "percentage": 73.4,
+      "detected_075": false,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-AR-004",
+      "pair": "ID-AR",
+      "domain": "Filsafat Islam / Pemikiran",
+      "source_lang": "id",
+      "submission_lang": "ar",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.6758,
+      "percentage": 67.58,
+      "detected_075": false,
+      "detected_070": false
+    },
+    {
+      "case_id": "XLN-AR-005",
+      "pair": "ID-AR",
+      "domain": "Kaidah Fikih Lingkungan",
+      "source_lang": "id",
+      "submission_lang": "ar",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.4716,
+      "percentage": 47.16,
+      "detected_075": false,
+      "detected_070": false
+    },
+    {
+      "case_id": "XLN-AR-006",
+      "pair": "ID-AR",
+      "domain": "Linguistik Bahasa Semit",
+      "source_lang": "id",
+      "submission_lang": "ar",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.8122,
+      "percentage": 81.22,
+      "detected_075": true,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-AR-007",
+      "pair": "ID-AR",
+      "domain": "Studi Astronomi Falak",
+      "source_lang": "id",
+      "submission_lang": "ar",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.8053,
+      "percentage": 80.53,
+      "detected_075": true,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-AR-008",
+      "pair": "ID-AR",
+      "domain": "Hukum Waris / Faraidh",
+      "source_lang": "id",
+      "submission_lang": "ar",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.8282,
+      "percentage": 82.82,
+      "detected_075": true,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-AR-009",
+      "pair": "ID-AR",
+      "domain": "Etika Kedokteran Islam",
+      "source_lang": "id",
+      "submission_lang": "ar",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.7905,
+      "percentage": 79.05,
+      "detected_075": true,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-AR-010",
+      "pair": "ID-AR",
+      "domain": "Sejarah Maritim Timur Tengah - Nusantara",
+      "source_lang": "id",
+      "submission_lang": "ar",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.8431,
+      "percentage": 84.31,
+      "detected_075": true,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-ZH-001",
+      "pair": "ID-ZH",
+      "domain": "Rantai Pasok Industri Global",
+      "source_lang": "id",
+      "submission_lang": "zh",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.8737,
+      "percentage": 87.37,
+      "detected_075": true,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-ZH-002",
+      "pair": "ID-ZH",
+      "domain": "Teknologi Baterai Kendaraan Listrik",
+      "source_lang": "id",
+      "submission_lang": "zh",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.8355,
+      "percentage": 83.55,
+      "detected_075": true,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-ZH-003",
+      "pair": "ID-ZH",
+      "domain": "Hubungan Internasional / Perdagangan Bebas",
+      "source_lang": "id",
+      "submission_lang": "zh",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.8409,
+      "percentage": 84.09,
+      "detected_075": true,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-ZH-004",
+      "pair": "ID-ZH",
+      "domain": "Ekonomi Digital / E-Commerce",
+      "source_lang": "id",
+      "submission_lang": "zh",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.8281,
+      "percentage": 82.81,
+      "detected_075": true,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-ZH-005",
+      "pair": "ID-ZH",
+      "domain": "Teknik Sipil / Kereta Cepat",
+      "source_lang": "id",
+      "submission_lang": "zh",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.8255,
+      "percentage": 82.55,
+      "detected_075": true,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-ZH-006",
+      "pair": "ID-ZH",
+      "domain": "Sosiologi Urban / Demografi",
+      "source_lang": "id",
+      "submission_lang": "zh",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.9079,
+      "percentage": 90.79,
+      "detected_075": true,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-ZH-007",
+      "pair": "ID-ZH",
+      "domain": "Teknologi Komunikasi 5G/6G",
+      "source_lang": "id",
+      "submission_lang": "zh",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.7648,
+      "percentage": 76.48,
+      "detected_075": true,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-ZH-008",
+      "pair": "ID-ZH",
+      "domain": "Pertanian Presisi",
+      "source_lang": "id",
+      "submission_lang": "zh",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.8821,
+      "percentage": 88.21,
+      "detected_075": true,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-ZH-009",
+      "pair": "ID-ZH",
+      "domain": "Hukum Maritim Internasional",
+      "source_lang": "id",
+      "submission_lang": "zh",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.8943,
+      "percentage": 89.43,
+      "detected_075": true,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-ZH-010",
+      "pair": "ID-ZH",
+      "domain": "Kecerdasan Buatan / Visi Komputer",
+      "source_lang": "id",
+      "submission_lang": "zh",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.8013,
+      "percentage": 80.13,
+      "detected_075": true,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-NL-001",
+      "pair": "ID-NL",
+      "domain": "Hukum Perikatan Perdata",
+      "source_lang": "id",
+      "submission_lang": "nl",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.8655,
+      "percentage": 86.55,
+      "detected_075": true,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-NL-002",
+      "pair": "ID-NL",
+      "domain": "Hukum Perbuatan Melawan Hukum",
+      "source_lang": "id",
+      "submission_lang": "nl",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.8805,
+      "percentage": 88.05,
+      "detected_075": true,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-NL-003",
+      "pair": "ID-NL",
+      "domain": "Sejarah Agraria Hindia Belanda",
+      "source_lang": "id",
+      "submission_lang": "nl",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.8918,
+      "percentage": 89.18,
+      "detected_075": true,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-NL-004",
+      "pair": "ID-NL",
+      "domain": "Hukum Pidana / Asas Legalitas",
+      "source_lang": "id",
+      "submission_lang": "nl",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.8345,
+      "percentage": 83.45,
+      "detected_075": true,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-NL-005",
+      "pair": "ID-NL",
+      "domain": "Arsitektur Kolonial Tropis",
+      "source_lang": "id",
+      "submission_lang": "nl",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.6438,
+      "percentage": 64.38,
+      "detected_075": false,
+      "detected_070": false
+    },
+    {
+      "case_id": "XLN-NL-006",
+      "pair": "ID-NL",
+      "domain": "Tata Kelola Pengairan / Irigasi",
+      "source_lang": "id",
+      "submission_lang": "nl",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.6616,
+      "percentage": 66.16,
+      "detected_075": false,
+      "detected_070": false
+    },
+    {
+      "case_id": "XLN-NL-007",
+      "pair": "ID-NL",
+      "domain": "Hukum Kepailitan",
+      "source_lang": "id",
+      "submission_lang": "nl",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.7307,
+      "percentage": 73.07,
+      "detected_075": false,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-NL-008",
+      "pair": "ID-NL",
+      "domain": "Historiografi Arsip Dagang VOC",
+      "source_lang": "id",
+      "submission_lang": "nl",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.784,
+      "percentage": 78.4,
+      "detected_075": true,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-NL-009",
+      "pair": "ID-NL",
+      "domain": "Hukum Tata Negara Komparatif",
+      "source_lang": "id",
+      "submission_lang": "nl",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.9362,
+      "percentage": 93.62,
+      "detected_075": true,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-NL-010",
+      "pair": "ID-NL",
+      "domain": "Linguistik Serapan",
+      "source_lang": "id",
+      "submission_lang": "nl",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.8548,
+      "percentage": 85.48,
+      "detected_075": true,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-DE-001",
+      "pair": "ID-DE",
+      "domain": "Filsafat Hermeneutika",
+      "source_lang": "id",
+      "submission_lang": "de",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.8287,
+      "percentage": 82.87,
+      "detected_075": true,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-DE-002",
+      "pair": "ID-DE",
+      "domain": "Teknik Manufaktur Otomotif",
+      "source_lang": "id",
+      "submission_lang": "de",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.7304,
+      "percentage": 73.04,
+      "detected_075": false,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-DE-003",
+      "pair": "ID-DE",
+      "domain": "Sosiologi Kritis (Frankfurt School)",
+      "source_lang": "id",
+      "submission_lang": "de",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.8166,
+      "percentage": 81.66,
+      "detected_075": true,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-DE-004",
+      "pair": "ID-DE",
+      "domain": "Fisika Kuantum",
+      "source_lang": "id",
+      "submission_lang": "de",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.8368,
+      "percentage": 83.68,
+      "detected_075": true,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-DE-005",
+      "pair": "ID-DE",
+      "domain": "Psikologi Eksperimental",
+      "source_lang": "id",
+      "submission_lang": "de",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.7452,
+      "percentage": 74.52,
+      "detected_075": false,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-DE-006",
+      "pair": "ID-DE",
+      "domain": "Hukum Perdata Komparatif (BGB)",
+      "source_lang": "id",
+      "submission_lang": "de",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.7696,
+      "percentage": 76.96,
+      "detected_075": true,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-DE-007",
+      "pair": "ID-DE",
+      "domain": "Teknik Otomasi Industri",
+      "source_lang": "id",
+      "submission_lang": "de",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.7159,
+      "percentage": 71.59,
+      "detected_075": false,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-DE-008",
+      "pair": "ID-DE",
+      "domain": "Imunologi / Biologi Molekuler",
+      "source_lang": "id",
+      "submission_lang": "de",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.8708,
+      "percentage": 87.08,
+      "detected_075": true,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-DE-009",
+      "pair": "ID-DE",
+      "domain": "Sejarah Filsafat Modern",
+      "source_lang": "id",
+      "submission_lang": "de",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.7361,
+      "percentage": 73.61,
+      "detected_075": false,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-DE-010",
+      "pair": "ID-DE",
+      "domain": "Teknologi Metalurgi Presisi",
+      "source_lang": "id",
+      "submission_lang": "de",
+      "is_plagiarized": true,
+      "cosine_similarity": 0.7531,
+      "percentage": 75.31,
+      "detected_075": true,
+      "detected_070": true
+    },
+    {
+      "case_id": "XLN-NEG-001",
+      "pair": "EN-CLEAN",
+      "domain": "Astrofisika Radio",
+      "source_lang": "id",
+      "submission_lang": "en",
+      "is_plagiarized": false,
+      "cosine_similarity": -0.0844,
+      "percentage": -8.44,
+      "detected_075": false,
+      "detected_070": false
+    },
+    {
+      "case_id": "XLN-NEG-002",
+      "pair": "EN-CLEAN",
+      "domain": "Seni Rupa Abad Pertengahan",
+      "source_lang": "id",
+      "submission_lang": "en",
+      "is_plagiarized": false,
+      "cosine_similarity": 0.0518,
+      "percentage": 5.18,
+      "detected_075": false,
+      "detected_070": false
+    },
+    {
+      "case_id": "XLN-NEG-003",
+      "pair": "AR-CLEAN",
+      "domain": "Meteorologi Gurun",
+      "source_lang": "id",
+      "submission_lang": "ar",
+      "is_plagiarized": false,
+      "cosine_similarity": 0.0561,
+      "percentage": 5.61,
+      "detected_075": false,
+      "detected_070": false
+    },
+    {
+      "case_id": "XLN-NEG-004",
+      "pair": "AR-CLEAN",
+      "domain": "Geologi Hidrologi",
+      "source_lang": "id",
+      "submission_lang": "ar",
+      "is_plagiarized": false,
+      "cosine_similarity": 0.0479,
+      "percentage": 4.79,
+      "detected_075": false,
+      "detected_070": false
+    },
+    {
+      "case_id": "XLN-NEG-005",
+      "pair": "ZH-CLEAN",
+      "domain": "Arkeologi Keramik Kuno",
+      "source_lang": "id",
+      "submission_lang": "zh",
+      "is_plagiarized": false,
+      "cosine_similarity": -0.1384,
+      "percentage": -13.84,
+      "detected_075": false,
+      "detected_070": false
+    },
+    {
+      "case_id": "ZH-CLEAN-006",
+      "pair": "ZH-CLEAN",
+      "domain": "Seismologi Lempeng",
+      "source_lang": "id",
+      "submission_lang": "zh",
+      "is_plagiarized": false,
+      "cosine_similarity": -0.0224,
+      "percentage": -2.24,
+      "detected_075": false,
+      "detected_070": false
+    },
+    {
+      "case_id": "XLN-NEG-007",
+      "pair": "NL-CLEAN",
+      "domain": "Tata Rias Lanskap Belanda",
+      "source_lang": "id",
+      "submission_lang": "nl",
+      "is_plagiarized": false,
+      "cosine_similarity": 0.0807,
+      "percentage": 8.07,
+      "detected_075": false,
+      "detected_070": false
+    },
+    {
+      "case_id": "XLN-NEG-008",
+      "pair": "NL-CLEAN",
+      "domain": "Seni Lukis Klasik Belanda",
+      "source_lang": "id",
+      "submission_lang": "nl",
+      "is_plagiarized": false,
+      "cosine_similarity": 0.0405,
+      "percentage": 4.05,
+      "detected_075": false,
+      "detected_070": false
+    },
+    {
+      "case_id": "XLN-NEG-009",
+      "pair": "DE-CLEAN",
+      "domain": "Kehutanan Hutan Hitam",
+      "source_lang": "id",
+      "submission_lang": "de",
+      "is_plagiarized": false,
+      "cosine_similarity": 0.2274,
+      "percentage": 22.74,
+      "detected_075": false,
+      "detected_070": false
+    },
+    {
+      "case_id": "XLN-NEG-010",
+      "pair": "DE-CLEAN",
+      "domain": "Klimatologi Pegunungan Alpen",
+      "source_lang": "id",
+      "submission_lang": "de",
+      "is_plagiarized": false,
+      "cosine_similarity": -0.0788,
+      "percentage": -7.88,
+      "detected_075": false,
+      "detected_070": false
+    }
+  ]
+}
