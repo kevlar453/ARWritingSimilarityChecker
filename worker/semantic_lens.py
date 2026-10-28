@@ -272,7 +272,11 @@ class SemanticLens:
             return []
 
         cleaned = clean_chunk_text_for_embedding(query_text)
-        if len(cleaned.split()) < 15:
+        words_count = len(cleaned.split())
+        chars_count = len(cleaned.strip())
+        # Izinkan pemeriksaan jika memuat minimal 15 kata untuk teks ber-spasi,
+        # ATAU minimal 40 karakter non-spasi untuk aksara padat makna (Hanzi/Mandarin, Kanji, Thai, dll)
+        if words_count < 15 and chars_count < 40:
             return []
 
         vecs = self.embed_texts([cleaned])

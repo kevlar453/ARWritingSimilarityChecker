@@ -106,6 +106,24 @@ class SemanticVerifier:
                 })
                 scores.append(best_hit["score"])
 
+        # Lookup judul dokumen pembanding untuk transparansi pelaporan & lencana bahasa
+        if matched_chunks:
+            try:
+                from worker.database import get_connection
+                conn_t = get_connection()
+                cur_t = conn_t.cursor(dictionary=True)
+                m_ids = list({m["matched_document_id"] for m in matched_chunks if m.get("matched_document_id")})
+                if m_ids:
+                    fmt_ids = ','.join(['%s'] * len(m_ids))
+                    cur_t.execute(f"SELECT id, title FROM documents WHERE id IN ({fmt_ids})", tuple(m_ids))
+                    doc_titles = {r["id"]: r["title"] for r in cur_t.fetchall()}
+                    for m in matched_chunks:
+                        m["source_title"] = doc_titles.get(m["matched_document_id"])
+                cur_t.close()
+                conn_t.close()
+            except Exception:
+                pass
+
         # Kalkulasi skor semantik agregat
         semantic_score = 0.0
         max_cosine = 0.0

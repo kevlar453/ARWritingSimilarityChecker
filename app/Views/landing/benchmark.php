@@ -988,13 +988,16 @@
             </div>
 
             <div class="btn-group">
-                <a href="<?= base_url('datasets/artilik_indonesia_targeted_contextual_80_cases.json') ?>" download="artilik_indonesia_targeted_contextual_80_cases.json" target="_blank" class="btn-primary">
+                <a href="<?= base_url('datasets/artilik_cross_lingual_benchmark_dataset.json') ?>" download="artilik_cross_lingual_60_cases_benchmark.json" target="_blank" class="btn-primary" style="background: #0284c7;">
                     <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                    <span>Unduh Dataset 80 Kasus (JSON)</span>
+                    <span>Unduh Dataset Lintas Bahasa 60 Kasus (JSON)</span>
+                </a>
+                <a href="#unduh" class="btn-secondary">
+                    <span>Lihat Semua Dataset (JSON)</span>
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
                 </a>
                 <a href="#mismatch" class="btn-secondary">
-                    <span>Lihat 14 Kasus Mismatch Sistem</span>
-                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
+                    <span>Lihat 14 Mismatch</span>
                 </a>
             </div>
         </div>
@@ -1323,7 +1326,7 @@ guna menguji pengaruh variabel independen terhadap variabel dependen dengan tara
                 <div class="callout-text">
                     <h4 style="margin: 0 0 6px 0; font-size: 15px; color: #1e1b4b; font-weight: 800;">Headline Kejujuran Ilmiah Hasil Evaluasi</h4>
                     <p style="margin: 0; font-size: 13.5px; line-height: 1.65; color: #312e81;">
-                        <strong>Lensa Semantik menyelesaikan parafrase ringan (93,3%) dan lintas bahasa (93,3%), memangkas separuh parafrase sedang (53,3%), dan hampir tidak menyentuh parafrase agresif (6,7% pada ambang 0,75, atau 33,3% pada 0,70).</strong> Ini adalah lompatan besar dibanding mesin leksikal yang mengalami kebutaan total (0%), namun batas jujurnya tetap nyata: parafrase agresif dan metaforis tetap menjadi medan terbuka dalam perlombaan senjata deteksi teks.
+                        <strong>Lensa Semantik menyelesaikan parafrase ringan (93,3%) dan lintas bahasa (78,0%–92,0% pada evaluasi N=50 komprehensif), memangkas separuh parafrase sedang (53,3%), dan hampir tidak menyentuh parafrase agresif (6,7% pada ambang 0,75, atau 33,3% pada 0,70).</strong> Ini adalah lompatan besar dibanding mesin leksikal yang mengalami kebutaan total (0%), namun batas jujurnya tetap nyata: parafrase agresif dan metaforis tetap menjadi medan terbuka dalam perlombaan senjata deteksi teks.
                     </p>
                 </div>
             </div>
@@ -1481,7 +1484,7 @@ guna menguji pengaruh variabel independen terhadap variabel dependen dengan tara
                             <td style="text-align: center; font-weight: 800; color: var(--accent-emerald);">0 / 20 Alarm Palsu</td>
                         </tr>
                         <tr>
-                            <td><strong>Uji Lintas Bahasa (Cross-Lingual)</strong> (15 Kasus)</td>
+                            <td><strong>Uji Lintas Bahasa (Cross-Lingual Pilot - N=15)*</strong></td>
                             <td>Indonesia vs Inggris, Arab, Mandarin, Belanda, Jerman</td>
                             <td style="text-align: center; color: var(--accent-rose); font-weight: 700;">0.0%</td>
                             <td style="text-align: center; color: #4f46e5; font-weight: 800;">85.3%</td>
@@ -1491,6 +1494,9 @@ guna menguji pengaruh variabel independen terhadap variabel dependen dengan tara
                     </tbody>
                 </table>
             </div>
+            <p style="font-size: 12px; color: var(--muted); margin-top: 6px; font-style: italic;">
+                *<strong>Anotasi Metodologi Penggantian Data:</strong> Angka 93,3% pada baris uji lintas bahasa di atas merupakan hasil studi percontohan awal (pilot study, N=15 kasus, 3 kasus/pasangan) dari dataset benchmark perintis. Angka tersebut secara resmi telah <strong>diperluas dan digantikan oleh Evaluasi Komprehensif Fase 3</strong> pada Bagian 3 di bawah ($N=50$ kasus terarah + 10 kontrol negatif), yang mencatat daya tangkap komprehensif 78,0% pada ambang standar 0,75 dan 92,0% pada ambang penyelidikan 0,70. Kami mempertahankan baris pilot 15 kasus pada tabel perbandingan ini semata-mata demi integritas riwayat ilmiah dataset versi 1.1.
+            </p>
 
             <!-- Tabel 3: Validasi Lintas Bahasa per Pasangan Bahasa (Fase 3 - N=10 per Bahasa) -->
             <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin: 32px 0 12px 0;">
@@ -1541,7 +1547,7 @@ guna menguji pengaruh variabel independen terhadap variabel dependen dengan tara
                             </td>
                             <td>
                                 <span style="font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #dcfce7; color: #166534; font-weight: 800;">
-                                    Tervalidasi Kuat (N=10, LB 72%)
+                                    Tervalidasi Terarah (N=10, LB 72%)
                                 </span>
                             </td>
                         </tr>
@@ -1651,9 +1657,21 @@ guna menguji pengaruh variabel independen terhadap variabel dependen dengan tara
                     </p>
                 </div>
             </div>
-            <p style="font-size: 12px; color: var(--text-muted); margin-top: 10px; font-style: italic;">
-                *Catatan metodologis: Nilai $N=10$ adalah batas uji terarah minimum. Sesuai interval kepercayaan Wilson 95%, skor 10/10 tetap menyisakan ambang bawah statistik 72,2%. Oleh sebab itu, AR Tilik menggunakan label jujur "Tervalidasi Terarah (N=10)" dan mencantumkan batas bawah interval pada setiap pasangan bahasa.
-            </p>
+            <div class="callout-box" style="background: #f8fafc; border: 1px solid #cbd5e1; border-left: 4px solid #64748b; margin-top: 14px;">
+                <div class="callout-icon">⚖️</div>
+                <div class="callout-text">
+                    <h4 style="margin: 0 0 6px 0; font-size: 13.5px; color: #1e293b; font-weight: 700;">Catatan Metodologi Wilson 95%, Batasan Peringkat, &amp; Skala Kematangan</h4>
+                    <p style="margin: 0 0 8px 0; font-size: 12.5px; line-height: 1.6; color: #334155;">
+                        <strong>1. Peringkat Antar Bahasa Tidak Boleh Diartikan Sebagai Hierarki Mutlak:</strong> Pada ukuran sampel terarah $N=10$ per pasangan bahasa, interval kepercayaan Wilson 95% saling bertumpang-tindih secara lebar (misalnya interval Jerman $[31{,}3\% - 83{,}2\%]$ pada ambang 0,75 bertumpukan dengan Belanda $[39{,}7\% - 89{,}2\%]$). Selisih satu atau dua kasus pada ukuran $N=10$ rentan terhadap variasi terminologi spesifik (*noise*), bukan bukti perbedaan keunggulan model yang permanen. Pembaca tidak boleh mengurutkan performa sebagai fakta kaku ($ZH > EN > NL \approx AR > DE$).
+                    </p>
+                    <p style="margin: 0; font-size: 12.5px; line-height: 1.6; color: #334155;">
+                        <strong>2. Penjelasan Skala Kategori Label:</strong><br>
+                        • <strong>Tervalidasi Terarah ($N=10$, LB $\ge 60\%$):</strong> Daya tangkap konsisten tinggi pada ambang standar 0,75 dengan batas bawah statistik $\ge 60\%$ (Mandarin, Inggris).<br>
+                        • <strong>Sensitif di Mode 0,70 ($N=10$):</strong> Memerlukan ambang penyelidikan 0,70 untuk mengimbangi pemadatan morfologi majemuk (*Komposita*), di mana recall melonjak signifikan dari 60% ke 100% dengan LB 72,2% (Jerman).<br>
+                        • <strong>Indikasi Terarah ($N=10$, LB $\sim 40\%$):</strong> Menunjukkan sinyal semantik terarah pada naskah hukum dan keagamaan klasik, namun rentang kosinus dipengaruhi peristilahan arkais/filologis khusus (Belanda, Arab).
+                    </p>
+                </div>
+            </div>
 
             <!-- 4. Transparansi Kasus Batas / Kegagalan Semantik Terbuka -->
             <h3 style="font-size: 17px; font-weight: 800; color: var(--dark); margin: 28px 0 12px 0;">4. Transparansi Titik Kegagalan Mesin: Di Mana Lensa Semantik Mengalami Batas?</h3>
@@ -1849,9 +1867,17 @@ docker compose -f docker-compose.yml up -d
             </p>
 
             <div class="btn-group" style="justify-content: center; flex-wrap: wrap; gap: 12px;">
+                <a href="<?= base_url('datasets/artilik_cross_lingual_benchmark_dataset.json') ?>" download="artilik_cross_lingual_60_cases_benchmark.json" target="_blank" class="btn-primary" style="background: #0284c7;">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    <span>Unduh Dataset Lintas Bahasa (60 Kasus JSON)</span>
+                </a>
+                <a href="<?= base_url('datasets/artilik_cross_lingual_calibration_report.json') ?>" download="artilik_cross_lingual_calibration_report.json" target="_blank" class="btn-secondary" style="border-color: #0284c7; color: #0284c7;">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    <span>Unduh Laporan Kalibrasi Wilson (JSON)</span>
+                </a>
                 <a href="<?= base_url('datasets/artilik_semantic_paraphrase_benchmark.json') ?>" download="artilik_semantic_paraphrase_80_cases.json" target="_blank" class="btn-primary" style="background: #4f46e5;">
                     <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                    <span>Unduh Dataset Parafrase Semantik 80 Kasus (JSON)</span>
+                    <span>Unduh Dataset Parafrase Semantik (80 Kasus JSON)</span>
                 </a>
                 <a href="<?= base_url('datasets/artilik_semantic_calibration_report.json') ?>" download="artilik_semantic_calibration_report.json" target="_blank" class="btn-secondary" style="border-color: #4f46e5; color: #4f46e5;">
                     <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
@@ -1859,16 +1885,18 @@ docker compose -f docker-compose.yml up -d
                 </a>
                 <a href="<?= base_url('datasets/artilik_indonesia_targeted_contextual_80_cases.json') ?>" download="artilik_indonesia_targeted_contextual_80_cases.json" target="_blank" class="btn-secondary">
                     <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                    <span>Unduh Dataset Terarah 80 Kasus (JSON)</span>
+                    <span>Unduh Dataset Terarah (80 Kasus JSON)</span>
                 </a>
                 <a href="<?= base_url('datasets/artilik_indonesia_academic_benchmark_500_cases.json') ?>" download="artilik_indonesia_academic_benchmark_500_cases.json" target="_blank" class="btn-secondary">
                     <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                    <span>Unduh Dataset Baseline 500 Kasus (JSON)</span>
+                    <span>Unduh Dataset Baseline (500 Kasus JSON)</span>
                 </a>
             </div>
 
             <div style="margin-top: 14px; font-size: 13px; color: var(--muted); line-height: 1.8;">
                 Tautan alternatif rute controller / API:<br>
+                <a href="<?= base_url('benchmark/dataset/cross_lingual_60') ?>" target="_blank" style="color: var(--primary); text-decoration: underline; margin: 0 6px;">/benchmark/dataset/cross_lingual_60</a> |
+                <a href="<?= base_url('benchmark/dataset/cross_lingual_report') ?>" target="_blank" style="color: var(--primary); text-decoration: underline; margin: 0 6px;">/benchmark/dataset/cross_lingual_report</a> |
                 <a href="<?= base_url('benchmark/dataset/semantic_80') ?>" target="_blank" style="color: var(--primary); text-decoration: underline; margin: 0 6px;">/benchmark/dataset/semantic_80</a> |
                 <a href="<?= base_url('benchmark/dataset/semantic_report') ?>" target="_blank" style="color: var(--primary); text-decoration: underline; margin: 0 6px;">/benchmark/dataset/semantic_report</a> |
                 <a href="<?= base_url('benchmark/dataset/targeted_80') ?>" target="_blank" style="color: var(--primary); text-decoration: underline; margin: 0 6px;">/benchmark/dataset/targeted_80</a> |

@@ -2247,6 +2247,9 @@ $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evi
         <!-- ═════════════════════════════════════════════════════════════════════ -->
         <!-- PILAR: KEMIRIPAN MAKNA & DETEKSI PARAFRASE (LENSA SEMANTIK MiniLM-L12) -->
         <!-- ═════════════════════════════════════════════════════════════════════ -->
+        <?php
+            $semanticLens = $semanticLens ?? ($evidenceData['semantic_lens'] ?? null);
+        ?>
         <?php if (!empty($semanticLens)): ?>
         <?php
             $semScore = (float)($semanticLens['semantic_score'] ?? 0.0);
@@ -2425,8 +2428,20 @@ $corpusCount = (int) ($corpusCount ?? $evidenceData['corpus_docs_count'] ?? $evi
                     <?php foreach ($allVariantMatches as $sm): ?>
                     <?php
                         $matchScore = (float)($sm['semantic_score'] ?? (($sm['cosine_similarity'] ?? 0.0) * 100));
-                        $srcDocTitle = $sm['source_title'] ?? ('Dokumen Korpus #' . ($sm['source_document_id'] ?? ($sm['matched_document_id'] ?? '?')));
                         $srcDocId = (int)($sm['source_document_id'] ?? ($sm['matched_document_id'] ?? 0));
+                        $srcDocTitle = $sm['source_title'] ?? null;
+                        if (empty($srcDocTitle) && $srcDocId > 0) {
+                            try {
+                                $dbDoc = \Config\Database::connect();
+                                $docRow = $dbDoc->table('documents')->select('title')->where('id', $srcDocId)->get()->getFirstRow('array');
+                                if ($docRow && !empty($docRow['title'])) {
+                                    $srcDocTitle = $docRow['title'];
+                                }
+                            } catch (\Throwable $e) {}
+                        }
+                        if (empty($srcDocTitle)) {
+                            $srcDocTitle = 'Dokumen Korpus #' . ($srcDocId > 0 ? $srcDocId : '?');
+                        }
                         $subSnippet = $sm['submission_text'] ?? ($sm['submission_preview'] ?? '');
                         $srcSnippet = $sm['matched_corpus_preview'] ?? ($sm['matched_preview'] ?? '');
                         $pageNum = (int)($sm['page_number'] ?? ($sm['submission_page'] ?? 1));
