@@ -1629,9 +1629,9 @@ guna menguji pengaruh variabel independen terhadap variabel dependen dengan tara
                         </tr>
                         <tr style="background: rgba(254, 242, 242, 0.65);">
                             <td><strong>Indonesia ↔ Latin (LA)</strong><br><span style="font-size: 11px; color: #be123c; font-weight: 700;">Batas Kapabilitas Terbuka</span></td>
-                            <td>Vulgata Kitab Suci (Kejadian, Mazmur, Injil), Liturgi Katolik (Pater Noster, Credo), Hukum Romawi Klasik (Ulpianus)</td>
+                            <td>Vulgata Kitab Suci (Kejadian, Mazmur, Injil), Liturgi Katolik &amp; Devosi, Doktrin Skolastik Aquinas (kontrol: Cicero)</td>
                             <td style="text-align: center; font-mono-code; font-weight: 700; color: #991b1b;">0.3019</td>
-                            <td style="text-align: center; font-mono-code; font-size: 12px; color: #991b1b;">0.18 .. 0.41</td>
+                            <td style="text-align: center; font-mono-code; font-size: 12px; color: #991b1b;">0.21 .. 0.49</td>
                             <td style="text-align: center; font-weight: 800; color: #991b1b;">
                                 0 / 10 (0.0%)<br>
                                 <span style="font-size: 10px; color: #be123c; font-weight: 600;">Wilson: 0,0% – 27,8%</span>
@@ -1681,8 +1681,8 @@ guna menguji pengaruh variabel independen terhadap variabel dependen dengan tara
                         🏛️ Batas Kapabilitas Terbuka: Bahasa Latin Klasik ($N=10$)
                     </h4>
                     <p style="font-size: 12px; color: #881337; line-height: 1.6; margin: 0;">
-                        * <strong>Distingsi Bahasa vs Rumpun Aksara</strong>: Istilah <em>Aksara Latin</em> merujuk pada alfabet fonetik bahasa modern (EN, NL, DE). Sedangkan <strong>Bahasa Latin Klasik/Gerejawi (LA)</strong> diuji secara terpisah pada 10 teks kanonik (Kitab Suci Vulgata, liturgi Katolik, dan asas hukum Romawi).<br>
-                        * <strong>Hasil Kalibrasi Empiris</strong>: Rerata kosinus hanya <strong>$0{,}3019$</strong> (rentang 0,18 .. 0,41) dengan Recall <strong>$0{,}0\%$</strong> pada ambang $0{,}75$ maupun $0{,}70$ (batas bawah Wilson $0{,}0\%$).<br>
+                        * <strong>Distingsi Bahasa vs Rumpun Aksara</strong>: Istilah <em>Aksara Latin</em> merujuk pada alfabet fonetik bahasa modern (EN, NL, DE). Sedangkan <strong>Bahasa Latin Klasik/Gerejawi (LA)</strong> diuji secara terpisah pada 10 teks kanonik (Vulgata Kitab Suci, liturgi Katolik, dan doktrin skolastik Thomas Aquinas; dengan pidato Cicero sebagai kontrol).<br>
+                        * <strong>Hasil Kalibrasi Empiris</strong>: Rerata kosinus sebesar <strong>$0{,}3019$</strong> (rentang persis $0{,}2068$ .. $0{,}4926$; puncak retrieval $0{,}4926$ pada Vulgata Mazmur 23:1) dengan Recall <strong>$0{,}0\%$</strong> pada ambang $0{,}75$ maupun $0{,}70$ (batas bawah Wilson $0{,}0\%$). Puncak 0,4926 membuktikan bahwa sinyal retrieval ada namun tertahan di bawah ambang operasional model modern.<br>
                         * <strong>Prinsip Keterbukaan Ilmiah</strong>: MiniLM-L12 tidak dilatih untuk proyeksi bahasa klasik/mati. AR Tilik menetapkan Bahasa Latin berstatus <strong>Tanpa Lencana</strong>. Pada konteks kampus teologi/liturgi (seperti karya akademik di STAKat Negeri Pontianak), kutipan teks Latin dilindungi melalui <strong>Lensa 1 Exact Matcher</strong> dan deteksi sitasi resmi, bukan proyeksi semantik.
                     </p>
                 </div>
@@ -1911,6 +1911,10 @@ docker compose -f docker-compose.yml up -d
                 <a href="<?= base_url('datasets/artilik_latin_benchmark_dataset.json') ?>" download="artilik_latin_12_cases_benchmark.json" target="_blank" class="btn-secondary" style="border-color: #be123c; color: #be123c; background: #fff1f2;">
                     <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                     <span>Unduh Dataset Batas Latin (12 Kasus JSON)</span>
+                </a>
+                <a href="<?= base_url('datasets/artilik_latin_calibration_report.json') ?>" download="artilik_latin_calibration_report.json" target="_blank" class="btn-secondary" style="border-color: #be123c; color: #be123c;">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    <span>Unduh Laporan Kalibrasi Latin (JSON)</span>
                 </a>
                 <a href="<?= base_url('datasets/artilik_semantic_paraphrase_benchmark.json') ?>" download="artilik_semantic_paraphrase_80_cases.json" target="_blank" class="btn-primary" style="background: #4f46e5;">
                     <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
