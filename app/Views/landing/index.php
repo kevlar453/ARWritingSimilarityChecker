@@ -3328,8 +3328,8 @@
             <div class="spotlight-card" data-aos="fade-up" data-aos-duration="800">
                 <div class="spotlight-img-wrap" data-aos="fade-right" data-aos-delay="100" data-aos-duration="800">
                     <picture>
-                        <source srcset="<?= base_url('images/dual_lens_concept.webp') ?>" type="image/webp">
-                        <img src="<?= base_url('images/dual_lens_concept.jpg') ?>" alt="Konsep Arsitektur Tiga Lensa AR Tilik" loading="lazy" width="800" height="450">
+                        <source srcset="<?= base_url('images/three_lens_concept.webp') ?>" type="image/webp">
+                        <img src="<?= base_url('images/three_lens_concept.jpg') ?>" alt="Konsep Arsitektur Tiga Lensa AR Tilik" loading="lazy" width="800" height="450">
                     </picture>
                     <div class="spotlight-caption">
                         <span>LENSA 1: Sequential 5-Gram</span>

@@ -1627,6 +1627,25 @@ guna menguji pengaruh variabel independen terhadap variabel dependen dengan tara
                                 </span>
                             </td>
                         </tr>
+                        <tr style="background: rgba(254, 242, 242, 0.65);">
+                            <td><strong>Indonesia ↔ Latin (LA)</strong><br><span style="font-size: 11px; color: #be123c; font-weight: 700;">Batas Kapabilitas Terbuka</span></td>
+                            <td>Vulgata Kitab Suci (Kejadian, Mazmur, Injil), Liturgi Katolik (Pater Noster, Credo), Hukum Romawi Klasik (Ulpianus)</td>
+                            <td style="text-align: center; font-mono-code; font-weight: 700; color: #991b1b;">0.3019</td>
+                            <td style="text-align: center; font-mono-code; font-size: 12px; color: #991b1b;">0.18 .. 0.41</td>
+                            <td style="text-align: center; font-weight: 800; color: #991b1b;">
+                                0 / 10 (0.0%)<br>
+                                <span style="font-size: 10px; color: #be123c; font-weight: 600;">Wilson: 0,0% – 27,8%</span>
+                            </td>
+                            <td style="text-align: center; font-weight: 800; color: #991b1b;">
+                                0 / 10 (0.0%)<br>
+                                <span style="font-size: 10px; color: #be123c; font-weight: 600;">Wilson: 0,0% – 27,8%</span>
+                            </td>
+                            <td>
+                                <span style="font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #fee2e2; color: #991b1b; font-weight: 800;">
+                                    Tanpa Lencana (Di Luar Jangkauan MiniLM-L12)
+                                </span>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -1635,7 +1654,7 @@ guna menguji pengaruh variabel independen terhadap variabel dependen dengan tara
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; margin-top: 16px;">
                 <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; p: 14px; padding: 14px;">
                     <h4 style="font-size: 13px; font-weight: 800; color: var(--dark); margin: 0 0 6px 0;">
-                        🔍 Temuan Pergeseran Aksara (Latin vs Non-Latin)
+                        🔍 Temuan Pergeseran Aksara (Aksara Latin vs Non-Latin)
                     </h4>
                     <p style="font-size: 12px; color: var(--text); line-height: 1.6; margin: 0;">
                         * <strong>Rumpun Aksara Latin (EN, NL, DE)</strong>: Rerata kosinus $0{,}8104$ | Recall@0.75: $73{,}3\%$ | Recall@0.70: $93{,}3\%$.<br>
@@ -1654,6 +1673,17 @@ guna menguji pengaruh variabel independen terhadap variabel dependen dengan tara
                         * <strong>Kosinus Puncak Terbersih</strong>: $0{,}2274$ (22,7%)<br>
                         * <strong>False Positive Rate</strong>: $0{,}0\%$ pada ambang $0{,}75$ dan $0{,}0\%$ pada ambang $0{,}70$.<br>
                         * <strong>Margin Keamanan Anti-Salah-Tuduh</strong>: $+47{,}3$ poin ke ambang $0{,}70$ dan $+52{,}3$ poin ke ambang $0{,}75$.
+                    </p>
+                </div>
+
+                <div style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: 12px; padding: 14px;">
+                    <h4 style="font-size: 13px; font-weight: 800; color: #9f1239; margin: 0 0 6px 0;">
+                        🏛️ Batas Kapabilitas Terbuka: Bahasa Latin Klasik ($N=10$)
+                    </h4>
+                    <p style="font-size: 12px; color: #881337; line-height: 1.6; margin: 0;">
+                        * <strong>Distingsi Bahasa vs Rumpun Aksara</strong>: Istilah <em>Aksara Latin</em> merujuk pada alfabet fonetik bahasa modern (EN, NL, DE). Sedangkan <strong>Bahasa Latin Klasik/Gerejawi (LA)</strong> diuji secara terpisah pada 10 teks kanonik (Kitab Suci Vulgata, liturgi Katolik, dan asas hukum Romawi).<br>
+                        * <strong>Hasil Kalibrasi Empiris</strong>: Rerata kosinus hanya <strong>$0{,}3019$</strong> (rentang 0,18 .. 0,41) dengan Recall <strong>$0{,}0\%$</strong> pada ambang $0{,}75$ maupun $0{,}70$ (batas bawah Wilson $0{,}0\%$).<br>
+                        * <strong>Prinsip Keterbukaan Ilmiah</strong>: MiniLM-L12 tidak dilatih untuk proyeksi bahasa klasik/mati. AR Tilik menetapkan Bahasa Latin berstatus <strong>Tanpa Lencana</strong>. Pada konteks kampus teologi/liturgi (seperti karya akademik di STAKat Negeri Pontianak), kutipan teks Latin dilindungi melalui <strong>Lensa 1 Exact Matcher</strong> dan deteksi sitasi resmi, bukan proyeksi semantik.
                     </p>
                 </div>
             </div>
@@ -1878,6 +1908,10 @@ docker compose -f docker-compose.yml up -d
                     <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                     <span>Unduh Laporan Kalibrasi Wilson (JSON)</span>
                 </a>
+                <a href="<?= base_url('datasets/artilik_latin_benchmark_dataset.json') ?>" download="artilik_latin_12_cases_benchmark.json" target="_blank" class="btn-secondary" style="border-color: #be123c; color: #be123c; background: #fff1f2;">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    <span>Unduh Dataset Batas Latin (12 Kasus JSON)</span>
+                </a>
                 <a href="<?= base_url('datasets/artilik_semantic_paraphrase_benchmark.json') ?>" download="artilik_semantic_paraphrase_80_cases.json" target="_blank" class="btn-primary" style="background: #4f46e5;">
                     <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                     <span>Unduh Dataset Parafrase Semantik (80 Kasus JSON)</span>
@@ -1900,6 +1934,8 @@ docker compose -f docker-compose.yml up -d
                 Tautan alternatif rute controller / API:<br>
                 <a href="<?= base_url('benchmark/dataset/cross_lingual_60') ?>" target="_blank" style="color: var(--primary); text-decoration: underline; margin: 0 6px;">/benchmark/dataset/cross_lingual_60</a> |
                 <a href="<?= base_url('benchmark/dataset/cross_lingual_report') ?>" target="_blank" style="color: var(--primary); text-decoration: underline; margin: 0 6px;">/benchmark/dataset/cross_lingual_report</a> |
+                <a href="<?= base_url('benchmark/dataset/latin_12') ?>" target="_blank" style="color: #be123c; text-decoration: underline; margin: 0 6px; font-weight: 700;">/benchmark/dataset/latin_12</a> |
+                <a href="<?= base_url('benchmark/dataset/latin_report') ?>" target="_blank" style="color: #be123c; text-decoration: underline; margin: 0 6px;">/benchmark/dataset/latin_report</a> |
                 <a href="<?= base_url('benchmark/dataset/semantic_80') ?>" target="_blank" style="color: var(--primary); text-decoration: underline; margin: 0 6px;">/benchmark/dataset/semantic_80</a> |
                 <a href="<?= base_url('benchmark/dataset/semantic_report') ?>" target="_blank" style="color: var(--primary); text-decoration: underline; margin: 0 6px;">/benchmark/dataset/semantic_report</a> |
                 <a href="<?= base_url('benchmark/dataset/targeted_80') ?>" target="_blank" style="color: var(--primary); text-decoration: underline; margin: 0 6px;">/benchmark/dataset/targeted_80</a> |
