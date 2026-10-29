@@ -30,6 +30,7 @@ class SendQuotaReminder extends BaseCommand
     protected $arguments = [];
     protected $options = [
         '--user_id' => 'Kirim atau pratinjau pengingat untuk ID pengguna tertentu (misal: --user_id=5)',
+        '--to'      => 'Kirim salinan surel ke alamat email tujuan tertentu (misal: --to=admin@domain.com)',
         '--preview' => 'Tampilkan pratinjau teks surel di konsol tanpa mengirim surel',
         '--force'   => 'Kirim paksa dengan mengabaikan status pengiriman sebelumnya (last_quota_reminder_sent_at)',
     ];
@@ -50,12 +51,16 @@ class SendQuotaReminder extends BaseCommand
         $db           = \Config\Database::connect();
 
         $targetUserId = CLI::getOption('user_id');
+        $overrideTo   = CLI::getOption('to');
         $isPreview    = (bool) CLI::getOption('preview');
         $isForce      = (bool) CLI::getOption('force');
 
         foreach (CLI::getOptions() as $optKey => $optVal) {
             if (str_starts_with($optKey, 'user_id=')) {
                 $targetUserId = substr($optKey, strlen('user_id='));
+            }
+            if (str_starts_with($optKey, 'to=')) {
+                $overrideTo = substr($optKey, strlen('to='));
             }
             if (str_starts_with($optKey, 'preview')) {
                 $isPreview = true;
@@ -146,12 +151,19 @@ class SendQuotaReminder extends BaseCommand
                 continue;
             }
 
-            $sent = $emailService->sendQuotaExhaustedEmail($u, $quotaInfo);
+            $uTarget = $u;
+            if (!empty($overrideTo)) {
+                $uTarget['email'] = trim((string) $overrideTo);
+                $uTarget['_is_test_copy'] = true;
+            }
+            $destEmail = $uTarget['email'];
+
+            $sent = $emailService->sendQuotaExhaustedEmail($uTarget, $quotaInfo);
             if ($sent) {
-                CLI::write("  [✓] Sukses terkirim ke {$uEmail}", 'green');
+                CLI::write("  [✓] Sukses terkirim ke {$destEmail}", 'green');
                 $successCount++;
             } else {
-                CLI::error("  [✗] Gagal mengirim ke {$uEmail}");
+                CLI::error("  [✗] Gagal mengirim ke {$destEmail}");
                 $failCount++;
             }
 

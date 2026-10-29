@@ -808,7 +808,7 @@ HTML;
             $sent = $email->send();
             if (! $sent) {
                 log_message('error', "Gagal mengirim pengingat kuota habis ke {$recipientEmail}: " . $email->printDebugger(['headers']));
-            } else {
+            } elseif (empty($user['_is_test_copy'])) {
                 $userModel->update($user['id'], [
                     'last_quota_reminder_sent_at' => date('Y-m-d H:i:s'),
                 ]);
