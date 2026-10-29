@@ -770,4 +770,258 @@ HTML;
 
         return $text;
     }
+
+    /**
+     * Mengirimkan surel Pengingat Kuota Habis di Tengah Pekan (Skenario 1)
+     */
+    public function sendQuotaExhaustedEmail(array $user, array $quotaInfo): bool
+    {
+        $email = Services::email();
+
+        $userModel = new \App\Models\UserModel();
+        $unsubToken = !empty($user['unsubscribe_token']) ? $user['unsubscribe_token'] : $userModel->getOrCreateUnsubscribeToken((int) $user['id']);
+        $unsubUrl = base_url("email/unsubscribe?token=" . urlencode($unsubToken) . "&type=quota");
+
+        $subject = 'Kuota Pemeriksaan Minggu Ini Telah Habis — Cara Menambah Kuota di AR Tilik';
+
+        $htmlMessage = $this->buildQuotaExhaustedTemplate($user, $quotaInfo, $unsubUrl);
+        $altMessage  = $this->buildQuotaExhaustedAltText($user, $quotaInfo, $unsubUrl);
+
+        $recipientEmail = $user['email'];
+
+        $configEmail = config('Email');
+        $fromEmail = !empty($configEmail->fromEmail) ? $configEmail->fromEmail : 'tilik@arsetontong.top';
+        $email->setFrom($fromEmail, 'Makarius Yuwono — AR Tilik');
+        $email->setReplyTo($fromEmail, 'Makarius Yuwono — AR Tilik');
+
+        $email->setTo($recipientEmail);
+        $email->setSubject($subject);
+        $email->setMessage($htmlMessage);
+        $email->setMailType('html');
+        $email->setAltMessage($altMessage);
+
+        // Header RFC 8058 One-Click Unsubscribe
+        $email->setHeader('List-Unsubscribe', "<{$unsubUrl}>");
+        $email->setHeader('List-Unsubscribe-Post', 'List-Unsubscribe=One-Click');
+
+        try {
+            $sent = $email->send();
+            if (! $sent) {
+                log_message('error', "Gagal mengirim pengingat kuota habis ke {$recipientEmail}: " . $email->printDebugger(['headers']));
+            } else {
+                $userModel->update($user['id'], [
+                    'last_quota_reminder_sent_at' => date('Y-m-d H:i:s'),
+                ]);
+            }
+            return (bool) $sent;
+        } catch (\Throwable $e) {
+            log_message('error', "Exception saat mengirim pengingat kuota habis ke {$recipientEmail}: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Menyusun templat HTML untuk surel Pengingat Kuota Habis di Tengah Pekan
+     */
+    protected function buildQuotaExhaustedTemplate(array $user, array $quotaInfo, string $unsubscribeUrl): string
+    {
+        $hour = (int) date('H');
+        if ($hour >= 5 && $hour < 11) {
+            $sapaanWaktu = 'pagi';
+        } elseif ($hour >= 11 && $hour < 15) {
+            $sapaanWaktu = 'siang';
+        } elseif ($hour >= 15 && $hour < 18) {
+            $sapaanWaktu = 'sore';
+        } else {
+            $sapaanWaktu = 'malam';
+        }
+
+        $nama = esc($user['name'] ?? 'Pengguna AR Tilik');
+        $freeLimit = (int) ($quotaInfo['free_limit'] ?? 3);
+        $freeUsed = max($freeLimit, (int) ($quotaInfo['free_used'] ?? $freeLimit));
+        $daysUntilReset = max(1, (int) ($quotaInfo['days_until_reset'] ?? 7));
+        $resetDateRaw = $quotaInfo['reset_date'] ?? date('Y-m-d 00:00:00', strtotime('next monday'));
+        $tanggalResetIndo = esc($this->formatTanggalIndoInternal($resetDateRaw));
+
+        $corpusCount = (int) ($quotaInfo['uploaded_corpus_count'] ?? $quotaInfo['corpus_count'] ?? 0);
+        $currentCycle = $corpusCount % 3;
+        $corpusToNext = (int) ($quotaInfo['corpus_to_next_bonus'] ?? (3 - $currentCycle));
+
+        $linkKorpus  = base_url('dashboard#tab-corpus');
+        $linkTopup   = base_url('dashboard');
+        $linkLaporan = base_url('dashboard?tab=documents');
+
+        return <<<HTML
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengingat Kuota Pemeriksaan — AR Tilik</title>
+</head>
+<body style="margin:0; padding:0; background-color:#f8fafc; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color:#1e293b; line-height: 1.6;">
+    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:#f8fafc; padding: 30px 15px;">
+        <tr>
+            <td align="center">
+                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #ffffff; border-radius: 14px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);">
+                    <!-- Header -->
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); padding: 24px 28px; text-align: left;">
+                            <div style="font-size: 20px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px;">⚖️ AR Tilik</div>
+                            <div style="font-size: 11px; color: #c7d2fe; margin-top: 2px;">Sistem Pemeriksa Kesamaan Naskah &amp; Integritas Akademik</div>
+                        </td>
+                    </tr>
+
+                    <!-- Body -->
+                    <tr>
+                        <td style="padding: 28px 28px 20px 28px;">
+                            <div style="display: inline-block; padding: 5px 12px; background-color: #fef3c7; color: #b45309; border-radius: 20px; font-size: 11px; font-weight: 700; margin-bottom: 14px; border: 1px solid #fde68a;">
+                                🔔 Pemberitahuan Status Kuota
+                            </div>
+
+                            <p style="font-size: 14px; color: #0f172a; margin: 0 0 14px 0;">
+                                Selamat {$sapaanWaktu}, <strong>{$nama}</strong>,
+                            </p>
+                            <p style="font-size: 13px; color: #475569; margin: 0 0 20px 0;">
+                                Kami menginformasikan bahwa kuota pemeriksaan naskah Anda untuk pekan ini telah terpakai seluruhnya (<strong>{$freeUsed} dari {$freeLimit} kuota gratis mingguan</strong>, sisa kuota saat ini: <strong>0 dokumen</strong>).
+                            </p>
+
+                            <!-- Jadwal Reset Otomatis -->
+                            <div style="background-color: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; padding: 16px 20px; margin-bottom: 22px;">
+                                <div style="font-size: 13px; font-weight: 700; color: #0f172a; margin-bottom: 6px;">🗓️ Kapan kuota gratis diisi ulang?</div>
+                                <p style="font-size: 13px; color: #334155; margin: 0; line-height: 1.6;">
+                                    Kuota gratis Anda sebesar <strong>3 dokumen</strong> akan kembali terisi penuh secara otomatis pada <strong>Senin, {$tanggalResetIndo} pukul 00:00 WIB</strong> (sekitar {$daysUntilReset} hari lagi).
+                                </p>
+                            </div>
+
+                            <div style="font-size: 14px; font-weight: 700; color: #0f172a; margin-bottom: 12px;">
+                                Masih perlu memeriksa naskah hari ini tanpa menunggu hari Senin?
+                            </div>
+
+                            <!-- Opsi 1: Gotong Royong Korpus (Gratis) -->
+                            <div style="background-color: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 12px; padding: 16px 18px; margin-bottom: 16px;">
+                                <div style="font-size: 13px; font-weight: 800; color: #065f46; margin-bottom: 6px;">
+                                    1. Jalur Gratis: Sumbang Korpus Ilmiah (+1 Kuota per 3 Korpus Valid)
+                                </div>
+                                <p style="font-size: 12.5px; color: #064e3b; margin: 0 0 10px 0; line-height: 1.6;">
+                                    Unggah artikel jurnal, skripsi, atau makalah ilmiah (PDF/DOCX/TXT) ke perpustakaan rujukan AR Tilik. Setiap <strong>3 naskah korpus valid</strong> yang belum pernah terdaftar akan langsung memberikan <strong>+1 kuota pemeriksaan gratis</strong> ke akun Anda.
+                                </p>
+                                <div style="font-size: 12px; color: #047857; background-color: #d1fae5; padding: 8px 12px; border-radius: 8px; margin-bottom: 12px;">
+                                    📊 <strong>Progres Anda saat ini:</strong> {$currentCycle}/3 dokumen — tinggal <strong>{$corpusToNext} korpus valid lagi</strong> untuk klaim +1 kuota gratis berikutnya!
+                                </div>
+                                <a href="{$linkKorpus}" style="display: inline-block; background-color: #059669; color: #ffffff; font-size: 12px; font-weight: 700; text-decoration: none; padding: 9px 18px; border-radius: 8px;">
+                                    ➕ Sumbang Korpus &amp; Klaim Kuota Gratis →
+                                </a>
+                            </div>
+
+                            <!-- Opsi 2: Top-Up Instan -->
+                            <div style="background-color: #eef2ff; border: 1px solid #c7d2fe; border-radius: 12px; padding: 16px 18px; margin-bottom: 22px;">
+                                <div style="font-size: 13px; font-weight: 800; color: #3730a3; margin-bottom: 6px;">
+                                    2. Jalur Instan: Top-Up Eceran atau Paket Pejuang Skripsi
+                                </div>
+                                <p style="font-size: 12.5px; color: #312e81; margin: 0 0 12px 0; line-height: 1.6;">
+                                    Butuh kuota cepat tanpa batas waktu mingguan? Tersedia <strong>Top-Up Eceran Rp10.000 (+5 submisi permanen)</strong> atau <strong>Paket Pejuang Skripsi Rp35.000 (+25 submisi)</strong>. Pembayaran via QRIS, Virtual Account, atau E-Wallet akan langsung mengkreditkan kuota secara otomatis dalam hitungan detik.
+                                </p>
+                                <a href="{$linkTopup}" style="display: inline-block; background-color: #4338ca; color: #ffffff; font-size: 12px; font-weight: 700; text-decoration: none; padding: 9px 18px; border-radius: 8px;">
+                                    ⚡ Lihat Pilihan Top-Up di Dasbor →
+                                </a>
+                            </div>
+
+                            <p style="font-size: 12.5px; color: #475569; margin: 0 0 18px 0; line-height: 1.6;">
+                                Seluruh laporan dan sertifikat dari dokumen yang telah Anda periksa sebelumnya tetap tersimpan aman dan dapat diunduh kapan saja melalui halaman <a href="{$linkLaporan}" style="color: #4338ca; font-weight: 600; text-decoration: underline;">Laporan Saya</a>.
+                            </p>
+
+                            <p style="font-size: 13px; color: #0f172a; margin: 0; line-height: 1.5;">
+                                Salam hangat,<br>
+                                <strong>Makarius Yuwono — AR Tilik</strong><br>
+                                <a href="https://tilik.arsetontong.top" style="color: #4338ca; text-decoration: none;">https://tilik.arsetontong.top</a>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- Footer Unsubscribe & Pengaturan -->
+                    <tr>
+                        <td style="background-color: #f8fafc; border-top: 1px solid #e2e8f0; padding: 20px 28px; text-align: center; font-size: 11px; color: #64748b; line-height: 1.6;">
+                            Surel ini dikirimkan satu kali saat kuota mingguan Anda mencapai batas pemakaian.<br>
+                            Jika tidak ingin menerima surel pengingat kuota lagi, Anda dapat <a href="{$unsubscribeUrl}" target="_blank" rel="noopener noreferrer" style="color: #4f46e5; font-weight: 600; text-decoration: underline;">berhenti berlangganan di sini</a> atau <a href="{$unsubscribeUrl}" target="_blank" rel="noopener noreferrer" style="color: #4f46e5; text-decoration: underline;">atur preferensi komunikasi surel Anda</a>.
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+HTML;
+    }
+
+    /**
+     * Menyusun versi teks polos (AltText) untuk surel Pengingat Kuota Habis
+     */
+    protected function buildQuotaExhaustedAltText(array $user, array $quotaInfo, string $unsubscribeUrl): string
+    {
+        $hour = (int) date('H');
+        if ($hour >= 5 && $hour < 11) {
+            $sapaanWaktu = 'pagi';
+        } elseif ($hour >= 11 && $hour < 15) {
+            $sapaanWaktu = 'siang';
+        } elseif ($hour >= 15 && $hour < 18) {
+            $sapaanWaktu = 'sore';
+        } else {
+            $sapaanWaktu = 'malam';
+        }
+
+        $nama = $user['name'] ?? 'Pengguna';
+        $freeLimit = (int) ($quotaInfo['free_limit'] ?? 3);
+        $freeUsed = max($freeLimit, (int) ($quotaInfo['free_used'] ?? $freeLimit));
+        $daysUntilReset = max(1, (int) ($quotaInfo['days_until_reset'] ?? 7));
+        $resetDateRaw = $quotaInfo['reset_date'] ?? date('Y-m-d 00:00:00', strtotime('next monday'));
+        $tanggalResetIndo = $this->formatTanggalIndoInternal($resetDateRaw);
+
+        $corpusCount = (int) ($quotaInfo['uploaded_corpus_count'] ?? $quotaInfo['corpus_count'] ?? 0);
+        $currentCycle = $corpusCount % 3;
+        $corpusToNext = (int) ($quotaInfo['corpus_to_next_bonus'] ?? (3 - $currentCycle));
+
+        $text = "Selamat {$sapaanWaktu}, {$nama},\n\n";
+        $text .= "Kami menginformasikan bahwa kuota pemeriksaan naskah Anda untuk pekan ini telah terpakai seluruhnya ({$freeUsed} dari {$freeLimit} kuota gratis mingguan, sisa kuota saat ini: 0 dokumen).\n\n";
+        $text .= "KAPAN KUOTA GRATIS DIISI ULANG?\n";
+        $text .= "Kuota gratis Anda sebesar 3 dokumen akan kembali terisi penuh secara otomatis pada Senin, {$tanggalResetIndo} pukul 00:00 WIB (sekitar {$daysUntilReset} hari lagi).\n\n";
+        $text .= "MASIH PERLU MEMERIKSA NASKAH HARI INI TANPA MENUNGGU HARI SENIN?\n\n";
+        $text .= "1. Jalur Gratis: Sumbang Korpus Ilmiah (+1 Kuota per 3 Korpus Valid)\n";
+        $text .= "   Unggah artikel jurnal, skripsi, atau makalah ilmiah ke perpustakaan rujukan AR Tilik. Setiap 3 naskah korpus valid memberikan +1 kuota pemeriksaan gratis.\n";
+        $text .= "   Progres Anda saat ini: {$currentCycle}/3 dokumen (tinggal {$corpusToNext} korpus valid lagi untuk klaim +1 kuota gratis).\n";
+        $text .= "   Sumbang korpus di: " . base_url('dashboard#tab-corpus') . "\n\n";
+        $text .= "2. Jalur Instan: Top-Up Eceran atau Paket Pejuang Skripsi\n";
+        $text .= "   Tersedia Top-Up Eceran Rp10.000 (+5 submisi permanen) atau Paket Pejuang Skripsi Rp35.000 (+25 submisi) yang langsung aktif otomatis via QRIS/Virtual Account.\n";
+        $text .= "   Buka Dasbor: " . base_url('dashboard') . "\n\n";
+        $text .= "Seluruh laporan dan sertifikat dari dokumen yang telah Anda periksa sebelumnya tetap tersimpan aman di: " . base_url('dashboard?tab=documents') . "\n\n";
+        $text .= "Salam hangat,\nMakarius Yuwono — AR Tilik\nhttps://tilik.arsetontong.top\n\n";
+        $text .= "---\n";
+        $text .= "Surel ini dikirimkan satu kali saat kuota mingguan Anda mencapai batas pemakaian.\n";
+        $text .= "Untuk berhenti berlangganan atau mengatur preferensi surel, kunjungi tautan berikut:\n";
+        $text .= "{$unsubscribeUrl}\n";
+
+        return $text;
+    }
+
+    /**
+     * Helper internal untuk memformat tanggal YYYY-MM-DD ke Bahasa Indonesia
+     */
+    protected function formatTanggalIndoInternal(string $dateStr): string
+    {
+        $bulanIndo = [
+            1 => 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+            'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+        ];
+
+        $time = strtotime($dateStr);
+        if (! $time) {
+            return $dateStr;
+        }
+        $d = (int) date('j', $time);
+        $m = (int) date('n', $time);
+        $y = date('Y', $time);
+
+        return "{$d} " . ($bulanIndo[$m] ?? date('M', $time)) . " {$y}";
+    }
 }

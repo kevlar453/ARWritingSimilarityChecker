@@ -23,7 +23,7 @@ class EmailPreferenceController extends BaseController
         if ($this->request->getMethod() === 'POST' && $this->request->getHeaderLine('List-Unsubscribe') === 'One-Click') {
             if ($user) {
                 $updateData = [];
-                if ($type === 'weekly' || $type === 'all') {
+                if ($type === 'weekly' || $type === 'quota' || $type === 'all') {
                     $updateData['email_weekly_summary'] = 0;
                 }
                 if ($type === 'report' || $type === 'all') {

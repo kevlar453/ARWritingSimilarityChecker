@@ -26,6 +26,7 @@ class UserModel extends Model
         'email_notifications_enabled',
         'email_weekly_summary',
         'last_weekly_summary_sent_at',
+        'last_quota_reminder_sent_at',
         'reset_password_token',
         'reset_password_expires_at',
         'free_submissions_used_this_week',
@@ -56,12 +57,14 @@ class UserModel extends Model
                 UPDATE {$this->table}
                 SET free_submissions_used_this_week = 0,
                     week_reset_at = ?,
+                    last_quota_reminder_sent_at = NULL,
                     updated_at = ?
                 WHERE id = ? AND (week_reset_at <= ? OR week_reset_at IS NULL)
             ", [$newResetAt, $nowStr, $user['id'], $nowStr]);
 
             $user['free_submissions_used_this_week'] = 0;
             $user['week_reset_at'] = $newResetAt;
+            $user['last_quota_reminder_sent_at'] = null;
         }
 
         return $user;
@@ -163,6 +166,7 @@ class UserModel extends Model
             UPDATE {$this->table}
             SET free_submissions_used_this_week = 0,
                 week_reset_at = ?,
+                last_quota_reminder_sent_at = NULL,
                 updated_at = ?
             WHERE id = ? AND (week_reset_at <= ? OR week_reset_at IS NULL)
         ", [$nextReset, $nowStr, $userId, $nowStr]);
@@ -176,6 +180,7 @@ class UserModel extends Model
         ", [$nowStr, $userId]);
 
         if ($db->affectedRows() === 1) {
+            $this->checkAndTriggerQuotaExhaustedReminder($userId);
             return true;
         }
 
@@ -188,10 +193,54 @@ class UserModel extends Model
         ", [$nowStr, $userId]);
 
         if ($db->affectedRows() === 1) {
+            $this->checkAndTriggerQuotaExhaustedReminder($userId);
             return true;
         }
 
         return false;
+    }
+
+    /**
+     * Memeriksa apakah kuota pengguna baru saja habis (0 submisi tersisa) dan memicu
+     * pengiriman surel pengingat secara asinkron (non-blocking) di latar belakang.
+     */
+    protected function checkAndTriggerQuotaExhaustedReminder(int $userId): void
+    {
+        try {
+            $row = $this->db->table($this->table)
+                ->select('id, status, email_verified_at, email_weekly_summary, subscription_tier, subscription_expires_at, free_submissions_used_this_week, bonus_submissions, last_quota_reminder_sent_at')
+                ->where('id', $userId)
+                ->get()
+                ->getRowArray();
+
+            if (! $row) {
+                return;
+            }
+
+            if (($row['status'] ?? '') !== 'active' || empty($row['email_verified_at']) || empty($row['email_weekly_summary'])) {
+                return;
+            }
+
+            // Lewati jika pengguna berlangganan paket tanpa batas (Dosen Pro aktif)
+            $subTier = $row['subscription_tier'] ?? 'free';
+            $subExp  = $row['subscription_expires_at'] ?? null;
+            if ($subTier === 'dosen_pro' && !empty($subExp) && strtotime($subExp) > time()) {
+                return;
+            }
+
+            $freeUsed = (int) ($row['free_submissions_used_this_week'] ?? 0);
+            $bonus    = (int) ($row['bonus_submissions'] ?? 0);
+
+            if ($freeUsed >= 3 && $bonus === 0 && empty($row['last_quota_reminder_sent_at'])) {
+                $sparkPath = ROOTPATH . 'spark';
+                if (is_file($sparkPath) && function_exists('exec')) {
+                    $cmd = 'php ' . escapeshellarg($sparkPath) . ' email:send-quota-reminder --user_id=' . (int) $userId . ' > /dev/null 2>&1 &';
+                    @exec($cmd);
+                }
+            }
+        } catch (\Throwable $e) {
+            log_message('error', 'Gagal memicu pengingat kuota habis untuk user #' . $userId . ': ' . $e->getMessage());
+        }
     }
 
     /**
@@ -206,6 +255,7 @@ class UserModel extends Model
             $db->query("
                 UPDATE {$this->table}
                 SET bonus_submissions = bonus_submissions + 1,
+                    last_quota_reminder_sent_at = NULL,
                     updated_at = ?
                 WHERE id = ?
             ", [$nowStr, $userId]);
@@ -216,6 +266,7 @@ class UserModel extends Model
             $db->query("
                 UPDATE {$this->table}
                 SET free_submissions_used_this_week = GREATEST(0, CAST(free_submissions_used_this_week AS SIGNED) - 1),
+                    last_quota_reminder_sent_at = NULL,
                     updated_at = ?
                 WHERE id = ?
             ", [$nowStr, $userId]);
@@ -226,6 +277,7 @@ class UserModel extends Model
         $db->query("
             UPDATE {$this->table}
             SET free_submissions_used_this_week = free_submissions_used_this_week - 1,
+                last_quota_reminder_sent_at = NULL,
                 updated_at = ?
             WHERE id = ? AND free_submissions_used_this_week > 0
         ", [$nowStr, $userId]);
@@ -237,6 +289,7 @@ class UserModel extends Model
         $db->query("
             UPDATE {$this->table}
             SET bonus_submissions = bonus_submissions + 1,
+                last_quota_reminder_sent_at = NULL,
                 updated_at = ?
             WHERE id = ?
         ", [$nowStr, $userId]);
@@ -270,11 +323,16 @@ class UserModel extends Model
             $bonusAwarded = true;
         }
 
-        $db->table($this->table)->where('id', $userId)->update([
+        $updatePayload = [
             'uploaded_corpus_count' => $newCorpusCount,
             'bonus_submissions'     => $currentBonus,
             'updated_at'            => $nowStr,
-        ]);
+        ];
+        if ($bonusAwarded) {
+            $updatePayload['last_quota_reminder_sent_at'] = null;
+        }
+
+        $db->table($this->table)->where('id', $userId)->update($updatePayload);
 
         $db->transComplete();
 
@@ -303,6 +361,7 @@ class UserModel extends Model
                 UPDATE {$this->table}
                 SET free_submissions_used_this_week = 0,
                     week_reset_at = ?,
+                    last_quota_reminder_sent_at = NULL,
                     updated_at = ?
             ", [$nextReset, $nowStr]);
         } else {
@@ -310,6 +369,7 @@ class UserModel extends Model
                 UPDATE {$this->table}
                 SET free_submissions_used_this_week = 0,
                     week_reset_at = ?,
+                    last_quota_reminder_sent_at = NULL,
                     updated_at = ?
                 WHERE week_reset_at <= ? 
                    OR week_reset_at IS NULL

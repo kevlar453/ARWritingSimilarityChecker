@@ -88,9 +88,9 @@
                         <label class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/20 transition cursor-pointer">
                             <input type="checkbox" name="email_weekly_summary" value="1" <?= (!empty($user['email_weekly_summary'])) ? 'checked' : '' ?> class="mt-1 h-4 w-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
                             <div>
-                                <span class="text-xs font-bold text-slate-900 block">📊 Ringkasan Penggunaan Mingguan</span>
+                                <span class="text-xs font-bold text-slate-900 block">📊 Ringkasan Penggunaan &amp; Pengingat Kuota</span>
                                 <span class="text-[11px] text-slate-500 leading-relaxed block mt-0.5">
-                                    Rekap berkala setiap awal pekan mengenai jumlah dokumen yang diperiksa, rerata skor kemiripan, kesehatan sitasi, status kuota, dan trik akademik bermanfaat.
+                                    Rekap berkala setiap awal pekan mengenai jumlah dokumen yang diperiksa, rerata skor kemiripan, kesehatan sitasi, pengingat saat kuota mingguan habis, dan trik akademik bermanfaat.
                                 </span>
                             </div>
                         </label>

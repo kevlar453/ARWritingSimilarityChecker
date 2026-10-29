@@ -602,10 +602,14 @@ class DashboardController extends BaseController
             case 'adjust_quota':
                 $bonusAmount = (int) ($this->request->getPost('bonus_submissions') ?? 0);
                 $newBonus = max(0, ((int) $user['bonus_submissions']) + $bonusAmount);
-                $userModel->update($userId, [
+                $updateQuotaData = [
                     'bonus_submissions' => $newBonus,
                     'updated_at'        => $now,
-                ]);
+                ];
+                if ($newBonus > 0) {
+                    $updateQuotaData['last_quota_reminder_sent_at'] = null;
+                }
+                $userModel->update($userId, $updateQuotaData);
                 $msg = "Bonus kuota {$user['name']} berhasil diperbarui menjadi {$newBonus} submisi.";
                 break;
 
@@ -613,6 +617,7 @@ class DashboardController extends BaseController
                 $userModel->update($userId, [
                     'free_submissions_used_this_week' => 0,
                     'week_reset_at'                   => date('Y-m-d 00:00:00', strtotime('next monday')),
+                    'last_quota_reminder_sent_at'     => null,
                     'updated_at'                      => $now,
                 ]);
                 $msg = "Kuota gratis mingguan {$user['name']} berhasil direset ke 3 submisi (jadwal berikutnya: Senin depan).";
@@ -626,11 +631,12 @@ class DashboardController extends BaseController
                 $newBonus = $currentBonus + $bonusGrant;
 
                 $userModel->update($userId, [
-                    'subscription_tier'       => 'trial_kampus',
-                    'subscription_expires_at' => $expiresAt,
-                    'bonus_submissions'       => $newBonus,
-                    'status'                  => 'active',
-                    'updated_at'              => $now,
+                    'subscription_tier'           => 'trial_kampus',
+                    'subscription_expires_at'     => $expiresAt,
+                    'bonus_submissions'           => $newBonus,
+                    'last_quota_reminder_sent_at' => null,
+                    'status'                      => 'active',
+                    'updated_at'                  => $now,
                 ]);
 
                 // Otomatis terbitkan Kunci API Konektor OJS jika belum ada kunci aktif

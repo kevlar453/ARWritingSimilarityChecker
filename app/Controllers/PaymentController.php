@@ -307,6 +307,7 @@ class PaymentController extends BaseController
                         $db->query("
                             UPDATE users
                             SET bonus_submissions = bonus_submissions + ?,
+                                last_quota_reminder_sent_at = NULL,
                                 updated_at = ?
                             WHERE id = ?
                         ", [$submissionsToAdd, $paidAt, $user['id']]);

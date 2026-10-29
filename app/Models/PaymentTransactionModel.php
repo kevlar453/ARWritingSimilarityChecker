@@ -393,6 +393,7 @@ class PaymentTransactionModel extends Model
                 $db->query("
                     UPDATE users
                     SET bonus_submissions = bonus_submissions + ?,
+                        last_quota_reminder_sent_at = NULL,
                         updated_at = ?
                     WHERE id = ?
                 ", [$submissionsToAdd, $paidAt, $user['id']]);
@@ -405,9 +406,10 @@ class PaymentTransactionModel extends Model
                 $newExpiresAt = date('Y-m-d H:i:s', $baseTime + ($days * 86400));
 
                 $db->table('users')->where('id', $user['id'])->update([
-                    'subscription_tier'       => $transaction['subscription_tier'],
-                    'subscription_expires_at' => $newExpiresAt,
-                    'updated_at'              => $paidAt,
+                    'subscription_tier'           => $transaction['subscription_tier'],
+                    'subscription_expires_at'     => $newExpiresAt,
+                    'last_quota_reminder_sent_at' => null,
+                    'updated_at'                  => $paidAt,
                 ]);
             }
         }
