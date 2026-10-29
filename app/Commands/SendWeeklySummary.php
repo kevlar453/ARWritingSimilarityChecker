@@ -30,7 +30,8 @@ class SendWeeklySummary extends BaseCommand
     protected $arguments = [];
     protected $options = [
         '--user_id' => 'Kirim ringkasan hanya ke pengguna dengan ID tertentu (misal: --user_id=5)',
-        '--preview' => 'Tampilkan pratinjau teks email di konsol tanpa benar-benar mengirim email',
+        '--preview' => 'Tampilkan pratinjau teks email di konsol tanpa benar-benar mengirim email (default: 1 pengguna pertama; gunakan --all untuk semua)',
+        '--all'     => 'Saat mode pratinjau (--preview), tampilkan pratinjau untuk seluruh pengguna yang memenuhi syarat',
         '--force'   => 'Abaikan batas jeda 5 hari pengiriman terakhir (kirim paksa)',
     ];
 
@@ -38,6 +39,23 @@ class SendWeeklySummary extends BaseCommand
      * Eksekusi Perintah
      */
     public function run(array $params)
+    {
+        try {
+            $this->executeWeeklySummary($params);
+        } catch (\Throwable $e) {
+            $msg = $e->getMessage();
+            if (stripos($msg, 'Broken pipe') !== false || stripos($msg, 'errno=32') !== false) {
+                // Pipe downstream ditutup oleh pemanggil (misal: | head, | less, q). Berhenti dengan bersih tanpa peringatan.
+                return;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Implementasi logika pengiriman ringkasan mingguan
+     */
+    protected function executeWeeklySummary(array $params): void
     {
         CLI::write("==================================================", 'yellow');
         CLI::write("    AR Tilik — Pengirim Email Ringkasan Mingguan  ", 'yellow');
@@ -50,6 +68,7 @@ class SendWeeklySummary extends BaseCommand
         $targetUserId = CLI::getOption('user_id');
         $isPreview    = (bool) CLI::getOption('preview');
         $isForce      = (bool) CLI::getOption('force');
+        $isAll        = (bool) CLI::getOption('all');
 
         // Dukungan format --user_id=123, --preview=1, --force=1 di CI4 CLI parser
         foreach (CLI::getOptions() as $optKey => $optVal) {
@@ -61,6 +80,9 @@ class SendWeeklySummary extends BaseCommand
             }
             if (str_starts_with($optKey, 'force')) {
                 $isForce = true;
+            }
+            if (str_starts_with($optKey, 'all')) {
+                $isAll = true;
             }
         }
 
@@ -90,6 +112,13 @@ class SendWeeklySummary extends BaseCommand
         }
 
         CLI::write("Ditemukan {$totalUsers} pengguna target untuk diproses." . ($isPreview ? ' [MODE PRATINJAU / DRY-RUN]' : ''), 'cyan');
+
+        if ($isPreview && empty($targetUserId) && !$isAll && $totalUsers > 1) {
+            CLI::write("Mode pratinjau aktif: Menampilkan pratinjau untuk 1 pengguna pertama dari total {$totalUsers} pengguna.", 'light_cyan');
+            CLI::write("Petunjuk: Gunakan opsi --user_id=<id> untuk pengguna tertentu atau tambahkan --all untuk menampilkan seluruhnya.\n", 'dark_gray');
+            $users = array_slice($users, 0, 1);
+            $totalUsers = 1;
+        }
 
         // Rentang sepekan terakhir
         $startTs = strtotime('-7 days');

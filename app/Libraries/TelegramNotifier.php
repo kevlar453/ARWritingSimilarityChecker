@@ -301,6 +301,14 @@ class TelegramNotifier
             return $incidentId;
         }
 
+        $message = $exception->getMessage() ?: '(Tanpa pesan galat)';
+        $isCli = (PHP_SAPI === 'cli') || (function_exists('is_cli') && is_cli());
+
+        // Abaikan galat Broken pipe (EPIPE / errno=32) di CLI (misal output di-pipe ke head, less, grep)
+        if ($isCli && (stripos($message, 'Broken pipe') !== false || stripos($message, 'errno=32') !== false)) {
+            return $incidentId;
+        }
+
         // Tentukan direktori writable secara aman (baik saat di dalam framework CI maupun standalone)
         $writableDir = defined('WRITEPATH') ? WRITEPATH : (defined('APPPATH') ? dirname(APPPATH) . '/writable/' : sys_get_temp_dir() . '/');
         $cacheDir = rtrim($writableDir, '/\\') . '/cache/';

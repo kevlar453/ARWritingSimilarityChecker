@@ -101,6 +101,17 @@ class Exceptions extends BaseConfig
      */
     public function handler(int $statusCode, Throwable $exception): ExceptionHandlerInterface
     {
+        $isCli = (PHP_SAPI === 'cli') || (function_exists('is_cli') && is_cli());
+        $msg   = $exception->getMessage();
+
+        // Abaikan Broken pipe (EPIPE / errno=32) pada lingkungan CLI karena normal saat piping (misal: | head)
+        if ($isCli && (stripos($msg, 'Broken pipe') !== false || stripos($msg, 'errno=32') !== false)) {
+            if (function_exists('error_clear_last')) {
+                @error_clear_last();
+            }
+            exit(0);
+        }
+
         // Otomatis laporkan galat sistem (500 / unhandled exception) ke Telegram Bot
         if ($statusCode >= 500 || (!in_array($statusCode, [400, 404], true) && !($exception instanceof \CodeIgniter\Exceptions\PageNotFoundException))) {
             try {
