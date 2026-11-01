@@ -2260,6 +2260,55 @@
                         </div>
                     </div>
 
+                    <!-- KARTU GRAFIK DEMOGRAFI VISUAL (DUAL-CHART GRID: NEGARA & WILAYAH) -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <!-- Grafik 1: Peringkat Negara Pengunjung -->
+                        <div class="bg-slate-900/60 border border-slate-700/60 rounded-2xl p-4 sm:p-5 shadow-xs space-y-3">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h4 class="text-xs sm:text-sm font-bold text-white flex items-center gap-1.5">
+                                        <span>📊</span> Peringkat Negara Pengunjung Teratas
+                                    </h4>
+                                    <p class="text-[11px] text-slate-400 mt-0.5">Top 7 negara berdasarkan volume pengunjung unik &amp; tayangan</p>
+                                </div>
+                                <div class="inline-flex items-center gap-2 px-2.5 py-1 bg-slate-950/60 border border-slate-800 rounded-lg text-[10px]">
+                                    <span class="inline-flex items-center gap-1 text-emerald-400 font-semibold">
+                                        <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Unik
+                                    </span>
+                                    <span class="inline-flex items-center gap-1 text-sky-400 font-semibold">
+                                        <span class="w-2 h-2 rounded-full bg-sky-400"></span> Hits
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="relative w-full" style="height: 260px;">
+                                <canvas id="geoCountryAnalyticsChart" aria-label="Grafik Peringkat Negara Pengunjung"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Grafik 2: Peringkat Wilayah & Provinsi Terbanyak -->
+                        <div class="bg-slate-900/60 border border-slate-700/60 rounded-2xl p-4 sm:p-5 shadow-xs space-y-3">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h4 class="text-xs sm:text-sm font-bold text-white flex items-center gap-1.5">
+                                        <span>📍</span> Peringkat Wilayah / Provinsi Teratas
+                                    </h4>
+                                    <p class="text-[11px] text-slate-400 mt-0.5">Top 7 wilayah/provinsi asal akses landing page</p>
+                                </div>
+                                <div class="inline-flex items-center gap-2 px-2.5 py-1 bg-slate-950/60 border border-slate-800 rounded-lg text-[10px]">
+                                    <span class="inline-flex items-center gap-1 text-emerald-400 font-semibold">
+                                        <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Unik
+                                    </span>
+                                    <span class="inline-flex items-center gap-1 text-sky-400 font-semibold">
+                                        <span class="w-2 h-2 rounded-full bg-sky-400"></span> Hits
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="relative w-full" style="height: 260px;">
+                                <canvas id="geoRegionAnalyticsChart" aria-label="Grafik Peringkat Wilayah Pengunjung"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- PANE A: TABEL SURVEI BERDASARKAN NEGARA -->
                     <div id="geo-pane-countries" class="geo-pane space-y-3">
                         <div class="flex items-center justify-between text-xs text-slate-400 px-1">
@@ -6286,6 +6335,7 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
 
             // Inisialisasi Grafik
             initVisitorChart();
+            initGeoCharts();
 
             const syncEl = document.getElementById('visitor-last-sync');
             if (syncEl) {
@@ -6315,6 +6365,185 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
         // ==========================================
         // KONTROL SURVEI GEOGRAFIS (NEGARA & WILAYAH)
         // ==========================================
+        const initialGeoCountries = <?= json_encode($geoCountries ?? []) ?>;
+        const initialGeoRegions = <?= json_encode($geoRegions ?? []) ?>;
+        let geoCountryChart = null;
+        let geoRegionChart = null;
+
+        function initGeoCharts() {
+            const countryCanvas = document.getElementById('geoCountryAnalyticsChart');
+            const regionCanvas = document.getElementById('geoRegionAnalyticsChart');
+
+            // 1. Inisialisasi Grafik Peringkat Negara (Top 7)
+            if (countryCanvas && Array.isArray(initialGeoCountries) && initialGeoCountries.length > 0) {
+                const topC = initialGeoCountries.slice(0, 7);
+                const labels = topC.map(c => (c.flag ? c.flag + ' ' : '') + c.country_name);
+                const uniqueData = topC.map(c => Number(c.unique_visitors));
+                const hitsData = topC.map(c => Number(c.total_hits));
+
+                geoCountryChart = new Chart(countryCanvas, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        _raw: topC,
+                        datasets: [
+                            {
+                                label: 'Pengunjung Unik',
+                                data: uniqueData,
+                                backgroundColor: 'rgba(16, 185, 129, 0.85)',
+                                hoverBackgroundColor: '#10b981',
+                                borderRadius: 5,
+                                barPercentage: 0.7,
+                                categoryPercentage: 0.8
+                            },
+                            {
+                                label: 'Total Tayangan',
+                                data: hitsData,
+                                backgroundColor: 'rgba(56, 189, 248, 0.85)',
+                                hoverBackgroundColor: '#38bdf8',
+                                borderRadius: 5,
+                                barPercentage: 0.7,
+                                categoryPercentage: 0.8
+                            }
+                        ]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                                titleColor: '#ffffff',
+                                titleFont: { size: 12, weight: '700', family: 'Plus Jakarta Sans' },
+                                bodyColor: '#cbd5e1',
+                                bodyFont: { size: 11, family: 'Plus Jakarta Sans' },
+                                borderColor: 'rgba(51, 65, 85, 0.8)',
+                                borderWidth: 1,
+                                padding: 10,
+                                cornerRadius: 10,
+                                callbacks: {
+                                    label: function(item) {
+                                        return ` ${item.dataset.label}: ${item.raw.toLocaleString('id-ID')}`;
+                                    },
+                                    afterBody: function(items) {
+                                        if (!items.length) return '';
+                                        const idx = items[0].dataIndex;
+                                        const c = (geoCountryChart && geoCountryChart.data._raw) ? geoCountryChart.data._raw[idx] : null;
+                                        if (c && c.share_unique_pct) {
+                                            return ` Pangsa Unik: ${c.share_unique_pct}%`;
+                                        }
+                                        return '';
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                grid: { color: 'rgba(255, 255, 255, 0.04)', drawBorder: false },
+                                ticks: { color: '#64748b', font: { size: 10, family: 'JetBrains Mono' }, precision: 0 }
+                            },
+                            y: {
+                                grid: { display: false },
+                                ticks: { color: '#cbd5e1', font: { size: 10.5, family: 'Plus Jakarta Sans', weight: '600' } }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // 2. Inisialisasi Grafik Peringkat Wilayah & Provinsi (Top 7)
+            if (regionCanvas && Array.isArray(initialGeoRegions) && initialGeoRegions.length > 0) {
+                const topR = initialGeoRegions.slice(0, 7);
+                const labels = topR.map(r => (r.flag ? r.flag + ' ' : '') + r.region_name);
+                const uniqueData = topR.map(r => Number(r.unique_visitors));
+                const hitsData = topR.map(r => Number(r.total_hits));
+
+                geoRegionChart = new Chart(regionCanvas, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        _raw: topR,
+                        datasets: [
+                            {
+                                label: 'Pengunjung Unik',
+                                data: uniqueData,
+                                backgroundColor: 'rgba(16, 185, 129, 0.85)',
+                                hoverBackgroundColor: '#10b981',
+                                borderRadius: 5,
+                                barPercentage: 0.7,
+                                categoryPercentage: 0.8
+                            },
+                            {
+                                label: 'Total Tayangan',
+                                data: hitsData,
+                                backgroundColor: 'rgba(56, 189, 248, 0.85)',
+                                hoverBackgroundColor: '#38bdf8',
+                                borderRadius: 5,
+                                barPercentage: 0.7,
+                                categoryPercentage: 0.8
+                            }
+                        ]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                                titleColor: '#ffffff',
+                                titleFont: { size: 12, weight: '700', family: 'Plus Jakarta Sans' },
+                                bodyColor: '#cbd5e1',
+                                bodyFont: { size: 11, family: 'Plus Jakarta Sans' },
+                                borderColor: 'rgba(51, 65, 85, 0.8)',
+                                borderWidth: 1,
+                                padding: 10,
+                                cornerRadius: 10,
+                                callbacks: {
+                                    title: function(items) {
+                                        if (!items.length) return '';
+                                        const idx = items[0].dataIndex;
+                                        const r = (geoRegionChart && geoRegionChart.data._raw) ? geoRegionChart.data._raw[idx] : null;
+                                        if (r) {
+                                            return `${r.region_name} (${r.country_name})`;
+                                        }
+                                        return items[0].label;
+                                    },
+                                    label: function(item) {
+                                        return ` ${item.dataset.label}: ${item.raw.toLocaleString('id-ID')}`;
+                                    },
+                                    afterBody: function(items) {
+                                        if (!items.length) return '';
+                                        const idx = items[0].dataIndex;
+                                        const r = (geoRegionChart && geoRegionChart.data._raw) ? geoRegionChart.data._raw[idx] : null;
+                                        if (r && r.share_unique_pct) {
+                                            return ` Pangsa Unik: ${r.share_unique_pct}%`;
+                                        }
+                                        return '';
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                grid: { color: 'rgba(255, 255, 255, 0.04)', drawBorder: false },
+                                ticks: { color: '#64748b', font: { size: 10, family: 'JetBrains Mono' }, precision: 0 }
+                            },
+                            y: {
+                                grid: { display: false },
+                                ticks: { color: '#cbd5e1', font: { size: 10.5, family: 'Plus Jakarta Sans', weight: '600' } }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
         function switchGeoTab(tabName, btn) {
             const paneCountries = document.getElementById('geo-pane-countries');
             const paneRegions = document.getElementById('geo-pane-regions');
@@ -6378,6 +6607,26 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
             const badgeR = document.getElementById('badge-total-regions');
             if (badgeR && Array.isArray(geoData.regions)) {
                 badgeR.textContent = geoData.regions.length;
+            }
+
+            // Update Grafik Peringkat Negara Real-time
+            if (geoCountryChart && Array.isArray(geoData.countries) && geoData.countries.length > 0) {
+                const topC = geoData.countries.slice(0, 7);
+                geoCountryChart.data._raw = topC;
+                geoCountryChart.data.labels = topC.map(c => (c.flag ? c.flag + ' ' : '') + c.country_name);
+                geoCountryChart.data.datasets[0].data = topC.map(c => Number(c.unique_visitors));
+                geoCountryChart.data.datasets[1].data = topC.map(c => Number(c.total_hits));
+                geoCountryChart.update('none');
+            }
+
+            // Update Grafik Peringkat Wilayah Real-time
+            if (geoRegionChart && Array.isArray(geoData.regions) && geoData.regions.length > 0) {
+                const topR = geoData.regions.slice(0, 7);
+                geoRegionChart.data._raw = topR;
+                geoRegionChart.data.labels = topR.map(r => (r.flag ? r.flag + ' ' : '') + r.region_name);
+                geoRegionChart.data.datasets[0].data = topR.map(r => Number(r.unique_visitors));
+                geoRegionChart.data.datasets[1].data = topR.map(r => Number(r.total_hits));
+                geoRegionChart.update('none');
             }
         }
 
