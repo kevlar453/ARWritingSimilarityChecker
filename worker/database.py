@@ -20,13 +20,15 @@ def load_env():
 load_env()
 
 def get_connection():
+    load_env()
     return mysql.connector.connect(
-        host=os.getenv("DB_HOST", "127.0.0.1"),
-        port=int(os.getenv("DB_PORT", "3306")),
-        user=os.getenv("DB_USER", "ymakarius"),
-        password=os.getenv("DB_PASSWORD", "Segalang$$65216"),
-        database=os.getenv("DB_NAME", "db_artilik"),
+        host=os.getenv("DB_HOST") or os.getenv("database.default.hostname", "127.0.0.1"),
+        port=int(os.getenv("DB_PORT") or os.getenv("database.default.port", "3306")),
+        user=os.getenv("DB_USER") or os.getenv("database.default.username", "root"),
+        password=os.getenv("DB_PASSWORD") or os.getenv("database.default.password", ""),
+        database=os.getenv("DB_NAME") or os.getenv("database.default.database", "db_artilik"),
         charset="utf8mb4",
+        connection_timeout=10,
         use_pure=True
     )
 
@@ -44,7 +46,7 @@ def get_next_job(connection):
     cursor.close()
     return job
 
-def mark_job_processing(connection, job_id):
+def mark_job_processing(connection, job_id) -> bool:
     cursor = connection.cursor()
     cursor.execute("""
         UPDATE jobs
@@ -52,9 +54,12 @@ def mark_job_processing(connection, job_id):
             attempts = attempts + 1,
             updated_at = NOW()
         WHERE id = %s
+          AND status = 'pending'
     """, (job_id,))
+    claimed = cursor.rowcount > 0
     connection.commit()
     cursor.close()
+    return claimed
 
 def mark_job_completed(connection, job_id):
     cursor = connection.cursor()

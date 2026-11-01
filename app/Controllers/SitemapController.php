@@ -41,13 +41,7 @@ class SitemapController extends BaseController
             ],
             [
                 'loc'        => $baseUrl . '/integrations/ojs/pdf',
-                'lastmod'    => '2026-10-07',
-                'changefreq' => 'weekly',
-                'priority'   => '0.8',
-            ],
-            [
-                'loc'        => $baseUrl . '/integrations/ojs/connector',
-                'lastmod'    => '2026-10-07',
+                'lastmod'    => $today,
                 'changefreq' => 'weekly',
                 'priority'   => '0.8',
             ],

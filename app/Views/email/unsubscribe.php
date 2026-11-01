@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kelola Preferensi Surel — AR Tilik</title>
+    <meta name="robots" content="noindex, nofollow">
     <link rel="icon" type="image/png" href="<?= base_url('images/logo.png') ?>">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">

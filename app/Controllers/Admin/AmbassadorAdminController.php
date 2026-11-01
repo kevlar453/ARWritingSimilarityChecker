@@ -291,6 +291,8 @@ class AmbassadorAdminController extends BaseController
 
         return $this->response->setHeader('Content-Type', $mime)
                               ->setHeader('Content-Disposition', 'inline; filename="' . basename($fullPath) . '"')
+                              ->setHeader('X-Content-Type-Options', 'nosniff')
+                              ->setHeader('Content-Security-Policy', "default-src 'none'; img-src 'self' data:; style-src 'unsafe-inline'; sandbox")
                               ->setBody($content);
     }
 
@@ -320,6 +322,8 @@ class AmbassadorAdminController extends BaseController
 
         return $this->response->setHeader('Content-Type', $mime)
                               ->setHeader('Content-Disposition', 'inline; filename="' . basename($fullPath) . '"')
+                              ->setHeader('X-Content-Type-Options', 'nosniff')
+                              ->setHeader('Content-Security-Policy', "default-src 'none'; img-src 'self' data:; style-src 'unsafe-inline'; sandbox")
                               ->setBody($content);
     }
 
@@ -365,8 +369,10 @@ class AmbassadorAdminController extends BaseController
         $file = $this->request->getFile('transfer_proof');
         if ($file && $file->isValid()) {
             $allowed = ['jpg', 'jpeg', 'png', 'webp', 'pdf'];
+            $allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
             $ext = strtolower($file->getExtension());
-            if (in_array($ext, $allowed, true)) {
+            $mime = strtolower((string) $file->getMimeType());
+            if (in_array($ext, $allowed, true) && in_array($mime, $allowedMimes, true)) {
                 $newName = 'transfer_' . $id . '_' . date('Ymd_His') . '_' . bin2hex(random_bytes(3)) . '.' . $ext;
                 $targetDir = WRITEPATH . 'uploads/payout_proofs/';
                 if (!is_dir($targetDir)) {

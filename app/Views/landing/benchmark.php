@@ -815,7 +815,7 @@
 
             <!-- Desktop Nav Links -->
             <ul class="nav-links">
-                <li><a href="<?= base_url('/#keunggulan') ?>">Metodologi</a></li>
+                <li><a href="<?= base_url('/#fitur-unggulan') ?>">Metodologi</a></li>
                 <li><a href="<?= base_url('benchmark') ?>" class="active">Benchmark Lokal</a></li>
                 <li><a href="<?= base_url('riset/ar-tilik-vs-turnitin') ?>">vs Turnitin</a></li>
                 <li><a href="<?= base_url('riset/ar-tilik-vs-zerogpt') ?>">vs ZeroGPT</a></li>
@@ -882,11 +882,11 @@
                     </a>
                 </li>
                 <li>
-                    <a href="<?= base_url('/#keunggulan') ?>" class="mobile-nav-item" onclick="closeMobileNav()">
+                    <a href="<?= base_url('/#fitur-unggulan') ?>" class="mobile-nav-item" onclick="closeMobileNav()">
                         <span class="item-icon">📐</span>
                         <div class="item-text">
-                            <strong>Metodologi &amp; 4 Pilar</strong>
-                            <small>N-Gram, Cosine, Pasase, XGBoost</small>
+                            <strong>Metodologi &amp; Tiga Lensa</strong>
+                            <small>N-Gram, Cosine, Semantik, XGBoost</small>
                         </div>
                     </a>
                 </li>
@@ -1733,7 +1733,7 @@ guna menguji pengaruh variabel independen terhadap variabel dependen dengan tara
 
             <p style="margin-bottom: 16px;">
                 AR Tilik menolak keras pendekatan detektor probabilitas hitam seperti ZeroGPT yang melontarkan vonis <em>"Teks ini 98% buatan AI"</em>.
-                Pada modul <a href="file:///var/www/html/ARWritingSimilarityChecker/worker/ai_stylometrics.py"><code>worker/ai_stylometrics.py</code></a>, kami menyediakan 5 indikator statistik terbuka yang dikalibrasi pada korpus empiris naskah akademik Indonesia:
+                Pada modul <code>worker/ai_stylometrics.py</code>, kami menyediakan 5 indikator statistik terbuka yang dikalibrasi pada korpus empiris naskah akademik Indonesia:
             </p>
 
             <div class="table-responsive">

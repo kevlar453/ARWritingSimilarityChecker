@@ -2180,6 +2180,332 @@
                         </table>
                     </div>
                 </div>
+
+                <!-- ======================================================== -->
+                <!-- SURVEI GEOGRAFIS PENGUNJUNG: DISTRIBUSI NEGARA & WILAYAH -->
+                <!-- ======================================================== -->
+                <?php
+                    $geo = $geoAnalytics ?? ['summary' => [], 'countries' => [], 'regions' => []];
+                    $geoSummary = $geo['summary'] ?? [];
+                    $geoCountries = $geo['countries'] ?? [];
+                    $geoRegions = $geo['regions'] ?? [];
+                ?>
+                <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-4 sm:p-5 shadow-sm space-y-5">
+                    <!-- Header Survei Geografis & Filter Controls -->
+                    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-slate-700/60 pb-4">
+                        <div>
+                            <div class="inline-flex items-center gap-2 text-xs font-bold text-sky-400 bg-sky-500/10 border border-sky-500/20 px-2.5 py-1 rounded-full mb-1">
+                                <span>🌐</span> Demografi Lalu Lintas Pengunjung
+                            </div>
+                            <h3 class="text-base font-bold text-white flex items-center gap-2">
+                                Survei Pengunjung Berdasarkan Negara &amp; Wilayah
+                            </h3>
+                            <p class="text-xs text-slate-400 mt-0.5">
+                                Pemetaan persebaran sivitas akademika dan pembaca publik mulai skala nasional (provinsi &amp; kota) hingga mancanegara.
+                            </p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2.5">
+                            <!-- Tab Switcher: Negara vs Wilayah/Provinsi -->
+                            <div class="inline-flex p-0.5 rounded-xl bg-slate-900/80 border border-slate-700/70 text-xs font-medium">
+                                <button type="button" onclick="switchGeoTab('countries', this)" id="btn-geo-tab-countries" class="geo-tab-btn active-geo-tab px-3 py-1.5 rounded-lg text-xs bg-indigo-600 text-white font-semibold shadow-xs transition flex items-center gap-1.5 cursor-pointer">
+                                    <span>🌐</span> Berdasarkan Negara
+                                    <span class="ml-1 text-[10px] px-1.5 py-0.2 rounded-full bg-indigo-700/80 border border-indigo-400/30" id="badge-total-countries"><?= count($geoCountries) ?></span>
+                                </button>
+                                <button type="button" onclick="switchGeoTab('regions', this)" id="btn-geo-tab-regions" class="geo-tab-btn px-3 py-1.5 rounded-lg text-xs text-slate-300 hover:text-white transition flex items-center gap-1.5 cursor-pointer">
+                                    <span>🗺️</span> Wilayah &amp; Provinsi
+                                    <span class="ml-1 text-[10px] px-1.5 py-0.2 rounded-full bg-slate-800 border border-slate-700" id="badge-total-regions"><?= count($geoRegions) ?></span>
+                                </button>
+                            </div>
+                            <!-- Pencarian Filter Cepat -->
+                            <div class="relative">
+                                <input type="text" id="geo-search-input" oninput="filterGeoData(this.value)" placeholder="Cari negara, wilayah, kota..." class="bg-slate-900/80 border border-slate-700/70 text-slate-200 text-xs rounded-xl px-3 py-1.5 pl-8 focus:outline-none focus:border-indigo-500 w-44 sm:w-56 transition placeholder:text-slate-500">
+                                <svg class="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4 Kartu Metrik Ringkasan Geografis -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                        <div class="bg-slate-900/60 border border-slate-700/60 rounded-xl p-3.5 flex items-center justify-between">
+                            <div>
+                                <span class="text-[11px] text-slate-400">Total Negara Terjangkau</span>
+                                <div id="geo-metric-countries" class="text-xl font-bold text-white mt-0.5"><?= number_format($geoSummary['total_countries'] ?? count($geoCountries)) ?> Negara</div>
+                                <div class="text-[10px] text-slate-500 mt-0.5">Teratas: <?= esc($geoSummary['top_country']['country_name'] ?? 'Indonesia') ?></div>
+                            </div>
+                            <div class="w-9 h-9 rounded-xl bg-sky-500/10 text-sky-400 border border-sky-500/20 flex items-center justify-center text-lg">🌍</div>
+                        </div>
+                        <div class="bg-slate-900/60 border border-slate-700/60 rounded-xl p-3.5 flex items-center justify-between">
+                            <div>
+                                <span class="text-[11px] text-slate-400">Total Wilayah / Provinsi</span>
+                                <div id="geo-metric-regions" class="text-xl font-bold text-sky-400 mt-0.5"><?= number_format($geoSummary['total_regions'] ?? count($geoRegions)) ?> Wilayah</div>
+                                <div class="text-[10px] text-slate-500 mt-0.5">Teratas: <?= esc($geoSummary['top_region']['region_name'] ?? '-') ?></div>
+                            </div>
+                            <div class="w-9 h-9 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 flex items-center justify-center text-lg">🗺️</div>
+                        </div>
+                        <div class="bg-slate-900/60 border border-slate-700/60 rounded-xl p-3.5 flex items-center justify-between">
+                            <div>
+                                <span class="text-[11px] text-slate-400">Pengunjung Domestik (RI)</span>
+                                <div id="geo-metric-domestic" class="text-xl font-bold text-emerald-400 mt-0.5"><?= number_format($geoSummary['domestic_unique'] ?? 0) ?> (<?= number_format($geoSummary['domestic_share_pct'] ?? 0, 1) ?>%)</div>
+                                <div class="text-[10px] text-emerald-400/80 mt-0.5"><?= number_format($geoSummary['domestic_hits'] ?? 0) ?> tayangan halaman</div>
+                            </div>
+                            <div class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center text-lg">🇮🇩</div>
+                        </div>
+                        <div class="bg-slate-900/60 border border-slate-700/60 rounded-xl p-3.5 flex items-center justify-between">
+                            <div>
+                                <span class="text-[11px] text-slate-400">Pengunjung Mancanegara</span>
+                                <div id="geo-metric-intl" class="text-xl font-bold text-purple-400 mt-0.5"><?= number_format($geoSummary['international_unique'] ?? 0) ?> (<?= number_format($geoSummary['international_share_pct'] ?? 0, 1) ?>%)</div>
+                                <div class="text-[10px] text-purple-400/80 mt-0.5"><?= number_format($geoSummary['international_hits'] ?? 0) ?> tayangan halaman</div>
+                            </div>
+                            <div class="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20 flex items-center justify-center text-lg">✈️</div>
+                        </div>
+                    </div>
+
+                    <!-- PANE A: TABEL SURVEI BERDASARKAN NEGARA -->
+                    <div id="geo-pane-countries" class="geo-pane space-y-3">
+                        <div class="flex items-center justify-between text-xs text-slate-400 px-1">
+                            <span class="font-medium text-slate-300">Peringkat Persebaran Negara Asal Pengunjung</span>
+                            <span class="text-[11px]">Diurutkan berdasarkan akumulasi pengunjung unik</span>
+                        </div>
+
+                        <!-- Mobile List: Kartu Negara Responsif -->
+                        <div id="mobile-geo-countries-list" class="space-y-2.5 md:hidden">
+                            <?php if (empty($geoCountries)): ?>
+                                <div class="bg-slate-900/50 border border-slate-800 rounded-xl p-6 text-center text-xs text-slate-500">
+                                    Belum ada data geolokasi negara.
+                                </div>
+                            <?php else: ?>
+                                <?php foreach ($geoCountries as $c): ?>
+                                    <div class="geo-card-country bg-slate-900/60 border border-slate-700/60 rounded-xl p-3.5 space-y-2.5" data-search-text="<?= strtolower($c['country_name'] . ' ' . $c['country_code']) ?>">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-lg"><?= $c['flag'] ?></span>
+                                                <div>
+                                                    <div class="font-bold text-slate-100 text-xs flex items-center gap-1.5">
+                                                        <span><?= esc($c['country_name']) ?></span>
+                                                        <span class="text-[10px] font-mono text-slate-400 uppercase">(<?= esc($c['country_code']) ?>)</span>
+                                                    </div>
+                                                    <div class="text-[10px] text-slate-400">
+                                                        <?= $c['region_count'] ?> wilayah / <?= $c['city_count'] ?> kota
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold <?= $c['is_domestic'] ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-sky-500/10 text-sky-400 border border-sky-500/20' ?>">
+                                                <?= $c['is_domestic'] ? 'Domestik' : 'Mancanegara' ?>
+                                            </span>
+                                        </div>
+                                        <div class="grid grid-cols-3 gap-2 bg-slate-950/60 rounded-lg p-2 text-center text-xs">
+                                            <div>
+                                                <div class="text-[10px] text-slate-500">Pengunjung</div>
+                                                <div class="font-bold text-emerald-400 font-mono-code"><?= number_format($c['unique_visitors']) ?></div>
+                                            </div>
+                                            <div>
+                                                <div class="text-[10px] text-slate-500">Pangsa Unik</div>
+                                                <div class="font-bold text-slate-200 font-mono-code"><?= $c['share_unique_pct'] ?>%</div>
+                                            </div>
+                                            <div>
+                                                <div class="text-[10px] text-slate-500">Total Hits</div>
+                                                <div class="font-bold text-sky-400 font-mono-code"><?= number_format($c['total_hits']) ?></div>
+                                            </div>
+                                        </div>
+                                        <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                                            <div class="bg-gradient-to-r from-emerald-500 to-sky-400 h-full rounded-full" style="width: <?= min(100, max(4, $c['share_unique_pct'])) ?>%;"></div>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </div>
+
+                        <!-- Desktop Table: Tabel Negara Aksesibel & Responsif -->
+                        <div tabindex="0" role="region" aria-labelledby="geo-countries-caption" class="hidden md:block overflow-x-auto rounded-xl border border-slate-700/60 bg-slate-900/40">
+                            <table class="w-full text-xs text-left">
+                                <caption id="geo-countries-caption" class="sr-only">Survei Pengunjung Berdasarkan Negara</caption>
+                                <thead class="sticky top-0 bg-slate-900/95 text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-700/60 backdrop-blur-xs">
+                                    <tr>
+                                        <th scope="col" class="py-3 px-4">Negara Asal Pengunjung</th>
+                                        <th scope="col" class="py-3 px-4 text-center">Status</th>
+                                        <th scope="col" class="py-3 px-4 text-center">Pengunjung Unik</th>
+                                        <th scope="col" class="py-3 px-4 text-center" style="width: 180px;">Pangsa Unik</th>
+                                        <th scope="col" class="py-3 px-4 text-center">Total Tayangan</th>
+                                        <th scope="col" class="py-3 px-4 text-center">Rata-rata Hits</th>
+                                        <th scope="col" class="py-3 px-4 text-center">Cakupan Wilayah</th>
+                                        <th scope="col" class="py-3 px-4 text-right">Kunjungan Terakhir</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="desktop-geo-countries-tbody" class="divide-y divide-slate-800/80">
+                                    <?php if (empty($geoCountries)): ?>
+                                        <tr><td colspan="8" class="py-6 text-center text-slate-500">Belum ada data geolokasi negara.</td></tr>
+                                    <?php else: ?>
+                                        <?php foreach ($geoCountries as $c): ?>
+                                            <tr class="hover:bg-slate-800/50 transition-colors geo-row-country" data-search-text="<?= strtolower($c['country_name'] . ' ' . $c['country_code']) ?>">
+                                                <td class="py-3 px-4 font-semibold text-slate-200">
+                                                    <div class="flex items-center gap-2.5">
+                                                        <span class="text-lg"><?= $c['flag'] ?></span>
+                                                        <div>
+                                                            <div class="text-slate-100 font-bold"><?= esc($c['country_name']) ?></div>
+                                                            <div class="text-[10px] font-mono text-slate-500"><?= esc($c['country_code']) ?></div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="py-3 px-4 text-center">
+                                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold <?= $c['is_domestic'] ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-sky-500/10 text-sky-400 border border-sky-500/20' ?>">
+                                                        <?= $c['is_domestic'] ? 'Domestik' : 'Mancanegara' ?>
+                                                    </span>
+                                                </td>
+                                                <td class="py-3 px-4 text-center font-bold text-emerald-400 font-mono-code" data-cell="unique">
+                                                    <?= number_format($c['unique_visitors']) ?>
+                                                </td>
+                                                <td class="py-3 px-4">
+                                                    <div class="flex items-center gap-2">
+                                                        <div class="flex-1 bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                                                            <div class="bg-gradient-to-r from-emerald-500 to-sky-400 h-full rounded-full" style="width: <?= min(100, max(4, $c['share_unique_pct'])) ?>%;"></div>
+                                                        </div>
+                                                        <span class="font-mono-code text-[11px] text-slate-300 w-12 text-right"><?= $c['share_unique_pct'] ?>%</span>
+                                                    </div>
+                                                </td>
+                                                <td class="py-3 px-4 text-center font-bold text-sky-400 font-mono-code" data-cell="hits">
+                                                    <?= number_format($c['total_hits']) ?>
+                                                </td>
+                                                <td class="py-3 px-4 text-center text-slate-300 font-mono-code">
+                                                    <?= $c['avg_hits'] ?>
+                                                </td>
+                                                <td class="py-3 px-4 text-center text-slate-400 text-[11px]">
+                                                    <?= $c['region_count'] ?> wilayah &bull; <?= $c['city_count'] ?> kota
+                                                </td>
+                                                <td class="py-3 px-4 text-right text-slate-400 font-mono-code text-[11px]">
+                                                    <?= date('d M Y', strtotime($c['last_visit'])) ?>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- PANE B: TABEL SURVEI BERDASARKAN WILAYAH & PROVINSI -->
+                    <div id="geo-pane-regions" class="geo-pane hidden space-y-3">
+                        <div class="flex items-center justify-between text-xs text-slate-400 px-1">
+                            <span class="font-medium text-slate-300">Peringkat Persebaran Wilayah / Provinsi Asal Pengunjung</span>
+                            <span class="text-[11px]">Menampilkan rincian provinsi, cakupan kota, dan penyedia jaringan (ISP)</span>
+                        </div>
+
+                        <!-- Mobile List: Kartu Wilayah Responsif -->
+                        <div id="mobile-geo-regions-list" class="space-y-2.5 md:hidden">
+                            <?php if (empty($geoRegions)): ?>
+                                <div class="bg-slate-900/50 border border-slate-800 rounded-xl p-6 text-center text-xs text-slate-500">
+                                    Belum ada data geolokasi wilayah/provinsi.
+                                </div>
+                            <?php else: ?>
+                                <?php foreach ($geoRegions as $r): ?>
+                                    <div class="geo-card-region bg-slate-900/60 border border-slate-700/60 rounded-xl p-3.5 space-y-2.5" data-search-text="<?= strtolower($r['region_name'] . ' ' . $r['country_name'] . ' ' . $r['top_cities'] . ' ' . $r['top_isp']) ?>">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-lg"><?= $r['flag'] ?></span>
+                                                <div>
+                                                    <div class="font-bold text-slate-100 text-xs flex items-center gap-1.5">
+                                                        <span><?= esc($r['region_name']) ?></span>
+                                                    </div>
+                                                    <div class="text-[10px] text-slate-400">
+                                                        <?= esc($r['country_name']) ?> &bull; Kota: <?= esc($r['top_cities']) ?>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold <?= $r['is_domestic'] ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-sky-500/10 text-sky-400 border border-sky-500/20' ?>">
+                                                <?= $r['is_domestic'] ? 'Domestik' : 'Mancanegara' ?>
+                                            </span>
+                                        </div>
+                                        <div class="grid grid-cols-3 gap-2 bg-slate-950/60 rounded-lg p-2 text-center text-xs">
+                                            <div>
+                                                <div class="text-[10px] text-slate-500">Pengunjung</div>
+                                                <div class="font-bold text-emerald-400 font-mono-code"><?= number_format($r['unique_visitors']) ?></div>
+                                            </div>
+                                            <div>
+                                                <div class="text-[10px] text-slate-500">Pangsa Unik</div>
+                                                <div class="font-bold text-slate-200 font-mono-code"><?= $r['share_unique_pct'] ?>%</div>
+                                            </div>
+                                            <div>
+                                                <div class="text-[10px] text-slate-500">Total Hits</div>
+                                                <div class="font-bold text-sky-400 font-mono-code"><?= number_format($r['total_hits']) ?></div>
+                                            </div>
+                                        </div>
+                                        <?php if ($r['top_isp'] !== '-'): ?>
+                                            <div class="text-[10px] text-slate-400 flex items-center gap-1.5 truncate">
+                                                <span class="text-slate-500">ISP:</span>
+                                                <span class="text-slate-300 font-mono-code truncate"><?= esc($r['top_isp']) ?></span>
+                                            </div>
+                                        <?php endif; ?>
+                                        <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                                            <div class="bg-gradient-to-r from-emerald-500 to-indigo-400 h-full rounded-full" style="width: <?= min(100, max(4, $r['share_unique_pct'])) ?>%;"></div>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </div>
+
+                        <!-- Desktop Table: Tabel Wilayah Aksesibel & Responsif -->
+                        <div tabindex="0" role="region" aria-labelledby="geo-regions-caption" class="hidden md:block overflow-x-auto rounded-xl border border-slate-700/60 bg-slate-900/40">
+                            <table class="w-full text-xs text-left">
+                                <caption id="geo-regions-caption" class="sr-only">Survei Pengunjung Berdasarkan Wilayah dan Provinsi</caption>
+                                <thead class="sticky top-0 bg-slate-900/95 text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-700/60 backdrop-blur-xs">
+                                    <tr>
+                                        <th scope="col" class="py-3 px-4">Wilayah / Provinsi</th>
+                                        <th scope="col" class="py-3 px-4">Negara Asal</th>
+                                        <th scope="col" class="py-3 px-4 text-center">Pengunjung Unik</th>
+                                        <th scope="col" class="py-3 px-4 text-center" style="width: 170px;">Pangsa Unik</th>
+                                        <th scope="col" class="py-3 px-4 text-center">Total Tayangan</th>
+                                        <th scope="col" class="py-3 px-4">Kota Terdeteksi</th>
+                                        <th scope="col" class="py-3 px-4">ISP Utama / Jaringan</th>
+                                        <th scope="col" class="py-3 px-4 text-right">Kunjungan Terakhir</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="desktop-geo-regions-tbody" class="divide-y divide-slate-800/80">
+                                    <?php if (empty($geoRegions)): ?>
+                                        <tr><td colspan="8" class="py-6 text-center text-slate-500">Belum ada data geolokasi wilayah/provinsi.</td></tr>
+                                    <?php else: ?>
+                                        <?php foreach ($geoRegions as $r): ?>
+                                            <tr class="hover:bg-slate-800/50 transition-colors geo-row-region" data-search-text="<?= strtolower($r['region_name'] . ' ' . $r['country_name'] . ' ' . $r['top_cities'] . ' ' . $r['top_isp']) ?>">
+                                                <td class="py-3 px-4 font-semibold text-slate-100">
+                                                    <div class="flex items-center gap-2">
+                                                        <span><?= esc($r['region_name']) ?></span>
+                                                    </div>
+                                                </td>
+                                                <td class="py-3 px-4 text-slate-300">
+                                                    <div class="flex items-center gap-1.5">
+                                                        <span><?= $r['flag'] ?></span>
+                                                        <span class="text-xs"><?= esc($r['country_name']) ?></span>
+                                                    </div>
+                                                </td>
+                                                <td class="py-3 px-4 text-center font-bold text-emerald-400 font-mono-code" data-cell="unique">
+                                                    <?= number_format($r['unique_visitors']) ?>
+                                                </td>
+                                                <td class="py-3 px-4">
+                                                    <div class="flex items-center gap-2">
+                                                        <div class="flex-1 bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                                                            <div class="bg-gradient-to-r from-emerald-500 to-indigo-400 h-full rounded-full" style="width: <?= min(100, max(4, $r['share_unique_pct'])) ?>%;"></div>
+                                                        </div>
+                                                        <span class="font-mono-code text-[11px] text-slate-300 w-12 text-right"><?= $r['share_unique_pct'] ?>%</span>
+                                                    </div>
+                                                </td>
+                                                <td class="py-3 px-4 text-center font-bold text-sky-400 font-mono-code" data-cell="hits">
+                                                    <?= number_format($r['total_hits']) ?>
+                                                </td>
+                                                <td class="py-3 px-4 text-slate-300 text-[11px] max-w-[180px] truncate" title="<?= esc($r['top_cities']) ?>">
+                                                    <?= esc($r['top_cities']) ?>
+                                                </td>
+                                                <td class="py-3 px-4 text-slate-400 font-mono-code text-[10.5px] max-w-[160px] truncate" title="<?= esc($r['top_isp']) ?>">
+                                                    <?= esc($r['top_isp']) ?>
+                                                </td>
+                                                <td class="py-3 px-4 text-right text-slate-400 font-mono-code text-[11px]">
+                                                    <?= date('d M Y', strtotime($r['last_visit'])) ?>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
 
         <!-- ========================================== -->
@@ -5937,6 +6263,11 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                     if (syncEl) {
                         syncEl.textContent = 'Sinkron: ' + (data.synced_at || new Date().toLocaleTimeString('id-ID'));
                     }
+
+                    // Update Metrik & Tabel Survei Geografis Real-time
+                    if (data.geo && data.geo.summary) {
+                        updateGeoAnalyticsRealtime(data.geo);
+                    }
                 }
             } catch (err) {
                 console.warn('Realtime visitor poll skipped:', err.message);
@@ -5979,6 +6310,75 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                     refreshVisitorStatsRealtime();
                 }
             });
+        }
+
+        // ==========================================
+        // KONTROL SURVEI GEOGRAFIS (NEGARA & WILAYAH)
+        // ==========================================
+        function switchGeoTab(tabName, btn) {
+            const paneCountries = document.getElementById('geo-pane-countries');
+            const paneRegions = document.getElementById('geo-pane-regions');
+            if (!paneCountries || !paneRegions) return;
+
+            document.querySelectorAll('.geo-tab-btn').forEach(b => {
+                b.classList.remove('bg-indigo-600', 'text-white', 'font-semibold', 'shadow-xs');
+                b.classList.add('text-slate-300');
+            });
+            btn.classList.add('bg-indigo-600', 'text-white', 'font-semibold', 'shadow-xs');
+            btn.classList.remove('text-slate-300');
+
+            if (tabName === 'countries') {
+                paneCountries.classList.remove('hidden');
+                paneRegions.classList.add('hidden');
+            } else {
+                paneCountries.classList.add('hidden');
+                paneRegions.classList.remove('hidden');
+            }
+        }
+
+        function filterGeoData(query) {
+            const q = (query || '').toLowerCase().trim();
+            const countryRows = document.querySelectorAll('.geo-row-country, .geo-card-country');
+            const regionRows = document.querySelectorAll('.geo-row-region, .geo-card-region');
+
+            countryRows.forEach(el => {
+                const text = el.getAttribute('data-search-text') || '';
+                el.style.display = (!q || text.includes(q)) ? '' : 'none';
+            });
+
+            regionRows.forEach(el => {
+                const text = el.getAttribute('data-search-text') || '';
+                el.style.display = (!q || text.includes(q)) ? '' : 'none';
+            });
+        }
+
+        function updateGeoAnalyticsRealtime(geoData) {
+            if (!geoData || !geoData.summary) return;
+            const s = geoData.summary;
+
+            updateNumberWithHighlight(document.getElementById('geo-metric-countries'), (s.total_countries || 0).toLocaleString('en-US') + ' Negara');
+            updateNumberWithHighlight(document.getElementById('geo-metric-regions'), (s.total_regions || 0).toLocaleString('en-US') + ' Wilayah');
+
+            const domEl = document.getElementById('geo-metric-domestic');
+            if (domEl) {
+                const domText = (s.domestic_unique || 0).toLocaleString('en-US') + ' (' + (s.domestic_share_pct || 0) + '%)';
+                updateNumberWithHighlight(domEl, domText);
+            }
+
+            const intlEl = document.getElementById('geo-metric-intl');
+            if (intlEl) {
+                const intlText = (s.international_unique || 0).toLocaleString('en-US') + ' (' + (s.international_share_pct || 0) + '%)';
+                updateNumberWithHighlight(intlEl, intlText);
+            }
+
+            const badgeC = document.getElementById('badge-total-countries');
+            if (badgeC && Array.isArray(geoData.countries)) {
+                badgeC.textContent = geoData.countries.length;
+            }
+            const badgeR = document.getElementById('badge-total-regions');
+            if (badgeR && Array.isArray(geoData.regions)) {
+                badgeR.textContent = geoData.regions.length;
+            }
         }
 
         // ==========================================

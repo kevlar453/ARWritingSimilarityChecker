@@ -6,6 +6,8 @@ perguruan tinggi berbasis protokol OAI-PMH 2.0 (EPrints, DSpace, OJS, Neliti, dl
 
 import os
 import sys
+import socket
+import ipaddress
 import urllib.request
 import urllib.parse
 import xml.etree.ElementTree as ET
@@ -45,8 +47,26 @@ def clean_xml_tag(tag: str) -> str:
     return tag
 
 
+def _validate_external_http_url(url: str) -> None:
+    """Memvalidasi URL eksternal guna mencegah SSRF ke jaringan lokal/internal."""
+    parsed = urllib.parse.urlparse(url)
+    if parsed.scheme not in ("http", "https") or not parsed.hostname:
+        raise ValueError(f"Skema atau hostname URL tidak diizinkan: {url}")
+    host = parsed.hostname.lower()
+    if host in ("localhost", "127.0.0.1", "::1", "0.0.0.0"):
+        raise ValueError(f"Akses ke host loopback ditolak: {host}")
+    try:
+        ip_obj = ipaddress.ip_address(host)
+        if ip_obj.is_private or ip_obj.is_loopback or ip_obj.is_link_local or ip_obj.is_reserved:
+            raise ValueError(f"Akses ke IP internal ditolak: {host}")
+    except ValueError as ve:
+        if "ditolak" in str(ve):
+            raise
+
+
 def fetch_url_content(url: str, timeout: int = 25) -> Tuple[bytes, str]:
     """Mengambil konten dari URL via HTTP GET dengan timeout dan user-agent standar."""
+    _validate_external_http_url(url)
     req = urllib.request.Request(
         url,
         headers={"User-Agent": USER_AGENT}
@@ -59,6 +79,10 @@ def fetch_url_content(url: str, timeout: int = 25) -> Tuple[bytes, str]:
 
 def download_file_stream(url: str, dest_path: Path, max_bytes: int = 30 * 1024 * 1024, timeout: int = 30) -> bool:
     """Mengunduh berkas dengan batasan ukuran maksimum dan streaming."""
+    try:
+        _validate_external_http_url(url)
+    except Exception:
+        return False
     req = urllib.request.Request(
         url,
         headers={"User-Agent": USER_AGENT}

@@ -40,6 +40,33 @@ def _signal_handler(signum, frame):
     _SHUTDOWN_REQUESTED = True
 
 
+def recover_stuck_narrative_jobs(conn, timeout_minutes: int = 10) -> int:
+    """
+    Memulihkan ai_narrative_jobs yang macet dalam status 'processing' melebihi timeout_minutes
+    agar tidak menyebabkan deadlock permanen pada batas max_concurrent.
+    """
+    try:
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE ai_narrative_jobs
+            SET status = CASE WHEN retry_count < 3 THEN 'deferred' ELSE 'failed' END,
+                retry_count = retry_count + 1,
+                last_error = CONCAT(COALESCE(last_error, ''), ' [Auto-recovered after >', %s, 'm stuck in processing]'),
+                updated_at = NOW()
+            WHERE status = 'processing'
+              AND updated_at < NOW() - INTERVAL %s MINUTE
+        """, (timeout_minutes, timeout_minutes))
+        recovered = cursor.rowcount
+        conn.commit()
+        cursor.close()
+        if recovered > 0:
+            logger.warning(f"Memulihkan {recovered} tugas ai_narrative_jobs yang macet > {timeout_minutes} menit.")
+        return recovered
+    except Exception as e:
+        logger.error(f"Gagal memulihkan ai_narrative_jobs yang macet: {e}")
+        return 0
+
+
 def count_active_jobs(conn) -> int:
     """Menghitung jumlah pekerjaan yang saat ini sedang berstatus 'processing'."""
     try:
@@ -103,6 +130,7 @@ def run_single_pass(specific_job_id: Optional[int] = None) -> bool:
 
     conn = get_connection()
     try:
+        recover_stuck_narrative_jobs(conn, timeout_minutes=10)
         active = count_active_jobs(conn)
         if active >= max_concurrent and not specific_job_id:
             logger.debug(f"Batas konkurensi tercapai ({active}/{max_concurrent}). Menunda pengambilan job baru.")

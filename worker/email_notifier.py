@@ -4,6 +4,7 @@ Mengirimkan notifikasi email otomatis ke pengguna saat laporan hasil pemeriksaan
 """
 
 import os
+import html
 import smtplib
 import ssl
 from email.message import EmailMessage
@@ -168,13 +169,13 @@ def notify_user_report_completed(
                                 Pemeriksaan Naskah Selesai
                             </h2>
                             <p style="font-size: 14px; color: #475569; line-height: 1.6; margin-top: 0; margin-bottom: 20px;">
-                                Halo <strong>{recipient_name}</strong>, naskah karya ilmiah Anda telah selesai dianalisis oleh antrean pemrosesan worker AR Tilik. Berikut adalah rangkuman hasil pemeriksaannya:
+                                Halo <strong>{html.escape(str(recipient_name))}</strong>, naskah karya ilmiah Anda telah selesai dianalisis oleh antrean pemrosesan worker AR Tilik. Berikut adalah rangkuman hasil pemeriksaannya:
                             </p>
 
                             <!-- Summary Card -->
                             <div style="background-color: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; padding: 18px; margin-bottom: 24px;">
                                 <div style="font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 12px;">
-                                    📄 {document_title}
+                                    📄 {html.escape(str(document_title))}
                                 </div>
 
                                 <table width="100%" cellspacing="0" cellpadding="0" style="border-collapse: collapse;">

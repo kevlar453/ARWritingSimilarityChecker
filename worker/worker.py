@@ -50,7 +50,8 @@ def process_job(job: dict):
             doc = cursor.fetchone()
             cursor.close()
             if not doc:
-                raise ValueError(f"Dokumen ID {doc_id} tidak ditemukan.")
+                print(f"  [INDEX CORPUS] Dokumen korpus ID #{doc_id} tidak ditemukan (mungkin telah dihapus), melewati pengindeksan.")
+                return
             index_document(
                 connection=conn,
                 document_id=doc_id,
@@ -209,12 +210,16 @@ def run_worker(daemon: bool = True):
                 continue
                 
             job_id = job["id"]
-            print(f"[*] Memproses job #{job_id} ({job['type']})...")
             proc_conn = get_connection()
             try:
-                mark_job_processing(proc_conn, job_id)
+                claimed = mark_job_processing(proc_conn, job_id)
             finally:
                 proc_conn.close()
+
+            if not claimed:
+                continue
+
+            print(f"[*] Memproses job #{job_id} ({job['type']})...")
 
             try:
                 process_job(job)

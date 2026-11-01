@@ -3,24 +3,24 @@
 use CodeIgniter\Router\RouteCollection;
 
 /** @var RouteCollection $routes */
-$routes->match(['get', 'head'], '/', 'LandingController::index');
-$routes->match(['get', 'head'], 'riset/ar-tilik-vs-zerogpt', 'LandingController::researchZerogpt');
-$routes->match(['get', 'head'], 'perbandingan/zerogpt', 'LandingController::researchZerogpt');
-$routes->match(['get', 'head'], 'riset/ar-tilik-vs-turnitin', 'LandingController::researchTurnitin');
-$routes->match(['get', 'head'], 'perbandingan/turnitin', 'LandingController::researchTurnitin');
-$routes->match(['get', 'head'], 'riset/benchmark-naskah-indonesia', 'LandingController::benchmark');
-$routes->match(['get', 'head'], 'benchmark', 'LandingController::benchmark');
-$routes->match(['get', 'head'], 'benchmark/dataset/(:segment)', 'LandingController::downloadBenchmarkDataset/$1');
-$routes->match(['get', 'head'], 'benchmark/dataset', 'LandingController::downloadBenchmarkDataset');
-$routes->match(['get', 'head'], 'dashboard', 'DashboardController::index');
-$routes->match(['get', 'head'], 'report/(:num)', 'DashboardController::report/$1');
-$routes->match(['get', 'head'], 'reports/(:num)', 'DashboardController::report/$1');
-$routes->match(['get', 'head'], 'dashboard/report/(:num)', 'DashboardController::report/$1');
-$routes->match(['get', 'head'], 'dashboard/reports/(:num)', 'DashboardController::report/$1');
-$routes->match(['get', 'head'], 'report/(:num)/export', 'DashboardController::exportPdf/$1');
-$routes->match(['get', 'head'], 'reports/(:num)/export', 'DashboardController::exportPdf/$1');
-$routes->match(['get', 'head'], 'dashboard/report/(:num)/export', 'DashboardController::exportPdf/$1');
-$routes->match(['get', 'head'], 'dashboard/reports/(:num)/export', 'DashboardController::exportPdf/$1');
+$routes->match(['GET', 'HEAD'], '/', 'LandingController::index');
+$routes->match(['GET', 'HEAD'], 'riset/ar-tilik-vs-zerogpt', 'LandingController::researchZerogpt');
+$routes->match(['GET', 'HEAD'], 'perbandingan/zerogpt', 'LandingController::researchZerogpt');
+$routes->match(['GET', 'HEAD'], 'riset/ar-tilik-vs-turnitin', 'LandingController::researchTurnitin');
+$routes->match(['GET', 'HEAD'], 'perbandingan/turnitin', 'LandingController::researchTurnitin');
+$routes->match(['GET', 'HEAD'], 'riset/benchmark-naskah-indonesia', 'LandingController::benchmark');
+$routes->match(['GET', 'HEAD'], 'benchmark', 'LandingController::benchmark');
+$routes->match(['GET', 'HEAD'], 'benchmark/dataset/(:segment)', 'LandingController::downloadBenchmarkDataset/$1');
+$routes->match(['GET', 'HEAD'], 'benchmark/dataset', 'LandingController::downloadBenchmarkDataset');
+$routes->match(['GET', 'HEAD'], 'dashboard', 'DashboardController::index');
+$routes->match(['GET', 'HEAD'], 'report/(:num)', 'DashboardController::report/$1');
+$routes->match(['GET', 'HEAD'], 'reports/(:num)', 'DashboardController::report/$1');
+$routes->match(['GET', 'HEAD'], 'dashboard/report/(:num)', 'DashboardController::report/$1');
+$routes->match(['GET', 'HEAD'], 'dashboard/reports/(:num)', 'DashboardController::report/$1');
+$routes->match(['GET', 'HEAD'], 'report/(:num)/export', 'DashboardController::exportPdf/$1');
+$routes->match(['GET', 'HEAD'], 'reports/(:num)/export', 'DashboardController::exportPdf/$1');
+$routes->match(['GET', 'HEAD'], 'dashboard/report/(:num)/export', 'DashboardController::exportPdf/$1');
+$routes->match(['GET', 'HEAD'], 'dashboard/reports/(:num)/export', 'DashboardController::exportPdf/$1');
 $routes->get('report/(:num)/preview', 'DashboardController::previewPdf/$1');
 $routes->get('reports/(:num)/preview', 'DashboardController::previewPdf/$1');
 $routes->get('dashboard/report/(:num)/preview', 'DashboardController::previewPdf/$1');
@@ -29,49 +29,49 @@ $routes->post('dashboard/audit/run/(:num)', 'DashboardController::runAudit/$1');
 $routes->post('audit/run/(:num)', 'DashboardController::runAudit/$1');
 $routes->get('dashboard/audit/status/(:num)', 'DashboardController::auditStatus/$1');
 $routes->get('audit/status/(:num)', 'DashboardController::auditStatus/$1');
-$routes->match(['get', 'head'], 'documents/(:num)/preview', 'DashboardController::previewDocument/$1');
-$routes->match(['get', 'head'], 'dashboard/documents/(:num)/preview', 'DashboardController::previewDocument/$1');
-$routes->match(['get', 'head'], 'documents/shared/(:segment)', 'DashboardController::sharedAccess/$1');
-$routes->match(['get', 'head'], 'dashboard/documents/shared/(:segment)', 'DashboardController::sharedAccess/$1');
+$routes->match(['GET', 'HEAD'], 'documents/(:num)/preview', 'DashboardController::previewDocument/$1');
+$routes->match(['GET', 'HEAD'], 'dashboard/documents/(:num)/preview', 'DashboardController::previewDocument/$1');
+$routes->match(['GET', 'HEAD'], 'documents/shared/(:segment)', 'DashboardController::sharedAccess/$1');
+$routes->match(['GET', 'HEAD'], 'dashboard/documents/shared/(:segment)', 'DashboardController::sharedAccess/$1');
 $routes->post('dashboard/documents/(:num)/purge-file', 'DashboardController::purgeDocumentFile/$1');
 $routes->post('dashboard/documents/(:num)/delete', 'DashboardController::deleteUserDocument/$1');
 $routes->post('dashboard/documents/(:num)/update-title', 'DashboardController::updateDocumentTitle/$1');
 $routes->post('documents/(:num)/update-title', 'DashboardController::updateDocumentTitle/$1');
-$routes->match(['get', 'head'], 'dashboard/referral/stats', 'DashboardController::referralStats');
-$routes->match(['get', 'head'], 'verify/(:segment)/pdf', 'DashboardController::downloadCertificatePdf/$1');
-$routes->match(['get', 'head'], 'dashboard/reports/(:num)/certificate-pdf', 'DashboardController::downloadCertificatePdfByReportId/$1');
-$routes->match(['get', 'head'], 'verify/(:segment)', 'DashboardController::verify/$1');
-$routes->match(['get', 'head'], 'verify', 'DashboardController::verify');
-$routes->match(['get', 'head'], 'integrations/ojs/pdf', 'DashboardController::downloadOjsPdf');
-$routes->match(['get', 'head'], 'docs/ojs/pdf', 'DashboardController::downloadOjsPdf');
-$routes->match(['get', 'head'], 'integrations/ojs/connector', 'DashboardController::downloadOjsConnector');
-$routes->match(['get', 'head'], 'docs/ojs/connector', 'DashboardController::downloadOjsConnector');
-$routes->match(['get', 'head'], 'integrations/ojs/ARTilikOJSConnector.php', 'DashboardController::downloadOjsConnector');
-$routes->match(['get', 'head'], 'integrations/ojs/runner', 'DashboardController::downloadOjsRunner');
-$routes->match(['get', 'head'], 'docs/ojs/runner', 'DashboardController::downloadOjsRunner');
-$routes->match(['get', 'head'], 'integrations/ojs/artilik_ojs_runner.php', 'DashboardController::downloadOjsRunner');
-$routes->match(['get', 'head'], 'integrations/ojs/plugin', 'DashboardController::downloadOjsPluginZip');
-$routes->match(['get', 'head'], 'docs/ojs/plugin', 'DashboardController::downloadOjsPluginZip');
-$routes->match(['get', 'head'], 'integrations/ojs/artilik-ojs-plugin.zip', 'DashboardController::downloadOjsPluginZip');
+$routes->match(['GET', 'HEAD'], 'dashboard/referral/stats', 'DashboardController::referralStats');
+$routes->match(['GET', 'HEAD'], 'verify/(:segment)/pdf', 'DashboardController::downloadCertificatePdf/$1');
+$routes->match(['GET', 'HEAD'], 'dashboard/reports/(:num)/certificate-pdf', 'DashboardController::downloadCertificatePdfByReportId/$1');
+$routes->match(['GET', 'HEAD'], 'verify/(:segment)', 'DashboardController::verify/$1');
+$routes->match(['GET', 'HEAD'], 'verify', 'DashboardController::verify');
+$routes->match(['GET', 'HEAD'], 'integrations/ojs/pdf', 'DashboardController::downloadOjsPdf');
+$routes->match(['GET', 'HEAD'], 'docs/ojs/pdf', 'DashboardController::downloadOjsPdf');
+$routes->match(['GET', 'HEAD'], 'integrations/ojs/connector', 'DashboardController::downloadOjsConnector');
+$routes->match(['GET', 'HEAD'], 'docs/ojs/connector', 'DashboardController::downloadOjsConnector');
+$routes->match(['GET', 'HEAD'], 'integrations/ojs/ARTilikOJSConnector.php', 'DashboardController::downloadOjsConnector');
+$routes->match(['GET', 'HEAD'], 'integrations/ojs/runner', 'DashboardController::downloadOjsRunner');
+$routes->match(['GET', 'HEAD'], 'docs/ojs/runner', 'DashboardController::downloadOjsRunner');
+$routes->match(['GET', 'HEAD'], 'integrations/ojs/artilik_ojs_runner.php', 'DashboardController::downloadOjsRunner');
+$routes->match(['GET', 'HEAD'], 'integrations/ojs/plugin', 'DashboardController::downloadOjsPluginZip');
+$routes->match(['GET', 'HEAD'], 'docs/ojs/plugin', 'DashboardController::downloadOjsPluginZip');
+$routes->match(['GET', 'HEAD'], 'integrations/ojs/artilik-ojs-plugin.zip', 'DashboardController::downloadOjsPluginZip');
 
 // Media Promosi & Prospektus Eksekutif Institusi (PDF)
-$routes->match(['get', 'head'], 'docs/brosur', 'DashboardController::downloadPromoBrochure');
-$routes->match(['get', 'head'], 'promosi/brosur', 'DashboardController::downloadPromoBrochure');
-$routes->match(['get', 'head'], 'brosur', 'DashboardController::downloadPromoBrochure');
-$routes->match(['get', 'head'], 'docs/Brosur_Eksekutif_ARTilik.pdf', 'DashboardController::downloadPromoBrochure');
-$routes->match(['get', 'head'], 'promosi/Brosur_Eksekutif_ARTilik.pdf', 'DashboardController::downloadPromoBrochure');
+$routes->match(['GET', 'HEAD'], 'docs/brosur', 'DashboardController::downloadPromoBrochure');
+$routes->match(['GET', 'HEAD'], 'promosi/brosur', 'DashboardController::downloadPromoBrochure');
+$routes->match(['GET', 'HEAD'], 'brosur', 'DashboardController::downloadPromoBrochure');
+$routes->match(['GET', 'HEAD'], 'docs/Brosur_Eksekutif_ARTilik.pdf', 'DashboardController::downloadPromoBrochure');
+$routes->match(['GET', 'HEAD'], 'promosi/Brosur_Eksekutif_ARTilik.pdf', 'DashboardController::downloadPromoBrochure');
 
-$routes->match(['get', 'head'], 'sitemap.xml', 'SitemapController::index');
+$routes->match(['GET', 'HEAD'], 'sitemap.xml', 'SitemapController::index');
 
 // Preferensi Surel & Berhenti Berlangganan (RFC 8058 Unsubscribe)
-$routes->match(['get', 'post', 'head'], 'email/unsubscribe', 'EmailPreferenceController::unsubscribe');
-$routes->match(['get', 'post', 'head'], 'unsubscribe', 'EmailPreferenceController::unsubscribe');
+$routes->match(['GET', 'POST', 'HEAD'], 'email/unsubscribe', 'EmailPreferenceController::unsubscribe');
+$routes->match(['GET', 'POST', 'HEAD'], 'unsubscribe', 'EmailPreferenceController::unsubscribe');
 
 // Legal & Contact Routes
-$routes->match(['get', 'head'], 'privacy', 'LegalController::privacy');
-$routes->match(['get', 'head'], 'terms', 'LegalController::terms');
+$routes->match(['GET', 'HEAD'], 'privacy', 'LegalController::privacy');
+$routes->match(['GET', 'HEAD'], 'terms', 'LegalController::terms');
 $routes->get('contact/challenge', 'LegalController::challenge');
-$routes->match(['get', 'post'], 'contact/validate-email', 'LegalController::validateEmail');
+$routes->match(['GET', 'POST'], 'contact/validate-email', 'LegalController::validateEmail');
 $routes->post('contact/send', 'LegalController::sendMessage');
 
 // Feedback & Testimonials Routes
@@ -80,30 +80,30 @@ $routes->post('feedback/testimonial', 'FeedbackController::submitTestimonial');
 $routes->get('feedback/status/(:num)', 'FeedbackController::getStatus/$1');
 
 // Ambassador & Referral Program Routes (Fase 2)
-$routes->match(['get', 'head'], 'ambassador', 'AmbassadorController::index');
-$routes->match(['get', 'head'], 'ambassador/guide', 'AmbassadorController::guide');
+$routes->match(['GET', 'HEAD'], 'ambassador', 'AmbassadorController::index');
+$routes->match(['GET', 'HEAD'], 'ambassador/guide', 'AmbassadorController::guide');
 $routes->post('ambassador/apply', 'AmbassadorController::apply');
-$routes->match(['get', 'head'], 'ambassador/verify/(:segment)', 'AmbassadorController::verify/$1');
+$routes->match(['GET', 'HEAD'], 'ambassador/verify/(:segment)', 'AmbassadorController::verify/$1');
 $routes->post('ambassador/verify/(:segment)', 'AmbassadorController::submitVerification/$1');
-$routes->match(['get', 'head'], 'ambassador/dashboard', 'AmbassadorController::dashboard');
+$routes->match(['GET', 'HEAD'], 'ambassador/dashboard', 'AmbassadorController::dashboard');
 $routes->post('ambassador/proof', 'AmbassadorController::submitProof');
 $routes->post('ambassador/payout', 'AmbassadorController::requestPayout');
-$routes->match(['get', 'head'], 'ref/(:segment)', 'AmbassadorController::ref/$1');
+$routes->match(['GET', 'HEAD'], 'ref/(:segment)', 'AmbassadorController::ref/$1');
 
 // Ambassador Certificate & Public Verification (Fitur 2 - Kelulusan Duta Kampus)
-$routes->match(['get', 'head'], 'ambassador/certificate/(:segment)', 'AmbassadorController::certificate/$1');
-$routes->match(['get', 'head'], 'ambassador/certificate/(:segment)/pdf', 'AmbassadorController::downloadCertificatePdf/$1');
-$routes->match(['get', 'head'], 'ambassador/certificate/(:segment)/preview', 'AmbassadorController::previewCertificatePdf/$1');
+$routes->match(['GET', 'HEAD'], 'ambassador/certificate/(:segment)', 'AmbassadorController::certificate/$1');
+$routes->match(['GET', 'HEAD'], 'ambassador/certificate/(:segment)/pdf', 'AmbassadorController::downloadCertificatePdf/$1');
+$routes->match(['GET', 'HEAD'], 'ambassador/certificate/(:segment)/preview', 'AmbassadorController::previewCertificatePdf/$1');
 
 // Shortcut / Alias Friendly Routes
-$routes->match(['get', 'head'], 'pricing', static function () {
+$routes->match(['GET', 'HEAD'], 'pricing', static function () {
     return redirect()->to(base_url('/#langganan'));
 });
-$routes->match(['get', 'head'], 'login', static function () {
-    $redirect = service('request')->getGet('redirect');
+$routes->match(['GET', 'HEAD'], 'login', static function () {
+    $redirect = (string) service('request')->getGet('redirect');
     $target = base_url('/?auth=login');
-    if (!empty($redirect)) {
-        $target .= '&redirect=' . urlencode((string) $redirect);
+    if ($redirect !== '' && preg_match('/^[a-zA-Z0-9\/_\-]+$/', $redirect) && strpos($redirect, '//') === false) {
+        $target .= '&redirect=' . urlencode($redirect);
     }
     return redirect()->to($target);
 });
@@ -115,10 +115,10 @@ $routes->group('auth', function ($routes) {
     $routes->get('logout', 'AuthController::logout');
     $routes->post('logout', 'AuthController::logout');
     $routes->get('status', 'AuthController::status');
-    $routes->match(['get', 'head'], 'verify-email', 'AuthController::verifyEmail');
+    $routes->match(['GET', 'HEAD'], 'verify-email', 'AuthController::verifyEmail');
     $routes->post('resend-verification', 'AuthController::resendVerification');
     $routes->post('forgot-password', 'AuthController::forgotPassword');
-    $routes->match(['get', 'head'], 'reset-password', 'AuthController::resetPasswordView');
+    $routes->match(['GET', 'HEAD'], 'reset-password', 'AuthController::resetPasswordView');
     $routes->post('reset-password', 'AuthController::resetPassword');
     $routes->get('security-token', 'AuthController::securityToken');
 });
@@ -128,7 +128,7 @@ $routes->group('payment', function ($routes) {
     $routes->get('packages', 'PaymentController::packages');
     $routes->post('create-snap', 'PaymentController::createSnapToken');
     $routes->post('webhook', 'PaymentController::webhook');
-    $routes->match(['get', 'post', 'head'], 'status/(:segment)', 'PaymentController::checkStatus/$1');
+    $routes->match(['GET', 'POST', 'HEAD'], 'status/(:segment)', 'PaymentController::checkStatus/$1');
     $routes->post('cancel/(:segment)', 'PaymentController::cancel/$1');
     $routes->post('auto-expire', 'PaymentController::autoExpire');
     $routes->get('history', 'PaymentController::history');

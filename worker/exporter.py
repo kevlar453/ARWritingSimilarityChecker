@@ -329,16 +329,17 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
             tier = tc.get("significance_tier", "COMMON_VOCABULARY")
             tier_label = "Khas Disipliner" if tier == "DISCIPLINARY_KEYWORD" else ("Bidang Kajian" if tier == "TOPICAL_TERM" else "Kosakata Umum")
             c_pct = float(tc.get('contribution_percentage') or tc.get('contribution_pct') or 0.0)
+            safe_term = html_escape(tc.get("term", ""))
             t_rows += f"""
             <tr>
-                <td style="padding: 4px 8px; border: 1px solid #e2e8f0; font-weight: bold;">{tc.get('term')}</td>
+                <td style="padding: 4px 8px; border: 1px solid #e2e8f0; font-weight: bold;">{safe_term}</td>
                 <td style="padding: 4px 8px; border: 1px solid #e2e8f0; text-align: center;">{tc.get('sub_count', 0)}x / {tc.get('doc_count', 0)}x</td>
                 <td style="padding: 4px 8px; border: 1px solid #e2e8f0; text-align: right;">{float(tc.get('idf', 0)):.3f}</td>
                 <td style="padding: 4px 8px; border: 1px solid #e2e8f0; text-align: right; font-weight: bold; color: #047857;">{c_pct:.1f}%</td>
                 <td style="padding: 4px 8px; border: 1px solid #e2e8f0; text-align: center; font-size: 7.5pt;">{tier_label}</td>
             </tr>
             """
-        narrative = term_drill.get("explanation_narrative", "")
+        narrative = html_escape(term_drill.get("explanation_narrative", ""))
         term_drill_html = f"""
         <h3 class="section-header">{header_title}</h3>
         {ref_note_html}
@@ -399,7 +400,7 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
     display_sources = sources[:6]
     for s in display_sources:
         s_rank = s.get("source_rank", 1)
-        s_title = s.get("source_title") or s.get("title") or f"Rujukan #{s.get('source_document_id')}"
+        s_title = html_escape(s.get("source_title") or s.get("title") or f"Rujukan #{s.get('source_document_id')}")
         s_sim = float(s.get("similarity") or 0)
         s_exact = float(s.get("exact_similarity") or 0)
         s_cosine = float(s.get("cosine_similarity") or 0)
@@ -880,17 +881,19 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
     matches_html = ""
     for idx, m in enumerate(matches[:2], 1):
         w_cnt = m.get("word_count", 0)
-        m_type = (m.get("match_type") or "exact").upper()
-        s_sub = m.get("submission_snippet", "")
-        s_src = m.get("source_snippet", "")
-        src_id = m.get("source_document_id", "-")
+        m_type = html_escape((m.get("match_type") or "exact").upper())
+        raw_sub = str(m.get("submission_snippet", ""))
+        raw_src = str(m.get("source_snippet", ""))
+        s_sub_trunc = html_escape(raw_sub[:240] + ("..." if len(raw_sub) > 240 else ""))
+        s_src_trunc = html_escape(raw_src[:240] + ("..." if len(raw_src) > 240 else ""))
+        src_id = html_escape(m.get("source_document_id", "-"))
         sub_span = f"Kata {m.get('submission_start', 0)} &ndash; {m.get('submission_end', 0)}"
 
         bp_html = ""
         if m.get("is_boilerplate"):
-            bp_cat = m.get("boilerplate_category", "FORMULA")
-            bp_phr = m.get("boilerplate_phrase", "")
-            bp_rat = m.get("boilerplate_rationale", "")
+            bp_cat = html_escape(m.get("boilerplate_category", "FORMULA"))
+            bp_phr = html_escape(m.get("boilerplate_phrase", ""))
+            bp_rat = html_escape(m.get("boilerplate_rationale", ""))
             bp_html = f"""
             <div style="margin-top: 4px; padding: 3px 6px; background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 4px; font-size: 7pt; color: #3730a3;">
                 <strong>Formulasi Ilmiah Baku ({bp_cat}):</strong> &ldquo;{bp_phr}&rdquo; &mdash; {bp_rat}
@@ -906,11 +909,11 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
             <div style="font-size: 7.5pt; line-height: 1.35; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
                 <div style="background: #ffffff; padding: 5px; border: 1px solid #e2e8f0; border-radius: 4px;">
                     <div style="font-weight: bold; color: #1e3a8a; font-size: 7pt; margin-bottom: 2px; text-transform: uppercase;">Cuplikan Naskah Submisi</div>
-                    <div style="color: #334155; font-style: italic;">&ldquo;{s_sub[:240] + ('...' if len(s_sub) > 240 else '')}&rdquo;</div>
+                    <div style="color: #334155; font-style: italic;">&ldquo;{s_sub_trunc}&rdquo;</div>
                 </div>
                 <div style="background: #ffffff; padding: 5px; border: 1px solid #e2e8f0; border-radius: 4px;">
                     <div style="font-weight: bold; color: #475569; font-size: 7pt; margin-bottom: 2px; text-transform: uppercase;">Cuplikan Dokumen Rujukan</div>
-                    <div style="color: #334155; font-style: italic;">&ldquo;{s_src[:240] + ('...' if len(s_src) > 240 else '')}&rdquo;</div>
+                    <div style="color: #334155; font-style: italic;">&ldquo;{s_src_trunc}&rdquo;</div>
                 </div>
             </div>
             {bp_html}

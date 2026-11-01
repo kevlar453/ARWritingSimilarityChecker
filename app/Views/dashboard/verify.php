@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $status === 'valid' ? 'Sertifikat Hasil Uji Kemiripan #' . esc($code) . ' — AR Tilik' : 'Verifikasi Sertifikat Resmi — AR Tilik | Portal Validasi QR Ilmiah' ?></title>
     <meta name="description" content="Portal Verifikasi Resmi Sertifikat Keaslian Hasil Telaah Kesepadanan Naskah AR Tilik. Dokumen verifikasi integritas karya ilmiah berstandar perguruan tinggi berstempel digital kriptografis.">
-    <meta name="robots" content="<?= $status === 'valid' ? 'noindex, follow' : 'index, follow' ?>">
-    <link rel="canonical" href="<?= base_url('verify' . (!empty($code) ? '/' . esc($code) : '')) ?>">
+    <meta name="robots" content="<?= $status === 'input' ? 'index, follow' : 'noindex, nofollow' ?>">
+    <link rel="canonical" href="<?= base_url('verify' . ($status === 'valid' && !empty($code) ? '/' . esc($code) : '')) ?>">
     <meta name="theme-color" content="#081a33">
 
     <!-- Open Graph -->
@@ -353,9 +353,9 @@
                             <div class="font-sans text-[8px] sm:text-[9px] tracking-[0.18em] text-[#081a33] font-extrabold uppercase leading-tight text-center">
                                 SISTEM PEMERIKSAAN KARYA ILMIAH &bull; AR TILIK FORENSIC ENGINE
                             </div>
-                            <h1 class="font-diploma-serif text-[13px] sm:text-base font-black tracking-normal text-[#081a33] uppercase leading-snug px-1 text-center whitespace-normal sm:whitespace-nowrap">
+                            <div class="font-diploma-serif text-[13px] sm:text-base font-black tracking-normal text-[#081a33] uppercase leading-snug px-1 text-center whitespace-normal sm:whitespace-nowrap" role="heading" aria-level="2">
                                 SERTIFIKAT HASIL UJI KEMIRIPAN & ORISINALITAS NASKAH
-                            </h1>
+                            </div>
                             <div class="font-editorial-serif italic text-[11px] sm:text-xs text-[#875c16] font-semibold text-center">
                                 Certificate of Similarity &amp; Originality Forensic Attestation
                             </div>
@@ -538,7 +538,7 @@
                     ⚠️
                 </div>
                 <div class="space-y-1.5">
-                    <h2 class="text-xl font-bold text-slate-900 font-diploma-serif">Sertifikat Tidak Terdaftar</h2>
+                    <h1 class="text-xl font-bold text-slate-900 font-diploma-serif">Sertifikat Tidak Terdaftar</h1>
                     <p class="text-xs text-slate-500 leading-relaxed">
                         Nomor registrasi <span class="font-mono-code font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded"><?= esc($code) ?></span> tidak ditemukan dalam pangkalan data resmi integritas akademik AR Tilik.
                     </p>

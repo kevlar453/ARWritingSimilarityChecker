@@ -95,7 +95,7 @@
           ],
           "author": {
             "@id": "<?= base_url('#organization') ?>"
-          },
+          }<?php if (!empty($approvedTestimonials) && (int)($testimonialStats['total_reviews'] ?? count($approvedTestimonials)) > 0): ?>,
           "aggregateRating": {
             "@type": "AggregateRating",
             "ratingValue": "<?= number_format($testimonialStats['avg_rating'] ?? 5.0, 1) ?>",
@@ -103,14 +103,14 @@
             "reviewCount": "<?= max(1, (int)($testimonialStats['total_reviews'] ?? count($approvedTestimonials))) ?>",
             "bestRating": "5",
             "worstRating": "1"
-          }<?php if (!empty($approvedTestimonials)): ?>,
+          },
           "review": [
             <?php foreach (array_slice($approvedTestimonials, 0, 5) as $sIdx => $sRev): ?>
             {
               "@type": "Review",
               "author": {
                 "@type": "Person",
-                "name": "<?= esc($sRev['display_name'] ?? $sRev['author_name']) ?>"
+                "name": <?= json_encode((string)($sRev['display_name'] ?? $sRev['author_name'] ?? 'Sivitas Akademika'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) ?>
               },
               "reviewRating": {
                 "@type": "Rating",
@@ -118,7 +118,7 @@
                 "bestRating": "5",
                 "worstRating": "1"
               },
-              "reviewBody": "<?= esc(str_replace(['"', "\r", "\n"], ["'", ' ', ' '], $sRev['content'])) ?>"
+              "reviewBody": <?= json_encode(preg_replace('/\s+/', ' ', trim((string)($sRev['content'] ?? ''))), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) ?>
             }<?= $sIdx < min(4, count($approvedTestimonials) - 1) ? ',' : '' ?>
             <?php endforeach; ?>
           ]
@@ -165,7 +165,7 @@
               "name": "Apakah sivitas akademika (mahasiswa & dosen) dapat menggunakan AR Tilik secara gratis?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Ya, 100% gratis. Setiap akun yang mendaftar langsung memperoleh kuota 3 submisi per minggu yang diperbarui secara otomatis. Selain itu, sivitas akademika dapat menambah kuota permanen secara gratis melalui program Gotong Royong Korpus dengan menyumbangkan repositori skripsi/tesis berlisensi terbuka (Open Access), atau melakukan top-up terjangkau mulai Rp 5.000 via QRIS."
+                "text": "Ya, 100% gratis. Setiap akun yang mendaftar langsung memperoleh kuota 3 submisi per minggu yang diperbarui secara otomatis. Selain itu, sivitas akademika dapat menambah kuota permanen secara gratis melalui program Gotong Royong Korpus dengan menyumbangkan repositori skripsi/tesis berlisensi terbuka (Open Access), atau melakukan top-up terjangkau mulai Rp 10.000 (3 cek) via QRIS."
               }
             },
             {
@@ -3819,7 +3819,7 @@
                             <li><span class="check-icon">✓</span> <span><strong>Bebas Risiko Self-Plagiarism:</strong> Naskah pra-sidang Anda tidak disimpan ke korpus publik.</span></li>
                             <li><span class="check-icon">✓</span> <span><strong>Audit Sitasi Otomatis:</strong> Pastikan tidak ada kutipan fiktif sebelum naskah dicetak.</span></li>
                             <li><span class="check-icon">✓</span> <span><strong>Layar Ganda (Dual-Reader):</strong> Telusuri kalimat yang perlu diparafrasa berdampingan.</span></li>
-                            <li><span class="check-icon">✓</span> <span><strong>Tarif Ringan Mahasiswa:</strong> Gratis 3x/minggu atau top-up fleksibel Rp 3.500/dokumen.</span></li>
+                            <li><span class="check-icon">✓</span> <span><strong>Tarif Ringan Mahasiswa:</strong> Gratis 3x/minggu atau top-up fleksibel mulai Rp 10.000 (3 dokumen).</span></li>
                         </ul>
                     </div>
 
@@ -4568,7 +4568,7 @@
                     </button>
                     <div class="faq-content">
                         <p>
-                            <strong>Ya, 100% gratis.</strong> Setiap akun yang mendaftar langsung memperoleh kuota 3 submisi per minggu yang diperbarui secara otomatis. Selain itu, sivitas akademika dapat menambah kuota permanen secara gratis melalui program <em>Gotong Royong Korpus</em> dengan menyumbangkan repositori skripsi/tesis berlisensi terbuka (Open Access), atau melakukan top-up terjangkau mulai Rp 5.000 via QRIS.
+                            <strong>Ya, 100% gratis.</strong> Setiap akun yang mendaftar langsung memperoleh kuota 3 submisi per minggu yang diperbarui secara otomatis. Selain itu, sivitas akademika dapat menambah kuota permanen secara gratis melalui program <em>Gotong Royong Korpus</em> dengan menyumbangkan repositori skripsi/tesis berlisensi terbuka (Open Access), atau melakukan top-up terjangkau mulai Rp 10.000 (3 cek) via QRIS.
                         </p>
                     </div>
                 </div>

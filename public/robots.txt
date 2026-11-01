@@ -35,6 +35,11 @@ Disallow: /report
 Disallow: /report/
 Disallow: /reports
 Disallow: /reports/
+Disallow: /documents/shared/
+Disallow: /ambassador/verify/
+Disallow: /ambassador/dashboard
+Disallow: /unsubscribe
+Disallow: /email/
 
 # XML Sitemap Location
 Sitemap: https://tilik.arsetontong.top/sitemap.xml

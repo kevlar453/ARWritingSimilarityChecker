@@ -39,17 +39,16 @@ class App extends BaseConfig
         // Jika diakses melalui web browser, deteksi Host & Protokol secara dinamis
         // bila baseURL masih mengarah ke localhost/127.0.0.1 padahal client mengakses via domain.
         if (isset($_SERVER['HTTP_HOST'])) {
-            $host = $_SERVER['HTTP_HOST'];
-            $isLocal = in_array($host, ['localhost', '127.0.0.1', 'localhost:8085', 'localhost:8080'], true);
+            $host = strtolower(trim((string) $_SERVER['HTTP_HOST']));
+            $allowedLocalHosts = ['localhost', '127.0.0.1', 'localhost:8085', 'localhost:8080', '127.0.0.1:8085'];
+            $allowedProdHosts  = ['tilik.arsetontong.top', 'www.tilik.arsetontong.top'];
+            $isLocal = in_array($host, $allowedLocalHosts, true);
+            $isAllowedProd = in_array($host, $allowedProdHosts, true);
             $baseContainsLocal = (strpos($this->baseURL, 'localhost') !== false || strpos($this->baseURL, '127.0.0.1') !== false);
 
-            if (!$isLocal && $baseContainsLocal) {
-                $isHttps = (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off')
-                    || (isset($_SERVER['SERVER_PORT']) && (int)$_SERVER['SERVER_PORT'] === 443)
-                    || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https');
-                $scheme = $isHttps ? 'https://' : 'http://';
-                $this->baseURL = $scheme . $host . '/';
-            } elseif ($isLocal) {
+            if ($isAllowedProd && $baseContainsLocal) {
+                $this->baseURL = 'https://tilik.arsetontong.top/';
+            } elseif ($isLocal && (defined('ENVIRONMENT') && ENVIRONMENT !== 'production')) {
                 $this->baseURL = 'http://' . $host . '/';
             }
         }

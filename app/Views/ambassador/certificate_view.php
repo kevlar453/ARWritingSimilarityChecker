@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verifikasi Piagam Duta Kampus &bull; <?= esc($amb['ambassador_name']) ?> &bull; AR Tilik</title>
+    <meta name="description" content="Piagam Penghargaan Resmi Duta Integritas Akademik AR Tilik atas nama <?= esc($amb['ambassador_name']) ?> (<?= esc($amb['institution'] ?? 'Perguruan Tinggi') ?>).">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="<?= base_url('ambassador/certificate/' . esc($amb['certificate_code'] ?? $amb['referral_code'])) ?>">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Piagam Duta Integritas Akademik — <?= esc($amb['ambassador_name']) ?> | AR Tilik">
+    <meta property="og:description" content="Verifikasi keaslian Piagam Penghargaan Duta Kampus Digital AR Tilik.">
+    <meta property="og:url" content="<?= base_url('ambassador/certificate/' . esc($amb['certificate_code'] ?? $amb['referral_code'])) ?>">
+    <meta property="og:image" content="<?= base_url('images/og-artilik.png') ?>">
+    <meta name="twitter:card" content="summary_large_image">
     <!-- Favicon & Brand Icons -->
     <link rel="icon" type="image/x-icon" href="<?= base_url('favicon.ico?v=20261008') ?>">
     <link rel="icon" type="image/png" sizes="32x32" href="<?= base_url('favicon-32x32.png?v=20261008') ?>">

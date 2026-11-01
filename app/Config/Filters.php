@@ -36,6 +36,7 @@ class Filters extends BaseFilters
         'performance'   => PerformanceMetrics::class,
         'admin'         => \App\Filters\AdminFilter::class,
         'auth'          => \App\Filters\AuthFilter::class,
+        'sameorigin'    => \App\Filters\SameOriginFilter::class,
     ];
 
     /**
@@ -76,6 +77,7 @@ class Filters extends BaseFilters
         'before' => [
             // 'honeypot',
             // 'csrf',
+            'sameorigin',
             'invalidchars',
         ],
         'after' => [

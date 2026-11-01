@@ -2389,14 +2389,14 @@ class DashboardController extends BaseController
         $report = $builder->get()->getRowArray();
 
         if (!$report) {
-            return view('dashboard/verify', [
+            return $this->response->setStatusCode(404)->setBody(view('dashboard/verify', [
                 'status'       => 'not_found',
                 'code'         => $code,
                 'report'       => null,
                 'document'     => null,
                 'sources'      => [],
                 'evidenceData' => [],
-            ]);
+            ]));
         }
 
         $report['ai_assessment'] = self::extractAiMetrics($report);
@@ -2513,6 +2513,30 @@ class DashboardController extends BaseController
         $report = $db->table('reports')->where('id', $reportId)->get()->getRowArray();
         if (! $report) {
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Laporan #{$reportId} tidak ditemukan.");
+        }
+
+        $docModel = new DocumentModel();
+        $document = $docModel->find($report['document_id']);
+        if (! $document) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Dokumen #{$report['document_id']} tidak ditemukan.");
+        }
+
+        // Cek izin akses: pemilik, admin, kolaborator, atau pemegang token verifikasi resmi
+        $session = session();
+        $userId  = $session->get('user_id');
+        $isAdmin = ($session->get('user_role') === 'admin');
+        $isOwner = $userId && ((int) $document['user_id'] === (int) $userId);
+        $isShared = false;
+        if ($userId) {
+            $shareModel = new \App\Models\DocumentShareModel();
+            $isShared = $shareModel->userHasAccess((int) $document['id'], (int) $userId, 'view_report');
+        }
+
+        if (! $isOwner && ! $isAdmin && ! $isShared) {
+            $token = $this->request->getGet('token') ?: $this->request->getGet('code');
+            if (empty($token) || strtoupper(trim((string) $token)) !== strtoupper((string) ($report['verification_code'] ?? ''))) {
+                return $this->response->setStatusCode(403)->setBody('Akses ditolak: Anda tidak memiliki izin untuk mengunduh sertifikat laporan ini.');
+            }
         }
 
         if (! empty($report['verification_code'])) {
@@ -2727,6 +2751,10 @@ class DashboardController extends BaseController
             return $this->response->setStatusCode(403)->setJSON(['success' => false, 'message' => 'Hanya pemilik naskah yang berhak memusnahkan berkas fisik.']);
         }
 
+        if (! $isAdmin && ($doc['document_type'] ?? 'submission') === 'corpus') {
+            return $this->response->setStatusCode(403)->setJSON(['success' => false, 'message' => 'Dokumen kontribusi korpus institusi tidak dapat dimusnahkan oleh pengguna biasa untuk menjaga keutuhan indeks rujukan.']);
+        }
+
         if (! empty($doc['file_purged_at'])) {
             return $this->response->setJSON(['success' => true, 'message' => 'Berkas naskah ini sudah dimusnahkan sebelumnya.']);
         }
@@ -2786,6 +2814,10 @@ class DashboardController extends BaseController
 
         if (! $isAdmin && (int) $doc['user_id'] !== (int) $userId) {
             return $this->response->setStatusCode(403)->setJSON(['success' => false, 'message' => 'Hanya pemilik naskah yang berhak menghapus karya ilmiah ini.']);
+        }
+
+        if (! $isAdmin && ($doc['document_type'] ?? 'submission') === 'corpus') {
+            return $this->response->setStatusCode(403)->setJSON(['success' => false, 'message' => 'Dokumen kontribusi korpus institusi tidak dapat dihapus oleh pengguna biasa untuk menjaga keutuhan indeks rujukan.']);
         }
 
         $db = db_connect();

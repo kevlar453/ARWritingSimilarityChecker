@@ -92,13 +92,18 @@ def test_verify_valid_certificate_portal():
     with urllib.request.urlopen(req, timeout=15) as resp:
         assert resp.getcode() == 200
         html = resp.read().decode("utf-8")
-        assert ("TERVERIFIKASI ASLI" in html or "SERTIFIKAT AKREDITASI" in html)
+        assert ("TERVERIFIKASI ASLI" in html or "SERTIFIKAT AKREDITASI" in html or "SERTIFIKAT HASIL UJI KEMIRIPAN" in html)
         assert code in html
 
 def test_verify_not_found_certificate_portal():
     url = f"{BASE_URL}/verify/ART-NONEXISTENT-CODE"
     req = urllib.request.Request(url, method="GET")
-    with urllib.request.urlopen(req, timeout=15) as resp:
-        assert resp.getcode() == 200
-        html = resp.read().decode("utf-8")
-        assert "Sertifikat Tidak Ditemukan" in html
+    try:
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            status_code = resp.getcode()
+            html = resp.read().decode("utf-8")
+    except urllib.error.HTTPError as e:
+        status_code = e.code
+        html = e.read().decode("utf-8")
+    assert status_code == 404
+    assert "Sertifikat Tidak Ditemukan" in html

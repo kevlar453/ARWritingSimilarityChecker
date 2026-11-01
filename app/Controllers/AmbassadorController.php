@@ -145,10 +145,9 @@ class AmbassadorController extends BaseController
         }
 
         return $this->response->setJSON([
-            'success'            => true,
-            'message'            => 'Pendaftaran Duta Kampus Anda berhasil dikirim! Tim AR Tilik akan meninjau data Anda pada batch seleksi mingguan.',
-            'has_purchased'      => $result['has_purchased'],
-            'verification_token' => $result['verification_token'],
+            'success'       => true,
+            'message'       => 'Pendaftaran Duta Kampus Anda berhasil dikirim! Tim AR Tilik akan meninjau data Anda pada batch seleksi mingguan.',
+            'has_purchased' => $result['has_purchased'],
         ]);
     }
 
@@ -160,8 +159,8 @@ class AmbassadorController extends BaseController
         $appModel = new AmbassadorApplicationModel();
         $app = $appModel->findByToken($token);
 
-        if (!$app) {
-            return redirect()->to('/ambassador')->with('error', 'Token verifikasi tidak valid atau telah kedaluwarsa.');
+        if (!$app || !in_array($app['status'] ?? '', ['accepted', 'id_submitted', 'verified', 'active', 'graduated'], true)) {
+            return redirect()->to('/ambassador')->with('error', 'Token verifikasi tidak valid, belum disetujui pada seleksi tahap awal, atau telah kedaluwarsa.');
         }
 
         return view('ambassador/verify', [
@@ -177,11 +176,11 @@ class AmbassadorController extends BaseController
         $appModel = new AmbassadorApplicationModel();
         $app = $appModel->findByToken($token);
 
-        if (!$app) {
+        if (!$app || !in_array($app['status'] ?? '', ['accepted', 'id_submitted', 'verified'], true)) {
             return $this->response->setJSON([
                 'success' => false,
-                'message' => 'Token verifikasi identitas tidak ditemukan.',
-            ])->setStatusCode(404);
+                'message' => 'Token verifikasi identitas tidak ditemukan atau lamaran belum berada pada tahap verifikasi KTM.',
+            ])->setStatusCode(403);
         }
 
         $file = $this->request->getFile('id_card_file');
@@ -195,11 +194,13 @@ class AmbassadorController extends BaseController
         }
 
         $allowedExts = ['jpg', 'jpeg', 'png', 'webp', 'pdf'];
+        $allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
         $ext = strtolower($file->getExtension());
-        if (!in_array($ext, $allowedExts)) {
+        $mime = strtolower((string) $file->getMimeType());
+        if (!in_array($ext, $allowedExts, true) || !in_array($mime, $allowedMimes, true)) {
             return $this->response->setJSON([
                 'success' => false,
-                'message' => 'Format file harus berupa JPG, PNG, WEBP, atau PDF.',
+                'message' => 'Format file harus berupa JPG, PNG, WEBP, atau PDF yang valid.',
             ])->setStatusCode(400);
         }
 
@@ -321,8 +322,10 @@ class AmbassadorController extends BaseController
         $file = $this->request->getFile('proof_file');
         if ($file && $file->isValid()) {
             $allowed = ['jpg', 'jpeg', 'png', 'webp', 'pdf'];
+            $allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
             $ext = strtolower($file->getExtension());
-            if (in_array($ext, $allowed)) {
+            $mime = strtolower((string) $file->getMimeType());
+            if (in_array($ext, $allowed, true) && in_array($mime, $allowedMimes, true) && $file->getSizeByUnit('mb') <= 10.0) {
                 $newName = 'proof_' . $profile['id'] . '_' . date('Ymd_His') . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
                 $targetDir = WRITEPATH . 'uploads/ambassador_proofs/';
                 if (!is_dir($targetDir)) {

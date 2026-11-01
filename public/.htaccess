@@ -36,13 +36,17 @@ AddType application/xml .xml.gz
 	# RewriteCond %{REQUEST_URI} (.+)/$
 	# RewriteRule ^ %1 [L,R=301]
 
-	# Rewrite "www.example.com -> example.com"
-	RewriteCond %{HTTPS} !=on
+	# Rewrite "www.example.com -> https://example.com"
 	RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
-	RewriteRule ^ http://%1%{REQUEST_URI} [R=301,L]
+	RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L]
 
-	# Force ARTilikOJSConnector.php to be served through CodeIgniter download controller so it downloads as source code rather than being executed by PHP
+	# Blokir akses langsung ke berkas internal plugin OJS di dalam folder public
+	RewriteRule ^integrations/ojs/pkp-plugin/ - [F,L,NC]
+
+	# Force ARTilikOJSConnector.php & artilik_ojs_runner.php to be served through CodeIgniter download controller so they download as source code rather than being executed by PHP
 	RewriteRule ^integrations/ojs/ARTilikOJSConnector\.php$ index.php/integrations/ojs/connector [L,NC,QSA]
+	RewriteRule ^integrations/ojs/artilik_ojs_runner\.php$ index.php/integrations/ojs/runner [L,NC,QSA]
+	RewriteRule ^sitemap\.xml$ index.php/sitemap.xml [L,NC,QSA]
 
 	# Checks to see if the user is attempting to access a valid file,
 	# such as an image or css document, if this isn't true it sends the
@@ -56,12 +60,9 @@ AddType application/xml .xml.gz
 	RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 </IfModule>
 
-<Files "ARTilikOJSConnector.php">
+<FilesMatch "^(ARTilikOJSConnector|artilik_ojs_runner)\.php$">
 	ForceType text/plain
-	<IfModule mod_headers.c>
-		Header set Content-Disposition "attachment; filename=\"ARTilikOJSConnector.php\""
-	</IfModule>
-</Files>
+</FilesMatch>
 
 <IfModule !mod_rewrite.c>
 	# If we don't have mod_rewrite installed, all 404's

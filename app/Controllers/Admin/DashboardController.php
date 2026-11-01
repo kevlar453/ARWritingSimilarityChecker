@@ -299,8 +299,13 @@ class DashboardController extends BaseController
                                ->getResultArray();
         }
 
-        // 9. Data List: Pengunjung Harian
+        // 9. Data List: Pengunjung Harian & Analitik Wilayah/Negara
         $dailyVisitors = [];
+        $geoAnalytics = [
+            'summary'   => [],
+            'countries' => [],
+            'regions'   => [],
+        ];
         if ($activeTab === 'visitors') {
             $dailyVisitors = $db->table('landing_visitors')
                                 ->select('visit_date, COUNT(DISTINCT visitor_hash) as unique_visitors, SUM(hits) as total_hits')
@@ -309,6 +314,7 @@ class DashboardController extends BaseController
                                 ->limit(30)
                                 ->get()
                                 ->getResultArray();
+            $geoAnalytics = $visitorModel->getGeoAnalytics();
         }
 
         // 10. Data Transaksi & Pembayaran Midtrans
@@ -506,6 +512,7 @@ class DashboardController extends BaseController
             'corpusList'           => $corpusList,
             'securityLogs'         => $securityLogs,
             'dailyVisitors'        => $dailyVisitors,
+            'geoAnalytics'         => $geoAnalytics,
             'paymentsList'         => $paymentsList,
             'systemInfo'           => $systemInfo,
             'harvestLogs'          => $harvestLogs,
@@ -1107,6 +1114,7 @@ class DashboardController extends BaseController
                 'average_hits'     => number_format($avg, 2),
             ],
             'daily'     => $dailyFormatted,
+            'geo'       => $visitorModel->getGeoAnalytics(),
             'synced_at' => date('H:i:s'),
         ]);
     }

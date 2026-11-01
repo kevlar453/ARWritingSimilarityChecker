@@ -66,7 +66,8 @@ class SpamShield
 
     public function __construct()
     {
-        $this->secretKey = getenv('encryption.key') ?: 'AR_TILIK_SPAM_PROTECTION_SECRET_2026';
+        $this->secretKey = (string) (function_exists('env') ? env('encryption.key') : '')
+            ?: (getenv('encryption.key') ?: ($_ENV['encryption.key'] ?? 'AR_TILIK_SPAM_PROTECTION_SECRET_2026'));
     }
 
     /**
@@ -99,9 +100,9 @@ class SpamShield
      */
     public function validateTimeToken(?string $token, float $minSeconds = 1.5, int $maxSeconds = 7200): array
     {
-        // Dalam mode testing / CLI automated tests, izinkan token khusus atau bypass
-        $env = getenv('CI_ENVIRONMENT') ?: (defined('ENVIRONMENT') ? ENVIRONMENT : 'production');
-        if ($env === 'testing' || $token === 'TEST_TOKEN' || empty($token) && $env === 'testing') {
+        // Dalam mode testing / development lokal, izinkan token khusus pengujian otomatis
+        $env = getenv('CI_ENVIRONMENT') ?: ($_ENV['CI_ENVIRONMENT'] ?? (defined('ENVIRONMENT') ? ENVIRONMENT : 'production'));
+        if ($env === 'testing' || ($env !== 'production' && $token === 'TEST_TOKEN')) {
             return ['valid' => true, 'reason' => ''];
         }
 
@@ -158,8 +159,8 @@ class SpamShield
      */
     public function validateMathChallenge(?string $token, ?string $userAnswer): bool
     {
-        $env = getenv('CI_ENVIRONMENT') ?: (defined('ENVIRONMENT') ? ENVIRONMENT : 'production');
-        if ($env === 'testing' || $token === 'TEST_TOKEN') {
+        $env = getenv('CI_ENVIRONMENT') ?: ($_ENV['CI_ENVIRONMENT'] ?? (defined('ENVIRONMENT') ? ENVIRONMENT : 'production'));
+        if ($env === 'testing' || ($env !== 'production' && $token === 'TEST_TOKEN')) {
             return true;
         }
 
@@ -516,16 +517,17 @@ class SpamShield
                 ->where('locked_until IS NULL')
                 ->delete();
 
-        // 1. Periksa apakah terdapat penguncian aktif (berdasarkan identifier terlebih dahulu)
+        // 1. Periksa apakah terdapat penguncian aktif (berdasarkan pasangan identifier + IP agar tidak terjadi lockout DoS lintas IP)
         $lockedRecord = $db->table('auth_rate_limits')
             ->where('action_type', $action)
             ->where('identifier', $identifier)
+            ->where('ip_address', $ip)
             ->where('locked_until >', $now)
             ->orderBy('locked_until', 'DESC')
             ->get()
             ->getRowArray();
 
-        // Jika tidak ada lock pada identifier spesifik dan identifier berbeda dari IP, periksa lock global IP
+        // Jika tidak ada lock spesifik dan identifier berbeda dari IP, periksa lock global IP
         if (!$lockedRecord && $identifier !== $ip) {
             $lockedRecord = $db->table('auth_rate_limits')
                 ->where('action_type', $action)
@@ -534,6 +536,23 @@ class SpamShield
                 ->orderBy('locked_until', 'DESC')
                 ->get()
                 ->getRowArray();
+        }
+
+        // Periksa akumulasi kegagalan lintas akun dari 1 IP (proteksi Credential Stuffing)
+        if (!$lockedRecord && $identifier !== $ip) {
+            $ipSumRow = $db->table('auth_rate_limits')
+                ->selectSum('attempts', 'total_ip_attempts')
+                ->where('action_type', $action)
+                ->where('ip_address', $ip)
+                ->where('last_attempt_at >=', $cutoff)
+                ->get()
+                ->getRowArray();
+            $totalIpAttempts = (int) ($ipSumRow['total_ip_attempts'] ?? 0);
+            if ($totalIpAttempts >= max($maxAttempts * 4, 20)) {
+                $lockedRecord = [
+                    'locked_until' => date('Y-m-d H:i:s', time() + $decaySeconds),
+                ];
+            }
         }
 
         if ($lockedRecord) {
@@ -556,10 +575,11 @@ class SpamShield
             ];
         }
 
-        // Hitung akumulasi percobaan dalam jendela waktu decay berdasarkan identifier
+        // Hitung akumulasi percobaan dalam jendela waktu decay berdasarkan identifier + IP
         $currentRecord = $db->table('auth_rate_limits')
             ->where('action_type', $action)
             ->where('identifier', $identifier)
+            ->where('ip_address', $ip)
             ->where('last_attempt_at >=', $cutoff)
             ->orderBy('attempts', 'DESC')
             ->get()

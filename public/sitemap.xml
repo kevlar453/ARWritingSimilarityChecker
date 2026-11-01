@@ -46,21 +46,15 @@
     </url>
     <url>
         <loc>https://tilik.arsetontong.top/integrations/ojs/pdf</loc>
-        <lastmod>2026-10-27</lastmod>
+        <lastmod>2026-10-29</lastmod>
         <changefreq>weekly</changefreq>
-        <priority>0.7</priority>
-    </url>
-    <url>
-        <loc>https://tilik.arsetontong.top/integrations/ojs/connector</loc>
-        <lastmod>2026-10-27</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.7</priority>
+        <priority>0.8</priority>
     </url>
     <url>
         <loc>https://tilik.arsetontong.top/docs/Brosur_Eksekutif_ARTilik.pdf</loc>
-        <lastmod>2026-10-27</lastmod>
+        <lastmod>2026-10-29</lastmod>
         <changefreq>weekly</changefreq>
-        <priority>0.7</priority>
+        <priority>0.8</priority>
     </url>
     <url>
         <loc>https://tilik.arsetontong.top/privacy</loc>

@@ -229,6 +229,7 @@ class DocumentController extends BaseController
                 ->where('original_filename', $file->getClientName())
                 ->orWhere('title', $targetTitle)
                 ->orGroupStart()
+                    ->where('user_id', $userId)
                     ->where('file_size', $fileSize)
                     ->where('mime_type', $mime)
                 ->groupEnd()
@@ -272,10 +273,19 @@ class DocumentController extends BaseController
             'source_type'       => $sourceType,
             'faculty'           => !empty($faculty) ? $faculty : null,
             'department'        => !empty($department) ? $department : null,
-            'indexing_status'   => 'completed',
+            'indexing_status'   => 'pending',
             'created_at'        => $now,
             'updated_at'        => $now,
         ]);
+
+        // Jadwalkan pengindeksan korpus di worker latar belakang
+        try {
+            QueueService::dispatch('index_corpus', [
+                'document_id' => (int) $docId,
+            ]);
+        } catch (\Throwable $qe) {
+            log_message('error', 'Gagal menjadwalkan index_corpus untuk dokumen #' . $docId . ': ' . $qe->getMessage());
+        }
 
         // Catat kontribusi pengguna & hitung reward (+3 Korpus = +1 Submisi)
         $userModel = new \App\Models\UserModel();
@@ -391,7 +401,8 @@ class DocumentController extends BaseController
             $deductedInThisRequest = true;
         }
 
-        $engine = $this->request->getPost('engine') ?: 'hybrid';
+        $rawEngine = strtolower(trim((string) ($this->request->getPost('engine') ?: 'hybrid')));
+        $engine = in_array($rawEngine, ['hybrid', 'tfidf', 'exact', 'idf'], true) ? $rawEngine : 'hybrid';
 
         try {
             $reportId = $reportModel->insert([
@@ -693,7 +704,8 @@ class DocumentController extends BaseController
 
             $customTitle = trim((string)($this->request->getPost('custom_title') ?: $this->request->getPost('title') ?: ''));
             $title = !empty($customTitle) ? $customTitle : pathinfo($file->getClientName(), PATHINFO_FILENAME);
-            $engine = $this->request->getPost('engine') ?: 'hybrid';
+            $rawEngine = strtolower(trim((string) ($this->request->getPost('engine') ?: 'hybrid')));
+        $engine = in_array($rawEngine, ['hybrid', 'tfidf', 'exact', 'idf'], true) ? $rawEngine : 'hybrid';
             $now = date('Y-m-d H:i:s');
 
             $faculty = trim((string) ($this->request->getPost('faculty') ?? ''));

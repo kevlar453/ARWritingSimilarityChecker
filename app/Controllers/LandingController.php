@@ -115,9 +115,7 @@ class LandingController extends BaseController
      */
     public function benchmark()
     {
-        $this->response->setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
-        $this->response->setHeader('Pragma', 'no-cache');
-        $this->response->setHeader('Expires', '0');
+        $this->response->setHeader('Cache-Control', 'public, max-age=300');
 
         $metrics = \App\Libraries\SystemSpecs::getLiveMetrics();
         $capabilities = \App\Libraries\SystemSpecs::getCapabilities();

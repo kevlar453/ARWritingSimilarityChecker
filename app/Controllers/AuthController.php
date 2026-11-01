@@ -114,6 +114,12 @@ class AuthController extends BaseController
             return $this->respondError('Gagal mendaftarkan akun. Silakan coba kembali.', 500);
         }
 
+        // Catat pendaftaran untuk rate limit IP pada lingkungan produksi
+        $env = getenv('CI_ENVIRONMENT') ?: ($_ENV['CI_ENVIRONMENT'] ?? (defined('ENVIRONMENT') ? ENVIRONMENT : 'production'));
+        if ($env === 'production' || ! in_array($ip, ['127.0.0.1', '::1'], true)) {
+            $spamShield->recordFailedAttempt('register', $ip, $ip, 5, 3600, 3600);
+        }
+
         // Buat kode referral unik personal untuk pengguna baru
         $userModel->ensureReferralCode((int) $userId);
 
@@ -557,6 +563,12 @@ class AuthController extends BaseController
      */
     public function logout()
     {
+        $secFetchSite = strtolower($this->request->getHeaderLine('Sec-Fetch-Site'));
+        $secFetchDest = strtolower($this->request->getHeaderLine('Sec-Fetch-Dest'));
+        if ($secFetchSite === 'cross-site' || in_array($secFetchDest, ['image', 'script', 'style', 'iframe', 'embed', 'object'], true)) {
+            return $this->response->setStatusCode(403)->setBody('Permintaan lintas situs ditolak.');
+        }
+
         session()->destroy();
         return redirect()->to(base_url())->with('message', 'Anda telah berhasil keluar.');
     }
@@ -611,7 +623,7 @@ class AuthController extends BaseController
 
     private function setUserSession(array $user): void
     {
-        session()->regenerate();
+        session()->regenerate(true);
         session()->set([
             'user_id'          => (int) $user['id'],
             'user_name'        => $user['name'],

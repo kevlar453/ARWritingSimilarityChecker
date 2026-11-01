@@ -128,7 +128,7 @@ def get_html(url: str) -> tuple[int, str]:
     except urllib.error.HTTPError as e:
         return e.code, e.read().decode("utf-8")
 
-def wait_for_report(report_id: int, max_wait_sec: int = 20) -> dict:
+def wait_for_report(report_id: int, max_wait_sec: int = 45) -> dict:
     conn = get_connection()
     conn.autocommit = True
     start = time.time()
