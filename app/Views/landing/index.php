@@ -224,6 +224,18 @@
                 adScript.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9248253613564140';
                 adScript.async = true;
                 adScript.crossOrigin = 'anonymous';
+                adScript.onload = function() {
+                    try {
+                        var adElements = document.querySelectorAll('.artilik-ad-slot-body .adsbygoogle');
+                        adElements.forEach(function(el) {
+                            if (!el.getAttribute('data-adsbygoogle-status')) {
+                                (window.adsbygoogle = window.adsbygoogle || []).push({});
+                            }
+                        });
+                    } catch (e) {
+                        console.debug('AdSense slot init error:', e);
+                    }
+                };
                 document.head.appendChild(adScript);
             }
             ['scroll', 'mousemove', 'touchstart', 'click', 'keydown'].forEach(function(evt) {
@@ -276,6 +288,92 @@
             color: var(--text-main);
             line-height: 1.6;
             padding-top: 72px;
+            top: 0 !important;
+            position: static !important;
+        }
+
+        /* ==========================================================================
+           Google AdSense Clean Integration & Layout Stability (CLS Protection)
+           ========================================================================== */
+        /* Cegah Google Auto-Ads menyusup ke navigasi, hero, modal, tabel tarif & visual penting */
+        .google-anno-skip .google-auto-placed,
+        .navbar .google-auto-placed,
+        .hero .google-auto-placed,
+        #langganan .google-auto-placed,
+        .pricing-card .google-auto-placed,
+        .modal-overlay .google-auto-placed,
+        .hero-visual-card .google-auto-placed,
+        .nav-dropdown-menu .google-auto-placed,
+        .stats-bar .google-auto-placed {
+            display: none !important;
+            visibility: hidden !important;
+            height: 0 !important;
+            max-height: 0 !important;
+            overflow: hidden !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+
+        /* Wadah Iklan Terstruktur & Terukur (Mencegah Cumulative Layout Shift / CLS) */
+        .artilik-ad-section {
+            padding: 24px 0;
+            width: 100%;
+            position: relative;
+            clear: both;
+        }
+        .artilik-ad-card {
+            max-width: 970px;
+            margin: 0 auto;
+            background: #f8fafc;
+            border: 1px dashed #cbd5e1;
+            border-radius: 14px;
+            padding: 10px 16px 14px;
+            text-align: center;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            overflow: hidden;
+        }
+        .artilik-ad-card:hover {
+            border-color: #94a3b8;
+            box-shadow: 0 4px 14px -3px rgba(15, 23, 42, 0.05);
+        }
+        .artilik-ad-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+        }
+        .artilik-ad-badge {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #94a3b8;
+            background: #e2e8f0;
+            padding: 2px 10px;
+            border-radius: 9999px;
+            display: inline-block;
+        }
+        .artilik-ad-slot-body {
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            width: 100%;
+        }
+        @media (max-width: 768px) {
+            .artilik-ad-section {
+                padding: 16px 0;
+            }
+            .artilik-ad-card {
+                border-radius: 10px;
+                padding: 8px 10px 10px;
+            }
+            .artilik-ad-slot-body {
+                min-height: 250px;
+            }
         }
 
         /* Container */
@@ -2894,9 +2992,9 @@
 <body>
 
     <!-- Header Navigation -->
-    <header class="navbar">
+    <header class="navbar google-anno-skip">
         <div class="container nav-inner">
-            <a href="<?= base_url() ?>" class="brand">
+            <a href="<?= base_url() ?>" class="brand" data-google-vignette="false">
                 <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik Logo" class="brand-logo" width="40" height="40">
                 <div class="brand-text">
                     <span class="brand-title">AR Tilik</span>
@@ -2914,63 +3012,63 @@
                         </svg>
                     </button>
                     <div class="nav-dropdown-menu">
-                        <a href="#fitur-unggulan" class="dropdown-item" onclick="closeAllNavDropdowns()">
+                        <a href="#fitur-unggulan" class="dropdown-item" onclick="closeAllNavDropdowns()" data-google-vignette="false">
                             <div class="dropdown-icon" style="background: #eef2ff; color: #4338ca;">⚡</div>
                             <div class="dropdown-content">
                                 <span class="dropdown-title">Inovasi Mesin</span>
                                 <span class="dropdown-sub">Tiga Lensa 5-Gram, TF-IDF &amp; Semantik</span>
                             </div>
                         </a>
-                        <a href="#integrasi-ojs" class="dropdown-item" onclick="closeAllNavDropdowns()">
+                        <a href="#integrasi-ojs" class="dropdown-item" onclick="closeAllNavDropdowns()" data-google-vignette="false">
                             <div class="dropdown-icon" style="background: #f0fdf4; color: #16a34a;">🔌</div>
                             <div class="dropdown-content">
                                 <span class="dropdown-title">Integrasi OJS 3.x</span>
                                 <span class="dropdown-sub">Konektor otomatisasi naskah jurnal OJS</span>
                             </div>
                         </a>
-                        <a href="#solusi" class="dropdown-item" onclick="closeAllNavDropdowns()">
+                        <a href="#solusi" class="dropdown-item" onclick="closeAllNavDropdowns()" data-google-vignette="false">
                             <div class="dropdown-icon" style="background: #eff6ff; color: #2563eb;">🏛️</div>
                             <div class="dropdown-content">
                                 <span class="dropdown-title">Solusi Institusi</span>
                                 <span class="dropdown-sub">Sivitas akademika, LPPM &amp; dewan penguji</span>
                             </div>
                         </a>
-                        <a href="#cara-kerja" class="dropdown-item" onclick="closeAllNavDropdowns()">
+                        <a href="#cara-kerja" class="dropdown-item" onclick="closeAllNavDropdowns()" data-google-vignette="false">
                             <div class="dropdown-icon" style="background: #e0f2fe; color: #0284c7;">🔄</div>
                             <div class="dropdown-content">
                                 <span class="dropdown-title">Cara Kerja</span>
                                 <span class="dropdown-sub">Alur 4 tahap telaah kesepadanan naskah</span>
                             </div>
                         </a>
-                        <a href="#teori" class="dropdown-item" onclick="closeAllNavDropdowns()">
+                        <a href="#teori" class="dropdown-item" onclick="closeAllNavDropdowns()" data-google-vignette="false">
                             <div class="dropdown-icon" style="background: #fdf4ff; color: #9333ea;">⚖️</div>
                             <div class="dropdown-content">
                                 <span class="dropdown-title">Filosofi &amp; Teori Bukti</span>
                                 <span class="dropdown-sub">Keadilan akademik &amp; kedaulatan naskah</span>
                             </div>
                         </a>
-                        <a href="<?= base_url('riset/ar-tilik-vs-turnitin') ?>" class="dropdown-item" onclick="closeAllNavDropdowns()">
+                        <a href="<?= base_url('riset/ar-tilik-vs-turnitin') ?>" class="dropdown-item" onclick="closeAllNavDropdowns()" data-google-vignette="false">
                             <div class="dropdown-icon" style="background: #f0fdfa; color: #0f766e;">🏛️</div>
                             <div class="dropdown-content">
                                 <span class="dropdown-title">Riset: AR Tilik vs Turnitin</span>
                                 <span class="dropdown-sub">Analisis untuk jurnal &amp; kampus Indonesia</span>
                             </div>
                         </a>
-                        <a href="<?= base_url('riset/ar-tilik-vs-zerogpt') ?>" class="dropdown-item" onclick="closeAllNavDropdowns()">
+                        <a href="<?= base_url('riset/ar-tilik-vs-zerogpt') ?>" class="dropdown-item" onclick="closeAllNavDropdowns()" data-google-vignette="false">
                             <div class="dropdown-icon" style="background: #fff7ed; color: #ea580c;">📊</div>
                             <div class="dropdown-content">
                                 <span class="dropdown-title">Riset: AR Tilik vs ZeroGPT</span>
                                 <span class="dropdown-sub">Whitepaper audit bukti vs deteksi AI</span>
                             </div>
                         </a>
-                        <a href="<?= base_url('benchmark') ?>" class="dropdown-item" onclick="closeAllNavDropdowns()">
+                        <a href="<?= base_url('benchmark') ?>" class="dropdown-item" onclick="closeAllNavDropdowns()" data-google-vignette="false">
                             <div class="dropdown-icon" style="background: #eef2ff; color: #4338ca;">🔬</div>
                             <div class="dropdown-content">
                                 <span class="dropdown-title">Benchmark Terbuka Indonesia</span>
                                 <span class="dropdown-sub">Hasil uji empiris &amp; transparansi 14 mismatch</span>
                             </div>
                         </a>
-                        <a href="<?= base_url('docs/Brosur_Eksekutif_ARTilik.pdf') ?>" target="_blank" download="Brosur_Eksekutif_ARTilik.pdf" class="dropdown-item" onclick="closeAllNavDropdowns()">
+                        <a href="<?= base_url('docs/Brosur_Eksekutif_ARTilik.pdf') ?>" target="_blank" download="Brosur_Eksekutif_ARTilik.pdf" class="dropdown-item" onclick="closeAllNavDropdowns()" data-google-vignette="false">
                             <div class="dropdown-icon" style="background: #ecfdf5; color: #059669;">📄</div>
                             <div class="dropdown-content">
                                 <span class="dropdown-title">Brosur Eksekutif Kampus</span>
@@ -2981,12 +3079,12 @@
                 </li>
 
                 <?php if (!empty($approvedTestimonials)): ?>
-                    <li><a href="#testimoni">Testimoni</a></li>
+                    <li><a href="#testimoni" data-google-vignette="false">Testimoni</a></li>
                 <?php endif; ?>
-                <li><a href="#langganan">Tarif</a></li>
-                <li><a href="#faq">FAQ</a></li>
+                <li><a href="#langganan" data-google-vignette="false">Tarif</a></li>
+                <li><a href="#faq" data-google-vignette="false">FAQ</a></li>
                 <li>
-                    <a href="<?= base_url('ambassador') ?>" class="nav-link-ambassador" title="Program Kemitraan &amp; Afiliasi Duta Kampus (Komisi 20%)">
+                    <a href="<?= base_url('ambassador') ?>" class="nav-link-ambassador" title="Program Kemitraan &amp; Afiliasi Duta Kampus (Komisi 20%)" data-google-vignette="false">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color: #d97706; flex-shrink: 0;">
                             <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
                             <path d="M6 12v5c3 3 9 3 12 0v-5"/>
@@ -2996,7 +3094,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="<?= base_url('verify') ?>" class="nav-link-verify" title="Verifikasi Keaslian Sertifikat &amp; Laporan">
+                    <a href="<?= base_url('verify') ?>" class="nav-link-verify" title="Verifikasi Keaslian Sertifikat &amp; Laporan" data-google-vignette="false">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                         </svg>
@@ -3007,17 +3105,17 @@
 
             <div class="nav-actions">
                 <?php if ($currentUser) : ?>
-                    <a href="<?= base_url('dashboard') ?>" class="btn btn-primary btn-sm">
+                    <a href="<?= base_url('dashboard') ?>" class="btn btn-primary btn-sm" data-google-vignette="false">
                         <span>📊</span> Dashboard
                     </a>
-                    <a href="<?= base_url('auth/logout') ?>" class="btn btn-secondary btn-sm btn-desktop-only" title="Keluar">
+                    <a href="<?= base_url('auth/logout') ?>" class="btn btn-secondary btn-sm btn-desktop-only" title="Keluar" data-google-vignette="false">
                         Keluar
                     </a>
                 <?php else : ?>
-                    <button type="button" onclick="openAuthModal('login')" class="btn btn-outline btn-sm btn-desktop-only">
+                    <button type="button" onclick="openAuthModal('login')" class="btn btn-outline btn-sm btn-desktop-only" data-google-vignette="false">
                         Masuk
                     </button>
-                    <button type="button" onclick="openAuthModal('register')" class="btn btn-primary btn-sm">
+                    <button type="button" onclick="openAuthModal('register')" class="btn btn-primary btn-sm" data-google-vignette="false">
                         Daftar Gratis
                     </button>
                 <?php endif; ?>
@@ -3036,9 +3134,9 @@
     <div id="mobileNavOverlay" class="mobile-nav-overlay" onclick="closeMobileNav()"></div>
 
     <!-- Mobile Navigation Drawer -->
-    <div id="mobileNavDrawer" class="mobile-nav-drawer" aria-hidden="true" inert>
+    <div id="mobileNavDrawer" class="mobile-nav-drawer google-anno-skip" aria-hidden="true" inert>
         <div class="mobile-drawer-header">
-            <a href="<?= base_url() ?>" class="brand" onclick="closeMobileNav()">
+            <a href="<?= base_url() ?>" class="brand" onclick="closeMobileNav()" data-google-vignette="false">
                 <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik Logo" width="30" height="30" style="width: 30px; height: 30px; object-fit: contain; border-radius: 8px;">
                 <div class="brand-text">
                     <span class="brand-title" style="font-size: 18px;">AR Tilik</span>
@@ -3064,10 +3162,10 @@
                         </div>
                     </div>
                     <div style="display: flex; gap: 8px;">
-                        <a href="<?= base_url('dashboard') ?>" class="btn btn-primary btn-sm" style="flex: 1; justify-content: center;" onclick="closeMobileNav()">
+                        <a href="<?= base_url('dashboard') ?>" class="btn btn-primary btn-sm" style="flex: 1; justify-content: center;" onclick="closeMobileNav()" data-google-vignette="false">
                             <span>📊</span> Buka Dashboard
                         </a>
-                        <a href="<?= base_url('auth/logout') ?>" class="btn btn-secondary btn-sm" style="padding: 6px 12px;">
+                        <a href="<?= base_url('auth/logout') ?>" class="btn btn-secondary btn-sm" style="padding: 6px 12px;" data-google-vignette="false">
                             Keluar
                         </a>
                     </div>
@@ -3078,10 +3176,10 @@
                         ✨ Hak Akses Sivitas: <strong>3 Submisi Gratis Tiap Minggu</strong>
                     </div>
                     <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <button type="button" onclick="closeMobileNav(); openAuthModal('register');" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 11px 14px; font-size: 13.5px;">
+                        <button type="button" onclick="closeMobileNav(); openAuthModal('register');" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 11px 14px; font-size: 13.5px;" data-google-vignette="false">
                             Daftar Akun Gratis
                         </button>
-                        <button type="button" onclick="closeMobileNav(); openAuthModal('login');" class="btn btn-outline" style="width: 100%; justify-content: center; padding: 10px 14px; font-size: 13px;">
+                        <button type="button" onclick="closeMobileNav(); openAuthModal('login');" class="btn btn-outline" style="width: 100%; justify-content: center; padding: 10px 14px; font-size: 13px;" data-google-vignette="false">
                             Masuk ke Akun
                         </button>
                     </div>
@@ -3093,54 +3191,54 @@
         <div class="mobile-drawer-body">
             <div class="mobile-nav-group-title">Eksplorasi Layanan</div>
             <nav class="mobile-nav-menu">
-                <a href="#teori" class="mobile-nav-link" onclick="closeMobileNav()">
+                <a href="#teori" class="mobile-nav-link" onclick="closeMobileNav()" data-google-vignette="false">
                     <span class="nav-icon">🔍</span>
                     <span>Filosofi &amp; Teori Bukti</span>
                     <span class="nav-arrow">›</span>
                 </a>
-                <a href="#fitur-unggulan" class="mobile-nav-link" onclick="closeMobileNav()">
+                <a href="#fitur-unggulan" class="mobile-nav-link" onclick="closeMobileNav()" data-google-vignette="false">
                     <span class="nav-icon">⚡</span>
                     <span>Inovasi Mesin Cerdas</span>
                     <span class="nav-arrow">›</span>
                 </a>
-                <a href="#cara-kerja" class="mobile-nav-link" onclick="closeMobileNav()">
+                <a href="#cara-kerja" class="mobile-nav-link" onclick="closeMobileNav()" data-google-vignette="false">
                     <span class="nav-icon">🔄</span>
                     <span>Cara Kerja 4 Langkah</span>
                     <span class="nav-arrow">›</span>
                 </a>
-                <a href="#integrasi-ojs" class="mobile-nav-link" onclick="closeMobileNav()">
+                <a href="#integrasi-ojs" class="mobile-nav-link" onclick="closeMobileNav()" data-google-vignette="false">
                     <span class="nav-icon">🔌</span>
                     <span>Integrasi OJS 3.x Jurnal</span>
                     <span class="nav-arrow">›</span>
                 </a>
-                <a href="#solusi" class="mobile-nav-link" onclick="closeMobileNav()">
+                <a href="#solusi" class="mobile-nav-link" onclick="closeMobileNav()" data-google-vignette="false">
                     <span class="nav-icon">👥</span>
                     <span>Solusi Sivitas &amp; Kampus</span>
                     <span class="nav-arrow">›</span>
                 </a>
                 <?php if (!empty($approvedTestimonials)): ?>
-                <a href="#testimoni" class="mobile-nav-link" onclick="closeMobileNav()">
+                <a href="#testimoni" class="mobile-nav-link" onclick="closeMobileNav()" data-google-vignette="false">
                     <span class="nav-icon">🌟</span>
                     <span>Testimoni Akademisi</span>
                     <span class="nav-arrow">›</span>
                 </a>
                 <?php endif; ?>
-                <a href="#langganan" class="mobile-nav-link" onclick="closeMobileNav()">
+                <a href="#langganan" class="mobile-nav-link" onclick="closeMobileNav()" data-google-vignette="false">
                     <span class="nav-icon">💳</span>
                     <span>Paket Tarif &amp; Top-Up</span>
                     <span class="nav-arrow">›</span>
                 </a>
-                <a href="#faq" class="mobile-nav-link" onclick="closeMobileNav()">
+                <a href="#faq" class="mobile-nav-link" onclick="closeMobileNav()" data-google-vignette="false">
                     <span class="nav-icon">❓</span>
                     <span>Tanya Jawab (FAQ)</span>
                     <span class="nav-arrow">›</span>
                 </a>
-                <a href="<?= base_url('verify') ?>" class="mobile-nav-link highlight" onclick="closeMobileNav()">
+                <a href="<?= base_url('verify') ?>" class="mobile-nav-link highlight" onclick="closeMobileNav()" data-google-vignette="false">
                     <span class="nav-icon">🛡️</span>
                     <span>Portal Verifikasi Sertifikat QR</span>
                     <span class="nav-arrow">›</span>
                 </a>
-                <a href="<?= base_url('ambassador') ?>" class="mobile-nav-link" onclick="closeMobileNav()" style="background: rgba(245, 158, 11, 0.08); border-left: 3px solid #f59e0b;">
+                <a href="<?= base_url('ambassador') ?>" class="mobile-nav-link" onclick="closeMobileNav()" style="background: rgba(245, 158, 11, 0.08); border-left: 3px solid #f59e0b;" data-google-vignette="false">
                     <span class="nav-icon">🎓</span>
                     <span>Program Duta Kampus (Afiliasi)</span>
                     <span class="nav-badge" style="background: rgba(245, 158, 11, 0.2); color: #d97706; font-weight: 800;">Komisi 20%</span>
@@ -3149,32 +3247,32 @@
 
             <div class="mobile-nav-group-title" style="margin-top: 20px;">Unduhan &amp; Bantuan</div>
             <nav class="mobile-nav-menu">
-                <a href="<?= base_url('riset/ar-tilik-vs-turnitin') ?>" class="mobile-nav-link" onclick="closeMobileNav()">
+                <a href="<?= base_url('riset/ar-tilik-vs-turnitin') ?>" class="mobile-nav-link" onclick="closeMobileNav()" data-google-vignette="false">
                     <span class="nav-icon">🏛️</span>
                     <span>Whitepaper: AR Tilik vs Turnitin</span>
                     <span class="nav-badge" style="background: rgba(15, 118, 110, 0.15); color: #0f766e; font-weight: 700;">Riset</span>
                 </a>
-                <a href="<?= base_url('riset/ar-tilik-vs-zerogpt') ?>" class="mobile-nav-link" onclick="closeMobileNav()">
+                <a href="<?= base_url('riset/ar-tilik-vs-zerogpt') ?>" class="mobile-nav-link" onclick="closeMobileNav()" data-google-vignette="false">
                     <span class="nav-icon">📊</span>
                     <span>Whitepaper: AR Tilik vs ZeroGPT</span>
                     <span class="nav-badge" style="background: rgba(234, 88, 12, 0.15); color: #ea580c; font-weight: 700;">Riset</span>
                 </a>
-                <a href="<?= base_url('docs/Brosur_Eksekutif_ARTilik.pdf') ?>" target="_blank" download="Brosur_Eksekutif_ARTilik.pdf" class="mobile-nav-link" onclick="closeMobileNav()">
+                <a href="<?= base_url('docs/Brosur_Eksekutif_ARTilik.pdf') ?>" target="_blank" download="Brosur_Eksekutif_ARTilik.pdf" class="mobile-nav-link" onclick="closeMobileNav()" data-google-vignette="false">
                     <span class="nav-icon">📄</span>
                     <span>Brosur Eksekutif Kampus (PDF)</span>
                     <span class="nav-badge" style="background: rgba(16, 185, 129, 0.2); color: #10b981;">2.7 MB</span>
                 </a>
-                <a href="<?= base_url('integrations/ojs/Panduan_Integrasi_OJS_ARTilik.pdf') ?>" target="_blank" download="Panduan_Integrasi_OJS_ARTilik.pdf" class="mobile-nav-link" onclick="closeMobileNav()">
+                <a href="<?= base_url('integrations/ojs/Panduan_Integrasi_OJS_ARTilik.pdf') ?>" target="_blank" download="Panduan_Integrasi_OJS_ARTilik.pdf" class="mobile-nav-link" onclick="closeMobileNav()" data-google-vignette="false">
                     <span class="nav-icon">📕</span>
                     <span>Buku Panduan OJS (PDF)</span>
                     <span class="nav-badge">2.0 MB</span>
                 </a>
-                <a href="<?= base_url('integrations/ojs/connector') ?>" download="ARTilikOJSConnector.php" class="mobile-nav-link" onclick="closeMobileNav()">
+                <a href="<?= base_url('integrations/ojs/connector') ?>" download="ARTilikOJSConnector.php" class="mobile-nav-link" onclick="closeMobileNav()" data-google-vignette="false">
                     <span class="nav-icon">💻</span>
                     <span>Konektor PHP OJS 3.x</span>
                     <span class="nav-badge">PHP</span>
                 </a>
-                <button type="button" onclick="closeMobileNav(); openContactModal('Pertanyaan Umum');" class="mobile-nav-link" style="width: 100%; border: none; background: transparent; text-align: left; cursor: pointer; font: inherit;">
+                <button type="button" onclick="closeMobileNav(); openContactModal('Pertanyaan Umum');" class="mobile-nav-link" style="width: 100%; border: none; background: transparent; text-align: left; cursor: pointer; font: inherit;" data-google-vignette="false">
                     <span class="nav-icon">💬</span>
                     <span>Hubungi Tim Pengembang</span>
                     <span class="nav-arrow">›</span>
@@ -3185,11 +3283,11 @@
         <!-- Mobile Drawer Footer -->
         <div class="mobile-drawer-footer">
             <div class="mobile-footer-links">
-                <a href="<?= base_url('privacy') ?>" onclick="closeMobileNav(); openLegalModal('privacy', event)">Privasi</a>
+                <a href="<?= base_url('privacy') ?>" onclick="closeMobileNav(); openLegalModal('privacy', event)" data-google-vignette="false">Privasi</a>
                 <span>&bull;</span>
-                <a href="<?= base_url('terms') ?>" onclick="closeMobileNav(); openLegalModal('terms', event)">Ketentuan</a>
+                <a href="<?= base_url('terms') ?>" onclick="closeMobileNav(); openLegalModal('terms', event)" data-google-vignette="false">Ketentuan</a>
                 <span>&bull;</span>
-                <a href="<?= base_url('sitemap.xml') ?>" target="_blank">Sitemap</a>
+                <a href="<?= base_url('sitemap.xml') ?>" target="_blank" data-google-vignette="false">Sitemap</a>
             </div>
             <div class="mobile-footer-brand">
                 AR Tilik &copy; <?= date('Y') ?> &bull; <a href="https://www.arsetontong.top" target="_blank" rel="noopener noreferrer">Powered by ARSetontong</a>
@@ -3201,7 +3299,7 @@
     <main id="main-content">
 
     <!-- Hero Section -->
-    <section class="hero">
+    <section class="hero google-anno-skip">
         <div class="container">
             <div class="hero-grid">
                 <div>
@@ -3217,18 +3315,18 @@
 
                     <div class="hero-buttons">
                         <?php if ($currentUser) : ?>
-                            <a href="<?= base_url('dashboard') ?>" class="btn btn-primary">
+                            <a href="<?= base_url('dashboard') ?>" class="btn btn-primary" data-google-vignette="false">
                                 <span>🚀</span> Buka Dashboard Pemeriksaan
                             </a>
                         <?php else : ?>
-                            <button type="button" onclick="openAuthModal('register')" class="btn btn-primary">
+                            <button type="button" onclick="openAuthModal('register')" class="btn btn-primary" data-google-vignette="false">
                                 <span>✨</span> Mulai Gratis (3 Submisi/Minggu)
                             </button>
                         <?php endif; ?>
-                        <a href="#integrasi-ojs" class="btn btn-outline" style="border-color: #f43f5e; color: #be123c; background: #fff1f2;">
+                        <a href="#integrasi-ojs" class="btn btn-outline" style="border-color: #f43f5e; color: #be123c; background: #fff1f2;" data-google-vignette="false">
                             <span>📕</span> Panduan OJS 3.x (PDF)
                         </a>
-                        <a href="#fitur-unggulan" class="btn btn-outline">
+                        <a href="#fitur-unggulan" class="btn btn-outline" data-google-vignette="false">
                             <span>⚡</span> Inovasi Mesin
                         </a>
                     </div>
@@ -3470,25 +3568,43 @@
                     </p>
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 10px; align-items: stretch; justify-content: center;">
-                    <a href="<?= base_url('benchmark') ?>" class="btn btn-primary" style="background: #4338ca; border-color: #4338ca; padding: 13px 20px; font-size: 13.5px; font-weight: 700; text-align: center; border-radius: 10px; box-shadow: 0 6px 16px rgba(67, 56, 202, 0.35); text-decoration: none;">
+                    <a href="<?= base_url('benchmark') ?>" class="btn btn-primary" style="background: #4338ca; border-color: #4338ca; padding: 13px 20px; font-size: 13.5px; font-weight: 700; text-align: center; border-radius: 10px; box-shadow: 0 6px 16px rgba(67, 56, 202, 0.35); text-decoration: none;" data-google-vignette="false">
                         <span>🔬 Benchmark Terbuka Naskah Indonesia</span>
                         <span style="margin-left: 6px;">&rarr;</span>
                     </a>
-                    <a href="<?= base_url('riset/ar-tilik-vs-turnitin') ?>" class="btn btn-primary" style="background: #0f766e; border-color: #0f766e; padding: 13px 20px; font-size: 13.5px; font-weight: 700; text-align: center; border-radius: 10px; box-shadow: 0 6px 16px rgba(15, 118, 110, 0.35); text-decoration: none;">
+                    <a href="<?= base_url('riset/ar-tilik-vs-turnitin') ?>" class="btn btn-primary" style="background: #0f766e; border-color: #0f766e; padding: 13px 20px; font-size: 13.5px; font-weight: 700; text-align: center; border-radius: 10px; box-shadow: 0 6px 16px rgba(15, 118, 110, 0.35); text-decoration: none;" data-google-vignette="false">
                         <span>🏛️ Whitepaper: AR Tilik vs Turnitin</span>
                         <span style="margin-left: 6px;">&rarr;</span>
                     </a>
-                    <a href="<?= base_url('riset/ar-tilik-vs-zerogpt') ?>" class="btn btn-primary" style="background: #ea580c; border-color: #ea580c; padding: 13px 20px; font-size: 13.5px; font-weight: 700; text-align: center; border-radius: 10px; box-shadow: 0 6px 16px rgba(234, 88, 12, 0.35); text-decoration: none;">
+                    <a href="<?= base_url('riset/ar-tilik-vs-zerogpt') ?>" class="btn btn-primary" style="background: #ea580c; border-color: #ea580c; padding: 13px 20px; font-size: 13.5px; font-weight: 700; text-align: center; border-radius: 10px; box-shadow: 0 6px 16px rgba(234, 88, 12, 0.35); text-decoration: none;" data-google-vignette="false">
                         <span>📊 Whitepaper: AR Tilik vs ZeroGPT</span>
                         <span style="margin-left: 6px;">&rarr;</span>
                     </a>
-                    <a href="<?= base_url('dashboard') ?>" class="btn" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); color: #ffffff; padding: 11px 18px; font-size: 13px; font-weight: 600; text-align: center; border-radius: 10px; text-decoration: none;">
+                    <a href="<?= base_url('dashboard') ?>" class="btn" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); color: #ffffff; padding: 11px 18px; font-size: 13px; font-weight: 600; text-align: center; border-radius: 10px; text-decoration: none;" data-google-vignette="false">
                         Uji Coba Audit Naskah Mandiri
                     </a>
                 </div>
             </div>
         </div>
     </section>
+
+    <!-- Slot Iklan Terstruktur 1 (Antara Riset & Inovasi Mesin - Anti Layout Shift) -->
+    <aside class="artilik-ad-section google-anno-skip" aria-label="Iklan Sponsor AR Tilik">
+        <div class="container">
+            <div class="artilik-ad-card">
+                <div class="artilik-ad-header">
+                    <span class="artilik-ad-badge">Pariwara / Iklan Sponsor</span>
+                </div>
+                <div class="artilik-ad-slot-body">
+                    <ins class="adsbygoogle"
+                         style="display:block"
+                         data-ad-client="ca-pub-9248253613564140"
+                         data-ad-format="auto"
+                         data-full-width-responsive="true"></ins>
+                </div>
+            </div>
+        </div>
+    </aside>
 
     <!-- Section 2: Inovasi Mesin Pendeteksi Generasi Baru -->
     <section id="fitur-unggulan" class="section" style="background: #f8fafc; border-top: 1px solid var(--border);">
@@ -3669,6 +3785,24 @@
             </div>
         </div>
     </section>
+
+    <!-- Slot Iklan Terstruktur 2 (Antara Alur Telaah & Ekosistem OJS - Anti Layout Shift) -->
+    <aside class="artilik-ad-section google-anno-skip" aria-label="Iklan Sponsor AR Tilik">
+        <div class="container">
+            <div class="artilik-ad-card">
+                <div class="artilik-ad-header">
+                    <span class="artilik-ad-badge">Pariwara / Iklan Sponsor</span>
+                </div>
+                <div class="artilik-ad-slot-body">
+                    <ins class="adsbygoogle"
+                         style="display:block"
+                         data-ad-client="ca-pub-9248253613564140"
+                         data-ad-format="auto"
+                         data-full-width-responsive="true"></ins>
+                </div>
+            </div>
+        </div>
+    </aside>
 
     <!-- Section 4: Ekosistem Integrasi OJS 3.x & REST API -->
     <section id="integrasi-ojs" class="section" style="background: #ffffff; border-bottom: 1px solid var(--border);">
@@ -4297,7 +4431,7 @@
     <?php endif; ?>
 
     <!-- Section 4: Paket Berlangganan & Top-Up Kuota (Midtrans Aligned) -->
-    <section id="langganan" class="section" style="background: #ffffff; border-top: 1px solid var(--border); position: relative;">
+    <section id="langganan" class="section google-anno-skip" style="background: #ffffff; border-top: 1px solid var(--border); position: relative;">
         <!-- Anchor link alias for #pricing -->
         <span id="pricing" style="position: absolute; top: -70px; left: 0;"></span>
         <div class="container">
@@ -4311,7 +4445,7 @@
 
             <div class="grid-4">
                 <!-- Plan 1: Free Academic -->
-                <div class="pricing-card" data-aos="fade-up" data-aos-delay="100" data-aos-duration="700">
+                <div class="pricing-card google-anno-skip" data-aos="fade-up" data-aos-delay="100" data-aos-duration="700">
                     <div>
                         <span class="plan-pill plan-pill-free">Tier Gratis</span>
                         <div class="plan-name">Civitas Akademika</div>
@@ -4334,18 +4468,18 @@
                     </div>
 
                     <?php if ($currentUser) : ?>
-                        <a href="<?= base_url('dashboard') ?>" class="btn btn-outline">
+                        <a href="<?= base_url('dashboard') ?>" class="btn btn-outline" data-google-vignette="false">
                             Gunakan Kuota Saya
                         </a>
                     <?php else : ?>
-                        <button type="button" onclick="openAuthModal('register')" class="btn btn-outline">
+                        <button type="button" onclick="openAuthModal('register')" class="btn btn-outline" data-google-vignette="false">
                             Daftar Akun Gratis
                         </button>
                     <?php endif; ?>
                 </div>
 
                 <!-- Plan 2: Top-Up Fleksibel (Pay-As-You-Go) -->
-                <div class="pricing-card" data-aos="fade-up" data-aos-delay="150" data-aos-duration="700">
+                <div class="pricing-card google-anno-skip" data-aos="fade-up" data-aos-delay="150" data-aos-duration="700">
                     <div>
                         <span class="plan-pill plan-pill-payg">Top-Up Fleksibel</span>
                         <div class="plan-name">Top-Up Kuota</div>
@@ -4369,18 +4503,18 @@
                     </div>
 
                     <?php if ($currentUser) : ?>
-                        <a href="<?= base_url('dashboard') ?>" class="btn btn-primary">
+                        <a href="<?= base_url('dashboard') ?>" class="btn btn-primary" data-google-vignette="false">
                             ⚡ Top-Up di Dashboard
                         </a>
                     <?php else : ?>
-                        <button type="button" onclick="openAuthModal('login')" class="btn btn-primary">
+                        <button type="button" onclick="openAuthModal('login')" class="btn btn-primary" data-google-vignette="false">
                             Masuk & Beli Kuota
                         </button>
                     <?php endif; ?>
                 </div>
 
                 <!-- Plan 3: Paket Pejuang Skripsi (Featured) -->
-                <div class="pricing-card popular" data-aos="fade-up" data-aos-delay="200" data-aos-duration="700">
+                <div class="pricing-card popular google-anno-skip" data-aos="fade-up" data-aos-delay="200" data-aos-duration="700">
                     <div class="pricing-badge popular">⭐ Paling Diminati</div>
                     <div>
                         <span class="plan-pill plan-pill-popular">Paket Skripsi</span>
@@ -4406,18 +4540,18 @@
                     </div>
 
                     <?php if ($currentUser) : ?>
-                        <a href="<?= base_url('dashboard') ?>" class="btn" style="background: #f59e0b; border: 1px solid #d97706; color: #ffffff; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);">
+                        <a href="<?= base_url('dashboard') ?>" class="btn" style="background: #f59e0b; border: 1px solid #d97706; color: #ffffff; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);" data-google-vignette="false">
                             Langganan di Dashboard →
                         </a>
                     <?php else : ?>
-                        <button type="button" onclick="openAuthModal('register')" class="btn" style="background: #f59e0b; border: 1px solid #d97706; color: #ffffff; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);">
+                        <button type="button" onclick="openAuthModal('register')" class="btn" style="background: #f59e0b; border: 1px solid #d97706; color: #ffffff; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);" data-google-vignette="false">
                             Daftar & Langganan →
                         </button>
                     <?php endif; ?>
                 </div>
 
                 <!-- Plan 4: Dosen & Peneliti Pro -->
-                <div class="pricing-card" data-aos="fade-up" data-aos-delay="250" data-aos-duration="700">
+                <div class="pricing-card google-anno-skip" data-aos="fade-up" data-aos-delay="250" data-aos-duration="700">
                     <div>
                         <span class="plan-pill plan-pill-pro">Kapasitas Besar</span>
                         <div class="plan-name">Dosen & Peneliti Pro</div>
@@ -4442,11 +4576,11 @@
                     </div>
 
                     <?php if ($currentUser) : ?>
-                        <a href="<?= base_url('dashboard') ?>" class="btn btn-outline">
+                        <a href="<?= base_url('dashboard') ?>" class="btn btn-outline" data-google-vignette="false">
                             Pilih Paket Dosen
                         </a>
                     <?php else : ?>
-                        <button type="button" onclick="openAuthModal('register')" class="btn btn-outline">
+                        <button type="button" onclick="openAuthModal('register')" class="btn btn-outline" data-google-vignette="false">
                             Daftar & Langganan
                         </button>
                     <?php endif; ?>
@@ -4465,7 +4599,7 @@
                     </p>
                 </div>
                 <div style="flex-shrink: 0; width: 100%; max-width: 260px; text-align: center;">
-                    <button type="button" onclick="openContactModal('Konsultasi Institusi & Lisensi Kampus')" class="btn" style="background: #ffffff; color: #0f172a; font-weight: 800; width: 100%; border: none; padding: 14px 20px; display: inline-block; text-decoration: none; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); cursor: pointer;">
+                    <button type="button" onclick="openContactModal('Konsultasi Institusi & Lisensi Kampus')" class="btn" style="background: #ffffff; color: #0f172a; font-weight: 800; width: 100%; border: none; padding: 14px 20px; display: inline-block; text-decoration: none; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); cursor: pointer;" data-google-vignette="false">
                         Konsultasi Institusi →
                     </button>
                     <div style="font-size: 11px; color: #94a3b8; margin-top: 8px;">Mulai Rp 450.000 / bln untuk pengelolaan jurnal</div>
@@ -4589,6 +4723,24 @@
         </div>
     </section>
 
+    <!-- Slot Iklan Terstruktur 3 (Pra-Penutup / Pasca FAQ - Anti Layout Shift) -->
+    <aside class="artilik-ad-section google-anno-skip" aria-label="Iklan Sponsor AR Tilik">
+        <div class="container">
+            <div class="artilik-ad-card">
+                <div class="artilik-ad-header">
+                    <span class="artilik-ad-badge">Pariwara / Iklan Sponsor</span>
+                </div>
+                <div class="artilik-ad-slot-body">
+                    <ins class="adsbygoogle"
+                         style="display:block"
+                         data-ad-client="ca-pub-9248253613564140"
+                         data-ad-format="auto"
+                         data-full-width-responsive="true"></ins>
+                </div>
+            </div>
+        </div>
+    </aside>
+
     <!-- Section Khusus: Peluang Bergabung Duta Kampus AR Tilik -->
     <section id="duta-kampus-cta" class="section" style="background: linear-gradient(135deg, #090d16 0%, #1e1b4b 60%, #0f172a 100%); padding: 70px 0; border-top: 1px solid rgba(255,255,255,0.08); border-bottom: 1px solid rgba(255,255,255,0.08); color: #ffffff; position: relative; overflow: hidden;">
         <div class="container" style="position: relative; z-index: 2;">
@@ -4624,7 +4776,7 @@
     </main>
 
     <!-- Footer -->
-    <footer class="footer" data-aos="fade-in" data-aos-duration="800">
+    <footer class="footer google-anno-skip" data-aos="fade-in" data-aos-duration="800">
         <div class="container">
             <div class="footer-grid">
                 <div>
@@ -4709,7 +4861,7 @@
     </button>
 
     <!-- Auth Modal (Registration & Login) -->
-    <div id="authModal" class="modal-overlay">
+    <div id="authModal" class="modal-overlay google-anno-skip">
         <div class="modal-card">
             <div class="modal-header">
                 <div style="display: flex; align-items: center; gap: 10px;">
@@ -4842,7 +4994,7 @@
     </div>
 
     <!-- Contact & Inquiry Modal -->
-    <div id="contactModal" class="modal-overlay">
+    <div id="contactModal" class="modal-overlay google-anno-skip">
         <div class="modal-card modal-card-md">
             <div class="modal-header">
                 <div style="display: flex; align-items: center; gap: 10px;">
@@ -4932,7 +5084,7 @@
     </div>
 
     <!-- Legal Document Modal (Privacy Policy & Terms) -->
-    <div id="legalModal" class="modal-overlay">
+    <div id="legalModal" class="modal-overlay google-anno-skip">
         <div class="modal-card modal-card-lg">
             <div class="modal-header" style="border-bottom: 1px solid var(--border); padding: 18px 24px;">
                 <div style="display: flex; align-items: center; gap: 10px;">
