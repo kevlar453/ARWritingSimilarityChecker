@@ -249,8 +249,16 @@ class DocumentController extends BaseController
             mkdir($storagePath, 0775, true);
         }
 
-        $filename = $file->getRandomName();
-        $file->move($storagePath, $filename);
+        try {
+            $filename = $file->getRandomName();
+            $file->move($storagePath, $filename);
+        } catch (\Throwable $e) {
+            log_message('error', '[CORPUS UPLOAD MOVE FAILED] ' . $e->getMessage());
+            return $this->response->setStatusCode(500)->setJSON([
+                'status'  => 'error',
+                'message' => 'Gagal memproses dan menyimpan berkas korpus ke penyimpanan peladen. Silakan hubungi administrator.',
+            ]);
+        }
 
         $customTitle = trim((string) $this->request->getPost('title'));
         $title = !empty($customTitle) ? $customTitle : $targetTitle;

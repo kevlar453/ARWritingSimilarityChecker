@@ -217,7 +217,15 @@ class AmbassadorController extends BaseController
             mkdir($targetDir, 0775, true);
         }
 
-        $file->move($targetDir, $newName);
+        try {
+            $file->move($targetDir, $newName);
+        } catch (\Throwable $e) {
+            log_message('error', '[AMBASSADOR ID UPLOAD MOVE FAILED] ' . $e->getMessage());
+            return $this->response->setJSON([
+                'status'  => 'error',
+                'message' => 'Gagal memproses dan menyimpan berkas kartu identitas ke peladen.',
+            ])->setStatusCode(500);
+        }
         $savedPath = 'uploads/ambassador_ids/' . $newName;
 
         $appModel->saveIdCard((int) $app['id'], $savedPath, $idType);
@@ -331,8 +339,16 @@ class AmbassadorController extends BaseController
                 if (!is_dir($targetDir)) {
                     mkdir($targetDir, 0775, true);
                 }
-                $file->move($targetDir, $newName);
-                $filePath = 'uploads/ambassador_proofs/' . $newName;
+                try {
+                    $file->move($targetDir, $newName);
+                    $filePath = 'uploads/ambassador_proofs/' . $newName;
+                } catch (\Throwable $e) {
+                    log_message('error', '[AMBASSADOR PROOF UPLOAD MOVE FAILED] ' . $e->getMessage());
+                    return $this->response->setJSON([
+                        'status'  => 'error',
+                        'message' => 'Gagal memproses dan menyimpan berkas bukti aktivitas ke peladen.',
+                    ])->setStatusCode(500);
+                }
             }
         }
 

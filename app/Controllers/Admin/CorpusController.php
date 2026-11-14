@@ -41,7 +41,15 @@ class CorpusController extends BaseController
         $clientName = $file->getClientName();
 
         $filename = $file->getRandomName();
-        $file->move($storagePath, $filename);
+        try {
+            $file->move($storagePath, $filename);
+        } catch (\Throwable $e) {
+            log_message('error', '[ADMIN CORPUS UPLOAD MOVE FAILED] ' . $e->getMessage());
+            return $this->response->setStatusCode(500)->setJSON([
+                'status'  => 'error',
+                'message' => 'Gagal menyimpan berkas dokumen korpus ke penyimpanan repositori peladen.',
+            ]);
+        }
 
         $faculty = trim((string) ($this->request->getPost('faculty') ?? ''));
         $department = trim((string) ($this->request->getPost('department') ?? ''));
