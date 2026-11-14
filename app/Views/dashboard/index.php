@@ -114,6 +114,9 @@
                             <span class="text-xs font-bold text-slate-800 leading-tight"><?= esc($currentUser['name']) ?></span>
                             <span class="text-[10px] text-slate-500 leading-tight"><?= esc($currentUser['institution'] ?? 'Pengguna Terdaftar') ?></span>
                         </div>
+                        <button type="button" onclick="openSelfDeleteModal()" class="inline-flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-rose-600 bg-slate-50 hover:bg-rose-50 px-2 py-1.5 rounded-lg border border-slate-200 hover:border-rose-200 transition cursor-pointer" title="Hapus Akun Mandiri (UU PDP)">
+                            ⚙️ <span class="hidden md:inline">Hapus Akun</span>
+                        </button>
                         <a href="<?= base_url('auth/logout') ?>" class="inline-flex items-center gap-1 text-xs font-semibold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 px-2.5 py-1.5 rounded-lg border border-rose-200 transition" title="Keluar Akun">
                             🚪 <span class="hidden sm:inline">Keluar</span>
                         </a>
@@ -3910,6 +3913,108 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal Penghapusan Akun Mandiri (UU PDP / Right to Erasure) -->
+    <div id="selfDeleteModal" class="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div class="p-6 space-y-4">
+                <div class="flex items-start gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0 text-xl">
+                        ⚠️
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900 leading-tight">Pemusnahan Akun Permanen</h3>
+                        <p class="text-xs text-slate-500 mt-1">Hak penghapusan data pribadi (Right to Erasure)</p>
+                    </div>
+                </div>
+
+                <div class="bg-rose-50 border border-rose-200 rounded-xl p-3.5 text-xs text-rose-800 space-y-2 leading-relaxed">
+                    <p><strong>Peringatan Keras:</strong> Tindakan ini bersifat permanen dan tidak dapat dibatalkan.</p>
+                    <ul class="list-disc list-inside space-y-1 text-[11px] text-rose-700">
+                        <li>Seluruh berkas naskah dan draf yang diunggah akan dihapus bersih dari server.</li>
+                        <li>Laporan hasil telaah kesepadanan dan sitasi akan dimusnahkan.</li>
+                        <li>Sisa kuota dan riwayat akun Anda tidak dapat dipulihkan kembali.</li>
+                    </ul>
+                </div>
+
+                <div class="space-y-1.5">
+                    <label for="selfDeletePassword" class="block text-xs font-semibold text-slate-700">
+                        Masukkan Kata Sandi Anda Saat Ini:
+                    </label>
+                    <input type="password" id="selfDeletePassword" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:outline-none" placeholder="••••••••" autocomplete="current-password">
+                    <p id="selfDeleteError" class="text-[11px] text-rose-600 hidden font-medium"></p>
+                </div>
+
+                <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                    <button type="button" onclick="closeSelfDeleteModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition cursor-pointer">
+                        Batal
+                    </button>
+                    <button type="button" id="btnConfirmSelfDelete" onclick="executeSelfDelete()" class="px-4 py-2 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 transition cursor-pointer shadow-xs">
+                        Musnahkan Akun Saya
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    function openSelfDeleteModal() {
+        const m = document.getElementById('selfDeleteModal');
+        const pwd = document.getElementById('selfDeletePassword');
+        const err = document.getElementById('selfDeleteError');
+        if (pwd) pwd.value = '';
+        if (err) { err.textContent = ''; err.classList.add('hidden'); }
+        if (m) m.classList.remove('hidden');
+        if (pwd) pwd.focus();
+    }
+
+    function closeSelfDeleteModal() {
+        const m = document.getElementById('selfDeleteModal');
+        if (m) m.classList.add('hidden');
+    }
+
+    async function executeSelfDelete() {
+        const pwd = document.getElementById('selfDeletePassword').value;
+        const err = document.getElementById('selfDeleteError');
+        const btn = document.getElementById('btnConfirmSelfDelete');
+
+        if (!pwd) {
+            err.textContent = 'Mohon masukkan kata sandi untuk melanjutkan.';
+            err.classList.remove('hidden');
+            return;
+        }
+
+        btn.disabled = true;
+        const origText = btn.textContent;
+        btn.textContent = 'Memusnahkan akun...';
+
+        try {
+            const response = await fetch('<?= base_url('auth/delete-account') ?>', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ password: pwd })
+            });
+            const data = await response.json();
+            if (response.ok && data.status === 'success') {
+                alert(data.message || 'Akun Anda berhasil dihapus.');
+                window.location.href = data.redirect || '<?= base_url() ?>';
+            } else {
+                err.textContent = data.message || 'Gagal menghapus akun.';
+                err.classList.remove('hidden');
+                btn.disabled = false;
+                btn.textContent = origText;
+            }
+        } catch (e) {
+            err.textContent = 'Terjadi kesalahan jaringan atau server.';
+            err.classList.remove('hidden');
+            btn.disabled = false;
+            btn.textContent = origText;
+        }
+    }
+    </script>
 </body>
 </html>
 

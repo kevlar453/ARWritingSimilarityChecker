@@ -486,6 +486,105 @@ class UserModel extends Model
     }
 
     /**
+     * Memusnahkan akun pengguna dan seluruh artefak data terkait secara permanen dan bersih (Data Purge).
+     * Membersihkan dokumen, laporan telaah, chunk, sidik jari, transaksi pembayaran,
+     * profil kemitraan/duta, token otentikasi, log rujukan, dan berkas fisik pada disk.
+     *
+     * @param int $userId ID Pengguna yang akan dihapus
+     * @return bool
+     */
+    public function deleteUserPermanently(int $userId): bool
+    {
+        $db = \Config\Database::connect();
+        $db->transStart();
+
+        $user = $this->find($userId);
+        if (!$user) {
+            $db->transRollback();
+            return false;
+        }
+
+        // 1. Bersihkan data otorisasi, keamanan & transaksi
+        $db->table('auth_rate_limits')->where('identifier', (string) $userId)->delete();
+        $db->table('auth_rate_limits')->where('identifier', $user['email'])->delete();
+        $db->table('api_keys')->where('user_id', $userId)->delete();
+        $db->table('document_shares')->where('shared_by_user_id', $userId)->orWhere('shared_with_user_id', $userId)->delete();
+        $db->table('payment_transactions')->where('user_id', $userId)->delete();
+        $db->table('testimonials')->where('user_id', $userId)->delete();
+        $db->table('feature_votes')->where('user_id', $userId)->delete();
+        $db->table('referral_logs')->where('referrer_user_id', $userId)->orWhere('referred_user_id', $userId)->delete();
+
+        // 2. Bersihkan program duta kampus & berkas fisik terkait
+        $ambProfiles = $db->table('ambassador_profiles')->where('user_id', $userId)->get()->getResultArray();
+        foreach ($ambProfiles as $ap) {
+            $proofs = $db->table('ambassador_activity_proofs')->where('ambassador_id', $ap['id'])->get()->getResultArray();
+            foreach ($proofs as $pr) {
+                if (!empty($pr['file_path'])) {
+                    $proofPath = WRITEPATH . 'uploads/' . $pr['file_path'];
+                    if (file_exists($proofPath)) {
+                        @unlink($proofPath);
+                    }
+                }
+            }
+            $db->table('ambassador_activity_proofs')->where('ambassador_id', $ap['id'])->delete();
+
+            $payouts = $db->table('ambassador_payout_requests')->where('ambassador_id', $ap['id'])->get()->getResultArray();
+            foreach ($payouts as $po) {
+                if (!empty($po['transfer_proof_path'])) {
+                    $pPath = WRITEPATH . 'uploads/ambassador_payouts/' . basename($po['transfer_proof_path']);
+                    if (file_exists($pPath)) {
+                        @unlink($pPath);
+                    }
+                }
+            }
+            $db->table('ambassador_payout_requests')->where('ambassador_id', $ap['id'])->delete();
+        }
+        $db->table('ambassador_profiles')->where('user_id', $userId)->delete();
+
+        // Hapus aplikasi duta kampus & berkas KTM/KTP
+        $apps = $db->table('ambassador_applications')->where('user_id', $userId)->get()->getResultArray();
+        foreach ($apps as $app) {
+            if (!empty($app['id_card_path'])) {
+                $idPath = WRITEPATH . 'uploads/ambassador_ids/' . basename($app['id_card_path']);
+                if (file_exists($idPath)) {
+                    @unlink($idPath);
+                }
+            }
+        }
+        $db->table('ambassador_applications')->where('user_id', $userId)->delete();
+
+        // 3. Bersihkan seluruh dokumen pengguna, laporan telaah, chunk, dan berkas fisik
+        $docs = $db->table('documents')->where('user_id', $userId)->get()->getResultArray();
+        foreach ($docs as $d) {
+            $reports = $db->table('reports')->select('id')->where('document_id', $d['id'])->get()->getResultArray();
+            foreach ($reports as $r) {
+                $db->table('report_matches')->where('report_id', $r['id'])->delete();
+                $db->table('report_sources')->where('report_id', $r['id'])->delete();
+                $db->table('reports')->where('id', $r['id'])->delete();
+            }
+
+            $db->table('report_sources')->where('source_document_id', $d['id'])->delete();
+            $db->table('document_chunks')->where('document_id', $d['id'])->delete();
+            $db->table('document_pages')->where('document_id', $d['id'])->delete();
+            $db->table('fingerprints')->where('document_id', $d['id'])->delete();
+            $db->table('fingerprint_documents')->where('document_id', $d['id'])->delete();
+            $db->table('document_shares')->where('document_id', $d['id'])->delete();
+
+            if (!empty($d['storage_path']) && file_exists($d['storage_path']) && $d['storage_path'] !== '[PURGED]') {
+                @unlink($d['storage_path']);
+            }
+        }
+        $db->table('documents')->where('user_id', $userId)->delete();
+
+        // 4. Hapus entitas pengguna utama
+        $db->table($this->table)->where('id', $userId)->delete();
+
+        $db->transComplete();
+
+        return $db->transStatus();
+    }
+
+    /**
      * Mendapatkan atau membuat token unsubscribe unik untuk pengguna
      */
     public function getOrCreateUnsubscribeToken(int $userId): string

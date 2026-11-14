@@ -574,6 +574,62 @@ class AuthController extends BaseController
     }
 
     /**
+     * Fitur Penghapusan Akun Mandiri oleh Pengguna (Right to Erasure / UU PDP No. 27/2022)
+     * Mengharuskan verifikasi kata sandi saat ini sebelum pemusnahan akun dan dokumen.
+     */
+    public function deleteAccount(): ResponseInterface
+    {
+        $userId = (int) (session()->get('user_id') ?? 0);
+        if (! $userId) {
+            return $this->respondError('Sesi login telah berakhir. Silakan masuk kembali.', 401);
+        }
+
+        $userModel = new UserModel();
+        $user = $userModel->find($userId);
+        if (! $user) {
+            session()->destroy();
+            return $this->respondError('Pengguna tidak ditemukan.', 404);
+        }
+
+        // Jangan izinkan self-delete jika pengguna adalah satu-satunya admin aktif
+        if ($user['role'] === 'admin') {
+            $otherAdmins = $userModel->where('role', 'admin')
+                                     ->where('id !=', $userId)
+                                     ->where('status', 'active')
+                                     ->countAllResults();
+            if ($otherAdmins === 0) {
+                return $this->respondError('Akun Administrator utama tidak dapat dihapus demi keberlangsungan sistem.', 400);
+            }
+        }
+
+        $data = $this->getRequestData();
+        $password = (string) ($data['password'] ?? '');
+
+        if ($password === '') {
+            return $this->respondError('Mohon masukkan kata sandi Anda untuk konfirmasi keamanan.', 400);
+        }
+
+        if (! password_verify($password, $user['password_hash'])) {
+            return $this->respondError('Kata sandi yang Anda masukkan tidak sesuai.', 401);
+        }
+
+        $deleted = $userModel->deleteUserPermanently($userId);
+        if (! $deleted) {
+            return $this->respondError('Gagal memproses pemusnahan akun karena kendala sistem.', 500);
+        }
+
+        session()->destroy();
+
+        log_message('notice', "[USER SELF DELETE] Pengguna #{$userId} ({$user['email']}) berhasil menghapus akunnya secara mandiri.");
+
+        return $this->response->setJSON([
+            'status'   => 'success',
+            'message'  => 'Akun Anda beserta seluruh dokumen dan riwayatnya telah berhasil dimusnahkan secara permanen.',
+            'redirect' => base_url(),
+        ]);
+    }
+
+    /**
      * Mengambil status autentikasi dan informasi kuota pengguna saat ini
      */
     public function status(): ResponseInterface

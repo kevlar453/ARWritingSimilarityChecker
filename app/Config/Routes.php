@@ -121,6 +121,7 @@ $routes->group('auth', function ($routes) {
     $routes->match(['GET', 'HEAD'], 'reset-password', 'AuthController::resetPasswordView');
     $routes->post('reset-password', 'AuthController::resetPassword');
     $routes->get('security-token', 'AuthController::securityToken');
+    $routes->post('delete-account', 'AuthController::deleteAccount');
 });
 
 // Payment & Top-Up Routes (Midtrans Snap & Webhook)
@@ -176,6 +177,7 @@ $routes->get('admin', 'Admin\DashboardController::index', ['filter' => 'admin'])
 $routes->group('admin', ['filter' => 'admin'], function ($routes) {
     $routes->get('/', 'Admin\DashboardController::index');
     $routes->post('users/update', 'Admin\DashboardController::updateUser');
+    $routes->post('users/delete', 'Admin\DashboardController::deleteUser');
     $routes->post('documents/reprocess', 'Admin\DashboardController::reprocessDocument');
     $routes->post('documents/delete', 'Admin\DashboardController::deleteDocument');
     $routes->post('corpus/visibility', 'Admin\DashboardController::updateCorpusVisibility');

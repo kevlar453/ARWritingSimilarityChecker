@@ -719,7 +719,7 @@
                         </div>
                     <?php else: ?>
                         <?php foreach ($usersList as $u): ?>
-                            <div class="bg-slate-800/60 border border-slate-700/70 rounded-2xl p-4 shadow-sm space-y-3">
+                            <div id="user-card-<?= (int) $u['id'] ?>" class="bg-slate-800/60 border border-slate-700/70 rounded-2xl p-4 shadow-sm space-y-3">
                                 <!-- Baris Identitas & Status -->
                                 <div class="flex items-start justify-between gap-3">
                                     <div class="flex items-center gap-3 min-w-0">
@@ -814,6 +814,11 @@
                                         <button onclick="handleUserAction(<?= (int) $u['id'] ?>, 'set_status', {status: '<?= $u['status'] === 'active' ? 'inactive' : 'active' ?>'})" class="py-2 px-3 rounded-xl <?= $u['status'] === 'active' ? 'bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border-rose-500/30' : 'bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border-emerald-500/30' ?> border text-xs font-medium flex items-center justify-center gap-1.5 transition-colors active:scale-98">
                                             <span><?= $u['status'] === 'active' ? '🚫' : '✅' ?></span> <?= $u['status'] === 'active' ? 'Suspend' : 'Aktifkan' ?>
                                         </button>
+
+                                        <!-- Tombol Hapus Akun Permanen (Mobile) -->
+                                        <button onclick="confirmDeleteUser(<?= (int) $u['id'] ?>, '<?= esc($u['name'], 'js') ?>', '<?= esc($u['email'], 'js') ?>', 'user-card-<?= (int) $u['id'] ?>')" class="col-span-2 py-2 px-3 rounded-xl bg-rose-950/40 hover:bg-rose-900/50 text-rose-300 border border-rose-500/30 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors active:scale-98">
+                                            <span>🗑️</span> Hapus Akun Permanen
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -842,7 +847,7 @@
                                     <tr><td colspan="8" class="py-6 text-center text-slate-500">Tidak ada pengguna yang cocok dengan kriteria pencarian.</td></tr>
                                 <?php else: ?>
                                     <?php foreach ($usersList as $u): ?>
-                                        <tr class="hover:bg-slate-800/50 transition-colors">
+                                        <tr id="user-row-<?= (int) $u['id'] ?>" class="hover:bg-slate-800/50 transition-colors">
                                             <td class="py-3 px-4">
                                                 <div class="font-bold text-slate-200"><?= esc($u['name']) ?></div>
                                                 <div class="text-slate-400 text-[11px] font-mono-code"><?= esc($u['email']) ?></div>
@@ -920,6 +925,11 @@
                                                         <?php else: ?>
                                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                                         <?php endif; ?>
+                                                    </button>
+
+                                                    <!-- Hapus Akun Pengguna Permanen -->
+                                                    <button type="button" onclick="confirmDeleteUser(<?= (int) $u['id'] ?>, '<?= esc($u['name'], 'js') ?>', '<?= esc($u['email'], 'js') ?>', 'user-row-<?= (int) $u['id'] ?>')" class="p-1.5 text-rose-500 hover:text-rose-200 hover:bg-rose-600/30 rounded-lg transition-colors cursor-pointer" title="Hapus Akun Pengguna Secara Permanen" aria-label="Hapus Akun">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                                     </button>
                                                 </div>
                                             </td>
@@ -6940,6 +6950,36 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                         }
                     } else {
                         showAdminToast(res.message || 'Gagal menghapus testimoni.', true);
+                    }
+                }
+            });
+        }
+
+        function confirmDeleteUser(userId, userName, userEmail, rowId) {
+            openAdminActionModal({
+                title: 'Hapus Akun Pengguna Permanen?',
+                subtitle: 'Pemusnahan Akun & Data (Irreversible)',
+                icon: '🗑️',
+                type: 'danger',
+                confirmText: 'Ya, Musnahkan Akun & Data',
+                message: 'Apakah Anda yakin ingin memusnahkan akun pengguna <strong class="text-rose-300">"' + (userName || 'Pengguna #' + userId) + '"</strong> (' + (userEmail || '') + ') secara permanen?<br><br><span class="text-xs text-rose-400 font-semibold">⚠️ PERINGATAN KERAS:</span> Seluruh berkas naskah, laporan analisis kemiripan, data kuota, transaksi, dan riwayat pengguna ini akan dihapus bersih dari server.',
+                onConfirm: async () => {
+                    const res = await postJson('<?= base_url('admin/users/delete') ?>', { user_id: userId });
+                    if (res.status === 'success') {
+                        showAdminToast(res.message || 'Akun pengguna berhasil dimusnahkan secara permanen.');
+                        if (rowId) {
+                            const el = document.getElementById(rowId);
+                            if (el) {
+                                el.style.transition = 'all 0.3s ease';
+                                el.style.opacity = '0';
+                                el.style.transform = 'scale(0.95)';
+                                setTimeout(() => el.remove(), 300);
+                            }
+                        } else {
+                            setTimeout(() => window.location.reload(), 700);
+                        }
+                    } else {
+                        showAdminToast(res.message || 'Gagal menghapus akun pengguna.', true);
                     }
                 }
             });

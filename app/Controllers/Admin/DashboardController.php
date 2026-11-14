@@ -695,6 +695,40 @@ class DashboardController extends BaseController
                 $msg = "Status langganan {$user['name']} berhasil diubah menjadi {$tier}.";
                 break;
 
+            case 'delete_user':
+                $currentAdminId = (int) (session()->get('user_id') ?? 0);
+                if ($currentAdminId === $userId) {
+                    return $this->response->setStatusCode(400)->setJSON([
+                        'status'  => 'error',
+                        'message' => 'Anda tidak dapat menghapus akun administrator Anda sendiri saat sedang masuk.',
+                    ]);
+                }
+
+                if ($user['role'] === 'admin') {
+                    $otherAdminCount = $userModel->where('role', 'admin')
+                                                 ->where('id !=', $userId)
+                                                 ->where('status', 'active')
+                                                 ->countAllResults();
+                    if ($otherAdminCount === 0) {
+                        return $this->response->setStatusCode(400)->setJSON([
+                            'status'  => 'error',
+                            'message' => 'Tidak dapat menghapus administrator ini karena merupakan satu-satunya administrator aktif dalam sistem.',
+                        ]);
+                    }
+                }
+
+                $deleted = $userModel->deleteUserPermanently($userId);
+                if (! $deleted) {
+                    return $this->response->setStatusCode(500)->setJSON([
+                        'status'  => 'error',
+                        'message' => 'Gagal menghapus pengguna karena kendala pada database.',
+                    ]);
+                }
+
+                $msg = "Akun {$user['name']} ({$user['email']}) beserta seluruh dokumen dan riwayatnya berhasil dimusnahkan secara permanen.";
+                log_message('notice', "[ADMIN USER DELETE] Administrator #{$currentAdminId} menghapus permanen akun pengguna #{$userId} ({$user['email']}).");
+                break;
+
             default:
                 return $this->response->setStatusCode(400)->setJSON([
                     'status'  => 'error',
@@ -705,13 +739,73 @@ class DashboardController extends BaseController
         $responseData = [
             'status'  => 'success',
             'message' => $msg,
-            'user'    => $userModel->find($userId),
+            'user'    => $action === 'delete_user' ? null : $userModel->find($userId),
         ];
         if (isset($extraData)) {
             $responseData['extra'] = $extraData;
         }
 
         return $this->response->setJSON($responseData);
+    }
+
+    /**
+     * Menghapus pengguna dan seluruh dokumen serta artefak datanya secara permanen dari sistem (Admin)
+     */
+    public function deleteUser(): ResponseInterface
+    {
+        $userId = (int) ($this->request->getPost('user_id') ?? 0);
+        $userModel = new UserModel();
+
+        if (! $userId) {
+            return $this->response->setStatusCode(400)->setJSON([
+                'status'  => 'error',
+                'message' => 'ID pengguna tidak valid.',
+            ]);
+        }
+
+        $user = $userModel->find($userId);
+        if (! $user) {
+            return $this->response->setStatusCode(404)->setJSON([
+                'status'  => 'error',
+                'message' => 'Pengguna tidak ditemukan.',
+            ]);
+        }
+
+        $currentAdminId = (int) (session()->get('user_id') ?? 0);
+        if ($currentAdminId === $userId) {
+            return $this->response->setStatusCode(400)->setJSON([
+                'status'  => 'error',
+                'message' => 'Anda tidak dapat menghapus akun administrator Anda sendiri saat sedang masuk.',
+            ]);
+        }
+
+        if ($user['role'] === 'admin') {
+            $otherAdminCount = $userModel->where('role', 'admin')
+                                         ->where('id !=', $userId)
+                                         ->where('status', 'active')
+                                         ->countAllResults();
+            if ($otherAdminCount === 0) {
+                return $this->response->setStatusCode(400)->setJSON([
+                    'status'  => 'error',
+                    'message' => 'Tidak dapat menghapus administrator ini karena merupakan satu-satunya administrator aktif dalam sistem.',
+                ]);
+            }
+        }
+
+        $deleted = $userModel->deleteUserPermanently($userId);
+        if (! $deleted) {
+            return $this->response->setStatusCode(500)->setJSON([
+                'status'  => 'error',
+                'message' => 'Gagal menghapus pengguna karena kendala pada database.',
+            ]);
+        }
+
+        log_message('notice', "[ADMIN USER DELETE] Administrator #{$currentAdminId} menghapus permanen akun #{$userId} ({$user['email']}).");
+
+        return $this->response->setJSON([
+            'status'  => 'success',
+            'message' => "Akun {$user['name']} ({$user['email']}) beserta seluruh dokumen dan riwayatnya berhasil dimusnahkan secara permanen.",
+        ]);
     }
 
     /**
