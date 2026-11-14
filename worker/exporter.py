@@ -14,7 +14,12 @@ import qrcode
 import base64
 import io
 import secrets
-from html import escape as html_escape
+from html import escape as _raw_html_escape
+
+def html_escape(val, quote=True) -> str:
+    if val is None:
+        return ""
+    return _raw_html_escape(str(val), quote=quote)
 
 # Ensure root directory is on PYTHONPATH and prevent script dir from shadowing worker package
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -886,7 +891,7 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
         raw_src = str(m.get("source_snippet", ""))
         s_sub_trunc = html_escape(raw_sub[:240] + ("..." if len(raw_sub) > 240 else ""))
         s_src_trunc = html_escape(raw_src[:240] + ("..." if len(raw_src) > 240 else ""))
-        src_id = html_escape(m.get("source_document_id", "-"))
+        src_id = html_escape(str(m.get("source_document_id") or "-"))
         sub_span = f"Kata {m.get('submission_start', 0)} &ndash; {m.get('submission_end', 0)}"
 
         bp_html = ""
@@ -1619,5 +1624,7 @@ if __name__ == "__main__":
                 f.write(pdf_data)
             print(f"[✓] Berkas PDF laporan #{args.report} berhasil disimpan ke: {default_out} ({len(pdf_data):,} byte)")
     except Exception as e:
+        import traceback
+        traceback.print_exc(file=sys.stderr)
         print(f"[!] Gagal mengekspor PDF: {e}", file=sys.stderr)
         sys.exit(1)
