@@ -1284,7 +1284,25 @@ class DashboardController extends BaseController
     protected function getPredictiveAnalyticsData(bool $forceRefresh = false): array
     {
         $cacheFile = WRITEPATH . 'cache/predictive_forecast_latest.json';
-        if (! $forceRefresh && file_exists($cacheFile)) {
+        $cacheMtime = file_exists($cacheFile) ? filemtime($cacheFile) : 0;
+
+        // Evaluasi apakah ada transaksi pembayaran lunas baru yang terjadi setelah berkas cache dibuat
+        $db = \Config\Database::connect();
+        $hasNewTransaction = false;
+        if ($cacheMtime > 0 && $db->tableExists('payment_transactions')) {
+            $latestTx = $db->table('payment_transactions')
+                ->select("MAX(COALESCE(paid_at, created_at)) as latest_tx_time")
+                ->whereIn('transaction_status', ['settlement', 'capture'])
+                ->get()->getRowArray();
+            if (!empty($latestTx['latest_tx_time'])) {
+                $hasNewTransaction = strtotime($latestTx['latest_tx_time']) > $cacheMtime;
+            }
+        }
+
+        // Cache kedaluwarsa jika: ada transaksi baru, umur cache > 2 jam, atau diminta refresh paksa
+        $isExpired = ($cacheMtime > 0) && ((time() - $cacheMtime) > 7200);
+
+        if (! $forceRefresh && ! $hasNewTransaction && ! $isExpired && file_exists($cacheFile)) {
             $raw = file_get_contents($cacheFile);
             $decoded = json_decode($raw, true);
             if (is_array($decoded) && ($decoded['status'] ?? '') === 'success') {
@@ -1300,8 +1318,17 @@ class DashboardController extends BaseController
             $pyPath = ROOTPATH . '.venv/bin/python3';
         }
         $scriptPath = escapeshellarg(ROOTPATH . 'worker/predictive_analytics.py');
-        $cmd = "{$pyPath} {$scriptPath} --action=" . ($forceRefresh ? 'run' : 'get') . " 2>&1";
+        $cmd = "{$pyPath} {$scriptPath} --action=run 2>&1";
         $output = shell_exec($cmd);
+
+        // Jika Python venv gagal (misal module missing), coba fallback ke sistem python3
+        if ((empty($output) || strpos($output, 'Traceback') !== false) && $pyPath !== '/usr/bin/python3') {
+            $fallbackCmd = "/usr/bin/python3 {$scriptPath} --action=run 2>&1";
+            $fallbackOut = shell_exec($fallbackCmd);
+            if ($fallbackOut && strpos($fallbackOut, '{') !== false) {
+                $output = $fallbackOut;
+            }
+        }
 
         if (file_exists($cacheFile)) {
             $raw = file_get_contents($cacheFile);

@@ -3043,7 +3043,7 @@
 
                     $salesGrowth = (float) ($salesFc['growth_pct'] ?? 0);
                     $usageGrowth = (float) ($usageFc['growth_pct'] ?? 0);
-                    $salesProjTotal = (float) ($salesFc['projected_30d_total'] ?? 0);
+                    $salesProjTotal = max((float) ($metrics['payment_stats']['total_revenue'] ?? 0), (float) ($salesFc['projected_30d_total'] ?? 0));
                     $usageProjTotal = (float) ($usageFc['projected_30d_total'] ?? 0);
                     $convPct = (float) ($pa['model_convergence_pct'] ?? ($usageFc['convergence_pct'] ?? 96.8));
                     $convPctFormatted = number_format($convPct, 1, ',', '.') . '%';
@@ -3094,10 +3094,13 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         <!-- Card 1: Proyeksi Penjualan Ritel Mandiri -->
                         <?php 
-                            $hasRealSales = !empty($salesFc['has_real_sales']) || ($salesFc['historical_30d_total'] ?? 0) > 0;
-                            $histRev = (float)($salesFc['historical_30d_total'] ?? ($pa['real_revenue_total'] ?? 0));
-                            $txCount = (int)($pa['real_tx_total'] ?? ($salesFc['real_tx_total'] ?? ($topPkg['sold'] ?? 0)));
+                            $liveRev = (float)($metrics['payment_stats']['total_revenue'] ?? 0);
+                            $liveTxCount = (int)($metrics['payment_stats']['settled_count'] ?? 0);
+                            $hasRealSales = !empty($salesFc['has_real_sales']) || ($salesFc['historical_30d_total'] ?? 0) > 0 || $liveRev > 0 || $liveTxCount > 0;
+                            $histRev = max($liveRev, (float)($salesFc['historical_30d_total'] ?? ($pa['real_revenue_total'] ?? 0)));
+                            $txCount = max($liveTxCount, (int)($pa['real_tx_total'] ?? ($salesFc['real_tx_total'] ?? ($topPkg['sold'] ?? 0))));
                             $untappedVal = (float)($salesFc['untapped_potential'] ?? ($pa['untapped_potential'] ?? 2123000));
+                            $topPkgSold = max($txCount, (int)($topPkg['sold'] ?? 0));
                         ?>
                         <div class="bg-slate-800/60 border border-slate-700/60 rounded-2xl p-5 shadow-sm relative overflow-hidden group hover:border-indigo-500/40 transition-colors">
                             <div class="flex items-center justify-between">
@@ -3131,7 +3134,7 @@
                             </div>
                             <div class="mt-2 text-[11px] text-slate-400 truncate" id="kpi-sales-subtitle" title="Asumsi: Naskah non-berbayar dikalikan tarif ritel aktif Rp 3.333/naskah (Paket Top-Up 3)">
                                 <?php if ($hasRealSales): ?>
-                                    Terlaris: <strong class="text-slate-200"><?= esc($topPkg['name']) ?></strong> (<?= (int)$topPkg['sold'] ?> unit) &bull; Potensi: <span class="text-emerald-400 font-mono">Rp <?= number_format($untappedVal, 0, ',', '.') ?></span>
+                                    Terlaris: <strong class="text-slate-200"><?= esc($topPkg['name'] ?? 'Top-Up 3 Dokumen') ?></strong> (<?= (int)$topPkgSold ?> unit) &bull; Potensi: <span class="text-emerald-400 font-mono">Rp <?= number_format($untappedVal, 0, ',', '.') ?></span>
                                 <?php else: ?>
                                     Potensi Belum Termonetisasi: <strong class="text-emerald-400 font-mono">Rp <?= number_format($untappedVal, 0, ',', '.') ?></strong>
                                 <?php endif; ?>

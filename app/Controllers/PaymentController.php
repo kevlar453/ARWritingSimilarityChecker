@@ -365,6 +365,12 @@ class PaymentController extends BaseController
                     log_message('warning', 'Gagal mengirim notif Telegram: ' . $te->getMessage());
                 }
 
+                // Invalidate cache analitik prediktif agar data omzet dan transaksi langsung tersinkron
+                $predCache = WRITEPATH . 'cache/predictive_forecast_latest.json';
+                if (file_exists($predCache)) {
+                    @unlink($predCache);
+                }
+
                 return $this->response->setJSON([
                     'status'   => 'settlement_success',
                     'order_id' => $orderId,

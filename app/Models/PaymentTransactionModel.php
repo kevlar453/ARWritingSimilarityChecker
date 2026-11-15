@@ -446,6 +446,12 @@ class PaymentTransactionModel extends Model
             log_message('warning', 'Gagal notif Telegram: ' . $te->getMessage());
         }
 
+        // Invalidate cache analitik prediktif agar data omzet dan transaksi langsung tersinkron
+        $predCache = WRITEPATH . 'cache/predictive_forecast_latest.json';
+        if (file_exists($predCache)) {
+            @unlink($predCache);
+        }
+
         return true;
     }
 }
