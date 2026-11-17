@@ -634,6 +634,16 @@ class DocumentController extends BaseController
             if (!empty($authHeader)) {
                 $keyData = $apiKeyModel->validateKey($authHeader);
                 if ($keyData) {
+                    $rateInfo = \App\Libraries\ApiRateLimiter::checkLimit(
+                        (int) $keyData['id'],
+                        (int) ($keyData['rate_limit_per_minute'] ?? 60),
+                        (string) ($keyData['key_prefix'] ?? '')
+                    );
+                    \App\Libraries\ApiRateLimiter::applyHeaders($this->response, $rateInfo);
+                    if (! $rateInfo['allowed']) {
+                        return \App\Libraries\ApiRateLimiter::buildRateLimitExceededResponse($this->response, $rateInfo);
+                    }
+
                     $userId = (int) $keyData['user_id'];
                     $apiKeyId = (int) $keyData['id'];
                 }

@@ -42,10 +42,11 @@ class PublicApiController extends BaseController
     }
 
     /**
-     * POST /api/v1/check
-     * Menerima naskah artikel ilmiah dari OJS atau sistem eksternal untuk dicek
+     * Mengautentikasi API Key sekaligus menerapkan rate limiting per menit via Redis (fail-open).
+     *
+     * @return array|\CodeIgniter\HTTP\ResponseInterface
      */
-    public function checkSubmission()
+    protected function authenticateAndRateLimit()
     {
         $keyData = $this->authenticate();
         if (! $keyData) {
@@ -54,6 +55,31 @@ class PublicApiController extends BaseController
                 'code'    => 401,
                 'message' => 'Autentikasi gagal. Sertakan API Key yang valid pada header X-API-Key atau Authorization: Bearer <token>.'
             ]);
+        }
+
+        $rateInfo = \App\Libraries\ApiRateLimiter::checkLimit(
+            (int) $keyData['id'],
+            (int) ($keyData['rate_limit_per_minute'] ?? 60),
+            (string) ($keyData['key_prefix'] ?? '')
+        );
+        \App\Libraries\ApiRateLimiter::applyHeaders($this->response, $rateInfo);
+
+        if (! $rateInfo['allowed']) {
+            return \App\Libraries\ApiRateLimiter::buildRateLimitExceededResponse($this->response, $rateInfo);
+        }
+
+        return $keyData;
+    }
+
+    /**
+     * POST /api/v1/check
+     * Menerima naskah artikel ilmiah dari OJS atau sistem eksternal untuk dicek
+     */
+    public function checkSubmission()
+    {
+        $keyData = $this->authenticateAndRateLimit();
+        if ($keyData instanceof \CodeIgniter\HTTP\ResponseInterface) {
+            return $keyData;
         }
 
         if (! empty($keyData['quota_exceeded'])) {
@@ -274,12 +300,9 @@ class PublicApiController extends BaseController
      */
     public function getStatus($documentId)
     {
-        $keyData = $this->authenticate();
-        if (! $keyData) {
-            return $this->response->setStatusCode(401)->setJSON([
-                'status'  => 'error',
-                'message' => 'Autentikasi gagal. Sertakan API Key yang valid.'
-            ]);
+        $keyData = $this->authenticateAndRateLimit();
+        if ($keyData instanceof \CodeIgniter\HTTP\ResponseInterface) {
+            return $keyData;
         }
 
         $doc = $this->documentModel->find($documentId);
@@ -318,12 +341,9 @@ class PublicApiController extends BaseController
      */
     public function getReport($reportId)
     {
-        $keyData = $this->authenticate();
-        if (! $keyData) {
-            return $this->response->setStatusCode(401)->setJSON([
-                'status'  => 'error',
-                'message' => 'Autentikasi gagal. Sertakan API Key yang valid.'
-            ]);
+        $keyData = $this->authenticateAndRateLimit();
+        if ($keyData instanceof \CodeIgniter\HTTP\ResponseInterface) {
+            return $keyData;
         }
 
         $report = $this->reportModel->find($reportId);
@@ -430,12 +450,9 @@ class PublicApiController extends BaseController
      */
     public function getQuota()
     {
-        $keyData = $this->authenticate();
-        if (! $keyData) {
-            return $this->response->setStatusCode(401)->setJSON([
-                'status'  => 'error',
-                'message' => 'Autentikasi gagal. Sertakan API Key yang valid.'
-            ]);
+        $keyData = $this->authenticateAndRateLimit();
+        if ($keyData instanceof \CodeIgniter\HTTP\ResponseInterface) {
+            return $keyData;
         }
 
         $quotaLimit = (int) $keyData['quota_limit'];
