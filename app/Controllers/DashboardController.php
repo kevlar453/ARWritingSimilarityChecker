@@ -1919,8 +1919,9 @@ class DashboardController extends BaseController
         }
 
         if (! $isOwner && ! $isAdmin && ! $isShared) {
-            $token = $this->request->getGet('token') ?: $this->request->getGet('code');
-            if (empty($token) || $token !== ($report['verification_code'] ?? null)) {
+            $token = (string) ($this->request->getGet('token') ?: $this->request->getGet('code') ?: '');
+            $expectedCode = (string) ($report['verification_code'] ?? '');
+            if ($token === '' || $expectedCode === '' || ! hash_equals(strtoupper($expectedCode), strtoupper(trim($token)))) {
                 return $this->response->setStatusCode(403)->setBody('Akses ditolak: Anda tidak memiliki izin untuk mengunduh laporan PDF ini.');
             }
         }
@@ -1929,38 +1930,23 @@ class DashboardController extends BaseController
         $safeTitle = preg_replace('/[^a-zA-Z0-9_\-]/', '_', $rawTitle);
         $filename = "Laporan_AR_Tilik_#{$reportId}_{$safeTitle}.pdf";
 
-        // Eksekusi worker exporter via Python
+        // Eksekusi worker exporter via Python dengan batas timeout aman
         $projectRoot = ROOTPATH;
         $pythonBin = $projectRoot . '.venv/bin/python';
         if (! file_exists($pythonBin)) {
             $pythonBin = 'python3';
         }
 
-        $cmd = escapeshellcmd($pythonBin) . ' -m worker.exporter --report ' . $reportId . ' --stdout';
+        $cmd = escapeshellcmd($pythonBin) . ' -m worker.exporter --report ' . (int) $reportId . ' --stdout';
+        $procResult = $this->executeProcessWithTimeout($cmd, $projectRoot, 55);
 
-        $descriptors = [
-            0 => ['pipe', 'r'],
-            1 => ['pipe', 'w'],
-            2 => ['pipe', 'w'],
-        ];
-
-        $process = proc_open($cmd, $descriptors, $pipes, $projectRoot);
-        if (! is_resource($process)) {
-            return $this->response->setStatusCode(500)->setBody("Gagal menginisialisasi proses generator PDF.");
+        if (! $procResult['ok'] || empty($procResult['stdout'])) {
+            $stderr = $procResult['stderr'];
+            log_message('error', "PDF export failed (exit={$procResult['exit_code']}): {$stderr}");
+            return $this->response->setStatusCode(500)->setBody("Gagal menghasilkan PDF laporan: " . esc($stderr ?: 'Proses generator PDF gagal atau melampaui batas waktu.'));
         }
 
-        fclose($pipes[0]);
-        $pdfContent = stream_get_contents($pipes[1]);
-        fclose($pipes[1]);
-        $stderr = stream_get_contents($pipes[2]);
-        fclose($pipes[2]);
-
-        $exitCode = proc_close($process);
-
-        if ($exitCode !== 0 || empty($pdfContent)) {
-            log_message('error', "PDF export failed: {$stderr}");
-            return $this->response->setStatusCode(500)->setBody("Gagal menghasilkan PDF laporan: " . esc($stderr));
-        }
+        $pdfContent = $procResult['stdout'];
 
         return $this->response
             ->setHeader('Content-Type', 'application/pdf')
@@ -1995,18 +1981,43 @@ class DashboardController extends BaseController
             }
         }
 
-        // Cek izin akses ketat: pemilik dokumen, admin, korpus rujukan publik, atau dibagikan ke akun ini
+        // Cek izin akses ketat: pemilik, admin, dibagikan ke akun ini, korpus bervisibilitas publik,
+        // korpus rujukan bagi pengguna terautentikasi, atau pemegang token laporan resmi terkait
         $isOwner  = $userId && ((int) $doc['user_id'] === (int) $userId);
         $isAdmin  = $session->get('user_role') === 'admin';
-        $isCorpus = ($doc['document_type'] === 'corpus' || ($doc['corpus_visibility'] ?? '') === 'public');
+        $isPublicCorpus = (($doc['corpus_visibility'] ?? '') === 'public');
+        $isAuthenticatedCorpus = ($userId && ($doc['document_type'] ?? '') === 'corpus');
+
         $isShared = false;
         if ($userId) {
             $shareModel = new \App\Models\DocumentShareModel();
             $isShared = $shareModel->userHasAccess((int) $documentId, (int) $userId, 'view_all');
         }
 
-        if (! $isOwner && ! $isAdmin && ! $isCorpus && ! $isShared) {
-            return $this->response->setStatusCode(403)->setBody('Akses ke dokumen ditolak. Naskah bersifat privat bagi pemilik.');
+        // Validasi akses berbasis token laporan resmi (untuk verifikator / pembaca eksternal berizin)
+        $hasValidReportToken = false;
+        $reqReportId = (int) ($this->request->getGet('report_id') ?? 0);
+        $reqToken    = trim((string) ($this->request->getGet('token') ?: $this->request->getGet('code') ?: ''));
+        if ($reqReportId > 0 && $reqToken !== '') {
+            $db = db_connect();
+            $repRow = $db->table('reports')->where('id', $reqReportId)->get()->getRowArray();
+            if ($repRow && ! empty($repRow['verification_code']) && hash_equals(strtoupper($repRow['verification_code']), strtoupper($reqToken))) {
+                if ((int) $repRow['document_id'] === (int) $documentId) {
+                    $hasValidReportToken = true;
+                } else {
+                    $srcMatch = $db->table('report_sources')
+                        ->where('report_id', $reqReportId)
+                        ->where('source_document_id', (int) $documentId)
+                        ->countAllResults();
+                    if ($srcMatch > 0) {
+                        $hasValidReportToken = true;
+                    }
+                }
+            }
+        }
+
+        if (! $isOwner && ! $isAdmin && ! $isShared && ! $isPublicCorpus && ! $isAuthenticatedCorpus && ! $hasValidReportToken) {
+            return $this->response->setStatusCode(403)->setBody('Akses ke dokumen ditolak. Naskah bersifat privat atau memerlukan autentikasi.');
         }
 
         $rawMime = $doc['mime_type'] ?: mime_content_type($filePath);
@@ -2014,11 +2025,12 @@ class DashboardController extends BaseController
         $safeMime = $isPdf ? 'application/pdf' : 'application/octet-stream';
         $disposition = $isPdf ? 'inline' : 'attachment';
 
-        $filename = $doc['original_filename'] ?: basename($filePath);
+        $rawName = $doc['original_filename'] ?: basename($filePath);
+        $filename = preg_replace('/[\r\n"\\\\\/]+/', '_', (string) $rawName) ?: ('document_' . (int) $documentId);
 
         return $this->response
             ->setHeader('Content-Type', $safeMime)
-            ->setHeader('Content-Disposition', $disposition . '; filename="' . addslashes($filename) . '"')
+            ->setHeader('Content-Disposition', $disposition . '; filename="' . $filename . '"')
             ->setHeader('Content-Length', (string) filesize($filePath))
             ->setHeader('X-Content-Type-Options', 'nosniff')
             ->setHeader('X-Frame-Options', 'SAMEORIGIN')
@@ -2469,32 +2481,17 @@ class DashboardController extends BaseController
         }
 
         $cmd = escapeshellcmd($pythonBin) . ' ' . escapeshellarg($projectRoot . 'worker/generate_certificate_pdf.py') . ' --code ' . escapeshellarg($code) . $aiArg . ' --stdout';
+        $procResult = $this->executeProcessWithTimeout($cmd, $projectRoot, 55);
 
-        $descriptors = [
-            0 => ['pipe', 'r'],
-            1 => ['pipe', 'w'],
-            2 => ['pipe', 'w'],
-        ];
-
-        $process = proc_open($cmd, $descriptors, $pipes, $projectRoot);
-        if (! is_resource($process)) {
-            return $this->response->setStatusCode(500)->setBody("Gagal menginisialisasi proses generator sertifikat.");
-        }
-
-        fclose($pipes[0]);
-        $pdfContent = stream_get_contents($pipes[1]);
-        fclose($pipes[1]);
-        $stderr = stream_get_contents($pipes[2]);
-        fclose($pipes[2]);
-
-        $exitCode = proc_close($process);
-
-        if ($exitCode !== 0 || empty($pdfContent)) {
-            log_message('error', "Certificate PDF export failed: {$stderr}");
+        if (! $procResult['ok'] || empty($procResult['stdout'])) {
+            $stderr = $procResult['stderr'];
+            log_message('error', "Certificate PDF export failed (exit={$procResult['exit_code']}): {$stderr}");
             return $this->response->setStatusCode(500)->setBody("Gagal menghasilkan PDF Sertifikat Hasil Uji: " . esc($stderr));
         }
 
-        $filename = "Sertifikat_Uji_ARTilik_{$code}.pdf";
+        $pdfContent = $procResult['stdout'];
+        $safeCode = preg_replace('/[^A-Za-z0-9_\-]/', '_', $code);
+        $filename = "Sertifikat_Uji_ARTilik_{$safeCode}.pdf";
 
         return $this->response
             ->setHeader('Content-Type', 'application/pdf')
@@ -2533,8 +2530,9 @@ class DashboardController extends BaseController
         }
 
         if (! $isOwner && ! $isAdmin && ! $isShared) {
-            $token = $this->request->getGet('token') ?: $this->request->getGet('code');
-            if (empty($token) || strtoupper(trim((string) $token)) !== strtoupper((string) ($report['verification_code'] ?? ''))) {
+            $token = trim((string) ($this->request->getGet('token') ?: $this->request->getGet('code') ?: ''));
+            $expected = (string) ($report['verification_code'] ?? '');
+            if ($token === '' || $expected === '' || ! hash_equals(strtoupper($expected), strtoupper($token))) {
                 return $this->response->setStatusCode(403)->setBody('Akses ditolak: Anda tidak memiliki izin untuk mengunduh sertifikat laporan ini.');
             }
         }
@@ -2556,31 +2554,15 @@ class DashboardController extends BaseController
         }
 
         $cmd = escapeshellcmd($pythonBin) . ' ' . escapeshellarg($projectRoot . 'worker/generate_certificate_pdf.py') . ' --report ' . (int)$reportId . $aiArg . ' --stdout';
+        $procResult = $this->executeProcessWithTimeout($cmd, $projectRoot, 55);
 
-        $descriptors = [
-            0 => ['pipe', 'r'],
-            1 => ['pipe', 'w'],
-            2 => ['pipe', 'w'],
-        ];
-
-        $process = proc_open($cmd, $descriptors, $pipes, $projectRoot);
-        if (! is_resource($process)) {
-            return $this->response->setStatusCode(500)->setBody("Gagal menginisialisasi proses generator sertifikat.");
-        }
-
-        fclose($pipes[0]);
-        $pdfContent = stream_get_contents($pipes[1]);
-        fclose($pipes[1]);
-        $stderr = stream_get_contents($pipes[2]);
-        fclose($pipes[2]);
-
-        $exitCode = proc_close($process);
-
-        if ($exitCode !== 0 || empty($pdfContent)) {
-            log_message('error', "Certificate PDF export failed: {$stderr}");
+        if (! $procResult['ok'] || empty($procResult['stdout'])) {
+            $stderr = $procResult['stderr'];
+            log_message('error', "Certificate PDF export failed (exit={$procResult['exit_code']}): {$stderr}");
             return $this->response->setStatusCode(500)->setBody("Gagal menghasilkan PDF Sertifikat Hasil Uji: " . esc($stderr));
         }
 
+        $pdfContent = $procResult['stdout'];
         $filename = "Sertifikat_Uji_ARTilik_Report_{$reportId}.pdf";
 
         return $this->response
@@ -2921,6 +2903,88 @@ class DashboardController extends BaseController
             'status' => 'success',
             'data'   => $stats,
         ]);
+    }
+
+    /**
+     * Menjalankan proses eksternal via proc_open dengan pengawasan batas waktu (timeout)
+     */
+    private function executeProcessWithTimeout(string $cmd, string $cwd, int $timeoutSeconds = 55): array
+    {
+        $descriptors = [
+            0 => ['pipe', 'r'],
+            1 => ['pipe', 'w'],
+            2 => ['pipe', 'w'],
+        ];
+
+        $process = proc_open($cmd, $descriptors, $pipes, $cwd);
+        if (! is_resource($process)) {
+            return ['ok' => false, 'exit_code' => -1, 'stdout' => '', 'stderr' => 'Gagal menginisialisasi proses.'];
+        }
+
+        fclose($pipes[0]);
+        stream_set_blocking($pipes[1], false);
+        stream_set_blocking($pipes[2], false);
+
+        $stdout = '';
+        $stderr = '';
+        $deadline = microtime(true) + $timeoutSeconds;
+        $timedOut = false;
+
+        while (true) {
+            $read = [];
+            if (is_resource($pipes[1]) && ! feof($pipes[1])) {
+                $read[] = $pipes[1];
+            }
+            if (is_resource($pipes[2]) && ! feof($pipes[2])) {
+                $read[] = $pipes[2];
+            }
+            if (empty($read)) {
+                break;
+            }
+
+            $remaining = $deadline - microtime(true);
+            if ($remaining <= 0) {
+                $timedOut = true;
+                @proc_terminate($process, 9);
+                break;
+            }
+
+            $sec = (int) floor($remaining);
+            $usec = (int) (($remaining - $sec) * 1_000_000);
+            $write = null;
+            $except = null;
+
+            $ready = @stream_select($read, $write, $except, $sec, $usec);
+            if ($ready === false) {
+                break;
+            }
+
+            foreach ($read as $stream) {
+                $chunk = fread($stream, 65536);
+                if ($chunk !== false && $chunk !== '') {
+                    if ($stream === $pipes[1]) {
+                        $stdout .= $chunk;
+                    } else {
+                        $stderr .= $chunk;
+                    }
+                }
+            }
+        }
+
+        if (is_resource($pipes[1])) {
+            fclose($pipes[1]);
+        }
+        if (is_resource($pipes[2])) {
+            fclose($pipes[2]);
+        }
+
+        $exitCode = proc_close($process);
+        if ($timedOut) {
+            $stderr = trim($stderr . "\nProses melampaui batas waktu ({$timeoutSeconds} detik) dan dihentikan.");
+            return ['ok' => false, 'exit_code' => -1, 'stdout' => '', 'stderr' => $stderr];
+        }
+
+        return ['ok' => ($exitCode === 0), 'exit_code' => $exitCode, 'stdout' => $stdout, 'stderr' => $stderr];
     }
 }
 

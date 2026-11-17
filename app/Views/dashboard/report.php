@@ -3133,7 +3133,7 @@ $detectedLang = $detectedLang ?? \App\Libraries\LanguageDetector::detect(
                                 (!empty($m['boilerplate_category']) && in_array($m['boilerplate_category'], ['ADMINISTRATIVE_FORMULA', 'LEGAL_CITATION'], true))
                             );
                         ?>
-                        <div id="passage-card-<?= $idx ?>" data-match-idx="<?= $idx ?>" data-word-count="<?= (int)$m['word_count'] ?>" data-is-boilerplate="<?= $isBpMatch ? '1' : '0' ?>" data-is-quote="<?= $isQuoteMatch ? '1' : '0' ?>" data-is-biblio="<?= $isBibMatch ? '1' : '0' ?>" data-is-front="<?= $isFrontMatch ? '1' : '0' ?>" class="passage-card border border-slate-200 rounded-xl p-4 bg-slate-50/50 hover:bg-white hover:border-indigo-300 transition-all space-y-3">
+                        <div id="passage-card-<?= $idx ?>" data-match-idx="<?= $idx ?>" data-sub-start="<?= (int)$m['submission_start'] ?>" data-sub-end="<?= (int)$m['submission_end'] ?>" data-word-count="<?= (int)$m['word_count'] ?>" data-is-boilerplate="<?= $isBpMatch ? '1' : '0' ?>" data-is-quote="<?= $isQuoteMatch ? '1' : '0' ?>" data-is-biblio="<?= $isBibMatch ? '1' : '0' ?>" data-is-front="<?= $isFrontMatch ? '1' : '0' ?>" class="passage-card border border-slate-200 rounded-xl p-4 bg-slate-50/50 hover:bg-white hover:border-indigo-300 transition-all space-y-3">
                             <div class="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-200/60">
                                 <div class="flex items-center gap-2">
                                     <span class="text-xs font-bold px-2 py-0.5 rounded bg-slate-200 text-slate-700 font-mono-code">#<?= $idx + 1 ?></span>
@@ -4169,9 +4169,13 @@ $detectedLang = $detectedLang ?? \App\Libraries\LanguageDetector::detect(
         }
 
         function loadDualPdfFrames() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const verifyToken = urlParams.get('token') || urlParams.get('code') || '';
+            const tokenQuery = verifyToken ? `?report_id=<?= (int)$report['id'] ?>&token=${encodeURIComponent(verifyToken)}` : '';
+
             const subFrame = document.getElementById('dualSubPdfFrame');
             const subNewTab = document.getElementById('dualSubPdfNewTab');
-            const subPdfUrl = '<?= base_url('dashboard/documents/' . $report['document_id'] . '/preview') ?>';
+            const subPdfUrl = '<?= base_url('dashboard/documents/' . $report['document_id'] . '/preview') ?>' + tokenQuery;
 
             if (subFrame && (!subFrame.src || subFrame.src === 'about:blank' || subFrame.src.endsWith('about:blank'))) {
                 subFrame.src = subPdfUrl;
@@ -4192,7 +4196,7 @@ $detectedLang = $detectedLang ?? \App\Libraries\LanguageDetector::detect(
 
             if (selectedSourceObj) {
                 if (srcTitle) srcTitle.innerText = `${selectedSourceObj.source_title || 'Naskah Asli Rujukan'} (PDF)`;
-                const srcPdfUrl = '<?= base_url('dashboard/documents') ?>/' + selectedSrcId + '/preview';
+                const srcPdfUrl = '<?= base_url('dashboard/documents') ?>/' + selectedSrcId + '/preview' + tokenQuery;
 
                 if (srcNewTab) srcNewTab.href = srcPdfUrl;
                 if (srcFrame) {
@@ -4644,6 +4648,22 @@ $detectedLang = $detectedLang ?? \App\Libraries\LanguageDetector::detect(
         // ═════════════════════════════════════════════════════════════════════
         const rawOverallScore = <?= (float)$report['overall_similarity'] ?>;
 
+        function mergeWordIntervals(intervals) {
+            if (!intervals || intervals.length === 0) return 0;
+            const sorted = [...intervals].sort((a, b) => (a[0] - b[0]) || (a[1] - b[1]));
+            const merged = [[sorted[0][0], sorted[0][1]]];
+            for (let i = 1; i < sorted.length; i++) {
+                const [s, e] = sorted[i];
+                const last = merged[merged.length - 1];
+                if (s <= last[1] + 1) {
+                    last[1] = Math.max(last[1], e);
+                } else {
+                    merged.push([s, e]);
+                }
+            }
+            return merged.reduce((sum, [s, e]) => sum + Math.max(0, e - s + 1), 0);
+        }
+
         function recalculateLiveScore() {
             const excludeQuotes = document.getElementById('toggleExcludeQuotes').checked;
             const excludeBoilerplate = document.getElementById('toggleExcludeBoilerplate').checked;
@@ -4651,12 +4671,14 @@ $detectedLang = $detectedLang ?? \App\Libraries\LanguageDetector::detect(
             const excludeBiblio = document.getElementById('toggleExcludeBibliography').checked;
 
             const cards = document.querySelectorAll('.passage-card');
-            let totalMatchedWords = 0;
-            let excludedWords = 0;
+            const allIntervals = [];
+            const activeIntervals = [];
             let excludedCount = 0;
 
             cards.forEach(card => {
                 const wCount = parseInt(card.getAttribute('data-word-count') || 0);
+                const sStart = parseInt(card.getAttribute('data-sub-start') || 0);
+                const sEnd = parseInt(card.getAttribute('data-sub-end') || (sStart + Math.max(0, wCount - 1)));
                 const isBp = card.getAttribute('data-is-boilerplate') === '1';
                 const isQuote = card.getAttribute('data-is-quote') === '1';
                 const isFront = card.getAttribute('data-is-front') === '1';
@@ -4664,7 +4686,9 @@ $detectedLang = $detectedLang ?? \App\Libraries\LanguageDetector::detect(
                 const idx = card.getAttribute('data-match-idx');
                 const badge = document.getElementById(`passage-excluded-badge-${idx}`);
 
-                totalMatchedWords += wCount;
+                if (wCount > 0 && sEnd >= sStart) {
+                    allIntervals.push([sStart, sEnd]);
+                }
 
                 let shouldExclude = false;
                 let reasons = [];
@@ -4687,7 +4711,6 @@ $detectedLang = $detectedLang ?? \App\Libraries\LanguageDetector::detect(
                 }
 
                 if (shouldExclude) {
-                    excludedWords += wCount;
                     excludedCount++;
                     card.classList.add('opacity-40', 'bg-slate-100', 'border-dashed');
                     card.classList.remove('hover:bg-white', 'hover:border-indigo-300');
@@ -4696,18 +4719,24 @@ $detectedLang = $detectedLang ?? \App\Libraries\LanguageDetector::detect(
                         badge.innerText = `Dikecualikan Filter (${reasons.join(', ')})`;
                     }
                 } else {
+                    if (wCount > 0 && sEnd >= sStart) {
+                        activeIntervals.push([sStart, sEnd]);
+                    }
                     card.classList.remove('opacity-40', 'bg-slate-100', 'border-dashed');
                     card.classList.add('hover:bg-white', 'hover:border-indigo-300');
                     if (badge) badge.classList.add('hidden');
                 }
             });
 
-            // Hitung skor kemiripan murni (Adjusted Score) secara proporsional
+            // Hitung skor kemiripan murni memakai cakupan union interval kata (anti double-counting)
+            const totalUnionWords = mergeWordIntervals(allIntervals);
+            const activeUnionWords = mergeWordIntervals(activeIntervals);
+            const excludedWords = Math.max(0, totalUnionWords - activeUnionWords);
+
             let adjustedScore = rawOverallScore;
-            if (totalMatchedWords > 0) {
-                const activeWords = Math.max(0, totalMatchedWords - excludedWords);
-                adjustedScore = (activeWords / totalMatchedWords) * rawOverallScore;
-            } else if (excludedWords > 0) {
+            if (totalUnionWords > 0) {
+                adjustedScore = (activeUnionWords / totalUnionWords) * rawOverallScore;
+            } else if (excludedCount > 0) {
                 adjustedScore = 0.0;
             }
             adjustedScore = Math.max(0, Math.min(rawOverallScore, adjustedScore));
@@ -4724,7 +4753,7 @@ $detectedLang = $detectedLang ?? \App\Libraries\LanguageDetector::detect(
 
             if (excludeQuotes || excludeBoilerplate || excludeFrontMatter || excludeBiblio) {
                 activeBadge.classList.remove('hidden');
-                statusNotice.innerHTML = `Filter aktif: <strong class="text-indigo-200">${excludedCount} pasase (${excludedWords} kata)</strong> dikecualikan dari perhitungan murni.`;
+                statusNotice.innerHTML = `Filter aktif: <strong class="text-indigo-200">${excludedCount} pasase (${excludedWords} kata unik)</strong> dikecualikan dari perhitungan murni.`;
             } else {
                 activeBadge.classList.add('hidden');
                 statusNotice.innerText = 'Semua pasase aktif (0 kata dikecualikan).';

@@ -301,9 +301,10 @@ def fetch_historical_series(conn) -> pd.DataFrame:
     else:
         merged_df["anon_doc_count"] = 0
 
-    # Hitung pendapatan riil organik (tanpa data sintetis)
+    # Hitung pendapatan & kredit terjual riil organik (tanpa data sintetis)
     real_revenue_total = float(merged_df["daily_revenue"].sum())
     real_tx_total = int(merged_df["tx_count"].sum())
+    real_credits_sold = int(merged_df["daily_credits_sold"].sum()) if "daily_credits_sold" in merged_df.columns else real_tx_total
     non_zero_days = int((merged_df["daily_revenue"] > 0).sum())
 
     # Kriteria apakah sudah ada transaksi penjualan ritel riil masuk
@@ -317,11 +318,11 @@ def fetch_historical_series(conn) -> pd.DataFrame:
     organic_docs_total = int(merged_df["doc_count"].sum())
 
     # Hitung potensi monetisasi yang belum tergarap secara akurat:
-    # Dokumen non-berbayar riil = total submisi organik dikurangi naskah yang terkonversi pembayaran
-    unpaid_docs_total = max(0, organic_docs_total - real_tx_total)
+    # Dokumen non-berbayar riil = total submisi organik dikurangi total kuota kredit submisi yang dibeli
+    unpaid_docs_total = max(0, organic_docs_total - real_credits_sold)
     # Tarif per dokumen dihitung dari paket ritel aktif yang terjual: Top-Up 3 Dokumen (Rp 10.000 / 3 = Rp 3.333,33/naskah)
     retail_rate_per_doc = 10000.0 / 3.0
-    untapped_potential = float(round(unpaid_docs_total * retail_rate_per_doc, -3)) # Rp 2.123.000
+    untapped_potential = float(round(unpaid_docs_total * retail_rate_per_doc, -3))
 
     if not pkg_rows:
         pkg_rows = [
@@ -572,10 +573,12 @@ def synthesize_with_gemini(
     anon_docs = int(metrics_summary.get("anon_docs_total", 0))
     total_users = int(metrics_summary.get("total_users", 38))
 
-    # Perhitungan dokumen tak berbayar & tarif satuan aktif
-    unpaid_docs = max(0, total_docs - real_tx)
+    # Perhitungan dokumen tak berbayar & tarif satuan aktif (disinkronkan dengan hitungan seri historis)
+    organic_total = int(metrics_summary.get("organic_docs_total", total_docs))
+    real_credits = int(metrics_summary.get("real_credits_sold", real_tx))
+    unpaid_docs = max(0, organic_total - real_credits)
     retail_unit_rate = 10000.0 / 3.0
-    untapped_pot = float(round(unpaid_docs * retail_unit_rate, -3)) # Rp 2.123.000
+    untapped_pot = float(metrics_summary.get("untapped_potential", round(unpaid_docs * retail_unit_rate, -3)))
 
     # Metrik konversi ganda
     conv_by_docs_pct = round((real_tx / max(1, total_docs)) * 100, 2)
@@ -921,6 +924,8 @@ def run_full_pipeline(force_live: bool = False) -> Dict[str, Any]:
         total_users = int(cursor.fetchone()["total_users"] or 0)
         cursor.close()
 
+        real_credits_sold = int(df["daily_credits_sold"].sum()) if "daily_credits_sold" in df.columns else real_tx_total
+
         metrics_summary = {
             "sales": sales_result,
             "usage": usage_result,
@@ -928,6 +933,7 @@ def run_full_pipeline(force_live: bool = False) -> Dict[str, Any]:
             "has_statistical_sample": has_statistical_sample,
             "real_revenue_total": real_revenue_total,
             "real_tx_total": real_tx_total,
+            "real_credits_sold": real_credits_sold,
             "untapped_potential": untapped_potential,
             "model_convergence_pct": usage_result.get("convergence_pct", 96.8),
             "registered_docs_total": registered_docs_total,

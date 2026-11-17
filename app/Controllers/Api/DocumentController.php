@@ -163,20 +163,20 @@ class DocumentController extends BaseController
             ]);
         }
 
-        $allowed = [
-            'application/pdf',
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'text/plain',
-            'text/x-tex',
-            'application/x-tex',
-            'application/octet-stream'
+        $ext = strtolower($file->getClientExtension());
+        $mime = $file->getMimeType();
+        $allowedExts = ['pdf', 'docx', 'txt', 'tex'];
+        $allowedMimes = [
+            'pdf'  => ['application/pdf', 'application/x-pdf'],
+            'docx' => ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/zip', 'application/octet-stream'],
+            'txt'  => ['text/plain'],
+            'tex'  => ['text/x-tex', 'application/x-tex', 'text/plain', 'application/octet-stream']
         ];
 
-        $mime = $file->getMimeType();
-        if (! in_array($mime, $allowed, true) && ! in_array($file->getClientExtension(), ['pdf', 'docx', 'txt', 'tex'], true)) {
+        if (! in_array($ext, $allowedExts, true) || ! isset($allowedMimes[$ext]) || ! in_array($mime, $allowedMimes[$ext], true)) {
             return $this->response->setStatusCode(415)->setJSON([
                 'status'  => 'error',
-                'message' => 'Hanya berkas format PDF, DOCX, TXT, dan LaTeX (.TEX) yang didukung.'
+                'message' => 'Hanya berkas format PDF, DOCX, TXT, dan LaTeX (.TEX) yang valid dan didukung.'
             ]);
         }
 
@@ -332,12 +332,14 @@ class DocumentController extends BaseController
             ]);
         }
 
-        // Cek kepemilikan dokumen (kecuali admin, korpus publik, atau dibagikan ke pengguna)
+        // Cek kepemilikan dokumen (kecuali admin, dibagikan ke pengguna, korpus publik, atau korpus untuk pengguna login)
         $isOwner = $userId && ((int) $document['user_id'] === (int) $userId);
         $shareModel = new \App\Models\DocumentShareModel();
         $isShared = $userId && $shareModel->userHasAccess((int) $id, (int) $userId, 'view_report');
+        $isPublicCorpus = (($document['corpus_visibility'] ?? '') === 'public');
+        $isAuthCorpus = ($userId && ($document['document_type'] ?? '') === 'corpus');
 
-        if (! $isOwner && ! $isAdmin && ! $isShared && $document['document_type'] !== 'corpus') {
+        if (! $isOwner && ! $isAdmin && ! $isShared && ! $isPublicCorpus && ! $isAuthCorpus) {
             return $this->response->setStatusCode(404)->setJSON([
                 'status'  => 'error',
                 'message' => 'Dokumen tidak ditemukan.'

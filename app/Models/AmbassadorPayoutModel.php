@@ -85,7 +85,7 @@ class AmbassadorPayoutModel extends Model
     {
         $ambassadorId = (int) $data['ambassador_id'];
         $userId       = (int) $data['user_id'];
-        $amount       = (float) ($data['amount'] ?? 0);
+        $amount       = round((float) ($data['amount'] ?? 0), 2);
         $channel      = trim((string) ($data['payout_channel'] ?? ''));
         $accNumber    = trim((string) ($data['payout_account_number'] ?? ''));
         $accName      = trim((string) ($data['payout_account_name'] ?? ''));
@@ -104,43 +104,69 @@ class AmbassadorPayoutModel extends Model
             ];
         }
 
-        // Cek saldo tersedia
-        $financial = $this->getFinancialSummary($ambassadorId, $totalCommissionEarned);
-        if ($amount > $financial['available_balance']) {
+        $db = \Config\Database::connect();
+        $db->transBegin();
+
+        try {
+            // Kunci baris profil duta untuk mencegah race condition double-withdrawal
+            $db->query("SELECT id FROM ambassador_profiles WHERE id = ? FOR UPDATE", [$ambassadorId]);
+
+            // Cek saldo tersedia di dalam transaksi terkunci
+            $financial = $this->getFinancialSummary($ambassadorId, $totalCommissionEarned);
+            if ($amount > $financial['available_balance']) {
+                $db->transRollback();
+                return [
+                    'success' => false,
+                    'message' => 'Jumlah penarikan (Rp ' . number_format($amount, 0, ',', '.') . ') melebihi saldo komisi yang tersedia (Rp ' . number_format($financial['available_balance'], 0, ',', '.') . ').',
+                ];
+            }
+
+            // Buat kode pencairan unik, misal: WD-202610-1234
+            $now = date('Y-m-d H:i:s');
+            $code = 'WD-' . date('Ym') . '-' . strtoupper(bin2hex(random_bytes(3)));
+
+            $insertData = [
+                'ambassador_id'         => $ambassadorId,
+                'user_id'               => $userId,
+                'payout_code'           => $code,
+                'amount'                => $amount,
+                'payout_channel'        => $channel,
+                'payout_account_number' => $accNumber,
+                'payout_account_name'   => $accName,
+                'status'                => 'pending',
+                'requested_at'          => $now,
+                'created_at'            => $now,
+                'updated_at'            => $now,
+            ];
+
+            $payoutId = $this->insert($insertData, true);
+
+            // Perbarui data rekening terakhir di profil duta agar tersimpan
+            $profileModel = new AmbassadorProfileModel();
+            $profileModel->update($ambassadorId, [
+                'payout_channel'        => $channel,
+                'payout_account_number' => $accNumber,
+                'payout_account_name'   => $accName,
+                'updated_at'            => $now,
+            ]);
+
+            if ($db->transStatus() === false) {
+                $db->transRollback();
+                return [
+                    'success' => false,
+                    'message' => 'Gagal memproses permintaan pencairan karena gangguan transaksi basis data.',
+                ];
+            }
+
+            $db->transCommit();
+        } catch (\Throwable $e) {
+            $db->transRollback();
+            log_message('error', 'Payout request error: ' . $e->getMessage());
             return [
                 'success' => false,
-                'message' => 'Jumlah penarikan (Rp ' . number_format($amount, 0, ',', '.') . ') melebihi saldo komisi yang tersedia (Rp ' . number_format($financial['available_balance'], 0, ',', '.') . ').',
+                'message' => 'Terjadi kesalahan sistem saat mengajukan pencairan komisi.',
             ];
         }
-
-        // Buat kode pencairan unik, misal: WD-202610-1234
-        $now = date('Y-m-d H:i:s');
-        $code = 'WD-' . date('Ym') . '-' . strtoupper(bin2hex(random_bytes(3)));
-
-        $insertData = [
-            'ambassador_id'         => $ambassadorId,
-            'user_id'               => $userId,
-            'payout_code'           => $code,
-            'amount'                => $amount,
-            'payout_channel'        => $channel,
-            'payout_account_number' => $accNumber,
-            'payout_account_name'   => $accName,
-            'status'                => 'pending',
-            'requested_at'          => $now,
-            'created_at'            => $now,
-            'updated_at'            => $now,
-        ];
-
-        $payoutId = $this->insert($insertData, true);
-
-        // Perbarui data rekening terakhir di profil duta agar tersimpan
-        $profileModel = new AmbassadorProfileModel();
-        $profileModel->update($ambassadorId, [
-            'payout_channel'        => $channel,
-            'payout_account_number' => $accNumber,
-            'payout_account_name'   => $accName,
-            'updated_at'            => $now,
-        ]);
 
         return [
             'success'           => true,

@@ -1565,7 +1565,7 @@ def export_report_pdf(report_id: int, output_path: str | None = None) -> bytes:
         success = False
         weasy_bin = shutil.which("weasyprint")
         if weasy_bin:
-            res = subprocess.run([weasy_bin, html_file, pdf_file], capture_output=True, text=True)
+            res = subprocess.run([weasy_bin, html_file, pdf_file], capture_output=True, text=True, timeout=45)
             if res.returncode == 0:
                 success = True
 
@@ -1586,7 +1586,7 @@ def export_report_pdf(report_id: int, output_path: str | None = None) -> bytes:
                     f"--print-to-pdf={pdf_file}",
                     html_file
                 ]
-                subprocess.run(chrome_cmd, capture_output=True, check=True)
+                subprocess.run(chrome_cmd, capture_output=True, check=True, timeout=45)
                 success = True
             else:
                 raise RuntimeError("Tidak ditemukan WeasyPrint maupun Google Chrome/Chromium untuk merender PDF.")

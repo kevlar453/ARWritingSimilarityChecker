@@ -31,12 +31,28 @@ class CorpusController extends BaseController
             ]);
         }
 
+        $ext = strtolower($file->getClientExtension());
+        $mime = $file->getMimeType() ?: 'application/octet-stream';
+        $allowedExts = ['pdf', 'docx', 'txt', 'tex'];
+        $allowedMimes = [
+            'pdf'  => ['application/pdf', 'application/x-pdf'],
+            'docx' => ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/zip', 'application/octet-stream'],
+            'txt'  => ['text/plain'],
+            'tex'  => ['text/x-tex', 'application/x-tex', 'text/plain', 'application/octet-stream']
+        ];
+
+        if (! in_array($ext, $allowedExts, true) || ! isset($allowedMimes[$ext]) || ! in_array($mime, $allowedMimes[$ext], true)) {
+            return $this->response->setStatusCode(415)->setJSON([
+                'status'  => 'error',
+                'message' => 'Hanya format PDF, DOCX, TXT, dan LaTeX (.TEX) yang valid dan didukung.'
+            ]);
+        }
+
         $storagePath = WRITEPATH . 'documents/corpus/';
         if (! is_dir($storagePath)) {
             mkdir($storagePath, 0775, true);
         }
 
-        $mime = $file->getMimeType() ?: 'text/plain';
         $size = $file->getSize();
         $clientName = $file->getClientName();
 
@@ -169,6 +185,17 @@ class CorpusController extends BaseController
         ]);
     }
 
+    /**
+     * Menjalankan modul Python worker secara aman tanpa pembungkusan escapeshellcmd ganda
+     */
+    private function executeWorkerModule(string $pythonBin, string $module, array $args = []): string
+    {
+        $rootPath = escapeshellarg(rtrim(ROOTPATH, '/'));
+        $escapedArgs = implode(' ', array_map('escapeshellarg', $args));
+        $cmd = "cd {$rootPath} && PYTHONPATH={$rootPath} " . escapeshellcmd($pythonBin) . ' -m ' . escapeshellarg($module) . ($escapedArgs !== '' ? ' ' . $escapedArgs : '') . ' 2>&1';
+        return (string) shell_exec($cmd);
+    }
+
     public function syncDropzone()
     {
         $pythonBin = ROOTPATH . '.venv/bin/python';
@@ -181,10 +208,7 @@ class CorpusController extends BaseController
             ]);
         }
 
-        // Jalankan dari ROOTPATH dengan PYTHONPATH eksplisit
-        $rootPath = escapeshellarg(rtrim(ROOTPATH, '/'));
-        $cmd = "cd {$rootPath} && PYTHONPATH={$rootPath} " . escapeshellcmd("{$pythonBin} -m worker.corpus_harvester --dropzone") . ' 2>&1';
-        $output = shell_exec($cmd);
+        $output = $this->executeWorkerModule($pythonBin, 'worker.corpus_harvester', ['--dropzone']);
 
         $hasError = (strpos($output, 'Traceback') !== false) || (strpos($output, 'Error:') !== false);
 
@@ -219,10 +243,8 @@ class CorpusController extends BaseController
         $query = trim($this->request->getPost('query') ?: '');
         $limit = max(1, min((int) ($this->request->getPost('limit') ?: 5), 30));
 
-        $rootPath = escapeshellarg(rtrim(ROOTPATH, '/'));
-
         if ($mode === 'registry') {
-            $cmd = "cd {$rootPath} && PYTHONPATH={$rootPath} " . escapeshellcmd("{$pythonBin} -m worker.auto_discovery_harvester --registry --limit {$limit}") . ' 2>&1';
+            $output = $this->executeWorkerModule($pythonBin, 'worker.auto_discovery_harvester', ['--registry', '--limit', (string) $limit]);
         } else {
             if (empty($query)) {
                 return $this->response->setStatusCode(400)->setJSON([
@@ -230,11 +252,9 @@ class CorpusController extends BaseController
                     'message' => 'Topik atau kata kunci pencarian karya ilmiah wajib diisi.'
                 ]);
             }
-            $escapedQuery = escapeshellarg($query);
-            $cmd = "cd {$rootPath} && PYTHONPATH={$rootPath} " . escapeshellcmd("{$pythonBin} -m worker.auto_discovery_harvester --query {$escapedQuery} --limit {$limit}") . ' 2>&1';
+            $output = $this->executeWorkerModule($pythonBin, 'worker.auto_discovery_harvester', ['--query', $query, '--limit', (string) $limit]);
         }
 
-        $output = shell_exec($cmd);
         $hasError = (strpos($output, 'Traceback') !== false) || (strpos($output, 'Error:') !== false);
 
         if ($hasError) {
@@ -261,10 +281,7 @@ class CorpusController extends BaseController
         $query = trim($this->request->getPost('query') ?: '');
         $limit = max(1, min((int) ($this->request->getPost('limit') ?: 10), 50));
 
-        $rootPath = escapeshellarg(rtrim(ROOTPATH, '/'));
-        $escapedQuery = escapeshellarg($query);
-        $cmd = "cd {$rootPath} && PYTHONPATH={$rootPath} " . escapeshellcmd("{$pythonBin} -m worker.national_harvester --source neliti --query {$escapedQuery} --limit {$limit}") . ' 2>&1';
-        $output = shell_exec($cmd);
+        $output = $this->executeWorkerModule($pythonBin, 'worker.national_harvester', ['--source', 'neliti', '--query', $query, '--limit', (string) $limit]);
 
         return $this->response->setJSON([
             'status'  => 'success',
@@ -282,10 +299,7 @@ class CorpusController extends BaseController
         $query = trim($this->request->getPost('query') ?: 'informatika');
         $limit = max(1, min((int) ($this->request->getPost('limit') ?: 10), 50));
 
-        $rootPath = escapeshellarg(rtrim(ROOTPATH, '/'));
-        $escapedQuery = escapeshellarg($query);
-        $cmd = "cd {$rootPath} && PYTHONPATH={$rootPath} " . escapeshellcmd("{$pythonBin} -m worker.national_harvester --source garuda --query {$escapedQuery} --limit {$limit}") . ' 2>&1';
-        $output = shell_exec($cmd);
+        $output = $this->executeWorkerModule($pythonBin, 'worker.national_harvester', ['--source', 'garuda', '--query', $query, '--limit', (string) $limit]);
 
         return $this->response->setJSON([
             'status'  => 'success',
@@ -301,9 +315,7 @@ class CorpusController extends BaseController
             $pythonBin = 'python3';
         }
 
-        $rootPath = escapeshellarg(rtrim(ROOTPATH, '/'));
-        $cmd = "cd {$rootPath} && PYTHONPATH={$rootPath} " . escapeshellcmd("{$pythonBin} -m worker.national_harvester --scheduled") . ' 2>&1';
-        $output = shell_exec($cmd);
+        $output = $this->executeWorkerModule($pythonBin, 'worker.national_harvester', ['--scheduled']);
 
         return $this->response->setJSON([
             'status'  => 'success',

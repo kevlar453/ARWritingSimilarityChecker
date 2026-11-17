@@ -5174,6 +5174,16 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
             featList.innerHTML = html;
         }
 
+        function escapeAdminHtml(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
         async function runPredictiveForecast() {
             const btn = document.getElementById('btn-run-forecast');
             const icon = document.getElementById('btn-forecast-icon');
@@ -5219,8 +5229,8 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                     const kpiSubtitle = document.getElementById('kpi-sales-subtitle');
                     if (kpiSubtitle) {
                         if (sFc.has_real_sales) {
-                            const pkgName = res.top_package_name || (res.top_package ? res.top_package.name : '-');
-                            const pkgSold = res.top_package_sold || (res.top_package ? res.top_package.sold : 0);
+                            const pkgName = escapeAdminHtml(res.top_package_name || (res.top_package ? res.top_package.name : '-'));
+                            const pkgSold = Number(res.top_package_sold || (res.top_package ? res.top_package.sold : 0));
                             const potFmt = Number(sFc.untapped_potential || res.untapped_potential || 0).toLocaleString('id-ID');
                             kpiSubtitle.innerHTML = `Terlaris: <strong class="text-slate-200">${pkgName}</strong> (${pkgSold} unit) &bull; Potensi: <span class="text-emerald-400 font-mono">Rp ${potFmt}</span>`;
                             kpiSubtitle.title = 'Asumsi: Naskah non-berbayar dikalikan tarif ritel aktif Rp 3.333/naskah (Paket Top-Up 3)';
@@ -5284,12 +5294,12 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                                     <div class="space-y-1.5">
                                         <div class="flex items-center justify-between gap-1 flex-wrap">
                                             <span class="px-2 py-0.5 rounded text-[10px] font-bold ${isHigh ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'}">
-                                                Prioritas ${rc.priority || 'Sedang'}
+                                                Prioritas ${escapeAdminHtml(rc.priority || 'Sedang')}
                                             </span>
-                                            <span class="text-[10px] text-slate-400">${rc.category || 'Bisnis'}</span>
+                                            <span class="text-[10px] text-slate-400">${escapeAdminHtml(rc.category || 'Bisnis')}</span>
                                         </div>
-                                        <h6 class="text-xs font-bold text-white">${rc.title || 'Rekomendasi'}</h6>
-                                        <p class="text-[11px] text-slate-300 leading-relaxed">${rc.action || ''}</p>
+                                        <h6 class="text-xs font-bold text-white">${escapeAdminHtml(rc.title || 'Rekomendasi')}</h6>
+                                        <p class="text-[11px] text-slate-300 leading-relaxed">${escapeAdminHtml(rc.action || '')}</p>
                                     </div>
                                 </div>
                             `;
@@ -5302,18 +5312,18 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                         let rowsHtml = '';
                         res.execution_history.forEach((h, idx) => {
                             const isLatest = (idx === 0);
-                            const dtStr = h.created_at ? h.created_at.substring(0, 16) : '-';
+                            const dtStr = escapeAdminHtml(h.created_at ? String(h.created_at).substring(0, 16) : '-');
                             rowsHtml += `
                                 <tr class="${isLatest ? 'bg-indigo-950/30 border-l-2 border-indigo-400' : 'hover:bg-slate-800/30'} transition-colors">
                                     <td class="py-2.5 px-3.5 whitespace-nowrap">
                                         <div class="font-mono text-xs text-white flex items-center gap-1.5">
                                             ${isLatest ? '<span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse" title="Sesi Terkini"></span>' : ''}
-                                            #${h.id} &bull; ${dtStr} WIB
+                                            #${Number(h.id)} &bull; ${dtStr} WIB
                                         </div>
                                     </td>
                                     <td class="py-2.5 px-3.5">
-                                        <div class="text-xs text-slate-200 font-semibold">${h.model_type || 'XGBoost'}</div>
-                                        <div class="text-[10px] text-purple-300 font-mono">${h.gemini_model || 'Gemini AI'}</div>
+                                        <div class="text-xs text-slate-200 font-semibold">${escapeAdminHtml(h.model_type || 'XGBoost')}</div>
+                                        <div class="text-[10px] text-purple-300 font-mono">${escapeAdminHtml(h.gemini_model || 'Gemini AI')}</div>
                                     </td>
                                     <td class="py-2.5 px-3.5 text-right">
                                         <span class="font-mono text-xs font-bold text-white">${Number(h.usage_projected_30d || 0).toLocaleString('id-ID')}</span>
@@ -5321,13 +5331,13 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                                     </td>
                                     <td class="py-2.5 px-3.5 text-right">
                                         <span class="font-mono text-xs font-bold text-amber-300">${Number(h.peak_val || 0).toLocaleString('id-ID')} naskah</span>
-                                        <span class="text-[10px] text-slate-400 block">${h.peak_date || '-'}</span>
+                                        <span class="text-[10px] text-slate-400 block">${escapeAdminHtml(h.peak_date || '-')}</span>
                                     </td>
                                     <td class="py-2.5 px-3.5 text-right">
                                         <span class="font-mono text-xs text-emerald-400 font-semibold">Rp ${Number(h.sales_projected_30d || 0).toLocaleString('id-ID')}</span>
                                     </td>
                                     <td class="py-2.5 px-3.5 text-xs text-slate-300 leading-relaxed max-w-sm">
-                                        ${h.methodology_note || '-'}
+                                        ${escapeAdminHtml(h.methodology_note || '-')}
                                     </td>
                                 </tr>
                             `;

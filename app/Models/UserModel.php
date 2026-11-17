@@ -221,13 +221,6 @@ class UserModel extends Model
                 return;
             }
 
-            // Lewati jika pengguna berlangganan paket tanpa batas (Dosen Pro aktif)
-            $subTier = $row['subscription_tier'] ?? 'free';
-            $subExp  = $row['subscription_expires_at'] ?? null;
-            if ($subTier === 'dosen_pro' && !empty($subExp) && strtotime($subExp) > time()) {
-                return;
-            }
-
             $freeUsed = (int) ($row['free_submissions_used_this_week'] ?? 0);
             $bonus    = (int) ($row['bonus_submissions'] ?? 0);
 

@@ -424,8 +424,8 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
             sub_longest = max((m.get("word_count", 0) for m in sub_matches), default=0)
             sub_ranges = [(m["submission_start"], m["submission_end"]) for m in sub_matches if "submission_start" in m]
             merged_sub = merge_ranges(sub_ranges)
-            sub_covered_words = sum(end - start + 1 for start, end in merged_sub)
-            sub_sim = round((sub_covered_words / max(1, doc_word_count)) * 100.0, 2)
+            sub_covered_words = min(sum(end - start + 1 for start, end in merged_sub), max(0, doc_word_count))
+            sub_sim = min(100.0, round((sub_covered_words / max(1, doc_word_count)) * 100.0, 2))
 
             cursor.execute("SELECT COUNT(*) AS total_docs FROM documents WHERE document_type = 'corpus'")
             c_row = cursor.fetchone()
