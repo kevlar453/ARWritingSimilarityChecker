@@ -95,6 +95,24 @@ class PublicApiController extends BaseController
         $author = trim($this->request->getPost('author') ?: '');
         $extRef = trim($this->request->getPost('external_id') ?: $this->request->getPost('ojs_submission_id') ?: '');
         $callbackUrl = trim($this->request->getPost('callback_url') ?: '');
+        $rawParentId = (int) ($this->request->getPost('parent_document_id') ?: $this->request->getPost('revision_of') ?: 0);
+        $rawRevNote  = (string) ($this->request->getPost('revision_note') ?? '');
+
+        try {
+            $revisionMeta = $this->documentModel->resolveRevisionMetadata($rawParentId > 0 ? $rawParentId : null, $userId, false, $rawRevNote);
+        } catch (\RuntimeException $re) {
+            return $this->response->setStatusCode(403)->setJSON([
+                'status'  => 'error',
+                'code'    => 403,
+                'message' => $re->getMessage(),
+            ]);
+        } catch (\InvalidArgumentException $ie) {
+            return $this->response->setStatusCode(422)->setJSON([
+                'status'  => 'error',
+                'code'    => 422,
+                'message' => $ie->getMessage(),
+            ]);
+        }
 
         if ($callbackUrl !== '') {
             $urlCheck = \App\Libraries\WebhookUrlValidator::validate($callbackUrl);
@@ -218,25 +236,38 @@ class PublicApiController extends BaseController
         try {
             $faculty = trim((string) ($this->request->getPost('faculty') ?? ''));
             $department = trim((string) ($this->request->getPost('department') ?? ''));
+            if ($faculty === '' && ! empty($revisionMeta['default_faculty'])) {
+                $faculty = (string) $revisionMeta['default_faculty'];
+            }
+            if ($department === '' && ! empty($revisionMeta['default_department'])) {
+                $department = (string) $revisionMeta['default_department'];
+            }
 
             // Simpan ke tabel documents
             $docId = $this->documentModel->insert([
-                'user_id'           => $userId,
-                'title'             => $title,
-                'original_filename' => $clientFilename,
-                'mime_type'         => $mimeType,
-                'file_size'         => $fileSize,
-                'storage_path'      => $savedFile,
-                'status'            => 'uploaded',
-                'document_type'     => 'submission',
-                'corpus_visibility' => 'private',
-                'source_type'       => ($keyData['system_type'] === 'ojs') ? 'journal' : 'other',
-                'faculty'           => !empty($faculty) ? $faculty : null,
-                'department'        => !empty($department) ? $department : null,
-                'indexing_status'   => 'not_required',
-                'created_at'        => date('Y-m-d H:i:s'),
-                'updated_at'        => date('Y-m-d H:i:s'),
+                'user_id'            => $userId,
+                'parent_document_id' => $revisionMeta['parent_document_id'],
+                'revision_root_id'   => $revisionMeta['revision_root_id'],
+                'revision_number'    => $revisionMeta['revision_number'],
+                'revision_note'      => $revisionMeta['revision_note'],
+                'title'              => $title,
+                'original_filename'  => $clientFilename,
+                'mime_type'          => $mimeType,
+                'file_size'          => $fileSize,
+                'storage_path'       => $savedFile,
+                'status'             => 'uploaded',
+                'document_type'      => 'submission',
+                'corpus_visibility'  => 'private',
+                'source_type'        => ($keyData['system_type'] === 'ojs') ? 'journal' : 'other',
+                'faculty'            => !empty($faculty) ? $faculty : null,
+                'department'         => !empty($department) ? $department : null,
+                'indexing_status'    => 'not_required',
+                'created_at'         => date('Y-m-d H:i:s'),
+                'updated_at'         => date('Y-m-d H:i:s'),
             ]);
+            if ($docId && empty($revisionMeta['revision_root_id'])) {
+                $this->documentModel->update($docId, ['revision_root_id' => $docId]);
+            }
 
             // Buat kode verifikasi sertifikat acak aman (12 karakter hex acak kriptografis)
             $rnd = strtoupper(bin2hex(random_bytes(6)));
@@ -428,6 +459,13 @@ class PublicApiController extends BaseController
                     ],
                 ],
                 'forensic_audit'     => $forensicPayload,
+                'revision'           => [
+                    'revision_number'    => (int) ($doc['revision_number'] ?? 1),
+                    'parent_document_id' => ! empty($doc['parent_document_id']) ? (int) $doc['parent_document_id'] : null,
+                    'revision_root_id'   => ! empty($doc['revision_root_id']) ? (int) $doc['revision_root_id'] : (int) $doc['id'],
+                    'revision_note'      => $doc['revision_note'] ?? null,
+                    'diff'               => $evidenceData['revision_diff'] ?? null,
+                ],
                 'sources_count'      => count($sources),
                 'top_sources'        => array_map(function ($s) {
                     return [

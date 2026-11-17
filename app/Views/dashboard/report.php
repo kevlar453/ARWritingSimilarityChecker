@@ -213,6 +213,12 @@ $detectedLang = $detectedLang ?? \App\Libraries\LanguageDetector::detect(
                     <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded-md border border-indigo-100">
                         Academic Evidence Report
                     </span>
+                    <?php $docRevNum = (int) ($document['revision_number'] ?? 1); ?>
+                    <?php if ($docRevNum > 1 || !empty($revisionChain) && count($revisionChain) > 1): ?>
+                        <span class="text-[11px] font-bold font-mono-code text-violet-800 bg-violet-50 px-2 py-0.5 rounded-md border border-violet-200">
+                            Versi v<?= $docRevNum ?>
+                        </span>
+                    <?php endif; ?>
                     <span class="text-xs text-slate-400">•</span>
                     <span class="text-xs text-slate-500">ID Submisi #<?= $document['id'] ?? $report['document_id'] ?></span>
                 </div>
@@ -278,7 +284,13 @@ $detectedLang = $detectedLang ?? \App\Libraries\LanguageDetector::detect(
                     <span class="text-[11px] text-slate-400">Skor Terpadu</span>
                 </div>
                 <?php if (($report['status'] ?? '') === 'completed'): ?>
-                    <div class="flex items-center gap-2 mt-1">
+                    <div class="flex items-center flex-wrap gap-2 mt-1">
+                        <?php if (!empty($isOwner) || session()->get('user_role') === 'admin'): ?>
+                            <a href="<?= base_url('dashboard?revise_of=' . (int) ($document['id'] ?? $report['document_id']) . '#tab-submission') ?>" class="inline-flex items-center gap-1.5 text-xs font-semibold text-violet-800 bg-violet-50 hover:bg-violet-100 border border-violet-200 px-3 py-1.5 rounded-lg transition shadow-xs" title="Unggah versi revisi baru untuk dibandingkan dengan laporan ini">
+                                <span>🔄</span>
+                                <span>Unggah Revisi</span>
+                            </a>
+                        <?php endif; ?>
                         <?php if (!empty($report['verification_code'])): ?>
                             <a href="<?= base_url('verify/' . esc($report['verification_code'])) ?>" target="_blank" class="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-300 px-3 py-1.5 rounded-lg transition shadow-xs" title="Lihat Piagam Akreditasi Resmi">
                                 <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
@@ -446,6 +458,158 @@ $detectedLang = $detectedLang ?? \App\Libraries\LanguageDetector::detect(
                 <button type="button" onclick="resetLiveFilters()" class="text-indigo-300 hover:text-white underline text-[10px] cursor-pointer">Reset Semua Filter</button>
             </div>
         </div>
+
+        <?php if (!empty($revisionChain) && count($revisionChain) > 1): ?>
+            <?php $tokenSuffix = !empty($token) ? ('?token=' . urlencode((string) $token)) : ''; ?>
+            <!-- Strip Navigasi Rantai Revisi (v1, v2, ...) -->
+            <div class="bg-white border border-violet-200 rounded-2xl p-4 shadow-xs space-y-3" id="revisionChainBar">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div class="flex items-center gap-2">
+                        <span class="text-lg">🔄</span>
+                        <div>
+                            <h3 class="text-sm font-extrabold text-slate-900">Riwayat &amp; Perbandingan Revisi Naskah</h3>
+                            <p class="text-[11px] text-slate-500">Laporan versi sebelumnya tetap tersimpan utuh dan dapat dibuka kapan saja.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center flex-wrap gap-1.5">
+                        <?php foreach ($revisionChain as $rItem):
+                            $isCurrent = ((int) $rItem['document_id'] === (int) ($document['id'] ?? 0));
+                            $rRepId = (int) ($rItem['latest_report_id'] ?? 0);
+                            $rNum = (int) ($rItem['revision_number'] ?? 1);
+                            $rSim = $rItem['overall_similarity'];
+                            $verHref = $rRepId > 0 ? base_url('dashboard/report/' . $rRepId) : '#';
+                            if ($rRepId > 0 && !empty($rItem['verification_code']) && !empty($token)) {
+                                $verHref = base_url('report/' . $rRepId . '?token=' . urlencode((string) $rItem['verification_code']));
+                            }
+                        ?>
+                            <?php if ($isCurrent): ?>
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-violet-600 text-white text-xs font-bold shadow-2xs">
+                                    v<?= $rNum ?> (Aktif)<?= $rSim !== null ? ' • ' . number_format((float) $rSim, 2) . '%' : '' ?>
+                                </span>
+                            <?php elseif ($rRepId > 0): ?>
+                                <a href="<?= $verHref ?>" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-violet-50 text-slate-700 hover:text-violet-800 border border-slate-200 text-xs font-semibold transition" title="Buka laporan asli v<?= $rNum ?>">
+                                    v<?= $rNum ?><?= $rSim !== null ? ' • ' . number_format((float) $rSim, 2) . '%' : '' ?>
+                                </a>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            </div>
+        <?php endif; ?>
+
+        <?php if (!empty($revisionDiff) && !empty($revisionDiff['metrics'])):
+            $rdMet = $revisionDiff['metrics'];
+            $rdCnt = $revisionDiff['status_counts'] ?? [];
+            $rdChanges = $revisionDiff['passage_changes'] ?? [];
+            $deltaRaw = (float) ($rdMet['delta_overall_similarity'] ?? 0.0);
+            $deltaQb  = (float) ($rdMet['delta_filtered_quotes_bib_similarity'] ?? 0.0);
+            $deltaWords = (int) ($rdMet['delta_matched_words'] ?? 0);
+            $rawBadgeCls = $deltaRaw < 0 ? 'text-emerald-700 bg-emerald-50 border-emerald-200' : ($deltaRaw > 0 ? 'text-rose-700 bg-rose-50 border-rose-200' : 'text-slate-600 bg-slate-100 border-slate-200');
+            $qbBadgeCls  = $deltaQb < 0 ? 'text-emerald-700 bg-emerald-50 border-emerald-200' : ($deltaQb > 0 ? 'text-rose-700 bg-rose-50 border-rose-200' : 'text-slate-600 bg-slate-100 border-slate-200');
+        ?>
+            <!-- ═════════════════════════════════════════════════════════════════════ -->
+            <!-- PANEL REVISION DIFF (v1 vs v2)                                        -->
+            <!-- ═════════════════════════════════════════════════════════════════════ -->
+            <div id="revisionDiffPanel" class="bg-white border-2 border-violet-200 rounded-2xl overflow-hidden shadow-sm">
+                <div class="bg-gradient-to-r from-violet-950 via-indigo-950 to-slate-900 text-white px-5 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                        <h3 class="text-sm sm:text-base font-extrabold flex items-center gap-2">
+                            <span>📊</span>
+                            <span>Revision Diff: v<?= (int) ($revisionDiff['prev_revision_number'] ?? 1) ?> (#<?= (int) $revisionDiff['prev_report_id'] ?>) → v<?= (int) ($revisionDiff['curr_revision_number'] ?? 2) ?> (#<?= (int) $revisionDiff['curr_report_id'] ?>)</span>
+                        </h3>
+                        <?php if (!empty($revisionDiff['curr_revision_note'])): ?>
+                            <p class="text-[11px] text-violet-200 mt-0.5">Catatan Revisi: &ldquo;<?= esc($revisionDiff['curr_revision_note']) ?>&rdquo;</p>
+                        <?php endif; ?>
+                    </div>
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-200 border border-emerald-400/40 text-xs font-bold">
+                        <?= number_format((float) ($rdMet['resolution_rate_pct'] ?? 0), 1) ?>% Pasase v<?= (int) ($revisionDiff['prev_revision_number'] ?? 1) ?> Membaik / Selesai
+                    </span>
+                </div>
+
+                <div class="p-5 space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+                            <div class="text-[11px] font-bold uppercase text-slate-500">Skor Kemiripan Mentah</div>
+                            <div class="mt-1 flex items-baseline gap-2 flex-wrap">
+                                <span class="text-xs font-mono text-slate-500 line-through"><?= number_format((float) $rdMet['prev_overall_similarity'], 2) ?>%</span>
+                                <span class="text-slate-400">→</span>
+                                <span class="text-lg font-black text-slate-900"><?= number_format((float) $rdMet['curr_overall_similarity'], 2) ?>%</span>
+                                <span class="text-[11px] font-mono font-bold px-1.5 py-0.5 rounded border <?= $rawBadgeCls ?>">
+                                    <?= ($deltaRaw >= 0 ? '+' : '') . number_format($deltaRaw, 2) ?>%
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+                            <div class="text-[11px] font-bold uppercase text-slate-500">Tanpa Kutipan &amp; Bibliografi</div>
+                            <div class="mt-1 flex items-baseline gap-2 flex-wrap">
+                                <span class="text-xs font-mono text-slate-500 line-through"><?= number_format((float) $rdMet['prev_filtered_quotes_bib_similarity'], 2) ?>%</span>
+                                <span class="text-slate-400">→</span>
+                                <span class="text-lg font-black text-indigo-700"><?= number_format((float) $rdMet['curr_filtered_quotes_bib_similarity'], 2) ?>%</span>
+                                <span class="text-[11px] font-mono font-bold px-1.5 py-0.5 rounded border <?= $qbBadgeCls ?>">
+                                    <?= ($deltaQb >= 0 ? '+' : '') . number_format($deltaQb, 2) ?>%
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+                            <div class="text-[11px] font-bold uppercase text-slate-500">Kata Cocok Unik</div>
+                            <div class="mt-1 flex items-baseline gap-2 flex-wrap">
+                                <span class="text-xs font-mono text-slate-500"><?= number_format((int) $rdMet['prev_matched_words']) ?> kata</span>
+                                <span class="text-slate-400">→</span>
+                                <span class="text-lg font-black text-slate-900"><?= number_format((int) $rdMet['curr_matched_words']) ?> kata</span>
+                                <span class="text-[11px] font-mono font-bold px-1.5 py-0.5 rounded border <?= $deltaWords <= 0 ? 'text-emerald-700 bg-emerald-50 border-emerald-200' : 'text-rose-700 bg-rose-50 border-rose-200' ?>">
+                                    <?= ($deltaWords >= 0 ? '+' : '') . $deltaWords ?> kata
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center flex-wrap gap-2 text-xs">
+                        <span class="px-2.5 py-1 rounded-full font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">✓ Hilang / Selesai: <?= (int) ($rdCnt['resolved'] ?? 0) ?></span>
+                        <span class="px-2.5 py-1 rounded-full font-bold bg-sky-50 text-sky-800 border border-sky-200">↘ Berkurang / Parafrase: <?= (int) ($rdCnt['improved'] ?? 0) ?></span>
+                        <span class="px-2.5 py-1 rounded-full font-bold bg-slate-100 text-slate-700 border border-slate-200">= Tetap Sama: <?= (int) ($rdCnt['unchanged'] ?? 0) ?></span>
+                        <span class="px-2.5 py-1 rounded-full font-bold bg-amber-50 text-amber-800 border border-amber-200">↗ Meluas: <?= (int) ($rdCnt['expanded'] ?? 0) ?></span>
+                        <span class="px-2.5 py-1 rounded-full font-bold bg-rose-50 text-rose-800 border border-rose-200">+ Baru Muncul: <?= (int) ($rdCnt['new'] ?? 0) ?></span>
+                    </div>
+
+                    <?php if (!empty($rdChanges)): ?>
+                        <div class="border border-slate-200 rounded-xl divide-y divide-slate-100 max-h-96 overflow-y-auto">
+                            <?php foreach ($rdChanges as $ch):
+                                $st = $ch['status'] ?? 'UNCHANGED';
+                                $stStyle = match ($st) {
+                                    'RESOLVED'  => ['bg-emerald-100 text-emerald-800 border-emerald-200', 'HILANG / SELESAI'],
+                                    'IMPROVED'  => ['bg-sky-100 text-sky-800 border-sky-200', 'BERKURANG'],
+                                    'EXPANDED'  => ['bg-amber-100 text-amber-800 border-amber-200', 'MELUAS'],
+                                    'NEW'       => ['bg-rose-100 text-rose-800 border-rose-200', 'BARU MUNCUL'],
+                                    default     => ['bg-slate-100 text-slate-700 border-slate-200', 'TETAP SAMA'],
+                                };
+                                $chPreview = ($ch['curr_snippet'] ?? '') !== '' ? $ch['curr_snippet'] : ($ch['prev_snippet'] ?? '');
+                            ?>
+                                <div class="p-3 hover:bg-slate-50/70 transition flex flex-col gap-1.5 text-xs">
+                                    <div class="flex items-center justify-between gap-2 flex-wrap">
+                                        <div class="flex items-center gap-2 min-w-0">
+                                            <span class="px-2 py-0.5 rounded border text-[10px] font-extrabold <?= $stStyle[0] ?>">
+                                                <?= $stStyle[1] ?>
+                                            </span>
+                                            <span class="font-semibold text-slate-800 truncate max-w-md" title="<?= esc($ch['source_title'] ?? '') ?>">
+                                                <?= esc($ch['source_title'] ?? 'Korpus Rujukan') ?>
+                                            </span>
+                                        </div>
+                                        <span class="font-mono text-[11px] text-slate-600 shrink-0">
+                                            v<?= (int) ($revisionDiff['prev_revision_number'] ?? 1) ?>: <?= (int) $ch['prev_word_count'] ?> kata → v<?= (int) ($revisionDiff['curr_revision_number'] ?? 2) ?>: <?= (int) $ch['curr_word_count'] ?> kata
+                                        </span>
+                                    </div>
+                                    <?php if ($chPreview !== ''): ?>
+                                        <p class="text-[11px] text-slate-600 italic leading-relaxed">&ldquo;<?= esc($chPreview) ?>&rdquo;</p>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        <?php endif; ?>
 
         <!-- ═════════════════════════════════════════════════════════════════════ -->
         <!-- CORE EVIDENCE DECOMPOSITION CARD                                     -->
@@ -755,6 +919,16 @@ $detectedLang = $detectedLang ?? \App\Libraries\LanguageDetector::detect(
                                             <span>•</span>
                                             <span><?= number_format($src['matched_words']) ?> matched words</span>
                                         </div>
+                                        <?php if (!empty($src['source_repository']) || !empty($src['source_url'])): ?>
+                                            <div class="text-[11px] text-slate-500 flex flex-wrap items-center gap-2 mt-0.5">
+                                                <?php if (!empty($src['source_repository'])): ?>
+                                                    <span class="px-1.5 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200 font-semibold">🏛️ <?= esc($src['source_repository']) ?></span>
+                                                <?php endif; ?>
+                                                <?php if (!empty($src['source_url']) && preg_match('/^https?:\/\//i', (string) $src['source_url'])): ?>
+                                                    <a href="<?= esc($src['source_url']) ?>" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:underline truncate max-w-xs" title="<?= esc($src['source_url']) ?>">🔗 Sumber Asli Repositori ↗</a>
+                                                <?php endif; ?>
+                                            </div>
+                                        <?php endif; ?>
                                     </div>
 
                                     <div>
@@ -812,6 +986,16 @@ $detectedLang = $detectedLang ?? \App\Libraries\LanguageDetector::detect(
                                             <span>•</span>
                                             <span><?= number_format($src['matched_words']) ?> shared terms</span>
                                         </div>
+                                        <?php if (!empty($src['source_repository']) || !empty($src['source_url'])): ?>
+                                            <div class="text-[11px] text-slate-500 flex flex-wrap items-center gap-2 mt-0.5">
+                                                <?php if (!empty($src['source_repository'])): ?>
+                                                    <span class="px-1.5 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200 font-semibold">🏛️ <?= esc($src['source_repository']) ?></span>
+                                                <?php endif; ?>
+                                                <?php if (!empty($src['source_url']) && preg_match('/^https?:\/\//i', (string) $src['source_url'])): ?>
+                                                    <a href="<?= esc($src['source_url']) ?>" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:underline truncate max-w-xs" title="<?= esc($src['source_url']) ?>">🔗 Sumber Asli Repositori ↗</a>
+                                                <?php endif; ?>
+                                            </div>
+                                        <?php endif; ?>
                                     </div>
 
                                     <div class="flex items-center gap-1.5 self-start sm:self-auto">

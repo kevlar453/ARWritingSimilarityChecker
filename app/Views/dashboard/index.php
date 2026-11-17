@@ -508,6 +508,38 @@
                             </label>
                         </div>
                     </div>
+                    <!-- Pelacakan Revisi Naskah (v1 vs v2, Opsional) -->
+                    <div id="revisionTrackingBox" class="p-3.5 rounded-xl bg-indigo-50/50 border border-indigo-200/80 text-xs space-y-2">
+                        <div class="font-bold text-indigo-950 flex items-center justify-between flex-wrap gap-2">
+                            <div class="flex items-center gap-1.5">
+                                <span>🔄</span> <span>Tautkan sebagai Revisi Naskah (Perbandingan v1 vs v2)</span>
+                            </div>
+                            <span class="text-[11px] font-normal text-indigo-700">Laporan versi sebelumnya tetap tersimpan utuh</span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label for="submissionParentDocId" class="block text-[11px] font-medium text-slate-600 mb-1">Naskah Induk (Opsional):</label>
+                                <select id="submissionParentDocId" name="parent_document_id" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+                                    <option value="">-- Unggahan Naskah Baru (v1) --</option>
+                                    <?php foreach (($revisionParentCandidates ?? []) as $cand):
+                                        $cRev = (int) ($cand['revision_number'] ?? 1);
+                                        $cSelected = (!empty($reviseOfDoc) && (int) $reviseOfDoc['id'] === (int) $cand['id']) ? 'selected' : '';
+                                    ?>
+                                        <option value="<?= (int) $cand['id'] ?>"
+                                            data-faculty="<?= esc($cand['faculty'] ?? '') ?>"
+                                            data-department="<?= esc($cand['department'] ?? '') ?>"
+                                            <?= $cSelected ?>>
+                                            #<?= (int) $cand['id'] ?> [v<?= $cRev ?> • <?= number_format((float) ($cand['overall_similarity'] ?? 0), 2) ?>%] <?= esc(mb_strimwidth($cand['title'] ?: $cand['original_filename'], 0, 58, '...')) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="submissionRevisionNote" class="block text-[11px] font-medium text-slate-600 mb-1">Catatan Perubahan / Revisi (Opsional):</label>
+                                <input type="text" id="submissionRevisionNote" name="revision_note" maxlength="500" placeholder="Contoh: Perbaikan parafrase Bab 2 dan tanda petik kutipan" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+                            </div>
+                        </div>
+                    </div>
                     <!-- Metadata Taksonomi Akademik (Opsional) -->
                     <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-2">
                         <div class="font-bold text-slate-700 flex items-center justify-between">
@@ -961,6 +993,10 @@
                                                             <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
                                                             <span>Ulangi Pemeriksaan</span>
                                                         </button>
+                                                        <button type="button" onclick="closeAllActionDropdowns(); selectRevisionParent(<?= (int) $sub['id'] ?>, <?= htmlspecialchars(json_encode($sub['title']), ENT_QUOTES, 'UTF-8') ?>, <?= htmlspecialchars(json_encode($sub['faculty'] ?? ''), ENT_QUOTES, 'UTF-8') ?>, <?= htmlspecialchars(json_encode($sub['department'] ?? ''), ENT_QUOTES, 'UTF-8') ?>)" class="w-full text-left px-3 py-1.5 text-indigo-700 hover:bg-indigo-50 flex items-center gap-2 transition cursor-pointer font-semibold">
+                                                            <span class="text-sm">🔄</span>
+                                                            <span>Unggah Revisi Baru</span>
+                                                        </button>
                                                         <button type="button" onclick="closeAllActionDropdowns(); openPurgeFileModal(<?= $sub['id'] ?>, <?= htmlspecialchars(json_encode($sub['title']), ENT_QUOTES, 'UTF-8') ?>)" class="w-full text-left px-3 py-1.5 text-rose-700 hover:bg-rose-50 flex items-center gap-2 transition cursor-pointer">
                                                             <span class="text-sm">🛡️</span>
                                                             <span>Musnahkan Berkas</span>
@@ -1100,7 +1136,15 @@
                                 ?>
                                     <tr class="submission-row <?= $isProcessing ? 'submission-processing' : '' ?> hover:bg-slate-50/70 transition-colors">
                                         <td class="p-3.5 sm:p-4 font-medium text-slate-800 min-w-[240px] max-w-[450px]">
-                                            <div class="font-semibold text-slate-900 leading-snug break-words" title="<?= esc($sub['title']) ?>"><?= esc($sub['title']) ?></div>
+                                            <div class="font-semibold text-slate-900 leading-snug break-words flex items-start gap-1.5 flex-wrap" title="<?= esc($sub['title']) ?>">
+                                                <?php $revNum = (int) ($sub['revision_number'] ?? 1); ?>
+                                                <?php if ($revNum > 1 || !empty($sub['parent_document_id'])): ?>
+                                                    <span class="inline-flex items-center px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-800 border border-indigo-200 text-[10px] font-mono font-bold shrink-0 mt-0.5" title="Revisi dari dokumen #<?= (int) ($sub['parent_document_id'] ?? 0) ?><?= !empty($sub['revision_note']) ? (' — ' . esc($sub['revision_note'])) : '' ?>">
+                                                        v<?= $revNum ?>
+                                                    </span>
+                                                <?php endif; ?>
+                                                <span><?= esc($sub['title']) ?></span>
+                                            </div>
                                             <div class="flex items-center gap-1.5 flex-wrap mt-0.5">
                                                 <span class="text-[11px] text-slate-400 truncate max-w-[200px]" title="<?= esc($sub['original_filename']) ?>"><?= esc($sub['original_filename']) ?></span>
                                                 <?php if ($isPurged): ?>
@@ -1174,11 +1218,20 @@
                                                 <span class="text-xs text-slate-400">Belum diperiksa</span>
                                             <?php endif; ?>
                                         </td>
-                                        <td class="p-3.5 sm:p-4">
+                                                <td class="p-3.5 sm:p-4">
                                             <?php if ($rep && $rep['status'] === 'completed'): ?>
                                                 <div class="font-extrabold text-sm <?= $rep['overall_similarity'] >= 70 ? 'text-rose-600' : ($rep['overall_similarity'] >= 10 ? 'text-amber-600' : 'text-slate-700') ?>">
                                                     <?= number_format($rep['overall_similarity'], 2) ?>%
                                                 </div>
+                                                <?php if (isset($sub['revision_delta'])):
+                                                    $rDelta = (float) $sub['revision_delta'];
+                                                    $rDeltaClass = $rDelta < 0 ? 'text-emerald-700 bg-emerald-50 border-emerald-200' : ($rDelta > 0 ? 'text-rose-700 bg-rose-50 border-rose-200' : 'text-slate-600 bg-slate-100 border-slate-200');
+                                                    $rArrow = $rDelta < 0 ? '↓' : ($rDelta > 0 ? '↑' : '=');
+                                                ?>
+                                                    <div class="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded border text-[10px] font-mono font-bold mt-0.5 <?= $rDeltaClass ?>" title="Perubahan skor terhadap versi sebelumnya">
+                                                        <?= $rArrow ?> <?= ($rDelta >= 0 ? '+' : '') . number_format($rDelta, 2) ?>% vs v<?= max(1, (int) ($sub['parent_info']['revision_number'] ?? 1)) ?>
+                                                    </div>
+                                                <?php endif; ?>
                                                 <div class="text-[10px] text-slate-400 whitespace-nowrap">
                                                     <?= (int) ($rep['longest_match_words'] ?? 0) ?> kata berurutan
                                                 </div>
@@ -1291,6 +1344,11 @@
                                                                 <span>Ulangi Pemeriksaan</span>
                                                             </button>
                                                             <?php endif; ?>
+
+                                                            <button type="button" onclick="closeAllActionDropdowns(); selectRevisionParent(<?= (int) $sub['id'] ?>, <?= htmlspecialchars(json_encode($sub['title']), ENT_QUOTES, 'UTF-8') ?>, <?= htmlspecialchars(json_encode($sub['faculty'] ?? ''), ENT_QUOTES, 'UTF-8') ?>, <?= htmlspecialchars(json_encode($sub['department'] ?? ''), ENT_QUOTES, 'UTF-8') ?>)" class="w-full text-left px-3 py-1.5 text-indigo-700 hover:bg-indigo-50 flex items-center gap-2 transition cursor-pointer font-semibold">
+                                                                <span class="text-sm">🔄</span>
+                                                                <span>Unggah Revisi Baru</span>
+                                                            </button>
 
                                                             <?php if (! $isPurged): ?>
                                                             <button type="button" onclick="closeAllActionDropdowns(); openPurgeFileModal(<?= $sub['id'] ?>, <?= htmlspecialchars(json_encode($sub['title']), ENT_QUOTES, 'UTF-8') ?>)" class="w-full text-left px-3 py-1.5 text-rose-700 hover:bg-rose-50 flex items-center gap-2 transition cursor-pointer">
@@ -2486,6 +2544,14 @@
                 if (subCustomTitle && total === 1) {
                     formData.append('custom_title', subCustomTitle);
                 }
+                const parentDocId = document.getElementById('submissionParentDocId')?.value?.trim();
+                if (parentDocId && total === 1) {
+                    formData.append('parent_document_id', parentDocId);
+                    const revNote = document.getElementById('submissionRevisionNote')?.value?.trim();
+                    if (revNote) {
+                        formData.append('revision_note', revNote);
+                    }
+                }
 
                 try {
                     const res = await fetch('<?= base_url('api/documents') ?>', {
@@ -2564,6 +2630,46 @@
                 alertBox.innerHTML = `<strong>Gagal mengunggah berkas:</strong><br>${errList}`;
             }
         });
+
+        function selectRevisionParent(docId, title, faculty, department) {
+            const selectEl = document.getElementById('submissionParentDocId');
+            const box = document.getElementById('revisionTrackingBox');
+            if (!selectEl) return;
+
+            let opt = Array.from(selectEl.options).find(o => String(o.value) === String(docId));
+            if (!opt) {
+                opt = document.createElement('option');
+                opt.value = String(docId);
+                opt.textContent = `#${docId} ${title || 'Naskah Induk'}`;
+                selectEl.appendChild(opt);
+            }
+            selectEl.value = String(docId);
+
+            const facInput = document.getElementById('subFaculty');
+            if (facInput && !facInput.value.trim() && faculty) facInput.value = faculty;
+            const depInput = document.getElementById('subDepartment');
+            if (depInput && !depInput.value.trim() && department) depInput.value = department;
+
+            const tabBtn = document.querySelector('[data-tab="tab-submission"]') || document.querySelector('a[href="#tab-submission"]');
+            if (tabBtn && typeof tabBtn.click === 'function') tabBtn.click();
+            if (box) {
+                box.classList.add('ring-2', 'ring-indigo-500');
+                box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                setTimeout(() => box.classList.remove('ring-2', 'ring-indigo-500'), 2200);
+            }
+            document.getElementById('submissionRevisionNote')?.focus();
+        }
+
+        <?php if (!empty($reviseOfDoc)): ?>
+        document.addEventListener('DOMContentLoaded', function() {
+            selectRevisionParent(
+                <?= (int) $reviseOfDoc['id'] ?>,
+                <?= json_encode($reviseOfDoc['title'] ?? '') ?>,
+                <?= json_encode($reviseOfDoc['faculty'] ?? '') ?>,
+                <?= json_encode($reviseOfDoc['department'] ?? '') ?>
+            );
+        });
+        <?php endif; ?>
 
         // Handle upload corpus
         document.getElementById('uploadCorpusForm').addEventListener('submit', async function(e) {

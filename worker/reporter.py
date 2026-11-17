@@ -80,6 +80,8 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
 
         # 3c. Just-In-Time (JIT) Topic Harvesting (Pencarian Korpus Sebidang Otomatis)
         jit_harvest_res = None
+        jit_latency_ms = 0.0
+        jit_max_works = max(1, int(os.getenv("JIT_HARVESTER_MAX_WORKS", "5") or "5"))
         if document.get("document_type") != "corpus":
             doc_title = document.get("title") or document.get("original_filename") or ""
             cursor.execute(
@@ -90,17 +92,28 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
             early_text = " ".join(c["text"] for c in early_chunks if c.get("text")) if early_chunks else None
 
             if doc_title:
+                t_jit_start = time.perf_counter()
                 try:
                     from worker.jit_harvester import harvest_topic_references_jit
                     jit_harvest_res = harvest_topic_references_jit(
                         title=doc_title,
                         text=early_text,
-                        max_works=3,
+                        max_works=jit_max_works,
                         connection=connection
                     )
+                    jit_latency_ms = round((time.perf_counter() - t_jit_start) * 1000.0, 2)
+                    if isinstance(jit_harvest_res, dict):
+                        jit_harvest_res.setdefault("duration_ms", jit_latency_ms)
+                        jit_harvest_res.setdefault("max_works", jit_max_works)
                 except Exception as jit_err:
+                    jit_latency_ms = round((time.perf_counter() - t_jit_start) * 1000.0, 2)
                     print(f"  [JIT HARVESTER WARNING] Gagal menjalankan JIT harvester untuk Doc #{document_id}: {jit_err}")
-                    jit_harvest_res = {"status": "error", "error_message": str(jit_err)}
+                    jit_harvest_res = {
+                        "status": "error",
+                        "max_works": jit_max_works,
+                        "duration_ms": jit_latency_ms,
+                        "error_message": str(jit_err),
+                    }
 
         # 4. Jalankan similarity check sesuai engine
         engine = (engine or "hybrid").lower()
@@ -599,6 +612,8 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
             result["v1_1_observability"] = {
                 "citation_parsing_ms": round(cite_latency_ms, 4),
                 "presentation_ms": round(pres_latency_ms, 4),
+                "jit_harvesting_ms": round(jit_latency_ms, 2),
+                "jit_max_works": jit_max_works,
                 "sla_passed": cite_latency_ms < 150.0,
                 "context_type": context_res.context_type,
                 "citation_status": context_res.citation_status,
@@ -719,6 +734,22 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
             ))
             
         connection.commit()
+
+        # 7b. P2-1 Revision Diff otomatis bila dokumen memiliki parent_document_id
+        if document.get("parent_document_id"):
+            try:
+                from worker.revision_diff import build_revision_diff_for_report
+                rev_diff = build_revision_diff_for_report(connection, report_id)
+                if rev_diff:
+                    result["revision_diff"] = rev_diff
+                    cursor.execute(
+                        "UPDATE reports SET evidence_data = %s WHERE id = %s",
+                        (json.dumps(result, ensure_ascii=False), report_id),
+                    )
+                    connection.commit()
+            except Exception as diff_err:
+                print(f"  [REVISION DIFF WARNING] Gagal menghitung diff revisi untuk Report #{report_id}: {diff_err}")
+
         cursor.close()
         print(f"  [METRIC] Report #{report_id} Doc #{document_id} [{engine.upper()}] completed in {duration:.2f}s "
               f"-> {predicted_decision.upper()} ({evidence_pattern}) | Exact: {exact_sim:.1f}% | Cosine: {cosine_sim:.1f}%")

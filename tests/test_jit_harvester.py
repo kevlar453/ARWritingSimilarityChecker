@@ -61,5 +61,49 @@ def test_harvest_topic_references_jit_mocked():
         res = harvest_topic_references_jit("PENGARUH MOTIVASI TERHADAP K3 DI SMK", max_works=1, connection="mock_conn")
         assert res["status"] == "success"
         assert res["total_discovered"] == 1
+        assert res["max_works"] == 1
+        assert res["indexed_count"] == 1
+        assert isinstance(res["duration_ms"], float)
         assert res["discovered_works"][0]["document_id"] == 999
         assert res["discovered_works"][0]["title"] == "Analisis Penerapan K3 di Bengkel Otomotif SMK"
+
+
+def test_jit_harvester_default_limit_is_five_and_caps_correctly():
+    import inspect
+    from pathlib import Path
+    from unittest.mock import patch
+    from worker.jit_harvester import harvest_topic_references_jit
+
+    sig = inspect.signature(harvest_topic_references_jit)
+    assert sig.parameters["max_works"].default == 5
+
+    reporter_src = (Path(__file__).resolve().parents[1] / "worker" / "reporter.py").read_text(encoding="utf-8")
+    assert 'os.getenv("JIT_HARVESTER_MAX_WORKS", "5")' in reporter_src
+    assert "max_works=3" not in reporter_src
+
+    sample_works = [
+        {
+            "title": f"Artikel Uji JIT Nomor {i}",
+            "year": 2024,
+            "source_name": "Jurnal Uji",
+            "doi": f"https://doi.org/10.9999/jit.{i}",
+            "landing_url": f"https://example.org/work/{i}",
+            "pdf_url": None,
+        }
+        for i in range(1, 8)
+    ]
+
+    with patch("worker.jit_harvester.search_openalex_works", return_value=sample_works) as mock_search, \
+         patch("worker.jit_harvester.ingest_scholarly_work") as mock_ingest:
+        mock_ingest.side_effect = [
+            {"status": "indexed", "document_id": 1000 + i, "title": w["title"]}
+            for i, w in enumerate(sample_works)
+        ]
+
+        res = harvest_topic_references_jit("SISTEM DETEKSI HAMA TANAMAN PADI BERBASIS IOT", connection="mock_conn")
+        assert res["status"] == "success"
+        assert res["max_works"] == 5
+        assert res["total_discovered"] == 5
+        assert res["indexed_count"] == 5
+        assert mock_search.call_args.kwargs["limit"] == 5
+        assert len(res["discovered_works"]) == 5

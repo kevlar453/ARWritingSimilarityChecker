@@ -8,6 +8,7 @@ lalu secara mandiri mengunduh dan mengindeks literatur akademik sebidang dari ba
 import os
 import sys
 import re
+import time
 from pathlib import Path
 from typing import Optional, List, Dict, Any, Tuple
 
@@ -100,11 +101,15 @@ def harvest_topic_references_jit(
     Menjalankan Just-In-Time (JIT) Dynamic Scholarly Retrieval.
     Mencari dan langsung mengindeks naskah sebidang yang relevan ke dalam korpus rujukan.
     """
+    t_start = time.perf_counter()
+    max_works = max(1, int(max_works))
     queries = extract_substantive_topics(title, text)
     if not queries:
         return {
             "status": "skipped",
             "message": "Tidak dapat mengekstrak kata kunci topik dari judul naskah.",
+            "max_works": max_works,
+            "duration_ms": round((time.perf_counter() - t_start) * 1000.0, 2),
             "discovered_works": []
         }
 
@@ -115,6 +120,8 @@ def harvest_topic_references_jit(
 
     discovered_works = []
     seen_titles = set()
+    indexed_count = 0
+    skipped_count = 0
 
     try:
         for q in queries:
@@ -132,7 +139,12 @@ def harvest_topic_references_jit(
 
                 # Ingest & langsung indeks ke dalam korpus
                 res = ingest_scholarly_work(connection=connection, work_data=w)
-                if res.get("status") in ("indexed", "skipped"):
+                status = res.get("status")
+                if status in ("indexed", "skipped"):
+                    if status == "indexed":
+                        indexed_count += 1
+                    else:
+                        skipped_count += 1
                     discovered_works.append({
                         "document_id": res.get("document_id"),
                         "title": w_title,
@@ -140,7 +152,7 @@ def harvest_topic_references_jit(
                         "source_name": w.get("source_name") or "Jurnal Akademik Nasional/Internasional",
                         "doi": w.get("doi"),
                         "url": w.get("landing_url") or w.get("pdf_url"),
-                        "ingest_status": res.get("status")
+                        "ingest_status": status
                     })
 
                 if len(discovered_works) >= max_works:
@@ -148,15 +160,23 @@ def harvest_topic_references_jit(
 
         return {
             "status": "success",
+            "max_works": max_works,
             "queries_executed": queries,
             "total_discovered": len(discovered_works),
+            "indexed_count": indexed_count,
+            "skipped_count": skipped_count,
+            "duration_ms": round((time.perf_counter() - t_start) * 1000.0, 2),
             "discovered_works": discovered_works
         }
     except Exception as e:
         print(f"  [JIT HARVESTER ERROR] Kendala saat mengambil korpus dinamis: {e}")
         return {
             "status": "error",
+            "max_works": max_works,
             "queries_executed": queries,
+            "indexed_count": indexed_count,
+            "skipped_count": skipped_count,
+            "duration_ms": round((time.perf_counter() - t_start) * 1000.0, 2),
             "error_message": str(e),
             "discovered_works": discovered_works
         }
@@ -170,7 +190,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="AR Tilik Just-In-Time (JIT) Topic Harvester")
     parser.add_argument("--title", type=str, default="PENGARUH MOTIVASI DAN MINAT TERHADAP PRESTASI SISWA PADA MATA DIKLAT KESELAMATAN DAN KESEHATAN KERJA DI SMK NEGERI 1 SEDAYU", help="Judul naskah yang diuji")
     parser.add_argument("--text", type=str, default=None, help="Teks atau cuplikan naskah")
-    parser.add_argument("--max-works", type=int, default=3, help="Jumlah naskah maksimal yang diunduh")
+    parser.add_argument("--max-works", type=int, default=5, help="Jumlah naskah maksimal yang diunduh (default: 5)")
     args = parser.parse_args()
 
     sample_title = args.title

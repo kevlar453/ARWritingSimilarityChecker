@@ -203,6 +203,27 @@ class DashboardController extends BaseController
             }
         }
 
+        $parentDocIds = [];
+        foreach ($submissions as $subItem) {
+            if (!empty($subItem['parent_document_id'])) {
+                $parentDocIds[(int) $subItem['parent_document_id']] = true;
+            }
+        }
+        $parentReportMap = [];
+        if (!empty($parentDocIds)) {
+            $pIds = array_keys($parentDocIds);
+            $parentRows = $db->table('documents pd')
+                ->select('pd.id, pd.title, pd.revision_number, pr.id AS rep_id, pr.overall_similarity')
+                ->join('(SELECT document_id, MAX(id) AS max_id FROM reports WHERE status = "completed" GROUP BY document_id) plr', 'plr.document_id = pd.id', 'inner', false)
+                ->join('reports pr', 'pr.id = plr.max_id', 'inner')
+                ->whereIn('pd.id', $pIds)
+                ->get()
+                ->getResultArray();
+            foreach ($parentRows as $prow) {
+                $parentReportMap[(int) $prow['id']] = $prow;
+            }
+        }
+
         foreach ($submissions as &$sub) {
             $repId = $sub['latest_report_id'] ?? null;
             $latestReport = ($repId && isset($reportsById[$repId])) ? $reportsById[$repId] : null;
@@ -211,8 +232,37 @@ class DashboardController extends BaseController
                 $latestReport['corpus_docs_count'] = self::extractCorpusCount($latestReport, $totalCorpus);
             }
             $sub['latest_report'] = $latestReport;
+            $pid = (int) ($sub['parent_document_id'] ?? 0);
+            if ($pid > 0 && isset($parentReportMap[$pid])) {
+                $pInfo = $parentReportMap[$pid];
+                $sub['parent_info'] = $pInfo;
+                if ($latestReport && ($latestReport['status'] ?? '') === 'completed' && isset($latestReport['overall_similarity'])) {
+                    $sub['revision_delta'] = round((float) $latestReport['overall_similarity'] - (float) $pInfo['overall_similarity'], 2);
+                }
+            }
         }
         unset($sub);
+
+        $revCandidateBuilder = $db->table('documents d')
+            ->select('d.id, d.title, d.original_filename, d.revision_number, d.faculty, d.department, r.overall_similarity')
+            ->join('(SELECT document_id, MAX(id) AS max_id FROM reports WHERE status = "completed" GROUP BY document_id) lr', 'lr.document_id = d.id', 'inner', false)
+            ->join('reports r', 'r.id = lr.max_id', 'inner')
+            ->where('d.document_type', 'submission')
+            ->where('d.benchmark_run_id IS NULL', null, false);
+        if (($currentUser['role'] ?? 'user') !== 'admin') {
+            $revCandidateBuilder->where('d.user_id', $userId);
+        }
+        $revisionParentCandidates = $revCandidateBuilder->orderBy('d.id', 'DESC')->limit(30)->get()->getResultArray();
+
+        $reviseOfId = (int) ($this->request->getGet('revise_of') ?? 0);
+        $reviseOfDoc = null;
+        if ($reviseOfId > 0) {
+            $candDoc = $docModel->find($reviseOfId);
+            if ($candDoc && ($candDoc['document_type'] ?? '') === 'submission'
+                && (($currentUser['role'] ?? 'user') === 'admin' || (int) $candDoc['user_id'] === (int) $userId)) {
+                $reviseOfDoc = $candDoc;
+            }
+        }
 
         $subFilter = [
             'q'              => $subSearch,
@@ -334,9 +384,11 @@ class DashboardController extends BaseController
         }
 
         return view('dashboard/index', [
-            'submissions'         => $submissions,
-            'subFilter'           => $subFilter,
-            'sharedDocuments'     => $sharedDocuments,
+            'submissions'              => $submissions,
+            'subFilter'                => $subFilter,
+            'revisionParentCandidates' => $revisionParentCandidates,
+            'reviseOfDoc'              => $reviseOfDoc,
+            'sharedDocuments'          => $sharedDocuments,
             'corpusDocs'          => $corpusDocs,
             'corpusSearch'        => $corpusSearch,
             'corpusPage'          => $corpusPage,
@@ -709,7 +761,7 @@ class DashboardController extends BaseController
 
         // Sources
         $sources = $db->table('report_sources rs')
-                      ->select('rs.*, d.title AS source_title, d.original_filename AS source_filename, d.source_type')
+                      ->select('rs.*, d.title AS source_title, d.original_filename AS source_filename, d.source_type, d.source_repository, d.source_url, d.oai_identifier')
                       ->join('documents d', 'd.id = rs.source_document_id', 'left')
                       ->where('rs.report_id', $reportId)
                       ->orderBy('rs.source_rank', 'ASC')
@@ -1033,6 +1085,60 @@ class DashboardController extends BaseController
         $fallbackCorpus = (new DocumentModel())->where('document_type', 'corpus')->where('benchmark_run_id IS NULL', null, false)->countAllResults();
         $corpusCount = self::extractCorpusCount($report, $fallbackCorpus);
 
+        // Resolusi Rantai Revisi & Perbandingan v1 vs v2 (P2-1)
+        $revRootId = (int) ($document['revision_root_id'] ?? 0);
+        if ($revRootId <= 0 && !empty($document['parent_document_id'])) {
+            $parentDocRow = $docModel->find((int) $document['parent_document_id']);
+            if ($parentDocRow) {
+                $revRootId = (int) ($parentDocRow['revision_root_id'] ?? $parentDocRow['id']);
+            }
+        }
+        if ($revRootId <= 0) {
+            $revRootId = (int) $document['id'];
+        }
+
+        $revisionChain = $db->table('documents d')
+            ->select('d.id AS document_id, d.parent_document_id, d.revision_root_id, d.revision_number, d.revision_note, d.title, d.original_filename, d.created_at, r.id AS latest_report_id, r.status AS report_status, r.overall_similarity, r.predicted_decision, r.verification_code')
+            ->join('(SELECT document_id, MAX(id) AS max_id FROM reports GROUP BY document_id) lr', 'lr.document_id = d.id', 'left', false)
+            ->join('reports r', 'r.id = lr.max_id', 'left')
+            ->groupStart()
+                ->where('d.id', $revRootId)
+                ->orWhere('d.revision_root_id', $revRootId)
+                ->orWhere('d.parent_document_id', (int) $document['id'])
+            ->groupEnd()
+            ->orderBy('COALESCE(d.revision_number, 1)', 'ASC', false)
+            ->orderBy('d.id', 'ASC')
+            ->get()
+            ->getResultArray();
+
+        $compareReportId = (int) ($this->request->getGet('compare_with') ?? 0);
+        if ($compareReportId > 0) {
+            // Proteksi IDOR: pastikan laporan pembanding berada pada rantai revisi yang sama
+            $allowedReportIds = array_filter(array_map(static fn($row) => (int) ($row['latest_report_id'] ?? 0), $revisionChain));
+            if (! in_array($compareReportId, $allowedReportIds, true) || $compareReportId === $reportId) {
+                $compareReportId = 0;
+            }
+        }
+
+        $revisionDiff = null;
+        if (($report['status'] ?? '') === 'completed' && ($compareReportId > 0 || !empty($document['parent_document_id']))) {
+            if ($compareReportId === 0 && !empty($evidenceData['revision_diff']) && is_array($evidenceData['revision_diff'])) {
+                $revisionDiff = $evidenceData['revision_diff'];
+            } else {
+                $diffCmd = 'cd ' . escapeshellarg(ROOTPATH) . ' && ' . escapeshellcmd($pythonBin)
+                    . ' -m worker.revision_diff --report ' . (int) $reportId
+                    . ($compareReportId > 0 ? (' --compare-with ' . (int) $compareReportId) : '')
+                    . ' --json';
+                $diffJsonOut = @shell_exec($diffCmd);
+                if (!empty($diffJsonOut)) {
+                    $parsedDiff = json_decode($diffJsonOut, true);
+                    if (is_array($parsedDiff) && !empty($parsedDiff['diff'])) {
+                        $revisionDiff = $parsedDiff['diff'];
+                    }
+                }
+            }
+        }
+
         return view('dashboard/report', [
             'report'              => $report,
             'document'            => $document,
@@ -1063,6 +1169,9 @@ class DashboardController extends BaseController
             'hasPurchased'        => $hasPurchased,
             'isAmbassador'        => $isAmbassador,
             'ambProfile'          => $ambProfile,
+            'revisionChain'       => $revisionChain,
+            'revisionDiff'        => $revisionDiff,
+            'compareReportId'     => $compareReportId,
         ]);
     }
 

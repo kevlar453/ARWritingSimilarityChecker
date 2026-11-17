@@ -62,6 +62,24 @@ class DocumentController extends BaseController
             ]);
         }
 
+        $documentModel = new DocumentModel();
+        $isAdmin = (session()->get('user_role') === 'admin');
+        $rawParentId = (int) ($this->request->getPost('parent_document_id') ?: $this->request->getPost('revision_of') ?: 0);
+        $rawRevNote = (string) ($this->request->getPost('revision_note') ?? '');
+        try {
+            $revisionMeta = $documentModel->resolveRevisionMetadata($rawParentId > 0 ? $rawParentId : null, (int) $userId, $isAdmin, $rawRevNote);
+        } catch (\RuntimeException $re) {
+            return $this->response->setStatusCode(403)->setJSON([
+                'status'  => 'error',
+                'message' => $re->getMessage(),
+            ]);
+        } catch (\InvalidArgumentException $ie) {
+            return $this->response->setStatusCode(422)->setJSON([
+                'status'  => 'error',
+                'message' => $ie->getMessage(),
+            ]);
+        }
+
         // Periksa & potong kuota submisi SEBELUM memindahkan berkas fisik ke disk
         $userModel = new \App\Models\UserModel();
         $quotaDeducted = $userModel->deductSubmissionQuota($userId);
@@ -85,6 +103,12 @@ class DocumentController extends BaseController
 
             $faculty = trim((string) ($this->request->getPost('faculty') ?? ''));
             $department = trim((string) ($this->request->getPost('department') ?? ''));
+            if ($faculty === '' && ! empty($revisionMeta['default_faculty'])) {
+                $faculty = (string) $revisionMeta['default_faculty'];
+            }
+            if ($department === '' && ! empty($revisionMeta['default_department'])) {
+                $department = (string) $revisionMeta['default_department'];
+            }
 
             $rawVisibility = (string) $this->request->getPost('corpus_visibility');
             $visibility = in_array($rawVisibility, ['private', 'institution', 'corpus'], true) ? $rawVisibility : 'private';
@@ -92,26 +116,32 @@ class DocumentController extends BaseController
             $customTitle = trim((string) ($this->request->getPost('custom_title') ?: $this->request->getPost('title') ?: ''));
             $docTitle = !empty($customTitle) ? $customTitle : pathinfo($file->getClientName(), PATHINFO_FILENAME);
 
-            $documentModel = new DocumentModel();
             $documentId = $documentModel->insert([
-                'user_id'           => $userId,
-                'title'             => $docTitle,
-                'original_filename' => $file->getClientName(),
-                'mime_type'         => $mime,
-                'file_size'         => $file->getSize(),
-                'storage_path'      => $storagePath . $filename,
-                'status'            => 'uploaded',
-                'document_type'     => 'submission',
-                'corpus_visibility' => $visibility,
-                'faculty'           => !empty($faculty) ? $faculty : null,
-                'department'        => !empty($department) ? $department : null,
-                'indexing_status'   => 'not_required',
-                'created_at'        => date('Y-m-d H:i:s'),
-                'updated_at'        => date('Y-m-d H:i:s'),
+                'user_id'            => $userId,
+                'parent_document_id' => $revisionMeta['parent_document_id'],
+                'revision_root_id'   => $revisionMeta['revision_root_id'],
+                'revision_number'    => $revisionMeta['revision_number'],
+                'revision_note'      => $revisionMeta['revision_note'],
+                'title'              => $docTitle,
+                'original_filename'  => $file->getClientName(),
+                'mime_type'          => $mime,
+                'file_size'          => $file->getSize(),
+                'storage_path'       => $storagePath . $filename,
+                'status'             => 'uploaded',
+                'document_type'      => 'submission',
+                'corpus_visibility'  => $visibility,
+                'faculty'            => !empty($faculty) ? $faculty : null,
+                'department'         => !empty($department) ? $department : null,
+                'indexing_status'    => 'not_required',
+                'created_at'         => date('Y-m-d H:i:s'),
+                'updated_at'         => date('Y-m-d H:i:s'),
             ]);
 
             if (! $documentId) {
                 throw new \RuntimeException('Gagal menyimpan metadata dokumen ke basis data.');
+            }
+            if (empty($revisionMeta['revision_root_id'])) {
+                $documentModel->update($documentId, ['revision_root_id' => $documentId]);
             }
         } catch (\Throwable $e) {
             $userModel->refundSubmissionQuota($userId);
@@ -125,11 +155,15 @@ class DocumentController extends BaseController
         $quotaInfo = $userModel->getQuotaInfo($userId);
 
         return $this->response->setStatusCode(201)->setJSON([
-            'status'      => 'success',
-            'document_id' => $documentId,
-            'filename'    => $file->getClientName(),
-            'quota_info'  => $quotaInfo,
-            'message'     => 'Dokumen berhasil diunggah.'
+            'status'             => 'success',
+            'document_id'        => $documentId,
+            'filename'           => $file->getClientName(),
+            'parent_document_id' => $revisionMeta['parent_document_id'],
+            'revision_number'    => $revisionMeta['revision_number'],
+            'quota_info'         => $quotaInfo,
+            'message'            => $revisionMeta['revision_number'] > 1
+                ? "Dokumen revisi v{$revisionMeta['revision_number']} berhasil diunggah."
+                : 'Dokumen berhasil diunggah.'
         ]);
     }
 
@@ -699,6 +733,24 @@ class DocumentController extends BaseController
             ]);
         }
 
+        $documentModel = new DocumentModel();
+        $isAdmin = (session()->get('user_role') === 'admin');
+        $rawParentId = (int) ($this->request->getPost('parent_document_id') ?: $this->request->getPost('revision_of') ?: 0);
+        $rawRevNote = (string) ($this->request->getPost('revision_note') ?? '');
+        try {
+            $revisionMeta = $documentModel->resolveRevisionMetadata($rawParentId > 0 ? $rawParentId : null, (int) $userId, $isAdmin, $rawRevNote);
+        } catch (\RuntimeException $re) {
+            return $this->response->setStatusCode(403)->setJSON([
+                'status'  => 'error',
+                'message' => $re->getMessage(),
+            ]);
+        } catch (\InvalidArgumentException $ie) {
+            return $this->response->setStatusCode(422)->setJSON([
+                'status'  => 'error',
+                'message' => $ie->getMessage(),
+            ]);
+        }
+
         // Potong kuota submisi pengguna
         $userModel = new \App\Models\UserModel();
         $quotaDeducted = $userModel->deductSubmissionQuota($userId);
@@ -730,24 +782,36 @@ class DocumentController extends BaseController
 
             $faculty = trim((string) ($this->request->getPost('faculty') ?? ''));
             $department = trim((string) ($this->request->getPost('department') ?? ''));
+            if ($faculty === '' && ! empty($revisionMeta['default_faculty'])) {
+                $faculty = (string) $revisionMeta['default_faculty'];
+            }
+            if ($department === '' && ! empty($revisionMeta['default_department'])) {
+                $department = (string) $revisionMeta['default_department'];
+            }
 
-            $documentModel = new DocumentModel();
             $documentId = $documentModel->insert([
-                'user_id'           => $userId,
-                'title'             => $title,
-                'original_filename' => $file->getClientName(),
-                'mime_type'         => $mime,
-                'file_size'         => $file->getSize(),
-                'storage_path'      => $storagePath . $filename,
-                'status'            => 'uploaded',
-                'document_type'     => 'submission',
-                'corpus_visibility' => 'private',
-                'faculty'           => !empty($faculty) ? $faculty : null,
-                'department'        => !empty($department) ? $department : null,
-                'indexing_status'   => 'not_required',
-                'created_at'        => $now,
-                'updated_at'        => $now,
+                'user_id'            => $userId,
+                'parent_document_id' => $revisionMeta['parent_document_id'],
+                'revision_root_id'   => $revisionMeta['revision_root_id'],
+                'revision_number'    => $revisionMeta['revision_number'],
+                'revision_note'      => $revisionMeta['revision_note'],
+                'title'              => $title,
+                'original_filename'  => $file->getClientName(),
+                'mime_type'          => $mime,
+                'file_size'          => $file->getSize(),
+                'storage_path'       => $storagePath . $filename,
+                'status'             => 'uploaded',
+                'document_type'      => 'submission',
+                'corpus_visibility'  => 'private',
+                'faculty'            => !empty($faculty) ? $faculty : null,
+                'department'         => !empty($department) ? $department : null,
+                'indexing_status'    => 'not_required',
+                'created_at'         => $now,
+                'updated_at'         => $now,
             ]);
+            if ($documentId && empty($revisionMeta['revision_root_id'])) {
+                $documentModel->update($documentId, ['revision_root_id' => $documentId]);
+            }
 
             // Buat kode verifikasi acak aman
             $rnd = strtoupper(bin2hex(random_bytes(6)));

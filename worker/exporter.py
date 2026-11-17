@@ -424,7 +424,13 @@ def build_report_html(
         s_sim = float(s.get("similarity") or 0)
         s_exact = float(s.get("exact_similarity") or 0)
         s_cosine = float(s.get("cosine_similarity") or 0)
-        s_type = "Korpus Institusi" if s.get("source_type") == "corpus" else "Naskah Terpublikasi"
+        s_type = "Korpus Institusi" if s.get("source_type") == "corpus" else ("Skripsi / Tesis Repositori" if s.get("source_type") == "thesis" else "Naskah Terpublikasi")
+        s_repo = html_escape(s.get("source_repository") or "")
+        s_src_url = html_escape(s.get("source_url") or "")
+        prov_line = ""
+        if s_repo or s_src_url:
+            prov_parts = [p for p in (s_repo, s_src_url) if p]
+            prov_line = f"<div style=\"font-size: 6.8pt; color: #475569; margin-top: 1px; word-break: break-all;\">Sumber Asli: {' • '.join(prov_parts)}</div>"
 
         sources_html += f"""
         <tr>
@@ -432,6 +438,7 @@ def build_report_html(
             <td style="padding: 4px 8px;">
                 <strong style="color: #0f294a;">{s_title}</strong>
                 <div style="font-size: 7.5pt; color: #64748b; margin-top: 1px;">ID #{s.get('source_document_id')} • {s_type}</div>
+                {prov_line}
             </td>
             <td style="text-align: right; font-weight: bold; width: 75px; color: #1e3a8a;">{s_sim:.1f}%</td>
             <td style="text-align: right; width: 65px; color: #475569;">{s_exact:.1f}%</td>
@@ -1550,7 +1557,7 @@ def export_report_pdf(
 
         # 3. Fetch Sources
         cursor.execute("""
-            SELECT rs.*, d.title AS source_title, d.original_filename AS source_filename, d.source_type
+            SELECT rs.*, d.title AS source_title, d.original_filename AS source_filename, d.source_type, d.source_repository, d.source_url, d.oai_identifier
             FROM report_sources rs
             LEFT JOIN documents d ON d.id = rs.source_document_id
             WHERE rs.report_id = %s

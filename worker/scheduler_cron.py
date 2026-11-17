@@ -101,8 +101,8 @@ def run_scheduler_pipeline(
     else:
         print("\n[2/4] Memeriksa katalog registri repositori perguruan tinggi Indonesia...")
         try:
-            from worker.auto_discovery_harvester import harvest_indonesian_registry
-            reg_res = harvest_indonesian_registry(max_repos=2, limit_per_repo=3)
+            from worker.auto_discovery_harvester import auto_discover_from_registry
+            reg_res = auto_discover_from_registry(max_repos=2, limit_per_repo=3)
             indexed_oai = reg_res.get("indexed_count", 0)
             oai_result = reg_res
             print(f"      Diindeks dari registri: {indexed_oai}")
