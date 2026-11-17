@@ -296,7 +296,7 @@ class OAIHarvester:
             return
         try:
             err = summary.get("error") or ""
-            status = "failed" if err and summary["indexed_count"] == 0 else ("partial" if err or summary["failed_count"] > 0 else "success")
+            status = "failed" if err and summary["indexed_count"] == 0 else ("partial" if err or summary["failed_count"] > 0 else "completed")
             msg = (
                 f"OAI-PMH [{self.repository_name}] batch={summary.get('harvest_batch_id')}: "
                 f"scanned={summary['total_harvested']}, indexed={summary['indexed_count']} "

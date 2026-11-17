@@ -190,6 +190,7 @@ def test_oai_pilot_harvest_stores_provenance_dedup_and_thesis_type(tmp_path):
                 force_source_type="thesis",
                 request_delay=0.0,
                 harvest_batch_id="pilot_test_batch",
+                log_harvest=True,
             )
             assert summary1["total_harvested"] == 2
             assert summary1["indexed_count"] == 1
@@ -197,7 +198,7 @@ def test_oai_pilot_harvest_stores_provenance_dedup_and_thesis_type(tmp_path):
             doc_id = int(summary1["records"][0]["document_id"])
             created_ids.append(doc_id)
 
-            # Verifikasi provenance lengkap tersimpan di tabel documents
+            # Verifikasi provenance lengkap tersimpan di tabel documents dan log harvest_logs berstatus 'completed'
             cur = conn.cursor(dictionary=True)
             cur.execute("SELECT * FROM documents WHERE id = %s", (doc_id,))
             doc_row = cur.fetchone()
@@ -206,6 +207,9 @@ def test_oai_pilot_harvest_stores_provenance_dedup_and_thesis_type(tmp_path):
             assert doc_row["source_repository"] == "UNDIP-IR Pilot"
             assert doc_row["source_url"] == "https://eprints.undip.ac.id/9001/"
             assert doc_row["harvest_batch_id"] == "pilot_test_batch"
+            cur.execute("SELECT status, items_indexed FROM harvest_logs WHERE source = 'oai_pmh' ORDER BY id DESC LIMIT 1")
+            hl = cur.fetchone()
+            assert hl is not None and hl["status"] == "completed" and int(hl["items_indexed"]) == 1
             cur.close()
 
             # Panen kedua untuk ID OAI yang sama harus terdeteksi dedup -> skipped
@@ -227,6 +231,7 @@ def test_oai_pilot_harvest_stores_provenance_dedup_and_thesis_type(tmp_path):
                 c2.execute("DELETE FROM document_chunks WHERE document_id = %s", (did,))
                 c2.execute("DELETE FROM document_pages WHERE document_id = %s", (did,))
                 c2.execute("DELETE FROM documents WHERE id = %s", (did,))
+            c2.execute("DELETE FROM harvest_logs WHERE source_name = 'UNDIP-IR Pilot'")
             conn.commit()
         finally:
             c2.close()
