@@ -17,6 +17,8 @@ class ApiKeyModel extends Model
         'key_name',
         'key_prefix',
         'api_key',
+        'webhook_secret',
+        'webhook_secret_fingerprint',
         'system_type',
         'rate_limit_per_minute',
         'quota_limit',
@@ -43,29 +45,37 @@ class ApiKeyModel extends Model
         $fullKey = $prefix . $randomHex;
         $keyPrefix = substr($fullKey, 0, 14) . '...';
 
+        $webhookSecret = \App\Libraries\WebhookCrypto::generateSecret();
+        $encryptedWebhookSecret = \App\Libraries\WebhookCrypto::encryptSecret($webhookSecret);
+        $webhookSecretFingerprint = \App\Libraries\WebhookCrypto::fingerprint($webhookSecret);
+
         $data = [
-            'user_id'               => $userId,
-            'key_name'              => $keyName,
-            'key_prefix'            => $keyPrefix,
-            'api_key'               => hash('sha256', $fullKey), // simpan hash SHA-256 untuk keamanan
-            'system_type'           => $systemType,
-            'rate_limit_per_minute' => $rateLimit,
-            'quota_limit'           => $quotaLimit,
-            'quota_used'            => 0,
-            'is_active'             => 1,
-            'expires_at'            => $expiresAt,
-            'created_at'            => date('Y-m-d H:i:s'),
-            'updated_at'            => date('Y-m-d H:i:s'),
+            'user_id'                    => $userId,
+            'key_name'                   => $keyName,
+            'key_prefix'                 => $keyPrefix,
+            'api_key'                    => hash('sha256', $fullKey), // simpan hash SHA-256 untuk keamanan
+            'webhook_secret'             => $encryptedWebhookSecret,    // disimpan terenkripsi AES-256-GCM
+            'webhook_secret_fingerprint' => $webhookSecretFingerprint,
+            'system_type'                => $systemType,
+            'rate_limit_per_minute'      => $rateLimit,
+            'quota_limit'                => $quotaLimit,
+            'quota_used'                 => 0,
+            'is_active'                  => 1,
+            'expires_at'                 => $expiresAt,
+            'created_at'                 => date('Y-m-d H:i:s'),
+            'updated_at'                 => date('Y-m-d H:i:s'),
         ];
 
         $id = $this->insert($data);
 
         return [
-            'id'       => $id,
-            'key_name' => $keyName,
-            'raw_key'  => $fullKey, // Hanya ditampilkan 1x saat generate
-            'prefix'   => $keyPrefix,
-            'quota'    => $quotaLimit,
+            'id'                         => $id,
+            'key_name'                   => $keyName,
+            'raw_key'                    => $fullKey,       // Hanya ditampilkan 1x saat generate
+            'webhook_secret'             => $webhookSecret, // Hanya ditampilkan 1x saat generate
+            'webhook_secret_fingerprint' => $webhookSecretFingerprint,
+            'prefix'                     => $keyPrefix,
+            'quota'                      => $quotaLimit,
         ];
     }
 
@@ -102,6 +112,8 @@ class ApiKeyModel extends Model
             return null;
         }
 
+        unset($key['webhook_secret']);
+
         if ((int) $key['quota_used'] >= (int) $key['quota_limit']) {
             return array_merge($key, ['quota_exceeded' => true]);
         }
@@ -123,11 +135,12 @@ class ApiKeyModel extends Model
     }
 
     /**
-     * Mengambil daftar API Key milik pengguna
+     * Mengambil daftar API Key milik pengguna (tanpa kolom rahasia/hash)
      */
     public function getUserKeys(int $userId): array
     {
-        return $this->where('user_id', $userId)
+        return $this->select('id, user_id, key_name, key_prefix, webhook_secret_fingerprint, system_type, rate_limit_per_minute, quota_limit, quota_used, is_active, last_used_at, expires_at, created_at, updated_at')
+                    ->where('user_id', $userId)
                     ->orderBy('id', 'DESC')
                     ->findAll();
     }

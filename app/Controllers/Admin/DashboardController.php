@@ -343,7 +343,7 @@ class DashboardController extends BaseController
         $apiKeysList = [];
         if ($activeTab === 'api_keys') {
             $apiKeysList = $db->table('api_keys ak')
-                              ->select('ak.*, u.name as user_name, u.email as user_email')
+                              ->select('ak.id, ak.user_id, ak.key_name, ak.key_prefix, ak.webhook_secret_fingerprint, ak.system_type, ak.rate_limit_per_minute, ak.quota_limit, ak.quota_used, ak.is_active, ak.last_used_at, ak.expires_at, ak.created_at, ak.updated_at, u.name as user_name, u.email as user_email')
                               ->join('users u', 'u.id = ak.user_id', 'left')
                               ->orderBy('ak.id', 'DESC')
                               ->limit(50)

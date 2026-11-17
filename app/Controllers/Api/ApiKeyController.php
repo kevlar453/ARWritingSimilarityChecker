@@ -33,10 +33,11 @@ class ApiKeyController extends BaseController
             'status' => 'success',
             'data'   => array_map(function ($k) {
                 return [
-                    'id'                    => (int) $k['id'],
-                    'key_name'              => $k['key_name'],
-                    'key_prefix'            => $k['key_prefix'],
-                    'system_type'           => $k['system_type'],
+                    'id'                         => (int) $k['id'],
+                    'key_name'                   => $k['key_name'],
+                    'key_prefix'                 => $k['key_prefix'],
+                    'webhook_secret_fingerprint' => $k['webhook_secret_fingerprint'] ?? null,
+                    'system_type'                => $k['system_type'],
                     'quota_limit'           => (int) $k['quota_limit'],
                     'quota_used'            => (int) $k['quota_used'],
                     'rate_limit_per_minute' => (int) $k['rate_limit_per_minute'],

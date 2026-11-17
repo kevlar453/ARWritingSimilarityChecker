@@ -3627,18 +3627,30 @@
                     </div>
 
                     <!-- Modal / Alert API Key Baru -->
-                    <div id="key-result-box" class="hidden bg-slate-950 border border-emerald-500/40 rounded-xl p-4 space-y-2">
+                    <div id="key-result-box" class="hidden bg-slate-950 border border-emerald-500/40 rounded-xl p-4 space-y-3">
                         <div class="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                            API Key Berhasil Dibuat! Simpan kunci ini sekarang:
+                            API Key &amp; Webhook Secret Berhasil Dibuat! Salin kedua kunci ini sekarang:
                         </div>
-                        <div class="flex items-center gap-2 bg-slate-900 p-2.5 rounded-lg border border-slate-800">
-                            <code id="new-key-value" class="text-xs font-mono-code text-sky-300 flex-1 break-all"></code>
-                            <button onclick="navigator.clipboard.writeText(document.getElementById('new-key-value').innerText); alert('API Key disalin ke clipboard!');" class="px-3 py-1 rounded bg-sky-600 hover:bg-sky-500 text-white text-[11px] font-semibold whitespace-nowrap">
-                                Salin
-                            </button>
+                        <div class="space-y-1">
+                            <div class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">API Key (Header X-API-Key)</div>
+                            <div class="flex items-center gap-2 bg-slate-900 p-2.5 rounded-lg border border-slate-800">
+                                <code id="new-key-value" class="text-xs font-mono-code text-sky-300 flex-1 break-all"></code>
+                                <button type="button" onclick="navigator.clipboard.writeText(document.getElementById('new-key-value').innerText); alert('API Key disalin ke clipboard!');" class="px-3 py-1 rounded bg-sky-600 hover:bg-sky-500 text-white text-[11px] font-semibold whitespace-nowrap">
+                                    Salin Key
+                                </button>
+                            </div>
                         </div>
-                        <p class="text-[10px] text-slate-400">Kunci rahasia ini di-hash di basis data dan tidak akan ditampilkan secara utuh kembali demi keamanan.</p>
+                        <div class="space-y-1">
+                            <div class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Webhook HMAC-SHA256 Secret (Untuk Verifikasi Callback OJS/LMS)</div>
+                            <div class="flex items-center gap-2 bg-slate-900 p-2.5 rounded-lg border border-slate-800">
+                                <code id="new-webhook-secret-value" class="text-xs font-mono-code text-amber-300 flex-1 break-all"></code>
+                                <button type="button" onclick="navigator.clipboard.writeText(document.getElementById('new-webhook-secret-value').innerText); alert('Webhook Secret disalin ke clipboard!');" class="px-3 py-1 rounded bg-amber-600 hover:bg-amber-500 text-white text-[11px] font-semibold whitespace-nowrap">
+                                    Salin Secret
+                                </button>
+                            </div>
+                        </div>
+                        <p class="text-[10px] text-slate-400">API Key di-hash (SHA-256) dan Webhook Secret dienkripsi (AES-256-GCM) di basis data. Keduanya tidak akan ditampilkan secara utuh kembali demi keamanan.</p>
                     </div>
                 </div>
 
@@ -3668,11 +3680,19 @@
                                         </span>
                                     </div>
 
-                                    <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-2.5 flex items-center justify-between text-xs">
-                                        <span class="text-slate-400 text-[11px]">Prefix Identifikasi:</span>
-                                        <span class="font-mono-code text-sky-400 text-[11px] font-semibold bg-slate-950 px-2 py-0.5 rounded border border-slate-800">
-                                            <?= esc($ak['key_prefix']) ?>
-                                        </span>
+                                    <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-2.5 space-y-1.5 text-xs">
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-slate-400 text-[11px]">Prefix Identifikasi:</span>
+                                            <span class="font-mono-code text-sky-400 text-[11px] font-semibold bg-slate-950 px-2 py-0.5 rounded border border-slate-800">
+                                                <?= esc($ak['key_prefix']) ?>
+                                            </span>
+                                        </div>
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-slate-400 text-[11px]">Sidik Jari HMAC:</span>
+                                            <span class="font-mono-code text-amber-300 text-[11px] bg-slate-950 px-2 py-0.5 rounded border border-slate-800">
+                                                <?= !empty($ak['webhook_secret_fingerprint']) ? esc($ak['webhook_secret_fingerprint']) : 'Belum ada' ?>
+                                            </span>
+                                        </div>
                                     </div>
 
                                     <div class="grid grid-cols-2 gap-2 text-xs bg-slate-900/40 border border-slate-800/60 rounded-xl p-2.5">
@@ -3734,7 +3754,10 @@
                                                 <div class="text-[10px] text-slate-400"><?= esc($ak['user_name'] ?? $ak['user_email'] ?? 'Admin') ?></div>
                                             </td>
                                             <td class="py-2.5 px-3 font-mono-code text-sky-400 text-[11px]">
-                                                <?= esc($ak['key_prefix']) ?>
+                                                <div><?= esc($ak['key_prefix']) ?></div>
+                                                <div class="text-[10px] text-amber-300/80 mt-0.5">
+                                                    HMAC FP: <?= !empty($ak['webhook_secret_fingerprint']) ? esc($ak['webhook_secret_fingerprint']) : '-' ?>
+                                                </div>
                                             </td>
                                             <td class="py-2.5 px-3">
                                                 <span class="px-2 py-0.5 rounded text-[10px] bg-slate-800 text-slate-300 border border-slate-700">
@@ -5659,11 +5682,15 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                 if (res.status === 'success') {
                     const resultBox = document.getElementById('key-result-box');
                     const keyVal = document.getElementById('new-key-value');
+                    const secretVal = document.getElementById('new-webhook-secret-value');
                     if (resultBox && keyVal) {
                         keyVal.innerText = res.data.raw_key;
+                        if (secretVal) {
+                            secretVal.innerText = res.data.webhook_secret || '';
+                        }
                         resultBox.classList.remove('hidden');
                     }
-                    alert('API Key baru berhasil dibuat! Salin kunci sebelum menutup halaman.');
+                    alert('API Key & Webhook Secret berhasil dibuat! Salin kedua kunci sebelum menutup halaman.');
                 } else {
                     alert('Gagal: ' + res.message);
                 }

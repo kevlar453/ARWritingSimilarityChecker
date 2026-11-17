@@ -70,6 +70,17 @@ class PublicApiController extends BaseController
         $extRef = trim($this->request->getPost('external_id') ?: $this->request->getPost('ojs_submission_id') ?: '');
         $callbackUrl = trim($this->request->getPost('callback_url') ?: '');
 
+        if ($callbackUrl !== '') {
+            $urlCheck = \App\Libraries\WebhookUrlValidator::validate($callbackUrl);
+            if (! $urlCheck['valid']) {
+                return $this->response->setStatusCode(422)->setJSON([
+                    'status'  => 'error',
+                    'code'    => 422,
+                    'message' => $urlCheck['error'] ?? 'callback_url ditolak oleh kebijakan keamanan anti-SSRF.',
+                ]);
+            }
+        }
+
         $storagePath = WRITEPATH . 'documents/submissions/';
         if (! is_dir($storagePath)) {
             mkdir($storagePath, 0775, true);

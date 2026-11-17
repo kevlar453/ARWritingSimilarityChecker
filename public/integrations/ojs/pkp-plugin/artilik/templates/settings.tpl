@@ -27,6 +27,22 @@
                 </span>
             {/fbvFormSection}
 
+            {fbvFormSection title="Webhook HMAC Secret"}
+                {fbvElement type="text" id="webhookSecret" name="webhookSecret" value=$webhookSecret maxlength="160"}
+                <span class="instruct" style="font-size: 0.85em; color: #64748b; display: block; margin-top: 4px;">
+                    Format rahasia HMAC-SHA256: <code>whsec_...</code> (Ditampilkan bersamaan saat membuat API Key di dashboard AR Tilik, digunakan untuk memverifikasi callback webhook).
+                </span>
+            {/fbvFormSection}
+
+            {if $webhookEndpointUrl}
+                {fbvFormSection title="Webhook Callback Receiver URL (OJS Endpoint)"}
+                    <input type="text" readonly="readonly" value="{$webhookEndpointUrl|escape}" onclick="this.select();" style="width:100%; background:#f8fafc; border:1px solid #cbd5e1; padding:6px 10px; font-family:monospace; font-size:0.85em; border-radius:4px;" />
+                    <span class="instruct" style="font-size: 0.85em; color: #64748b; display: block; margin-top: 4px;">
+                        Endpoint HTTPS ini menerima hasil pemeriksaan secara instan tanpa polling (<code>POST callback_url</code>) dengan tanda tangan header <code>X-ARTilik-Signature-256</code>.
+                    </span>
+                {/fbvFormSection}
+            {/if}
+
             {fbvFormSection title="API Endpoint URL"}
                 {fbvElement type="text" id="apiEndpoint" name="apiEndpoint" value=$apiEndpoint maxlength="255"}
                 <span class="instruct" style="font-size: 0.85em; color: #64748b; display: block; margin-top: 4px;">
@@ -37,7 +53,7 @@
             {fbvFormSection title="Opsi Otomasi Alur Kerja"}
                 {fbvElement type="checkbox" id="autoCheckOnDecision" name="autoCheckOnDecision" value="1" checked=$autoCheckOnDecision label="Jalankan evaluasi naskah otomatis saat Editor merekam keputusan (Review/Revisi)"}
                 <span class="instruct" style="font-size: 0.85em; color: #64748b; display: block; margin-top: 4px;">
-                    Pengecekan menggunakan <strong>Mode Polling Outbound</strong> sehingga tidak memerlukan IP publik, port forwarding, atau tunnel inbound.
+                    Mengirim naskah beserta <strong>Callback URL Webhook</strong> HTTPS jika Webhook Secret telah terpasang (tanpa polling).
                 </span>
             {/fbvFormSection}
         {/fbvFormArea}

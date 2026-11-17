@@ -151,23 +151,18 @@ Bagi tim yang ingin menyusun plugin formal berstruktur PKP OJS 3.x lengkap denga
 3. Struktur berkas yang terpasang:
    * `plugins/generic/artilik/version.xml` (Metadata deskriptor plugin PKP)
    * `plugins/generic/artilik/index.php` (Entry point bootstrap)
-   * `plugins/generic/artilik/ArtilikPlugin.inc.php` (Kelas turunan `GenericPlugin`, aksi GUI, dan hook)
-   * `plugins/generic/artilik/ArtilikSettingsForm.inc.php` (Form validasi dan penyimpanan pengaturan)
-   * `plugins/generic/artilik/templates/settings.tpl` (Template antarmuka GUI pengaturan API Key)
-   * `plugins/generic/artilik/ARTilikOJSConnector.php` (SDK klien koneksi)
+   * `plugins/generic/artilik/ArtilikPlugin.inc.php` (Kelas turunan `GenericPlugin`, hook `LoadHandler`, aksi GUI, dan `EditorAction::recordDecision`)
+   * `plugins/generic/artilik/ArtilikHandler.inc.php` (Endpoint penerima webhook callback `/artilik/webhook` ber-HMAC-SHA256)
+   * `plugins/generic/artilik/ArtilikSettingsForm.inc.php` (Form validasi dan penyimpanan pengaturan API Key & Webhook Secret)
+   * `plugins/generic/artilik/templates/settings.tpl` (Template antarmuka GUI pengaturan API Key, Webhook Secret & URL Endpoint Callback)
+   * `plugins/generic/artilik/ARTilikOJSConnector.php` (SDK klien koneksi & verifier HMAC-SHA256)
 4. Masuk ke antarmuka web OJS sebagai Journal Manager/Administrator:
    * Buka **Settings > Website > Plugins > Installed Plugins**.
    * Cari **AR Tilik Writing Similarity & AI Forensic Checker**, lalu centang kotak untuk mengaktifkannya.
-   * Klik tombol **Settings** (Pengaturan) di bawah nama plugin, masukkan API Key Anda (`artilik_ojs_...`), lalu klik **Simpan**.
-5. Daftarkan hook event editorial decision di `ArtilikPlugin.inc.php`:
-   ```php
-   HookRegistry::register('EditorAction::recordDecision', function($hookName, $args) {
-       $submission = $args[0];
-       $decision   = $args[1];
-       // Panggil ARTilikOJSConnector untuk memproses naskah artikel utama
-       return false;
-   });
-   ```
+   * Klik tombol **Settings** (Pengaturan) di bawah nama plugin, masukkan API Key (`artilik_ojs_...`) serta Webhook HMAC Secret (`whsec_...`), lalu klik **Simpan**.
+5. Endpoint penerima webhook aktif otomatis pada URL:
+   `https://<domain-ojs-anda>/index.php/<path-jurnal>/artilik/webhook`
+   Saat `POST /api/v1/check` mengirim parameter `callback_url` HTTPS tersebut, AR Tilik mengirim hasil ringkas bertanda tangan header `X-ARTilik-Signature-256: sha256=<hex>` dan `X-ARTilik-Signature: sha256=<hex>`, memverifikasi DNS/IP (anti-SSRF), dan melakukan retry bertahap maksimal 3 kali.
 
 ### 3. Pengujian Mandiri dengan Docker Compose (PKP OJS Containers)
 Bagi pengembang yang ingin mensimulasikan instalasi OJS 3.3.x lokal secara cepat dan terisolasi:

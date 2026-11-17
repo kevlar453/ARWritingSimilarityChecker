@@ -41,6 +41,7 @@ class ArtilikSettingsForm extends Form {
      */
     public function initData() {
         $this->setData('apiKey', $this->_plugin->getSetting($this->_contextId, 'apiKey'));
+        $this->setData('webhookSecret', $this->_plugin->getSetting($this->_contextId, 'webhookSecret'));
         $this->setData('apiEndpoint', $this->_plugin->getSetting($this->_contextId, 'apiEndpoint') ?: 'https://tilik.arsetontong.top/api/v1');
         $this->setData('autoCheckOnDecision', (bool) ($this->_plugin->getSetting($this->_contextId, 'autoCheckOnDecision') ?? true));
     }
@@ -49,7 +50,7 @@ class ArtilikSettingsForm extends Form {
      * Membaca input POST dari user
      */
     public function readInputData() {
-        $this->readUserVars(['apiKey', 'apiEndpoint', 'autoCheckOnDecision']);
+        $this->readUserVars(['apiKey', 'webhookSecret', 'apiEndpoint', 'autoCheckOnDecision']);
     }
 
     /**
@@ -57,11 +58,19 @@ class ArtilikSettingsForm extends Form {
      */
     public function fetch($request, $template = null, $display = false) {
         $templateMgr = TemplateManager::getManager($request);
+        $dispatcher = $request->getDispatcher();
+        $webhookEndpointUrl = '';
+        if ($dispatcher) {
+            $webhookEndpointUrl = $dispatcher->url($request, ROUTE_PAGE, null, 'artilik', 'webhook');
+        }
+
         $templateMgr->assign([
             'pluginName'          => $this->_plugin->getName(),
             'apiKey'              => $this->getData('apiKey'),
+            'webhookSecret'       => $this->getData('webhookSecret'),
             'apiEndpoint'         => $this->getData('apiEndpoint'),
             'autoCheckOnDecision' => $this->getData('autoCheckOnDecision'),
+            'webhookEndpointUrl'  => $webhookEndpointUrl,
         ]);
 
         return parent::fetch($request, $template, $display);
@@ -71,8 +80,9 @@ class ArtilikSettingsForm extends Form {
      * Menyimpan data pengaturan ke tabel plugin_settings OJS
      */
     public function execute(...$functionArgs) {
-        $this->_plugin->updateSetting($this->_contextId, 'apiKey', trim($this->getData('apiKey')));
-        $this->_plugin->updateSetting($this->_contextId, 'apiEndpoint', trim($this->getData('apiEndpoint')) ?: 'https://tilik.arsetontong.top/api/v1');
+        $this->_plugin->updateSetting($this->_contextId, 'apiKey', trim((string) $this->getData('apiKey')));
+        $this->_plugin->updateSetting($this->_contextId, 'webhookSecret', trim((string) $this->getData('webhookSecret')));
+        $this->_plugin->updateSetting($this->_contextId, 'apiEndpoint', trim((string) $this->getData('apiEndpoint')) ?: 'https://tilik.arsetontong.top/api/v1');
         $this->_plugin->updateSetting($this->_contextId, 'autoCheckOnDecision', (bool) $this->getData('autoCheckOnDecision'));
 
         return parent::execute(...$functionArgs);

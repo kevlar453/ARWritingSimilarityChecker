@@ -22,6 +22,7 @@ from worker.database import (
 )
 from worker.indexer import index_document
 from worker.reporter import process_similarity_check
+from worker.webhook_dispatcher import dispatch_webhook_if_configured
 from worker.queue_manager import (
     pop_next_job,
     is_redis_available,
@@ -63,11 +64,29 @@ def process_job(job: dict):
             conn.close()
             
     elif job_type == "similarity_check":
-        process_similarity_check(
-            document_id=payload["document_id"],
-            report_id=payload["report_id"],
-            engine=payload.get("engine", "hybrid")
-        )
+        try:
+            process_similarity_check(
+                document_id=payload["document_id"],
+                report_id=payload["report_id"],
+                engine=payload.get("engine", "hybrid")
+            )
+        except Exception:
+            try:
+                dispatch_webhook_if_configured(
+                    job_id=job.get("id"),
+                    payload=payload,
+                    event_type="similarity_check.failed",
+                    error_message="Proses analisis kemiripan gagal diselesaikan.",
+                )
+            except Exception as cb_err:
+                print(f"[WEBHOOK WARN] Gagal mengirim callback kegagalan: {cb_err}")
+            raise
+        else:
+            dispatch_webhook_if_configured(
+                job_id=job.get("id"),
+                payload=payload,
+                event_type="similarity_check.completed",
+            )
     elif job_type == "delete_corpus":
         doc_id = payload.get("document_id")
         if doc_id:

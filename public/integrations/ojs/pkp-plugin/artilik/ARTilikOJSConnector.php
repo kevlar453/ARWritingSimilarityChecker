@@ -178,6 +178,72 @@ class ARTilikOJSConnector
     }
 
     /**
+     * Memverifikasi tanda tangan HMAC-SHA256 pada permintaan webhook masuk dari AR Tilik.
+     * Mendukung header dengan format "sha256=<hex>" maupun "<hex>" mentah secara constant-time.
+     *
+     * @param string $rawBody Isi mentah HTTP POST (php://input)
+     * @param string $signatureHeader Nilai header X-ARTilik-Signature-256 atau X-ARTilik-Signature
+     * @param string $webhookSecret Kunci rahasia HMAC (whsec_...)
+     */
+    public static function verifyWebhookSignature(string $rawBody, string $signatureHeader, string $webhookSecret): bool
+    {
+        $webhookSecret = trim($webhookSecret);
+        $signatureHeader = trim($signatureHeader);
+        if ($webhookSecret === '' || $signatureHeader === '' || $rawBody === '') {
+            return false;
+        }
+
+        if (stripos($signatureHeader, 'sha256=') === 0) {
+            $providedHex = strtolower(trim(substr($signatureHeader, 7)));
+        } else {
+            $providedHex = strtolower($signatureHeader);
+        }
+
+        if (strlen($providedHex) !== 64 || ! ctype_xdigit($providedHex)) {
+            return false;
+        }
+
+        $expectedHex = hash_hmac('sha256', $rawBody, $webhookSecret);
+        return hash_equals($expectedHex, $providedHex);
+    }
+
+    /**
+     * Memverifikasi dan mem-parse payload JSON webhook callback dari AR Tilik.
+     *
+     * @param string $rawBody Isi mentah HTTP POST (php://input)
+     * @param array<string, string> $headers Peta header HTTP (contoh: getallheaders() atau $_SERVER)
+     * @param string $webhookSecret Kunci rahasia HMAC (whsec_...)
+     * @return array<string, mixed> Payload terdekode yang sah
+     * @throws RuntimeException Bila tanda tangan HMAC atau JSON tidak valid
+     */
+    public static function parseWebhookRequest(string $rawBody, array $headers, string $webhookSecret): array
+    {
+        $normalized = [];
+        foreach ($headers as $k => $v) {
+            if (is_string($k) && (is_string($v) || is_numeric($v))) {
+                $normalized[strtolower($k)] = (string) $v;
+            }
+        }
+
+        $sigHeader = $normalized['x-artilik-signature-256']
+            ?? $normalized['http_x_artilik_signature_256']
+            ?? $normalized['x-artilik-signature']
+            ?? $normalized['http_x_artilik_signature']
+            ?? '';
+
+        if (! self::verifyWebhookSignature($rawBody, $sigHeader, $webhookSecret)) {
+            throw new RuntimeException('Verifikasi tanda tangan HMAC-SHA256 webhook gagal.');
+        }
+
+        $decoded = json_decode($rawBody, true);
+        if (! is_array($decoded)) {
+            throw new RuntimeException('Payload JSON webhook tidak valid.');
+        }
+
+        return $decoded;
+    }
+
+    /**
      * Eksekutor cURL
      */
     private function executeCurl(string $url, string $method = 'GET', array $data = [], bool $isMultipart = false): array
