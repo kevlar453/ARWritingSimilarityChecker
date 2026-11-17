@@ -96,15 +96,18 @@ class ArtilikHandler extends Handler {
             ]);
         }
 
-        $stored = $this->persistWebhookResult($plugin, $contextId, $submission, $payload);
+        $persist = $this->persistWebhookResult($plugin, $contextId, $submission, $payload);
 
         return $this->sendJsonResponse(200, [
-            'status'        => 'ok',
-            'verified'      => true,
-            'stored'        => $stored,
-            'submission_id' => $submission ? (int) $submission->getId() : $submissionId,
-            'external_id'   => $payload['external_id'] ?? null,
-            'report_id'     => $payload['report_id'] ?? null,
+            'status'                 => 'ok',
+            'verified'               => true,
+            'stored'                 => $persist['stored'],
+            'event_logged'           => $persist['event_logged'],
+            'editorial_note_created' => $persist['editorial_note_created'],
+            'warnings'               => $persist['warnings'],
+            'submission_id'          => $submission ? (int) $submission->getId() : $submissionId,
+            'external_id'            => $payload['external_id'] ?? null,
+            'report_id'              => $payload['report_id'] ?? null,
         ]);
     }
 
@@ -132,8 +135,10 @@ class ArtilikHandler extends Handler {
 
     /**
      * Menyimpan hasil webhook ke plugin_settings serta mencatat aktivitas/catatan editorial pada submisi OJS.
+     *
+     * @return array{stored: bool, event_logged: bool, editorial_note_created: bool, warnings: array<int, string>}
      */
-    protected function persistWebhookResult($plugin, int $contextId, $submission, array $payload): bool {
+    protected function persistWebhookResult($plugin, int $contextId, $submission, array $payload): array {
         $record = [
             'verified_hmac'          => true,
             'event'                  => $payload['event'] ?? 'similarity_check.completed',
@@ -162,7 +167,11 @@ class ArtilikHandler extends Handler {
         $plugin->updateSetting($targetContextId, $settingKey, json_encode($record, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), 'string');
         $plugin->updateSetting($targetContextId, 'webhookLastDelivery', json_encode($record, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), 'string');
 
-        if ($submission && class_exists('\DAORegistry')) {
+        $eventLogged = false;
+        $noteCreated = false;
+        $warnings = [];
+
+        if ($submission && $this->hasDaoRegistry()) {
             $subId = (int) $submission->getId();
             $simText = number_format((float) $record['overall_similarity'], 2) . '%';
             $decision = strtoupper((string) $record['predicted_decision']);
@@ -170,36 +179,36 @@ class ArtilikHandler extends Handler {
             $webUrl = (string) $record['web_report_url'];
             $pdfUrl = (string) $record['pdf_export_url'];
 
-            // 1. Catat ke Riwayat Aktivitas Submisi OJS (SubmissionEventLogDAO)
+            // 1. Catat ke Riwayat Aktivitas Submisi OJS (SubmissionEventLogDAO sudah mengembalikan objek Entry yang tepat)
             try {
-                $eventLogDao = \DAORegistry::getDAO('SubmissionEventLogDAO');
+                $eventLogDao = $this->getDao('SubmissionEventLogDAO');
                 if ($eventLogDao) {
-                    if (function_exists('import')) {
-                        import('lib.pkp.classes.log.SubmissionEventLogEntry');
-                    }
                     $entry = $eventLogDao->newDataObject();
                     $entry->setAssocType(defined('ASSOC_TYPE_SUBMISSION') ? ASSOC_TYPE_SUBMISSION : 0x0100009);
                     $entry->setAssocId($subId);
                     $entry->setUserId(0);
-                    if (class_exists('\Core')) {
-                        $entry->setDateLogged(\Core::getCurrentDate());
-                    }
+                    $entry->setDateLogged(class_exists('\Core') ? \Core::getCurrentDate() : date('Y-m-d H:i:s'));
                     $entry->setEventType(0x10000999);
                     $entry->setMessage(
                         "AR Tilik Webhook (HMAC Terverifikasi): Kemiripan {$simText}, Putusan: {$decision}, Kode: {$verCode}, Laporan: {$webUrl}"
                     );
-                    $entry->setIsTranslated(0);
-                    $eventLogDao->insertObject($entry);
+                    $entry->setIsTranslated(1);
+                    $insertedId = $eventLogDao->insertObject($entry);
+                    $eventLogged = ($insertedId !== false && $insertedId !== null);
+                } else {
+                    $warnings[] = 'SubmissionEventLogDAO tidak tersedia pada runtime OJS.';
                 }
             } catch (\Throwable $e) {
-                error_log('[AR Tilik OJS] Gagal menulis SubmissionEventLogDAO: ' . $e->getMessage());
+                $msg = 'Gagal menulis SubmissionEventLogDAO: ' . $e->getMessage();
+                $warnings[] = $msg;
+                error_log('[AR Tilik OJS] ' . $msg);
             }
 
             // 2. Tambahkan catatan diskusi editorial pada workflow submisi bila peserta tersedia
             try {
-                $queryDao = \DAORegistry::getDAO('QueryDAO');
-                $noteDao = \DAORegistry::getDAO('NoteDAO');
-                $stageAssignmentDao = \DAORegistry::getDAO('StageAssignmentDAO');
+                $queryDao = $this->getDao('QueryDAO');
+                $noteDao = $this->getDao('NoteDAO');
+                $stageAssignmentDao = $this->getDao('StageAssignmentDAO');
                 if ($queryDao && $noteDao && $stageAssignmentDao) {
                     $participantIds = [];
                     $assignments = $stageAssignmentDao->getBySubmissionAndStageId($subId, (int) $submission->getData('stageId'));
@@ -217,7 +226,7 @@ class ArtilikHandler extends Handler {
                         $query->setAssocType(defined('ASSOC_TYPE_SUBMISSION') ? ASSOC_TYPE_SUBMISSION : 0x0100009);
                         $query->setAssocId($subId);
                         $query->setStageId((int) $submission->getData('stageId'));
-                        $query->setSequence(REALLY_BIG_NUMBER);
+                        $query->setSequence(defined('REALLY_BIG_NUMBER') ? REALLY_BIG_NUMBER : 10000);
                         $query->setIsClosed(false);
                         $queryId = $queryDao->insertObject($query);
                         $queryDao->resequence(defined('ASSOC_TYPE_SUBMISSION') ? ASSOC_TYPE_SUBMISSION : 0x0100009, $subId);
@@ -241,15 +250,31 @@ class ArtilikHandler extends Handler {
                             . ($pdfUrl ? '<li><strong>Unduh Sertifikat/PDF:</strong> <a href="' . htmlspecialchars($pdfUrl, ENT_QUOTES, 'UTF-8') . '" target="_blank">Unduh Laporan PDF</a></li>' : '')
                             . '</ul>'
                         );
-                        $noteDao->insertObject($note);
+                        $noteId = $noteDao->insertObject($note);
+                        $noteCreated = ($noteId !== false && $noteId !== null);
                     }
                 }
             } catch (\Throwable $e) {
-                error_log('[AR Tilik OJS] Gagal membuat catatan Query/Note editorial: ' . $e->getMessage());
+                $msg = 'Gagal membuat catatan Query/Note editorial: ' . $e->getMessage();
+                $warnings[] = $msg;
+                error_log('[AR Tilik OJS] ' . $msg);
             }
         }
 
-        return true;
+        return [
+            'stored'                 => true,
+            'event_logged'           => $eventLogged,
+            'editorial_note_created' => $noteCreated,
+            'warnings'               => $warnings,
+        ];
+    }
+
+    protected function hasDaoRegistry(): bool {
+        return class_exists('\DAORegistry');
+    }
+
+    protected function getDao(string $name) {
+        return class_exists('\DAORegistry') ? \DAORegistry::getDAO($name) : null;
     }
 
     protected function resolvePluginInstance() {

@@ -345,23 +345,54 @@ class FakePlugin {
     public function updateSetting($contextId, $name, $value, $type = null) { $this->settings["{$contextId}:{$name}"] = $value; }
 }
 
+class FakeEventLogEntry {
+    public array $props = [];
+    public function setAssocType($v) { $this->props['assocType'] = $v; }
+    public function setAssocId($v) { $this->props['assocId'] = $v; }
+    public function setUserId($v) { $this->props['userId'] = $v; }
+    public function setDateLogged($v) { $this->props['dateLogged'] = $v; }
+    public function setEventType($v) { $this->props['eventType'] = $v; }
+    public function setMessage($v) { $this->props['message'] = $v; }
+    public function setIsTranslated($v) { $this->props['isTranslated'] = $v; }
+}
+
+class FakeEventLogDao {
+    public array $entries = [];
+    public function newDataObject() { return new FakeEventLogEntry(); }
+    public function insertObject($entry) {
+        $this->entries[] = $entry;
+        return count($this->entries);
+    }
+}
+
+class FakeFailingEventLogDao {
+    public function newDataObject() { throw new \RuntimeException('Simulasi gagal tulis event_log'); }
+}
+
 class TestableArtilikHandler extends ArtilikHandler {
     public FakePlugin $plugin;
     public FakeSubmission $sub;
     public string $rawBody;
     public array $headers;
+    public $eventLogDao;
     public int $lastStatus = 0;
     public array $lastResp = [];
-    public function __construct($plugin, $sub, $rawBody, $headers) {
+    public function __construct($plugin, $sub, $rawBody, $headers, $eventLogDao = null) {
         $this->plugin = $plugin;
         $this->sub = $sub;
         $this->rawBody = $rawBody;
         $this->headers = $headers;
+        $this->eventLogDao = $eventLogDao;
     }
     protected function resolvePluginInstance() { return $this->plugin; }
     protected function findSubmission(int $submissionId) { return $submissionId === 1240 ? $this->sub : null; }
     protected function readRawBody(): string { return $this->rawBody; }
     protected function collectRequestHeaders(): array { return $this->headers; }
+    protected function hasDaoRegistry(): bool { return true; }
+    protected function getDao(string $name) {
+        if ($name === 'SubmissionEventLogDAO') return $this->eventLogDao;
+        return null;
+    }
     protected function sendJsonResponse(int $statusCode, array $payload) {
         $this->lastStatus = $statusCode;
         $this->lastResp = $payload;
@@ -380,16 +411,22 @@ $secret = $argv[3];
 $plugin = new FakePlugin($secret);
 $sub = new FakeSubmission(1240, 1);
 
-$hInvalid = new TestableArtilikHandler($plugin, $sub, $rawBody, ['X-ARTilik-Signature-256' => 'sha256=' . str_repeat('0', 64)]);
+$hInvalid = new TestableArtilikHandler($plugin, $sub, $rawBody, ['X-ARTilik-Signature-256' => 'sha256=' . str_repeat('0', 64)], new FakeEventLogDao());
 $hInvalid->webhook([], new FakeRequest());
 
-$hValid = new TestableArtilikHandler($plugin, $sub, $rawBody, ['X-ARTilik-Signature-256' => $sigHeader]);
+$eventDao = new FakeEventLogDao();
+$hValid = new TestableArtilikHandler($plugin, $sub, $rawBody, ['X-ARTilik-Signature-256' => $sigHeader], $eventDao);
 $hValid->webhook([], new FakeRequest());
+
+$hWarn = new TestableArtilikHandler($plugin, $sub, $rawBody, ['X-ARTilik-Signature-256' => $sigHeader], new FakeFailingEventLogDao());
+$hWarn->webhook([], new FakeRequest());
 
 echo json_encode([
     'invalid_status' => $hInvalid->lastStatus,
     'valid_status'   => $hValid->lastStatus,
     'valid_resp'     => $hValid->lastResp,
+    'event_entries'  => array_map(fn($e) => $e->props, $eventDao->entries),
+    'warn_resp'      => $hWarn->lastResp,
     'stored_json'    => json_decode($plugin->getSetting(1, 'webhookResult_1240'), true),
 ]);
 """
@@ -405,6 +442,14 @@ echo json_encode([
     assert out["valid_status"] == 200
     assert out["valid_resp"]["verified"] is True
     assert out["valid_resp"]["stored"] is True
+    assert out["valid_resp"]["event_logged"] is True
+    assert out["valid_resp"]["warnings"] == []
+    assert len(out["event_entries"]) == 1
+    assert out["event_entries"][0]["isTranslated"] == 1
+    assert out["event_entries"][0]["assocId"] == 1240
+    assert "ART-TEST-9991" in out["event_entries"][0]["message"]
+    assert out["warn_resp"]["event_logged"] is False
+    assert len(out["warn_resp"]["warnings"]) >= 1
     assert out["valid_resp"]["submission_id"] == 1240
     assert out["stored_json"]["overall_similarity"] == 16.25
     assert out["stored_json"]["substantive_similarity"] == 12.75
