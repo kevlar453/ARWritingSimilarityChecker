@@ -12,7 +12,26 @@ Karakteristik Desain:
 import os
 import re
 import uuid
+from pathlib import Path
 from typing import List, Dict, Any, Optional
+
+# Konfigurasikan direktori cache persisten di dalam proyek sebelum mengimpor fastembed/hf_hub,
+# sehingga user layanan sistem (seperti www-data dengan $HOME=/var/www yang read-only)
+# tidak terkena I/O error Permission denied (os error 13) pada /var/www/.cache.
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+_CACHE_BASE = PROJECT_ROOT / "writable" / "cache"
+try:
+    (_CACHE_BASE / "huggingface" / "xet").mkdir(parents=True, exist_ok=True)
+    (_CACHE_BASE / "fastembed").mkdir(parents=True, exist_ok=True)
+    if os.access(_CACHE_BASE, os.W_OK):
+        os.environ.setdefault("XDG_CACHE_HOME", str(_CACHE_BASE))
+        os.environ.setdefault("HF_HOME", str(_CACHE_BASE / "huggingface"))
+        os.environ.setdefault("HF_HUB_CACHE", str(_CACHE_BASE / "huggingface" / "hub"))
+        os.environ.setdefault("HF_XET_CACHE", str(_CACHE_BASE / "huggingface" / "xet"))
+        os.environ.setdefault("FASTEMBED_CACHE_PATH", str(_CACHE_BASE / "fastembed"))
+        os.environ.setdefault("HF_HUB_DISABLE_TELEMETRY", "1")
+except OSError:
+    pass
 
 try:
     from fastembed import TextEmbedding
@@ -146,6 +165,7 @@ class SemanticLens:
     """
     _instance = None
     _model = None
+    _model_failed = False
 
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
@@ -177,8 +197,16 @@ class SemanticLens:
 
     def get_model(self):
         """Memuat model embedding secara lazy (sekali pakai dalam memori proses)."""
-        if self._model is None and FASTEMBED_AVAILABLE:
-            self._model = TextEmbedding(MODEL_NAME)
+        if self._model is None and not self._model_failed and FASTEMBED_AVAILABLE:
+            cache_dir = os.getenv("FASTEMBED_CACHE_PATH")
+            try:
+                if cache_dir:
+                    self._model = TextEmbedding(MODEL_NAME, cache_dir=cache_dir)
+                else:
+                    self._model = TextEmbedding(MODEL_NAME)
+            except Exception:
+                self._model_failed = True
+                raise
         return self._model
 
     def embed_texts(self, texts: List[str]) -> List[List[float]]:
