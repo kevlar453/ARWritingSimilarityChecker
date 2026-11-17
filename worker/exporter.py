@@ -30,6 +30,12 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from worker.database import get_connection
+from worker.exclusion_filters import (
+    EXCLUSION_SCHEMA_VERSION,
+    compute_filtered_score,
+    get_match_exclusion_flags,
+    merge_db_and_evidence_matches,
+)
 
 VERIFY_BASE_URL = os.getenv("APP_PUBLIC_URL", "https://tilik.arsetontong.top")
 
@@ -164,7 +170,14 @@ def resolve_language_info(text: str, title: str = "") -> dict:
         pass
     return LANGUAGE_REGISTRY["ID"]
 
-def build_report_html(report: dict, document: dict, sources: list[dict], matches: list[dict], submission_text: str = "") -> str:
+def build_report_html(
+    report: dict,
+    document: dict,
+    sources: list[dict],
+    matches: list[dict],
+    submission_text: str = "",
+    filter_summary: dict | None = None,
+) -> str:
     detected_lang = resolve_language_info(submission_text, document.get("title") or "")
     r_id = report["id"]
     d_id = report["document_id"]
@@ -174,7 +187,9 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
     agreement = report["evidence_agreement"] or "COMPLEMENTARY_EVIDENCE"
     sources_agree = bool(report["sources_agree"])
     
-    overall_sim = float(report["overall_similarity"] or 0)
+    raw_overall_sim = float(report["overall_similarity"] or 0)
+    has_active_filters = bool(filter_summary and filter_summary.get("has_active_filters"))
+    overall_sim = float(filter_summary["filtered_similarity"]) if has_active_filters else raw_overall_sim
     exact_sim = float(report["exact_similarity"] or 0)
     cosine_sim = float(report["cosine_similarity"] or 0)
     longest_match = report["longest_match_words"] or 0
@@ -207,7 +222,7 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
         date_str = datetime.now().strftime("%d %B %Y, %H:%M WIB")
         raw_created = date_str
 
-    cert_hash = report.get("verification_code") or generate_verification_hash(r_id, d_id, raw_created, overall_sim)
+    cert_hash = report.get("verification_code") or generate_verification_hash(r_id, d_id, raw_created, raw_overall_sim)
     
     # Evidence data JSON
     evidence_data = {}
@@ -882,9 +897,40 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
             </div>
             """
 
-    # Matches rows (Tampilkan 2 pasase teratas agar muat bersama tanda tangan di Halaman 4)
+    # Siapkan ringkasan transparan pengecualian filter bila aktif
+    filter_labels_list = list(filter_summary.get("active_filter_labels") or []) if filter_summary else []
+    filter_labels_str = ", ".join(filter_labels_list)
+    filter_status_meta_val = (
+        f"Aktif: {html_escape(filter_labels_str)}"
+        if has_active_filters
+        else "Tidak ada filter aktif (Skor Mentah Penuh)"
+    )
+
+    filter_notice_html = ""
+    score_caption_html = '<div style="font-size: 7pt; font-weight: 600; color: #475569; text-align: right; margin-top: 2px;">Skor Kemiripan Total (Mentah)</div>'
+    if has_active_filters and filter_summary:
+        ex_passages = int(filter_summary.get("excluded_passages_count") or 0)
+        ex_words = int(filter_summary.get("excluded_words") or 0)
+        tot_union = int(filter_summary.get("total_union_words") or 0)
+        score_caption_html = (
+            f'<div style="font-size: 7pt; font-weight: 700; color: #312e81; text-align: right; margin-top: 2px;">'
+            f'Skor Murni Terfilter (Mentah: {raw_overall_sim:.2f}%)'
+            f'</div>'
+        )
+        filter_notice_html = f"""
+        <div style="margin-top: 8px; padding: 6px 10px; background: #eef2ff; border: 1px solid #818cf8; border-radius: 5px; font-size: 7.5pt; color: #1e1b4b; line-height: 1.4;">
+            <strong>Catatan Transparansi Pengecualian Aktif:</strong>
+            Skor utama <strong>{overall_sim:.2f}%</strong> dihitung setelah mengecualikan kategori:
+            <strong>{html_escape(filter_labels_str)}</strong>
+            ({ex_passages} pasase; {ex_words:,} dari {tot_union:,} kata unik beririsan dikecualikan).
+            Skor kemiripan mentah penuh sebelum filter adalah <strong>{raw_overall_sim:.2f}%</strong>.
+        </div>
+        """
+
+    # Matches rows (Tampilkan 2 pasase aktif teratas agar muat bersama tanda tangan di Halaman 4)
+    sample_pool = list(filter_summary.get("active_matches") or []) if has_active_filters and filter_summary else matches
     matches_html = ""
-    for idx, m in enumerate(matches[:2], 1):
+    for idx, m in enumerate(sample_pool[:2], 1):
         w_cnt = m.get("word_count", 0)
         m_type = html_escape((m.get("match_type") or "exact").upper())
         raw_sub = str(m.get("submission_snippet", ""))
@@ -893,6 +939,18 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
         s_src_trunc = html_escape(raw_src[:240] + ("..." if len(raw_src) > 240 else ""))
         src_id = html_escape(str(m.get("source_document_id") or "-"))
         sub_span = f"Kata {m.get('submission_start', 0)} &ndash; {m.get('submission_end', 0)}"
+
+        flags = get_match_exclusion_flags(m)
+        flag_badges = []
+        if flags.get("quote"):
+            flag_badges.append('<span style="background:#fef3c7;color:#92400e;border:1px solid #fcd34d;padding:1px 4px;border-radius:3px;font-size:6.5pt;font-weight:bold;">KUTIPAN</span>')
+        if flags.get("bibliography"):
+            flag_badges.append('<span style="background:#f3e8ff;color:#6b21a8;border:1px solid #d8b4fe;padding:1px 4px;border-radius:3px;font-size:6.5pt;font-weight:bold;">BIBLIOGRAFI</span>')
+        if flags.get("front_matter"):
+            flag_badges.append('<span style="background:#e0f2fe;color:#075985;border:1px solid #7dd3fc;padding:1px 4px;border-radius:3px;font-size:6.5pt;font-weight:bold;">FORMALITAS DEPAN</span>')
+        if flags.get("boilerplate"):
+            flag_badges.append('<span style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:1px 4px;border-radius:3px;font-size:6.5pt;font-weight:bold;">FRASA BAKU</span>')
+        flag_badges_html = (" &bull; " + " ".join(flag_badges)) if flag_badges else ""
 
         bp_html = ""
         if m.get("is_boilerplate"):
@@ -908,7 +966,7 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
         matches_html += f"""
         <div class="match-item" style="margin-bottom: 8px; padding: 6px 9px; border: 1px solid #e2e8f0; border-radius: 6px; background-color: #f8fafc; page-break-inside: avoid;">
             <div style="display: flex; justify-content: space-between; font-size: 8pt; margin-bottom: 4px; border-bottom: 1px solid #cbd5e1; padding-bottom: 3px;">
-                <span><strong>Pasase #{idx}</strong> • {sub_span} ({w_cnt} kata)</span>
+                <span><strong>Pasase #{idx}</strong> • {sub_span} ({w_cnt} kata){flag_badges_html}</span>
                 <span>Rujukan: <strong>Doc #{src_id}</strong> • Tipe: <strong>{m_type}</strong></span>
             </div>
             <div style="font-size: 7.5pt; line-height: 1.35; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
@@ -925,10 +983,10 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
         </div>
         """
 
-    if not matches:
+    if not sample_pool:
         matches_html = """
         <div style="text-align: center; color: #64748b; font-style: italic; padding: 12px; border: 1px dashed #cbd5e1; border-radius: 6px; font-size: 7.5pt;">
-            Tidak ditemukan pasase kata berurutan yang melebihi batas deteksi sekuensial.
+            Seluruh pasase beririsan dikecualikan oleh filter aktif, atau tidak ditemukan pasase kata berurutan.
         </div>
         """
 
@@ -1332,6 +1390,10 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
             </td>
         </tr>
         {fac_dept_row}
+        <tr>
+            <td class="meta-label">Filter Pengecualian</td>
+            <td class="meta-val" colspan="3">{filter_status_meta_val}</td>
+        </tr>
     </table>
 
     <!-- Decision Banner -->
@@ -1341,13 +1403,17 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
                 <div class="decision-title">{dec_label}</div>
                 <div class="decision-desc">{dec_desc}</div>
             </div>
-            <div class="decision-score">{overall_sim:.2f}%</div>
+            <div>
+                <div class="decision-score" style="text-align: right;">{overall_sim:.2f}%</div>
+                {score_caption_html}
+            </div>
         </div>
         <div>
             <span class="tag-pill">Pola Bukti: <strong>{pattern}</strong></span>
             <span class="tag-pill">Sintesis: <strong>{agreement}</strong></span>
             <span class="tag-pill">Kesepakatan Lensa: <strong>{'YA (Sepakat)' if sources_agree else 'TIDAK / TUNGGAL'}</strong></span>
         </div>
+        {filter_notice_html}
     </div>
 
     <!-- Dual-Lens Quantitative Decomposition -->
@@ -1446,7 +1512,15 @@ def build_report_html(report: dict, document: dict, sources: list[dict], matches
 """
     return html
 
-def export_report_pdf(report_id: int, output_path: str | None = None) -> bytes:
+def export_report_pdf(
+    report_id: int,
+    output_path: str | None = None,
+    *,
+    exclude_quotes: bool = False,
+    exclude_boilerplate: bool = False,
+    exclude_front_matter: bool = False,
+    exclude_bibliography: bool = False,
+) -> bytes:
     conn = get_connection()
     try:
         cursor = conn.cursor(dictionary=True)
@@ -1484,18 +1558,50 @@ def export_report_pdf(report_id: int, output_path: str | None = None) -> bytes:
         """, (report_id,))
         sources = cursor.fetchall()
 
-        # 4. Fetch Matches
+        # 4. Fetch ALL Matches (tanpa LIMIT agar union kata skor terfilter identik dengan report.php)
         cursor.execute("""
             SELECT rm.*, d.title AS source_title, d.original_filename AS source_filename
             FROM report_matches rm
             LEFT JOIN documents d ON d.id = rm.source_document_id
             WHERE rm.report_id = %s
-            ORDER BY rm.word_count DESC, rm.submission_start ASC
-            LIMIT 10
+            ORDER BY rm.submission_start ASC, rm.word_count DESC
         """, (report_id,))
-        matches = cursor.fetchall()
+        db_matches = cursor.fetchall()
 
-        # 5. Extract snippets using precise start_word_position
+        # 5. Fetch submission text (dibutuhkan untuk anotasi pengecualian server-side & analisis bahasa)
+        cursor.execute("""
+            SELECT text FROM document_chunks
+            WHERE document_id = %s
+            ORDER BY chunk_index ASC, id ASC
+        """, (doc_id,))
+        sub_chunks = cursor.fetchall()
+        submission_text = "\n\n".join(c["text"] for c in sub_chunks if c.get("text"))
+
+        # 6. Sinkronkan metadata & exclusion_flags dari evidence_data + perbaiki bila skema lama
+        ev_data = {}
+        if report.get("evidence_data"):
+            try:
+                ev_data = json.loads(report["evidence_data"]) if isinstance(report["evidence_data"], str) else report["evidence_data"]
+            except Exception:
+                ev_data = {}
+        ev_matches = ev_data.get("matches") if isinstance(ev_data, dict) and isinstance(ev_data.get("matches"), list) else []
+        if db_matches:
+            matches = merge_db_and_evidence_matches(db_matches, ev_matches, submission_text=submission_text)
+        else:
+            matches = ev_matches
+
+        # Hitung skor terfilter memakai Single Source of Truth Python
+        raw_overall_sim = float(report.get("overall_similarity") or 0.0)
+        filter_summary = compute_filtered_score(
+            raw_overall_sim,
+            matches,
+            exclude_quotes=exclude_quotes,
+            exclude_boilerplate=exclude_boilerplate,
+            exclude_front_matter=exclude_front_matter,
+            exclude_bibliography=exclude_bibliography,
+        )
+
+        # 7. Extract snippets hanya untuk pasase sampel teratas yang ditampilkan di halaman 4 PDF
         def fetch_snippet(document_id: int, start_word: int, word_count: int) -> str:
             cursor.execute("""
                 SELECT text, normalized_text, start_word_position, end_word_position
@@ -1533,23 +1639,28 @@ def export_report_pdf(report_id: int, output_path: str | None = None) -> bytes:
             words = raw_text.split()
             return " ".join(words[offset:offset + count]) if words else "Teks tidak tersedia."
 
-        for m in matches:
+        # Urutkan kandidat sampel berdasarkan panjang kata agar sampel PDF informatif
+        sample_candidates = sorted(
+            filter_summary["active_matches"] if filter_summary["has_active_filters"] else matches,
+            key=lambda item: (-int(item.get("word_count") or 0), int(item.get("submission_start") or 0)),
+        )
+        for m in sample_candidates[:2]:
             m["submission_snippet"] = fetch_snippet(doc_id, int(m["submission_start"]), int(m["word_count"]))
-            m["source_snippet"] = fetch_snippet(int(m["source_document_id"]), int(m["source_start"]), int(m["word_count"]))
-
-        # 6. Fetch submission text for language analysis & semantic lens
-        cursor.execute("""
-            SELECT text FROM document_chunks
-            WHERE document_id = %s
-            ORDER BY chunk_index ASC, id ASC
-        """, (doc_id,))
-        sub_chunks = cursor.fetchall()
-        submission_text = "\n\n".join(c["text"] for c in sub_chunks if c.get("text"))
+            if m.get("source_document_id"):
+                m["source_snippet"] = fetch_snippet(int(m["source_document_id"]), int(m.get("source_start") or 0), int(m["word_count"]))
+        filter_summary["active_matches"] = sample_candidates
 
     finally:
         conn.close()
 
-    html_content = build_report_html(report, document, sources, matches, submission_text=submission_text)
+    html_content = build_report_html(
+        report,
+        document,
+        sources,
+        sample_candidates if not filter_summary["has_active_filters"] else matches,
+        submission_text=submission_text,
+        filter_summary=filter_summary,
+    )
 
     # Compile PDF using WeasyPrint
     with tempfile.NamedTemporaryFile("w", suffix=".html", delete=False, encoding="utf-8") as f_html:
@@ -1610,10 +1721,21 @@ if __name__ == "__main__":
     parser.add_argument("--report", type=int, required=True, help="ID Laporan yang akan diekspor")
     parser.add_argument("--output", type=str, default=None, help="Lokasi berkas luaran PDF")
     parser.add_argument("--stdout", action="store_true", help="Keluarkan byte PDF langsung ke stdout")
+    parser.add_argument("--exclude-quotes", action="store_true", help="Kecualikan pasase kutipan langsung")
+    parser.add_argument("--exclude-boilerplate", action="store_true", help="Kecualikan frasa ilmiah baku (boilerplate)")
+    parser.add_argument("--exclude-front-matter", action="store_true", help="Kecualikan formalitas depan (front matter)")
+    parser.add_argument("--exclude-bibliography", action="store_true", help="Kecualikan daftar pustaka (bibliografi)")
     args = parser.parse_args()
 
     try:
-        pdf_data = export_report_pdf(args.report, args.output)
+        pdf_data = export_report_pdf(
+            args.report,
+            args.output,
+            exclude_quotes=bool(args.exclude_quotes),
+            exclude_boilerplate=bool(args.exclude_boilerplate),
+            exclude_front_matter=bool(args.exclude_front_matter),
+            exclude_bibliography=bool(args.exclude_bibliography),
+        )
         if args.stdout:
             sys.stdout.buffer.write(pdf_data)
         elif args.output:

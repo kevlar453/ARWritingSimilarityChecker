@@ -753,20 +753,75 @@ class DashboardController extends BaseController
         }
         unset($m);
 
-        // Petakan metadata v1.2 dari evidenceData['matches']
+        // Auto-heal section_segmentation & server-side exclusion_flags jika laporan historis / skema lama
+        $v11Pres = $evidenceData['v1_1_presentation'] ?? [];
+        $v12Evol = $v11Pres['v1_2_evolution'] ?? [];
+        $secSeg = $v12Evol['section_segmentation'] ?? null;
+        $totalWords = (int) ($evidenceData['total_words'] ?? 0);
+        $secTotalWords = (int) ($secSeg['total_words'] ?? 0);
+        $bodyPct = (float) ($secSeg['zone_percentage_distribution']['BODY_TEXT'] ?? 0.0);
+        $zoneSum = 0;
+        if (!empty($secSeg['zone_word_distribution']) && is_array($secSeg['zone_word_distribution'])) {
+            $zoneSum = array_sum($secSeg['zone_word_distribution']);
+        }
+
+        $pythonBin = ROOTPATH . '.venv/bin/python';
+        if (! file_exists($pythonBin)) {
+            $pythonBin = 'python3';
+        }
+
+        $needsHeal = empty($secSeg) || ($totalWords > 100 && $bodyPct == 0.0) || ($totalWords > 0 && ($secTotalWords !== $totalWords || $zoneSum !== $totalWords));
+        if ($needsHeal) {
+            $cmd = 'cd ' . escapeshellarg(ROOTPATH) . ' && ' . escapeshellcmd($pythonBin) . ' -m worker.section_parser --heal-report ' . (int) $reportId;
+            @exec($cmd);
+
+            $freshReport = $reportModel->find($reportId);
+            if (!empty($freshReport['evidence_data'])) {
+                $evidenceData = is_string($freshReport['evidence_data']) ? json_decode($freshReport['evidence_data'], true) : $freshReport['evidence_data'];
+                $v11Pres = $evidenceData['v1_1_presentation'] ?? [];
+                $v12Evol = $v11Pres['v1_2_evolution'] ?? [];
+                $secSeg = $v12Evol['section_segmentation'] ?? null;
+            }
+        }
+
+        $exclSchemaVer = (int) ($evidenceData['exclusion_schema_version'] ?? 0);
+        if ($exclSchemaVer < 2 && !empty($matches)) {
+            $cmdExcl = 'cd ' . escapeshellarg(ROOTPATH) . ' && ' . escapeshellcmd($pythonBin) . ' -m worker.exclusion_filters --heal-report ' . (int) $reportId;
+            @exec($cmdExcl);
+
+            $freshReportExcl = $reportModel->find($reportId);
+            if (!empty($freshReportExcl['evidence_data'])) {
+                $evidenceData = is_string($freshReportExcl['evidence_data']) ? json_decode($freshReportExcl['evidence_data'], true) : $freshReportExcl['evidence_data'];
+            }
+        }
+
+        // Petakan metadata v1.2 & exclusion_flags server-side dari evidenceData['matches']
         if (!empty($evidenceData['matches']) && is_array($evidenceData['matches'])) {
-            $evMatchMap = [];
+            $evExactMap = [];
+            $evStartMap = [];
             foreach ($evidenceData['matches'] as $em) {
-                $k = ($em['source_document_id'] ?? 0) . '_' . ($em['submission_start'] ?? 0);
-                $evMatchMap[$k] = $em;
+                $kExact = ((int) ($em['source_document_id'] ?? 0)) . '_' . ((int) ($em['submission_start'] ?? 0)) . '_' . ((int) ($em['submission_end'] ?? 0));
+                $kStart = ((int) ($em['source_document_id'] ?? 0)) . '_' . ((int) ($em['submission_start'] ?? 0));
+                $evExactMap[$kExact] = $em;
+                $evStartMap[$kStart] = $em;
             }
             foreach ($matches as &$m) {
-                $k = ((int) $m['source_document_id']) . '_' . ((int) $m['submission_start']);
-                if (isset($evMatchMap[$k])) {
-                    $m['is_boilerplate'] = !empty($evMatchMap[$k]['is_boilerplate']);
-                    $m['boilerplate_category'] = $evMatchMap[$k]['boilerplate_category'] ?? 'NONE';
-                    $m['boilerplate_phrase'] = $evMatchMap[$k]['boilerplate_phrase'] ?? null;
-                    $m['boilerplate_rationale'] = $evMatchMap[$k]['boilerplate_rationale'] ?? null;
+                $kExact = ((int) $m['source_document_id']) . '_' . ((int) $m['submission_start']) . '_' . ((int) $m['submission_end']);
+                $kStart = ((int) $m['source_document_id']) . '_' . ((int) $m['submission_start']);
+                $em = $evExactMap[$kExact] ?? $evStartMap[$kStart] ?? null;
+                if ($em !== null) {
+                    $m['is_boilerplate'] = !empty($em['is_boilerplate']);
+                    $m['boilerplate_category'] = $em['boilerplate_category'] ?? 'NONE';
+                    $m['boilerplate_phrase'] = $em['boilerplate_phrase'] ?? null;
+                    $m['boilerplate_rationale'] = $em['boilerplate_rationale'] ?? null;
+                    $m['zone'] = $em['zone'] ?? 'UNKNOWN';
+                    $m['section_name'] = $em['section_name'] ?? 'UNKNOWN';
+                    if (isset($em['exclusion_flags']) && is_array($em['exclusion_flags'])) {
+                        $m['exclusion_flags'] = $em['exclusion_flags'];
+                    }
+                    if (isset($em['citation_status'])) {
+                        $m['citation_status'] = $em['citation_status'];
+                    }
                 }
             }
             unset($m);
@@ -797,34 +852,6 @@ class DashboardController extends BaseController
                         ->orderBy('id', 'ASC')
                         ->get()->getResultArray();
         $submissionText = implode("\n\n", array_column($subChunks, 'text'));
-
-        // Auto-heal section_segmentation jika kosong, anomali zonasi (BODY_TEXT == 0 pada teks > 100 kata), atau word count tidak konsisten
-        $v11Pres = $evidenceData['v1_1_presentation'] ?? [];
-        $v12Evol = $v11Pres['v1_2_evolution'] ?? [];
-        $secSeg = $v12Evol['section_segmentation'] ?? null;
-        $totalWords = (int) ($evidenceData['total_words'] ?? 0);
-        $secTotalWords = (int) ($secSeg['total_words'] ?? 0);
-        $bodyPct = (float) ($secSeg['zone_percentage_distribution']['BODY_TEXT'] ?? 0.0);
-        $zoneSum = 0;
-        if (!empty($secSeg['zone_word_distribution']) && is_array($secSeg['zone_word_distribution'])) {
-            $zoneSum = array_sum($secSeg['zone_word_distribution']);
-        }
-
-        $needsHeal = empty($secSeg) || ($totalWords > 100 && $bodyPct == 0.0) || ($totalWords > 0 && ($secTotalWords !== $totalWords || $zoneSum !== $totalWords));
-        if ($needsHeal) {
-            $pythonBin = ROOTPATH . '.venv/bin/python';
-            if (! file_exists($pythonBin)) {
-                $pythonBin = 'python3';
-            }
-            $cmd = 'cd ' . escapeshellarg(ROOTPATH) . ' && ' . escapeshellcmd($pythonBin) . ' -m worker.section_parser --heal-report ' . (int) $reportId;
-            @exec($cmd);
-
-            // Muat ulang data report & evidence_data terbaru setelah pemulihan otomatis
-            $freshReport = $reportModel->find($reportId);
-            if (!empty($freshReport['evidence_data'])) {
-                $evidenceData = is_string($freshReport['evidence_data']) ? json_decode($freshReport['evidence_data'], true) : $freshReport['evidence_data'];
-            }
-        }
 
         $sourceTexts = [];
         foreach ($sources as $s) {
@@ -1937,7 +1964,22 @@ class DashboardController extends BaseController
             $pythonBin = 'python3';
         }
 
-        $cmd = escapeshellcmd($pythonBin) . ' -m worker.exporter --report ' . (int) $reportId . ' --stdout';
+        $isTruthy = static fn ($val): bool => in_array(strtolower(trim((string) $val)), ['1', 'true', 'yes', 'on'], true);
+        $filterFlags = [];
+        if ($isTruthy($this->request->getGet('exclude_quotes'))) {
+            $filterFlags[] = '--exclude-quotes';
+        }
+        if ($isTruthy($this->request->getGet('exclude_boilerplate'))) {
+            $filterFlags[] = '--exclude-boilerplate';
+        }
+        if ($isTruthy($this->request->getGet('exclude_front_matter'))) {
+            $filterFlags[] = '--exclude-front-matter';
+        }
+        if ($isTruthy($this->request->getGet('exclude_bibliography'))) {
+            $filterFlags[] = '--exclude-bibliography';
+        }
+
+        $cmd = escapeshellcmd($pythonBin) . ' -m worker.exporter --report ' . (int) $reportId . ' --stdout' . (! empty($filterFlags) ? ' ' . implode(' ', $filterFlags) : '');
         $procResult = $this->executeProcessWithTimeout($cmd, $projectRoot, 55);
 
         if (! $procResult['ok'] || empty($procResult['stdout'])) {
@@ -1952,7 +1994,7 @@ class DashboardController extends BaseController
             ->setHeader('Content-Type', 'application/pdf')
             ->setHeader('Content-Disposition', 'inline; filename="' . $filename . '"')
             ->setHeader('Content-Length', (string) strlen($pdfContent))
-            ->setHeader('Cache-Control', 'private, max-age=0, must-revalidate')
+            ->setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
             ->setBody($pdfContent);
     }
 

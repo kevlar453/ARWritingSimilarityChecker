@@ -418,6 +418,26 @@ def process_similarity_check(document_id: int, report_id: int, engine: str = "hy
                     zone_val not in ("FRONT_MATTER", "BACK_MATTER")
                 )
 
+            # Anotasi Single Source of Truth untuk 4 filter pengecualian (Kutipan, Frasa Baku, Formalitas Depan, Bibliografi)
+            from worker.exclusion_filters import (
+                EXCLUSION_SCHEMA_VERSION,
+                annotate_matches_with_exclusions,
+                get_match_exclusion_flags,
+            )
+            annotate_matches_with_exclusions(
+                submission_text,
+                result.get("matches", []),
+                sections=segmentation_res.sections if segmentation_res else None,
+                token_spans=token_spans,
+            )
+            result["exclusion_schema_version"] = EXCLUSION_SCHEMA_VERSION
+            result["exclusion_summary"] = {
+                "quote_matches": sum(1 for m in result.get("matches", []) if get_match_exclusion_flags(m)["quote"]),
+                "boilerplate_matches": sum(1 for m in result.get("matches", []) if get_match_exclusion_flags(m)["boilerplate"]),
+                "front_matter_matches": sum(1 for m in result.get("matches", []) if get_match_exclusion_flags(m)["front_matter"]),
+                "bibliography_matches": sum(1 for m in result.get("matches", []) if get_match_exclusion_flags(m)["bibliography"]),
+            }
+
             # Hitung metrik kemiripan substantif (di luar boilerplate dan zona administratif/pustaka)
             from worker.similarity import merge_ranges
             sub_matches = [m for m in result.get("matches", []) if m.get("is_substantive")]

@@ -144,7 +144,7 @@ $detectedLang = $detectedLang ?? \App\Libraries\LanguageDetector::detect(
                         <?php endif; ?>
 
                         <!-- Unduh PDF (Mobile & Desktop) -->
-                        <a href="<?= base_url('report/' . $report['id'] . '/export') ?>" target="_blank" onclick="handleDownloadPdfClick(event)" class="inline-flex items-center gap-1 sm:gap-1.5 text-xs font-semibold text-slate-700 hover:text-indigo-600 bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 px-2 sm:px-3 py-1.5 rounded-lg shadow-2xs transition whitespace-nowrap shrink-0" title="Unduh Laporan Format PDF">
+                        <a href="<?= base_url('report/' . $report['id'] . '/export') ?>" data-base-url="<?= base_url('report/' . $report['id'] . '/export') ?>" target="_blank" onclick="handleDownloadPdfClick(event)" class="pdf-export-link inline-flex items-center gap-1 sm:gap-1.5 text-xs font-semibold text-slate-700 hover:text-indigo-600 bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 px-2 sm:px-3 py-1.5 rounded-lg shadow-2xs transition whitespace-nowrap shrink-0" title="Unduh Laporan Format PDF">
                             <svg class="w-3.5 h-3.5 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                             </svg>
@@ -285,7 +285,7 @@ $detectedLang = $detectedLang ?? \App\Libraries\LanguageDetector::detect(
                                 Piagam Akreditasi
                             </a>
                         <?php endif; ?>
-                        <a href="<?= base_url('report/' . $report['id'] . '/export') ?>" target="_blank" onclick="handleDownloadPdfClick(event)" class="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-3 py-1.5 rounded-lg transition shadow-xs">
+                        <a href="<?= base_url('report/' . $report['id'] . '/export') ?>" data-base-url="<?= base_url('report/' . $report['id'] . '/export') ?>" target="_blank" onclick="handleDownloadPdfClick(event)" class="pdf-export-link inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-3 py-1.5 rounded-lg transition shadow-xs">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                             </svg>
@@ -3125,19 +3125,40 @@ $detectedLang = $detectedLang ?? \App\Libraries\LanguageDetector::detect(
                     <?php foreach ($matches as $idx => $m): ?>
                         <?php
                             $subSnip = $m['submission_snippet'] ?? '';
-                            $isQuoteMatch = (str_contains($subSnip, '"') || str_contains($subSnip, '“') || str_contains($subSnip, '”') || ($m['citation_status'] ?? '') === 'QUOTE');
-                            $isBpMatch = !empty($m['is_boilerplate']);
-                            $isBibMatch = (stripos($subSnip, 'daftar pustaka') !== false || stripos($subSnip, 'references') !== false || stripos($subSnip, 'bibliografi') !== false);
-                            $isFrontMatch = (
-                                (preg_match('/(?i)\b(?:lembar\s+(?:pengesahan|persetujuan)|pernyataan\s+(?:keaslian|bebas\s+plagiasi)|kata\s+pengantar|daftar\s+(?:isi|tabel|gambar))\b/', $subSnip) === 1) ||
-                                (!empty($m['boilerplate_category']) && in_array($m['boilerplate_category'], ['ADMINISTRATIVE_FORMULA', 'LEGAL_CITATION'], true))
-                            );
+                            $exclFlags = is_array($m['exclusion_flags'] ?? null) ? $m['exclusion_flags'] : [];
+                            $bpCatUpper = strtoupper((string) ($m['boilerplate_category'] ?? 'NONE'));
+                            $zoneUpper = strtoupper((string) ($m['zone'] ?? 'UNKNOWN'));
+
+                            $isQuoteMatch = array_key_exists('quote', $exclFlags)
+                                ? !empty($exclFlags['quote'])
+                                : (str_contains($subSnip, '"') || str_contains($subSnip, '“') || str_contains($subSnip, '”') || ($m['citation_status'] ?? '') === 'QUOTE');
+                            $isBpMatch = array_key_exists('boilerplate', $exclFlags)
+                                ? !empty($exclFlags['boilerplate'])
+                                : (!empty($m['is_boilerplate']) && !in_array($bpCatUpper, ['BIBLIOGRAPHIC_ENTRY', 'TABLE_OF_CONTENTS'], true));
+                            $isBibMatch = array_key_exists('bibliography', $exclFlags)
+                                ? !empty($exclFlags['bibliography'])
+                                : ($zoneUpper === 'BACK_MATTER' || $bpCatUpper === 'BIBLIOGRAPHIC_ENTRY' || stripos($subSnip, 'daftar pustaka') !== false || stripos($subSnip, 'references') !== false || stripos($subSnip, 'bibliografi') !== false);
+                            $isFrontMatch = array_key_exists('front_matter', $exclFlags)
+                                ? !empty($exclFlags['front_matter'])
+                                : ($zoneUpper === 'FRONT_MATTER' || preg_match('/(?i)\b(?:lembar\s+(?:pengesahan|persetujuan)|pernyataan\s+(?:keaslian|bebas\s+plagiasi)|kata\s+pengantar|daftar\s+(?:isi|tabel|gambar))\b/', $subSnip) === 1 || in_array($bpCatUpper, ['ADMINISTRATIVE_FORMULA', 'LEGAL_CITATION', 'TABLE_OF_CONTENTS'], true));
                         ?>
                         <div id="passage-card-<?= $idx ?>" data-match-idx="<?= $idx ?>" data-sub-start="<?= (int)$m['submission_start'] ?>" data-sub-end="<?= (int)$m['submission_end'] ?>" data-word-count="<?= (int)$m['word_count'] ?>" data-is-boilerplate="<?= $isBpMatch ? '1' : '0' ?>" data-is-quote="<?= $isQuoteMatch ? '1' : '0' ?>" data-is-biblio="<?= $isBibMatch ? '1' : '0' ?>" data-is-front="<?= $isFrontMatch ? '1' : '0' ?>" class="passage-card border border-slate-200 rounded-xl p-4 bg-slate-50/50 hover:bg-white hover:border-indigo-300 transition-all space-y-3">
                             <div class="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-200/60">
-                                <div class="flex items-center gap-2">
+                                <div class="flex flex-wrap items-center gap-2">
                                     <span class="text-xs font-bold px-2 py-0.5 rounded bg-slate-200 text-slate-700 font-mono-code">#<?= $idx + 1 ?></span>
                                     <span class="text-xs font-bold text-slate-800 truncate max-w-sm">Sumber: <?= esc($m['source_title']) ?></span>
+                                    <?php if ($isQuoteMatch): ?>
+                                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200">💬 Kutipan</span>
+                                    <?php endif; ?>
+                                    <?php if ($isBibMatch): ?>
+                                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-purple-50 text-purple-800 border border-purple-200">📚 Bibliografi</span>
+                                    <?php endif; ?>
+                                    <?php if ($isFrontMatch): ?>
+                                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-sky-50 text-sky-800 border border-sky-200">📋 Formalitas Depan</span>
+                                    <?php endif; ?>
+                                    <?php if ($isBpMatch): ?>
+                                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-indigo-50 text-indigo-800 border border-indigo-200">📐 Frasa Baku</span>
+                                    <?php endif; ?>
                                     <span id="passage-excluded-badge-<?= $idx ?>" class="hidden text-[10px] font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-300 font-mono-code">
                                         Dikecualikan Filter
                                     </span>
@@ -4758,6 +4779,24 @@ $detectedLang = $detectedLang ?? \App\Libraries\LanguageDetector::detect(
                 activeBadge.classList.add('hidden');
                 statusNotice.innerText = 'Semua pasase aktif (0 kata dikecualikan).';
             }
+
+            syncPdfExportLinks(excludeQuotes, excludeBoilerplate, excludeFrontMatter, excludeBiblio);
+        }
+
+        function syncPdfExportLinks(excludeQuotes, excludeBoilerplate, excludeFrontMatter, excludeBiblio) {
+            const pageParams = new URLSearchParams(window.location.search);
+            const accessToken = pageParams.get('token') || pageParams.get('code') || '';
+            document.querySelectorAll('.pdf-export-link').forEach(link => {
+                const baseHref = link.getAttribute('data-base-url') || link.getAttribute('href').split('?')[0];
+                const params = new URLSearchParams();
+                if (accessToken) params.set('token', accessToken);
+                if (excludeQuotes) params.set('exclude_quotes', '1');
+                if (excludeBoilerplate) params.set('exclude_boilerplate', '1');
+                if (excludeFrontMatter) params.set('exclude_front_matter', '1');
+                if (excludeBiblio) params.set('exclude_bibliography', '1');
+                const qs = params.toString();
+                link.setAttribute('href', qs ? `${baseHref}?${qs}` : baseHref);
+            });
         }
 
         function resetLiveFilters() {
@@ -4767,6 +4806,16 @@ $detectedLang = $detectedLang ?? \App\Libraries\LanguageDetector::detect(
             document.getElementById('toggleExcludeBibliography').checked = false;
             recalculateLiveScore();
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const initParams = new URLSearchParams(window.location.search);
+            const isParamTrue = (k) => ['1', 'true', 'yes', 'on'].includes((initParams.get(k) || '').toLowerCase());
+            if (isParamTrue('exclude_quotes')) document.getElementById('toggleExcludeQuotes').checked = true;
+            if (isParamTrue('exclude_boilerplate')) document.getElementById('toggleExcludeBoilerplate').checked = true;
+            if (isParamTrue('exclude_front_matter')) document.getElementById('toggleExcludeFrontMatter').checked = true;
+            if (isParamTrue('exclude_bibliography')) document.getElementById('toggleExcludeBibliography').checked = true;
+            recalculateLiveScore();
+        });
 
         // Page Transition Handling
         function startPageTransition() {
