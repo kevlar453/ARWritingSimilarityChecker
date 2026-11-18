@@ -1,8 +1,50 @@
+<?php
+$adsenseClient = trim((string) env('ADSENSE_CLIENT', 'ca-pub-9248253613564140'));
+$adsenseAutoAds = filter_var((string) env('ADSENSE_AUTO_ADS', 'false'), FILTER_VALIDATE_BOOLEAN);
+$adsenseSlots = [
+    1 => preg_replace('/\D+/', '', (string) env('ADSENSE_SLOT_1', '4774338502')),
+    2 => preg_replace('/\D+/', '', (string) env('ADSENSE_SLOT_2', '1341525808')),
+    3 => preg_replace('/\D+/', '', (string) env('ADSENSE_SLOT_3', '7905712963')),
+];
+$hasManualAdSlots = !empty($adsenseSlots[1]) || !empty($adsenseSlots[2]) || !empty($adsenseSlots[3]);
+$loadAdSenseScript = $adsenseClient !== '' && ($hasManualAdSlots || $adsenseAutoAds);
+$renderAdSlot = static function (int $slotNum, string $ariaLabel) use ($adsenseClient, $adsenseSlots): string {
+    $slotId = $adsenseSlots[$slotNum] ?? '';
+    if ($slotId === '' || $adsenseClient === '') {
+        return '';
+    }
+    $escClient = esc($adsenseClient, 'attr');
+    $escSlot = esc($slotId, 'attr');
+    $escAria = esc($ariaLabel, 'attr');
+    return <<<HTML
+    <aside class="artilik-ad-section google-anno-skip" aria-label="{$escAria}" data-ad-slot-wrapper="{$slotNum}">
+        <div class="container">
+            <div class="artilik-ad-card">
+                <div class="artilik-ad-header">
+                    <span class="artilik-ad-badge">Pariwara / Iklan Sponsor</span>
+                </div>
+                <div class="artilik-ad-slot-body">
+                    <ins class="adsbygoogle"
+                         style="display:block;width:100%;"
+                         data-ad-client="{$escClient}"
+                         data-ad-slot="{$escSlot}"
+                         data-ad-format="auto"
+                         data-full-width-responsive="true"></ins>
+                </div>
+            </div>
+        </div>
+    </aside>
+HTML;
+};
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <?php if ($adsenseClient !== '') : ?>
+    <meta name="google-adsense-account" content="<?= esc($adsenseClient, 'attr') ?>">
+    <?php endif; ?>
     <title>AR Tilik — Cek Plagiarisme &amp; Penelaah Kesepadanan Naskah Akademik Mandiri</title>
     
     <!-- Primary SEO Meta Tags -->
@@ -210,44 +252,100 @@
         <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
     </noscript>
 
-    <!-- Google AdSense (Lazy load upon user interaction or idle callback to prevent blocking LCP / TBT) -->
+    <?php if ($loadAdSenseScript) : ?>
+    <!-- Google AdSense: Muat unit manual terstruktur atau Auto Ads bila diaktifkan eksplisit di .env -->
     <script>
         (function() {
             var adsLoaded = false;
+            var autoAdsEnabled = <?= $adsenseAutoAds ? 'true' : 'false' ?>;
+            var adClient = <?= json_encode($adsenseClient) ?>;
+
+            function collapseSlot(wrapper) {
+                if (!wrapper) return;
+                wrapper.hidden = true;
+                wrapper.style.display = 'none';
+            }
+
+            function markSlotFilled(wrapper) {
+                if (!wrapper) return;
+                wrapper.classList.add('is-filled');
+                wrapper.hidden = false;
+                wrapper.style.display = '';
+            }
+
+            function syncSlotStatus(el) {
+                var wrapper = el.closest('[data-ad-slot-wrapper]');
+                var status = el.getAttribute('data-ad-status');
+                if (status === 'unfilled') {
+                    collapseSlot(wrapper);
+                } else if (status === 'filled') {
+                    markSlotFilled(wrapper);
+                }
+            }
+
             function initAdSense() {
                 if (adsLoaded) return;
                 adsLoaded = true;
                 ['scroll', 'mousemove', 'touchstart', 'click', 'keydown'].forEach(function(evt) {
                     window.removeEventListener(evt, initAdSense, { passive: true });
                 });
+
+                var slotEls = document.querySelectorAll('.artilik-ad-slot-body .adsbygoogle');
+                slotEls.forEach(function(el) {
+                    syncSlotStatus(el);
+                    if ('MutationObserver' in window) {
+                        var obs = new MutationObserver(function() { syncSlotStatus(el); });
+                        obs.observe(el, { attributes: true, attributeFilter: ['data-ad-status'] });
+                    }
+                });
+
                 var adScript = document.createElement('script');
-                adScript.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9248253613564140';
+                adScript.src = autoAdsEnabled
+                    ? ('https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + encodeURIComponent(adClient))
+                    : 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js';
                 adScript.async = true;
                 adScript.crossOrigin = 'anonymous';
                 adScript.onload = function() {
                     try {
-                        var adElements = document.querySelectorAll('.artilik-ad-slot-body .adsbygoogle');
-                        adElements.forEach(function(el) {
+                        slotEls.forEach(function(el) {
                             if (!el.getAttribute('data-adsbygoogle-status')) {
                                 (window.adsbygoogle = window.adsbygoogle || []).push({});
                             }
                         });
+                        setTimeout(function() {
+                            slotEls.forEach(function(el) {
+                                var st = el.getAttribute('data-ad-status');
+                                var initSt = el.getAttribute('data-adsbygoogle-status');
+                                if (st === 'unfilled' || !initSt) {
+                                    collapseSlot(el.closest('[data-ad-slot-wrapper]'));
+                                }
+                            });
+                        }, 10000);
                     } catch (e) {
-                        console.debug('AdSense slot init error:', e);
+                        slotEls.forEach(function(el) {
+                            collapseSlot(el.closest('[data-ad-slot-wrapper]'));
+                        });
                     }
+                };
+                adScript.onerror = function() {
+                    slotEls.forEach(function(el) {
+                        collapseSlot(el.closest('[data-ad-slot-wrapper]'));
+                    });
                 };
                 document.head.appendChild(adScript);
             }
+
             ['scroll', 'mousemove', 'touchstart', 'click', 'keydown'].forEach(function(evt) {
                 window.addEventListener(evt, initAdSense, { once: true, passive: true });
             });
             if ('requestIdleCallback' in window) {
-                requestIdleCallback(function() { setTimeout(initAdSense, 4500); });
+                requestIdleCallback(function() { setTimeout(initAdSense, 4000); });
             } else {
-                setTimeout(initAdSense, 4500);
+                setTimeout(initAdSense, 4000);
             }
         })();
     </script>
+    <?php endif; ?>
 
     <style>
         :root {
@@ -293,12 +391,29 @@
         }
 
         /* ==========================================================================
-           Google AdSense Clean Integration & Layout Stability (CLS Protection)
+           Google AdSense Clean Integration & Layout Stability
            ========================================================================== */
-        /* Cegah Google Auto-Ads menyusup ke navigasi, hero, modal, tabel tarif & visual penting */
+        /* Cegah Google Auto-Ads menyusup ke header, grid, kartu, modal, visual & footer */
+        body > .google-auto-placed,
         .google-anno-skip .google-auto-placed,
+        header .google-auto-placed,
+        footer .google-auto-placed,
         .navbar .google-auto-placed,
         .hero .google-auto-placed,
+        .section-header .google-auto-placed,
+        .grid-2 .google-auto-placed,
+        .grid-3 .google-auto-placed,
+        .grid-4 .google-auto-placed,
+        .ojs-grid .google-auto-placed,
+        .incentive-grid .google-auto-placed,
+        .spotlight-card .google-auto-placed,
+        .step-card .google-auto-placed,
+        .theory-card .google-auto-placed,
+        .persona-card .google-auto-placed,
+        .faq-card .google-auto-placed,
+        .dual-reader-showcase .google-auto-placed,
+        .ojs-banner-card .google-auto-placed,
+        .ojs-workflow-shell .google-auto-placed,
         #langganan .google-auto-placed,
         .pricing-card .google-auto-placed,
         .modal-overlay .google-auto-placed,
@@ -316,33 +431,54 @@
             pointer-events: none !important;
         }
 
-        /* Wadah Iklan Terstruktur & Terukur (Mencegah Cumulative Layout Shift / CLS) */
+        /* Wadah Iklan Terstruktur: nol kotak kosong sebelum terisi & otomatis kolaps jika unfilled */
         .artilik-ad-section {
-            padding: 24px 0;
+            padding: 0;
             width: 100%;
             position: relative;
             clear: both;
         }
+        .artilik-ad-section.is-filled,
+        .artilik-ad-section:has(ins.adsbygoogle[data-ad-status="filled"]) {
+            padding: 20px 0;
+        }
+        .artilik-ad-section:has(ins.adsbygoogle[data-ad-status="unfilled"]),
+        ins.adsbygoogle[data-ad-status="unfilled"] {
+            display: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
         .artilik-ad-card {
             max-width: 970px;
             margin: 0 auto;
-            background: #f8fafc;
-            border: 1px dashed #cbd5e1;
+            background: transparent;
+            border: 0;
             border-radius: 14px;
-            padding: 10px 16px 14px;
+            padding: 0;
             text-align: center;
             transition: border-color 0.2s ease, box-shadow 0.2s ease;
             overflow: hidden;
         }
-        .artilik-ad-card:hover {
+        .artilik-ad-section.is-filled .artilik-ad-card,
+        .artilik-ad-card:has(ins.adsbygoogle[data-ad-status="filled"]) {
+            background: #f8fafc;
+            border: 1px dashed #cbd5e1;
+            padding: 10px 16px 14px;
+        }
+        .artilik-ad-section.is-filled .artilik-ad-card:hover,
+        .artilik-ad-card:has(ins.adsbygoogle[data-ad-status="filled"]):hover {
             border-color: #94a3b8;
             box-shadow: 0 4px 14px -3px rgba(15, 23, 42, 0.05);
         }
         .artilik-ad-header {
-            display: flex;
+            display: none;
             align-items: center;
             justify-content: center;
             margin-bottom: 8px;
+        }
+        .artilik-ad-section.is-filled .artilik-ad-header,
+        .artilik-ad-card:has(ins.adsbygoogle[data-ad-status="filled"]) .artilik-ad-header {
+            display: flex;
         }
         .artilik-ad-badge {
             font-size: 10px;
@@ -356,23 +492,20 @@
             display: inline-block;
         }
         .artilik-ad-slot-body {
-            min-height: 100px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
+            display: block;
             width: 100%;
+            min-height: 0;
+            text-align: center;
+            overflow: hidden;
         }
         @media (max-width: 768px) {
             .artilik-ad-section {
-                padding: 16px 0;
+                padding: 12px 0;
             }
-            .artilik-ad-card {
+            .artilik-ad-section.is-filled .artilik-ad-card,
+            .artilik-ad-card:has(ins.adsbygoogle[data-ad-status="filled"]) {
                 border-radius: 10px;
                 padding: 8px 10px 10px;
-            }
-            .artilik-ad-slot-body {
-                min-height: 250px;
             }
         }
 
@@ -3268,6 +3401,13 @@
                         </svg>
                     </button>
                     <div class="nav-dropdown-menu">
+                        <a href="<?= base_url('cek-sitasi') ?>" class="dropdown-item" onclick="closeAllNavDropdowns()" data-google-vignette="false">
+                            <div class="dropdown-icon" style="background: #f0f9ff; color: #0284c7;">🔎</div>
+                            <div class="dropdown-content">
+                                <span class="dropdown-title">Cek Sitasi Gratis (Tanpa Login)</span>
+                                <span class="dropdown-sub">Verifikasi daftar pustaka via Crossref &amp; OpenAlex</span>
+                            </div>
+                        </a>
                         <a href="#fitur-unggulan" class="dropdown-item" onclick="closeAllNavDropdowns()" data-google-vignette="false">
                             <div class="dropdown-icon" style="background: #eef2ff; color: #4338ca;">⚡</div>
                             <div class="dropdown-content">
@@ -3489,6 +3629,11 @@
                     <span>Tanya Jawab (FAQ)</span>
                     <span class="nav-arrow">›</span>
                 </a>
+                <a href="<?= base_url('cek-sitasi') ?>" class="mobile-nav-link highlight" onclick="closeMobileNav()" data-google-vignette="false">
+                    <span class="nav-icon">🔎</span>
+                    <span>Cek Sitasi Gratis (Tanpa Login)</span>
+                    <span class="nav-arrow">›</span>
+                </a>
                 <a href="<?= base_url('verify') ?>" class="mobile-nav-link highlight" onclick="closeMobileNav()" data-google-vignette="false">
                     <span class="nav-icon">🛡️</span>
                     <span>Portal Verifikasi Sertifikat QR</span>
@@ -3584,6 +3729,9 @@
                                 <span>✨</span> Mulai Gratis (3 Submisi/Minggu)
                             </button>
                         <?php endif; ?>
+                        <a href="<?= base_url('cek-sitasi') ?>" class="btn btn-outline" style="border-color: #0284c7; color: #0369a1; background: #f0f9ff;" data-google-vignette="false">
+                            <span>🔎</span> Cek Sitasi Gratis
+                        </a>
                         <a href="#integrasi-ojs" class="btn btn-outline" style="border-color: #f43f5e; color: #be123c; background: #fff1f2;" data-google-vignette="false">
                             <span>📕</span> Panduan OJS 3.x (PDF)
                         </a>
@@ -3849,23 +3997,7 @@
         </div>
     </section>
 
-    <!-- Slot Iklan Terstruktur 1 (Antara Riset & Inovasi Mesin - Anti Layout Shift) -->
-    <aside class="artilik-ad-section google-anno-skip" aria-label="Iklan Sponsor AR Tilik">
-        <div class="container">
-            <div class="artilik-ad-card">
-                <div class="artilik-ad-header">
-                    <span class="artilik-ad-badge">Pariwara / Iklan Sponsor</span>
-                </div>
-                <div class="artilik-ad-slot-body">
-                    <ins class="adsbygoogle"
-                         style="display:block"
-                         data-ad-client="ca-pub-9248253613564140"
-                         data-ad-format="auto"
-                         data-full-width-responsive="true"></ins>
-                </div>
-            </div>
-        </div>
-    </aside>
+    <?= $renderAdSlot(1, 'Iklan Sponsor AR Tilik') ?>
 
     <!-- Section 2: Inovasi Mesin Pendeteksi Generasi Baru -->
     <section id="fitur-unggulan" class="section" style="background: #f8fafc; border-top: 1px solid var(--border);">
@@ -4047,23 +4179,7 @@
         </div>
     </section>
 
-    <!-- Slot Iklan Terstruktur 2 (Antara Alur Telaah & Ekosistem OJS - Anti Layout Shift) -->
-    <aside class="artilik-ad-section google-anno-skip" aria-label="Iklan Sponsor AR Tilik">
-        <div class="container">
-            <div class="artilik-ad-card">
-                <div class="artilik-ad-header">
-                    <span class="artilik-ad-badge">Pariwara / Iklan Sponsor</span>
-                </div>
-                <div class="artilik-ad-slot-body">
-                    <ins class="adsbygoogle"
-                         style="display:block"
-                         data-ad-client="ca-pub-9248253613564140"
-                         data-ad-format="auto"
-                         data-full-width-responsive="true"></ins>
-                </div>
-            </div>
-        </div>
-    </aside>
+    <?= $renderAdSlot(2, 'Iklan Sponsor AR Tilik') ?>
 
     <!-- Section 4: Ekosistem Integrasi OJS 3.x & REST API -->
     <section id="integrasi-ojs" class="section" style="background: #ffffff; border-bottom: 1px solid var(--border);">
@@ -5096,23 +5212,7 @@
         </div>
     </section>
 
-    <!-- Slot Iklan Terstruktur 3 (Pra-Penutup / Pasca FAQ - Anti Layout Shift) -->
-    <aside class="artilik-ad-section google-anno-skip" aria-label="Iklan Sponsor AR Tilik">
-        <div class="container">
-            <div class="artilik-ad-card">
-                <div class="artilik-ad-header">
-                    <span class="artilik-ad-badge">Pariwara / Iklan Sponsor</span>
-                </div>
-                <div class="artilik-ad-slot-body">
-                    <ins class="adsbygoogle"
-                         style="display:block"
-                         data-ad-client="ca-pub-9248253613564140"
-                         data-ad-format="auto"
-                         data-full-width-responsive="true"></ins>
-                </div>
-            </div>
-        </div>
-    </aside>
+    <?= $renderAdSlot(3, 'Iklan Sponsor AR Tilik') ?>
 
     <!-- Section Khusus: Peluang Bergabung Duta Kampus AR Tilik -->
     <section id="duta-kampus-cta" class="section" style="background: linear-gradient(135deg, #090d16 0%, #1e1b4b 60%, #0f172a 100%); padding: 70px 0; border-top: 1px solid rgba(255,255,255,0.08); border-bottom: 1px solid rgba(255,255,255,0.08); color: #ffffff; position: relative; overflow: hidden;">
@@ -5180,6 +5280,7 @@
                         <li><a href="#integrasi-ojs">Integrasi OJS 3.x Jurnal</a></li>
                         <li><a href="#solusi">Solusi Sivitas Akademika</a></li>
                         <li><a href="<?= base_url('ambassador') ?>">Program Duta Kampus (Afiliasi)</a></li>
+                        <li><a href="<?= base_url('cek-sitasi') ?>" style="color: #7dd3fc; font-weight: 600;">🔎 Cek Sitasi Gratis (Tanpa Login)</a></li>
                         <li><a href="<?= base_url('verify') ?>">Portal Verifikasi QR</a></li>
                         <li><a href="#kuota-korpus">Gotong Royong Korpus</a></li>
                         <li><a href="#langganan">Paket Tarif &amp; Top-Up</a></li>

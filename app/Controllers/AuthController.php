@@ -122,6 +122,7 @@ class AuthController extends BaseController
 
         // Buat kode referral unik personal untuk pengguna baru
         $userModel->ensureReferralCode((int) $userId);
+        \App\Libraries\CitationFunnelTracker::recordRegistration($data['utm_source'] ?? $this->request->getGet('utm_source'));
 
         $user = $userModel->find($userId);
 

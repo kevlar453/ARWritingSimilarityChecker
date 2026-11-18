@@ -55,6 +55,7 @@ class LandingController extends BaseController
         $ip = $this->request->getIPAddress();
         $userAgent = $this->request->getUserAgent()->getAgentString();
         $visitorStats = $visitorModel->recordVisit($ip, $userAgent);
+        \App\Libraries\CitationFunnelTracker::recordArrival($this->request->getGet('utm_source'));
 
         $spamShield = new \App\Libraries\SpamShield();
         $authSecurityToken = $spamShield->generateTimeToken();

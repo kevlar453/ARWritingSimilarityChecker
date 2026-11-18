@@ -42,6 +42,7 @@ $routes->match(['GET', 'HEAD'], 'verify/(:segment)/pdf', 'DashboardController::d
 $routes->match(['GET', 'HEAD'], 'dashboard/reports/(:num)/certificate-pdf', 'DashboardController::downloadCertificatePdfByReportId/$1');
 $routes->match(['GET', 'HEAD'], 'verify/(:segment)', 'DashboardController::verify/$1');
 $routes->match(['GET', 'HEAD'], 'verify', 'DashboardController::verify');
+$routes->match(['GET', 'HEAD'], 'cek-sitasi', 'CitationCheckController::index');
 $routes->match(['GET', 'HEAD'], 'integrations/ojs/pdf', 'DashboardController::downloadOjsPdf');
 $routes->match(['GET', 'HEAD'], 'docs/ojs/pdf', 'DashboardController::downloadOjsPdf');
 $routes->match(['GET', 'HEAD'], 'integrations/ojs/connector', 'DashboardController::downloadOjsConnector');
@@ -157,6 +158,7 @@ $routes->group('api', function ($routes) {
         $routes->get('status/(:num)', 'Api\PublicApiController::getStatus/$1');
         $routes->get('report/(:num)', 'Api\PublicApiController::getReport/$1');
         $routes->get('quota', 'Api\PublicApiController::getQuota');
+        $routes->post('citation-check', 'Api\CitationCheckController::check');
     });
 
     // Reports

@@ -28,6 +28,12 @@ class SitemapController extends BaseController
                 'priority'   => '0.8',
             ],
             [
+                'loc'        => $baseUrl . '/cek-sitasi',
+                'lastmod'    => $today,
+                'changefreq' => 'weekly',
+                'priority'   => '0.9',
+            ],
+            [
                 'loc'        => $baseUrl . '/ambassador',
                 'lastmod'    => $today,
                 'changefreq' => 'weekly',
