@@ -149,7 +149,7 @@
               "name": "Bagaimana cara mengintegrasikan AR Tilik ke jurnal Open Journal Systems (OJS 3.x)?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Integrasi OJS sangat praktis tanpa perlu mengubah core OJS. Pengelola jurnal cukup mengunduh berkas konektor mandiri ARTilikOJSConnector.php dan mengikuti panduan di Buku Panduan OJS (PDF). Konektor ini memanfaatkan REST API v1 AR Tilik untuk melakukan pemeriksaan submisi naskah secara otomatis saat penulis mengunggah artikel di OJS."
+                "text": "Integrasi OJS sangat praktis tanpa perlu mengubah core OJS. Pengelola jurnal mengunduh paket plugin resmi AR Tilik untuk OJS 3.x — atau pustaka konektor mandiri ARTilikOJSConnector.php untuk integrasi manual — dan mengikuti panduan di Buku Panduan OJS (PDF). Pemeriksaan berjalan otomatis saat penulis mengunggah artikel di OJS, dan hasilnya terkirim kembali ke meja editor lewat webhook terverifikasi HMAC-SHA256: skor, putusan, dan tautan laporan, tanpa polling. Setiap API key dibatasi 60 permintaan/menit."
               }
             },
             {
@@ -3267,6 +3267,11 @@
                     <span>Buku Panduan OJS (PDF)</span>
                     <span class="nav-badge">2.0 MB</span>
                 </a>
+                <a href="<?= base_url('integrations/ojs/plugin') ?>" download="artilik-ojs-plugin.zip" class="mobile-nav-link" onclick="closeMobileNav()" data-google-vignette="false">
+                    <span class="nav-icon">🧩</span>
+                    <span>Plugin Resmi OJS 3.x (.zip)</span>
+                    <span class="nav-badge" style="background: rgba(244, 63, 94, 0.2); color: #fb7185;">ZIP</span>
+                </a>
                 <a href="<?= base_url('integrations/ojs/connector') ?>" download="ARTilikOJSConnector.php" class="mobile-nav-link" onclick="closeMobileNav()" data-google-vignette="false">
                     <span class="nav-icon">💻</span>
                     <span>Konektor PHP OJS 3.x</span>
@@ -3337,7 +3342,7 @@
                         <div class="hero-pill-badge"><span>🌐</span> Lintas Bahasa 5 Pasangan Tervalidasi (EN, ZH, DE, NL, AR ⇄ ID)</div>
                         <div class="hero-pill-badge"><span>🛡️</span> Anti-Cheat Font/Homoglyph</div>
                         <div class="hero-pill-badge"><span>📑</span> Auditor Sitasi APA/IEEE</div>
-                        <div class="hero-pill-badge"><span>🦅</span> Pemanen Neliti & GARUDA Dikti</div>
+                        <div class="hero-pill-badge"><span>🦅</span> Pemanen Literatur &amp; Repositori (OAI-PMH 2.0)</div>
                     </div>
                 </div>
 
@@ -3668,13 +3673,13 @@
                     </p>
                 </div>
 
-                <!-- Fitur 6: National Harvester -->
+                <!-- Fitur 6: OAI-PMH & Academic Repository Harvester -->
                 <div class="theory-card" data-aos="fade-up" data-aos-delay="350" data-aos-duration="700">
                     <div class="card-icon-badge badge-cyan">🦅</div>
-                    <div style="font-size: 11px; font-weight: 800; color: #0284c7; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Korpus Nasional</div>
-                    <h3 class="theory-title">Pemanenan Neliti &amp; GARUDA Dikti (OAI-PMH)</h3>
+                    <div style="font-size: 11px; font-weight: 800; color: #0284c7; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Korpus Nasional &amp; Provenance</div>
+                    <h3 class="theory-title">Pemanen Literatur &amp; Repositori Skripsi Kampus (OAI-PMH 2.0)</h3>
                     <p class="theory-desc">
-                        Terhubung ke protokol OAI-PMH 2.0 untuk pemanenan berkala artikel jurnal nasional terakreditasi SINTA 1–6 dari pangkalan data GARUDA Kemdiktisaintek dan portal riset Neliti. Memastikan basis data pembanding terus bertumbuh tanpa bergantung pada unggahan manual.
+                        Memanen literatur terbuka lewat protokol OAI-PMH 2.0 &mdash; artikel jurnal dari GARUDA Kemdiktisaintek dan skripsi/tesis dari repositori kampus &mdash; serta menemukan hingga 5 karya sebidang lewat OpenAlex pada setiap pemeriksaan. Setiap rujukan repositori menampilkan nama institusi dan tautan ke sumber aslinya, sehingga asal setiap kecocokan dapat dilacak.
                     </p>
                 </div>
             </div>
@@ -3714,9 +3719,9 @@
                 <div class="step-card" data-aos="fade-up" data-aos-delay="300" data-aos-duration="700">
                     <div class="step-index">03</div>
                     <div class="card-icon-badge badge-emerald">⚡</div>
-                    <h3 class="step-title">Pemrosesan Asinkron Kilat</h3>
+                    <h3 class="step-title">Pemrosesan Asinkron</h3>
                     <p class="step-desc">
-                        Worker background membandingkan naskah terhadap ratusan korpus institusi dan jurnal terbuka. Dalam rentang waktu kurang dari 1 detik, laporan lengkap terbit.
+                        Worker background membandingkan naskah terhadap korpus institusi dan jurnal terbuka secara asinkron &mdash; Anda tidak perlu menunggu di depan layar. Laporan lengkap biasanya terbit dalam beberapa menit.
                     </p>
                 </div>
 
@@ -3768,9 +3773,9 @@
 
                     <div class="feature-card-dark" data-aos="fade-up" data-aos-delay="200" data-aos-duration="600">
                         <div class="feature-dark-icon">🔍</div>
-                        <h4 class="feature-dark-title">Filter Sitasi & Pustaka Dinamis</h4>
+                        <h4 class="feature-dark-title">Filter Sitasi &amp; Pustaka Dinamis</h4>
                         <p class="feature-dark-desc">
-                            Sakelar interaktif untuk mengecualikan kalimat dalam tanda petik, sitasi sah, maupun daftar referensi langsung menghitung ulang persentase di layar.
+                            Sakelar interaktif untuk mengecualikan kutipan bertanda petik, bibliografi, frasa baku, dan formalitas depan &mdash; persentase di layar langsung dihitung ulang, dan angka yang sama persis tercetak di PDF resmi. Setiap PDF menampilkan skor mentah beserta Catatan Transparansi Pengecualian, sehingga angka di tangan dosen sidang atau editor identik dengan yang tampil di layar.
                         </p>
                     </div>
 
@@ -3830,7 +3835,10 @@
                         </p>
 
                         <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                            <a href="<?= base_url('integrations/ojs/Panduan_Integrasi_OJS_ARTilik.pdf') ?>" target="_blank" download="Panduan_Integrasi_OJS_ARTilik.pdf" class="btn" style="background: linear-gradient(135deg, #e11d48 0%, #be123c 100%); color: #ffffff; box-shadow: 0 4px 14px rgba(225, 29, 72, 0.4); border: 1px solid rgba(255,255,255,0.2);">
+                            <a href="<?= base_url('integrations/ojs/artilik-ojs-plugin.zip') ?>" download="artilik-ojs-plugin.zip" class="btn" style="background: linear-gradient(135deg, #e11d48 0%, #be123c 100%); color: #ffffff; box-shadow: 0 4px 14px rgba(225, 29, 72, 0.4); border: 1px solid rgba(255,255,255,0.2);" data-google-vignette="false">
+                                <span>⬇️</span> Unduh Plugin OJS 3 (.zip)
+                            </a>
+                            <a href="<?= base_url('integrations/ojs/Panduan_Integrasi_OJS_ARTilik.pdf') ?>" target="_blank" download="Panduan_Integrasi_OJS_ARTilik.pdf" class="btn" style="background: rgba(244, 63, 94, 0.16); color: #fecdd3; border: 1px solid rgba(244, 63, 94, 0.45);">
                                 <span>📥</span> Unduh Panduan PDF (2.0 MB)
                             </a>
                             <a href="<?= base_url('docs/Brosur_Eksekutif_ARTilik.pdf') ?>" target="_blank" download="Brosur_Eksekutif_ARTilik.pdf" class="btn" style="background: rgba(99, 102, 241, 0.2); color: #c7d2fe; border: 1px solid rgba(129, 140, 248, 0.45);">
@@ -3893,14 +3901,14 @@
                 </div>
             </div>
 
-            <!-- 3 Alur Kerja Integrasi Jurnal -->
-            <div class="grid-3" style="margin-top: 40px;">
+            <!-- 4 Alur Kerja Integrasi Jurnal -->
+            <div class="grid-2" style="margin-top: 40px;">
                 <div class="step-card" data-aos="fade-up" data-aos-delay="100" data-aos-duration="700">
                     <div class="step-index">A</div>
                     <div class="card-icon-badge badge-rose">🔌</div>
-                    <h3 class="step-title">1 Berkas Tanpa Konfigurasi Rumit</h3>
+                    <h3 class="step-title">Plugin Resmi OJS 3.x &amp; Konektor Mandiri</h3>
                     <p class="step-desc">
-                        Cukup letakkan berkas pustaka <code>ARTilikOJSConnector.php</code> pada folder instalasi OJS Anda. Tidak memerlukan instalasi ekstensi kernel peladen atau dependensi eksternal yang rumit.
+                        Unduh paket plugin resmi AR Tilik untuk OJS 3.x &mdash; <a href="<?= base_url('integrations/ojs/artilik-ojs-plugin.zip') ?>" download="artilik-ojs-plugin.zip" style="color: #e11d48; font-weight: 700; text-decoration: underline;" data-google-vignette="false">⬇️ Unduh Plugin OJS 3 (.zip)</a> &mdash; dan ikuti Buku Panduan OJS (PDF) untuk pemasangannya. Tanpa mengubah core OJS, tanpa dependensi eksternal yang rumit. Integrasi manual tetap tersedia lewat pustaka <code>ARTilikOJSConnector.php</code> dan REST API v1.
                     </p>
                 </div>
 
@@ -3913,8 +3921,17 @@
                     </p>
                 </div>
 
-                <div class="step-card" data-aos="fade-up" data-aos-delay="300" data-aos-duration="700">
+                <div class="step-card" data-aos="fade-up" data-aos-delay="250" data-aos-duration="700">
                     <div class="step-index">C</div>
+                    <div class="card-icon-badge badge-amber">🔔</div>
+                    <h3 class="step-title">Hasil Otomatis Kembali ke OJS (Webhook)</h3>
+                    <p class="step-desc">
+                        Begitu analisis selesai, skor kemiripan, putusan, kode verifikasi, dan tautan laporan terkirim otomatis ke meja editor OJS &mdash; dan tercatat sebagai catatan diskusi editorial pada naskah yang sedang ditelaah &mdash; tanpa perlu <em>polling</em>. Setiap webhook ditandatangani HMAC-SHA256 dan dilindungi anti-SSRF, dan setiap API key dibatasi 60 permintaan/menit agar kuota jurnal tidak terkuras.
+                    </p>
+                </div>
+
+                <div class="step-card" data-aos="fade-up" data-aos-delay="300" data-aos-duration="700">
+                    <div class="step-index">D</div>
                     <div class="card-icon-badge badge-emerald">📜</div>
                     <h3 class="step-title">Sertifikat Digital Ber-QR Code</h3>
                     <p class="step-desc">
@@ -3953,6 +3970,7 @@
                             <li><span class="check-icon">✓</span> <span><strong>Bebas Risiko Self-Plagiarism:</strong> Naskah pra-sidang Anda tidak disimpan ke korpus publik.</span></li>
                             <li><span class="check-icon">✓</span> <span><strong>Audit Sitasi Otomatis:</strong> Pastikan tidak ada kutipan fiktif sebelum naskah dicetak.</span></li>
                             <li><span class="check-icon">✓</span> <span><strong>Layar Ganda (Dual-Reader):</strong> Telusuri kalimat yang perlu diparafrasa berdampingan.</span></li>
+                            <li><span class="check-icon">✓</span> <span><strong>Perbandingan Revisi (v1 vs v2):</strong> Unggah revisi bab dan lihat pasase mana yang hilang/selesai, berkurang, tetap sama, meluas, atau baru muncul &mdash; lengkap dengan selisih skor. Laporan versi sebelumnya tetap tersimpan utuh, sehingga progres bimbingan terdokumentasi.</span></li>
                             <li><span class="check-icon">✓</span> <span><strong>Tarif Ringan Mahasiswa:</strong> Gratis 3x/minggu atau top-up fleksibel mulai Rp 10.000 (3 dokumen).</span></li>
                         </ul>
                     </div>
@@ -4676,7 +4694,7 @@
                     </button>
                     <div class="faq-content">
                         <p>
-                            Integrasi OJS dapat dilakukan melalui pustaka konektor PHP mandiri <code>ARTilikOJSConnector.php</code> dan REST API v1 AR Tilik tanpa mengubah core OJS. Pengelola jurnal dapat memanggil konektor ini pada alur kerja peninjauan artikel di OJS untuk mengirimkan naskah submisi dan menerima kembali skor kemiripan Tiga Lensa serta tautan sertifikat QR ke meja editor. Panduan lengkap tersedia di Buku Panduan OJS (PDF).
+                            Integrasi OJS sangat praktis tanpa perlu mengubah <em>core</em> OJS. Pengelola jurnal mengunduh paket plugin resmi AR Tilik untuk OJS 3.x &mdash; atau pustaka konektor mandiri <code>ARTilikOJSConnector.php</code> untuk integrasi manual &mdash; dan mengikuti panduan di Buku Panduan OJS (PDF). Pemeriksaan berjalan otomatis saat penulis mengunggah artikel di OJS, dan hasilnya terkirim kembali ke meja editor lewat webhook terverifikasi HMAC-SHA256: skor, putusan, dan tautan laporan, tanpa <em>polling</em>. Setiap API key dibatasi 60 permintaan/menit.
                         </p>
                     </div>
                 </div>
@@ -4796,7 +4814,7 @@
                         <li><a href="#fitur-unggulan">Deteksi Lintas Bahasa (5 Pasangan Tervalidasi)</a></li>
                         <li><a href="#fitur-unggulan">Perisai Anti-Manipulasi Karakter</a></li>
                         <li><a href="#fitur-unggulan">Auditor Sitasi &amp; Daftar Pustaka</a></li>
-                        <li><a href="#fitur-unggulan">Pemanen Neliti &amp; GARUDA Dikti</a></li>
+                        <li><a href="#fitur-unggulan">Pemanen Literatur &amp; Repositori (OAI-PMH 2.0)</a></li>
                         <li><a href="#cara-kerja">Layar Ganda (Dual-Reader)</a></li>
                     </ul>
                 </div>
