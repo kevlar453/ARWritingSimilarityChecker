@@ -910,6 +910,93 @@
                 </div>
 
                 <!-- Table Container with Horizontal Scroll -->
+                <?php
+                $renderVersionBadge = static function (array $sub): string {
+                    $revNum = max(1, (int) ($sub['revision_number'] ?? 1));
+                    $chainCount = (int) ($sub['revision_chain_count'] ?? 1);
+                    if ($revNum <= 1 && empty($sub['parent_document_id']) && $chainCount <= 1) {
+                        return '';
+                    }
+                    $cls = $revNum === 1
+                        ? 'bg-violet-50 text-violet-800 border-violet-200'
+                        : 'bg-indigo-100 text-indigo-800 border-indigo-200';
+                    $titleParts = [];
+                    if ($revNum === 1) {
+                        $titleParts[] = 'Versi awal (v1) dengan ' . max(0, $chainCount - 1) . ' revisi';
+                    } else {
+                        $titleParts[] = 'Revisi dari dokumen #' . (int) ($sub['parent_document_id'] ?? 0);
+                    }
+                    if (!empty($sub['revision_note'])) {
+                        $titleParts[] = (string) $sub['revision_note'];
+                    }
+                    $titleAttr = esc(implode(' — ', $titleParts));
+                    return '<span class="inline-flex items-center px-1.5 py-0.5 rounded border text-[10px] font-mono font-bold shrink-0 ' . $cls . '" title="' . $titleAttr . '">v' . $revNum . '</span>';
+                };
+
+                $renderRevisionSubLinks = static function (array $sub): string {
+                    $chunks = [];
+                    $pInfo = $sub['parent_info'] ?? null;
+                    if (!empty($pInfo)) {
+                        $pRev = max(1, (int) ($pInfo['revision_number'] ?? 1));
+                        $pId  = (int) ($pInfo['id'] ?? 0);
+                        $pRep = (int) ($pInfo['rep_id'] ?? 0);
+                        if ($pRep > 0) {
+                            $chunks[] = '<a href="' . base_url('dashboard/report/' . $pRep) . '" class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-violet-50 hover:bg-violet-100 text-violet-800 border border-violet-200 text-[10px] font-semibold transition" title="Buka laporan asli v' . $pRev . '">← Lihat v' . $pRev . ' (#' . $pId . ') ↗</a>';
+                        } else {
+                            $chunks[] = '<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200 text-[10px] font-medium">← Induk v' . $pRev . ' (#' . $pId . ')</span>';
+                        }
+                    }
+                    $cInfo = $sub['latest_child_info'] ?? null;
+                    if (!empty($cInfo)) {
+                        $cRev = max(2, (int) ($cInfo['revision_number'] ?? 2));
+                        $cRep = (int) ($cInfo['rep_id'] ?? 0);
+                        $cSim = isset($cInfo['overall_similarity']) ? number_format((float) $cInfo['overall_similarity'], 2) . '%' : '';
+                        if ($cRep > 0) {
+                            $label = '→ Revisi v' . $cRev . ($cSim !== '' ? ' (' . $cSim . ')' : '') . ' ↗';
+                            $chunks[] = '<a href="' . base_url('dashboard/report/' . $cRep) . '" class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-[10px] font-semibold transition" title="Buka laporan revisi terbaru">' . $label . '</a>';
+                        } else {
+                            $chunks[] = '<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200 text-[10px] font-medium">→ Ada revisi v' . $cRev . '</span>';
+                        }
+                    }
+                    $noteHtml = '';
+                    if (!empty($sub['revision_note'])) {
+                        $noteHtml = '<div class="mt-1 text-[11px] text-indigo-800/90 bg-indigo-50/60 border border-indigo-100 rounded px-2 py-0.5 leading-snug break-words"><span class="font-semibold">📝 Catatan:</span> ' . esc((string) $sub['revision_note']) . '</div>';
+                    }
+                    $linksHtml = !empty($chunks) ? ('<div class="mt-1 flex items-center gap-1.5 flex-wrap">' . implode('', $chunks) . '</div>') : '';
+                    return $linksHtml . $noteHtml;
+                };
+
+                $renderRevisionDeltaLink = static function (array $sub): string {
+                    if (!isset($sub['revision_delta'])) {
+                        return '';
+                    }
+                    $rDelta = (float) $sub['revision_delta'];
+                    $rDeltaClass = $rDelta < 0 ? 'text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border-emerald-200' : ($rDelta > 0 ? 'text-rose-700 bg-rose-50 hover:bg-rose-100 border-rose-200' : 'text-slate-600 bg-slate-100 hover:bg-slate-200 border-slate-200');
+                    $rArrow = $rDelta < 0 ? '↓' : ($rDelta > 0 ? '↑' : '=');
+                    $pRev = max(1, (int) ($sub['parent_info']['revision_number'] ?? 1));
+                    $pRep = (int) ($sub['parent_info']['rep_id'] ?? 0);
+                    $text = $rArrow . ' ' . ($rDelta >= 0 ? '+' : '') . number_format($rDelta, 2) . '% vs v' . $pRev;
+                    if ($pRep > 0) {
+                        return '<a href="' . base_url('dashboard/report/' . $pRep) . '" class="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded border text-[10px] font-mono font-bold mt-0.5 transition underline-offset-2 hover:underline ' . $rDeltaClass . '" title="Buka laporan v' . $pRev . ' (' . number_format((float) ($sub['parent_info']['overall_similarity'] ?? 0), 2) . '%)">' . $text . ' ↗</a>';
+                    }
+                    return '<div class="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded border text-[10px] font-mono font-bold mt-0.5 ' . $rDeltaClass . '" title="Perubahan skor terhadap versi sebelumnya">' . $text . '</div>';
+                };
+
+                $renderRevisionDropdownItems = static function (array $sub): string {
+                    $items = '';
+                    $pRep = (int) ($sub['parent_info']['rep_id'] ?? 0);
+                    if ($pRep > 0) {
+                        $pRev = max(1, (int) ($sub['parent_info']['revision_number'] ?? 1));
+                        $items .= '<a href="' . base_url('dashboard/report/' . $pRep) . '" onclick="closeAllActionDropdowns()" class="w-full text-left px-3 py-1.5 text-violet-700 hover:bg-violet-50 flex items-center gap-2 transition font-medium"><span class="text-sm">📄</span><span>Buka Laporan v' . $pRev . '</span></a>';
+                    }
+                    $cRep = (int) ($sub['latest_child_info']['rep_id'] ?? 0);
+                    if ($cRep > 0) {
+                        $cRev = max(2, (int) ($sub['latest_child_info']['revision_number'] ?? 2));
+                        $items .= '<a href="' . base_url('dashboard/report/' . $cRep) . '" onclick="closeAllActionDropdowns()" class="w-full text-left px-3 py-1.5 text-indigo-700 hover:bg-indigo-50 flex items-center gap-2 transition font-medium"><span class="text-sm">📄</span><span>Buka Revisi v' . $cRev . '</span></a>';
+                    }
+                    return $items;
+                };
+                ?>
                 <div id="submissionsTableContainer">
                     <!-- Mobile List View: Tampilan Kartu Responsif Khusus Smartphone (md:hidden) -->
                     <div class="space-y-3 p-3 sm:p-4 md:hidden border-b border-slate-100">
@@ -997,6 +1084,7 @@
                                                             <span class="text-sm">🔄</span>
                                                             <span>Unggah Revisi Baru</span>
                                                         </button>
+                                                        <?= $renderRevisionDropdownItems($sub) ?>
                                                         <button type="button" onclick="closeAllActionDropdowns(); openPurgeFileModal(<?= $sub['id'] ?>, <?= htmlspecialchars(json_encode($sub['title']), ENT_QUOTES, 'UTF-8') ?>)" class="w-full text-left px-3 py-1.5 text-rose-700 hover:bg-rose-50 flex items-center gap-2 transition cursor-pointer">
                                                             <span class="text-sm">🛡️</span>
                                                             <span>Musnahkan Berkas</span>
@@ -1020,9 +1108,11 @@
 
                                     <!-- Baris 2: Judul & Berkas -->
                                     <div>
-                                        <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug break-words" title="<?= esc($sub['title']) ?>">
-                                            <?= esc($sub['title']) ?>
+                                        <div class="font-bold text-slate-900 text-xs sm:text-sm leading-snug break-words flex items-start gap-1.5 flex-wrap" title="<?= esc($sub['title']) ?>">
+                                            <?= $renderVersionBadge($sub) ?>
+                                            <span><?= esc($sub['title']) ?></span>
                                         </div>
+                                        <?= $renderRevisionSubLinks($sub) ?>
                                         <div class="text-[11px] text-slate-400 truncate mt-0.5">
                                             <?= esc($sub['original_filename']) ?>
                                             <?php if ($isPurged): ?>
@@ -1050,6 +1140,7 @@
                                                     <span class="font-black text-xs <?= $rep['overall_similarity'] >= 70 ? 'text-rose-600' : ($rep['overall_similarity'] >= 10 ? 'text-amber-600' : 'text-slate-800') ?>">
                                                         <?= number_format($rep['overall_similarity'], 1) ?>%
                                                     </span>
+                                                    <div><?= $renderRevisionDeltaLink($sub) ?></div>
                                                 <?php else: ?>
                                                     <span class="text-slate-400 text-xs">-</span>
                                                 <?php endif; ?>
@@ -1137,14 +1228,10 @@
                                     <tr class="submission-row <?= $isProcessing ? 'submission-processing' : '' ?> hover:bg-slate-50/70 transition-colors">
                                         <td class="p-3.5 sm:p-4 font-medium text-slate-800 min-w-[240px] max-w-[450px]">
                                             <div class="font-semibold text-slate-900 leading-snug break-words flex items-start gap-1.5 flex-wrap" title="<?= esc($sub['title']) ?>">
-                                                <?php $revNum = (int) ($sub['revision_number'] ?? 1); ?>
-                                                <?php if ($revNum > 1 || !empty($sub['parent_document_id'])): ?>
-                                                    <span class="inline-flex items-center px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-800 border border-indigo-200 text-[10px] font-mono font-bold shrink-0 mt-0.5" title="Revisi dari dokumen #<?= (int) ($sub['parent_document_id'] ?? 0) ?><?= !empty($sub['revision_note']) ? (' — ' . esc($sub['revision_note'])) : '' ?>">
-                                                        v<?= $revNum ?>
-                                                    </span>
-                                                <?php endif; ?>
+                                                <?= $renderVersionBadge($sub) ?>
                                                 <span><?= esc($sub['title']) ?></span>
                                             </div>
+                                            <?= $renderRevisionSubLinks($sub) ?>
                                             <div class="flex items-center gap-1.5 flex-wrap mt-0.5">
                                                 <span class="text-[11px] text-slate-400 truncate max-w-[200px]" title="<?= esc($sub['original_filename']) ?>"><?= esc($sub['original_filename']) ?></span>
                                                 <?php if ($isPurged): ?>
@@ -1223,15 +1310,7 @@
                                                 <div class="font-extrabold text-sm <?= $rep['overall_similarity'] >= 70 ? 'text-rose-600' : ($rep['overall_similarity'] >= 10 ? 'text-amber-600' : 'text-slate-700') ?>">
                                                     <?= number_format($rep['overall_similarity'], 2) ?>%
                                                 </div>
-                                                <?php if (isset($sub['revision_delta'])):
-                                                    $rDelta = (float) $sub['revision_delta'];
-                                                    $rDeltaClass = $rDelta < 0 ? 'text-emerald-700 bg-emerald-50 border-emerald-200' : ($rDelta > 0 ? 'text-rose-700 bg-rose-50 border-rose-200' : 'text-slate-600 bg-slate-100 border-slate-200');
-                                                    $rArrow = $rDelta < 0 ? '↓' : ($rDelta > 0 ? '↑' : '=');
-                                                ?>
-                                                    <div class="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded border text-[10px] font-mono font-bold mt-0.5 <?= $rDeltaClass ?>" title="Perubahan skor terhadap versi sebelumnya">
-                                                        <?= $rArrow ?> <?= ($rDelta >= 0 ? '+' : '') . number_format($rDelta, 2) ?>% vs v<?= max(1, (int) ($sub['parent_info']['revision_number'] ?? 1)) ?>
-                                                    </div>
-                                                <?php endif; ?>
+                                                <?= $renderRevisionDeltaLink($sub) ?>
                                                 <div class="text-[10px] text-slate-400 whitespace-nowrap">
                                                     <?= (int) ($rep['longest_match_words'] ?? 0) ?> kata berurutan
                                                 </div>
@@ -1349,6 +1428,7 @@
                                                                 <span class="text-sm">🔄</span>
                                                                 <span>Unggah Revisi Baru</span>
                                                             </button>
+                                                            <?= $renderRevisionDropdownItems($sub) ?>
 
                                                             <?php if (! $isPurged): ?>
                                                             <button type="button" onclick="closeAllActionDropdowns(); openPurgeFileModal(<?= $sub['id'] ?>, <?= htmlspecialchars(json_encode($sub['title']), ENT_QUOTES, 'UTF-8') ?>)" class="w-full text-left px-3 py-1.5 text-rose-700 hover:bg-rose-50 flex items-center gap-2 transition cursor-pointer">

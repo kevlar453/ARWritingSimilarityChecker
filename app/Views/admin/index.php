@@ -3802,11 +3802,12 @@
                         <pre class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-[11px] font-mono-code text-sky-300 overflow-x-auto leading-relaxed">curl -X POST https://tilik.arsetontong.top/api/v1/check \
   -H "X-API-Key: artilik_ojs_YOUR_KEY" \
   -F "document=@/path/to/manuscript.pdf" \
-  -F "title=Judul Naskah Ilmiah" \
-  -F "author=Nama Penulis" \
-  -F "ojs_submission_id=1240"</pre>
+  --form-string "title=Judul Naskah Ilmiah" \
+  --form-string "author=Nama Penulis" \
+  --form-string "revision_note=Perbaikan Bab 2; kutipan dirapikan" \
+  --form-string "ojs_submission_id=1240"</pre>
                         <p class="text-[11px] text-slate-400 leading-normal">
-                            Endpoint menerima berkas PDF/DOCX/TXT/TEX maksimal 64 MB. Autentikasi menggunakan header <code>X-API-Key</code> atau <code>Authorization: Bearer &lt;key&gt;</code>.
+                            Endpoint menerima berkas PDF/DOCX/TXT/TEX maksimal 64 MB, <code>application/x-www-form-urlencoded</code>, maupun <code>application/json</code>. Autentikasi menggunakan header <code>X-API-Key</code> atau <code>Authorization: Bearer &lt;key&gt;</code>. Catatan cURL: gunakan <code>--form-string</code> (bukan <code>-F</code>) untuk nilai teks yang mengandung titik koma (<code>;</code>).
                         </p>
                     </div>
 

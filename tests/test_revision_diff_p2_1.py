@@ -170,8 +170,10 @@ def test_compute_revision_diff_statuses_and_metrics():
 
 def test_end_to_end_revision_tracking_api_authorization_and_report_ui():
     import hashlib
-    import secrets
+    import http.cookiejar
     import io
+    import secrets
+    import shutil
 
     conn = get_connection()
     http_port = _find_free_port()
@@ -183,6 +185,7 @@ def test_end_to_end_revision_tracking_api_authorization_and_report_ui():
         stderr=subprocess.DEVNULL,
     )
 
+    created_user_ids = []
     created_doc_ids = []
     created_rep_ids = []
     created_job_ids = []
@@ -193,16 +196,26 @@ def test_end_to_end_revision_tracking_api_authorization_and_report_ui():
         _wait_http_ready(f"{base_url}/")
         cur = conn.cursor(dictionary=True)
 
-        cur.execute("SELECT id FROM users WHERE status = 'active' ORDER BY id ASC LIMIT 2")
-        users = cur.fetchall()
-        assert len(users) >= 1
-        user1_id = int(users[0]["id"])
-        user2_id = int(users[1]["id"]) if len(users) >= 2 else None
+        cur.execute("SELECT id FROM users WHERE status = 'active' ORDER BY id ASC LIMIT 1")
+        existing_users = cur.fetchall()
+        user2_id = int(existing_users[0]["id"]) if existing_users else None
 
-        # Pastikan user1 punya cukup kuota dan simpan snapshot untuk pemulihan di finally
-        cur.execute("SELECT id, free_submissions_used_this_week, bonus_submissions FROM users WHERE id = %s", (user1_id,))
-        user1_snapshot = cur.fetchone()
-        cur.execute("UPDATE users SET free_submissions_used_this_week = 0, bonus_submissions = bonus_submissions + 2 WHERE id = %s", (user1_id,))
+        # Buat user1 sementara berstatus aktif agar uji login HTTP /dashboard 100% terisolasi
+        ephemeral_email = f"p21_test_{secrets.token_hex(6)}@example.test"
+        ephemeral_pass = "P21TestPass!2026"
+        ephemeral_hash = subprocess.check_output(
+            ["php", "-r", f"echo password_hash({json.dumps(ephemeral_pass)}, PASSWORD_DEFAULT);"],
+            text=True,
+        ).strip()
+        cur.execute(
+            """
+            INSERT INTO users (name, email, password_hash, institution, role, status, email_verified_at, free_submissions_used_this_week, week_reset_at, bonus_submissions, uploaded_corpus_count, created_at, updated_at)
+            VALUES ('Penguji Revisi P2-1', %s, %s, 'Institusi Uji P2-1', 'user', 'active', NOW(), 0, DATE_ADD(NOW(), INTERVAL 7 DAY), 10, 0, NOW(), NOW())
+            """,
+            (ephemeral_email, ephemeral_hash),
+        )
+        user1_id = int(cur.lastrowid)
+        created_user_ids.append(user1_id)
 
         # Buat API key untuk user1
         raw_key = "artilik_live_p21_" + secrets.token_hex(12)
@@ -316,16 +329,18 @@ def test_end_to_end_revision_tracking_api_authorization_and_report_ui():
             assert exc_info.value.code == 403
 
         # 2. Unggah Naskah v2 via POST /api/v1/check dengan parent_document_id = v1_doc_id
-        v2_payload = urllib.parse.urlencode({
+        #    sekaligus uji pengiriman application/json & catatan bertitik koma (;)
+        semi_note = "Parafrase total kalimat mikrokontroler esp32 di pendahuluan; kutipan langsung ditambahkan"
+        v2_json = json.dumps({
             "title": "Naskah Uji Revisi P2-1 (v2)",
             "text": "Alat pantau lahan berbasis jaringan sensor nirkabel membantu mengoptimalkan pengairan sawah pertanian modern secara efektif.",
-            "parent_document_id": str(v1_doc_id),
-            "revision_note": "Parafrase total kalimat mikrokontroler esp32 di pendahuluan",
+            "parent_document_id": v1_doc_id,
+            "revision_note": semi_note,
         }).encode("utf-8")
         req_v2 = urllib.request.Request(
             f"{base_url}/api/v1/check",
-            data=v2_payload,
-            headers={"X-API-Key": raw_key},
+            data=v2_json,
+            headers={"X-API-Key": raw_key, "Content-Type": "application/json"},
             method="POST",
         )
         with urllib.request.urlopen(req_v2, timeout=10) as resp:
@@ -348,7 +363,7 @@ def test_end_to_end_revision_tracking_api_authorization_and_report_ui():
         assert int(v2_doc_row["parent_document_id"]) == v1_doc_id
         assert int(v2_doc_row["revision_root_id"]) == v1_doc_id
         assert int(v2_doc_row["revision_number"]) == 2
-        assert "Parafrase total" in (v2_doc_row["revision_note"] or "")
+        assert v2_doc_row["revision_note"] == semi_note
 
         # Pastikan v1 tetap utuh & tidak tertimpa!
         cur.execute("SELECT overall_similarity, status FROM reports WHERE id = %s", (v1_rep_id,))
@@ -376,21 +391,89 @@ def test_end_to_end_revision_tracking_api_authorization_and_report_ui():
         cur.execute("UPDATE reports SET evidence_data = %s WHERE id = %s", (json.dumps(v2_ev), v2_rep_id))
         conn.commit()
 
-        # 3. Buka UI report v2 -> pastikan #revisionChainBar dan #revisionDiffPanel tampil dengan angka delta & tautan v1!
+        # 3. Buka UI report v2 -> pastikan #revisionChainBar dan #revisionDiffPanel tampil dengan angka delta, catatan titik koma utuh, & tautan v1!
         html_v2 = urllib.request.urlopen(f"{base_url}/report/{v2_rep_id}?token={v2_ver}", timeout=10).read().decode("utf-8")
         assert "revisionChainBar" in html_v2
         assert "revisionDiffPanel" in html_v2
         assert "46.67%" in html_v2
         assert "-46.67%" in html_v2
         assert "HILANG / SELESAI" in html_v2
+        assert semi_note in html_v2
         assert "v1" in html_v2 and "v2" in html_v2
 
-        # 4. Pastikan JSON Public API v1 menyertakan field revision + diff
+        # 3b. Login via HTTP POST /auth/login & ambil GET /dashboard -> pastikan badge v1 tampil,
+        #     tautan langsung ke laporan v1 & v2 tersedia, dan catatan revisi bertitik koma tampil utuh!
+        cookie_jar = http.cookiejar.CookieJar()
+        web_opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cookie_jar))
+        login_payload = urllib.parse.urlencode({
+            "email": ephemeral_email,
+            "password": ephemeral_pass,
+        }).encode("utf-8")
+        login_req = urllib.request.Request(
+            f"{base_url}/auth/login",
+            data=login_payload,
+            method="POST",
+        )
+        with web_opener.open(login_req, timeout=10) as login_resp:
+            assert login_resp.status == 200
+            login_json = json.loads(login_resp.read().decode("utf-8"))
+            assert login_json["status"] == "success"
+
+        with web_opener.open(f"{base_url}/dashboard", timeout=10) as dash_resp:
+            assert dash_resp.status == 200
+            dash_html = dash_resp.read().decode("utf-8")
+
+        assert ">v1<" in dash_html
+        assert ">v2<" in dash_html
+        assert f"dashboard/report/{v1_rep_id}" in dash_html
+        assert f"dashboard/report/{v2_rep_id}" in dash_html
+        assert "vs v1" in dash_html
+        assert semi_note in dash_html
+
+        # 4. Pastikan JSON Public API v1 menyertakan field revision + diff + revision_note lengkap
         req_api = urllib.request.Request(f"{base_url}/api/v1/report/{v2_rep_id}", headers={"X-API-Key": raw_key})
         api_rep = json.loads(urllib.request.urlopen(req_api, timeout=10).read().decode("utf-8"))
         assert api_rep["data"]["revision"]["revision_number"] == 2
         assert api_rep["data"]["revision"]["parent_document_id"] == v1_doc_id
+        assert api_rep["data"]["revision"]["revision_note"] == semi_note
         assert api_rep["data"]["revision"]["diff"]["status_counts"]["resolved"] == 1
+
+        # 5. Pastikan POST /api/v1/check via curl --form-string mempertahankan titik koma (;) secara utuh
+        if shutil.which("curl"):
+            semi_form_note = "Bab 1 diringkas; sitasi ditambahkan; daftar pustaka dirapikan"
+            curl_res = subprocess.run(
+                [
+                    "curl", "-sS", "-w", "\n%{http_code}",
+                    "-X", "POST", f"{base_url}/api/v1/check",
+                    "-H", f"X-API-Key: {raw_key}",
+                    "--form-string", "title=Naskah Uji Revisi P2-1 (v3 FormString)",
+                    "--form-string", "text=Sistem irigasi presisi menggunakan mikrokontroler untuk menghemat penggunaan air di lahan pertanian modern.",
+                    "--form-string", f"parent_document_id={v2_doc_id}",
+                    "--form-string", f"revision_note={semi_form_note}",
+                ],
+                capture_output=True,
+                text=True,
+                timeout=15,
+                check=True,
+            )
+            curl_body, curl_code = curl_res.stdout.rsplit("\n", 1)
+            assert curl_code.strip() == "202", f"Unexpected HTTP code {curl_code}: {curl_body}"
+            v3_resp = json.loads(curl_body)
+            v3_doc_id = int(v3_resp["data"]["document_id"])
+            v3_rep_id = int(v3_resp["data"]["report_id"])
+            created_doc_ids.append(v3_doc_id)
+            created_rep_ids.append(v3_rep_id)
+            conn.commit()
+            cur.execute("SELECT id FROM jobs WHERE payload LIKE %s", (f'%"document_id":{v3_doc_id}%',))
+            for jr in cur.fetchall():
+                created_job_ids.append(int(jr["id"]))
+            cur.execute("SELECT revision_note, revision_number, storage_path FROM documents WHERE id = %s", (v3_doc_id,))
+            v3_doc_row = cur.fetchone()
+            assert v3_doc_row is not None
+            assert int(v3_doc_row["revision_number"]) == 3
+            assert v3_doc_row["revision_note"] == semi_form_note
+            if v3_doc_row.get("storage_path"):
+                temp_files.append(PROJECT_ROOT / "writable" / v3_doc_row["storage_path"])
 
         cur.close()
     finally:
@@ -408,15 +491,7 @@ def test_end_to_end_revision_tracking_api_authorization_and_report_ui():
 
         c2 = conn.cursor()
         try:
-            if "user1_snapshot" in locals() and user1_snapshot:
-                c2.execute(
-                    "UPDATE users SET free_submissions_used_this_week = %s, bonus_submissions = %s WHERE id = %s",
-                    (
-                        user1_snapshot["free_submissions_used_this_week"],
-                        user1_snapshot["bonus_submissions"],
-                        user1_snapshot["id"],
-                    ),
-                )
+            conn.commit()
             for jid in created_job_ids:
                 c2.execute("DELETE FROM jobs WHERE id = %s", (jid,))
             for rid in created_rep_ids:
@@ -429,6 +504,8 @@ def test_end_to_end_revision_tracking_api_authorization_and_report_ui():
                 c2.execute("DELETE FROM documents WHERE id = %s", (did,))
             for kid in created_api_key_ids:
                 c2.execute("DELETE FROM api_keys WHERE id = %s", (kid,))
+            for uid in created_user_ids:
+                c2.execute("DELETE FROM users WHERE id = %s", (uid,))
             conn.commit()
         finally:
             c2.close()

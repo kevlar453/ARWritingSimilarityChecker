@@ -91,12 +91,34 @@ class PublicApiController extends BaseController
         }
 
         $userId = (int) $keyData['user_id'];
-        $title  = trim($this->request->getPost('title') ?: '');
-        $author = trim($this->request->getPost('author') ?: '');
-        $extRef = trim($this->request->getPost('external_id') ?: $this->request->getPost('ojs_submission_id') ?: '');
-        $callbackUrl = trim($this->request->getPost('callback_url') ?: '');
-        $rawParentId = (int) ($this->request->getPost('parent_document_id') ?: $this->request->getPost('revision_of') ?: 0);
-        $rawRevNote  = (string) ($this->request->getPost('revision_note') ?? '');
+        $jsonBody = null;
+        if (stripos($this->request->getHeaderLine('Content-Type'), 'application/json') !== false) {
+            $decoded = json_decode((string) $this->request->getBody(), true);
+            if (is_array($decoded)) {
+                $jsonBody = $decoded;
+            }
+        }
+        $readField = function (string $key) use ($jsonBody): ?string {
+            $val = $this->request->getPost($key);
+            if ($val !== null && $val !== '') {
+                return is_scalar($val) ? (string) $val : null;
+            }
+            if (is_array($jsonBody) && array_key_exists($key, $jsonBody) && $jsonBody[$key] !== null && $jsonBody[$key] !== '') {
+                return is_scalar($jsonBody[$key]) ? (string) $jsonBody[$key] : null;
+            }
+            $getVal = $this->request->getGet($key);
+            if ($getVal !== null && $getVal !== '') {
+                return is_scalar($getVal) ? (string) $getVal : null;
+            }
+            return null;
+        };
+
+        $title       = trim((string) ($readField('title') ?? ''));
+        $author      = trim((string) ($readField('author') ?? ''));
+        $extRef      = trim((string) ($readField('external_id') ?? $readField('ojs_submission_id') ?? ''));
+        $callbackUrl = trim((string) ($readField('callback_url') ?? ''));
+        $rawParentId = (int) ($readField('parent_document_id') ?? $readField('revision_of') ?? 0);
+        $rawRevNote  = (string) ($readField('revision_note') ?? '');
 
         try {
             $revisionMeta = $this->documentModel->resolveRevisionMetadata($rawParentId > 0 ? $rawParentId : null, $userId, false, $rawRevNote);
@@ -197,8 +219,8 @@ class PublicApiController extends BaseController
             $file->move($storagePath, $randomName);
             $savedFile = $storagePath . $randomName;
         } else {
-            // 2. Dukungan Pengiriman Teks Langsung
-            $rawText = $this->request->getPost('text') ?: $this->request->getPost('content');
+            // 2. Dukungan Pengiriman Teks Langsung (multipart/form-data, urlencoded, atau JSON)
+            $rawText = $readField('text') ?? $readField('content');
             if (! empty($rawText)) {
                 // Periksa & potong kuota submisi akun pengguna pemilik kunci
                 $deducted = $userModel->deductSubmissionQuota($userId);
@@ -234,8 +256,8 @@ class PublicApiController extends BaseController
         }
 
         try {
-            $faculty = trim((string) ($this->request->getPost('faculty') ?? ''));
-            $department = trim((string) ($this->request->getPost('department') ?? ''));
+            $faculty = trim((string) ($readField('faculty') ?? ''));
+            $department = trim((string) ($readField('department') ?? ''));
             if ($faculty === '' && ! empty($revisionMeta['default_faculty'])) {
                 $faculty = (string) $revisionMeta['default_faculty'];
             }

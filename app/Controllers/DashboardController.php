@@ -204,23 +204,53 @@ class DashboardController extends BaseController
         }
 
         $parentDocIds = [];
+        $chainRootIds = [];
+        $pageDocIds   = [];
         foreach ($submissions as $subItem) {
+            $dId = (int) ($subItem['id'] ?? 0);
+            if ($dId > 0) {
+                $pageDocIds[$dId] = true;
+            }
+            $rId = (int) ($subItem['revision_root_id'] ?? 0);
+            if ($rId > 0) {
+                $chainRootIds[$rId] = true;
+            } elseif ($dId > 0) {
+                $chainRootIds[$dId] = true;
+            }
             if (!empty($subItem['parent_document_id'])) {
                 $parentDocIds[(int) $subItem['parent_document_id']] = true;
             }
         }
-        $parentReportMap = [];
-        if (!empty($parentDocIds)) {
-            $pIds = array_keys($parentDocIds);
-            $parentRows = $db->table('documents pd')
-                ->select('pd.id, pd.title, pd.revision_number, pr.id AS rep_id, pr.overall_similarity')
-                ->join('(SELECT document_id, MAX(id) AS max_id FROM reports WHERE status = "completed" GROUP BY document_id) plr', 'plr.document_id = pd.id', 'inner', false)
-                ->join('reports pr', 'pr.id = plr.max_id', 'inner')
-                ->whereIn('pd.id', $pIds)
+
+        $chainRows = [];
+        $allQueryIds = array_values(array_unique(array_merge(array_keys($parentDocIds), array_keys($chainRootIds), array_keys($pageDocIds))));
+        if (!empty($allQueryIds)) {
+            $chainRows = $db->table('documents cd')
+                ->select('cd.id, cd.parent_document_id, cd.revision_root_id, cd.revision_number, cd.title, cr.id AS rep_id, cr.status AS rep_status, cr.overall_similarity')
+                ->join('(SELECT document_id, MAX(id) AS max_id FROM reports WHERE status = "completed" GROUP BY document_id) clr', 'clr.document_id = cd.id', 'left', false)
+                ->join('reports cr', 'cr.id = clr.max_id', 'left')
+                ->groupStart()
+                    ->whereIn('cd.id', $allQueryIds)
+                    ->orWhereIn('cd.revision_root_id', $allQueryIds)
+                    ->orWhereIn('cd.parent_document_id', $allQueryIds)
+                ->groupEnd()
+                ->orderBy('COALESCE(cd.revision_number, 1)', 'ASC', false)
+                ->orderBy('cd.id', 'ASC')
                 ->get()
                 ->getResultArray();
-            foreach ($parentRows as $prow) {
-                $parentReportMap[(int) $prow['id']] = $prow;
+        }
+
+        $docMetaById = [];
+        $docsByRootId = [];
+        $childrenByParentId = [];
+        foreach ($chainRows as $crow) {
+            $cid = (int) $crow['id'];
+            $docMetaById[$cid] = $crow;
+            $cRoot = (int) ($crow['revision_root_id'] ?: ($crow['parent_document_id'] ?: $cid));
+            $docsByRootId[$cRoot][$cid] = $crow;
+            if (!empty($crow['parent_document_id'])) {
+                $cpid = (int) $crow['parent_document_id'];
+                $childrenByParentId[$cpid][$cid] = $crow;
             }
         }
 
@@ -232,13 +262,35 @@ class DashboardController extends BaseController
                 $latestReport['corpus_docs_count'] = self::extractCorpusCount($latestReport, $totalCorpus);
             }
             $sub['latest_report'] = $latestReport;
+
+            $docId = (int) $sub['id'];
+            $revNum = max(1, (int) ($sub['revision_number'] ?? 1));
+            $rootId = (int) ($sub['revision_root_id'] ?: ($sub['parent_document_id'] ?: $docId));
+            $chainMembers = array_values($docsByRootId[$rootId] ?? []);
+            if (empty($chainMembers) && !empty($childrenByParentId[$docId])) {
+                $chainMembers = array_merge([$sub], array_values($childrenByParentId[$docId]));
+            }
+            $sub['revision_chain_count'] = max(1, count($chainMembers));
+
             $pid = (int) ($sub['parent_document_id'] ?? 0);
-            if ($pid > 0 && isset($parentReportMap[$pid])) {
-                $pInfo = $parentReportMap[$pid];
+            if ($pid > 0 && isset($docMetaById[$pid])) {
+                $pInfo = $docMetaById[$pid];
                 $sub['parent_info'] = $pInfo;
-                if ($latestReport && ($latestReport['status'] ?? '') === 'completed' && isset($latestReport['overall_similarity'])) {
+                if ($latestReport && ($latestReport['status'] ?? '') === 'completed'
+                    && isset($latestReport['overall_similarity'], $pInfo['overall_similarity'])
+                    && ($pInfo['rep_status'] ?? '') === 'completed') {
                     $sub['revision_delta'] = round((float) $latestReport['overall_similarity'] - (float) $pInfo['overall_similarity'], 2);
                 }
+            }
+
+            // Jika dokumen ini memiliki versi revisi lebih baru (mis. v1 -> v2), siapkan tautan langsung ke revisi terbaru
+            $newerCandidates = array_filter($chainMembers, static function ($cm) use ($docId, $revNum) {
+                $cmId = (int) ($cm['id'] ?? 0);
+                $cmRev = max(1, (int) ($cm['revision_number'] ?? 1));
+                return $cmId !== $docId && ($cmRev > $revNum || ($cmRev === $revNum && $cmId > $docId));
+            });
+            if (!empty($newerCandidates)) {
+                $sub['latest_child_info'] = end($newerCandidates);
             }
         }
         unset($sub);
