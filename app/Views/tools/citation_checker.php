@@ -77,14 +77,19 @@
         }
 
         .header-inner {
-            max-width: 960px;
+            max-width: 1140px;
             margin: 0 auto;
-            padding: 12px 20px;
+            padding: 10px 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            flex-wrap: wrap;
             gap: 12px;
+        }
+
+        @media (prefers-reduced-motion: no-preference) {
+            @view-transition {
+                navigation: auto;
+            }
         }
 
         .brand-link {
@@ -97,6 +102,7 @@
             font-size: 1.125rem;
             letter-spacing: -0.02em;
             min-block-size: 44px;
+            flex-shrink: 0;
         }
 
         .brand-link img {
@@ -106,11 +112,103 @@
             object-fit: contain;
         }
 
+        .cek-desktop-nav {
+            display: flex;
+            align-items: center;
+        }
+
+        .cek-nav-list {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .cek-nav-list a {
+            display: inline-flex;
+            align-items: center;
+            padding: 7px 10px;
+            border-radius: 8px;
+            font-size: 0.84rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-decoration: none;
+            white-space: nowrap;
+            transition: color 0.15s ease, background 0.15s ease;
+        }
+
+        .cek-nav-list a:hover {
+            color: var(--primary);
+            background: #eef2ff;
+        }
+
+        .cek-nav-list a[aria-current="page"] {
+            color: var(--primary);
+            background: #eef2ff;
+            font-weight: 700;
+            box-shadow: inset 0 -2px 0 var(--primary);
+        }
+
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .cek-menu-toggle {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+            font-size: 1.25rem;
+            line-height: 1;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .cek-mobile-panel {
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 20px 16px;
+        }
+
+        .cek-mobile-panel ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: grid;
+            gap: 6px;
+        }
+
+        .cek-mobile-panel a {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px;
+            border-radius: 10px;
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.92rem;
+        }
+
+        .cek-mobile-panel a[aria-current="page"] {
+            background: #eef2ff;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        @media (max-width: 880px) {
+            .cek-desktop-nav { display: none; }
+            .cek-menu-toggle { display: inline-flex; }
         }
 
         .nav-pill {
@@ -629,18 +727,45 @@
     <header class="site-header">
         <div class="header-inner">
             <a href="<?= base_url('/') ?>" class="brand-link">
-                <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik">
+                <img src="<?= base_url('images/logo.png') ?>" alt="AR Tilik" width="32" height="32">
                 <span>AR Tilik</span>
             </a>
-            <nav class="header-actions" aria-label="Navigasi Alat Sitasi">
-                <a href="<?= base_url('/') ?>" class="nav-pill">Beranda</a>
-                <?php if (! empty($currentUser)) : ?>
-                    <a href="<?= base_url('dashboard') ?>" class="nav-pill nav-pill-primary">Buka Dashboard</a>
-                <?php else : ?>
-                    <a href="<?= base_url('/?utm_source=cek-sitasi&utm_medium=nav&utm_campaign=citation_checker&auth=register') ?>" class="nav-pill nav-pill-primary">Cek Naskah Gratis (3x/Minggu)</a>
-                <?php endif; ?>
+
+            <nav class="cek-desktop-nav" aria-label="Navigasi Utama">
+                <ul class="cek-nav-list">
+                    <li><a href="<?= base_url('/') ?>">Beranda</a></li>
+                    <li><a href="<?= base_url('fitur') ?>">Fitur</a></li>
+                    <li><a href="<?= base_url('ojs') ?>">OJS</a></li>
+                    <li><a href="<?= base_url('harga') ?>">Harga</a></li>
+                    <li><a href="<?= base_url('cek-sitasi') ?>" aria-current="page">Cek Sitasi Gratis</a></li>
+                    <li><a href="<?= base_url('tentang') ?>">Tentang</a></li>
+                    <li><a href="<?= base_url('faq') ?>">FAQ</a></li>
+                </ul>
             </nav>
+
+            <div class="header-actions">
+                <?php if (! empty($currentUser)) : ?>
+                    <a href="<?= base_url('dashboard') ?>" class="nav-pill nav-pill-primary">Dashboard</a>
+                <?php else : ?>
+                    <a href="<?= base_url('/?utm_source=cek-sitasi&utm_medium=nav&utm_campaign=citation_checker&auth=register') ?>" class="nav-pill nav-pill-primary">Mulai Gratis</a>
+                <?php endif; ?>
+                <button type="button" id="cekMenuToggle" class="cek-menu-toggle" aria-expanded="false" aria-controls="cekMobilePanel" aria-label="Buka Menu Navigasi">
+                    &#9776;
+                </button>
+            </div>
         </div>
+
+        <nav id="cekMobilePanel" class="cek-mobile-panel" aria-label="Menu Seluler" hidden>
+            <ul>
+                <li><a href="<?= base_url('/') ?>">Beranda <span aria-hidden="true">&rsaquo;</span></a></li>
+                <li><a href="<?= base_url('fitur') ?>">Fitur <span aria-hidden="true">&rsaquo;</span></a></li>
+                <li><a href="<?= base_url('ojs') ?>">OJS <span aria-hidden="true">&rsaquo;</span></a></li>
+                <li><a href="<?= base_url('harga') ?>">Harga <span aria-hidden="true">&rsaquo;</span></a></li>
+                <li><a href="<?= base_url('cek-sitasi') ?>" aria-current="page">Cek Sitasi Gratis <span aria-hidden="true">&rsaquo;</span></a></li>
+                <li><a href="<?= base_url('tentang') ?>">Tentang <span aria-hidden="true">&rsaquo;</span></a></li>
+                <li><a href="<?= base_url('faq') ?>">FAQ <span aria-hidden="true">&rsaquo;</span></a></li>
+            </ul>
+        </nav>
     </header>
 
     <main id="main-content" class="page-main">
@@ -752,8 +877,15 @@
         <span>AR Tilik &copy; <?= date('Y') ?> &bull; Pemeriksaan sitasi tidak menyimpan teks Anda.</span>
         <span>
             <a href="<?= base_url('/') ?>">Beranda</a> &bull;
-            <a href="<?= base_url('verify') ?>">Verifikasi Sertifikat</a> &bull;
-            <a href="<?= base_url('privacy') ?>">Privasi</a>
+            <a href="<?= base_url('fitur') ?>">Fitur</a> &bull;
+            <a href="<?= base_url('ojs') ?>">OJS</a> &bull;
+            <a href="<?= base_url('harga') ?>">Harga</a> &bull;
+            <a href="<?= base_url('faq') ?>">FAQ</a> &bull;
+            <a href="<?= base_url('benchmark') ?>">Benchmark</a> &bull;
+            <a href="<?= base_url('verify') ?>">Verifikasi QR</a> &bull;
+            <a href="<?= base_url('privacy') ?>">Privasi</a> &bull;
+            <a href="https://wa.me/6285138862032" target="_blank" rel="noopener noreferrer">WA 0851 3886 2032</a> &bull;
+            <a href="mailto:tilik@arsetontong.top">tilik@arsetontong.top</a>
         </span>
     </footer>
 
@@ -1214,6 +1346,23 @@
                     }
                 }
             });
+
+            const cekMenuBtn = document.getElementById('cekMenuToggle');
+            const cekMobilePanel = document.getElementById('cekMobilePanel');
+            if (cekMenuBtn && cekMobilePanel) {
+                cekMenuBtn.addEventListener('click', () => {
+                    const opening = cekMobilePanel.hidden;
+                    cekMobilePanel.hidden = !opening;
+                    cekMenuBtn.setAttribute('aria-expanded', opening ? 'true' : 'false');
+                });
+                document.addEventListener('keydown', (ev) => {
+                    if (ev.key === 'Escape' && !cekMobilePanel.hidden) {
+                        cekMobilePanel.hidden = true;
+                        cekMenuBtn.setAttribute('aria-expanded', 'false');
+                        cekMenuBtn.focus();
+                    }
+                });
+            }
 
             updateCounter();
         })();

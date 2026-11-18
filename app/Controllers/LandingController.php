@@ -8,36 +8,10 @@ use CodeIgniter\HTTP\ResponseInterface;
 class LandingController extends BaseController
 {
     /**
-     * Menampilkan Landing Page modern, edukatif, dan elegan
+     * Menyusun data bersama untuk halaman publik utama & subhalaman beranda.
      */
-    public function index(): string
+    private function buildSharedPageData(string $activeNav, bool $includeCorpusStats = false, bool $includeTestimonials = false): array
     {
-        $db = db_connect();
-
-        // Ambil statistik riil sistem untuk transparansi ilmiah (selaras dengan dashboard produksi)
-        $totalCorpus = $db->table('documents')
-            ->where('document_type', 'corpus')
-            ->where('benchmark_run_id IS NULL', null, false)
-            ->countAllResults();
-
-        $submissionsRegistered = $db->table('documents')
-            ->where('document_type', 'submission')
-            ->where('user_id IS NOT NULL', null, false)
-            ->countAllResults();
-
-        $submissionsAnonymous = $db->table('documents')
-            ->where('document_type', 'submission')
-            ->where('user_id IS NULL', null, false)
-            ->where('benchmark_run_id IS NULL', null, false)
-            ->countAllResults();
-
-        $totalOrganicSubmissions = $submissionsRegistered + $submissionsAnonymous;
-        $totalSubmissions = $submissionsRegistered;
-
-        $totalReports = $db->table('reports')
-            ->where('status', 'completed')
-            ->countAllResults();
-
         $userModel = new UserModel();
         $currentUser = null;
         $quotaInfo = null;
@@ -50,7 +24,7 @@ class LandingController extends BaseController
             }
         }
 
-        // Catat kunjungan pengunjung unik
+        // Catat kunjungan pengunjung unik beserta atribusi UTM dari Alat Cek Sitasi
         $visitorModel = new \App\Models\VisitorModel();
         $ip = $this->request->getIPAddress();
         $userAgent = $this->request->getUserAgent()->getAgentString();
@@ -60,25 +34,99 @@ class LandingController extends BaseController
         $spamShield = new \App\Libraries\SpamShield();
         $authSecurityToken = $spamShield->generateTimeToken();
 
-        // Testimoni Publik Terverifikasi (Fase 1 Social Proof & SEO)
-        $testimonialModel = new \App\Models\TestimonialModel();
-        $approvedTestimonials = $testimonialModel->getApprovedForPublic(12);
-        $testimonialStats = $testimonialModel->getStats();
+        $data = [
+            'activeNav'         => $activeNav,
+            'currentUser'       => $currentUser,
+            'quotaInfo'         => $quotaInfo,
+            'visitorStats'      => $visitorStats,
+            'authSecurityToken' => $authSecurityToken,
+        ];
 
-        return view('landing/index', [
-            'currentUser'              => $currentUser,
-            'quotaInfo'                => $quotaInfo,
-            'totalCorpus'              => $totalCorpus,
-            'totalSubmissions'         => $totalSubmissions,
-            'submissionsRegistered'    => $submissionsRegistered,
-            'submissionsAnonymous'     => $submissionsAnonymous,
-            'totalOrganicSubmissions'  => $totalOrganicSubmissions,
-            'totalReports'             => $totalReports,
-            'visitorStats'             => $visitorStats,
-            'authSecurityToken'        => $authSecurityToken,
-            'approvedTestimonials'     => $approvedTestimonials,
-            'testimonialStats'         => $testimonialStats,
-        ]);
+        if ($includeCorpusStats) {
+            $db = db_connect();
+            $totalCorpus = $db->table('documents')
+                ->where('document_type', 'corpus')
+                ->where('benchmark_run_id IS NULL', null, false)
+                ->countAllResults();
+
+            $submissionsRegistered = $db->table('documents')
+                ->where('document_type', 'submission')
+                ->where('user_id IS NOT NULL', null, false)
+                ->countAllResults();
+
+            $submissionsAnonymous = $db->table('documents')
+                ->where('document_type', 'submission')
+                ->where('user_id IS NULL', null, false)
+                ->where('benchmark_run_id IS NULL', null, false)
+                ->countAllResults();
+
+            $totalReports = $db->table('reports')
+                ->where('status', 'completed')
+                ->countAllResults();
+
+            $data['totalCorpus']             = $totalCorpus;
+            $data['totalSubmissions']        = $submissionsRegistered;
+            $data['submissionsRegistered']   = $submissionsRegistered;
+            $data['submissionsAnonymous']    = $submissionsAnonymous;
+            $data['totalOrganicSubmissions'] = $submissionsRegistered + $submissionsAnonymous;
+            $data['totalReports']            = $totalReports;
+        }
+
+        if ($includeTestimonials) {
+            $testimonialModel = new \App\Models\TestimonialModel();
+            $data['approvedTestimonials'] = $testimonialModel->getApprovedForPublic(12);
+            $data['testimonialStats']     = $testimonialModel->getStats();
+        }
+
+        return $data;
+    }
+
+    /**
+     * Menampilkan Beranda ringkas AR Tilik (/)
+     */
+    public function index(): string
+    {
+        return view('landing/index', $this->buildSharedPageData('beranda', true, true));
+    }
+
+    /**
+     * Menampilkan halaman pembuktian teknis, Tiga Lensa, Tiga Lapis & Dual-Reader (/fitur)
+     */
+    public function features(): string
+    {
+        return view('landing/fitur', $this->buildSharedPageData('fitur'));
+    }
+
+    /**
+     * Menampilkan halaman khusus integrasi Open Journal Systems (OJS 3.x) & Webhook (/ojs)
+     */
+    public function ojs(): string
+    {
+        return view('landing/ojs', $this->buildSharedPageData('ojs'));
+    }
+
+    /**
+     * Menampilkan halaman tarif, paket berlangganan, top-up & solusi kampus (/harga)
+     */
+    public function pricing(): string
+    {
+        return view('landing/harga', $this->buildSharedPageData('harga'));
+    }
+
+    /**
+     * Menampilkan halaman filosofi, Gotong Royong Korpus, testimoni lengkap & Duta Kampus (/tentang)
+     */
+    public function about(): string
+    {
+        return view('landing/tentang', $this->buildSharedPageData('tentang', false, true));
+    }
+
+    /**
+     * Menampilkan halaman Tanya Jawab Lengkap (/faq)
+     */
+    public function faq(): string
+    {
+        return view('landing/faq', $this->buildSharedPageData('faq'));
     }
 
     /**

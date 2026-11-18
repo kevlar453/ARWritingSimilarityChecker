@@ -3501,7 +3501,7 @@ $detectedLang = $detectedLang ?? \App\Libraries\LanguageDetector::detect(
                                 </div>
                             <?php else: ?>
                                 <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-medium bg-amber-500/15 text-amber-200 border border-amber-500/30">
-                                    <span>💡</span> <span>Syarat Seleksi: Terbuka untuk akun yang pernah membeli paket pemeriksaan apapun. <a href="<?= base_url('/#langganan') ?>" class="underline font-bold text-amber-300 hover:text-white">Beli paket untuk aktivasi &rarr;</a></span>
+                                    <span>💡</span> <span>Syarat Seleksi: Terbuka untuk akun yang pernah membeli paket pemeriksaan apapun. <a href="<?= base_url('harga') ?>" class="underline font-bold text-amber-300 hover:text-white">Beli paket untuk aktivasi &rarr;</a></span>
                                 </div>
                             <?php endif; ?>
                         </div>

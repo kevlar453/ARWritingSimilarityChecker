@@ -3,6 +3,12 @@
 
 User-agent: *
 Allow: /
+Allow: /fitur
+Allow: /ojs
+Allow: /harga
+Allow: /tentang
+Allow: /faq
+Allow: /cek-sitasi
 Allow: /benchmark
 Allow: /riset/
 Allow: /verify

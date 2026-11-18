@@ -22,6 +22,36 @@ class SitemapController extends BaseController
                 'priority'   => '1.0',
             ],
             [
+                'loc'        => $baseUrl . '/fitur',
+                'lastmod'    => $today,
+                'changefreq' => 'weekly',
+                'priority'   => '0.9',
+            ],
+            [
+                'loc'        => $baseUrl . '/ojs',
+                'lastmod'    => $today,
+                'changefreq' => 'weekly',
+                'priority'   => '0.9',
+            ],
+            [
+                'loc'        => $baseUrl . '/harga',
+                'lastmod'    => $today,
+                'changefreq' => 'weekly',
+                'priority'   => '0.9',
+            ],
+            [
+                'loc'        => $baseUrl . '/tentang',
+                'lastmod'    => $today,
+                'changefreq' => 'weekly',
+                'priority'   => '0.8',
+            ],
+            [
+                'loc'        => $baseUrl . '/faq',
+                'lastmod'    => $today,
+                'changefreq' => 'weekly',
+                'priority'   => '0.8',
+            ],
+            [
                 'loc'        => $baseUrl . '/verify',
                 'lastmod'    => $today,
                 'changefreq' => 'weekly',

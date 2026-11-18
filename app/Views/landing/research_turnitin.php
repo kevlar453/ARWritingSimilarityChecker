@@ -82,7 +82,7 @@
               "@type": "ListItem",
               "position": 2,
               "name": "Riset & Komparasi",
-              "item": "<?= base_url('#riset-komparasi') ?>"
+              "item": "<?= base_url('fitur#riset-komparasi') ?>"
             },
             {
               "@type": "ListItem",
@@ -1131,9 +1131,9 @@
 
             <nav>
                 <ul class="nav-links">
-                    <li><a href="<?= base_url() ?>#teori">Tiga Lensa</a></li>
-                    <li><a href="<?= base_url() ?>#fitur-unggulan">Inovasi Mesin</a></li>
-                    <li><a href="<?= base_url() ?>#integrasi-ojs">Integrasi OJS</a></li>
+                    <li><a href="<?= base_url('fitur#teori') ?>">Tiga Lensa</a></li>
+                    <li><a href="<?= base_url('fitur#fitur-unggulan') ?>">Inovasi Mesin</a></li>
+                    <li><a href="<?= base_url('ojs') ?>">Integrasi OJS</a></li>
                     <li><a href="<?= base_url('riset/ar-tilik-vs-zerogpt') ?>">AR Tilik vs ZeroGPT</a></li>
                     <li><a href="<?= base_url('benchmark') ?>">Benchmark Indonesia</a></li>
                     <li><a href="<?= base_url('docs/Brosur_Eksekutif_ARTilik.pdf') ?>" target="_blank" download="Brosur_Eksekutif_ARTilik.pdf">Brosur Kampus</a></li>
@@ -1741,8 +1741,8 @@
                     <ul class="footer-links">
                         <li><a href="<?= base_url('riset/ar-tilik-vs-turnitin') ?>" style="color: #38bdf8; font-weight: 700;">AR Tilik vs Turnitin</a></li>
                         <li><a href="<?= base_url('riset/ar-tilik-vs-zerogpt') ?>">AR Tilik vs ZeroGPT</a></li>
-                        <li><a href="<?= base_url() ?>#teori">Mesin Tiga Lensa</a></li>
-                        <li><a href="<?= base_url() ?>#fitur-unggulan">Audit Forensik Cerdas</a></li>
+                        <li><a href="<?= base_url('fitur#teori') ?>">Mesin Tiga Lensa</a></li>
+                        <li><a href="<?= base_url('fitur#fitur-unggulan') ?>">Audit Forensik Cerdas</a></li>
                     </ul>
                 </div>
 

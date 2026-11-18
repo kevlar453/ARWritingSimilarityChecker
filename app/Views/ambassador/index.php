@@ -134,7 +134,7 @@
                     <a href="<?= base_url('/?auth=login') ?>" class="text-xs text-slate-300 hover:text-white font-semibold transition px-2 py-1">
                         Masuk
                     </a>
-                    <a href="<?= base_url('/#langganan') ?>" class="text-xs px-2.5 sm:px-3 py-1.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold hover:bg-amber-500/30 transition">
+                    <a href="<?= base_url('harga') ?>" class="text-xs px-2.5 sm:px-3 py-1.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold hover:bg-amber-500/30 transition">
                         <span class="hidden sm:inline">Paket </span>Pemeriksaan
                     </a>
                 <?php endif; ?>
@@ -328,7 +328,7 @@
                                 <span class="text-lg text-amber-400">💡</span>
                                 <div class="text-xs text-slate-300">
                                     <strong class="text-amber-300">Catatan Kualifikasi:</strong> Duta Kampus wajib pernah melakukan pembelian paket pemeriksaan apapun di AR Tilik agar memahami alur kerja dan kualitas naskah secara nyata. Anda tetap dapat mengisi formulir sekarang, namun aktivasi kode referral akan menunggu riwayat pembelian paket pertama Anda. 
-                                    <a href="<?= base_url('/#langganan') ?>" target="_blank" class="text-amber-300 font-bold underline hover:text-white ml-1">Lihat Pilihan Paket &rarr;</a>
+                                    <a href="<?= base_url('harga') ?>" target="_blank" class="text-amber-300 font-bold underline hover:text-white ml-1">Lihat Pilihan Paket &rarr;</a>
                                 </div>
                             </div>
                         <?php endif; ?>

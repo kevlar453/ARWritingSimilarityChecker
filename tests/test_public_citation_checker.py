@@ -238,23 +238,77 @@ def test_landing_adsense_clean_and_cek_sitasi_http_e2e_rate_limit_and_utm():
         _wait_http_ready(f"{base_default}/")
         _wait_http_ready(f"{base_ad}/")
 
-        # Cek beranda bawaan: 3 slot PARIWARA resmi terpasang & bebas Auto Ads acak + link /cek-sitasi ada
-        landing_html = urllib.request.urlopen(f"{base_default}/", timeout=10).read().decode("utf-8")
-        assert 'meta name="google-adsense-account" content="ca-pub-9248253613564140"' in landing_html
-        assert 'data-ad-slot="4774338502"' in landing_html
-        assert 'data-ad-slot="1341525808"' in landing_html
-        assert 'data-ad-slot="7905712963"' in landing_html
-        assert 'style="display:block;width:100%;"' in landing_html
-        assert 'data-ad-slot-wrapper="1"' in landing_html
-        assert 'data-ad-slot-wrapper="2"' in landing_html
-        assert 'data-ad-slot-wrapper="3"' in landing_html
-        assert "var autoAdsEnabled = false;" in landing_html
-        assert f"{base_default}/cek-sitasi" in landing_html or "/cek-sitasi" in landing_html
+        import re
 
-        # Cek mode off: nol <ins class="adsbygoogle"> kosong
-        landing_off_html = urllib.request.urlopen(f"{base_ad}/", timeout=10).read().decode("utf-8")
-        assert '<ins class="adsbygoogle"' not in landing_off_html
-        assert "data-ad-slot-wrapper" not in landing_off_html
+        # Cek beranda baru: etalase ringkas TANPA kotak iklan PARIWARA & tautan ke semua halaman utama
+        landing_html = urllib.request.urlopen(f"{base_default}/", timeout=10).read().decode("utf-8")
+        assert '<ins class="adsbygoogle"' not in landing_html
+        assert "data-ad-slot-wrapper" not in landing_html
+        assert 'meta name="google-adsense-account" content="ca-pub-9248253613564140"' in landing_html
+        assert "openAuthModal('login')" in landing_html
+        assert "Mulai Gratis" in landing_html
+        for route_slug in ["/fitur", "/ojs", "/harga", "/cek-sitasi", "/tentang", "/faq", "/benchmark"]:
+            assert route_slug in landing_html
+        assert "0851 3886 2032" in landing_html
+        assert "tilik@arsetontong.top" in landing_html
+
+        # Cek pemecahan halaman baru: masing-masing punya 1 H1, title & meta description unik, serta penempatan AdSense sesuai seksi
+        split_pages = {
+            "/": {"title_kw": "AR Tilik", "must_have": ["Tiga Lensa", "OJS"], "slots": []},
+            "/fitur": {"title_kw": "Fitur", "must_have": ["Three-Layer Separation", "/harga", "/benchmark", "artilik-landing.css"], "slots": ["4774338502", "1341525808"]},
+            "/ojs": {"title_kw": "OJS", "must_have": ["artilik-ojs-plugin.zip", "HMAC-SHA256", "60 permintaan/menit", "/harga#kampus"], "slots": []},
+            "/harga": {"title_kw": "Harga", "must_have": ["Pejuang Skripsi", "Rp 10.000", "Dosen &amp; Peneliti Pro", "Mulai Rp 450.000"], "slots": []},
+            "/tentang": {"title_kw": "Tentang", "must_have": ["3 Korpus Valid = +1 Submisi", "Duta Kampus", "/harga#kampus", "/ambassador"], "slots": []},
+            "/faq": {"title_kw": "FAQ", "must_have": ["FAQPage", "non-repository default", "/fitur", "/ojs", "/cek-sitasi", "/verify"], "slots": ["7905712963"]},
+        }
+        seen_titles = set()
+        seen_descriptions = set()
+        for path, spec in split_pages.items():
+            html = urllib.request.urlopen(f"{base_default}{path}", timeout=10).read().decode("utf-8")
+            # Satu H1 unik per halaman
+            assert len(re.findall(r"<h1\b", html)) == 1, f"H1 harus tepat 1 di {path}"
+            t_m = re.search(r"<title>(.*?)</title>", html, re.S)
+            d_m = re.search(r'<meta name="description" content="([^"]+)"', html)
+            assert t_m and spec["title_kw"].lower() in t_m.group(1).lower()
+            assert d_m and len(d_m.group(1)) > 40
+            seen_titles.add(t_m.group(1).strip())
+            seen_descriptions.add(d_m.group(1).strip())
+            assert 'aria-current="page"' in html
+            for needle in spec["must_have"]:
+                assert needle in html, f"Konten '{needle}' tidak ditemukan di {path}"
+            all_slots = {"4774338502", "1341525808", "7905712963"}
+            for expected_slot in spec["slots"]:
+                assert f'data-ad-slot="{expected_slot}"' in html
+            for absent_slot in all_slots - set(spec["slots"]):
+                assert f'data-ad-slot="{absent_slot}"' not in html
+            if spec["slots"]:
+                assert "var autoAdsEnabled = false;" in html
+                assert 'style="display:block;width:100%;"' in html
+
+        assert len(seen_titles) == len(split_pages)
+        assert len(seen_descriptions) == len(split_pages)
+
+        # Cek /pricing redirect menuju /harga
+        class _NoRedirect(urllib.request.HTTPRedirectHandler):
+            def redirect_request(self, req, fp, code, msg, headers, newurl):
+                return None
+
+        no_redir_opener = urllib.request.build_opener(_NoRedirect())
+        with pytest.raises(urllib.error.HTTPError) as redir_exc:
+            no_redir_opener.open(f"{base_default}/pricing", timeout=10)
+        assert redir_exc.value.code in (301, 302)
+        assert "/harga" in redir_exc.value.headers.get("Location", "")
+
+        # Cek sitemap mencantumkan semua halaman baru
+        sitemap_xml = urllib.request.urlopen(f"{base_default}/sitemap.xml", timeout=10).read().decode("utf-8")
+        for sm_path in ["/fitur", "/ojs", "/harga", "/tentang", "/faq", "/cek-sitasi"]:
+            assert sm_path in sitemap_xml
+
+        # Cek mode off pada halaman konten beriklan (/fitur & /faq): nol <ins class="adsbygoogle"> kosong
+        for ad_path in ["/fitur", "/faq"]:
+            ad_off_html = urllib.request.urlopen(f"{base_ad}{ad_path}", timeout=10).read().decode("utf-8")
+            assert '<ins class="adsbygoogle"' not in ad_off_html
+            assert "data-ad-slot-wrapper" not in ad_off_html
 
         # Cek funnel UTM arrival tracking: kunjungi /?utm_source=cek-sitasi
         urllib.request.urlopen(f"{base_default}/?utm_source=cek-sitasi&utm_medium=cta", timeout=10).read()

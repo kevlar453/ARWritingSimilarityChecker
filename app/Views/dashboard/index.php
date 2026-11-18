@@ -123,7 +123,7 @@
                     </div>
                     <?php else: ?>
                     <div class="flex items-center gap-2 pl-2 border-l border-slate-200">
-                        <a href="<?= base_url('/#auth-section') ?>" class="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 px-3 py-1.5 rounded-lg transition shadow-xs">
+                        <a href="<?= base_url('/?auth=login') ?>" class="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 px-3 py-1.5 rounded-lg transition shadow-xs">
                             🔑 Masuk / Daftar
                         </a>
                     </div>
@@ -310,10 +310,10 @@
                 </p>
             </div>
             <div class="flex items-center gap-2 flex-shrink-0">
-                <a href="<?= base_url('/#auth-section') ?>" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-xs bg-indigo-500 hover:bg-indigo-400 text-white shadow-sm transition">
+                <a href="<?= base_url('/?auth=register') ?>" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-xs bg-indigo-500 hover:bg-indigo-400 text-white shadow-sm transition">
                     ✨ Daftar Gratis Sekarang
                 </a>
-                <a href="<?= base_url('/#pricing') ?>" class="inline-flex items-center gap-1 px-3 py-2 rounded-xl font-medium text-xs bg-indigo-800/60 hover:bg-indigo-800 text-indigo-200 border border-indigo-700 transition">
+                <a href="<?= base_url('harga') ?>" class="inline-flex items-center gap-1 px-3 py-2 rounded-xl font-medium text-xs bg-indigo-800/60 hover:bg-indigo-800 text-indigo-200 border border-indigo-700 transition">
                     Paket Langganan
                 </a>
             </div>
@@ -2677,7 +2677,7 @@
                                 <button type="button" onclick="openContributeCorpusModal()" class="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition">
                                     ➕ Sumbang Korpus (+1 Submisi)
                                 </button>
-                                <a href="<?= base_url('/#pricing') ?>" class="px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-900 text-white font-medium text-xs shadow-xs transition">
+                                <a href="<?= base_url('harga') ?>" class="px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-900 text-white font-medium text-xs shadow-xs transition">
                                     💎 Rencana Paket Berlangganan
                                 </a>
                             </div>
@@ -3156,7 +3156,7 @@
         function openContributeCorpusModal() {
             <?php if (empty($currentUser)): ?>
             alert('Silakan daftar atau masuk terlebih dahulu untuk menyumbang korpus rujukan dan memperoleh bonus kuota.');
-            window.location.href = '<?= base_url('/#auth-section') ?>';
+            window.location.href = '<?= base_url('/?auth=login') ?>';
             return;
             <?php endif; ?>
             const modal = document.getElementById('contributeCorpusModal');

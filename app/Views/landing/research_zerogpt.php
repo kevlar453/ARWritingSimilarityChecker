@@ -82,7 +82,7 @@
               "@type": "ListItem",
               "position": 2,
               "name": "Riset & Komparasi",
-              "item": "<?= base_url('#riset-komparasi') ?>"
+              "item": "<?= base_url('fitur#riset-komparasi') ?>"
             },
             {
               "@type": "ListItem",
@@ -1059,9 +1059,9 @@
 
             <nav>
                 <ul class="nav-links">
-                    <li><a href="<?= base_url() ?>#teori">Tiga Lensa</a></li>
-                    <li><a href="<?= base_url() ?>#fitur-unggulan">Inovasi Mesin</a></li>
-                    <li><a href="<?= base_url() ?>#integrasi-ojs">Integrasi OJS</a></li>
+                    <li><a href="<?= base_url('fitur#teori') ?>">Tiga Lensa</a></li>
+                    <li><a href="<?= base_url('fitur#fitur-unggulan') ?>">Inovasi Mesin</a></li>
+                    <li><a href="<?= base_url('ojs') ?>">Integrasi OJS</a></li>
                     <li><a href="<?= base_url('riset/ar-tilik-vs-turnitin') ?>">AR Tilik vs Turnitin</a></li>
                     <li><a href="<?= base_url('benchmark') ?>">Benchmark Indonesia</a></li>
                     <li><a href="<?= base_url('docs/Brosur_Eksekutif_ARTilik.pdf') ?>" target="_blank" download="Brosur_Eksekutif_ARTilik.pdf">Brosur Kampus</a></li>
@@ -1559,22 +1559,22 @@
                 <div>
                     <strong style="color: #ffffff; display: block; margin-bottom: 14px;">Fitur &amp; Inovasi</strong>
                     <ul class="footer-links">
-                        <li><a href="<?= base_url() ?>#teori">Mesin Tiga Lensa (5-Gram, TF-IDF &amp; Semantik)</a></li>
-                        <li><a href="<?= base_url() ?>#fitur-unggulan">Deteksi Lintas Bahasa (5 Pasangan Tervalidasi)</a></li>
-                        <li><a href="<?= base_url() ?>#fitur-unggulan">Perisai Anti-Manipulasi Karakter</a></li>
-                        <li><a href="<?= base_url() ?>#fitur-unggulan">Auditor Sitasi &amp; Daftar Pustaka</a></li>
-                        <li><a href="<?= base_url() ?>#fitur-unggulan">Pemanen Neliti &amp; GARUDA Dikti</a></li>
+                        <li><a href="<?= base_url('fitur#teori') ?>">Mesin Tiga Lensa (5-Gram, TF-IDF &amp; Semantik)</a></li>
+                        <li><a href="<?= base_url('fitur#fitur-unggulan') ?>">Deteksi Lintas Bahasa (5 Pasangan Tervalidasi)</a></li>
+                        <li><a href="<?= base_url('fitur#fitur-unggulan') ?>">Perisai Anti-Manipulasi Karakter</a></li>
+                        <li><a href="<?= base_url('fitur#fitur-unggulan') ?>">Auditor Sitasi &amp; Daftar Pustaka</a></li>
+                        <li><a href="<?= base_url('fitur#fitur-unggulan') ?>">Pemanen Neliti &amp; GARUDA Dikti</a></li>
                     </ul>
                 </div>
 
                 <div>
                     <strong style="color: #ffffff; display: block; margin-bottom: 14px;">Layanan &amp; Solusi</strong>
                     <ul class="footer-links">
-                        <li><a href="<?= base_url() ?>#integrasi-ojs">Integrasi OJS 3.x Jurnal</a></li>
-                        <li><a href="<?= base_url() ?>#solusi">Solusi Sivitas Akademika</a></li>
+                        <li><a href="<?= base_url('ojs') ?>">Integrasi OJS 3.x Jurnal</a></li>
+                        <li><a href="<?= base_url('harga#solusi') ?>">Solusi Sivitas Akademika</a></li>
                         <li><a href="<?= base_url('ambassador') ?>">Program Duta Kampus (Afiliasi)</a></li>
                         <li><a href="<?= base_url('verify') ?>">Portal Verifikasi QR</a></li>
-                        <li><a href="<?= base_url() ?>#langganan">Paket Tarif &amp; Top-Up</a></li>
+                        <li><a href="<?= base_url('harga') ?>">Paket Tarif &amp; Top-Up</a></li>
                     </ul>
                 </div>
 

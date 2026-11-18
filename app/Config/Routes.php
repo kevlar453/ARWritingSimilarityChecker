@@ -4,6 +4,11 @@ use CodeIgniter\Router\RouteCollection;
 
 /** @var RouteCollection $routes */
 $routes->match(['GET', 'HEAD'], '/', 'LandingController::index');
+$routes->match(['GET', 'HEAD'], 'fitur', 'LandingController::features');
+$routes->match(['GET', 'HEAD'], 'ojs', 'LandingController::ojs');
+$routes->match(['GET', 'HEAD'], 'harga', 'LandingController::pricing');
+$routes->match(['GET', 'HEAD'], 'tentang', 'LandingController::about');
+$routes->match(['GET', 'HEAD'], 'faq', 'LandingController::faq');
 $routes->match(['GET', 'HEAD'], 'riset/ar-tilik-vs-zerogpt', 'LandingController::researchZerogpt');
 $routes->match(['GET', 'HEAD'], 'perbandingan/zerogpt', 'LandingController::researchZerogpt');
 $routes->match(['GET', 'HEAD'], 'riset/ar-tilik-vs-turnitin', 'LandingController::researchTurnitin');
@@ -98,7 +103,7 @@ $routes->match(['GET', 'HEAD'], 'ambassador/certificate/(:segment)/preview', 'Am
 
 // Shortcut / Alias Friendly Routes
 $routes->match(['GET', 'HEAD'], 'pricing', static function () {
-    return redirect()->to(base_url('/#langganan'));
+    return redirect()->to(base_url('harga'), 301);
 });
 $routes->match(['GET', 'HEAD'], 'login', static function () {
     $redirect = (string) service('request')->getGet('redirect');

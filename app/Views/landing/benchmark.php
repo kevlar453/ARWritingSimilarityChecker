@@ -815,7 +815,7 @@
 
             <!-- Desktop Nav Links -->
             <ul class="nav-links">
-                <li><a href="<?= base_url('/#fitur-unggulan') ?>">Metodologi</a></li>
+                <li><a href="<?= base_url('fitur') ?>">Metodologi</a></li>
                 <li><a href="<?= base_url('benchmark') ?>" class="active">Benchmark Lokal</a></li>
                 <li><a href="<?= base_url('riset/ar-tilik-vs-turnitin') ?>">vs Turnitin</a></li>
                 <li><a href="<?= base_url('riset/ar-tilik-vs-zerogpt') ?>">vs ZeroGPT</a></li>
@@ -882,7 +882,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="<?= base_url('/#fitur-unggulan') ?>" class="mobile-nav-item" onclick="closeMobileNav()">
+                    <a href="<?= base_url('fitur') ?>" class="mobile-nav-item" onclick="closeMobileNav()">
                         <span class="item-icon">📐</span>
                         <div class="item-text">
                             <strong>Metodologi &amp; Tiga Lensa</strong>
