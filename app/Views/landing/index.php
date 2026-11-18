@@ -1963,6 +1963,262 @@
             box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
         }
 
+        /* OJS Webhook Workflow Diagram */
+        .ojs-workflow-shell {
+            background: #0f172a;
+            border: 1px solid rgba(244, 63, 94, 0.28);
+            border-radius: 18px;
+            padding: 14px;
+            box-shadow: 0 18px 40px -10px rgba(15, 23, 42, 0.35);
+            margin: 0;
+        }
+
+        .ojs-workflow-chrome {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px 14px;
+            margin-bottom: 12px;
+            padding: 2px 6px;
+        }
+
+        .ojs-workflow-chrome-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-inline-size: 0;
+        }
+
+        .ojs-workflow-stage {
+            container: ojs-flow / inline-size;
+            background: radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.08), transparent 62%), #0b1224;
+            border: 1px solid rgba(148, 163, 184, 0.16);
+            border-radius: 12px;
+            padding: clamp(20px, 3cqi, 34px) clamp(14px, 3cqi, 28px);
+        }
+
+        .ojs-workflow-header {
+            text-align: center;
+            margin-bottom: 26px;
+        }
+
+        .ojs-workflow-heading {
+            font-size: clamp(1.2rem, 2.2cqi + 0.5rem, 1.6rem);
+            font-weight: 800;
+            color: #f8fafc;
+            letter-spacing: -0.02em;
+            line-height: 1.25;
+            margin: 0 0 6px;
+        }
+
+        .ojs-workflow-sub {
+            font-size: clamp(0.82rem, 1cqi + 0.45rem, 0.94rem);
+            color: #cbd5e1;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .ojs-flow-steps {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            gap: 14px;
+        }
+
+        .ojs-flow-item {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            min-inline-size: 0;
+        }
+
+        .ojs-flow-card {
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.72) 0%, rgba(15, 23, 42, 0.92) 100%);
+            border: 1px solid rgba(148, 163, 184, 0.22);
+            border-top: 3px solid var(--step-accent, #38bdf8);
+            border-radius: 14px;
+            padding: 20px 16px 18px;
+            position: relative;
+            min-inline-size: 0;
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .ojs-flow-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(148, 163, 184, 0.42);
+            box-shadow: 0 10px 24px -8px rgba(2, 6, 23, 0.65);
+        }
+
+        .ojs-flow-card--step1 { --step-accent: #38bdf8; }
+        .ojs-flow-card--step2 { --step-accent: #a78bfa; }
+        .ojs-flow-card--step3 { --step-accent: #facc15; }
+        .ojs-flow-card--step4 { --step-accent: #34d399; }
+
+        .ojs-step-num {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--step-accent, #38bdf8);
+            color: #082f49;
+            font-size: 12px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+
+        .ojs-step-icon {
+            width: 34px;
+            height: 34px;
+            margin: 6px 0 12px;
+            color: var(--step-accent, #38bdf8);
+            flex-shrink: 0;
+        }
+
+        .ojs-step-stage {
+            font-size: 10.5px;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--step-accent, #38bdf8);
+            margin-bottom: 6px;
+        }
+
+        .ojs-step-title-h {
+            font-size: 15.5px;
+            font-weight: 800;
+            color: #ffffff;
+            margin: 0 0 8px;
+            line-height: 1.3;
+        }
+
+        .ojs-step-body {
+            font-size: 12.5px;
+            color: #cbd5e1;
+            line-height: 1.55;
+            margin: 0;
+        }
+
+        .ojs-step-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 12px;
+            padding: 4px 11px;
+            border-radius: 999px;
+            background: rgba(250, 204, 21, 0.1);
+            border: 1px solid rgba(250, 204, 21, 0.45);
+            color: #fde047;
+            font-size: 11px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .ojs-step-connector {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #38bdf8;
+            padding-top: 10px;
+            pointer-events: none;
+        }
+
+        .ojs-step-connector svg {
+            width: 20px;
+            height: 20px;
+            transform: rotate(90deg);
+            display: block;
+        }
+
+        @container ojs-flow (inline-size >= 580px) {
+            .ojs-flow-steps {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 16px;
+            }
+            .ojs-step-connector {
+                display: none;
+            }
+        }
+
+        @container ojs-flow (inline-size >= 920px) {
+            .ojs-flow-steps {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+                gap: 28px;
+            }
+            .ojs-step-connector {
+                display: flex;
+                padding-top: 0;
+                position: absolute;
+                inset-inline-end: -25px;
+                inset-block-start: 50%;
+                transform: translateY(-50%);
+                width: 22px;
+                height: 22px;
+                z-index: 2;
+            }
+            .ojs-step-connector svg {
+                transform: none;
+            }
+        }
+
+        .ojs-security-bar {
+            margin-top: 22px;
+            padding: 12px 18px;
+            border-radius: 12px;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px 14px;
+            font-size: 13px;
+            color: #e2e8f0;
+            text-align: center;
+        }
+
+        .ojs-security-bar strong {
+            color: #ffffff;
+        }
+
+        .ojs-workflow-footer {
+            margin-top: 14px;
+            text-align: center;
+            font-size: 12px;
+            color: #cbd5e1;
+            overflow-wrap: anywhere;
+        }
+
+        .ojs-workflow-footer a {
+            color: #7dd3fc;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11.5px;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        .ojs-workflow-footer a:hover {
+            color: #bae6fd;
+        }
+
+        .ojs-workflow-footer a:focus-visible {
+            outline: 2px solid #38bdf8;
+            outline-offset: 2px;
+            border-radius: 4px;
+        }
+
         /* Persona Solution Cards */
         .persona-card {
             background: #ffffff;
@@ -3885,20 +4141,119 @@
                 </div>
             </div>
 
-            <!-- Visual OJS Dashboard Interface Preview -->
+            <!-- Visual OJS Webhook Workflow Diagram -->
             <div data-aos="fade-up" data-aos-duration="700" style="margin-top: 32px;">
-                <div style="background: #0f172a; border: 1px solid rgba(244, 63, 94, 0.25); border-radius: 16px; padding: 14px; box-shadow: 0 16px 36px -8px rgba(15, 23, 42, 0.25);">
-                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding: 0 6px;">
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #ef4444;"></span>
-                            <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #f59e0b;"></span>
-                            <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #10b981;"></span>
-                            <span style="font-size: 12px; color: #94a3b8; font-family: 'JetBrains Mono', monospace; margin-left: 8px;">OJS 3.x Editorial Review Stage &bull; AR Tilik Live Integration</span>
+                <figure class="ojs-workflow-shell" aria-labelledby="ojs-webhook-diagram-title">
+                    <div class="ojs-workflow-chrome">
+                        <div class="ojs-workflow-chrome-title" style="flex-wrap: wrap;">
+                            <span style="display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0;" aria-hidden="true">
+                                <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #ef4444;"></span>
+                                <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #f59e0b;"></span>
+                                <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #10b981;"></span>
+                            </span>
+                            <span style="font-size: 12px; color: #cbd5e1; font-family: 'JetBrains Mono', monospace; overflow-wrap: anywhere;">OJS 3.x Review Stage &bull; Plugin ZIP &amp; Webhook</span>
                         </div>
-                        <span style="font-size: 11px; color: #f43f5e; font-weight: 700;">● Terhubung REST API v1</span>
+                        <span style="font-size: 11px; color: #34d399; font-weight: 700;">● REST API v1 &amp; Webhook Aktif</span>
                     </div>
-                    <img src="<?= base_url('images/ojs_integration_admin.png') ?>" alt="Integrasi AR Tilik pada Alur Kerja Editor OJS 3.x" width="1024" height="479" style="width: 100%; height: auto; border-radius: 10px; display: block;" loading="lazy">
-                </div>
+
+                    <div class="ojs-workflow-stage">
+                        <div class="ojs-workflow-header">
+                            <h3 id="ojs-webhook-diagram-title" class="ojs-workflow-heading">Alur Webhook AR Tilik &times; OJS 3.x</h3>
+                            <p class="ojs-workflow-sub">Hasil pemeriksaan kembali ke meja editor secara otomatis &mdash; tanpa <em>polling</em></p>
+                        </div>
+
+                        <ol class="ojs-flow-steps" role="list">
+                            <li class="ojs-flow-item">
+                                <div class="ojs-flow-card ojs-flow-card--step1">
+                                    <span class="ojs-step-num" aria-hidden="true">1</span>
+                                    <svg class="ojs-step-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                        <polyline points="14 2 14 8 20 8"/>
+                                        <line x1="16" y1="13" x2="8" y2="13"/>
+                                        <line x1="16" y1="17" x2="8" y2="17"/>
+                                        <line x1="10" y1="9" x2="8" y2="9"/>
+                                    </svg>
+                                    <div class="ojs-step-stage">OJS 3.x</div>
+                                    <h4 class="ojs-step-title-h">Naskah diunggah</h4>
+                                    <p class="ojs-step-body">Penulis mengunggah naskah &mdash; pemeriksaan terpicu otomatis saat <em>Author Submission</em> atau <em>Peer Review</em>.</p>
+                                </div>
+                                <span class="ojs-step-connector" aria-hidden="true">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                        <line x1="4" y1="12" x2="20" y2="12"/>
+                                        <polyline points="14 6 20 12 14 18"/>
+                                    </svg>
+                                </span>
+                            </li>
+
+                            <li class="ojs-flow-item">
+                                <div class="ojs-flow-card ojs-flow-card--step2">
+                                    <span class="ojs-step-num" aria-hidden="true">2</span>
+                                    <svg class="ojs-step-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <circle cx="11" cy="11" r="7"/>
+                                        <circle cx="11" cy="11" r="2.5"/>
+                                        <line x1="20" y1="20" x2="16" y2="16"/>
+                                    </svg>
+                                    <div class="ojs-step-stage">AR Tilik</div>
+                                    <h4 class="ojs-step-title-h">Diperiksa Tiga Lensa</h4>
+                                    <p class="ojs-step-body">5-Gram, TF-IDF, dan Lensa Semantik menghasilkan skor kemiripan, putusan, dan kode verifikasi.</p>
+                                </div>
+                                <span class="ojs-step-connector" aria-hidden="true">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                        <line x1="4" y1="12" x2="20" y2="12"/>
+                                        <polyline points="14 6 20 12 14 18"/>
+                                    </svg>
+                                </span>
+                            </li>
+
+                            <li class="ojs-flow-item">
+                                <div class="ojs-flow-card ojs-flow-card--step3">
+                                    <span class="ojs-step-num" aria-hidden="true">3</span>
+                                    <svg class="ojs-step-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                                    </svg>
+                                    <div class="ojs-step-stage">Webhook</div>
+                                    <h4 class="ojs-step-title-h">Hasil dikirim otomatis</h4>
+                                    <p class="ojs-step-body">AR Tilik mendorong hasil ke OJS begitu analisis selesai &mdash; tanpa perlu <em>polling</em>.</p>
+                                    <span class="ojs-step-pill">HMAC-SHA256 &bull; Anti-SSRF</span>
+                                </div>
+                                <span class="ojs-step-connector" aria-hidden="true">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                        <line x1="4" y1="12" x2="20" y2="12"/>
+                                        <polyline points="14 6 20 12 14 18"/>
+                                    </svg>
+                                </span>
+                            </li>
+
+                            <li class="ojs-flow-item">
+                                <div class="ojs-flow-card ojs-flow-card--step4">
+                                    <span class="ojs-step-num" aria-hidden="true">4</span>
+                                    <svg class="ojs-step-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                        <polyline points="9 12 11 14 15 10"/>
+                                    </svg>
+                                    <div class="ojs-step-stage">OJS 3.x</div>
+                                    <h4 class="ojs-step-title-h">Hasil tiba di meja editor</h4>
+                                    <p class="ojs-step-body">Skor, putusan, dan tautan laporan tampil untuk editor serta tercatat sebagai catatan diskusi editorial.</p>
+                                </div>
+                            </li>
+                        </ol>
+
+                        <div class="ojs-security-bar">
+                            <span><strong>Keamanan &amp; Kendali Laju:</strong> HMAC-SHA256</span>
+                            <span aria-hidden="true">&bull;</span>
+                            <span>Anti-SSRF</span>
+                            <span aria-hidden="true">&bull;</span>
+                            <span>Rate limit <strong>60 permintaan/menit</strong> per API key</span>
+                            <span aria-hidden="true">&bull;</span>
+                            <span>Plugin ZIP OJS 3.x &amp; REST API v1</span>
+                        </div>
+
+                        <figcaption class="ojs-workflow-footer">
+                            Plugin resmi OJS 3.x:
+                            <a href="<?= base_url('integrations/ojs/artilik-ojs-plugin.zip') ?>" download="artilik-ojs-plugin.zip" data-google-vignette="false">tilik.arsetontong.top/integrations/ojs/artilik-ojs-plugin.zip</a>
+                        </figcaption>
+                    </div>
+                </figure>
             </div>
 
             <!-- 4 Alur Kerja Integrasi Jurnal -->
