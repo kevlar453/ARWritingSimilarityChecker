@@ -886,7 +886,18 @@
             window.openAuthModal('login');
         }
 
-        // Bidirectional AOS scroll tracker
+        function revealVisibleAos() {
+            const viewBottom = window.innerHeight || document.documentElement.clientHeight;
+            const atBottom = (window.scrollY + viewBottom) >= (document.documentElement.scrollHeight - 40);
+            document.querySelectorAll('[data-aos]:not(.aos-animate)').forEach((el) => {
+                const rect = el.getBoundingClientRect();
+                if (atBottom || rect.top <= viewBottom - 16) {
+                    el.classList.add('aos-animate');
+                }
+            });
+        }
+
+        // Bidirectional AOS scroll tracker + fallback visibilitas viewport
         let lastScrollTop = window.pageYOffset || document.documentElement.scrollTop;
         document.body.classList.add('scrolling-down');
 
@@ -902,26 +913,52 @@
                 }
                 lastScrollTop = currentScrollTop <= 0 ? 0 : currentScrollTop;
             }
+            revealVisibleAos();
         }, { passive: true });
 
+        function refreshAosOffsets() {
+            if (typeof AOS !== 'undefined' && typeof AOS.refreshHard === 'function') {
+                AOS.refreshHard();
+            } else if (typeof AOS !== 'undefined' && typeof AOS.refresh === 'function') {
+                AOS.refresh();
+            }
+            revealVisibleAos();
+        }
+
+        let aosInitialized = false;
         function initAOS() {
-            if (typeof AOS !== 'undefined') {
+            if (typeof AOS !== 'undefined' && !aosInitialized) {
+                aosInitialized = true;
                 AOS.init({
                     duration: 550,
                     easing: 'ease-out-cubic',
                     once: true,
                     mirror: false,
-                    offset: 40
+                    offset: 40,
+                    disable: () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
                 });
-                if (typeof AOS.refreshHard === 'function') {
-                    AOS.refreshHard();
-                }
+                refreshAosOffsets();
             }
         }
         if (typeof AOS !== 'undefined') {
             initAOS();
-        } else {
-            window.addEventListener('load', initAOS);
+        }
+        window.addEventListener('load', () => {
+            initAOS();
+            refreshAosOffsets();
+        });
+        if (document.fonts && document.fonts.ready) {
+            document.fonts.ready.then(refreshAosOffsets).catch(() => {});
+        }
+        if ('ResizeObserver' in window && document.body) {
+            let resizeRaf = 0;
+            const bodyObserver = new ResizeObserver(() => {
+                if (resizeRaf) cancelAnimationFrame(resizeRaf);
+                resizeRaf = requestAnimationFrame(() => {
+                    refreshAosOffsets();
+                });
+            });
+            bodyObserver.observe(document.body);
         }
     });
 })();

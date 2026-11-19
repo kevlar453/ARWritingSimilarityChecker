@@ -641,13 +641,6 @@ ins.adsbygoogle[data-ad-status="unfilled"] {
 /* Section Styling */
 .section {
     padding: 90px 0;
-    content-visibility: auto;
-    contain-intrinsic-size: 1px 700px;
-}
-
-.faq-section, .footer {
-    content-visibility: auto;
-    contain-intrinsic-size: 1px 600px;
 }
 
 .section-header {
@@ -1667,6 +1660,14 @@ body.scrolling-up [data-aos="fade-right"]:not(.aos-animate) {
 /* Instant reaction on reverse scroll (eliminate delay on upward reading) */
 body.scrolling-up [data-aos] {
     transition-delay: 0s !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    [data-aos] {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+    }
 }
 
 /* Modern Additions: Badges & Section Components */

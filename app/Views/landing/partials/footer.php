@@ -3,7 +3,7 @@ $currentUser = $currentUser ?? null;
 $visitorStats = $visitorStats ?? ['total_unique' => 1, 'today_unique' => 1, 'total_hits' => 1];
 ?>
     <!-- Footer -->
-    <footer class="footer google-anno-skip" data-aos="fade-in" data-aos-duration="800">
+    <footer class="footer google-anno-skip">
         <div class="container">
             <div class="footer-grid">
                 <div>
