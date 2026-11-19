@@ -22,9 +22,14 @@ class CitationCheckController extends BaseController
             (string) $this->request->getIPAddress()
         );
 
+        $visitorStats = (new \App\Models\VisitorModel())->getStats();
+        $authSecurityToken = (new \App\Libraries\SpamShield())->generateTimeToken();
+
         return view('tools/citation_checker', [
-            'currentUser' => $currentUser,
-            'quota'       => $quota,
+            'currentUser'       => $currentUser,
+            'quota'             => $quota,
+            'visitorStats'      => $visitorStats,
+            'authSecurityToken' => $authSecurityToken,
         ]);
     }
 }
