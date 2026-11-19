@@ -4,13 +4,6 @@ $flashNotice = session()->getFlashdata('auth_notice') ?: session()->getFlashdata
 $flashSuccess = session()->getFlashdata('message');
 $jsVersion = @filemtime(FCPATH . 'js/artilik-landing.js') ?: '20261119';
 ?>
-    <!-- Floating Go to Top Button -->
-    <button type="button" id="scrollTopBtn" class="btn-scroll-top" onclick="scrollToTop()" aria-label="Kembali ke atas" title="Kembali ke atas">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <polyline points="18 15 12 9 6 15"></polyline>
-        </svg>
-    </button>
-
     <!-- Auth Modal (Registration & Login) -->
     <div id="authModal" class="modal-overlay google-anno-skip" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
         <div class="modal-card">

@@ -544,17 +544,14 @@
 
     /* --- Scroll to Top & Fixed Navbar --- */
     window.scrollToTop = function () {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
     };
 
     window.addEventListener('scroll', function () {
         const scrollY = window.pageYOffset || document.documentElement.scrollTop;
-        const scrollBtn = document.getElementById('scrollTopBtn');
         const navbar = document.querySelector('.navbar');
 
-        if (scrollBtn) {
-            scrollBtn.classList.toggle('visible', scrollY > 280);
-        }
         if (navbar) {
             navbar.classList.toggle('scrolled', scrollY > 15);
         }

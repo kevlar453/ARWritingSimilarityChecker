@@ -133,13 +133,14 @@ ins.adsbygoogle[data-ad-status="unfilled"] {
     display: flex;
 }
 .artilik-ad-badge {
-    font-size: 10px;
+    font-size: 10.5px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.8px;
-    color: #94a3b8;
+    color: #334155;
     background: #e2e8f0;
-    padding: 2px 10px;
+    border: 1px solid #cbd5e1;
+    padding: 3px 11px;
     border-radius: 9999px;
     display: inline-block;
 }
@@ -195,51 +196,39 @@ ins.adsbygoogle[data-ad-status="unfilled"] {
     max-width: 1240px;
 }
 
-/* Floating Go to Top Button */
-.btn-scroll-top {
-    position: fixed;
-    bottom: 28px;
-    right: 28px;
-    width: 46px;
-    height: 46px;
-    border-radius: 14px;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-    color: #ffffff;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 8px 24px -4px rgba(67, 56, 202, 0.45), 0 2px 6px rgba(0, 0, 0, 0.08);
-    display: flex;
+/* Footer Utility: Back to Top Button (Docked, zero content overlap) */
+.btn-footer-scroll-top {
+    display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 8px 18px;
+    border-radius: 9999px;
+    background: rgba(99, 102, 241, 0.18);
+    color: #e0e7ff;
+    border: 1px solid rgba(129, 140, 248, 0.4);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 700;
     cursor: pointer;
-    z-index: 900;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(14px) scale(0.9);
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease, color 0.2s ease;
 }
 
-.btn-scroll-top.visible {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0) scale(1);
-}
-
-.btn-scroll-top:hover {
-    transform: translateY(-3px) scale(1.06);
-    box-shadow: 0 12px 28px -4px rgba(67, 56, 202, 0.6), 0 4px 10px rgba(0, 0, 0, 0.12);
+.btn-footer-scroll-top:hover {
+    background: var(--primary);
+    border-color: var(--primary-light);
     color: #ffffff;
+    transform: translateY(-1px);
 }
 
-.btn-scroll-top:active {
-    transform: translateY(0) scale(0.98);
+.btn-footer-scroll-top:focus-visible {
+    outline: 2px solid #93c5fd;
+    outline-offset: 2px;
 }
 
-.btn-scroll-top svg {
-    transition: transform 0.2s ease;
-}
-
-.btn-scroll-top:hover svg {
-    transform: translateY(-2px);
+.btn-footer-scroll-top:active {
+    transform: translateY(0);
 }
 
 .nav-inner {
@@ -1292,7 +1281,11 @@ ins.adsbygoogle[data-ad-status="unfilled"] {
 }
 
 .footer-counter-wrap {
-    text-align: center;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 12px 16px;
     margin-bottom: 24px;
 }
 
@@ -2422,15 +2415,6 @@ body.scrolling-up [data-aos] {
     .navbar { padding: 10px 0; }
     .nav-actions { gap: 8px; }
 
-    /* Go to Top Mobile */
-    .btn-scroll-top {
-        bottom: 20px;
-        right: 20px;
-        width: 42px;
-        height: 42px;
-        border-radius: 12px;
-    }
-
     /* Hero */
     .hero { padding: 44px 0 36px; }
     .hero-grid { grid-template-columns: 1fr; gap: 28px; margin-bottom: 28px; }
@@ -2598,6 +2582,11 @@ body.scrolling-up [data-aos] {
 .testi-carousel-wrapper {
     position: relative;
     width: 100%;
+    padding: 0 54px;
+}
+
+.testi-carousel-wrapper:has(.testi-carousel-track.no-carousel) {
+    padding: 0;
 }
 
 .testi-carousel-track {
@@ -2606,6 +2595,7 @@ body.scrolling-up [data-aos] {
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     scroll-behavior: smooth;
+    overscroll-behavior-x: contain;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     -ms-overflow-style: none;
@@ -2821,7 +2811,12 @@ body.scrolling-up [data-aos] {
     cursor: pointer;
     z-index: 10;
     transition: all 0.2s ease;
-    outline: none;
+    touch-action: manipulation;
+}
+
+.testi-nav-arrow:focus-visible {
+    outline: 3px solid var(--primary, #4338ca);
+    outline-offset: 2px;
 }
 
 .testi-nav-arrow:hover:not(:disabled) {
@@ -2839,11 +2834,11 @@ body.scrolling-up [data-aos] {
 }
 
 .testi-prev-arrow {
-    left: -22px;
+    left: 0;
 }
 
 .testi-next-arrow {
-    right: -22px;
+    right: 0;
 }
 
 /* Controls Bar (Dots & Mobile Nav) */
@@ -2984,6 +2979,10 @@ body.scrolling-up [data-aos] {
 
     .testi-nav-arrow {
         display: none !important;
+    }
+
+    .testi-carousel-wrapper {
+        padding: 0;
     }
 
     .testi-mobile-nav-btn {

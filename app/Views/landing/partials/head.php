@@ -200,10 +200,15 @@ if (! empty($extraJsonLdNodes) && is_array($extraJsonLdNodes)) {
 
             function syncSlotStatus(el) {
                 var wrapper = el.closest('[data-ad-slot-wrapper]');
+                if (!wrapper) return;
                 var status = el.getAttribute('data-ad-status');
+                var initSt = el.getAttribute('data-adsbygoogle-status');
+                var rect = el.getBoundingClientRect();
+                var hasVisibleBox = Math.max(el.offsetHeight || 0, Math.round(rect.height || 0)) >= 24;
+
                 if (status === 'unfilled') {
                     collapseSlot(wrapper);
-                } else if (status === 'filled') {
+                } else if (status === 'filled' || (hasVisibleBox && (status === 'unfill-optimized' || initSt === 'done'))) {
                     markSlotFilled(wrapper);
                 }
             }
@@ -220,7 +225,15 @@ if (! empty($extraJsonLdNodes) && is_array($extraJsonLdNodes)) {
                     syncSlotStatus(el);
                     if ('MutationObserver' in window) {
                         var obs = new MutationObserver(function() { syncSlotStatus(el); });
-                        obs.observe(el, { attributes: true, attributeFilter: ['data-ad-status'] });
+                        obs.observe(el, {
+                            attributes: true,
+                            attributeFilter: ['data-ad-status', 'data-adsbygoogle-status', 'style'],
+                            childList: true
+                        });
+                    }
+                    if ('ResizeObserver' in window) {
+                        var rObs = new ResizeObserver(function() { syncSlotStatus(el); });
+                        rObs.observe(el);
                     }
                 });
 
@@ -241,7 +254,11 @@ if (! empty($extraJsonLdNodes) && is_array($extraJsonLdNodes)) {
                             slotEls.forEach(function(el) {
                                 var st = el.getAttribute('data-ad-status');
                                 var initSt = el.getAttribute('data-adsbygoogle-status');
-                                if (st === 'unfilled' || !initSt) {
+                                var rect = el.getBoundingClientRect();
+                                var hasVisibleBox = Math.max(el.offsetHeight || 0, Math.round(rect.height || 0)) >= 24;
+                                if (hasVisibleBox && st !== 'unfilled') {
+                                    markSlotFilled(el.closest('[data-ad-slot-wrapper]'));
+                                } else if (st === 'unfilled' || !initSt) {
                                     collapseSlot(el.closest('[data-ad-slot-wrapper]'));
                                 }
                             });

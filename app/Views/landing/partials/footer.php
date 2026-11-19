@@ -76,6 +76,12 @@ $visitorStats = $visitorStats ?? ['total_unique' => 1, 'today_unique' => 1, 'tot
                     <span class="counter-sep">&bull;</span>
                     <span>Total Kunjungan: <strong><?= number_format($visitorStats['total_hits'] ?? 1) ?></strong></span>
                 </div>
+                <button type="button" id="scrollTopBtn" class="btn-footer-scroll-top" onclick="scrollToTop()" aria-label="Kembali ke atas halaman" title="Kembali ke atas">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <polyline points="18 15 12 9 6 15"></polyline>
+                    </svg>
+                    <span>Kembali ke atas</span>
+                </button>
             </div>
 
             <div class="footer-bottom">
