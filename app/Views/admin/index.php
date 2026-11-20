@@ -2079,8 +2079,8 @@
                 </div>
 
                 <!-- KARTU GRAFIK ANALITIK VISUAL (Real-time Live Sync) -->
-                <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-4 sm:p-5 shadow-sm space-y-4">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-4 sm:p-5 shadow-sm space-y-3">
+                    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
                         <div>
                             <h3 class="text-sm font-bold text-white flex items-center gap-2">
                                 <span>📈</span> Tren Kunjungan Harian Landing Page
@@ -2088,15 +2088,11 @@
                             <p class="text-[11px] text-slate-400">Visualisasi dinamika Pengunjung Unik dan Total Tayangan (Hits)</p>
                         </div>
                         <div class="flex items-center gap-2 flex-wrap">
-                            <!-- Custom Legend Badges -->
-                            <div class="inline-flex items-center gap-3 px-3 py-1 bg-slate-900/60 border border-slate-700/70 rounded-xl text-xs">
-                                <span class="inline-flex items-center gap-1.5 text-emerald-400 font-semibold text-[11px]">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span> Pengunjung Unik
-                                </span>
-                                <span class="inline-flex items-center gap-1.5 text-sky-400 font-semibold text-[11px]">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-sky-400"></span> Total Tayangan
-                                </span>
-                            </div>
+                            <!-- Saklar Rata-rata 7 Hari (MA7) -->
+                            <label for="toggle-visitor-ma7" class="inline-flex items-center gap-2 min-h-[44px] sm:min-h-[32px] px-3 py-1 rounded-xl bg-slate-900/70 border border-slate-700/70 hover:border-slate-500 text-[11px] font-medium text-slate-200 cursor-pointer select-none transition">
+                                <input type="checkbox" id="toggle-visitor-ma7" checked onchange="toggleVisitorMa7(this.checked)" class="w-3.5 h-3.5 rounded accent-indigo-500 border-slate-600 bg-slate-950 focus-visible:outline-2 focus-visible:outline-indigo-400 cursor-pointer shrink-0">
+                                <span>Tampilkan rata-rata 7 hari</span>
+                            </label>
                             <!-- Time Range Selector -->
                             <div class="inline-flex p-0.5 rounded-xl bg-slate-900/80 border border-slate-700/70 text-xs font-medium">
                                 <button type="button" onclick="setChartRange(7, this)" class="chart-range-btn px-2.5 py-1 rounded-lg text-[11px] text-slate-300 hover:text-white transition cursor-pointer">7 Hari</button>
@@ -2109,6 +2105,26 @@
                                 <span id="label-toggle-table">Buka Tabel Data</span>
                             </button>
                         </div>
+                    </div>
+
+                    <!-- Legenda Grafik di Atas Kanvas -->
+                    <div id="visitorChartLegend" class="flex flex-wrap items-center gap-x-4 gap-y-1.5 px-3 py-2 bg-slate-900/60 border border-slate-700/70 rounded-xl text-[11px]">
+                        <span class="inline-flex items-center gap-1.5 text-sky-400 font-semibold">
+                            <span class="w-2.5 h-2.5 rounded-full border-2 border-sky-400 bg-slate-900 shrink-0" aria-hidden="true"></span>
+                            <span>Total Tayangan</span>
+                        </span>
+                        <span class="inline-flex items-center gap-1.5 text-emerald-400 font-semibold">
+                            <span class="w-2.5 h-2.5 rounded-full border-2 border-emerald-400 bg-slate-900 shrink-0" aria-hidden="true"></span>
+                            <span>Pengunjung Unik</span>
+                        </span>
+                        <span data-ma7-legend class="inline-flex items-center gap-1.5 text-sky-300 font-medium">
+                            <span class="w-4 border-t-2 border-dashed border-sky-400 inline-block shrink-0" aria-hidden="true"></span>
+                            <span>Rata-rata 7 hari &mdash; Tayangan</span>
+                        </span>
+                        <span data-ma7-legend class="inline-flex items-center gap-1.5 text-emerald-300 font-medium">
+                            <span class="w-4 border-t-2 border-dashed border-emerald-400 inline-block shrink-0" aria-hidden="true"></span>
+                            <span>Rata-rata 7 hari &mdash; Unik</span>
+                        </span>
                     </div>
 
                     <!-- Canvas Grafik -->
@@ -6077,8 +6093,57 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
         let visitorChart = null;
         let rawDailyData = initialVisitorDaily || [];
         let currentRangeDays = 30;
+        let showVisitorMa7 = true;
         let visitorPollInterval = null;
         let isFetchingVisitor = false;
+
+        function computeTrailingMa7(values) {
+            const result = [];
+            let runningSum = 0;
+            for (let i = 0; i < values.length; i++) {
+                const v = Number(values[i]) || 0;
+                runningSum += v;
+                if (i >= 7) {
+                    runningSum -= (Number(values[i - 7]) || 0);
+                }
+                const windowCount = Math.min(i + 1, 7);
+                // Pembulatan baku (0,05 ke atas) ke 1 angka desimal
+                const avg = Math.round(((runningSum * 10) / windowCount) + 1e-9) / 10;
+                result.push(avg);
+            }
+            return result;
+        }
+
+        function formatMa7Decimal(val) {
+            return Number(val).toLocaleString('id-ID', {
+                minimumFractionDigits: 1,
+                maximumFractionDigits: 1
+            });
+        }
+
+        function getSelectedXTickIndices(totalCount) {
+            const keep = new Set();
+            if (totalCount <= 0) return keep;
+            const last = totalCount - 1;
+            for (let i = 0; i < last; i += 3) {
+                if ((last - i) >= 3) {
+                    keep.add(i);
+                }
+            }
+            keep.add(last);
+            return keep;
+        }
+
+        function toggleVisitorMa7(checked) {
+            showVisitorMa7 = Boolean(checked);
+            document.querySelectorAll('[data-ma7-legend]').forEach((el) => {
+                el.classList.toggle('hidden', !showVisitorMa7);
+            });
+            if (!visitorChart) return;
+            visitorChart.setDatasetVisibility(2, showVisitorMa7);
+            visitorChart.setDatasetVisibility(3, showVisitorMa7);
+            visitorChart.update('none');
+        }
 
         function formatChartDate(dateStr) {
             if (!dateStr) return '';
@@ -6111,10 +6176,17 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
             const canvas = document.getElementById('visitorAnalyticsChart');
             if (!canvas) return;
 
+            const toggleInput = document.getElementById('toggle-visitor-ma7');
+            if (toggleInput) {
+                showVisitorMa7 = Boolean(toggleInput.checked);
+            }
+
             const sliced = rawDailyData.slice(-currentRangeDays);
             const labels = sliced.map(d => formatChartDate(d.visit_date));
             const uniqueData = sliced.map(d => Number(d.unique_visitors));
             const hitsData = sliced.map(d => Number(d.total_hits));
+            const ma7HitsData = computeTrailingMa7(hitsData);
+            const ma7UniqueData = computeTrailingMa7(uniqueData);
 
             const ctx = canvas.getContext('2d');
 
@@ -6134,7 +6206,7 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                     _activeSlice: sliced,
                     datasets: [
                         {
-                            label: 'Total Tayangan (Hits)',
+                            label: 'Total Tayangan',
                             data: hitsData,
                             borderColor: '#38bdf8',
                             backgroundColor: gradientHits,
@@ -6148,7 +6220,7 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                             pointHoverRadius: 6,
                             pointHoverBorderWidth: 3,
                             pointHoverBackgroundColor: '#38bdf8',
-                            order: 2
+                            order: 3
                         },
                         {
                             label: 'Pengunjung Unik',
@@ -6165,13 +6237,55 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                             pointHoverRadius: 6,
                             pointHoverBorderWidth: 3,
                             pointHoverBackgroundColor: '#10b981',
+                            order: 2
+                        },
+                        {
+                            label: 'Rata-rata 7 hari — Tayangan',
+                            data: ma7HitsData,
+                            borderColor: '#38bdf8',
+                            backgroundColor: 'transparent',
+                            borderWidth: 2,
+                            borderDash: [6, 4],
+                            fill: false,
+                            tension: 0.35,
+                            pointRadius: 0,
+                            pointHoverRadius: 4,
+                            pointHitRadius: 10,
+                            pointBackgroundColor: '#38bdf8',
+                            pointBorderColor: '#38bdf8',
+                            isMa7: true,
+                            hidden: !showVisitorMa7,
                             order: 1
+                        },
+                        {
+                            label: 'Rata-rata 7 hari — Unik',
+                            data: ma7UniqueData,
+                            borderColor: '#10b981',
+                            backgroundColor: 'transparent',
+                            borderWidth: 2,
+                            borderDash: [6, 4],
+                            fill: false,
+                            tension: 0.35,
+                            pointRadius: 0,
+                            pointHoverRadius: 4,
+                            pointHitRadius: 10,
+                            pointBackgroundColor: '#10b981',
+                            pointBorderColor: '#10b981',
+                            isMa7: true,
+                            hidden: !showVisitorMa7,
+                            order: 0
                         }
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    layout: {
+                        padding: {
+                            left: 4,
+                            right: 14
+                        }
+                    },
                     interaction: {
                         mode: 'index',
                         intersect: false,
@@ -6189,6 +6303,10 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                             padding: 12,
                             cornerRadius: 12,
                             boxPadding: 6,
+                            itemSort: function(a, b) {
+                                const order = { 0: 0, 2: 1, 1: 2, 3: 3 };
+                                return (order[a.datasetIndex] ?? 9) - (order[b.datasetIndex] ?? 9);
+                            },
                             callbacks: {
                                 title: function(items) {
                                     if (!items.length) return '';
@@ -6203,7 +6321,21 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                                     return items[0].label;
                                 },
                                 label: function(item) {
-                                    return ` ${item.dataset.label}: ${item.raw.toLocaleString('id-ID')}`;
+                                    if (item.dataset && item.dataset.isMa7) {
+                                        return ` ${item.dataset.label}: ${formatMa7Decimal(item.raw)}`;
+                                    }
+                                    return ` ${item.dataset.label}: ${Number(item.raw).toLocaleString('id-ID')}`;
+                                },
+                                labelColor: function(item) {
+                                    const col = (item.dataset && item.dataset.borderColor) || '#38bdf8';
+                                    const isMa7 = Boolean(item.dataset && item.dataset.isMa7);
+                                    return {
+                                        borderColor: col,
+                                        backgroundColor: isMa7 ? '#0f172a' : col,
+                                        borderWidth: 2,
+                                        borderDash: isMa7 ? [3, 2] : undefined,
+                                        borderRadius: 2
+                                    };
                                 },
                                 afterBody: function(items) {
                                     if (!items.length) return '';
@@ -6227,12 +6359,21 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                                 color: 'rgba(255, 255, 255, 0.04)',
                                 drawBorder: false
                             },
+                            afterBuildTicks: function(axis) {
+                                const chartLabels = (axis.chart && axis.chart.data && axis.chart.data.labels) ? axis.chart.data.labels : [];
+                                const keepSet = getSelectedXTickIndices(chartLabels.length);
+                                axis.ticks = (axis.ticks || []).filter(t => keepSet.has(t.value));
+                            },
                             ticks: {
                                 color: '#64748b',
-                                font: { size: 10, family: 'Plus Jakarta Sans' },
+                                font: function(ctx) {
+                                    const w = (ctx.chart && ctx.chart.width) ? ctx.chart.width : 600;
+                                    return { size: w < 480 ? 9 : 10, family: 'Plus Jakarta Sans' };
+                                },
                                 maxRotation: 0,
-                                autoSkip: true,
-                                maxTicksLimit: 10
+                                minRotation: 0,
+                                autoSkip: false,
+                                padding: 6
                             }
                         },
                         y: {
@@ -6261,10 +6402,16 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                 return;
             }
             const sliced = rawDailyData.slice(-currentRangeDays);
+            const hitsData = sliced.map(d => Number(d.total_hits));
+            const uniqueData = sliced.map(d => Number(d.unique_visitors));
             visitorChart.data._activeSlice = sliced;
             visitorChart.data.labels = sliced.map(d => formatChartDate(d.visit_date));
-            visitorChart.data.datasets[0].data = sliced.map(d => Number(d.total_hits));
-            visitorChart.data.datasets[1].data = sliced.map(d => Number(d.unique_visitors));
+            visitorChart.data.datasets[0].data = hitsData;
+            visitorChart.data.datasets[1].data = uniqueData;
+            visitorChart.data.datasets[2].data = computeTrailingMa7(hitsData);
+            visitorChart.data.datasets[3].data = computeTrailingMa7(uniqueData);
+            visitorChart.setDatasetVisibility(2, showVisitorMa7);
+            visitorChart.setDatasetVisibility(3, showVisitorMa7);
             visitorChart.update('none');
         }
 
