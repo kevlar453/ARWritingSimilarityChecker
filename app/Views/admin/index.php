@@ -2029,7 +2029,7 @@
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div>
                         <h2 class="text-lg font-bold text-white">Analitik Pengunjung Unik Landing Page</h2>
-                        <p class="text-xs text-slate-400">Data analitik anonim pelacak pengunjung landing page 30 hari terakhir</p>
+                        <p class="text-xs text-slate-400">Data analitik anonim pelacak pengunjung landing page hingga 90 hari terakhir</p>
                     </div>
                     <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800/60 border border-slate-700/60 text-xs text-slate-300 w-fit">
                         <span class="relative flex h-2 w-2">
@@ -2080,28 +2080,35 @@
 
                 <!-- KARTU GRAFIK ANALITIK VISUAL (Real-time Live Sync) -->
                 <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-4 sm:p-5 shadow-sm space-y-3">
-                    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+                    <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-3">
                         <div>
                             <h3 class="text-sm font-bold text-white flex items-center gap-2">
                                 <span>📈</span> Tren Kunjungan Harian Landing Page
                             </h3>
-                            <p class="text-[11px] text-slate-400">Visualisasi dinamika Pengunjung Unik dan Total Tayangan (Hits)</p>
+                            <p id="visitorChartSubtitle" class="text-[11px] text-slate-400">Visualisasi dinamika Pengunjung Unik dan Total Tayangan (Harian)</p>
                         </div>
-                        <div class="flex items-center gap-2 flex-wrap">
+                        <div class="flex items-center gap-2 flex-wrap" role="toolbar" aria-label="Kontrol Grafik Tren Kunjungan" aria-controls="visitorAnalyticsChart">
                             <!-- Saklar Rata-rata 7 Hari (MA7) -->
-                            <label for="toggle-visitor-ma7" class="inline-flex items-center gap-2 min-h-[44px] sm:min-h-[32px] px-3 py-1 rounded-xl bg-slate-900/70 border border-slate-700/70 hover:border-slate-500 text-[11px] font-medium text-slate-200 cursor-pointer select-none transition">
+                            <label id="label-toggle-ma7" for="toggle-visitor-ma7" class="inline-flex items-center gap-2 min-h-[40px] sm:min-h-[32px] px-3 py-1 rounded-xl bg-slate-900/70 border border-slate-700/70 hover:border-slate-500 text-[11px] font-medium text-slate-200 cursor-pointer select-none transition">
                                 <input type="checkbox" id="toggle-visitor-ma7" checked onchange="toggleVisitorMa7(this.checked)" class="w-3.5 h-3.5 rounded accent-indigo-500 border-slate-600 bg-slate-950 focus-visible:outline-2 focus-visible:outline-indigo-400 cursor-pointer shrink-0">
                                 <span>Tampilkan rata-rata 7 hari</span>
                             </label>
-                            <!-- Time Range Selector -->
-                            <div class="inline-flex p-0.5 rounded-xl bg-slate-900/80 border border-slate-700/70 text-xs font-medium">
-                                <button type="button" onclick="setChartRange(7, this)" class="chart-range-btn px-2.5 py-1 rounded-lg text-[11px] text-slate-300 hover:text-white transition cursor-pointer">7 Hari</button>
-                                <button type="button" onclick="setChartRange(14, this)" class="chart-range-btn px-2.5 py-1 rounded-lg text-[11px] text-slate-300 hover:text-white transition cursor-pointer">14 Hari</button>
-                                <button type="button" onclick="setChartRange(30, this)" class="chart-range-btn active-range-btn px-2.5 py-1 rounded-lg text-[11px] bg-indigo-600 text-white font-semibold shadow-xs transition cursor-pointer">30 Hari</button>
+                            <!-- Time Range Selector (7 / 14 / 30 / 60 / 90 Hari) -->
+                            <div role="group" aria-label="Rentang Waktu Grafik" class="inline-flex flex-wrap p-0.5 rounded-xl bg-slate-900/80 border border-slate-700/70 text-xs font-medium">
+                                <button type="button" data-range="7" aria-pressed="false" onclick="setChartRange(7, this)" class="chart-range-btn px-2.5 py-1 min-h-[34px] sm:min-h-[28px] rounded-lg text-[11px] text-slate-300 hover:text-white focus-visible:outline-2 focus-visible:outline-indigo-400 transition cursor-pointer">7 Hari</button>
+                                <button type="button" data-range="14" aria-pressed="false" onclick="setChartRange(14, this)" class="chart-range-btn px-2.5 py-1 min-h-[34px] sm:min-h-[28px] rounded-lg text-[11px] text-slate-300 hover:text-white focus-visible:outline-2 focus-visible:outline-indigo-400 transition cursor-pointer">14 Hari</button>
+                                <button type="button" data-range="30" aria-pressed="true" onclick="setChartRange(30, this)" class="chart-range-btn active-range-btn px-2.5 py-1 min-h-[34px] sm:min-h-[28px] rounded-lg text-[11px] bg-indigo-600 text-white font-semibold shadow-xs focus-visible:outline-2 focus-visible:outline-indigo-400 transition cursor-pointer">30 Hari</button>
+                                <button type="button" data-range="60" aria-pressed="false" onclick="setChartRange(60, this)" class="chart-range-btn px-2.5 py-1 min-h-[34px] sm:min-h-[28px] rounded-lg text-[11px] text-slate-300 hover:text-white focus-visible:outline-2 focus-visible:outline-indigo-400 transition cursor-pointer">60 Hari</button>
+                                <button type="button" data-range="90" aria-pressed="false" onclick="setChartRange(90, this)" class="chart-range-btn px-2.5 py-1 min-h-[34px] sm:min-h-[28px] rounded-lg text-[11px] text-slate-300 hover:text-white focus-visible:outline-2 focus-visible:outline-indigo-400 transition cursor-pointer">90 Hari</button>
+                            </div>
+                            <!-- Granularitas Agregasi (Harian vs Mingguan untuk rentang panjang) -->
+                            <div id="visitorAggGroup" role="group" aria-label="Agregasi Grafik" class="inline-flex p-0.5 rounded-xl bg-slate-900/80 border border-slate-700/70 text-xs font-medium">
+                                <button type="button" id="btn-agg-daily" aria-pressed="true" onclick="setChartAggregation('daily')" class="chart-agg-btn px-2.5 py-1 min-h-[34px] sm:min-h-[28px] rounded-lg text-[11px] bg-indigo-600 text-white font-semibold shadow-xs focus-visible:outline-2 focus-visible:outline-indigo-400 transition cursor-pointer">Harian</button>
+                                <button type="button" id="btn-agg-weekly" aria-pressed="false" aria-disabled="true" onclick="setChartAggregation('weekly')" class="chart-agg-btn px-2.5 py-1 min-h-[34px] sm:min-h-[28px] rounded-lg text-[11px] text-slate-400 opacity-45 cursor-not-allowed focus-visible:outline-2 focus-visible:outline-indigo-400 transition" title="Agregasi mingguan tersedia pada rentang 60 atau 90 hari">Mingguan</button>
                             </div>
                             <!-- Tombol Toggle Tabel Data -->
-                            <button type="button" onclick="toggleVisitorTable()" id="btn-toggle-visitor-table" class="px-2.5 py-1 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700/70 text-slate-300 hover:text-white text-[11px] font-medium transition flex items-center gap-1.5 cursor-pointer" title="Tampilkan rincian tabel tabular">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            <button type="button" onclick="toggleVisitorTable()" id="btn-toggle-visitor-table" class="px-2.5 py-1 min-h-[36px] sm:min-h-[30px] rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700/70 text-slate-300 hover:text-white text-[11px] font-medium focus-visible:outline-2 focus-visible:outline-indigo-400 transition flex items-center gap-1.5 cursor-pointer" title="Tampilkan rincian tabel tabular">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                 <span id="label-toggle-table">Buka Tabel Data</span>
                             </button>
                         </div>
@@ -6093,6 +6100,7 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
         let visitorChart = null;
         let rawDailyData = initialVisitorDaily || [];
         let currentRangeDays = 30;
+        let currentChartAgg = 'daily';
         let showVisitorMa7 = true;
         let visitorPollInterval = null;
         let isFetchingVisitor = false;
@@ -6121,27 +6129,202 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
             });
         }
 
-        function getSelectedXTickIndices(totalCount) {
-            const keep = new Set();
-            if (totalCount <= 0) return keep;
+        function buildSteppedIndices(totalCount, step) {
+            const indices = [];
             const last = totalCount - 1;
-            for (let i = 0; i < last; i += 3) {
-                if ((last - i) >= 3) {
-                    keep.add(i);
+            for (let i = 0; i < last; i += step) {
+                if ((last - i) >= step) {
+                    indices.push(i);
                 }
             }
-            keep.add(last);
+            indices.push(last);
+            return indices;
+        }
+
+        function getSelectedXTickIndices(totalCount, isWeekly = false, maxLabels = 10) {
+            const keep = new Set();
+            if (totalCount <= 0) return keep;
+            if (totalCount === 1) {
+                keep.add(0);
+                return keep;
+            }
+            let step = isWeekly ? 1 : 3;
+            let chosen = buildSteppedIndices(totalCount, step);
+            while (chosen.length > maxLabels) {
+                step += 1;
+                chosen = buildSteppedIndices(totalCount, step);
+            }
+            chosen.forEach(idx => keep.add(idx));
             return keep;
+        }
+
+        function shouldShowSeriesMarkers(pointCount, canvasEl) {
+            if (pointCount > 40) return false;
+            const vw = window.innerWidth || document.documentElement.clientWidth || 1024;
+            const cw = (canvasEl && canvasEl.clientWidth) ? canvasEl.clientWidth : vw;
+            if (vw < 640 || cw < 480) return false;
+            return true;
+        }
+
+        function getIsoWeekStartKey(dateStr) {
+            const parts = String(dateStr || '').split('-');
+            if (parts.length !== 3) return String(dateStr || '');
+            const dt = new Date(Date.UTC(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10)));
+            const isoDay = dt.getUTCDay() || 7;
+            dt.setUTCDate(dt.getUTCDate() - (isoDay - 1));
+            return dt.toISOString().slice(0, 10);
+        }
+
+        function aggregateWeeklyBuckets(slicedDaily) {
+            const buckets = [];
+            const bucketMap = new Map();
+            slicedDaily.forEach((d) => {
+                const weekKey = getIsoWeekStartKey(d.visit_date);
+                let bucket = bucketMap.get(weekKey);
+                if (!bucket) {
+                    bucket = {
+                        week_key: weekKey,
+                        start_date: d.visit_date,
+                        end_date: d.visit_date,
+                        visit_date: d.visit_date,
+                        unique_visitors: 0,
+                        total_hits: 0,
+                        day_count: 0,
+                        is_weekly: true
+                    };
+                    bucketMap.set(weekKey, bucket);
+                    buckets.push(bucket);
+                }
+                bucket.end_date = d.visit_date;
+                bucket.visit_date = d.visit_date;
+                bucket.unique_visitors += Number(d.unique_visitors) || 0;
+                bucket.total_hits += Number(d.total_hits) || 0;
+                bucket.day_count += 1;
+            });
+            return buckets;
+        }
+
+        function formatWeeklyRangeTitle(bucket) {
+            if (!bucket) return '';
+            if (!bucket.start_date || bucket.start_date === bucket.end_date) {
+                return `${formatFullIndonesianDate(bucket.end_date)} (${bucket.day_count || 1} hari)`;
+            }
+            const sParts = String(bucket.start_date).split('-');
+            const eParts = String(bucket.end_date).split('-');
+            const endYear = eParts[0] || '';
+            const sLabel = formatChartDate(bucket.start_date);
+            const eLabel = formatChartDate(bucket.end_date);
+            if (sParts[0] === eParts[0] && sParts[1] === eParts[1]) {
+                return `Minggu ${parseInt(sParts[2], 10)}–${eLabel} ${endYear} (${bucket.day_count} hari)`;
+            }
+            return `Minggu ${sLabel}–${eLabel} ${endYear} (${bucket.day_count} hari)`;
+        }
+
+        function syncChartControlsUi() {
+            const canWeekly = currentRangeDays >= 60;
+            if (!canWeekly && currentChartAgg === 'weekly') {
+                currentChartAgg = 'daily';
+            }
+            const isWeekly = currentChartAgg === 'weekly';
+
+            document.querySelectorAll('.chart-range-btn').forEach((b) => {
+                const r = parseInt(b.getAttribute('data-range') || '0', 10);
+                const isActive = (r === currentRangeDays);
+                b.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+                b.classList.toggle('bg-indigo-600', isActive);
+                b.classList.toggle('text-white', isActive);
+                b.classList.toggle('font-semibold', isActive);
+                b.classList.toggle('shadow-xs', isActive);
+                b.classList.toggle('text-slate-300', !isActive);
+            });
+
+            const btnDaily = document.getElementById('btn-agg-daily');
+            const btnWeekly = document.getElementById('btn-agg-weekly');
+            if (btnDaily) {
+                btnDaily.setAttribute('aria-pressed', !isWeekly ? 'true' : 'false');
+                btnDaily.classList.toggle('bg-indigo-600', !isWeekly);
+                btnDaily.classList.toggle('text-white', !isWeekly);
+                btnDaily.classList.toggle('font-semibold', !isWeekly);
+                btnDaily.classList.toggle('shadow-xs', !isWeekly);
+                btnDaily.classList.toggle('text-slate-300', isWeekly);
+            }
+            if (btnWeekly) {
+                btnWeekly.setAttribute('aria-disabled', canWeekly ? 'false' : 'true');
+                btnWeekly.setAttribute('aria-pressed', isWeekly ? 'true' : 'false');
+                btnWeekly.classList.toggle('opacity-45', !canWeekly);
+                btnWeekly.classList.toggle('cursor-not-allowed', !canWeekly);
+                btnWeekly.classList.toggle('cursor-pointer', canWeekly);
+                btnWeekly.classList.toggle('hover:text-white', canWeekly);
+                btnWeekly.classList.toggle('bg-indigo-600', isWeekly && canWeekly);
+                btnWeekly.classList.toggle('text-white', isWeekly && canWeekly);
+                btnWeekly.classList.toggle('font-semibold', isWeekly && canWeekly);
+                btnWeekly.classList.toggle('shadow-xs', isWeekly && canWeekly);
+                btnWeekly.classList.toggle('text-slate-300', !isWeekly && canWeekly);
+                btnWeekly.classList.toggle('text-slate-400', !canWeekly);
+            }
+
+            const ma7Input = document.getElementById('toggle-visitor-ma7');
+            const ma7Label = document.getElementById('label-toggle-ma7');
+            if (ma7Input) {
+                ma7Input.disabled = isWeekly;
+            }
+            if (ma7Label) {
+                ma7Label.classList.toggle('opacity-45', isWeekly);
+                ma7Label.classList.toggle('cursor-not-allowed', isWeekly);
+                ma7Label.classList.toggle('cursor-pointer', !isWeekly);
+                ma7Label.setAttribute('aria-disabled', isWeekly ? 'true' : 'false');
+                ma7Label.title = isWeekly ? 'Rata-rata 7 hari tersedia pada tampilan Harian' : '';
+            }
+
+            const showMa7Now = !isWeekly && showVisitorMa7;
+            document.querySelectorAll('[data-ma7-legend]').forEach((el) => {
+                el.classList.toggle('hidden', !showMa7Now);
+            });
+
+            const subtitleEl = document.getElementById('visitorChartSubtitle');
+            if (subtitleEl) {
+                subtitleEl.textContent = isWeekly
+                    ? 'Visualisasi dinamika Pengunjung Unik dan Total Tayangan (Agregasi Mingguan)'
+                    : 'Visualisasi dinamika Pengunjung Unik dan Total Tayangan (Harian)';
+            }
+        }
+
+        function resolveSeriesMarkerRadius(ctx) {
+            const pts = (ctx && ctx.chart && ctx.chart.data && ctx.chart.data.labels) ? ctx.chart.data.labels.length : 0;
+            return shouldShowSeriesMarkers(pts, ctx && ctx.chart ? ctx.chart.canvas : null) ? 4 : 0;
+        }
+
+        function resolveSeriesMarkerBorder(ctx) {
+            return resolveSeriesMarkerRadius(ctx) > 0 ? 2 : 0;
+        }
+
+        function buildChartSeriesPayload(canvasEl) {
+            const sliced = rawDailyData.slice(-currentRangeDays);
+            const isWeekly = (currentRangeDays >= 60 && currentChartAgg === 'weekly');
+            const activeSeries = isWeekly ? aggregateWeeklyBuckets(sliced) : sliced;
+            const labels = activeSeries.map(d => formatChartDate(d.visit_date));
+            const hitsData = activeSeries.map(d => Number(d.total_hits));
+            const uniqueData = activeSeries.map(d => Number(d.unique_visitors));
+            const ma7HitsData = isWeekly ? [] : computeTrailingMa7(hitsData);
+            const ma7UniqueData = isWeekly ? [] : computeTrailingMa7(uniqueData);
+            return {
+                activeSeries,
+                labels,
+                hitsData,
+                uniqueData,
+                ma7HitsData,
+                ma7UniqueData,
+                isWeekly
+            };
         }
 
         function toggleVisitorMa7(checked) {
             showVisitorMa7 = Boolean(checked);
-            document.querySelectorAll('[data-ma7-legend]').forEach((el) => {
-                el.classList.toggle('hidden', !showVisitorMa7);
-            });
+            syncChartControlsUi();
             if (!visitorChart) return;
-            visitorChart.setDatasetVisibility(2, showVisitorMa7);
-            visitorChart.setDatasetVisibility(3, showVisitorMa7);
+            const visibleMa7 = (currentChartAgg !== 'weekly') && showVisitorMa7;
+            visitorChart.setDatasetVisibility(2, visibleMa7);
+            visitorChart.setDatasetVisibility(3, visibleMa7);
             visitorChart.update('none');
         }
 
@@ -6180,14 +6363,9 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
             if (toggleInput) {
                 showVisitorMa7 = Boolean(toggleInput.checked);
             }
+            syncChartControlsUi();
 
-            const sliced = rawDailyData.slice(-currentRangeDays);
-            const labels = sliced.map(d => formatChartDate(d.visit_date));
-            const uniqueData = sliced.map(d => Number(d.unique_visitors));
-            const hitsData = sliced.map(d => Number(d.total_hits));
-            const ma7HitsData = computeTrailingMa7(hitsData);
-            const ma7UniqueData = computeTrailingMa7(uniqueData);
-
+            const payload = buildChartSeriesPayload(canvas);
             const ctx = canvas.getContext('2d');
 
             // Soft gradients
@@ -6199,15 +6377,18 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
             gradientUnique.addColorStop(0, 'rgba(16, 185, 129, 0.30)');
             gradientUnique.addColorStop(1, 'rgba(16, 185, 129, 0.00)');
 
+            const showMa7OnCanvas = !payload.isWeekly && showVisitorMa7;
+
             visitorChart = new Chart(canvas, {
                 type: 'line',
                 data: {
-                    labels: labels,
-                    _activeSlice: sliced,
+                    labels: payload.labels,
+                    _activeSlice: payload.activeSeries,
+                    _isWeekly: payload.isWeekly,
                     datasets: [
                         {
                             label: 'Total Tayangan',
-                            data: hitsData,
+                            data: payload.hitsData,
                             borderColor: '#38bdf8',
                             backgroundColor: gradientHits,
                             borderWidth: 2.5,
@@ -6215,16 +6396,17 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                             tension: 0.35,
                             pointBackgroundColor: '#0f172a',
                             pointBorderColor: '#38bdf8',
-                            pointBorderWidth: 2,
-                            pointRadius: 4,
+                            pointBorderWidth: resolveSeriesMarkerBorder,
+                            pointRadius: resolveSeriesMarkerRadius,
                             pointHoverRadius: 6,
+                            pointHitRadius: 10,
                             pointHoverBorderWidth: 3,
                             pointHoverBackgroundColor: '#38bdf8',
                             order: 3
                         },
                         {
                             label: 'Pengunjung Unik',
-                            data: uniqueData,
+                            data: payload.uniqueData,
                             borderColor: '#10b981',
                             backgroundColor: gradientUnique,
                             borderWidth: 2.5,
@@ -6232,16 +6414,17 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                             tension: 0.35,
                             pointBackgroundColor: '#0f172a',
                             pointBorderColor: '#10b981',
-                            pointBorderWidth: 2,
-                            pointRadius: 4,
+                            pointBorderWidth: resolveSeriesMarkerBorder,
+                            pointRadius: resolveSeriesMarkerRadius,
                             pointHoverRadius: 6,
+                            pointHitRadius: 10,
                             pointHoverBorderWidth: 3,
                             pointHoverBackgroundColor: '#10b981',
                             order: 2
                         },
                         {
                             label: 'Rata-rata 7 hari — Tayangan',
-                            data: ma7HitsData,
+                            data: payload.ma7HitsData,
                             borderColor: '#38bdf8',
                             backgroundColor: 'transparent',
                             borderWidth: 2,
@@ -6254,12 +6437,12 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                             pointBackgroundColor: '#38bdf8',
                             pointBorderColor: '#38bdf8',
                             isMa7: true,
-                            hidden: !showVisitorMa7,
+                            hidden: !showMa7OnCanvas,
                             order: 1
                         },
                         {
                             label: 'Rata-rata 7 hari — Unik',
-                            data: ma7UniqueData,
+                            data: payload.ma7UniqueData,
                             borderColor: '#10b981',
                             backgroundColor: 'transparent',
                             borderWidth: 2,
@@ -6272,7 +6455,7 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                             pointBackgroundColor: '#10b981',
                             pointBorderColor: '#10b981',
                             isMa7: true,
-                            hidden: !showVisitorMa7,
+                            hidden: !showMa7OnCanvas,
                             order: 0
                         }
                     ]
@@ -6280,6 +6463,10 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    onResize: function(chart) {
+                        if (!chart || !chart.data) return;
+                        chart.update('none');
+                    },
                     layout: {
                         padding: {
                             left: 4,
@@ -6316,6 +6503,9 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                                         : rawDailyData.slice(-currentRangeDays);
                                     const d = currentSlice[idx];
                                     if (d) {
+                                        if (d.is_weekly) {
+                                            return formatWeeklyRangeTitle(d);
+                                        }
                                         return formatFullIndonesianDate(d.visit_date) || d.full_date || d.visit_date;
                                     }
                                     return items[0].label;
@@ -6344,11 +6534,18 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                                         ? visitorChart.data._activeSlice
                                         : rawDailyData.slice(-currentRangeDays);
                                     const d = currentSlice[idx];
-                                    if (d && Number(d.unique_visitors) > 0) {
-                                        const avg = (Number(d.total_hits) / Number(d.unique_visitors)).toFixed(2);
-                                        return ` Rasio: ${avg} hits / pengunjung`;
+                                    if (!d) return '';
+                                    const lines = [];
+                                    if (d.is_weekly && d.day_count > 0) {
+                                        const avgH = formatMa7Decimal(Number(d.total_hits) / d.day_count);
+                                        const avgU = formatMa7Decimal(Number(d.unique_visitors) / d.day_count);
+                                        lines.push(` Rata-rata/hari: ${avgH} tayangan • ${avgU} unik`);
                                     }
-                                    return '';
+                                    if (Number(d.unique_visitors) > 0) {
+                                        const avg = (Number(d.total_hits) / Number(d.unique_visitors)).toFixed(2);
+                                        lines.push(` Rasio: ${avg} hits / pengunjung`);
+                                    }
+                                    return lines;
                                 }
                             }
                         }
@@ -6361,7 +6558,8 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                             },
                             afterBuildTicks: function(axis) {
                                 const chartLabels = (axis.chart && axis.chart.data && axis.chart.data.labels) ? axis.chart.data.labels : [];
-                                const keepSet = getSelectedXTickIndices(chartLabels.length);
+                                const isWeekly = Boolean(axis.chart && axis.chart.data && axis.chart.data._isWeekly);
+                                const keepSet = getSelectedXTickIndices(chartLabels.length, isWeekly, 10);
                                 axis.ticks = (axis.ticks || []).filter(t => keepSet.has(t.value));
                             },
                             ticks: {
@@ -6401,29 +6599,37 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                 initVisitorChart();
                 return;
             }
-            const sliced = rawDailyData.slice(-currentRangeDays);
-            const hitsData = sliced.map(d => Number(d.total_hits));
-            const uniqueData = sliced.map(d => Number(d.unique_visitors));
-            visitorChart.data._activeSlice = sliced;
-            visitorChart.data.labels = sliced.map(d => formatChartDate(d.visit_date));
-            visitorChart.data.datasets[0].data = hitsData;
-            visitorChart.data.datasets[1].data = uniqueData;
-            visitorChart.data.datasets[2].data = computeTrailingMa7(hitsData);
-            visitorChart.data.datasets[3].data = computeTrailingMa7(uniqueData);
-            visitorChart.setDatasetVisibility(2, showVisitorMa7);
-            visitorChart.setDatasetVisibility(3, showVisitorMa7);
+            syncChartControlsUi();
+            const payload = buildChartSeriesPayload(visitorChart.canvas);
+            const showMa7OnCanvas = !payload.isWeekly && showVisitorMa7;
+
+            visitorChart.data._activeSlice = payload.activeSeries;
+            visitorChart.data._isWeekly = payload.isWeekly;
+            visitorChart.data.labels = payload.labels;
+            visitorChart.data.datasets[0].data = payload.hitsData;
+            visitorChart.data.datasets[1].data = payload.uniqueData;
+            visitorChart.data.datasets[2].data = payload.ma7HitsData;
+            visitorChart.data.datasets[3].data = payload.ma7UniqueData;
+            visitorChart.setDatasetVisibility(2, showMa7OnCanvas);
+            visitorChart.setDatasetVisibility(3, showMa7OnCanvas);
             visitorChart.update('none');
         }
 
         function setChartRange(days, btn) {
             currentRangeDays = days;
-            document.querySelectorAll('.chart-range-btn').forEach(b => {
-                b.classList.remove('bg-indigo-600', 'text-white', 'font-semibold', 'shadow-xs');
-                b.classList.add('text-slate-300');
-            });
-            btn.classList.add('bg-indigo-600', 'text-white', 'font-semibold', 'shadow-xs');
-            btn.classList.remove('text-slate-300');
+            if (currentRangeDays < 60 && currentChartAgg === 'weekly') {
+                currentChartAgg = 'daily';
+            }
+            syncChartControlsUi();
+            updateChartWithData(rawDailyData);
+        }
 
+        function setChartAggregation(mode) {
+            if (mode === 'weekly' && currentRangeDays < 60) {
+                return;
+            }
+            currentChartAgg = (mode === 'weekly') ? 'weekly' : 'daily';
+            syncChartControlsUi();
             updateChartWithData(rawDailyData);
         }
 

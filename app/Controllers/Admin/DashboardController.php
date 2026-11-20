@@ -307,13 +307,7 @@ class DashboardController extends BaseController
             'regions'   => [],
         ];
         if ($activeTab === 'visitors') {
-            $dailyVisitors = $db->table('landing_visitors')
-                                ->select('visit_date, COUNT(DISTINCT visitor_hash) as unique_visitors, SUM(hits) as total_hits')
-                                ->groupBy('visit_date')
-                                ->orderBy('visit_date', 'DESC')
-                                ->limit(30)
-                                ->get()
-                                ->getResultArray();
+            $dailyVisitors = $this->getDailyVisitorsSummary($db, 90);
             $geoAnalytics = $visitorModel->getGeoAnalytics();
         }
 
@@ -1168,14 +1162,8 @@ class DashboardController extends BaseController
         $hits = (int) ($todayRow['total_hits'] ?? $stats['today_hits'] ?? 0);
         $avg = $unique > 0 ? round($hits / $unique, 2) : 1.00;
 
-        // Data tren harian untuk visualisasi grafik analitik (30 hari terakhir, kronologis ASC)
-        $daily = $db->table('landing_visitors')
-                    ->select('visit_date, COUNT(DISTINCT visitor_hash) as unique_visitors, SUM(hits) as total_hits')
-                    ->groupBy('visit_date')
-                    ->orderBy('visit_date', 'DESC')
-                    ->limit(30)
-                    ->get()
-                    ->getResultArray();
+        // Data tren harian untuk visualisasi grafik analitik (hingga 90 hari terakhir, kronologis ASC)
+        $daily = $this->getDailyVisitorsSummary($db, 90);
 
         $daily = array_reverse($daily);
 
@@ -1438,6 +1426,20 @@ class DashboardController extends BaseController
     {
         $data = $this->getPredictiveAnalyticsData(false);
         return $this->response->setJSON($data);
+    }
+
+    /**
+     * Ambil agregasi kunjungan harian landing page hingga batas hari terkini (DESC).
+     */
+    private function getDailyVisitorsSummary($db, int $limit = 90): array
+    {
+        return $db->table('landing_visitors')
+                  ->select('visit_date, COUNT(DISTINCT visitor_hash) as unique_visitors, SUM(hits) as total_hits')
+                  ->groupBy('visit_date')
+                  ->orderBy('visit_date', 'DESC')
+                  ->limit($limit)
+                  ->get()
+                  ->getResultArray();
     }
 }
 
