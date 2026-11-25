@@ -729,6 +729,7 @@ class AuthController extends BaseController
         $challenge    = GoogleOAuthClient::computeCodeChallenge($codeVerifier);
 
         session()->set('google_oauth_tx', [
+            'intent'        => 'auth',
             'state'         => $state,
             'code_verifier' => $codeVerifier,
             'redirect'      => $redirectTarget,
@@ -742,14 +743,96 @@ class AuthController extends BaseController
     }
 
     /**
-     * Menangani callback dari Google OAuth 2.0, memverifikasi PKCE + ID Token, lalu masuk/mendaftar
+     * Memulai alur penyambungan akun Google ke akun pengguna aktif saat ini (lintas email)
+     */
+    public function googleLinkRedirect()
+    {
+        $userId = (int) (session()->get('user_id') ?? 0);
+        if ($userId <= 0) {
+            return redirect()->to(base_url('/?auth=login'))
+                ->with('auth_notice', 'Silakan masuk terlebih dahulu untuk menyambungkan akun Google.');
+        }
+
+        $userModel = new UserModel();
+        $user = $userModel->find($userId);
+        if (! $user || ($user['status'] ?? '') !== 'active') {
+            return redirect()->to(base_url('dashboard'))
+                ->with('error', 'Akun Anda tidak aktif atau tidak ditemukan.');
+        }
+
+        if (! empty($user['google_id'])) {
+            return redirect()->to(base_url('dashboard'))
+                ->with('message', 'Akun Anda sudah terhubung dengan akun Google.');
+        }
+
+        $oauth = new GoogleOAuthClient();
+        if (! $oauth->isConfigured()) {
+            return redirect()->to(base_url('dashboard'))
+                ->with('error', 'Fitur masuk menggunakan Google belum dikonfigurasi oleh pengelola sistem.');
+        }
+
+        $state        = GoogleOAuthClient::generateState();
+        $codeVerifier = GoogleOAuthClient::generateCodeVerifier();
+        $challenge    = GoogleOAuthClient::computeCodeChallenge($codeVerifier);
+
+        session()->set('google_oauth_tx', [
+            'intent'        => 'link',
+            'link_user_id'  => $userId,
+            'state'         => $state,
+            'code_verifier' => $codeVerifier,
+            'redirect'      => base_url('dashboard'),
+            'mode'          => 'login',
+            'created_at'    => time(),
+        ]);
+
+        return redirect()->to($oauth->buildAuthorizationUrl($state, $challenge));
+    }
+
+    /**
+     * Melepaskan tautan akun Google dari akun pengguna aktif (wajib sudah memiliki kata sandi lokal)
+     */
+    public function googleUnlink()
+    {
+        $userId = (int) (session()->get('user_id') ?? 0);
+        if ($userId <= 0) {
+            return $this->respondError('Sesi tidak valid. Silakan masuk kembali.', 401);
+        }
+
+        $userModel = new UserModel();
+        $user = $userModel->find($userId);
+        if (! $user) {
+            return $this->respondError('Pengguna tidak ditemukan.', 404);
+        }
+
+        if (empty($user['google_id'])) {
+            return redirect()->to(base_url('dashboard'))
+                ->with('message', 'Akun ini tidak memiliki tautan Google aktif.');
+        }
+
+        if (empty($user['password_hash'])) {
+            return redirect()->to(base_url('dashboard'))
+                ->with('error', 'Tautan Google tidak dapat dilepaskan karena akun Anda belum memiliki kata sandi lokal. Silakan atur kata sandi lewat menu Lupa Kata Sandi terlebih dahulu.');
+        }
+
+        $userModel->update($userId, [
+            'google_id'  => null,
+            'updated_at' => date('Y-m-d H:i:s'),
+        ]);
+
+        return redirect()->to(base_url('dashboard'))
+            ->with('message', 'Tautan akun Google berhasil dilepaskan dari akun Anda.');
+    }
+
+    /**
+     * Menangani callback dari Google OAuth 2.0, memverifikasi PKCE + ID Token, lalu masuk/mendaftar/menautkan akun
      */
     public function googleCallback()
     {
         $tx = session()->get('google_oauth_tx');
         session()->remove('google_oauth_tx');
 
-        $mode = (is_array($tx) && ($tx['mode'] ?? '') === 'register') ? 'register' : 'login';
+        $isLinkIntent = (is_array($tx) && ($tx['intent'] ?? 'auth') === 'link');
+        $mode         = (is_array($tx) && ($tx['mode'] ?? '') === 'register') ? 'register' : 'login';
 
         $errorParam = trim((string) ($this->request->getGet('error') ?? ''));
         if ($errorParam !== '') {
@@ -757,8 +840,7 @@ class AuthController extends BaseController
             $errMsg  = ($errorParam === 'access_denied')
                 ? 'Proses autentikasi dengan akun Google dibatalkan.'
                 : 'Autentikasi Google tidak dapat diselesaikan. Silakan coba kembali.';
-            return redirect()->to(base_url("/?auth={$mode}&oauth_error={$errCode}"))
-                ->with('auth_notice', $errMsg);
+            return $this->redirectGoogleError($isLinkIntent, $mode, $errCode, $errMsg);
         }
 
         $code  = trim((string) ($this->request->getGet('code') ?? ''));
@@ -771,14 +853,22 @@ class AuthController extends BaseController
             || ! hash_equals((string) ($tx['state'] ?? ''), $state)
             || (time() - (int) ($tx['created_at'] ?? 0)) > 600
         ) {
-            return redirect()->to(base_url("/?auth={$mode}&oauth_error=invalid_state"))
-                ->with('auth_notice', 'Sesi autentikasi Google tidak valid atau telah kedaluwarsa. Silakan coba kembali.');
+            return $this->redirectGoogleError(
+                $isLinkIntent,
+                $mode,
+                'invalid_state',
+                'Sesi autentikasi Google tidak valid atau telah kedaluwarsa. Silakan coba kembali.'
+            );
         }
 
         $oauth = new GoogleOAuthClient();
         if (! $oauth->isConfigured()) {
-            return redirect()->to(base_url("/?auth={$mode}&oauth_error=not_configured"))
-                ->with('auth_notice', 'Fitur masuk menggunakan Google belum dikonfigurasi oleh pengelola sistem.');
+            return $this->redirectGoogleError(
+                $isLinkIntent,
+                $mode,
+                'not_configured',
+                'Fitur masuk menggunakan Google belum dikonfigurasi oleh pengelola sistem.'
+            );
         }
 
         try {
@@ -786,8 +876,30 @@ class AuthController extends BaseController
             $profile = $oauth->verifyIdToken((string) $tokens['id_token']);
         } catch (\Throwable $e) {
             log_message('warning', 'Google OAuth callback gagal: ' . $e->getMessage());
-            return redirect()->to(base_url("/?auth={$mode}&oauth_error=failed"))
-                ->with('auth_notice', 'Gagal memverifikasi akun Google Anda. Pastikan email Google aktif dan silakan coba kembali.');
+            return $this->redirectGoogleError(
+                $isLinkIntent,
+                $mode,
+                'failed',
+                'Gagal memverifikasi akun Google Anda. Pastikan email Google aktif dan silakan coba kembali.'
+            );
+        }
+
+        if ($isLinkIntent) {
+            $sessionUserId = (int) (session()->get('user_id') ?? 0);
+            $expectedUserId = (int) ($tx['link_user_id'] ?? 0);
+            if ($sessionUserId <= 0 || $sessionUserId !== $expectedUserId) {
+                return redirect()->to(base_url('/?auth=login&oauth_error=invalid_state'))
+                    ->with('auth_notice', 'Sesi pengguna berubah saat menautkan akun Google. Silakan masuk kembali.');
+            }
+
+            $linkRes = $this->linkGoogleToUser($sessionUserId, $profile);
+            if (! ($linkRes['ok'] ?? false)) {
+                return redirect()->to(base_url('dashboard'))
+                    ->with('error', (string) ($linkRes['error'] ?? 'Gagal menautkan akun Google.'));
+            }
+
+            return redirect()->to(base_url('dashboard'))
+                ->with('message', 'Akun Google (' . $profile['email'] . ') berhasil disambungkan! Kini Anda dapat masuk menggunakan akun Google ini.');
         }
 
         $result = $this->resolveOrCreateGoogleUser(
@@ -818,6 +930,80 @@ class AuthController extends BaseController
 
         $redirectUrl = (string) ($tx['redirect'] ?? base_url('dashboard'));
         return redirect()->to($redirectUrl);
+    }
+
+    /**
+     * Menyambungkan akun Google terverifikasi secara manual ke akun pengguna aktif (termasuk lintas email).
+     *
+     * @return array{ok:bool, user:?array, error:?string}
+     */
+    public function linkGoogleToUser(int $userId, array $profile): array
+    {
+        $googleId  = trim((string) ($profile['google_id'] ?? ''));
+        $email     = strtolower(trim((string) ($profile['email'] ?? '')));
+        $avatarUrl = $profile['avatar_url'] ?? null;
+
+        if ($userId <= 0 || $googleId === '' || $email === '' || empty($profile['email_verified'])) {
+            return [
+                'ok'    => false,
+                'user'  => null,
+                'error' => 'Profil Google tidak memiliki email terverifikasi yang valid.',
+            ];
+        }
+
+        $userModel = new UserModel();
+        $targetUser = $userModel->find($userId);
+
+        if (! $targetUser || ($targetUser['status'] ?? '') !== 'active') {
+            return [
+                'ok'    => false,
+                'user'  => null,
+                'error' => 'Akun AR Tilik Anda tidak aktif atau tidak ditemukan.',
+            ];
+        }
+
+        if (! empty($targetUser['google_id'])) {
+            if ($targetUser['google_id'] === $googleId) {
+                return ['ok' => true, 'user' => $targetUser, 'error' => null];
+            }
+
+            return [
+                'ok'    => false,
+                'user'  => null,
+                'error' => 'Akun AR Tilik ini sudah terhubung dengan akun Google lain. Lepaskan tautan sebelumnya terlebih dahulu bila ingin mengganti.',
+            ];
+        }
+
+        $existingOwner = $userModel->where('google_id', $googleId)->first();
+        if ($existingOwner && (int) $existingOwner['id'] !== $userId) {
+            return [
+                'ok'    => false,
+                'user'  => null,
+                'error' => 'Akun Google tersebut sudah terhubung dengan akun AR Tilik lain. Gunakan akun Google lain atau lepaskan tautannya terlebih dahulu.',
+            ];
+        }
+
+        $updates = [
+            'google_id'  => $googleId,
+            'updated_at' => date('Y-m-d H:i:s'),
+        ];
+        if ($avatarUrl) {
+            $updates['avatar_url'] = $avatarUrl;
+        }
+
+        $userModel->update($userId, $updates);
+
+        return ['ok' => true, 'user' => $userModel->find($userId), 'error' => null];
+    }
+
+    private function redirectGoogleError(bool $isLinkIntent, string $mode, string $errCode, string $message)
+    {
+        if ($isLinkIntent) {
+            return redirect()->to(base_url('dashboard'))->with('error', $message);
+        }
+
+        return redirect()->to(base_url("/?auth={$mode}&oauth_error={$errCode}"))
+            ->with('auth_notice', $message);
     }
 
     /**

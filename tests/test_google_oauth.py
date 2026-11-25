@@ -428,3 +428,97 @@ def test_google_only_self_delete_via_phrase_and_forgot_password_sets_password(db
         assert cursor.fetchone() is None
     finally:
         cursor.execute("DELETE FROM users WHERE email = %s", (email,))
+
+
+def test_cross_email_google_linking_and_unlinking(db_conn):
+    """Menguji penyambungan akun Google lintas-email (mis. akun @kampus.ac.id ditautkan ke @gmail.com), penolakan duplikat, UI dashboard, dan pelepasan tautan."""
+    uid_hex = uuid.uuid4().hex[:8]
+    campus_email = f"dosen_{uid_hex}@kampus.ac.id"
+    other_email = f"lain_{uid_hex}@kampus.ac.id"
+    gmail_addr = f"pribadi_{uid_hex}@gmail.com"
+    pwd = "CampusPassword123!"
+
+    cursor = db_conn.cursor(dictionary=True)
+    try:
+        # 1. Buat dua akun aktif ber-password lewat API register + aktivasi DB
+        s1 = requests.Session()
+        r1 = s1.post(f"{BASE_URL}/auth/register", json={
+            "name": "Dosen Lintas Email",
+            "email": campus_email,
+            "password": pwd,
+            "institution": "Univ Lintas",
+            "security_token": "TEST_TOKEN",
+        }, headers={"Accept": "application/json"}, timeout=10)
+        assert r1.status_code == 201
+
+        r2 = requests.post(f"{BASE_URL}/auth/register", json={
+            "name": "Pengguna Lain",
+            "email": other_email,
+            "password": pwd,
+            "institution": "Univ Lain",
+            "security_token": "TEST_TOKEN",
+        }, headers={"Accept": "application/json"}, timeout=10)
+        assert r2.status_code == 201
+
+        cursor.execute("UPDATE users SET status = 'active', email_verified_at = NOW() WHERE email IN (%s, %s)", (campus_email, other_email))
+        cursor.execute("SELECT id FROM users WHERE email = %s", (campus_email,))
+        user_a_id = cursor.fetchone()["id"]
+        cursor.execute("SELECT id FROM users WHERE email = %s", (other_email,))
+        user_b_id = cursor.fetchone()["id"]
+
+        # 2. Tamu yang mengakses /auth/google/link diarahkan ke login
+        guest_link = requests.get(f"{BASE_URL}/auth/google/link", allow_redirects=False, timeout=10)
+        assert guest_link.status_code in (302, 303)
+        assert "auth=login" in guest_link.headers.get("Location", "")
+
+        # 3. Login User A -> Dashboard harus menampilkan tombol Sambungkan Akun Google
+        login_res = s1.post(f"{BASE_URL}/auth/login", json={"email": campus_email, "password": pwd}, headers={"Accept": "application/json"}, timeout=10)
+        assert login_res.status_code == 200
+        dash_before = s1.get(f"{BASE_URL}/dashboard", timeout=10)
+        assert dash_before.status_code == 200
+        assert 'id="btnLinkGoogleAccount"' in dash_before.text
+
+        # 4. Uji linkGoogleToUser lintas email (kampus <- gmail), login berikutnya, dan penolakan pencurian google_id oleh User B
+        php = f"""
+        $auth = new \\App\\Controllers\\AuthController();
+        $profile = [
+            'google_id' => 'gid_cross_{uid_hex}',
+            'email' => {json.dumps(gmail_addr)},
+            'name' => 'Akun Gmail Pribadi',
+            'avatar_url' => 'https://lh3.googleusercontent.com/cross',
+            'email_verified' => true,
+        ];
+        $linkA = $auth->linkGoogleToUser({int(user_a_id)}, $profile);
+        $loginViaGoogle = $auth->resolveOrCreateGoogleUser($profile);
+        $linkB = $auth->linkGoogleToUser({int(user_b_id)}, $profile);
+
+        echo json_encode([
+            'linkA_ok' => $linkA['ok'],
+            'linkA_email_kept' => ($linkA['user']['email'] ?? '') === {json.dumps(campus_email)},
+            'linkA_gid' => $linkA['user']['google_id'] ?? null,
+            'google_login_matched_a' => (int) ($loginViaGoogle['user']['id'] ?? 0) === {int(user_a_id)},
+            'google_login_created' => $loginViaGoogle['created'],
+            'linkB_rejected' => $linkB['ok'] === false,
+        ]);
+        """
+        out = run_php(php)
+        assert out["linkA_ok"] is True
+        assert out["linkA_email_kept"] is True
+        assert out["linkA_gid"] == f"gid_cross_{uid_hex}"
+        assert out["google_login_matched_a"] is True
+        assert out["google_login_created"] is False
+        assert out["linkB_rejected"] is True
+
+        # 5. Dashboard kini menampilkan lencana Terhubung ke Google + tombol Putuskan
+        dash_after = s1.get(f"{BASE_URL}/dashboard", timeout=10)
+        assert dash_after.status_code == 200
+        assert 'id="googleLinkedBadge"' in dash_after.text
+        assert 'auth/google/unlink' in dash_after.text
+
+        # 6. POST /auth/google/unlink melepaskan tautan secara aman (karena User A punya password lokal)
+        unlink_res = s1.post(f"{BASE_URL}/auth/google/unlink", headers={"X-Requested-With": "XMLHttpRequest"}, allow_redirects=False, timeout=10)
+        assert unlink_res.status_code in (302, 303)
+        cursor.execute("SELECT google_id FROM users WHERE id = %s", (user_a_id,))
+        assert cursor.fetchone()["google_id"] is None
+    finally:
+        cursor.execute("DELETE FROM users WHERE email IN (%s, %s, %s)", (campus_email, other_email, gmail_addr))

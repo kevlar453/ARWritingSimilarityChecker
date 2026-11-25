@@ -164,12 +164,21 @@
 
         <!-- Email Verification / Flash Message Banner -->
         <?php if (session()->getFlashdata('message') || (isset($_GET['verified']) && $_GET['verified'] === 'success')): ?>
-        <div class="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center justify-between gap-3 text-emerald-800 text-xs sm:text-sm font-medium shadow-xs">
+        <div class="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center justify-between gap-3 text-emerald-800 text-xs sm:text-sm font-medium shadow-xs" role="status">
             <div class="flex items-center gap-2.5">
                 <span class="text-xl">🎉</span>
                 <span><?= esc(session()->getFlashdata('message')) ?: 'Alamat email Anda berhasil diverifikasi! Selamat datang di dashboard AR Tilik.' ?></span>
             </div>
-            <button type="button" onclick="this.parentElement.remove()" class="text-emerald-500 hover:text-emerald-800 text-lg font-bold leading-none p-1">&times;</button>
+            <button type="button" onclick="this.parentElement.remove()" class="text-emerald-500 hover:text-emerald-800 text-lg font-bold leading-none p-1" aria-label="Tutup pemberitahuan">&times;</button>
+        </div>
+        <?php endif; ?>
+        <?php if (session()->getFlashdata('error')): ?>
+        <div class="mb-6 p-4 bg-rose-50 border border-rose-200 rounded-2xl flex items-center justify-between gap-3 text-rose-800 text-xs sm:text-sm font-medium shadow-xs" role="alert">
+            <div class="flex items-center gap-2.5">
+                <span class="text-xl">⚠️</span>
+                <span><?= esc(session()->getFlashdata('error')) ?></span>
+            </div>
+            <button type="button" onclick="this.parentElement.remove()" class="text-rose-500 hover:text-rose-800 text-lg font-bold leading-none p-1" aria-label="Tutup peringatan">&times;</button>
         </div>
         <?php endif; ?>
 
@@ -194,6 +203,21 @@
                             <?php endif; ?>
                         <?php endif; ?>
                         <span class="text-xs text-slate-400">• <?= esc($currentUser['email']) ?></span>
+                        <?php if (empty($currentUser['google_id'])): ?>
+                        <a href="<?= base_url('auth/google/link') ?>" id="btnLinkGoogleAccount" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white hover:bg-slate-100 text-slate-800 text-[11px] font-bold shadow-xs transition border border-white/80">
+                            <svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17Z"/><path fill="#34A853" d="M12 24c3.3 0 6.08-1.09 8.11-2.96l-3.88-3.05c-1.09.73-2.48 1.16-4.23 1.16-3.25 0-6.01-2.19-7-5.15H.98v3.14C3 21.18 7.2 24 12 24Z"/><path fill="#FBBC05" d="M5 14c-.25-.73-.39-1.52-.39-2.32 0-.8.14-1.59.39-2.32V6.22H.98A11.96 11.96 0 0 0 0 11.68c0 1.93.46 3.76 1.28 5.46L5 14Z"/><path fill="#EA4335" d="M12 4.75c1.79 0 3.41.62 4.68 1.82l3.51-3.51C18.07 1.14 15.3 0 12 0 7.2 0 3 2.82.98 6.86L5 10c.99-2.96 3.75-5.25 7-5.25Z"/></svg>
+                            <span>Sambungkan Akun Google</span>
+                        </a>
+                        <?php else: ?>
+                        <div id="googleLinkedBadge" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-200 border border-emerald-400/40 text-[11px] font-semibold">
+                            <span>✓ Terhubung ke Google</span>
+                            <?php if (!empty($currentUser['password_hash'])): ?>
+                            <form action="<?= base_url('auth/google/unlink') ?>" method="POST" class="inline" onsubmit="return confirm('Lepaskan tautan akun Google dari akun AR Tilik ini?')">
+                                <button type="submit" class="ml-1 text-[10px] underline text-slate-300 hover:text-white cursor-pointer bg-transparent border-0 p-0">Putuskan</button>
+                            </form>
+                            <?php endif; ?>
+                        </div>
+                        <?php endif; ?>
                     </div>
                     <h2 class="text-lg font-bold text-white flex items-center gap-2 flex-wrap">
                         <span>🎯 Status Kuota Submisi:</span>

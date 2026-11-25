@@ -119,6 +119,8 @@ $routes->group('auth', function ($routes) {
     $routes->post('register', 'AuthController::register');
     $routes->post('login', 'AuthController::login');
     $routes->get('google', 'AuthController::googleRedirect');
+    $routes->get('google/link', 'AuthController::googleLinkRedirect');
+    $routes->post('google/unlink', 'AuthController::googleUnlink');
     $routes->get('google/callback', 'AuthController::googleCallback');
     $routes->get('logout', 'AuthController::logout');
     $routes->post('logout', 'AuthController::logout');
