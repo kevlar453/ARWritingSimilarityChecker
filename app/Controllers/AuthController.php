@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Libraries\EmailService;
+use App\Libraries\GoogleOAuthClient;
 use App\Libraries\SpamShield;
 use App\Models\UserModel;
 use CodeIgniter\HTTP\ResponseInterface;
@@ -502,7 +503,14 @@ class AuthController extends BaseController
         $userModel = new UserModel();
         $user = $userModel->where('email', $email)->first();
 
-        if (! $user || ! password_verify($password, $user['password_hash'])) {
+        if ($user && empty($user['password_hash'])) {
+            return $this->respondError(
+                'Akun ini terdaftar melalui Google dan belum memiliki kata sandi lokal. Silakan klik "Masuk dengan Google", atau pilih "Lupa kata sandi?" untuk membuat kata sandi baru.',
+                401
+            );
+        }
+
+        if (! $user || ! password_verify($password, (string) $user['password_hash'])) {
             // Catat kegagalan untuk memicu penguncian akun jika serangan brute force
             $spamShield->recordFailedAttempt('login', $email, $ip, 5, 900, 900);
             $recheck = $spamShield->checkRateLimit('login', $email, $ip, 5, 900);
@@ -570,7 +578,11 @@ class AuthController extends BaseController
             return $this->response->setStatusCode(403)->setBody('Permintaan lintas situs ditolak.');
         }
 
-        session()->destroy();
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session()->destroy();
+        } else {
+            session()->remove(['user_id', 'user_name', 'user_email', 'user_institution', 'user_role', 'is_logged_in']);
+        }
         return redirect()->to(base_url())->with('message', 'Anda telah berhasil keluar.');
     }
 
@@ -588,7 +600,11 @@ class AuthController extends BaseController
         $userModel = new UserModel();
         $user = $userModel->find($userId);
         if (! $user) {
+            if (session_status() === PHP_SESSION_ACTIVE) {
             session()->destroy();
+        } else {
+            session()->remove(['user_id', 'user_name', 'user_email', 'user_institution', 'user_role', 'is_logged_in']);
+        }
             return $this->respondError('Pengguna tidak ditemukan.', 404);
         }
 
@@ -606,12 +622,19 @@ class AuthController extends BaseController
         $data = $this->getRequestData();
         $password = (string) ($data['password'] ?? '');
 
-        if ($password === '') {
-            return $this->respondError('Mohon masukkan kata sandi Anda untuk konfirmasi keamanan.', 400);
-        }
+        if (empty($user['password_hash'])) {
+            $confirmPhrase = strtoupper(trim((string) ($data['confirm_phrase'] ?? $password)));
+            if ($confirmPhrase !== 'HAPUS') {
+                return $this->respondError('Untuk akun Google, silakan ketik kata HAPUS untuk mengonfirmasi pemusnahan akun.', 400);
+            }
+        } else {
+            if ($password === '') {
+                return $this->respondError('Mohon masukkan kata sandi Anda untuk konfirmasi keamanan.', 400);
+            }
 
-        if (! password_verify($password, $user['password_hash'])) {
-            return $this->respondError('Kata sandi yang Anda masukkan tidak sesuai.', 401);
+            if (! password_verify($password, (string) $user['password_hash'])) {
+                return $this->respondError('Kata sandi yang Anda masukkan tidak sesuai.', 401);
+            }
         }
 
         $deleted = $userModel->deleteUserPermanently($userId);
@@ -619,7 +642,11 @@ class AuthController extends BaseController
             return $this->respondError('Gagal memproses pemusnahan akun karena kendala sistem.', 500);
         }
 
-        session()->destroy();
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session()->destroy();
+        } else {
+            session()->remove(['user_id', 'user_name', 'user_email', 'user_institution', 'user_role', 'is_logged_in']);
+        }
 
         log_message('notice', "[USER SELF DELETE] Pengguna #{$userId} ({$user['email']}) berhasil menghapus akunnya secara mandiri.");
 
@@ -647,7 +674,11 @@ class AuthController extends BaseController
         $user = $userModel->find($userId);
 
         if (! $user) {
+            if (session_status() === PHP_SESSION_ACTIVE) {
             session()->destroy();
+        } else {
+            session()->remove(['user_id', 'user_name', 'user_email', 'user_institution', 'user_role', 'is_logged_in']);
+        }
             return $this->response->setJSON([
                 'authenticated' => false,
                 'quota_info'    => $userModel->getQuotaInfo(null),
@@ -657,13 +688,325 @@ class AuthController extends BaseController
         return $this->response->setJSON([
             'authenticated' => true,
             'user'          => [
-                'id'          => $user['id'],
-                'name'        => $user['name'],
-                'email'       => $user['email'],
-                'institution' => $user['institution'],
+                'id'           => $user['id'],
+                'name'         => $user['name'],
+                'email'        => $user['email'],
+                'institution'  => $user['institution'],
+                'has_password' => ! empty($user['password_hash']),
+                'has_google'   => ! empty($user['google_id']),
             ],
             'quota_info'    => $userModel->getQuotaInfo($user),
         ]);
+    }
+
+    /**
+     * Memulai alur autentikasi Google OAuth 2.0 + PKCE S256
+     */
+    public function googleRedirect()
+    {
+        $mode = ($this->request->getGet('mode') === 'register') ? 'register' : 'login';
+        $oauth = new GoogleOAuthClient();
+
+        if (! $oauth->isConfigured()) {
+            return redirect()->to(base_url("/?auth={$mode}&oauth_error=not_configured"))
+                ->with('auth_notice', 'Fitur masuk menggunakan Google belum dikonfigurasi oleh pengelola sistem.');
+        }
+
+        $redirectTarget = self::normalizeGoogleRedirect((string) ($this->request->getGet('redirect') ?? ''));
+
+        $rawRef = (string) ($this->request->getGet('ref')
+            ?? session()->get('referred_by_code')
+            ?? $this->request->getCookie('referred_by_code')
+            ?? '');
+        $rawRef = strtoupper(trim($rawRef));
+        $referralCode = preg_match('/^[A-Z0-9_\-]{4,32}$/', $rawRef) ? $rawRef : null;
+
+        $utmSource = trim((string) ($this->request->getGet('utm_source') ?? ''));
+        $utmSource = $utmSource !== '' ? mb_substr(preg_replace('/[^a-zA-Z0-9_\-]/', '', $utmSource), 0, 64) : null;
+
+        $state        = GoogleOAuthClient::generateState();
+        $codeVerifier = GoogleOAuthClient::generateCodeVerifier();
+        $challenge    = GoogleOAuthClient::computeCodeChallenge($codeVerifier);
+
+        session()->set('google_oauth_tx', [
+            'state'         => $state,
+            'code_verifier' => $codeVerifier,
+            'redirect'      => $redirectTarget,
+            'mode'          => $mode,
+            'referral_code' => $referralCode,
+            'utm_source'    => $utmSource,
+            'created_at'    => time(),
+        ]);
+
+        return redirect()->to($oauth->buildAuthorizationUrl($state, $challenge));
+    }
+
+    /**
+     * Menangani callback dari Google OAuth 2.0, memverifikasi PKCE + ID Token, lalu masuk/mendaftar
+     */
+    public function googleCallback()
+    {
+        $tx = session()->get('google_oauth_tx');
+        session()->remove('google_oauth_tx');
+
+        $mode = (is_array($tx) && ($tx['mode'] ?? '') === 'register') ? 'register' : 'login';
+
+        $errorParam = trim((string) ($this->request->getGet('error') ?? ''));
+        if ($errorParam !== '') {
+            $errCode = ($errorParam === 'access_denied') ? 'cancelled' : 'failed';
+            $errMsg  = ($errorParam === 'access_denied')
+                ? 'Proses autentikasi dengan akun Google dibatalkan.'
+                : 'Autentikasi Google tidak dapat diselesaikan. Silakan coba kembali.';
+            return redirect()->to(base_url("/?auth={$mode}&oauth_error={$errCode}"))
+                ->with('auth_notice', $errMsg);
+        }
+
+        $code  = trim((string) ($this->request->getGet('code') ?? ''));
+        $state = trim((string) ($this->request->getGet('state') ?? ''));
+
+        if (
+            ! is_array($tx)
+            || $code === ''
+            || $state === ''
+            || ! hash_equals((string) ($tx['state'] ?? ''), $state)
+            || (time() - (int) ($tx['created_at'] ?? 0)) > 600
+        ) {
+            return redirect()->to(base_url("/?auth={$mode}&oauth_error=invalid_state"))
+                ->with('auth_notice', 'Sesi autentikasi Google tidak valid atau telah kedaluwarsa. Silakan coba kembali.');
+        }
+
+        $oauth = new GoogleOAuthClient();
+        if (! $oauth->isConfigured()) {
+            return redirect()->to(base_url("/?auth={$mode}&oauth_error=not_configured"))
+                ->with('auth_notice', 'Fitur masuk menggunakan Google belum dikonfigurasi oleh pengelola sistem.');
+        }
+
+        try {
+            $tokens  = $oauth->exchangeCode($code, (string) ($tx['code_verifier'] ?? ''));
+            $profile = $oauth->verifyIdToken((string) $tokens['id_token']);
+        } catch (\Throwable $e) {
+            log_message('warning', 'Google OAuth callback gagal: ' . $e->getMessage());
+            return redirect()->to(base_url("/?auth={$mode}&oauth_error=failed"))
+                ->with('auth_notice', 'Gagal memverifikasi akun Google Anda. Pastikan email Google aktif dan silakan coba kembali.');
+        }
+
+        $result = $this->resolveOrCreateGoogleUser(
+            $profile,
+            $tx['referral_code'] ?? null,
+            $tx['utm_source'] ?? null
+        );
+
+        if (! ($result['ok'] ?? false) || empty($result['user'])) {
+            return redirect()->to(base_url("/?auth={$mode}&oauth_error=account_error"))
+                ->with('auth_notice', (string) ($result['error'] ?? 'Akun Google tidak dapat digunakan untuk masuk.'));
+        }
+
+        $userModel = new UserModel();
+        $user = $userModel->refreshWeeklyQuota($result['user']);
+
+        $now = date('Y-m-d H:i:s');
+        $userModel->update($user['id'], [
+            'last_login_at' => $now,
+            'updated_at'    => $now,
+        ]);
+        $user['last_login_at'] = $now;
+
+        $spamShield = new SpamShield();
+        $spamShield->clearRateLimit('login', (string) $user['email'], $this->request->getIPAddress());
+
+        $this->setUserSession($user);
+
+        $redirectUrl = (string) ($tx['redirect'] ?? base_url('dashboard'));
+        return redirect()->to($redirectUrl);
+    }
+
+    /**
+     * Menemukan, menautkan, mengaktifkan, atau membuat akun pengguna dari profil Google terverifikasi.
+     *
+     * @return array{ok:bool, user:?array, error:?string, created:bool}
+     */
+    public function resolveOrCreateGoogleUser(array $profile, ?string $referralCode = null, ?string $utmSource = null): array
+    {
+        $googleId  = trim((string) ($profile['google_id'] ?? ''));
+        $email     = strtolower(trim((string) ($profile['email'] ?? '')));
+        $name      = trim((string) ($profile['name'] ?? ''));
+        $avatarUrl = $profile['avatar_url'] ?? null;
+
+        if ($googleId === '' || $email === '' || empty($profile['email_verified'])) {
+            return [
+                'ok'      => false,
+                'user'    => null,
+                'error'   => 'Profil Google tidak memiliki email terverifikasi yang valid.',
+                'created' => false,
+            ];
+        }
+
+        $userModel = new UserModel();
+        $now = date('Y-m-d H:i:s');
+
+        $user = $userModel->where('google_id', $googleId)->first();
+        if ($user) {
+            if (! in_array($user['status'], ['active', 'pending_verification'], true)) {
+                return [
+                    'ok'      => false,
+                    'user'    => null,
+                    'error'   => 'Akun Anda dinonaktifkan. Silakan hubungi administrator.',
+                    'created' => false,
+                ];
+            }
+
+            $updates = [];
+            if ($avatarUrl && ($user['avatar_url'] ?? null) !== $avatarUrl) {
+                $updates['avatar_url'] = $avatarUrl;
+            }
+            if ($user['status'] === 'pending_verification') {
+                $updates['status']                        = 'active';
+                $updates['verification_token']            = null;
+                $updates['verification_token_expires_at'] = null;
+                $updates['email_verified_at']             = $user['email_verified_at'] ?: $now;
+            }
+            if (! empty($updates)) {
+                $updates['updated_at'] = $now;
+                $userModel->update($user['id'], $updates);
+                $user = $userModel->find($user['id']);
+            }
+
+            return ['ok' => true, 'user' => $user, 'error' => null, 'created' => false];
+        }
+
+        $userByEmail = $userModel->where('email', $email)->first();
+        if ($userByEmail) {
+            if (! empty($userByEmail['google_id']) && $userByEmail['google_id'] !== $googleId) {
+                return [
+                    'ok'      => false,
+                    'user'    => null,
+                    'error'   => 'Alamat email ini sudah terhubung dengan akun Google lain.',
+                    'created' => false,
+                ];
+            }
+
+            if (! in_array($userByEmail['status'], ['active', 'pending_verification'], true)) {
+                return [
+                    'ok'      => false,
+                    'user'    => null,
+                    'error'   => 'Akun Anda dinonaktifkan. Silakan hubungi administrator.',
+                    'created' => false,
+                ];
+            }
+
+            $wasPending = ($userByEmail['status'] === 'pending_verification');
+            $linkUpdates = [
+                'google_id'  => $googleId,
+                'updated_at' => $now,
+            ];
+            if ($avatarUrl) {
+                $linkUpdates['avatar_url'] = $avatarUrl;
+            }
+            if (trim((string) ($userByEmail['name'] ?? '')) === '' && $name !== '') {
+                $linkUpdates['name'] = $name;
+            }
+            if ($wasPending) {
+                $linkUpdates['status']                        = 'active';
+                $linkUpdates['verification_token']            = null;
+                $linkUpdates['verification_token_expires_at'] = null;
+                $linkUpdates['email_verified_at']             = $now;
+            }
+
+            $userModel->update($userByEmail['id'], $linkUpdates);
+
+            if ($wasPending) {
+                try {
+                    (new \App\Models\ReferralModel())->awardVerificationBonus((int) $userByEmail['id']);
+                } catch (\Throwable $e) {
+                    log_message('error', 'Gagal memproses bonus referral Google linking: ' . $e->getMessage());
+                }
+            }
+
+            return ['ok' => true, 'user' => $userModel->find($userByEmail['id']), 'error' => null, 'created' => false];
+        }
+
+        // Pendaftaran pengguna baru melalui akun Google (email sudah terverifikasi oleh Google)
+        $cleanRef = $referralCode ? strtoupper(trim($referralCode)) : null;
+        if ($cleanRef !== null && ! preg_match('/^[A-Z0-9_\-]{4,32}$/', $cleanRef)) {
+            $cleanRef = null;
+        }
+        $bonusSubmissions = $cleanRef ? 1 : 0;
+        $resetAt = date('Y-m-d 00:00:00', strtotime('next monday'));
+
+        $newUserId = $userModel->insert([
+            'name'                            => $name !== '' ? mb_substr($name, 0, 150) : 'Pengguna Google',
+            'email'                           => $email,
+            'google_id'                       => $googleId,
+            'avatar_url'                      => $avatarUrl,
+            'password_hash'                   => null,
+            'institution'                     => 'Institusi Akademik',
+            'role'                            => 'user',
+            'status'                          => 'active',
+            'verification_token'              => null,
+            'verification_token_expires_at'   => null,
+            'verification_emails_sent'        => 0,
+            'last_verification_email_sent_at' => null,
+            'email_verified_at'               => $now,
+            'free_submissions_used_this_week' => 0,
+            'week_reset_at'                   => $resetAt,
+            'bonus_submissions'               => $bonusSubmissions,
+            'referred_by_code'                => $cleanRef,
+            'uploaded_corpus_count'           => 0,
+            'last_login_at'                   => $now,
+            'created_at'                      => $now,
+            'updated_at'                      => $now,
+        ]);
+
+        if (! $newUserId) {
+            return [
+                'ok'      => false,
+                'user'    => null,
+                'error'   => 'Gagal membuat akun baru dari profil Google. Silakan coba lagi.',
+                'created' => false,
+            ];
+        }
+
+        $userModel->ensureReferralCode((int) $newUserId);
+
+        if ($cleanRef !== null) {
+            try {
+                (new \App\Models\ReferralModel())->awardVerificationBonus((int) $newUserId);
+            } catch (\Throwable $e) {
+                log_message('error', 'Gagal memproses bonus referral Google signup: ' . $e->getMessage());
+            }
+        }
+
+        try {
+            \App\Libraries\CitationFunnelTracker::recordRegistration($utmSource);
+        } catch (\Throwable $e) {
+            log_message('error', 'Gagal mencatat funnel registrasi Google: ' . $e->getMessage());
+        }
+
+        return ['ok' => true, 'user' => $userModel->find((int) $newUserId), 'error' => null, 'created' => true];
+    }
+
+    /**
+     * Memastikan tujuan redirect pasca-OAuth selalu tetap berada di origin internal aplikasi.
+     */
+    public static function normalizeGoogleRedirect(?string $raw): string
+    {
+        $candidate = trim((string) $raw);
+        if (
+            $candidate === ''
+            || strpos($candidate, '//') !== false
+            || strpos($candidate, '\\') !== false
+            || strpos($candidate, ':') !== false
+            || preg_match('/[\x00-\x1F\x7F]/', $candidate)
+        ) {
+            return base_url('dashboard');
+        }
+
+        $trimmed = ltrim($candidate, '/');
+        if ($trimmed === '' || ! preg_match('/^[a-zA-Z0-9][a-zA-Z0-9\/_\-\.\?\=\&\%]*$/', $trimmed)) {
+            return base_url('dashboard');
+        }
+
+        return base_url($trimmed);
     }
 
     /**

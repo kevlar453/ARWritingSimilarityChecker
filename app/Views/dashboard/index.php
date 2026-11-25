@@ -4123,11 +4123,19 @@
                     </ul>
                 </div>
 
+                <?php $selfDeleteHasPassword = ! empty($currentUser['password_hash'] ?? ''); ?>
                 <div class="space-y-1.5">
+                    <?php if ($selfDeleteHasPassword): ?>
                     <label for="selfDeletePassword" class="block text-xs font-semibold text-slate-700">
                         Masukkan Kata Sandi Anda Saat Ini:
                     </label>
                     <input type="password" id="selfDeletePassword" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:outline-none" placeholder="••••••••" autocomplete="current-password">
+                    <?php else: ?>
+                    <label for="selfDeletePassword" class="block text-xs font-semibold text-slate-700">
+                        Ketik <span class="font-mono font-bold text-rose-700">HAPUS</span> untuk konfirmasi pemusnahan akun Google Anda:
+                    </label>
+                    <input type="text" id="selfDeletePassword" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:outline-none font-mono uppercase" placeholder="HAPUS" autocomplete="off">
+                    <?php endif; ?>
                     <p id="selfDeleteError" class="text-[11px] text-rose-600 hidden font-medium"></p>
                 </div>
 
@@ -4165,7 +4173,7 @@
         const btn = document.getElementById('btnConfirmSelfDelete');
 
         if (!pwd) {
-            err.textContent = 'Mohon masukkan kata sandi untuk melanjutkan.';
+            err.textContent = <?= json_encode($selfDeleteHasPassword ? 'Mohon masukkan kata sandi untuk melanjutkan.' : 'Mohon ketik kata HAPUS untuk melanjutkan.') ?>;
             err.classList.remove('hidden');
             return;
         }

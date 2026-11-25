@@ -7,6 +7,7 @@
     let lastDrawerTrigger = null;
     let emailDebounceTimer = null;
     let isEmailVerifiedActive = null;
+    let currentAuthMode = 'login';
     const legalCache = {};
 
     function setBackgroundInert(isInert) {
@@ -78,19 +79,26 @@
         const formRegister = document.getElementById('formRegister');
         const formForgot = document.getElementById('formForgot');
         const modalTitle = document.getElementById('modalTitle');
+        const googleSection = document.getElementById('googleAuthSection');
+        const googleLabel = document.getElementById('googleAuthBtnLabel');
 
         hideAlert();
 
         if (mode === 'register') {
+            currentAuthMode = 'register';
             if (tabSwitch) tabSwitch.style.display = 'flex';
             if (tabRegister) tabRegister.classList.add('active');
             if (tabLogin) tabLogin.classList.remove('active');
+            if (googleSection) googleSection.style.display = 'block';
+            if (googleLabel) googleLabel.textContent = 'Daftar dengan Google';
             if (formRegister) formRegister.style.display = 'block';
             if (formLogin) formLogin.style.display = 'none';
             if (formForgot) formForgot.style.display = 'none';
             if (modalTitle) modalTitle.textContent = 'Daftar Akun AR Tilik Gratis';
         } else if (mode === 'forgot') {
+            currentAuthMode = 'forgot';
             if (tabSwitch) tabSwitch.style.display = 'none';
+            if (googleSection) googleSection.style.display = 'none';
             if (formLogin) formLogin.style.display = 'none';
             if (formRegister) formRegister.style.display = 'none';
             if (formForgot) {
@@ -103,14 +111,47 @@
             }
             if (modalTitle) modalTitle.textContent = 'Atur Ulang Kata Sandi';
         } else {
+            currentAuthMode = 'login';
             if (tabSwitch) tabSwitch.style.display = 'flex';
             if (tabLogin) tabLogin.classList.add('active');
             if (tabRegister) tabRegister.classList.remove('active');
+            if (googleSection) googleSection.style.display = 'block';
+            if (googleLabel) googleLabel.textContent = 'Masuk dengan Google';
             if (formLogin) formLogin.style.display = 'block';
             if (formRegister) formRegister.style.display = 'none';
             if (formForgot) formForgot.style.display = 'none';
             if (modalTitle) modalTitle.textContent = 'Masuk ke AR Tilik';
         }
+    };
+
+    window.startGoogleAuth = function () {
+        const baseGoogleUrl = cfg.googleAuthUrl || '/auth/google';
+        const target = new URL(baseGoogleUrl, window.location.origin);
+        target.searchParams.set('mode', currentAuthMode === 'register' ? 'register' : 'login');
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectVal = urlParams.get('redirect');
+        if (redirectVal) {
+            target.searchParams.set('redirect', redirectVal);
+        }
+
+        const refInput = document.getElementById('regReferralCode');
+        const refVal = (refInput && refInput.value ? refInput.value : urlParams.get('ref') || '').trim();
+        if (refVal) {
+            target.searchParams.set('ref', refVal.toUpperCase());
+        }
+
+        const utmSource = urlParams.get('utm_source');
+        if (utmSource) {
+            target.searchParams.set('utm_source', utmSource);
+        }
+
+        const btn = document.getElementById('btnGoogleAuth');
+        const label = document.getElementById('googleAuthBtnLabel');
+        if (btn) btn.disabled = true;
+        if (label) label.textContent = 'Mengarahkan ke Google...';
+
+        window.location.href = target.toString();
     };
 
     function showAlert(msg, isError) {
@@ -831,7 +872,16 @@
         const authParam = urlParams.get('auth');
         const verifiedParam = urlParams.get('verified');
         const resetParam = urlParams.get('reset');
+        const oauthErrorParam = urlParams.get('oauth_error');
         const reasonParam = urlParams.get('reason');
+
+        const oauthErrorMessages = {
+            cancelled: 'Proses autentikasi dengan akun Google dibatalkan.',
+            invalid_state: 'Sesi autentikasi Google tidak valid atau telah kedaluwarsa. Silakan coba kembali.',
+            not_configured: 'Fitur masuk menggunakan Google belum dikonfigurasi oleh pengelola sistem.',
+            account_error: 'Akun Google tidak dapat digunakan untuk masuk.',
+            failed: 'Gagal memverifikasi akun Google Anda. Silakan coba kembali.'
+        };
 
         if (verifiedParam === 'error') {
             window.openAuthModal('login');
@@ -856,10 +906,18 @@
                     '<button type="button" onclick="switchTab(\'forgot\')" style="background:none; border:none; padding:0; cursor:pointer; font-family:inherit; color:var(--primary); font-weight:700; text-decoration:underline; display:inline-block; margin-top:6px;">Klik di sini untuk mengajukan permintaan baru.</button>';
             }
             showAlert(errText, true);
-        } else if (authParam === 'login' || authParam === 'register' || authParam === 'forgot') {
-            window.openAuthModal(authParam);
+        } else if (authParam === 'login' || authParam === 'register' || authParam === 'forgot' || oauthErrorParam) {
+            const targetMode = (authParam === 'register' || authParam === 'forgot') ? authParam : 'login';
+            window.openAuthModal(targetMode);
             if (cfg.flashNotice) {
                 showAlert(cfg.flashNotice, true);
+            } else if (oauthErrorParam) {
+                const alertBox = document.getElementById('authAlert');
+                if (alertBox) {
+                    alertBox.textContent = oauthErrorMessages[oauthErrorParam] || oauthErrorMessages.failed;
+                    alertBox.className = 'alert-box alert-error';
+                    alertBox.style.display = 'block';
+                }
             } else if (cfg.flashSuccess) {
                 showAlert(cfg.flashSuccess, false);
             }

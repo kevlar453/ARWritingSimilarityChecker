@@ -23,6 +23,20 @@ $jsVersion = @filemtime(FCPATH . 'js/artilik-landing.js') ?: '20261119';
 
                 <div id="authAlert" class="alert-box" role="status" aria-live="polite"></div>
 
+                <!-- Google OAuth Quick Sign-In / Sign-Up -->
+                <div id="googleAuthSection" class="google-auth-section">
+                    <button type="button" id="btnGoogleAuth" class="btn-google-auth" onclick="startGoogleAuth()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                            <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17Z"/>
+                            <path fill="#34A853" d="M12 24c3.3 0 6.08-1.09 8.11-2.96l-3.88-3.05c-1.09.73-2.48 1.16-4.23 1.16-3.25 0-6.01-2.19-7-5.15H.98v3.14C3 21.18 7.2 24 12 24Z"/>
+                            <path fill="#FBBC05" d="M5 14c-.25-.73-.39-1.52-.39-2.32 0-.8.14-1.59.39-2.32V6.22H.98A11.96 11.96 0 0 0 0 11.68c0 1.93.46 3.76 1.28 5.46L5 14Z"/>
+                            <path fill="#EA4335" d="M12 4.75c1.79 0 3.41.62 4.68 1.82l3.51-3.51C18.07 1.14 15.3 0 12 0 7.2 0 3 2.82.98 6.86L5 10c.99-2.96 3.75-5.25 7-5.25Z"/>
+                        </svg>
+                        <span id="googleAuthBtnLabel">Masuk dengan Google</span>
+                    </button>
+                    <div class="auth-divider" aria-hidden="true"><span>atau dengan email</span></div>
+                </div>
+
                 <!-- Login Form -->
                 <form id="formLogin" onsubmit="handleLogin(event)">
                     <div style="display:none; visibility:hidden; opacity:0; position:absolute; left:-9999px;" aria-hidden="true">
@@ -249,6 +263,7 @@ $jsVersion = @filemtime(FCPATH . 'js/artilik-landing.js') ?: '20261119';
             securityTokenUrl: <?= json_encode(base_url('auth/security-token')) ?>,
             loginUrl: <?= json_encode(base_url('auth/login')) ?>,
             registerUrl: <?= json_encode(base_url('auth/register')) ?>,
+            googleAuthUrl: <?= json_encode(base_url('auth/google')) ?>,
             forgotPasswordUrl: <?= json_encode(base_url('auth/forgot-password')) ?>,
             resendVerificationUrl: <?= json_encode(base_url('auth/resend-verification')) ?>,
             dashboardUrl: <?= json_encode(base_url('dashboard')) ?>,
