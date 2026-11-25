@@ -316,6 +316,16 @@
                             <?= $ambPending > 0 ? $ambPending : '' ?>
                         </span>
                     </a>
+                    <?php $refLogsBadge = (int) ($referralLogsTotal ?? 0); ?>
+                    <a href="<?= base_url('admin?tab=referrals') ?>" class="group flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 <?= $activeTab === 'referrals' ? 'bg-indigo-600/15 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent' ?>">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <span class="text-sm flex-shrink-0">🎁</span>
+                            <span class="truncate">Member-Get-Member</span>
+                        </div>
+                        <span id="sidebar-badge-referrals" title="<?= $refLogsBadge ?> catatan reward referral" class="flex-shrink-0 min-w-5 h-5 px-1.5 inline-flex items-center justify-center rounded-full text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold <?= $refLogsBadge > 0 ? '' : 'hidden' ?>">
+                            <?= $refLogsBadge > 0 ? $refLogsBadge : '' ?>
+                        </span>
+                    </a>
                 </div>
 
                 <!-- Group 4: Sistem & Keamanan -->
@@ -4855,6 +4865,202 @@ php artilik_ojs_runner.php /path/to/sample.pdf "Judul Artikel" "Dr. Penulis"</pr
                                                     </button>
                                                 <?php endif; ?>
                                             </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 6B: MEMBER-GET-MEMBER (REFERRAL LOGS)  -->
+        <!-- ========================================== -->
+        <?php elseif ($activeTab === 'referrals'): ?>
+            <?php
+            $refSummary = $referralData['summary'] ?? [];
+            $refLogs = $referralData['logs'] ?? [];
+            $topRefs = $referralData['topReferrers'] ?? [];
+            ?>
+            <div class="space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-700/60 pb-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                            <span>🎁 Monitoring Reward Member-Get-Member</span>
+                            <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono-code">
+                                referral_logs
+                            </span>
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-0.5">Pantau transaksi pemberian kuota bonus (+2 aktivasi &amp; +5 pembelian perdana) antar-pengguna reguler</p>
+                    </div>
+                </div>
+
+                <!-- Ringkasan KPI -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-4">
+                        <div class="text-[11px] font-semibold text-slate-400">Total Transaksi Reward</div>
+                        <div class="text-2xl font-extrabold text-white mt-1 font-mono-code"><?= number_format((int) ($refSummary['total_logs'] ?? 0)) ?></div>
+                        <div class="text-[11px] text-slate-400 mt-1">Catatan pemberian kuota di `referral_logs`</div>
+                    </div>
+                    <div class="bg-slate-800/40 border border-emerald-500/30 rounded-2xl p-4">
+                        <div class="text-[11px] font-semibold text-emerald-300">Bonus Aktivasi (+2)</div>
+                        <div class="text-2xl font-extrabold text-emerald-400 mt-1 font-mono-code"><?= number_format((int) ($refSummary['total_verified_bonuses'] ?? 0)) ?></div>
+                        <div class="text-[11px] text-slate-400 mt-1">Reward verifikasi email / Google</div>
+                    </div>
+                    <div class="bg-slate-800/40 border border-amber-500/30 rounded-2xl p-4">
+                        <div class="text-[11px] font-semibold text-amber-300">Bonus Pembelian (+5)</div>
+                        <div class="text-2xl font-extrabold text-amber-400 mt-1 font-mono-code"><?= number_format((int) ($refSummary['total_purchase_bonuses'] ?? 0)) ?></div>
+                        <div class="text-[11px] text-slate-400 mt-1">Reward transaksi perdana sahabat</div>
+                    </div>
+                    <div class="bg-slate-800/40 border border-indigo-500/30 rounded-2xl p-4">
+                        <div class="text-[11px] font-semibold text-indigo-300">Total Kuota Bonus Terbit</div>
+                        <div class="text-2xl font-extrabold text-indigo-300 mt-1 font-mono-code">+<?= number_format((int) ($refSummary['total_bonus_awarded'] ?? 0)) ?></div>
+                        <div class="text-[11px] text-slate-400 mt-1"><?= number_format((int) ($refSummary['active_referred_users'] ?? 0)) ?> / <?= number_format((int) ($refSummary['total_referred_users'] ?? 0)) ?> sahabat aktif</div>
+                    </div>
+                </div>
+
+                <!-- Pencarian & Filter -->
+                <search>
+                    <form method="GET" action="<?= base_url('admin') ?>" class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-4 flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+                        <input type="hidden" name="tab" value="referrals">
+                        <div class="flex-1">
+                            <label for="refSearchInput" class="sr-only">Cari pengundang, sahabat, atau kode referral</label>
+                            <input type="search" id="refSearchInput" name="q" value="<?= esc($searchQuery) ?>" placeholder="Cari nama, email, atau kode referral (mis. REF-...)..." class="w-full px-3.5 py-2 rounded-xl bg-slate-900/90 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500">
+                        </div>
+                        <div class="sm:w-56">
+                            <label for="refRewardTypeSelect" class="sr-only">Filter jenis reward</label>
+                            <select id="refRewardTypeSelect" name="reward_type" class="w-full px-3 py-2 rounded-xl bg-slate-900/90 border border-slate-700 text-xs text-white focus:outline-none focus:border-indigo-500">
+                                <option value="all" <?= ($rewardTypeFilter ?? 'all') === 'all' ? 'selected' : '' ?>>Semua Jenis Reward</option>
+                                <option value="registration_verified" <?= ($rewardTypeFilter ?? '') === 'registration_verified' ? 'selected' : '' ?>>Aktivasi Akun (+2)</option>
+                                <option value="first_purchase" <?= ($rewardTypeFilter ?? '') === 'first_purchase' ? 'selected' : '' ?>>Pembelian Perdana (+5)</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button type="submit" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition cursor-pointer">
+                                Terapkan Filter
+                            </button>
+                            <?php if ($searchQuery !== '' || ($rewardTypeFilter ?? 'all') !== 'all'): ?>
+                            <a href="<?= base_url('admin?tab=referrals') ?>" class="px-3 py-2 rounded-xl bg-slate-700/70 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition">
+                                Reset
+                            </a>
+                            <?php endif; ?>
+                        </div>
+                    </form>
+                </search>
+
+                <!-- Tabel Riwayat Reward Member-Get-Member -->
+                <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-5">
+                    <div class="flex items-center justify-between mb-4 gap-2">
+                        <div>
+                            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                                <span>📜 Riwayat Transaksi Reward Referral</span>
+                                <span class="text-[10px] font-mono-code px-2 py-0.5 rounded bg-slate-700 text-slate-300">
+                                    <?= count($refLogs) ?> entri ditampilkan
+                                </span>
+                            </h3>
+                        </div>
+                    </div>
+
+                    <?php if (empty($refLogs)): ?>
+                        <div class="text-center py-10 text-slate-400 text-xs bg-slate-900/50 rounded-xl border border-dashed border-slate-700">
+                            Belum ada catatan reward Member-Get-Member yang sesuai filter.
+                        </div>
+                    <?php else: ?>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs border-collapse">
+                                <thead>
+                                    <tr class="border-b border-slate-700/80 text-slate-400 text-[11px] uppercase tracking-wider">
+                                        <th class="py-2.5 px-3">Waktu</th>
+                                        <th class="py-2.5 px-3">Penerima Reward (Pengundang)</th>
+                                        <th class="py-2.5 px-3">Sahabat Bergabung</th>
+                                        <th class="py-2.5 px-3">Kode Referral</th>
+                                        <th class="py-2.5 px-3 text-center">Jenis &amp; Bonus</th>
+                                        <th class="py-2.5 px-3 text-center">Status Sahabat</th>
+                                        <th class="py-2.5 px-3">Catatan</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-800/80">
+                                    <?php foreach ($refLogs as $rl): ?>
+                                        <tr class="hover:bg-slate-800/40 transition-colors">
+                                            <td class="py-3 px-3 align-top whitespace-nowrap font-mono-code text-[11px] text-slate-300">
+                                                <?= esc($rl['created_at']) ?>
+                                            </td>
+                                            <td class="py-3 px-3 align-top">
+                                                <div class="font-bold text-white"><?= esc($rl['referrer_name'] ?? '(Akun terhapus)') ?></div>
+                                                <div class="text-[11px] text-slate-400"><?= esc($rl['referrer_email'] ?? '-') ?></div>
+                                                <?php if (!empty($rl['referrer_institution'])): ?>
+                                                    <div class="text-[10px] text-slate-500"><?= esc($rl['referrer_institution']) ?></div>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td class="py-3 px-3 align-top">
+                                                <div class="font-semibold text-slate-200"><?= esc($rl['friend_name'] ?? '(Akun terhapus)') ?></div>
+                                                <div class="text-[11px] text-slate-400"><?= esc($rl['friend_email'] ?? '-') ?></div>
+                                            </td>
+                                            <td class="py-3 px-3 align-top whitespace-nowrap">
+                                                <span class="px-2 py-0.5 rounded bg-slate-900 border border-slate-700 text-amber-300 font-mono-code text-[11px] font-bold">
+                                                    <?= esc($rl['referral_code']) ?>
+                                                </span>
+                                            </td>
+                                            <td class="py-3 px-3 align-top text-center whitespace-nowrap">
+                                                <?php if (($rl['reward_type'] ?? '') === 'first_purchase'): ?>
+                                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                                                        +<?= (int) ($rl['bonus_awarded'] ?? 0) ?> Pembelian Perdana
+                                                    </span>
+                                                <?php else: ?>
+                                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                                                        +<?= (int) ($rl['bonus_awarded'] ?? 0) ?> Aktivasi Akun
+                                                    </span>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td class="py-3 px-3 align-top text-center whitespace-nowrap">
+                                                <?php if (($rl['friend_status'] ?? '') === 'active'): ?>
+                                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">Terverifikasi Aktif</span>
+                                                <?php elseif (!empty($rl['friend_status'])): ?>
+                                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-700 text-slate-300"><?= esc($rl['friend_status']) ?></span>
+                                                <?php else: ?>
+                                                    <span class="text-slate-500 text-[11px]">-</span>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td class="py-3 px-3 align-top text-[11px] text-slate-300 max-w-xs">
+                                                <?= esc($rl['notes'] ?? '-') ?>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Papan Pengundang Teratas -->
+                <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-5">
+                    <h3 class="text-sm font-bold text-white mb-3">🏆 10 Pengundang Teratas Member-Get-Member</h3>
+                    <?php if (empty($topRefs)): ?>
+                        <p class="text-xs text-slate-400">Belum ada data leaderboard pengundang.</p>
+                    <?php else: ?>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs border-collapse">
+                                <thead>
+                                    <tr class="border-b border-slate-700/80 text-slate-400 text-[11px] uppercase tracking-wider">
+                                        <th class="py-2 px-3">Pengundang</th>
+                                        <th class="py-2 px-3">Kode Referral</th>
+                                        <th class="py-2 px-3 text-center">Jumlah Reward</th>
+                                        <th class="py-2 px-3 text-center">Total Bonus Kuota</th>
+                                        <th class="py-2 px-3">Reward Terakhir</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-800/80">
+                                    <?php foreach ($topRefs as $tr): ?>
+                                        <tr class="hover:bg-slate-800/40">
+                                            <td class="py-2.5 px-3">
+                                                <div class="font-bold text-white"><?= esc($tr['referrer_name'] ?? '(Akun terhapus)') ?></div>
+                                                <div class="text-[11px] text-slate-400"><?= esc($tr['referrer_email'] ?? '-') ?></div>
+                                            </td>
+                                            <td class="py-2.5 px-3 font-mono-code text-amber-300 font-bold"><?= esc($tr['referral_code']) ?></td>
+                                            <td class="py-2.5 px-3 text-center font-mono-code text-white"><?= (int) ($tr['total_rewards'] ?? 0) ?></td>
+                                            <td class="py-2.5 px-3 text-center font-mono-code text-emerald-400 font-bold">+<?= (int) ($tr['total_bonus'] ?? 0) ?></td>
+                                            <td class="py-2.5 px-3 font-mono-code text-[11px] text-slate-400"><?= esc($tr['last_reward_at'] ?? '-') ?></td>
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>

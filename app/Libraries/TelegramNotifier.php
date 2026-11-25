@@ -32,10 +32,29 @@ class TelegramNotifier
     }
 
     /**
+     * Menentukan apakah pengiriman alert Telegram harus ditekan (saat pengujian otomatis).
+     */
+    public static function shouldSuppressAlerts(): bool
+    {
+        if (defined('ENVIRONMENT') && ENVIRONMENT === 'testing') {
+            return true;
+        }
+
+        $flag = function_exists('env') ? env('TELEGRAM_DISABLE_ALERTS', '') : getenv('TELEGRAM_DISABLE_ALERTS');
+        $normalized = strtolower(trim((string) ($flag ?: ($_ENV['TELEGRAM_DISABLE_ALERTS'] ?? $_SERVER['TELEGRAM_DISABLE_ALERTS'] ?? ''))));
+
+        return in_array($normalized, ['1', 'true', 'yes', 'on'], true);
+    }
+
+    /**
      * Mengirimkan pesan teks format HTML ke Telegram.
      */
     public function sendMessage(string $message, ?string $chatId = null): bool
     {
+        if (self::shouldSuppressAlerts()) {
+            return false;
+        }
+
         $targetChatId = $chatId ?: $this->chatId;
         if (empty($this->botToken) || empty($targetChatId)) {
             if (function_exists('log_message')) {

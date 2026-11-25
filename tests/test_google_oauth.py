@@ -38,7 +38,7 @@ $app = CodeIgniter\\Boot::bootWorker($paths);
         capture_output=True,
         text=True,
         timeout=30,
-        env={**os.environ, "CI_ENVIRONMENT": "development"},
+        env={**os.environ, "CI_ENVIRONMENT": "development", "TELEGRAM_DISABLE_ALERTS": "1"},
     )
     assert proc.returncode == 0, f"PHP exited with {proc.returncode}:\nSTDOUT:\n{proc.stdout}\nSTDERR:\n{proc.stderr}"
     lines = [line.strip() for line in proc.stdout.strip().splitlines() if line.strip()]
@@ -522,3 +522,80 @@ def test_cross_email_google_linking_and_unlinking(db_conn):
         assert cursor.fetchone()["google_id"] is None
     finally:
         cursor.execute("DELETE FROM users WHERE email IN (%s, %s, %s)", (campus_email, other_email, gmail_addr))
+
+
+def test_telegram_suppressed_in_test_mode_and_admin_referral_tab(db_conn):
+    """Memastikan TelegramNotifier ditekan saat TELEGRAM_DISABLE_ALERTS=1 dan tab Admin Member-Get-Member menampilkan referral_logs."""
+    # 1. Uji penekanan TelegramNotifier
+    php = r"""
+    $tg = new \App\Libraries\TelegramNotifier();
+    echo json_encode([
+        'suppressed' => \App\Libraries\TelegramNotifier::shouldSuppressAlerts(),
+        'send_result' => $tg->sendMessage('Tes tidak boleh terkirim ke Telegram'),
+    ]);
+    """
+    out = run_php(php)
+    assert out["suppressed"] is True
+    assert out["send_result"] is False
+
+    # 2. Buat admin, referrer, dan referred user + referral_log lalu uji /admin?tab=referrals
+    uid_hex = uuid.uuid4().hex[:8]
+    admin_email = f"adm_ref_{uid_hex}@kampus.ac.id"
+    ref_email = f"ref_adm_{uid_hex}@kampus.ac.id"
+    friend_email = f"fr_adm_{uid_hex}@gmail.com"
+    pwd = "AdminPassword123!"
+    cursor = db_conn.cursor(dictionary=True)
+
+    try:
+        sess = requests.Session()
+        for em, nm in [(admin_email, "Admin Referral"), (ref_email, "Pengundang Kampus"), (friend_email, "Sahabat Kampus")]:
+            reg = requests.post(f"{BASE_URL}/auth/register", json={
+                "name": nm,
+                "email": em,
+                "password": pwd,
+                "institution": "Univ Test",
+                "security_token": "TEST_TOKEN",
+            }, headers={"Accept": "application/json"}, timeout=10)
+            assert reg.status_code == 201
+
+        cursor.execute("UPDATE users SET status = 'active', email_verified_at = NOW() WHERE email IN (%s, %s, %s)", (admin_email, ref_email, friend_email))
+        cursor.execute("UPDATE users SET role = 'admin' WHERE email = %s", (admin_email,))
+        cursor.execute("SELECT id FROM users WHERE email = %s", (ref_email,))
+        ref_id = cursor.fetchone()["id"]
+        cursor.execute("SELECT id FROM users WHERE email = %s", (friend_email,))
+        fr_id = cursor.fetchone()["id"]
+
+        sample_code = f"REF-TEST-{uid_hex[:4].upper()}"
+        cursor.execute(
+            """
+            INSERT INTO referral_logs (referrer_user_id, referred_user_id, referral_code, reward_type, bonus_awarded, notes, created_at)
+            VALUES (%s, %s, %s, 'registration_verified', 2, 'Bonus uji admin monitor', NOW())
+            """,
+            (ref_id, fr_id, sample_code),
+        )
+
+        login_res = sess.post(f"{BASE_URL}/auth/login", json={"email": admin_email, "password": pwd}, headers={"Accept": "application/json"}, timeout=10)
+        assert login_res.status_code == 200
+
+        adm_page = sess.get(f"{BASE_URL}/admin?tab=referrals", timeout=10)
+        assert adm_page.status_code == 200
+        assert "Monitoring Reward Member-Get-Member" in adm_page.text
+        assert sample_code in adm_page.text
+        assert "Pengundang Kampus" in adm_page.text
+        assert "Sahabat Kampus" in adm_page.text
+
+        # Uji filter pencarian
+        filtered_ok = sess.get(f"{BASE_URL}/admin?tab=referrals&reward_type=registration_verified&q={sample_code}", timeout=10)
+        assert filtered_ok.status_code == 200
+        assert sample_code in filtered_ok.text
+
+        filtered_empty = sess.get(f"{BASE_URL}/admin?tab=referrals&reward_type=first_purchase&q={sample_code}", timeout=10)
+        assert filtered_empty.status_code == 200
+        assert "Belum ada catatan reward Member-Get-Member yang sesuai filter." in filtered_empty.text
+    finally:
+        cursor.execute("SELECT id FROM users WHERE email IN (%s, %s, %s)", (admin_email, ref_email, friend_email))
+        ids = [r["id"] for r in cursor.fetchall()]
+        if ids:
+            ph = ",".join(["%s"] * len(ids))
+            cursor.execute(f"DELETE FROM referral_logs WHERE referrer_user_id IN ({ph}) OR referred_user_id IN ({ph})", ids + ids)
+            cursor.execute(f"DELETE FROM users WHERE id IN ({ph})", ids)

@@ -473,6 +473,16 @@ class DashboardController extends BaseController
                             ->getResultArray();
         }
 
+        // 16. Data Monitoring Reward Member-Get-Member (referral_logs)
+        $rewardTypeFilter = trim((string) ($this->request->getGet('reward_type') ?? 'all'));
+        if (! in_array($rewardTypeFilter, ['all', 'registration_verified', 'first_purchase'], true)) {
+            $rewardTypeFilter = 'all';
+        }
+        $referralLogsTotal = (int) $db->table('referral_logs')->countAllResults();
+        $referralData = ($activeTab === 'referrals')
+            ? $this->loadAdminReferralTabData($db, $searchQuery, $rewardTypeFilter)
+            : ['summary' => ['total_logs' => $referralLogsTotal], 'logs' => [], 'topReferrers' => []];
+
         return view('admin/index', [
             'activeTab'            => $activeTab,
             'searchQuery'          => $searchQuery,
@@ -537,6 +547,9 @@ class DashboardController extends BaseController
             'ambApplications'      => $ambApplications,
             'ambProfiles'          => $ambProfiles,
             'ambProofs'            => $ambProofs,
+            'referralLogsTotal'    => $referralLogsTotal,
+            'referralData'         => $referralData,
+            'rewardTypeFilter'     => $rewardTypeFilter,
             'predictiveAnalytics'  => $predictiveAnalytics,
             'currentAdmin'         => $userModel->find(session()->get('user_id')),
         ]);
@@ -1440,6 +1453,78 @@ class DashboardController extends BaseController
                   ->limit($limit)
                   ->get()
                   ->getResultArray();
+    }
+
+    /**
+     * Memuat ringkasan, daftar log transaksi reward, dan papan pengundang teratas Member-Get-Member.
+     */
+    private function loadAdminReferralTabData($db, string $searchQuery, string $rewardTypeFilter): array
+    {
+        $agg = $db->table('referral_logs')
+                  ->select("
+                      COUNT(*) AS total_logs,
+                      COALESCE(SUM(bonus_awarded), 0) AS total_bonus_awarded,
+                      SUM(CASE WHEN reward_type = 'registration_verified' THEN 1 ELSE 0 END) AS total_verified_bonuses,
+                      SUM(CASE WHEN reward_type = 'first_purchase' THEN 1 ELSE 0 END) AS total_purchase_bonuses
+                  ", false)
+                  ->get()
+                  ->getRowArray() ?? [];
+
+        $referredCounts = $db->table('users')
+                             ->select("
+                                 COUNT(*) AS total_referred,
+                                 SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) AS active_referred
+                             ", false)
+                             ->where("referred_by_code IS NOT NULL AND referred_by_code != ''", null, false)
+                             ->get()
+                             ->getRowArray() ?? [];
+
+        $logsBuilder = $db->table('referral_logs rl')
+                          ->select('rl.*, ref.name AS referrer_name, ref.email AS referrer_email, ref.institution AS referrer_institution, fr.name AS friend_name, fr.email AS friend_email, fr.status AS friend_status')
+                          ->join('users ref', 'ref.id = rl.referrer_user_id', 'left')
+                          ->join('users fr', 'fr.id = rl.referred_user_id', 'left');
+
+        if ($rewardTypeFilter !== 'all') {
+            $logsBuilder->where('rl.reward_type', $rewardTypeFilter);
+        }
+
+        if ($searchQuery !== '') {
+            $logsBuilder->groupStart()
+                        ->like('rl.referral_code', $searchQuery)
+                        ->orLike('ref.name', $searchQuery)
+                        ->orLike('ref.email', $searchQuery)
+                        ->orLike('fr.name', $searchQuery)
+                        ->orLike('fr.email', $searchQuery)
+                        ->groupEnd();
+        }
+
+        $logs = $logsBuilder->orderBy('rl.id', 'DESC')
+                            ->limit(150)
+                            ->get()
+                            ->getResultArray();
+
+        $topReferrers = $db->table('referral_logs rl')
+                           ->select('rl.referrer_user_id, rl.referral_code, ref.name AS referrer_name, ref.email AS referrer_email, ref.institution AS referrer_institution, COUNT(rl.id) AS total_rewards, COALESCE(SUM(rl.bonus_awarded), 0) AS total_bonus, MAX(rl.created_at) AS last_reward_at')
+                           ->join('users ref', 'ref.id = rl.referrer_user_id', 'left')
+                           ->groupBy('rl.referrer_user_id, rl.referral_code, ref.name, ref.email, ref.institution')
+                           ->orderBy('total_bonus', 'DESC')
+                           ->orderBy('total_rewards', 'DESC')
+                           ->limit(10)
+                           ->get()
+                           ->getResultArray();
+
+        return [
+            'summary' => [
+                'total_logs'             => (int) ($agg['total_logs'] ?? 0),
+                'total_bonus_awarded'    => (int) ($agg['total_bonus_awarded'] ?? 0),
+                'total_verified_bonuses' => (int) ($agg['total_verified_bonuses'] ?? 0),
+                'total_purchase_bonuses' => (int) ($agg['total_purchase_bonuses'] ?? 0),
+                'total_referred_users'   => (int) ($referredCounts['total_referred'] ?? 0),
+                'active_referred_users'  => (int) ($referredCounts['active_referred'] ?? 0),
+            ],
+            'logs'         => $logs,
+            'topReferrers' => $topReferrers,
+        ];
     }
 }
 
